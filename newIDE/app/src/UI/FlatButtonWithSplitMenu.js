@@ -25,6 +25,7 @@ type Props = {|
     margin?: number,
     flexShrink?: 0,
   |},
+  fullWidth?: boolean,
 |};
 
 const shouldNeverBeCalled = () => {
@@ -39,6 +40,7 @@ const styles = {
     // Reduce the size forced by Material UI to avoid making the arrow
     // too big.
     minWidth: 30,
+    maxWidth: 30,
     paddingLeft: 0,
     paddingRight: 0,
   },
@@ -58,6 +60,7 @@ const FlatButtonWithSplitMenu = (props: Props) => {
     primary,
     icon,
     disabled,
+    fullWidth,
   } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
@@ -74,6 +77,7 @@ const FlatButtonWithSplitMenu = (props: Props) => {
       disabled={disabled}
       size="small"
       style={props.style}
+      fullWidth={fullWidth}
     >
       <Button
         id={id}

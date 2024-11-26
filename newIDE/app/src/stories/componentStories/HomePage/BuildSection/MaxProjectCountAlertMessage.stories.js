@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import { MaxProjectCountAlertMessage } from '../../../../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import { MaxProjectCountAlertMessage } from '../../../../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 import paperDecorator from '../../../PaperDecorator';
 import {
   limitsForSilverUser,
@@ -9,7 +9,7 @@ import {
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
-  title: 'HomePage/BuildSection/MaxProjectCountAlertMessage',
+  title: 'HomePage/CreateSection/MaxProjectCountAlertMessage',
   component: MaxProjectCountAlertMessage,
   decorators: [paperDecorator],
 };

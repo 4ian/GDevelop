@@ -26,17 +26,6 @@ const styles = {
     aspectRatio: '16 / 9',
     height: 'auto',
     justifyContent: 'center',
-    overflow: 'hidden', // Keep the radius effect.
-  },
-  thumbnailContainer: {
-    height: 153,
-    width: 272,
-    overflow: 'hidden', // Keep the radius effect.
-  },
-  mobileThumbnailContainer: {
-    height: 84,
-    width: 150,
-    overflow: 'hidden', // Keep the radius effect.
   },
   thumbnail: {
     aspectRatio: '16 / 9',
@@ -62,6 +51,7 @@ type Props = {|
   onGameUpdated?: (updatedGame: Game) => void,
   onUpdatingGame?: (isUpdatingGame: boolean) => void,
   fullWidthOnMobile?: boolean,
+  width?: number,
 |};
 
 export const GameThumbnail = ({
@@ -74,6 +64,7 @@ export const GameThumbnail = ({
   onUpdatingGame,
   background = 'light',
   fullWidthOnMobile,
+  width,
 }: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -168,15 +159,19 @@ export const GameThumbnail = ({
     }
   };
 
+  const thumbnailWidth = width ? width : isMobile && !isLandscape ? 150 : 272;
+  const thumbnailHeight = Math.floor(thumbnailWidth / (16 / 9));
+
   return (
     <ColumnStackLayout noMargin alignItems="center">
       <Paper
         style={{
-          ...(isMobile && !isLandscape
-            ? fullWidthOnMobile
-              ? styles.fullWidthContainer
-              : styles.mobileThumbnailContainer
-            : styles.thumbnailContainer),
+          width: thumbnailWidth,
+          height: thumbnailHeight,
+          ...(isMobile && !isLandscape && fullWidthOnMobile
+            ? styles.fullWidthContainer
+            : undefined),
+          overflow: 'hidden', // Keep the radius effect.
           whiteSpace: 'normal',
           display: 'flex',
         }}

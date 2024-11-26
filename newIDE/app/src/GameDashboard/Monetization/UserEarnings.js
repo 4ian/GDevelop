@@ -239,7 +239,7 @@ const UserEarnings = ({ hideTitle, margin }: Props) => {
 
   return (
     <>
-      <Line>
+      <Line noMargin>
         <Column noMargin expand>
           {margin === 'dense' ? (
             content

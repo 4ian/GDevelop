@@ -26,7 +26,10 @@ import {
 import Avatar from '@material-ui/core/Avatar';
 import Tooltip from '@material-ui/core/Tooltip';
 import { getGravatarUrl } from '../../../../UI/GravatarUrl';
-import { type LastModifiedInfo } from './utils';
+import {
+  getStorageProviderByInternalName,
+  type LastModifiedInfo,
+} from './utils';
 import DotBadge from '../../../../UI/DotBadge';
 import { type FileMetadata } from '../../../../ProjectsStorage';
 import StatusIndicator from './StatusIndicator';
@@ -188,21 +191,12 @@ const PrettyBreakablePath = ({ path }: {| path: string |}) => {
   }, []);
 };
 
-const getStorageProviderByInternalName = (
-  storageProviders: Array<StorageProvider>,
-  internalName: string
-): ?StorageProvider => {
-  return storageProviders.find(
-    storageProvider => storageProvider.internalName === internalName
-  );
-};
-
 type ProjectFileListItemProps = {|
   file: FileMetadataAndStorageProviderName,
   currentFileMetadata: ?FileMetadata,
   lastModifiedInfo?: LastModifiedInfo | null,
   storageProviders: Array<StorageProvider>,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   isWindowSizeMediumOrLarger: boolean,
   isLoading: boolean,
   onOpenContextMenu: (
@@ -216,7 +210,7 @@ export const ProjectFileListItem = ({
   currentFileMetadata,
   lastModifiedInfo, // If null, the project has been modified last by the current user.
   storageProviders,
-  onOpenRecentFile,
+  onOpenProject,
   isWindowSizeMediumOrLarger,
   isLoading,
   onOpenContextMenu,
@@ -244,7 +238,7 @@ export const ProjectFileListItem = ({
             button
             key={file.fileMetadata.fileIdentifier}
             onClick={() => {
-              onOpenRecentFile(file);
+              onOpenProject(file);
             }}
             style={styles.listItem}
             onContextMenu={event => onOpenContextMenu(event, file)}

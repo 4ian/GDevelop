@@ -4,7 +4,10 @@ import { type I18n as I18nType } from '@lingui/core';
 import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
 import { type Profile } from '../../../../Utils/GDevelopServices/Authentication';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
-import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../../ProjectsStorage';
 import { marginsSize } from '../../../../UI/Grid';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
@@ -12,10 +15,13 @@ import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopS
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
+import { type Game } from '../../../../Utils/GDevelopServices/Game';
 import {
   ExampleTile,
   PrivateGameTemplateTile,
 } from '../../../../AssetStore/ShopTiles';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 export type LastModifiedInfo = {|
   lastModifiedByUsername: ?string,
@@ -84,6 +90,44 @@ export const getLastModifiedInfoByProjectId = async ({
     );
     return {};
   }
+};
+
+export const getStorageProviderByInternalName = (
+  storageProviders: Array<StorageProvider>,
+  internalName: string
+): ?StorageProvider => {
+  return storageProviders.find(
+    storageProvider => storageProvider.internalName === internalName
+  );
+};
+
+export const useProjectsListFor = (game: ?Game) => {
+  const { getRecentProjectFiles } = React.useContext(PreferencesContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const { cloudProjects } = authenticatedUser;
+
+  let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
+    file => !game || (file.fileMetadata && file.fileMetadata.gameId === game.id)
+  );
+
+  if (cloudProjects) {
+    projectFiles = projectFiles.concat(
+      transformCloudProjectsIntoFileMetadataWithStorageProviderName(
+        cloudProjects.filter(
+          cloudProject => !game || cloudProject.gameId === game.id
+        )
+      )
+    );
+  }
+
+  projectFiles.sort((a, b) => {
+    if (!a.fileMetadata.lastModifiedDate) return 1;
+    if (!b.fileMetadata.lastModifiedDate) return -1;
+    return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
+  });
+
+  return projectFiles;
 };
 
 export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (

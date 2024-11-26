@@ -8,7 +8,7 @@ import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 
 import GameDashboard from '../../../GameDashboard';
-
+import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import {
   game1,
@@ -48,7 +48,6 @@ export default {
   component: GameDashboard,
   decorators: [paperDecorator],
   argTypes: {
-    analyticsSource: { control: { type: false } }, // Hide default control.
     game: { control: { type: false } }, // Hide default control.
     gameState: {
       options: ['Published', 'Not published'],
@@ -324,8 +323,10 @@ export const Default = ({
     <AuthenticatedUserContext.Provider value={authenticatedUser}>
       <MarketingPlansStoreStateProvider>
         <GameDashboard
+          currentFileMetadata={null}
+          onOpenProject={action('onOpenProject')}
+          storageProviders={[CloudStorageProvider]}
           game={game}
-          analyticsSource="homepage"
           key={renderCount.toFixed(0)}
           currentView={tab}
           setCurrentView={setTab}
@@ -339,6 +340,7 @@ export const Default = ({
             )
           }
           gameUnregisterErrorText={gameUnregisterErrorText}
+          closeProject={action('closeProject')}
         />
       </MarketingPlansStoreStateProvider>
     </AuthenticatedUserContext.Provider>

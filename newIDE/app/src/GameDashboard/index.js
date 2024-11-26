@@ -20,6 +20,11 @@ import {
   getAclsFromUserIds,
   setGameUserAcls,
 } from '../Utils/GDevelopServices/Game';
+import {
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+  type StorageProvider,
+} from '../ProjectsStorage';
 import { ColumnStackLayout } from '../UI/Layout';
 import GameHeader from './GameHeader';
 import FeedbackWidget from './Widgets/FeedbackWidget';
@@ -51,6 +56,7 @@ import PublicGamePropertiesDialog, {
 } from './PublicGamePropertiesDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import ProjectsWidget from './Widgets/ProjectsWidget';
 
 export type GameDetailsTab =
   | 'details'
@@ -61,26 +67,43 @@ export type GameDetailsTab =
   | 'leaderboards';
 
 type Props = {|
+  // Project handling:
   project?: ?gdProject,
+  currentFileMetadata: ?FileMetadata,
+  onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  storageProviders: Array<StorageProvider>,
+  closeProject: () => Promise<void>,
+
+  // Current game:
   game: Game,
-  analyticsSource: 'profile' | 'homepage' | 'projectManager',
-  currentView: GameDetailsTab,
-  setCurrentView: GameDetailsTab => void,
-  onBack: () => void,
   onGameUpdated: (game: Game) => void,
   onUnregisterGame: (i18n: I18nType) => Promise<void>,
   gameUnregisterErrorText: ?React.Node,
+
+  // Navigation:
+  currentView: GameDetailsTab,
+  setCurrentView: GameDetailsTab => void,
+  onBack: () => void,
 |};
 
 const GameDashboard = ({
+  // Project handling:
   project,
+  currentFileMetadata,
+  onOpenProject,
+  storageProviders,
+  closeProject,
+
+  // Current game:
   game,
-  currentView,
-  setCurrentView,
-  onBack,
   onGameUpdated,
   onUnregisterGame,
   gameUnregisterErrorText,
+
+  // Navigation:
+  currentView,
+  setCurrentView,
+  onBack,
 }: Props) => {
   const [
     gameDetailsDialogOpen,
@@ -533,6 +556,14 @@ const GameDashboard = ({
                     displayUnlockMoreLeaderboardsCallout={
                       displayUnlockMoreLeaderboardsCallout
                     }
+                  />
+                  <ProjectsWidget
+                    project={project}
+                    currentFileMetadata={currentFileMetadata}
+                    game={game}
+                    onOpenProject={onOpenProject}
+                    storageProviders={storageProviders}
+                    closeProject={closeProject}
                   />
                   <BuildsWidget
                     builds={builds}

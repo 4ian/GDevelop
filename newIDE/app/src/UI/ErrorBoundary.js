@@ -70,7 +70,8 @@ type ErrorBoundaryScope =
   | 'project-icons'
   | 'box-search-result'
   | 'list-search-result'
-  | 'custom-object-editor-canvas';
+  | 'custom-object-editor-canvas'
+  | 'project-file-list';
 
 export const getEditorErrorBoundaryProps = (
   editorKey: string

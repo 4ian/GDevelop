@@ -178,27 +178,16 @@ namespace gdjs {
       this._registeredBehaviors.delete(physicsBehavior);
     }
 
-    /**
-     * Reset all contactsStartedThisFrame and contactsEndedThisFrame of all
-     * registered physics behavior.
-     */
-    resetStartedAndEndedCollisions(): void {
+    step(deltaTime: float): void {
+      // Reset started and ended contacts array for all physics instances.
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.contactsStartedThisFrame.length = 0;
         physicsBehavior.contactsEndedThisFrame.length = 0;
       }
-    }
-
-    /**
-     * Update all registered body.
-     */
-    updateBodiesFromObjects(): void {
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
       }
-    }
 
-    step(deltaTime: float): void {
       this.frameTime += deltaTime;
       // `frameTime` can take negative values.
       // It's better to be a bit early rather than skipping a frame and being
@@ -216,6 +205,13 @@ namespace gdjs {
       }
       this.world.ClearForces();
       this.stepped = true;
+
+      // It's important that updateBodyFromObject and updateObjectFromBody are
+      // called at the same time because other behavior may move the object in
+      // their doStepPreEvents.
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.updateObjectFromBody();
+      }
     }
 
     clearBodyJoints(body: Box2D.b2Body): void {
@@ -948,15 +944,23 @@ namespace gdjs {
         !this._sharedData.stepped &&
         !instanceContainer.getScene().getTimeManager().isFirstFrame()
       ) {
-        // Reset started and ended contacts array for all physics instances.
-        this._sharedData.resetStartedAndEndedCollisions();
-        this._sharedData.updateBodiesFromObjects();
         this._sharedData.step(
           instanceContainer.getScene().getTimeManager().getElapsedTime() /
             1000.0
         );
       }
+    }
 
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Reset world step to update next frame
+      this._sharedData.stepped = false;
+    }
+
+    onObjectHotReloaded() {
+      this.updateBodyFromObject();
+    }
+
+    updateObjectFromBody() {
       // Copy transform from body to the GD object.
       // It's possible the behavior was either deactivated or the object deleted
       // just before this doStepPreEvents (for example, another behavior deleted
@@ -982,15 +986,6 @@ namespace gdjs {
       this._objectOldX = this.owner.getX();
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
-    }
-
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      // Reset world step to update next frame
-      this._sharedData.stepped = false;
-    }
-
-    onObjectHotReloaded() {
-      this.updateBodyFromObject();
     }
 
     updateBodyFromObject() {

@@ -7,7 +7,15 @@ namespace Jolt {
 }
 
 namespace gdjs {
-  interface PhysicsCharacter3DNetworkSyncDataType {}
+  interface PhysicsCharacter3DNetworkSyncDataType {
+    fws: float,
+    sws: float,
+    fs: float,
+    js: float,
+    cj: boolean,
+    tscjs: float,
+    jkhsjs: boolean
+  }
 
   export interface PhysicsCharacter3DNetworkSyncData
     extends BehaviorNetworkSyncData {
@@ -68,6 +76,11 @@ namespace gdjs {
     _timeSinceCurrentJumpStart: float = 0;
     _jumpKeyHeldSinceJumpStart: boolean = false;
     private _hasReallyMoved: boolean = false;
+
+    // This is useful when the object is synchronized by an external source
+    // like in a multiplayer game, and we want to be able to predict the
+    // movement of the object, even if the inputs are not updated every frame.
+    _dontClearInputsBetweenFrames: boolean = false;
 
     /**
      * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
@@ -159,17 +172,88 @@ namespace gdjs {
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+      if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
+        this.setGravity(newBehaviorData.gravity);
+      }
+      if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
+        this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
+      }
+      if (oldBehaviorData.forwardAcceleration !== newBehaviorData.forwardAcceleration) {
+        this.setForwardAcceleration(newBehaviorData.forwardAcceleration);
+      }
+      if (oldBehaviorData.forwardDeceleration !== newBehaviorData.forwardDeceleration) {
+        this.setForwardDeceleration(newBehaviorData.forwardDeceleration);
+      }
+      if (oldBehaviorData.forwardSpeedMax !== newBehaviorData.forwardSpeedMax) {
+        this.setForwardSpeedMax(newBehaviorData.forwardSpeedMax);
+      }
+      if (oldBehaviorData.sidewaysAcceleration !== newBehaviorData.sidewaysAcceleration) {
+        this.setSidewaysAcceleration(newBehaviorData.sidewaysAcceleration);
+      }
+      if (oldBehaviorData.sidewaysDeceleration !== newBehaviorData.sidewaysDeceleration) {
+        this.setSidewaysDeceleration(newBehaviorData.sidewaysDeceleration);
+      }
+      if (oldBehaviorData.sidewaysSpeedMax !== newBehaviorData.sidewaysSpeedMax) {
+        this.setSidewaysSpeedMax(newBehaviorData.sidewaysSpeedMax);
+      }
+      if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
+        this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+      }
+      if (oldBehaviorData.jumpHeight !== newBehaviorData.jumpHeight) {
+        this.setJumpSpeed(this.getJumpSpeedToReach(newBehaviorData.jumpHeight));
+      }
       return true;
     }
 
     getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
-      return super.getNetworkSyncData();
+      // This method is called, so we are synchronizing this object.
+      // Let's clear the inputs between frames as we control it.
+      this._dontClearInputsBetweenFrames = false;
+
+      return {
+        ...super.getNetworkSyncData(),
+        props: {
+          fws: this._currentForwardSpeed,
+          sws: this._currentSidewaysSpeed,
+          fs: this._currentFallSpeed,
+          js: this._currentJumpSpeed,
+          cj: this._canJump,
+          tscjs: this._timeSinceCurrentJumpStart,
+          jkhsjs: this._jumpKeyHeldSinceJumpStart,
+        },
+      };
     }
 
     updateFromNetworkSyncData(
       networkSyncData: PhysicsCharacter3DNetworkSyncData
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
+
+      const behaviorSpecificProps = networkSyncData.props;
+      if (behaviorSpecificProps.fws !== this._currentForwardSpeed) {
+        this._currentForwardSpeed = behaviorSpecificProps.fws;
+      }
+      if (behaviorSpecificProps.sws !== this._currentSidewaysSpeed) {
+        this._currentSidewaysSpeed = behaviorSpecificProps.sws;
+      }
+      if (behaviorSpecificProps.fs !== this._currentFallSpeed) {
+        this._currentFallSpeed = behaviorSpecificProps.fs;
+      }
+      if (behaviorSpecificProps.js !== this._currentJumpSpeed) {
+        this._currentJumpSpeed = behaviorSpecificProps.js;
+      }
+      if (behaviorSpecificProps.cj !== this._canJump) {
+        this._canJump = behaviorSpecificProps.cj;
+      }
+      if (behaviorSpecificProps.tscjs !== this._timeSinceCurrentJumpStart) {
+        this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
+      }
+      if (behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart) {
+        this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
+      }
+
+      // When the object is synchronized from the network, the inputs must not be cleared.
+      this._dontClearInputsBetweenFrames = true;
     }
 
     createAndAddBody(): Jolt.Body {
@@ -701,13 +785,15 @@ namespace gdjs {
       //     this.character.GetGroundNormal().GetZ()
       // );
 
-      this.hasPressedForwardKey = false;
-      this.hasPressedBackwardKey = false;
-      this.hasPressedRightKey = false;
-      this.hasPressedLeftKey = false;
-      this.hasPressedJumpKey = false;
-      this._stickForce = 0;
-      this._stickAngle = 0;
+      if (!this._dontClearInputsBetweenFrames) {
+        this.hasPressedForwardKey = false;
+        this.hasPressedBackwardKey = false;
+        this.hasPressedRightKey = false;
+        this.hasPressedLeftKey = false;
+        this.hasPressedJumpKey = false;
+        this._stickForce = 0;
+        this._stickAngle = 0;
+      }
 
       this._hasReallyMoved =
         Math.abs(this.character.GetPosition().GetX() - oldX) >
@@ -725,7 +811,7 @@ namespace gdjs {
     onObjectHotReloaded() {}
 
     /**
-     * Get maximum angle of a slope for the Platformer Object to run on it as a floor.
+     * Get maximum angle of a slope for the Character to run on it as a floor.
      * @returns the slope maximum angle, in degrees.
      */
     getSlopeMaxAngle(): float {
@@ -733,7 +819,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the maximum slope angle of the Platformer Object.
+     * Set the maximum slope angle of the Character.
      * @param slopeMaxAngle The new maximum slope angle.
      */
     setSlopeMaxAngle(slopeMaxAngle: float): void {
@@ -760,7 +846,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the gravity of the Platformer Object.
+     * Get the gravity of the Character.
      * @returns The current gravity.
      */
     getGravity(): float {
@@ -768,7 +854,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the gravity of the Platformer Object.
+     * Set the gravity of the Character.
      * @param gravity The new gravity.
      */
     setGravity(gravity: float): void {
@@ -776,7 +862,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the maximum falling speed of the Platformer Object.
+     * Get the maximum falling speed of the Character.
      * @returns The maximum falling speed.
      */
     getMaxFallingSpeed(): float {
@@ -784,7 +870,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the maximum falling speed of the Platformer Object.
+     * Set the maximum falling speed of the Character.
      * @param maxFallingSpeed The maximum falling speed.
      * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
      */
@@ -808,7 +894,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the acceleration value of the Platformer Object.
+     * Get the forward acceleration value of the Character.
      * @returns The current acceleration.
      */
     getForwardAcceleration(): float {
@@ -816,7 +902,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the acceleration of the Platformer Object.
+     * Set the forward acceleration of the Character.
      * @param forwardAcceleration The new acceleration.
      */
     setForwardAcceleration(forwardAcceleration: float): void {
@@ -824,7 +910,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the deceleration of the Platformer Object.
+     * Get the forward deceleration of the Character.
      * @returns The current deceleration.
      */
     getForwardDeceleration(): float {
@@ -832,7 +918,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the deceleration of the Platformer Object.
+     * Set the forward deceleration of the Character.
      * @param forwardDeceleration The new deceleration.
      */
     setForwardDeceleration(forwardDeceleration: float): void {
@@ -840,7 +926,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the maximum speed of the Platformer Object.
+     * Get the forward maximum speed of the Character.
      * @returns The maximum speed.
      */
     getForwardSpeedMax(): float {
@@ -848,7 +934,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the maximum speed of the Platformer Object.
+     * Set the forward maximum speed of the Character.
      * @param forwardSpeedMax The new maximum speed.
      */
     setForwardSpeedMax(forwardSpeedMax: float): void {
@@ -856,7 +942,55 @@ namespace gdjs {
     }
 
     /**
-     * Get the jump speed of the Platformer Object.
+     * Get the sideways acceleration value of the Character.
+     * @returns The current acceleration.
+     */
+    getSidewaysAcceleration(): float {
+      return this._sidewaysAcceleration;
+    }
+
+    /**
+     * Set the sideways acceleration of the Character.
+     * @param sidewaysAcceleration The new acceleration.
+     */
+    setSidewaysAcceleration(sidewaysAcceleration: float): void {
+      this._sidewaysAcceleration = sidewaysAcceleration;
+    }
+
+    /**
+     * Get the sideways deceleration of the Character.
+     * @returns The current deceleration.
+     */
+    getSidewaysDeceleration(): float {
+      return this._sidewaysDeceleration;
+    }
+
+    /**
+     * Set the sideways deceleration of the Character.
+     * @param sidewaysDeceleration The new deceleration.
+     */
+    setSidewaysDeceleration(sidewaysDeceleration: float): void {
+      this._sidewaysDeceleration = sidewaysDeceleration;
+    }
+
+    /**
+     * Get the sideways maximum speed of the Character.
+     * @returns The maximum speed.
+     */
+    getSidewaysSpeedMax(): float {
+      return this._sidewaysSpeedMax;
+    }
+
+    /**
+     * Set the sideways maximum speed of the Character.
+     * @param sidewaysSpeedMax The new maximum speed.
+     */
+    setSidewaysSpeedMax(sidewaysSpeedMax: float): void {
+      this._sidewaysSpeedMax = sidewaysSpeedMax;
+    }
+
+    /**
+     * Get the jump speed of the Character.
      * @returns The jump speed.
      */
     getJumpSpeed(): float {
@@ -864,7 +998,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the jump speed of the Platformer Object.
+     * Set the jump speed of the Character.
      * @param jumpSpeed The new jump speed.
      */
     setJumpSpeed(jumpSpeed: float): void {
@@ -872,7 +1006,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the jump sustain time of the Platformer Object.
+     * Get the jump sustain time of the Character.
      * @returns The jump sustain time.
      */
     getJumpSustainTime(): float {
@@ -880,7 +1014,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the jump sustain time of the Platformer Object.
+     * Set the jump sustain time of the Character.
      * @param jumpSpeed The new jump sustain time.
      */
     setJumpSustainTime(jumpSustainTime: float): void {
@@ -888,7 +1022,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the current speed of the Platformer Object.
+     * Get the current speed of the Character.
      * @returns The current speed.
      */
     getCurrentForwardSpeed(): float {
@@ -896,7 +1030,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the current speed of the Platformer Object.
+     * Set the current speed of the Character.
      * @param currentForwardSpeed The current speed.
      */
     setForwardCurrentSpeed(currentForwardSpeed: float): void {
@@ -908,7 +1042,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the current speed of the Platformer Object.
+     * Get the current speed of the Character.
      * @returns The current speed.
      */
     getCurrentSidewaysSpeed(): float {
@@ -916,7 +1050,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the current speed of the Platformer Object.
+     * Set the current speed of the Character.
      * @param currentSidewaysSpeed The current speed.
      */
     setForwardSidewaysSpeed(currentSidewaysSpeed: float): void {
@@ -951,7 +1085,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the current jump speed of the Platformer Object.
+     * Get the current jump speed of the Character.
      * @returns The current jump speed.
      */
     getCurrentJumpSpeed(): float {
@@ -959,7 +1093,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object can jump.
+     * Check if the Character can jump.
      * @returns Returns true if the object can jump.
      */
     canJump(): boolean {
@@ -967,14 +1101,14 @@ namespace gdjs {
     }
 
     /**
-     * Allow the Platformer Object to jump again.
+     * Allow the Character to jump again.
      */
     setCanJump(): void {
       this._canJump = true;
     }
 
     /**
-     * Forbid the Platformer Object to air jump.
+     * Forbid the Character to air jump.
      */
     setCanNotAirJump(): void {
       if (this.isJumping() || this.isFalling()) {
@@ -1020,7 +1154,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is on a floor.
+     * Check if the Character is on a floor.
      * @returns Returns true if on a floor and false if not.
      */
     isOnFloor(): boolean {
@@ -1028,7 +1162,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is on the given object.
+     * Check if the Character is on the given object.
      * @returns Returns true if on the object and false if not.
      */
     isOnFloorObject(physics3DBehavior: gdjs.Physics3DRuntimeBehavior): boolean {
@@ -1042,7 +1176,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is jumping.
+     * Check if the Character is jumping.
      * @returns Returns true if jumping and false if not.
      */
     isJumping(): boolean {
@@ -1050,7 +1184,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is in the falling state. This is false
+     * Check if the Character is in the falling state. This is false
      * if the object is jumping, even if the object is going down after reaching
      * the jump peak.
      * @returns Returns true if it is falling and false if not.
@@ -1060,7 +1194,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is "going down", either because it's in the
+     * Check if the Character is "going down", either because it's in the
      * falling state *or* because it's jumping but reached the jump peak and
      * is now going down (because the jump speed can't compensate anymore the
      * falling speed).
@@ -1078,7 +1212,7 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is moving.
+     * Check if the Character is moving.
      * @returns Returns true if it is moving and false if not.
      */
     isMovingEvenALittle(): boolean {

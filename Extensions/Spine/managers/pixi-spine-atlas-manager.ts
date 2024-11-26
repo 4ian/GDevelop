@@ -147,8 +147,10 @@ namespace gdjs {
           : 'anonymous',
       });
       PIXI.Assets.add(resource.name, url, { images });
+      console.log('Loading spine atlas:', resource.name, url, images);
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
+          console.log('Loaded spine atlas:', resource.name, atlas);
           /**
            * Ideally atlas of TextureAtlas should be passed here
            * but there is known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537)

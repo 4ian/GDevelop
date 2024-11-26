@@ -210,6 +210,7 @@ const formatItemForGrid = ({
       <ExampleTile
         exampleShortHeader={item}
         onSelect={() => onSelectExample(item)}
+        key={item.id}
       />
     );
   } else {
@@ -223,6 +224,7 @@ const formatItemForGrid = ({
         privateGameTemplateListingData={item}
         onSelect={() => onSelectGameTemplate(item)}
         owned={isTemplateOwned}
+        key={item.id}
       />
     );
   }

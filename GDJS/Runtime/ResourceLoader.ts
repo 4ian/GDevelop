@@ -543,7 +543,9 @@ namespace gdjs {
      */
     getFullUrl(url: string) {
       const { gdevelopResourceToken } = this._runtimeGame._options;
-      if (!gdevelopResourceToken) return url;
+      if (!gdevelopResourceToken) {
+        return this._getAbsolutePath(url);
+      };
 
       if (!checkIfIsGDevelopCloudBucketUrl(url)) return url;
 
@@ -552,6 +554,10 @@ namespace gdjs {
         'gd_resource_token',
         encodeURIComponent(gdevelopResourceToken)
       );
+    }
+
+    private _getAbsolutePath(path: string) {
+      return new URL(path, window.location.origin).href;
     }
 
     /**

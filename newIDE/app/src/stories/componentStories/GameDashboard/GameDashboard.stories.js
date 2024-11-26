@@ -48,7 +48,6 @@ export default {
   component: GameDashboard,
   decorators: [paperDecorator],
   argTypes: {
-    analyticsSource: { control: { type: false } }, // Hide default control.
     game: { control: { type: false } }, // Hide default control.
     gameState: {
       options: ['Published', 'Not published'],

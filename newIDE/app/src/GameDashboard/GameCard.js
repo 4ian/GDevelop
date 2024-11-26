@@ -148,7 +148,7 @@ export const GameCard = ({
     />
   );
 
-  const renderButtons = (fullWidth: boolean) => {
+  const renderButtons = ({ fullWidth }: { fullWidth: boolean }) => {
     return (
       <div styles={styles.buttonsContainer}>
         <LineStackLayout noMargin>
@@ -240,7 +240,7 @@ export const GameCard = ({
                 {renderPublicInfo()}
               </LineStackLayout>
               {renderShareUrl(i18n)}
-              {renderButtons(/*fullWidth=*/ true)}
+              {renderButtons({ fullWidth: true })}
             </ColumnStackLayout>
           ) : (
             <LineStackLayout noMargin>
@@ -256,7 +256,7 @@ export const GameCard = ({
                   alignItems="flex-start"
                 >
                   {renderTitle(i18n)}
-                  {renderButtons(/*fullWidth=*/ false)}
+                  {renderButtons({ fullWidth: false })}
                 </LineStackLayout>
                 {renderPublicInfo()}
                 {renderShareUrl(i18n)}

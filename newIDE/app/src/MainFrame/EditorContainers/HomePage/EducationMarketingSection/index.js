@@ -303,7 +303,7 @@ const EducationMarketingSection = ({
       {({ i18n }) => (
         <SectionContainer>
           <SectionRow>
-            <ResponsiveLineStackLayout noColumnMargin>
+            <ResponsiveLineStackLayout noColumnMargin noMargin>
               <ColumnStackLayout noMargin>
                 {!isMobile && educationTutorials && (
                   <EducationCurriculum

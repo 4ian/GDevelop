@@ -7,7 +7,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Column, Line, Spacer } from './Grid';
+import { Line, Spacer } from './Grid';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
@@ -19,6 +19,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import ChevronArrowLeft from './CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from './CustomSvgIcons/ChevronArrowRight';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import { ColumnStackLayout } from './Layout';
 
 type OverlayTextPosition =
   | 'topLeft'
@@ -475,10 +476,12 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
   );
 
   return (
-    <Column noMargin>
-      <Line justifyContent="space-between" alignItems="center">
-        <Text size="section-title">{title}</Text>
-        <Line>
+    <ColumnStackLayout noMargin>
+      <Line justifyContent="space-between" alignItems="center" noMargin>
+        <Text size="section-title" noMargin>
+          {title}
+        </Text>
+        <Line noMargin>
           {additionalAction && (
             <>
               {additionalAction}
@@ -605,7 +608,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
             </div>
           )}
       </div>
-    </Column>
+    </ColumnStackLayout>
   );
 };
 

@@ -489,7 +489,7 @@ export const EventsFunctionPropertiesEditor = ({
                           multiline
                           value={eventsFunction.getSentence()}
                           onChange={text => {
-                            eventsFunction.setSentence(text);
+                            eventsFunction.setSentence(text.replace(/\n/g, ''));
                             if (onConfigurationUpdated)
                               onConfigurationUpdated();
                             forceUpdate();

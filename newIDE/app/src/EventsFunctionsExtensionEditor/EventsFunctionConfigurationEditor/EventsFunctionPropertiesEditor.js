@@ -451,6 +451,7 @@ export const EventsFunctionPropertiesEditor = ({
                           <Trans>Sentence in Events Sheet</Trans>
                         }
                         fullWidth
+                        multiline
                         value={
                           getterFunction
                             ? 'Change ' +
@@ -485,9 +486,10 @@ export const EventsFunctionPropertiesEditor = ({
                           }
                           translatableHintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                           fullWidth
+                          multiline
                           value={eventsFunction.getSentence()}
                           onChange={text => {
-                            eventsFunction.setSentence(text);
+                            eventsFunction.setSentence(text.replace(/\n/g, ''));
                             if (onConfigurationUpdated)
                               onConfigurationUpdated();
                             forceUpdate();

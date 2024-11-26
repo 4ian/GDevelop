@@ -546,7 +546,7 @@ module.exports = {
       const aut = extension
         .addBehavior(
           'Physics3DBehavior',
-          _('3D Physics Engine'),
+          _('3D physics engine'),
           'Physics3D',
           _('Simulate realistic object physics with gravity, forces, etc.'),
           '',
@@ -1719,13 +1719,13 @@ module.exports = {
 
       const aut = extension
         .addBehavior(
-          'PhysicsCharacter3DBehavior',
-          _('3D Physics Character'),
           'PhysicsCharacter3D',
-          _('Simulate realistic object physics with gravity, forces, etc.'),
+          _('3D physics character'),
+          'PhysicsCharacter3D',
+          _('Jump and run on platforms.'),
           '',
           'res/physics3d.svg',
-          'PhysicsCharacter3DBehavior',
+          'PhysicsCharacter3D',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
           new gd.BehaviorsSharedData()
@@ -1745,7 +1745,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('simulateForwardKey');
 
       aut
@@ -1759,7 +1759,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('simulateBackwardKey');
 
       aut
@@ -1773,7 +1773,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('simulateRightKey');
 
       aut
@@ -1787,7 +1787,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('simulateLeftKey');
 
       aut
@@ -1801,11 +1801,11 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('simulateJumpKey');
 
       aut
-        .addAction(
+        .addScopedAction(
           'SimulateStick',
           _('Simulate stick control'),
           _('Simulate a stick control.'),
@@ -1817,11 +1817,75 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .addParameter('expression', _('Stick angle (in degrees)'))
         .addParameter('expression', _('Stick force (between 0 and 1)'))
         .markAsAdvanced()
         .setFunctionName('simulateStick');
+
+      aut
+        .addScopedAction(
+          'SetCanJump',
+          _('Allow jumping again'),
+          _(
+            "When this action is executed, the object is able to jump again, even if it is in the air: this can be useful to allow a double jump for example. This is not a permanent effect: you must call again this action every time you want to allow the object to jump (apart if it's on the floor)."
+          ),
+          _('Allow _PARAM0_ to jump again'),
+          _('Platformer state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .markAsSimple()
+        .setFunctionName('setCanJump');
+
+      aut
+        .addScopedAction(
+          'SetCanNotAirJump',
+          _('Forbid jumping again in the air'),
+          _(
+            'This revokes the effect of "Allow jumping again". The object is made unable to jump while in mid air. This has no effect if the object is not in the air.'
+          ),
+          _('Forbid _PARAM0_ to air jump'),
+          _('Platformer state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .setFunctionName('setCanNotAirJump');
+
+      aut
+        .addScopedAction(
+          'AbortJump',
+          _('Abort jump'),
+          _(
+            "Abort the current jump and stop the object vertically. This action doesn't have any effect when the character is not jumping."
+          ),
+          _('Abort the current jump of _PARAM0_'),
+          _('Platformer state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .setFunctionName('abortJump');
+
+      aut
+        .addScopedCondition(
+          'CanJump',
+          _('Can jump'),
+          _('Check if the object can jump.'),
+          _('_PARAM0_ can jump'),
+          _('Platformer state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .markAsSimple()
+        .setFunctionName('canJump');
 
       aut
         .addScopedCondition(
@@ -1836,7 +1900,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .markAsSimple()
         .setFunctionName('isMovingEvenALittle');
 
@@ -1851,7 +1915,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .markAsSimple()
         .setFunctionName('isOnFloor');
 
@@ -1866,7 +1930,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .markAsSimple()
         .setFunctionName('isJumping');
 
@@ -1883,7 +1947,7 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('isFalling');
 
       aut
@@ -1899,10 +1963,80 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
         .setFunctionName('setCurrentForwardSpeed')
         .setGetter('getCurrentForwardSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ForwardAcceleration',
+          _('Forward acceleration'),
+          _('the forward acceleration of an object.'),
+          _('the forward acceleration'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Acceleration (in pixels per second per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setForwardAcceleration')
+        .setGetter('getForwardAcceleration');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ForwardDeceleration',
+          _('Forward deceleration'),
+          _('the forward deceleration of an object.'),
+          _('the forward deceleration'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Deceleration (in pixels per second per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setForwardDeceleration')
+        .setGetter('getForwardDeceleration');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ForwardSpeedMax',
+          _('Forward max speed'),
+          _('the forward max speed of the object.'),
+          _('the forward max speed'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
+        .setFunctionName('setForwardSpeedMax')
+        .setGetter('getForwardSpeedMax');
 
       aut
         .addExpressionAndConditionAndAction(
@@ -1917,26 +2051,262 @@ module.exports = {
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
         .setFunctionName('setCurrentSidewaysSpeed')
         .setGetter('getCurrentSidewaysSpeed');
 
       aut
         .addExpressionAndConditionAndAction(
           'number',
-          'ForwardSpeedMax',
-          _('Forward max speed'),
-          _('the forward max speed of the object.'),
-          _('the forward max speed'),
+          'SidewaysAcceleration',
+          _('Sideways acceleration'),
+          _('the sideways acceleration of an object.'),
+          _('the sideways acceleration'),
           _('Character configuration'),
           'res/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
-        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-        .setFunctionName('setForwardSpeedMax')
-        .setGetter('getForwardSpeedMax');
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Acceleration (in pixels per second per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setSidewaysAcceleration')
+        .setGetter('getSidewaysAcceleration');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'SidewaysDeceleration',
+          _('Sideways deceleration'),
+          _('the sideways deceleration of an object.'),
+          _('the sideways deceleration'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Deceleration (in pixels per second per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setSidewaysDeceleration')
+        .setGetter('getSidewaysDeceleration');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'SidewaysSpeedMax',
+          _('Sideways max speed'),
+          _('the sideways max speed of the object.'),
+          _('the sideways max speed'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
+        .setFunctionName('setSidewaysSpeedMax')
+        .setGetter('getSidewaysSpeedMax');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'CurrentFallSpeed',
+          _('Current falling speed'),
+          _(
+            'Compare the current falling speed of the object. Its value is always positive.'
+          ),
+          _('the current falling speed'),
+          _('Character state'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions
+            .makeNewOptions()
+            .setDescription(_('Speed to compare to (in pixels per second)'))
+        )
+        .markAsAdvanced()
+        .setFunctionName('getCurrentFallSpeed');
+
+      aut
+        .addScopedAction(
+          'SetCurrentFallSpeed',
+          _('Current falling speed'),
+          _(
+            "Change the current falling speed of the object. This action doesn't have any effect when the character is not falling or is in the first phase of a jump."
+          ),
+          _('the current falling speed'),
+          _('Character state'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setCurrentFallSpeed');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'CurrentJumpSpeed',
+          _('Current jump speed'),
+          _(
+            'Compare the current jump speed of the object. Its value is always positive.'
+          ),
+          _('the current jump speed'),
+          _('Character state'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed to compare to (in pixels per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('getCurrentJumpSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'JumpSpeed',
+          _('Jump speed'),
+          _('the jump speed of an object. Its value is always positive.'),
+          _('the jump speed'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
+        .setFunctionName('setJumpSpeed')
+        .setGetter('getJumpSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'JumpSustainTime',
+          _('Jump sustain time'),
+          _(
+            'the jump sustain time of an object. This is the time during which keeping the jump button held allow the initial jump speed to be maintained.'
+          ),
+          _('the jump sustain time'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Duration (in seconds)')
+          )
+        )
+        .setFunctionName('setJumpSustainTime')
+        .setGetter('getJumpSustainTime');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Gravity',
+          _('Gravity'),
+          _('the gravity applied on an object.'),
+          _('the gravity'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Gravity (in pixels per second per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setGravity')
+        .setGetter('getGravity');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'FallingSpeedMax',
+          _('Maximum falling speed'),
+          _('the maximum falling speed of an object.'),
+          _('the maximum falling speed'),
+          _('Character configuration'),
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Max speed (in pixels per second)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('getMaxFallingSpeed');
+
+      aut
+        .addScopedAction(
+          'FallingSpeedMax',
+          _('Maximum falling speed'),
+          _('Change the maximum falling speed of an object.'),
+          _('the maximum falling speed'),
+          _('Character configuration'),
+          'res/physics3d.svg',
+          'res/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Max speed (in pixels per second)')
+          )
+        )
+        .addParameter(
+          'yesorno',
+          _('If jumping, try to preserve the current speed in the air')
+        )
+        .markAsAdvanced()
+        .setFunctionName('setMaxFallingSpeed')
+        .setGetter('getMaxFallingSpeed');
     }
 
     extension
@@ -1950,7 +2320,7 @@ module.exports = {
         'res/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3DBehavior')
+      .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
       .addParameter('objectList', _('Platforms'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
       .addCodeOnlyParameter('conditionInverted', '')

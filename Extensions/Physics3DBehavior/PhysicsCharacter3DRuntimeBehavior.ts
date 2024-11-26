@@ -936,6 +936,21 @@ namespace gdjs {
     }
 
     /**
+     * Set the current fall speed.
+     *
+     * When the character is not in the falling state this method has no effect.
+     */
+    setCurrentFallSpeed(currentFallSpeed: float) {
+      if (this.isFalling()) {
+        this._currentFallSpeed = gdjs.evtTools.common.clamp(
+          currentFallSpeed,
+          0,
+          this._maxFallingSpeed
+        );
+      }
+    }
+
+    /**
      * Get the current jump speed of the Platformer Object.
      * @returns The current jump speed.
      */
@@ -949,6 +964,34 @@ namespace gdjs {
      */
     canJump(): boolean {
       return this._canJump;
+    }
+
+    /**
+     * Allow the Platformer Object to jump again.
+     */
+    setCanJump(): void {
+      this._canJump = true;
+    }
+
+    /**
+     * Forbid the Platformer Object to air jump.
+     */
+    setCanNotAirJump(): void {
+      if (this.isJumping() || this.isFalling()) {
+        this._canJump = false;
+      }
+    }
+
+    /**
+     * Abort the current jump.
+     *
+     * When the character is not in the jumping state this method has no effect.
+     */
+    abortJump(): void {
+      if (this.isJumping()) {
+        this._currentFallSpeed = 0;
+        this._currentJumpSpeed = 0;
+      }
     }
 
     simulateForwardKey(): void {
@@ -1004,6 +1047,16 @@ namespace gdjs {
      */
     isJumping(): boolean {
       return this._currentJumpSpeed > 0;
+    }
+
+    /**
+     * Check if the Platformer Object is in the falling state. This is false
+     * if the object is jumping, even if the object is going down after reaching
+     * the jump peak.
+     * @returns Returns true if it is falling and false if not.
+     */
+    isFallingWithoutJumping(): boolean {
+      return !this.isOnFloor() && this._currentJumpSpeed === 0;
     }
 
     /**
@@ -1095,7 +1148,7 @@ namespace gdjs {
   }
 
   gdjs.registerBehavior(
-    'Physics3D::PhysicsCharacter3DBehavior',
+    'Physics3D::PhysicsCharacter3D',
     gdjs.PhysicsCharacter3DRuntimeBehavior
   );
 }

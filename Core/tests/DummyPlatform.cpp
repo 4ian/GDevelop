@@ -265,9 +265,9 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
 
   extension
       ->AddAction("SetNumberVariable",
-                  "Do something with number variables",
-                  "This does something with variables",
-                  "Do something with variables",
+                  "Change variable value",
+                  "Modify the number value of a variable.",
+                  "the variable _PARAM0_",
                   "",
                   "",
                   "")
@@ -278,9 +278,9 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
 
   extension
       ->AddAction("SetStringVariable",
-                  "Do something with string variables",
-                  "This does something with variables",
-                  "Do something with variables",
+                  "Change text variable",
+                  "Modify the text (string) of a variable.",
+                  "the variable _PARAM0_",
                   "",
                   "",
                   "")
@@ -291,9 +291,9 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
 
   extension
       ->AddAction("SetBooleanVariable",
-                  "Do something with boolean variables",
-                  "This does something with variables",
-                  "Do something with variables",
+                  "Change boolean variable",
+                  "Modify the boolean value of a variable.",
+                  "Change the variable _PARAM0_: _PARAM1_",
                   "",
                   "",
                   "")
@@ -357,6 +357,17 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("imageResource", "Parameter 2 (an image resource)")
       .AddParameter("soundfile", "Parameter 3 (an audio resource)")
       .SetFunctionName("doSomethingWithResources");
+
+  extension
+      ->AddAction("DoSomethingWithAnyVariable",
+                  "Do something with variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("variable", "Any variable")
+      .SetFunctionName("doSomethingWithAnyVariable");
 
   extension
       ->AddAction("DoSomethingWithLegacyPreScopedVariables",

@@ -41,6 +41,8 @@ class GD_CORE_API EventsPropertyReplacer
         removedPropertyNames(removedPropertyNames_){};
   virtual ~EventsPropertyReplacer();
 
+  static bool CanContainProperty(const gd::ValueTypeMetadata &valueTypeMetadata);
+
  private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;

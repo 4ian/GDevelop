@@ -41,6 +41,7 @@ class GD_CORE_API ExpressionPropertyReplacer
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
       const gd::PropertiesContainer& targetPropertiesContainer_,
+      bool isParentTypeAVariable_,
       const std::unordered_map<gd::String, gd::String>& oldToNewPropertyNames_,
       const std::unordered_set<gd::String>& removedPropertyNames_)
       : hasDoneRenaming(false),
@@ -48,6 +49,7 @@ class GD_CORE_API ExpressionPropertyReplacer
         platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         targetPropertiesContainer(targetPropertiesContainer_),
+        isParentTypeAVariable(isParentTypeAVariable_),
         oldToNewPropertyNames(oldToNewPropertyNames_),
         removedPropertyNames(removedPropertyNames_){};
   virtual ~ExpressionPropertyReplacer(){};
@@ -69,16 +71,21 @@ class GD_CORE_API ExpressionPropertyReplacer
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
+    if (isParentTypeAVariable) {
+        // Do nothing, it's a variable.
+        if (node.child) node.child->Visit(*this);
+        return;
+    }
+
     auto& propertiesContainersList =
         projectScopedContainers.GetPropertiesContainersList();
 
     // The node represents a variable or an object name on which a variable
     // will be accessed, or a property with a child.
 
-    // Match the potential *new* name of the property, because refactorings are
-    // done after changes in the variables container.
     projectScopedContainers.MatchIdentifierWithName<void>(
-      GetPotentialNewName(node.name),
+      // The property name is changed after the refactor operation.
+      node.name,
       [&]() {
         // Do nothing, it's an object variable.
         if (node.child) node.child->Visit(*this);
@@ -100,16 +107,7 @@ class GD_CORE_API ExpressionPropertyReplacer
         // Do nothing, it's a parameter.
         if (node.child) node.child->Visit(*this);
       }, [&]() {
-        // This is something else - potentially a deleted property.
-        // Check if it's coming from the target container with
-        // properties to replace.
-        if (propertiesContainersList.HasPropertiesContainer(
-                targetPropertiesContainer)) {
-          // The node represents a property, that can come from the target
-          // (because the target is in the scope), replace or remove it:
-          RenameOrRemovePropertyOfTargetPropertyContainer(node.name);
-        }
-
+        // Do nothing, it's something else.
         if (node.child) node.child->Visit(*this);
       });
   }
@@ -118,17 +116,24 @@ class GD_CORE_API ExpressionPropertyReplacer
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
+    bool isGrandParentTypeAVariable = isParentTypeAVariable;
+    isParentTypeAVariable = false;
     node.expression->Visit(*this);
+    isParentTypeAVariable = isGrandParentTypeAVariable;
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
+    if (isParentTypeAVariable) {
+        // Do nothing, it's a variable.
+        return;
+    }
+
     auto& propertiesContainersList =
         projectScopedContainers.GetPropertiesContainersList();
 
-    // Match the potential *new* name of the property, because refactorings are
-    // done after changes in the variables container.
     projectScopedContainers.MatchIdentifierWithName<void>(
-      GetPotentialNewName(node.identifierName),
+      // The property name is changed after the refactor operation
+      node.identifierName,
       [&]() {
         // Do nothing, it's an object variable.
       }, [&]() {
@@ -145,34 +150,35 @@ class GD_CORE_API ExpressionPropertyReplacer
       }, [&]() {
         // Do nothing, it's a parameter.
       }, [&]() {
-        // This is something else - potentially a deleted property.
-        // Check if it's coming from the target container with
-        // properties to replace.
-        if (propertiesContainersList.HasPropertiesContainer(
-                targetPropertiesContainer)) {
-          // The node represents a property, that can come from the target
-          // (because the target is in the scope), replace or remove it:
-          RenameOrRemovePropertyOfTargetPropertyContainer(node.identifierName);
-        }
+        // Do nothing, it's something else.
       });
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
-  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    for (auto& parameter : node.parameters) {
-      parameter->Visit(*this);
+  void OnVisitFunctionCallNode(FunctionCallNode &node) override {
+    bool isGrandParentTypeAVariable = isParentTypeAVariable;
+    for (auto &parameter : node.parameters) {
+      const auto &parameterMetadata =
+          gd::MetadataProvider::GetFunctionCallParameterMetadata(
+              platform, projectScopedContainers.GetObjectsContainersList(),
+              node, *parameter);
+      if (!parameterMetadata) {
+        continue;
+      }
+      const auto &parameterTypeMetadata =
+          parameterMetadata->GetValueTypeMetadata();
+      if (gd::EventsPropertyReplacer::CanContainProperty(
+              parameterTypeMetadata)) {
+        isParentTypeAVariable = parameterTypeMetadata.IsVariable();
+        parameter->Visit(*this);
+      }
     }
+    isParentTypeAVariable = isGrandParentTypeAVariable;
   }
   void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
   bool hasDoneRenaming;
   bool removedPropertyUsed;
-
-  const gd::String& GetPotentialNewName(const gd::String& oldName) {
-    return oldToNewPropertyNames.count(oldName) >= 1
-            ? oldToNewPropertyNames.find(oldName)->second
-            : oldName;
-  }
 
   bool RenameOrRemovePropertyOfTargetPropertyContainer(
       gd::String& propertyName) {
@@ -198,6 +204,7 @@ class GD_CORE_API ExpressionPropertyReplacer
   const std::unordered_set<gd::String>& removedPropertyNames;
 
   gd::String objectNameToUseForVariableAccessor;
+  bool isParentTypeAVariable;
 };
 
 bool EventsPropertyReplacer::DoVisitInstruction(gd::Instruction& instruction,
@@ -216,20 +223,16 @@ bool EventsPropertyReplacer::DoVisitInstruction(gd::Instruction& instruction,
           const gd::Expression& parameterValue,
           size_t parameterIndex,
           const gd::String& lastObjectName) {
-        const gd::String& type = parameterMetadata.GetType();
-
-        if (!gd::ParameterMetadata::IsExpression("variable", type) &&
-            !gd::ParameterMetadata::IsExpression("number", type) &&
-            !gd::ParameterMetadata::IsExpression("string", type))
-          return;  // Not an expression that can contain properties.
-
+        if (!gd::EventsPropertyReplacer::CanContainProperty(
+          parameterMetadata.GetValueTypeMetadata())) {
+          return;
+        }
         auto node = parameterValue.GetRootNode();
         if (node) {
-          ExpressionPropertyReplacer renamer(platform,
-                                             GetProjectScopedContainers(),
-                                             targetPropertiesContainer,
-                                             oldToNewPropertyNames,
-                                             removedPropertyNames);
+          ExpressionPropertyReplacer renamer(
+              platform, GetProjectScopedContainers(), targetPropertiesContainer,
+              parameterMetadata.GetValueTypeMetadata().IsVariable(),
+              oldToNewPropertyNames, removedPropertyNames);
           node->Visit(renamer);
 
           if (renamer.IsRemovedPropertyUsed()) {
@@ -246,20 +249,16 @@ bool EventsPropertyReplacer::DoVisitInstruction(gd::Instruction& instruction,
 
 bool EventsPropertyReplacer::DoVisitEventExpression(
     gd::Expression& expression, const gd::ParameterMetadata& metadata) {
-  const gd::String& type = metadata.GetType();
-
-  if (!gd::ParameterMetadata::IsExpression("variable", type) &&
-      !gd::ParameterMetadata::IsExpression("number", type) &&
-      !gd::ParameterMetadata::IsExpression("string", type))
-    return false;  // Not an expression that can contain properties.
-
+  if (!gd::EventsPropertyReplacer::CanContainProperty(
+          metadata.GetValueTypeMetadata())) {
+    return false;
+  }
   auto node = expression.GetRootNode();
   if (node) {
-    ExpressionPropertyReplacer renamer(platform,
-                                       GetProjectScopedContainers(),
-                                       targetPropertiesContainer,
-                                       oldToNewPropertyNames,
-                                       removedPropertyNames);
+    ExpressionPropertyReplacer renamer(
+        platform, GetProjectScopedContainers(), targetPropertiesContainer,
+        metadata.GetValueTypeMetadata().IsVariable(), oldToNewPropertyNames,
+        removedPropertyNames);
     node->Visit(renamer);
 
     if (renamer.IsRemovedPropertyUsed()) {
@@ -270,6 +269,12 @@ bool EventsPropertyReplacer::DoVisitEventExpression(
   }
 
   return false;
+}
+
+bool EventsPropertyReplacer::CanContainProperty(
+    const gd::ValueTypeMetadata &valueTypeMetadata) {
+  return valueTypeMetadata.IsVariable() || valueTypeMetadata.IsNumber() ||
+         valueTypeMetadata.IsString();
 }
 
 EventsPropertyReplacer::~EventsPropertyReplacer() {}

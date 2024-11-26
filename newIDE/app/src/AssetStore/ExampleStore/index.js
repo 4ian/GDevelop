@@ -15,7 +15,7 @@ import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopService
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import GridList from '@material-ui/core/GridList';
-import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/BuildSection/utils';
+import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
 import { ColumnStackLayout } from '../../UI/Layout';
 

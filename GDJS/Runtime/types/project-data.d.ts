@@ -283,6 +283,7 @@ declare interface LayerData {
   name: string;
   renderingType?: '' | '2d' | '3d' | '2d+3d';
   cameraType?: 'perspective' | 'orthographic';
+  defaultCameraBehavior?: 'top-left-anchored-if-never-moved' | 'do-nothing';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];

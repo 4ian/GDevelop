@@ -28,8 +28,24 @@ namespace gdjs {
     ) {
       super(layerData, instanceContainer);
 
-      this._cameraX = this.getWidth() / 2;
-      this._cameraY = this.getHeight() / 2;
+      if (
+        this._defaultCameraBehavior ===
+        gdjs.RuntimeLayerDefaultCameraBehavior.TOP_LEFT_ANCHORED_IF_NEVER_MOVED
+      ) {
+        // If top-left must stay in the top-left corner, this means we center the camera on the current size.
+        this._cameraX = this._runtimeScene.getViewportOriginX();
+        this._cameraY = this._runtimeScene.getViewportOriginY();
+      } else {
+        // Otherwise, the default camera position is the center of the initial viewport.
+        this._cameraX =
+          (this._runtimeScene.getInitialUnrotatedViewportMinX() +
+            this._runtimeScene.getInitialUnrotatedViewportMaxX()) /
+          2;
+        this._cameraY =
+          (this._runtimeScene.getInitialUnrotatedViewportMinY() +
+            this._runtimeScene.getInitialUnrotatedViewportMaxY()) /
+          2;
+      }
       if (this.getCameraType() === gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC) {
         this._cameraZ =
           (this._initialCamera3DFarPlaneDistance +
@@ -53,10 +69,13 @@ namespace gdjs {
       // * When the camera follows a player/object, it will rarely be at the default position.
       //   (and if is, it will be moved again by the behavior/events).
       // * Cameras not following a player/object are usually UIs which are intuitively
-      //   expected not to "move". Not adapting the center position would make the camera
-      //   move from its initial position (which is centered on the screen) - and anchor
-      //   behavior would behave counterintuitively.
+      //   expected not to "move" (top-left stays "fixed"), while gameplay is "centered" (center stays "fixed").
+      //
+      // Note that anchor behavior is usually a better choice for UIs.
       if (
+        this._defaultCameraBehavior ===
+          gdjs.RuntimeLayerDefaultCameraBehavior
+            .TOP_LEFT_ANCHORED_IF_NEVER_MOVED &&
         // Have a safety margin of 1 pixel to avoid rounding errors.
         Math.abs(this._cameraX - oldGameResolutionOriginX) < 1 &&
         Math.abs(this._cameraY - oldGameResolutionOriginY) < 1 &&
@@ -352,6 +371,7 @@ namespace gdjs {
       y *= Math.abs(this._zoomFactor);
       position[0] = x + this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       position[1] = y + this.getRuntimeScene()._cachedGameResolutionHeight / 2;
+
       return position;
     }
 

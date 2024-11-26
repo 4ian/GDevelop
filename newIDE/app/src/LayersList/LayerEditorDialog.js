@@ -21,10 +21,11 @@ import HotReloadPreviewButton, {
 import HelpButton from '../UI/HelpButton';
 import { Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
-import { Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import Paper from '../UI/Paper';
 
 const gd: libGDevelop = global.gd;
 
@@ -237,20 +238,51 @@ const LayerEditorDialog = ({
               </Trans>
             </DismissableAlertMessage>
           ) : null}
+          <Text size="block-title">
+            <Trans>Camera positioning</Trans>
+          </Text>
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Default camera behavior</Trans>}
+            value={layer.getDefaultCameraBehavior()}
+            onChange={(e, i, value: string) => {
+              layer.setDefaultCameraBehavior(value);
+              forceUpdate();
+            }}
+          >
+            <SelectOption
+              value={'do-nothing'}
+              label={t`Keep centered (best for game content)`}
+            />
+            <SelectOption
+              value={'top-left-anchored-if-never-moved'}
+              label={t`Keep top-left corner fixed (best for content that can extend)`}
+            />
+          </SelectField>
+          <Text size="block-title">
+            <Trans>Visibility and instances ordering</Trans>
+          </Text>
           <Text>
             <Trans>
               There are {instancesCount} instances of objects on this layer.
             </Trans>
           </Text>
           {!project.getUseDeprecatedZeroAsDefaultZOrder() && (
-            <Text>
-              <Trans>
-                Objects created using events on this layer will be given a "Z
-                order" of {highestZOrder + 1}, so that they appear in front of
-                all objects of this layer. You can change this using the action
-                to change an object Z order, after using an action to create it.
-              </Trans>
-            </Text>
+            <Paper background="light" variant="outlined">
+              <Line>
+                <Column>
+                  <Text noMargin>
+                    <Trans>
+                      Objects created using events on this layer will be given a
+                      "Z order" of {highestZOrder + 1}, so that they appear in
+                      front of all objects of this layer. You can change this
+                      using the action to change an object Z order, after using
+                      an action to create it.
+                    </Trans>
+                  </Text>
+                </Column>
+              </Line>
+            </Paper>
           )}
           <InlineCheckbox
             label={<Trans>Hide the layer</Trans>}

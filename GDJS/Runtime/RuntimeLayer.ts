@@ -23,11 +23,23 @@ namespace gdjs {
     PERSPECTIVE,
     ORTHOGRAPHIC,
   }
-
   const getCameraTypeFromString = (renderingTypeAsString: string | undefined) =>
     renderingTypeAsString === 'orthographic'
       ? RuntimeLayerCameraType.ORTHOGRAPHIC
       : RuntimeLayerCameraType.PERSPECTIVE;
+
+  export enum RuntimeLayerDefaultCameraBehavior {
+    DO_NOTHING,
+    TOP_LEFT_ANCHORED_IF_NEVER_MOVED,
+  }
+
+  const getDefaultCameraBehaviorFromString = (
+    defaultCameraBehaviorAsString: string
+  ) =>
+    defaultCameraBehaviorAsString === 'top-left-anchored-if-never-moved'
+      ? RuntimeLayerDefaultCameraBehavior.TOP_LEFT_ANCHORED_IF_NEVER_MOVED
+      : RuntimeLayerDefaultCameraBehavior.DO_NOTHING;
+
   /**
    * Represents a layer of a "container", used to display objects.
    * The container can be a scene (see gdjs.Layer)
@@ -37,6 +49,7 @@ namespace gdjs {
     _name: string;
     _renderingType: RuntimeLayerRenderingType;
     _cameraType: RuntimeLayerCameraType;
+    _defaultCameraBehavior: RuntimeLayerDefaultCameraBehavior;
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
@@ -70,6 +83,9 @@ namespace gdjs {
       this._name = layerData.name;
       this._renderingType = getRenderingTypeFromString(layerData.renderingType);
       this._cameraType = getCameraTypeFromString(layerData.cameraType);
+      this._defaultCameraBehavior = getDefaultCameraBehaviorFromString(
+        layerData.defaultCameraBehavior || 'top-left-anchored-if-never-moved'
+      );
       this._hidden = !layerData.visibility;
       this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
       this._initialCamera3DNearPlaneDistance =

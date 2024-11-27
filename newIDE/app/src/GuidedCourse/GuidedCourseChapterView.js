@@ -32,7 +32,8 @@ const GuidedCourseChapterView = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-  const isFinished = true;
+  const completion = { done: 5, total: guidedCourseChapter.tasks.length };
+  const isFinished = completion.done === completion.total;
   return (
     <ColumnStackLayout expand noMargin>
       <LineStackLayout
@@ -53,7 +54,7 @@ const GuidedCourseChapterView = ({
             </div>
           )}
         </LineStackLayout>
-        {isFinished && (
+        {isFinished ? (
           <div
             style={{
               color: gdevelopTheme.statusIndicator.success,
@@ -63,6 +64,12 @@ const GuidedCourseChapterView = ({
               <Trans>Finished</Trans>
             </Text>
           </div>
+        ) : (
+          <Text color="secondary">
+            <Trans>
+              {completion.done} of {completion.total} completed
+            </Trans>
+          </Text>
         )}
       </LineStackLayout>
       <ResponsiveLineStackLayout expand>

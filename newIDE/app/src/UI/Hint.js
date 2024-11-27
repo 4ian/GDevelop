@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { useTheme } from '@material-ui/styles';
-import Text from './Text';
 import LampBulb from './CustomSvgIcons/LampBulb';
 import Paper from './Paper';
+import { MarkdownText } from './MarkdownText';
 
 const styles = {
   container: {
@@ -16,7 +16,7 @@ const styles = {
 };
 
 type Props = {|
-  text: string | React.Node,
+  text: string,
 |};
 
 const Hint = ({ text }: Props) => {
@@ -38,9 +38,7 @@ const Hint = ({ text }: Props) => {
       >
         <LampBulb />
       </span>
-      <Text noMargin color="inherit">
-        {text}
-      </Text>
+      <MarkdownText source={text} />
     </Paper>
   );
 };

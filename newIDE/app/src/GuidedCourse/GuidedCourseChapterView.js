@@ -12,7 +12,7 @@ import {
 } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import RaisedButton from '../UI/RaisedButton';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { Divider } from '@material-ui/core';
@@ -20,6 +20,16 @@ import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import GuidedCourseChapterTaskItem from './GuidedCourseChapterTaskItem';
+
+const styles = {
+  stickyTitle: {
+    position: 'sticky',
+    top: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    zIndex: 2,
+  },
+};
 
 type Props = {|
   guidedCourseChapter: GuidedCourseChapter,
@@ -91,8 +101,14 @@ const GuidedCourseChapterView = ({
           </Paper>
         </ColumnStackLayout>
       </ResponsiveLineStackLayout>
-      <Divider />
-      <Column expand>
+      <div
+        style={{
+          ...styles.stickyTitle,
+          backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+        }}
+      >
+        <Divider />
+        <Spacer />
         <Line alignItems="center" justifyContent="space-between" noMargin>
           <Text size="block-title">
             <Trans>Tasks</Trans>
@@ -112,8 +128,9 @@ const GuidedCourseChapterView = ({
             onClick={() => setOpenTasks(!openTasks)}
           />
         </Line>
-      </Column>
-      <Divider />
+        <Spacer />
+        <Divider />
+      </div>
       {guidedCourseChapter.tasks.map((item, index) => (
         <GuidedCourseChapterTaskItem
           guidedCourseChapterTask={item}

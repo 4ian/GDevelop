@@ -318,6 +318,16 @@
           "comment": "Palette/Green/40"
         }
       },
+      "answer": {
+        "borderColor": {
+          "value": "#08754C",
+          "comment": "Palette/Green/70"
+        },
+        "background-color": {
+          "value": "#04291B",
+          "comment": "Palette/Green/100"
+        }
+      },
       "empty-shadow": {
         "color": {
           "value": "transparent"

@@ -265,6 +265,14 @@
           "value": "#31748f"
         }
       },
+      "answer": {
+        "borderColor": {
+          "value": "#08754C"
+        },
+        "background-color": {
+          "value": "#04291B"
+        }
+      },
       "empty-shadow": {
         "color": {
           "value": "#191724"

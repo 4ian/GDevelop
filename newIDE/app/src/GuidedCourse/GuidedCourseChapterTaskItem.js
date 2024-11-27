@@ -67,9 +67,9 @@ const GuidedCourseChapterTaskItem = ({
             <Hint text={guidedCourseChapterTask.hint} />
           )}
           {isOpen && guidedCourseChapterTask.answer && (
-            <Accordion>
+            <Accordion kind="answer">
               <AccordionHeader>
-                <Text>
+                <Text size="sub-title">
                   <Trans>Answer</Trans>
                 </Text>
               </AccordionHeader>

@@ -468,6 +468,10 @@ export function createGdevelopTheme({
         warning: styles['ThemeMessageWarningColor'],
         error: styles['ThemeMessageErrorColor'],
         valid: styles['ThemeMessageValidColor'],
+        answer: {
+          backgroundColor: styles['ThemeMessageAnswerBackgroundColor'],
+          borderColor: styles['ThemeMessageAnswerBorderColor'],
+        },
         hot: {
           backgroundColor: styles['ThemeMessageHotBackgroundColor'],
           color: styles['ThemeMessageHotColor'],

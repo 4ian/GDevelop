@@ -53,7 +53,8 @@ Layout::Layout()
       stopSoundsOnStartup(true),
       standardSortMethod(true),
       disableInputWhenNotFocused(true),
-      variables(gd::VariablesContainer::SourceType::Scene) {}
+      variables(gd::VariablesContainer::SourceType::Scene),
+      objectsContainer(gd::ObjectsContainer::SourceType::Scene) {}
 
 void Layout::SetName(const gd::String& name_) {
   name = name_;

@@ -16,7 +16,14 @@
 
 namespace gd {
 
-ObjectsContainer::ObjectsContainer() {
+ObjectsContainer::ObjectsContainer()
+    : sourceType(ObjectsContainer::SourceType::Unknown) {
+  rootFolder = gd::make_unique<gd::ObjectFolderOrObject>("__ROOT");
+}
+
+ObjectsContainer::ObjectsContainer(
+    const ObjectsContainer::SourceType sourceType_)
+    : sourceType(sourceType_) {
   rootFolder = gd::make_unique<gd::ObjectFolderOrObject>("__ROOT");
 }
 
@@ -34,6 +41,7 @@ ObjectsContainer& ObjectsContainer::operator=(
 }
 
 void ObjectsContainer::Init(const gd::ObjectsContainer& other) {
+  sourceType = other.sourceType;
   initialObjects = gd::Clone(other.initialObjects);
   objectGroups = other.objectGroups;
   // The objects folders are not copied.

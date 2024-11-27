@@ -19,6 +19,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: gdEventsBasedBehavior | null,
@@ -70,20 +71,15 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   };
 
   _getValidatedObjectOrGroupName = (newName: string) => {
-    const { objectsContainer } = this.props;
+    const { projectScopedContainersAccessor } = this.props;
+    const objectsContainersList = projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList();
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
-        if (
-          objectsContainer.hasObjectNamed(tentativeNewName) ||
-          objectsContainer.getObjectGroups().has(tentativeNewName)
-        ) {
-          return true;
-        }
-
-        return false;
-      }
+      tentativeNewName =>
+        objectsContainersList.hasObjectOrGroupNamed(tentativeNewName)
     );
 
     return safeAndUniqueNewName;
@@ -134,6 +130,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     const {
       project,
       projectScopedContainersAccessor,
+      globalObjectsContainer,
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
@@ -222,7 +219,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <ObjectGroupsListWithObjectGroupEditor
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
-            globalObjectsContainer={null}
+            globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             globalObjectGroups={null}
             objectGroups={eventsFunction.getObjectGroups()}

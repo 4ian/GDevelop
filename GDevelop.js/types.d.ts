@@ -39,6 +39,14 @@ export enum VariablesContainer_SourceType {
   ExtensionScene = 6,
 }
 
+export enum ObjectsContainer_SourceType {
+  Unknown = 0,
+  Global = 1,
+  Scene = 2,
+  Object = 3,
+  Function = 4,
+}
+
 export enum ObjectsContainersList_VariableExistence {
   DoesNotExist = 0,
   Exists = 1,
@@ -466,6 +474,8 @@ export class ObjectFolderOrObject extends EmscriptenObject {
 
 export class ObjectsContainer extends EmscriptenObject {
   constructor();
+  constructor(sourceType: ObjectsContainer_SourceType);
+  getSourceType(): ObjectsContainer_SourceType;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
   insertNewObjectInFolder(project: Project, type: string, name: string, folder: ObjectFolderOrObject, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
@@ -614,6 +624,7 @@ export class ObjectsContainersList extends EmscriptenObject {
   hasObjectOrGroupNamed(name: string): boolean;
   hasObjectNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectsContainerSourceType(objectOrGroupName: string): ObjectsContainer_SourceType;
   getObjectsContainer(index: number): ObjectsContainer;
   getObjectsContainersCount(): number;
 }

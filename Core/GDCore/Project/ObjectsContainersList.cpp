@@ -615,6 +615,28 @@ std::vector<gd::String> ObjectsContainersList::GetAnimationNamesOfObject(
   return animationNames;
 }
 
+const ObjectsContainer *
+ObjectsContainersList::GetObjectsContainerFromObjectName(
+    const gd::String &objectOrGroupName) const {
+  for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
+       ++it) {
+    if ((*it)->HasObjectNamed(objectOrGroupName) ||
+        (*it)->GetObjectGroups().Has(objectOrGroupName)) {
+      return *it;
+    }
+  }
+  return nullptr;
+}
+
+const gd::ObjectsContainer::SourceType
+ObjectsContainersList::GetObjectsContainerSourceType(
+    const gd::String &objectOrGroupName) const {
+  const auto *objectsContainer =
+      GetObjectsContainerFromObjectName(objectOrGroupName);
+  return objectsContainer ? objectsContainer->GetSourceType()
+                          : gd::ObjectsContainer::SourceType::Unknown;
+}
+
 const gd::ObjectsContainer &
 ObjectsContainersList::GetObjectsContainer(std::size_t index) const {
   return *objectsContainers[index];

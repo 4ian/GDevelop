@@ -98,26 +98,6 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                   "for the parent. ");
     return;
   }
-
-  gd::EventsFunctionTools::CopyEventsBasedObjectChildrenToObjectsContainer(
-      eventsBasedObject, outputObjectsContainer);
-}
-
-void EventsFunctionTools::CopyEventsBasedObjectChildrenToObjectsContainer(
-    const gd::EventsBasedObject& eventsBasedObject,
-    gd::ObjectsContainer& outputObjectsContainer) {
-  auto &children = eventsBasedObject.GetObjects().GetObjects();
-  for (auto &childObject : children) {
-    auto child = childObject.get();
-    outputObjectsContainer.InsertObject(
-        *child, outputObjectsContainer.GetObjectsCount());
-  }
-  auto &childrenGroups = eventsBasedObject.GetObjects().GetObjectGroups();
-  for (size_t index = 0; index < childrenGroups.Count(); ++index) {
-    auto &childGroup = childrenGroups.Get(index);
-    outputObjectsContainer.GetObjectGroups().Insert(
-        childGroup, outputObjectsContainer.GetObjectGroups().Count());
-  }
 }
 
 }  // namespace gd

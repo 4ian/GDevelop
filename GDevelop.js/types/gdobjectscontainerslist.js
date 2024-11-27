@@ -16,6 +16,7 @@ declare class gdObjectsContainersList {
   hasObjectOrGroupNamed(name: string): boolean;
   hasObjectNamed(name: string): boolean;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectsContainerSourceType(objectOrGroupName: string): ObjectsContainer_SourceType;
   getObjectsContainer(index: number): gdObjectsContainer;
   getObjectsContainersCount(): number;
   delete(): void;

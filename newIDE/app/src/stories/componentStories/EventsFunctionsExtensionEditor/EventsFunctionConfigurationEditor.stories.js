@@ -23,6 +23,7 @@ export const DefaultFreeFunction = () => (
       projectScopedContainersAccessor={
         testProject.emptySceneProjectScopedContainersAccessor
       }
+      globalObjectsContainer={null}
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testEventsFunction}
@@ -42,6 +43,7 @@ export const DefaultBehaviorFunction = () => (
       projectScopedContainersAccessor={
         testProject.emptySceneProjectScopedContainersAccessor
       }
+      globalObjectsContainer={null}
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorEventsFunction}
@@ -61,6 +63,7 @@ export const DefaultBehaviorLifecycleFunction = () => (
       projectScopedContainersAccessor={
         testProject.emptySceneProjectScopedContainersAccessor
       }
+      globalObjectsContainer={null}
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
@@ -80,6 +83,7 @@ export const DefaultObjectFunction = () => (
       projectScopedContainersAccessor={
         testProject.emptySceneProjectScopedContainersAccessor
       }
+      globalObjectsContainer={null}
       objectsContainer={testProject.testLayout.getObjects()}
       helpPagePath="/events/functions"
       eventsFunction={testProject.testObjectEventsFunction}

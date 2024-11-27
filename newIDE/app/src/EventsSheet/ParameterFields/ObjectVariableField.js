@@ -104,17 +104,35 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         )
       : null;
 
+    const objectSourceType = React.useMemo(
+      () =>
+        objectName
+          ? projectScopedContainersAccessor
+              .get()
+              .getObjectsContainersList()
+              .getObjectsContainerSourceType(objectName)
+          : gd.ObjectsContainer.Unknown,
+      [objectName, projectScopedContainersAccessor]
+    );
+    const canObjectDeclareVariable =
+      objectSourceType !== gd.ObjectsContainer.Function;
+
     const { layout } = scope;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
       () =>
-        objectName
+        objectName && canObjectDeclareVariable
           ? getObjectOrGroupVariablesContainers(
               globalObjectsContainer,
               objectsContainer,
               objectName
             )
           : [],
-      [objectName, globalObjectsContainer, objectsContainer]
+      [
+        objectName,
+        canObjectDeclareVariable,
+        globalObjectsContainer,
+        objectsContainer,
+      ]
     );
 
     const enumerateObjectVariables = React.useCallback(
@@ -176,7 +194,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          onOpenDialog={canObjectDeclareVariable ? setEditorOpen : null}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}

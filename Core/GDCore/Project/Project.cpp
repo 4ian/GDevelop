@@ -75,7 +75,8 @@ Project::Project()
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
       gdBuildVersion(gd::VersionWrapper::Build()),
-      variables(gd::VariablesContainer::SourceType::Global) {}
+      variables(gd::VariablesContainer::SourceType::Global),
+      objectsContainer(gd::ObjectsContainer::SourceType::Global) {}
 
 Project::~Project() {}
 

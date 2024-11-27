@@ -472,8 +472,19 @@ interface ObjectFolderOrObject {
     void SetQuickCustomizationVisibility(QuickCustomization_Visibility visibility);
 };
 
+enum ObjectsContainer_SourceType {
+  "ObjectsContainer::Unknown",
+  "ObjectsContainer::Global",
+  "ObjectsContainer::Scene",
+  "ObjectsContainer::Object",
+  "ObjectsContainer::Function",
+};
+
 interface ObjectsContainer {
     void ObjectsContainer();
+    void ObjectsContainer(ObjectsContainer_SourceType sourceType);
+
+    ObjectsContainer_SourceType GetSourceType();
 
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
     [Ref] gdObject InsertNewObjectInFolder([Ref] Project project, [Const] DOMString type, [Const] DOMString name, [Ref] ObjectFolderOrObject folder, unsigned long pos);
@@ -673,6 +684,8 @@ interface ObjectsContainersList {
   boolean HasObjectOrGroupNamed([Const] DOMString name);
   boolean HasObjectNamed([Const] DOMString name);
   ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
+  ObjectsContainer_SourceType GetObjectsContainerSourceType(
+    [Const] DOMString objectOrGroupName);
 
   [Const, Ref] ObjectsContainer GetObjectsContainer(unsigned long index);
   unsigned long GetObjectsContainersCount();

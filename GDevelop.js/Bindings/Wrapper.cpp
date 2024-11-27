@@ -450,6 +450,7 @@ typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
 typedef gd::VariablesContainer::SourceType VariablesContainer_SourceType;
+typedef gd::ObjectsContainer::SourceType ObjectsContainer_SourceType;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;

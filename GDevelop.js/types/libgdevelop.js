@@ -78,6 +78,7 @@ declare class libGDevelop {
   LoadingScreen: Class<gdLoadingScreen>;
   Watermark: Class<gdWatermark>;
   ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
+  ObjectsContainer_SourceType: Class<ObjectsContainer_SourceType>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ObjectsContainersList_VariableExistence: Class<ObjectsContainersList_VariableExistence>;

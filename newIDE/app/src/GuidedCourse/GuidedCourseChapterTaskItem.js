@@ -6,12 +6,12 @@ import type { GuidedCourseChapterTask } from '../Utils/GDevelopServices/Asset';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
-import { Line } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Hint from '../UI/Hint';
-import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { MarkdownText } from '../UI/MarkdownText';
 
 const styles = {
   textContainer: { overflow: 'hidden' },
@@ -50,18 +50,22 @@ const GuidedCourseChapterTaskItem = ({
       </div>
       <Line>
         <ColumnStackLayout expand noMargin noOverflowParent>
-          <Text noMargin size="sub-title">
-            {guidedCourseChapterTask.title}
-          </Text>
-          {guidedCourseChapterTask.text && (
-            <Text noMargin style={isOpen ? undefined : textEllipsisStyle}>
-              {guidedCourseChapterTask.text}
+          <Column expand noMargin noOverflowParent>
+            <Text noMargin size="sub-title">
+              {guidedCourseChapterTask.title}
             </Text>
-          )}
+            {guidedCourseChapterTask.text && (
+              <MarkdownText
+                withTextEllipsis={!isOpen}
+                source={guidedCourseChapterTask.text}
+                allowParagraphs
+              />
+            )}
+          </Column>
           {isOpen &&
             guidedCourseChapterTask.imageUrls &&
             guidedCourseChapterTask.imageUrls.map(imageUrl => (
-              <CorsAwareImage key={imageUrl} src={imageUrl} />
+              <CorsAwareImage key={imageUrl} alt="" src={imageUrl} />
             ))}
           {isOpen && guidedCourseChapterTask.hint && (
             <Hint text={guidedCourseChapterTask.hint} />
@@ -75,11 +79,14 @@ const GuidedCourseChapterTaskItem = ({
               </AccordionHeader>
               <AccordionBody>
                 {!!guidedCourseChapterTask.answer.text && (
-                  <Text>{guidedCourseChapterTask.answer.text}</Text>
+                  <MarkdownText
+                    source={guidedCourseChapterTask.answer.text}
+                    allowParagraphs
+                  />
                 )}
                 {!!guidedCourseChapterTask.answer.imageUrls &&
                   guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
-                    <CorsAwareImage key={imageUrl} src={imageUrl} />
+                    <CorsAwareImage key={imageUrl} alt="" src={imageUrl} />
                   ))}
               </AccordionBody>
             </Accordion>

@@ -112,10 +112,25 @@ namespace gdjs {
      * @return The Z position of the rendered object.
      */
     getDrawableZ(): float {
-      if (this._isUntransformedHitBoxesDirty) {
-        this._updateUntransformedHitBoxes();
+      let minZ = 0;
+      if (this._innerArea) {
+        minZ = this._innerArea.min[2];
+      } else {
+        if (this._isUntransformedHitBoxesDirty) {
+          this._updateUntransformedHitBoxes();
+        }
+        minZ = this._minZ;
       }
-      return this._z + this._minZ;
+      const absScaleZ = this.getScaleZ();
+      if (!this._flippedZ) {
+        return this._z + minZ * absScaleZ;
+      } else {
+        return (
+          this._z +
+          (-minZ - this.getUnscaledDepth() + 2 * this.getUnscaledCenterZ()) *
+            absScaleZ
+        );
+      }
     }
 
     /**
@@ -239,9 +254,38 @@ namespace gdjs {
     }
 
     /**
+     * @return the internal top bound of the object according to its children.
+     */
+    getInnerAreaMinZ(): number {
+      if (this._innerArea) {
+        return this._innerArea.min[2];
+      }
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this._minZ;
+    }
+
+    /**
+     * @return the internal bottom bound of the object according to its children.
+     */
+    getInnerAreaMaxZ(): number {
+      if (this._innerArea) {
+        return this._innerArea.max[2];
+      }
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this._maxZ;
+    }
+
+    /**
      * @return the internal width of the object according to its children.
      */
     getUnscaledDepth(): float {
+      if (this._innerArea) {
+        return this._innerArea.max[2] - this._innerArea.min[2];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -279,6 +323,9 @@ namespace gdjs {
     getUnscaledCenterZ(): float {
       if (this.hasCustomRotationCenter()) {
         return this._customCenterZ;
+      }
+      if (this._innerArea) {
+        return (this._innerArea.min[2] + this._innerArea.max[2]) / 2;
       }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();

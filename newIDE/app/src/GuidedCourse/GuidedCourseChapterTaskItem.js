@@ -6,10 +6,17 @@ import type { GuidedCourseChapterTask } from '../Utils/GDevelopServices/Asset';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
-import { Column, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Hint from '../UI/Hint';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+
+const styles = {
+  textContainer: { overflow: 'hidden' },
+  checkboxContainer: { paddingTop: 6 },
+};
 
 type Props = {|
   guidedCourseChapterTask: GuidedCourseChapterTask,
@@ -26,48 +33,59 @@ const GuidedCourseChapterTaskItem = ({
   isComplete,
   onComplete,
 }: Props) => {
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
-    <LineStackLayout alignItems="flex-start">
-      <Column noMargin>
-        <Line>
-          <Checkbox
-            checked={isComplete}
-            onCheck={() => onComplete(!isComplete)}
-          />
-        </Line>
-      </Column>
-      <ColumnStackLayout expand noMargin>
-        <Text size="sub-title">{guidedCourseChapterTask.title}</Text>
-        {guidedCourseChapterTask.text && (
-          <Text>{guidedCourseChapterTask.text}</Text>
-        )}
-        {isOpen &&
-          guidedCourseChapterTask.imageUrls &&
-          guidedCourseChapterTask.imageUrls.map(imageUrl => (
-            <CorsAwareImage key={imageUrl} src={imageUrl} />
-          ))}
-        {isOpen && guidedCourseChapterTask.hint && (
-          <Hint text={guidedCourseChapterTask.hint} />
-        )}
-        {isOpen && guidedCourseChapterTask.answer && (
-          <Accordion>
-            <AccordionHeader>
-              <Text>
-                <Trans>Answer</Trans>
-              </Text>
-            </AccordionHeader>
-            <AccordionBody>
-              {!!guidedCourseChapterTask.answer.text && (
-                <Text>{guidedCourseChapterTask.answer.text}</Text>
-              )}
-              {!!guidedCourseChapterTask.answer.imageUrls &&
-                guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
-                  <CorsAwareImage key={imageUrl} src={imageUrl} />
-                ))}
-            </AccordionBody>
-          </Accordion>
-        )}
-      </ColumnStackLayout>
+    <LineStackLayout alignItems="flex-start" noMargin>
+      <div
+        style={{
+          ...styles.checkboxContainer,
+          paddingLeft: isMobile && !isLandscape ? 0 : 20,
+        }}
+      >
+        <Checkbox
+          checked={isComplete}
+          onCheck={() => onComplete(!isComplete)}
+          style={{ margin: 0 }}
+        />
+      </div>
+      <Line>
+        <ColumnStackLayout expand noMargin noOverflowParent>
+          <Text noMargin size="sub-title">
+            {guidedCourseChapterTask.title}
+          </Text>
+          {guidedCourseChapterTask.text && (
+            <Text noMargin style={isOpen ? undefined : textEllipsisStyle}>
+              {guidedCourseChapterTask.text}
+            </Text>
+          )}
+          {isOpen &&
+            guidedCourseChapterTask.imageUrls &&
+            guidedCourseChapterTask.imageUrls.map(imageUrl => (
+              <CorsAwareImage key={imageUrl} src={imageUrl} />
+            ))}
+          {isOpen && guidedCourseChapterTask.hint && (
+            <Hint text={guidedCourseChapterTask.hint} />
+          )}
+          {isOpen && guidedCourseChapterTask.answer && (
+            <Accordion>
+              <AccordionHeader>
+                <Text>
+                  <Trans>Answer</Trans>
+                </Text>
+              </AccordionHeader>
+              <AccordionBody>
+                {!!guidedCourseChapterTask.answer.text && (
+                  <Text>{guidedCourseChapterTask.answer.text}</Text>
+                )}
+                {!!guidedCourseChapterTask.answer.imageUrls &&
+                  guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
+                    <CorsAwareImage key={imageUrl} src={imageUrl} />
+                  ))}
+              </AccordionBody>
+            </Accordion>
+          )}
+        </ColumnStackLayout>
+      </Line>
     </LineStackLayout>
   );
 };

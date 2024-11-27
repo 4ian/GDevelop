@@ -3,6 +3,8 @@
 .gd-markdown {
   font-family: var(--gdevelop-modern-font-family);
   font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.01em;
 }
 
 .gd-markdown.text-ellipsis {
@@ -50,8 +52,8 @@
 }
 
 .gd-markdown p {
-  margin-block-start: 10px;
-  margin-block-end: 10px;
+  margin-block-start: 8px;
+  margin-block-end: 8px;
 }
 
 .gd-markdown.text-ellipsis p {

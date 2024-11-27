@@ -2,10 +2,16 @@
 
 .gd-markdown {
   font-family: var(--gdevelop-modern-font-family);
+  font-size: 14px;
+}
+
+.gd-markdown.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .gd-markdown.standalone-text-container {
-  font-size: 16px;
   line-height: 1.3;
 }
 
@@ -33,7 +39,7 @@
 }
 
 .gd-markdown code {
-  font-family: "Lucida Console", Monaco, monospace;
+  font-family: 'Lucida Console', Monaco, monospace;
   -webkit-user-select: text;
   user-select: text;
   cursor: text;
@@ -46,6 +52,12 @@
 .gd-markdown p {
   margin-block-start: 10px;
   margin-block-end: 10px;
+}
+
+.gd-markdown.text-ellipsis p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .gd-markdown table {

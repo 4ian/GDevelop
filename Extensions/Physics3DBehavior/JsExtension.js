@@ -30,7 +30,7 @@ module.exports = {
       .setTags('physics, gravity, obstacle, collision');
     extension
       .addInstructionOrExpressionGroupMetadata(_('3D Physics Engine'))
-      .setIcon('res/physics3d.svg');
+      .setIcon('JsPlatform/Extensions/physics3d.svg');
     {
       const behavior = new gd.BehaviorJsImplementation();
       behavior.updateProperty = function (
@@ -550,7 +550,7 @@ module.exports = {
           'Physics3D',
           _('Simulate realistic object physics with gravity, forces, etc.'),
           '',
-          'res/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg',
           'Physics3DBehavior',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
@@ -569,7 +569,7 @@ module.exports = {
           _('World scale'),
           _('Return the world scale.'),
           _('Global'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -588,7 +588,7 @@ module.exports = {
             ),
           _('the world gravity on X axis'),
           _('Global'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -613,7 +613,7 @@ module.exports = {
             ),
           _('the world gravity on Y axis'),
           _('Global'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -638,7 +638,7 @@ module.exports = {
             ),
           _('the world gravity on Z axis'),
           _('Global'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -658,8 +658,8 @@ module.exports = {
           _('Check if an object is dynamic.'),
           _('_PARAM0_ is dynamic'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -673,8 +673,8 @@ module.exports = {
           _('Check if an object is static.'),
           _('_PARAM0_ is static'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -688,8 +688,8 @@ module.exports = {
           _('Check if an object is kinematic.'),
           _('_PARAM0_ is kinematic'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -703,8 +703,8 @@ module.exports = {
           _('Check if an object is being treat as a bullet.'),
           _('_PARAM0_ is bullet'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -720,8 +720,8 @@ module.exports = {
           ),
           _('Treat _PARAM0_ as bullet: _PARAM2_'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -737,8 +737,8 @@ module.exports = {
           _('Check if an object has fixed rotation.'),
           _('_PARAM0_ has fixed rotation'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -754,8 +754,8 @@ module.exports = {
           ),
           _('Set _PARAM0_ fixed rotation: _PARAM2_'),
           _('Dynamics'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -774,8 +774,8 @@ module.exports = {
           ),
           _('the shape scale'),
           _('Body settings'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -799,7 +799,7 @@ module.exports = {
           ),
           _('the density'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -817,7 +817,7 @@ module.exports = {
           ),
           _('the friction'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -835,7 +835,7 @@ module.exports = {
           ),
           _('the restitution'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -853,7 +853,7 @@ module.exports = {
           ),
           _('the linear damping'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -871,7 +871,7 @@ module.exports = {
           ),
           _('the angular damping'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -889,7 +889,7 @@ module.exports = {
           ),
           _('the gravity scale'),
           _('Body settings'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -910,8 +910,8 @@ module.exports = {
           _('Check if an object has a specific layer enabled.'),
           _('_PARAM0_ has layer _PARAM2_ enabled'),
           _('Filtering'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -928,8 +928,8 @@ module.exports = {
           ),
           _('Enable layer _PARAM2_ for _PARAM0_: _PARAM3_'),
           _('Filtering'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -946,8 +946,8 @@ module.exports = {
           _('Check if an object has a specific mask enabled.'),
           _('_PARAM0_ has mask _PARAM2_ enabled'),
           _('Filtering'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -964,8 +964,8 @@ module.exports = {
           ),
           _('Enable mask _PARAM2_ for _PARAM0_: _PARAM3_'),
           _('Filtering'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -984,7 +984,7 @@ module.exports = {
           _('the object linear velocity on X.'),
           _('the linear velocity on X'),
           _('Velocity'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1005,7 +1005,7 @@ module.exports = {
           _('the object linear velocity on Y.'),
           _('the linear velocity on Y'),
           _('Velocity'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1026,7 +1026,7 @@ module.exports = {
           _('the object linear velocity on Z.'),
           _('the linear velocity on Z'),
           _('Velocity'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1047,7 +1047,7 @@ module.exports = {
           _('the object linear velocity length.'),
           _('the linear velocity length'),
           _('Velocity'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1071,8 +1071,8 @@ module.exports = {
             'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1104,8 +1104,8 @@ module.exports = {
             'Apply a force of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1129,8 +1129,8 @@ module.exports = {
             'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1155,8 +1155,8 @@ module.exports = {
             'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ at _PARAM5_ ; _PARAM6_ ; _PARAM7_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1188,8 +1188,8 @@ module.exports = {
             'Apply an impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ at the center of _PARAM0_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1213,8 +1213,8 @@ module.exports = {
             'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_ ; _PARAM4_ ; _PARAM5_'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1237,8 +1237,8 @@ module.exports = {
           ),
           _('Apply a torque of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1262,8 +1262,8 @@ module.exports = {
             'Apply angular impulse of _PARAM2_ ; _PARAM3_ ; _PARAM4_ to _PARAM0_ an'
           ),
           _('Forces & impulses'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1284,7 +1284,7 @@ module.exports = {
           _('Mass'),
           _('Return the mass of the object (in kilograms)'),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1299,7 +1299,7 @@ module.exports = {
             'Return the inertia around X axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
           ),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1314,7 +1314,7 @@ module.exports = {
             'Return the inertia around Y axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
           ),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1329,7 +1329,7 @@ module.exports = {
             'Return the inertia around Z axis of the object (in kilograms · meters²) when for its default rotation is (0°; 0°; 0°)'
           ),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1342,7 +1342,7 @@ module.exports = {
           _('Mass center X'),
           _('Mass center X'),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1355,7 +1355,7 @@ module.exports = {
           _('Mass center Y'),
           _('Mass center Y'),
           '',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1370,8 +1370,8 @@ module.exports = {
         _('Check if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
         '',
-        'res/physics3d.svg',
-        'res/physics3d.svg'
+        'JsPlatform/Extensions/physics3d.svg',
+        'JsPlatform/Extensions/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1392,8 +1392,8 @@ module.exports = {
         _('Check if two objects just started colliding during this frame.'),
         _('_PARAM0_ started colliding with _PARAM2_'),
         _('Collision'),
-        'res/physics3d.svg',
-        'res/physics3d.svg'
+        'JsPlatform/Extensions/physics3d.svg',
+        'JsPlatform/Extensions/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1414,8 +1414,8 @@ module.exports = {
         _('Check if two objects just stopped colliding at this frame.'),
         _('_PARAM0_ stopped colliding with _PARAM2_'),
         _('Collision'),
-        'res/physics3d.svg',
-        'res/physics3d.svg'
+        'JsPlatform/Extensions/physics3d.svg',
+        'JsPlatform/Extensions/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
@@ -1724,7 +1724,7 @@ module.exports = {
           'PhysicsCharacter3D',
           _('Jump and run on platforms.'),
           '',
-          'res/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg',
           'PhysicsCharacter3D',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
@@ -1741,8 +1741,8 @@ module.exports = {
           _('Simulate a press of the move forward key.'),
           _('Simulate pressing Forward key for _PARAM0_'),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1755,8 +1755,8 @@ module.exports = {
           _('Simulate a press of the move backward key.'),
           _('Simulate pressing Backward key for _PARAM0_'),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1769,8 +1769,8 @@ module.exports = {
           _('Simulate a press of the move right key.'),
           _('Simulate pressing Right key for _PARAM0_'),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1783,8 +1783,8 @@ module.exports = {
           _('Simulate a press of the move left key.'),
           _('Simulate pressing Left key for _PARAM0_'),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1797,8 +1797,8 @@ module.exports = {
           _('Simulate a press of the jump key.'),
           _('Simulate pressing Jump key for _PARAM0_'),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1813,8 +1813,8 @@ module.exports = {
             'Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force'
           ),
           _('Character controls'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1832,8 +1832,8 @@ module.exports = {
           ),
           _('Allow _PARAM0_ to jump again'),
           _('Platformer state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1849,8 +1849,8 @@ module.exports = {
           ),
           _('Forbid _PARAM0_ to air jump'),
           _('Platformer state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1865,8 +1865,8 @@ module.exports = {
           ),
           _('Abort the current jump of _PARAM0_'),
           _('Platformer state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1879,8 +1879,8 @@ module.exports = {
           _('Check if the object can jump.'),
           _('_PARAM0_ can jump'),
           _('Platformer state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1896,8 +1896,8 @@ module.exports = {
           ),
           _('_PARAM0_ is moving'),
           _('Character state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1911,8 +1911,8 @@ module.exports = {
           _('Check if the object is on a platform.'),
           _('_PARAM0_ is on floor'),
           _('Character state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1926,8 +1926,8 @@ module.exports = {
           _('Check if the object is jumping.'),
           _('_PARAM0_ is jumping'),
           _('Character state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1943,8 +1943,8 @@ module.exports = {
           ),
           _('_PARAM0_ is falling'),
           _('Character state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1960,7 +1960,7 @@ module.exports = {
           ),
           _('the current forward speed'),
           _('Character state'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -1981,7 +1981,7 @@ module.exports = {
           _('the forward acceleration of an object.'),
           _('the forward acceleration'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2003,7 +2003,7 @@ module.exports = {
           _('the forward deceleration of an object.'),
           _('the forward deceleration'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2025,7 +2025,7 @@ module.exports = {
           _('the forward max speed of the object.'),
           _('the forward max speed'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2048,7 +2048,7 @@ module.exports = {
           ),
           _('the current sideways speed'),
           _('Character state'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2069,7 +2069,7 @@ module.exports = {
           _('the sideways acceleration of an object.'),
           _('the sideways acceleration'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2091,7 +2091,7 @@ module.exports = {
           _('the sideways deceleration of an object.'),
           _('the sideways deceleration'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2113,7 +2113,7 @@ module.exports = {
           _('the sideways max speed of the object.'),
           _('the sideways max speed'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2136,7 +2136,7 @@ module.exports = {
           ),
           _('the current falling speed'),
           _('Character state'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2158,8 +2158,8 @@ module.exports = {
           ),
           _('the current falling speed'),
           _('Character state'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2182,7 +2182,7 @@ module.exports = {
           ),
           _('the current jump speed'),
           _('Character state'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2203,7 +2203,7 @@ module.exports = {
           _('the jump speed of an object. Its value is always positive.'),
           _('the jump speed'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2226,7 +2226,7 @@ module.exports = {
           ),
           _('the jump sustain time'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2247,7 +2247,7 @@ module.exports = {
           _('the gravity applied on an object.'),
           _('the gravity'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2269,7 +2269,7 @@ module.exports = {
           _('the maximum falling speed of an object.'),
           _('the maximum falling speed'),
           _('Character configuration'),
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2289,8 +2289,8 @@ module.exports = {
           _('Change the maximum falling speed of an object.'),
           _('the maximum falling speed'),
           _('Character configuration'),
-          'res/physics3d.svg',
-          'res/physics3d.svg'
+          'JsPlatform/Extensions/physics3d.svg',
+          'JsPlatform/Extensions/physics3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
@@ -2316,8 +2316,8 @@ module.exports = {
         _('Check if a platformer character is on a given platform.'),
         _('_PARAM0_ is on platform _PARAM2_'),
         _('Collision'),
-        'res/physics3d.svg',
-        'res/physics3d.svg'
+        'JsPlatform/Extensions/physics3d.svg',
+        'JsPlatform/Extensions/physics3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')

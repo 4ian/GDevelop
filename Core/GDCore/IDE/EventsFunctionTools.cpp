@@ -24,15 +24,16 @@ void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputObjectsContainer) {
   // Functions scope for objects is defined according
-  // to parameters
-  outputObjectsContainer.GetObjects().clear();
-  outputObjectsContainer.GetObjectGroups().Clear();
-
+  // to parameters.
   auto &parameters = eventsFunction.GetParametersForEvents(functionContainer);
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
       project,
       parameters,
       outputObjectsContainer);
+
+  // TODO: in theory we should ensure stability of the groups across calls
+  // to this function. BUT groups in functions should probably have never been
+  // supported, so we're phasing this out in the UI.
   outputObjectsContainer.GetObjectGroups() = eventsFunction.GetObjectGroups();
 }
 

@@ -6,6 +6,8 @@
 #include "ParameterMetadataTools.h"
 
 #include "GDCore/Events/Expression.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
@@ -13,8 +15,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
-#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 
 namespace gd {
 const ParameterMetadata ParameterMetadataTools::badParameterMetadata;
@@ -23,7 +23,10 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     const gd::Project& project,
     const ParameterMetadataContainer& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
-  outputObjectsContainer.GetObjects().clear();
+  // Keep track of all objects and their behaviors names, so we can remove
+  // those who are in the container but not in the parameters anymore.
+  std::set<gd::String> allObjectNames;
+  std::map<gd::String, std::set<gd::String>> allObjectBehaviorNames;
 
   gd::String lastObjectName;
   for (std::size_t i = 0; i < parameters.GetParametersCount(); ++i) {
@@ -31,31 +34,84 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     if (parameter.GetName().empty()) continue;
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
-      outputObjectsContainer.InsertNewObject(
-          project,
-          parameter.GetExtraInfo(),
-          parameter.GetName(),
-          outputObjectsContainer.GetObjectsCount());
+      const gd::String& objectName = parameter.GetName();
+      const gd::String& objectType = parameter.GetExtraInfo();
+      allObjectNames.insert(objectName);
+
+      // Check if we can keep the existing object.
+      if (outputObjectsContainer.HasObjectNamed(objectName)) {
+        const gd::Object& object = outputObjectsContainer.GetObject(objectName);
+
+        if (object.GetType() != objectType) {
+          // Object type has changed, remove it so it is re-created.
+          outputObjectsContainer.RemoveObject(objectName);
+        }
+      }
+
+      if (outputObjectsContainer.HasObjectNamed(objectName)) {
+        // Keep the existing object - behaviors will be added or removed later.
+      } else {
+        outputObjectsContainer.InsertNewObject(
+            project,
+            parameter.GetExtraInfo(),
+            objectName,
+            outputObjectsContainer.GetObjectsCount());
+      }
 
       // Memorize the last object name. By convention, parameters that require
       // an object (mainly, "objectvar" and "behavior") should be placed after
       // the object in the list of parameters (if possible, just after).
       // Search "lastObjectName" in the codebase for other place where this
       // convention is enforced.
-      lastObjectName = parameter.GetName();
+      lastObjectName = objectName;
     } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
       if (!lastObjectName.empty()) {
         if (outputObjectsContainer.HasObjectNamed(lastObjectName)) {
-          const gd::Object& object =
-              outputObjectsContainer.GetObject(lastObjectName);
-          gd::String behaviorName = parameter.GetName();
+          const gd::String& behaviorName = parameter.GetName();
+          const gd::String& behaviorType = parameter.GetExtraInfo();
+
+          gd::Object& object = outputObjectsContainer.GetObject(lastObjectName);
+          allObjectBehaviorNames[lastObjectName].insert(behaviorName);
+
+          // Check if we can keep the existing behavior.
+          if (object.HasBehaviorNamed(behaviorName)) {
+            if (object.GetBehavior(behaviorName).GetTypeName() !=
+                behaviorType) {
+              // Behavior type has changed, remove it so it is re-created.
+              object.RemoveBehavior(behaviorName);
+            }
+          }
 
           if (!object.HasBehaviorNamed(behaviorName)) {
-            outputObjectsContainer.GetObject(lastObjectName)
-                .AddNewBehavior(
-                    project, parameter.GetExtraInfo(), behaviorName);
+            object.AddNewBehavior(
+                project, parameter.GetExtraInfo(), behaviorName);
           }
         }
+      }
+    }
+  }
+
+  // Remove objects that are not in the parameters anymore.
+  std::set<gd::String> objectNamesInContainer =
+      outputObjectsContainer.GetAllObjectNames();
+  for (const auto& objectName : objectNamesInContainer) {
+    if (allObjectNames.find(objectName) == allObjectNames.end()) {
+      outputObjectsContainer.RemoveObject(objectName);
+    }
+  }
+
+  // Remove behaviors of objects that are not in the parameters anymore.
+  for (const auto& objectName : allObjectNames) {
+    if (!outputObjectsContainer.HasObjectNamed(objectName)) {
+      // Should not happen.
+      continue;
+    }
+
+    auto& object = outputObjectsContainer.GetObject(objectName);
+    for (const auto& behaviorName : object.GetAllBehaviorNames()) {
+      const auto& allBehaviorNames = allObjectBehaviorNames[objectName];
+      if (allBehaviorNames.find(behaviorName) == allBehaviorNames.end()) {
+        object.RemoveBehavior(behaviorName);
       }
     }
   }

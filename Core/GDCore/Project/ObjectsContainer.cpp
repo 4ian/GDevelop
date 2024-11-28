@@ -205,6 +205,14 @@ void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(
       objectFolderOrObject, newParentFolder, newPosition);
 }
 
+std::set<gd::String> ObjectsContainer::GetAllObjectNames() const {
+  std::set<gd::String> names;
+  for (const auto& object : initialObjects) {
+    names.insert(object->GetName());
+  }
+  return names;
+}
+
 std::vector<const ObjectFolderOrObject*>
 ObjectsContainer::GetAllObjectFolderOrObjects() const {
   std::vector<const ObjectFolderOrObject*> results;

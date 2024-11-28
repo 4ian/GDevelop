@@ -2,12 +2,12 @@
 #include <vector>
 
 #include "Variable.h"
+#include "GDCore/Project/ObjectsContainer.h"
 
 namespace gd {
 class String;
 class Project;
 class Layout;
-class ObjectsContainer;
 class VariablesContainer;
 class Object;
 class ObjectConfiguration;
@@ -189,6 +189,19 @@ class GD_CORE_API ObjectsContainersList {
       const gd::String& search,
       std::function<void(const gd::String& variableName,
                          const gd::Variable& variable)> fn) const;
+
+  /**
+   * \brief Return the source type of the container for the specified object or
+   * group of objects.
+   */
+  const gd::ObjectsContainer::SourceType GetObjectsContainerSourceType(
+      const gd::String& objectOrGroupName) const;
+
+  /**
+   * Get the objects container for for the specified object or group of objects.
+   */
+  const ObjectsContainer *
+  GetObjectsContainerFromObjectName(const gd::String &objectOrGroupName) const;
 
   /**
    * \brief Return a the objects container at position \a index.

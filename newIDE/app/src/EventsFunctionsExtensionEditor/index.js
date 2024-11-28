@@ -152,8 +152,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   // Avoid recreating containers if they were already created, so that
   // we keep the same objects in memory and avoid remounting components
   // (like ObjectGroupsList) because objects "ptr" changed.
-  _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
-  _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
+  /** An empty list for when one is asked */
+  _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
+    gd.ObjectsContainer.Unknown
+  );
+  /** The objects from function parameters. */
+  _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
+    gd.ObjectsContainer.Function
+  );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
@@ -1306,6 +1312,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       eventsFunctionsExtension
                     }
                     eventsFunctionsExtension={eventsFunctionsExtension}
+                    globalObjectsContainer={
+                      selectedEventsBasedObject
+                        ? selectedEventsBasedObject.getObjects()
+                        : null
+                    }
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={
@@ -1367,7 +1378,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editor => (this.editor = editor)}
                 project={project}
                 scope={scope}
-                globalObjectsContainer={this._globalObjectsContainer}
+                globalObjectsContainer={
+                  selectedEventsBasedObject
+                    ? selectedEventsBasedObject.getObjects()
+                    : this._globalObjectsContainer
+                }
                 objectsContainer={this._objectsContainer}
                 projectScopedContainersAccessor={
                   this._projectScopedContainersAccessor

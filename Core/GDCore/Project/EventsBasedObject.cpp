@@ -23,7 +23,8 @@ EventsBasedObject::EventsBasedObject()
     areaMinZ(0),
     areaMaxX(64),
     areaMaxY(64),
-    areaMaxZ(64) {
+    areaMaxZ(64),
+    objectsContainer(gd::ObjectsContainer::SourceType::Object) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}

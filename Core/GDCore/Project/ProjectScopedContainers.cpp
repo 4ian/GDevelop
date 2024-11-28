@@ -136,7 +136,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
       project, eventsBasedObject, eventsFunction, parameterObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
-      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+      ObjectsContainersList::MakeNewObjectsContainersListForContainers(
+          eventsBasedObject.GetObjects(),
           parameterObjectsContainer),
       VariablesContainersList::
           MakeNewVariablesContainersListForEventsFunctionsExtension(
@@ -180,17 +181,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
           eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
       "Object", outputObjectsContainer.GetObjectsCount());
 
-  // TODO: We should avoid to do a copy of the objects container here - as this results
-  // in an objects container that contains temporary objects. This can create issues in the
-  // UI (for example, a tree view that keeps references on objects).
-  // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
-  // in the codebase.
-  gd::EventsFunctionTools::CopyEventsBasedObjectChildrenToObjectsContainer(
-      eventsBasedObject, outputObjectsContainer);
-
   ProjectScopedContainers projectScopedContainers(
-      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
-          outputObjectsContainer),
+      ObjectsContainersList::MakeNewObjectsContainersListForContainers(
+          eventsBasedObject.GetObjects(), outputObjectsContainer),
       VariablesContainersList::
           MakeNewVariablesContainersListForEventsFunctionsExtension(
               eventsFunctionsExtension),

@@ -5,8 +5,12 @@ const gd: libGDevelop = global.gd;
 describe('SceneEditor', () => {
   test('cleanNonExistingObjectFolderOrObjectWithContexts', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
-    const globalObjectsContainer = new gd.ObjectsContainer();
-    const objectsContainer = new gd.ObjectsContainer();
+    const globalObjectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const objectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
 
     const globalRootFolder = globalObjectsContainer.getRootFolder();
     globalObjectsContainer.insertNewObjectInFolder(

@@ -417,9 +417,9 @@ describe('libGD.js', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       // Prepare two containers, one with 3 objects and one empty
-      const objectsContainer1 = new gd.ObjectsContainer();
+      const objectsContainer1 = new gd.ObjectsContainer(gd.ObjectsContainer.Unknown);
       const rootFolder1 = objectsContainer1.getRootFolder();
-      const objectsContainer2 = new gd.ObjectsContainer();
+      const objectsContainer2 = new gd.ObjectsContainer(gd.ObjectsContainer.Unknown);
       const rootFolder2 = objectsContainer2.getRootFolder();
       const subFolder2 = rootFolder2.insertNewFolder('Folder', 1);
       const mySpriteObject = objectsContainer1.insertNewObject(
@@ -571,7 +571,7 @@ describe('libGD.js', function () {
       const project = new gd.ProjectHelper.createNewGDJSProject();
 
       // Prepare two containers, one with 3 objects and one empty
-      const objectsContainer = new gd.ObjectsContainer();
+      const objectsContainer = new gd.ObjectsContainer(gd.ObjectsContainer.Unknown);
       const rootFolder = objectsContainer.getRootFolder();
       const folder = rootFolder.insertNewFolder('Folder 1', 0);
       const mySpriteObject = objectsContainer.insertNewObjectInFolder(
@@ -4283,7 +4283,7 @@ describe('libGD.js', function () {
       parameters.removeParameter('MySpriteObject2');
       expect(parameters.getParametersCount()).toBe(7);
 
-      objectsContainer = new gd.ObjectsContainer();
+      objectsContainer = new gd.ObjectsContainer(gd.ObjectsContainer.Function);
       gd.ParameterMetadataTools.parametersToObjectsContainer(
         project,
         parameters,
@@ -4399,7 +4399,6 @@ describe('libGD.js', function () {
       parameters.insertNewParameter('Param5', 4).setType('objectvar');
       parameters.insertNewParameter('Param6', 5).setType('objectvar');
 
-      objectsContainer = new gd.ObjectsContainer();
       expect(
         gd.ParameterMetadataTools.getObjectParameterIndexFor(parameters, 0)
       ).toBe(0);

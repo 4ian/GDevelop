@@ -16,6 +16,9 @@ import { MarkdownText } from '../UI/MarkdownText';
 const styles = {
   textContainer: { overflow: 'hidden' },
   checkboxContainer: { paddingTop: 6 },
+  image: {
+    maxWidth: 600,
+  },
 };
 
 type Props = {|
@@ -65,7 +68,12 @@ const GuidedCourseChapterTaskItem = ({
           {isOpen &&
             guidedCourseChapterTask.imageUrls &&
             guidedCourseChapterTask.imageUrls.map(imageUrl => (
-              <CorsAwareImage key={imageUrl} alt="" src={imageUrl} />
+              <CorsAwareImage
+                style={styles.image}
+                key={imageUrl}
+                alt=""
+                src={imageUrl}
+              />
             ))}
           {isOpen && guidedCourseChapterTask.hint && (
             <Hint text={guidedCourseChapterTask.hint} />
@@ -84,10 +92,18 @@ const GuidedCourseChapterTaskItem = ({
                     allowParagraphs
                   />
                 )}
-                {!!guidedCourseChapterTask.answer.imageUrls &&
-                  guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
-                    <CorsAwareImage key={imageUrl} alt="" src={imageUrl} />
-                  ))}
+                {!!guidedCourseChapterTask.answer.imageUrls && (
+                  <ColumnStackLayout noMargin noOverflowParent>
+                    {guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
+                      <CorsAwareImage
+                        style={styles.image}
+                        key={imageUrl}
+                        alt=""
+                        src={imageUrl}
+                      />
+                    ))}
+                  </ColumnStackLayout>
+                )}
               </AccordionBody>
             </Accordion>
           )}

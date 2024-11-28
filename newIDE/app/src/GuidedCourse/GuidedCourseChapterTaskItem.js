@@ -9,9 +9,9 @@ import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
-import Hint from '../UI/Hint';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { MarkdownText } from '../UI/MarkdownText';
+import AlertMessage from '../UI/AlertMessage';
 
 const styles = {
   textContainer: { overflow: 'hidden' },
@@ -76,7 +76,9 @@ const GuidedCourseChapterTaskItem = ({
               />
             ))}
           {isOpen && guidedCourseChapterTask.hint && (
-            <Hint text={guidedCourseChapterTask.hint} />
+            <AlertMessage kind="info" background="light">
+              <MarkdownText source={guidedCourseChapterTask.hint} />
+            </AlertMessage>
           )}
           {isOpen && guidedCourseChapterTask.answer && (
             <Accordion kind="answer">

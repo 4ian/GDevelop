@@ -36,7 +36,10 @@ namespace gd {
 
 gd::BehaviorsSharedData Layout::badBehaviorSharedData("", "");
 
-Layout::Layout(const Layout& other) { Init(other); }
+Layout::Layout(const Layout &other)
+    : objectsContainer(gd::ObjectsContainer::SourceType::Scene) {
+  Init(other);
+}
 
 Layout& Layout::operator=(const Layout& other) {
   if (this != &other) Init(other);

@@ -16,11 +16,6 @@
 
 namespace gd {
 
-ObjectsContainer::ObjectsContainer()
-    : sourceType(ObjectsContainer::SourceType::Unknown) {
-  rootFolder = gd::make_unique<gd::ObjectFolderOrObject>("__ROOT");
-}
-
 ObjectsContainer::ObjectsContainer(
     const ObjectsContainer::SourceType sourceType_)
     : sourceType(sourceType_) {

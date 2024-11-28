@@ -481,7 +481,6 @@ enum ObjectsContainer_SourceType {
 };
 
 interface ObjectsContainer {
-    void ObjectsContainer();
     void ObjectsContainer(ObjectsContainer_SourceType sourceType);
 
     ObjectsContainer_SourceType GetSourceType();

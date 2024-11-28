@@ -153,7 +153,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   // we keep the same objects in memory and avoid remounting components
   // (like ObjectGroupsList) because objects "ptr" changed.
   /** An empty list for when one is asked */
-  _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
+  _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
+    gd.ObjectsContainer.Unknown
+  );
   /** The objects from function parameters. */
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function

@@ -129,12 +129,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer parameterObjectsAndGroups;
+  gd::ObjectsContainer parameterObjectsAndGroups(
+      gd::ObjectsContainer::SourceType::Function);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForFreeEventsFunction(
-          project,
-          eventsFunctionsExtension,
-          eventsFunction,
+          project, eventsFunctionsExtension, eventsFunction,
           parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
@@ -184,14 +183,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer parameterObjectsContainers;
+  gd::ObjectsContainer parameterObjectsContainers(
+      gd::ObjectsContainer::SourceType::Function);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
-          project,
-          eventsFunctionsExtension,
-          eventsBasedBehavior,
-          eventsFunction,
-          parameterObjectsContainers);
+          project, eventsFunctionsExtension, eventsBasedBehavior,
+          eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -266,13 +263,11 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer parameterObjectsContainers;
+  gd::ObjectsContainer parameterObjectsContainers(
+      gd::ObjectsContainer::SourceType::Function);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
-          project,
-          eventsFunctionsExtension,
-          eventsBasedObject,
-          eventsFunction,
+          project, eventsFunctionsExtension, eventsBasedObject, eventsFunction,
           parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);

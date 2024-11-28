@@ -45,9 +45,8 @@ class GD_CORE_API ObjectsContainer {
   };
 
   /**
-   * \brief Default constructor creating a container without any objects.
+   * \brief Constructor creating a container without any objects.
    */
-  ObjectsContainer();
   ObjectsContainer(const SourceType sourceType);
   virtual ~ObjectsContainer();
 

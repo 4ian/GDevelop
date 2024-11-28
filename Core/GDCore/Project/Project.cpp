@@ -1231,7 +1231,10 @@ gd::SourceFile& Project::InsertNewSourceFile(const gd::String& name,
   return newlyInsertedSourceFile;
 }
 
-Project::Project(const Project& other) { Init(other); }
+Project::Project(const Project &other)
+    : objectsContainer(gd::ObjectsContainer::SourceType::Global) {
+  Init(other);
+}
 
 Project& Project::operator=(const Project& other) {
   if (this != &other) Init(other);

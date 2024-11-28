@@ -1561,7 +1561,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // events in this test.
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsExtension, eventsFunction,
@@ -1589,7 +1590,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           eventsExtension.GetEventsFunction("MyOtherEventsFunction");
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsExtension, eventsFunction,
@@ -1644,7 +1646,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           project, "MyExtension::Sprite", "Object2", 0);
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForEventsBasedObject(
               project, eventsExtension, eventsBasedObject,
@@ -1685,7 +1688,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       eventsBasedObject.GetInitialInstances().InsertInitialInstance(instance2);
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForEventsBasedObject(
               project, eventsExtension, eventsBasedObject,
@@ -1711,7 +1715,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyOtherEventsBasedObject");
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForEventsBasedObject(
               project, eventsExtension, eventsBasedObject,
@@ -1766,7 +1771,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           project, "MyExtension::Sprite", "Object2", 0);
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForEventsBasedObject(
               project, eventsExtension, eventsBasedObject,
@@ -1806,7 +1812,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       eventsBasedObject.GetInitialInstances().InsertInitialInstance(instance2);
 
       // Create the objects container for the events function
-      gd::ObjectsContainer parametersObjectsContainer;
+      gd::ObjectsContainer parametersObjectsContainer(
+          gd::ObjectsContainer::SourceType::Function);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForEventsBasedObject(
               project, eventsExtension, eventsBasedObject,

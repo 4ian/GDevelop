@@ -416,7 +416,8 @@ gd::String ObjectsContainersList::GetTypeOfObject(
     return "";
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::GetTypeOfObject(emptyObjectsContainer, *objectsContainers[0],
                                objectName, true);
   }
@@ -439,7 +440,8 @@ bool ObjectsContainersList::HasBehaviorInObjectOrGroup(
     return false;
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::HasBehaviorInObjectOrGroup(
         emptyObjectsContainer, *objectsContainers[0], objectOrGroupName,
         behaviorName, true);
@@ -468,7 +470,8 @@ gd::String ObjectsContainersList::GetTypeOfBehaviorInObjectOrGroup(
     return "";
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::GetTypeOfBehaviorInObjectOrGroup(
         emptyObjectsContainer, *objectsContainers[0], objectOrGroupName,
         behaviorName, searchInGroups);
@@ -495,7 +498,8 @@ gd::String ObjectsContainersList::GetTypeOfBehavior(
     return "";
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::GetTypeOfBehavior(emptyObjectsContainer, *objectsContainers[0],
                                  behaviorName, searchInGroups);
   }
@@ -521,7 +525,8 @@ std::vector<gd::String> ObjectsContainersList::GetBehaviorsOfObject(
     return behaviors;
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::GetBehaviorsOfObject(emptyObjectsContainer,
                                     *objectsContainers[0], objectName,
                                     searchInGroups);
@@ -546,7 +551,8 @@ std::vector<gd::String> ObjectsContainersList::GetBehaviorNamesInObjectOrGroup(
     return behaviors;
   }
   if (objectsContainers.size() == 1) {
-    gd::ObjectsContainer emptyObjectsContainer;
+    gd::ObjectsContainer emptyObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
     return gd::GetBehaviorNamesInObjectOrGroup(emptyObjectsContainer,
                                     *objectsContainers[0], objectOrGroupName, behaviorType,
                                     searchInGroups);

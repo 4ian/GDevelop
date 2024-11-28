@@ -473,7 +473,6 @@ export class ObjectFolderOrObject extends EmscriptenObject {
 }
 
 export class ObjectsContainer extends EmscriptenObject {
-  constructor();
   constructor(sourceType: ObjectsContainer_SourceType);
   getSourceType(): ObjectsContainer_SourceType;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;

@@ -975,6 +975,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     numberRelationalOperatorParameterMetadata,
     colorRelationalOperatorParameterMetadata,
     unknownRelationalOperatorParameterMetadata,
-    emptyObjectsContainer: new gd.ObjectsContainer(),
+    emptyObjectsContainer: new gd.ObjectsContainer(gd.ObjectsContainer.Unknown),
   };
 };

@@ -5,7 +5,6 @@ declare class gdObjectsContainer {
   static Scene: 2;
   static Object: 3;
   static Function: 4;
-  constructor(): void;
   constructor(sourceType: ObjectsContainer_SourceType): void;
   getSourceType(): ObjectsContainer_SourceType;
   insertNewObject(project: gdProject, type: string, name: string, pos: number): gdObject;

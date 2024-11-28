@@ -144,6 +144,7 @@ const guidedCourseChapter: GuidedCourseChapter = {
   ],
   templateUrl:
     'https://resources.gdevelop-app.com/tutorial/templates/chapter1/game.json',
+  videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
 };
 
 export const Default = () => {

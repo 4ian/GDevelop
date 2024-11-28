@@ -8,13 +8,13 @@ namespace Jolt {
 
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
-    fws: float,
-    sws: float,
-    fs: float,
-    js: float,
-    cj: boolean,
-    tscjs: float,
-    jkhsjs: boolean
+    fws: float;
+    sws: float;
+    fs: float;
+    js: float;
+    cj: boolean;
+    tscjs: float;
+    jkhsjs: boolean;
   }
 
   export interface PhysicsCharacter3DNetworkSyncData
@@ -33,8 +33,7 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
-  {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
@@ -76,6 +75,15 @@ namespace gdjs {
     _timeSinceCurrentJumpStart: float = 0;
     _jumpKeyHeldSinceJumpStart: boolean = false;
     private _hasReallyMoved: boolean = false;
+
+    // This is useful for extensions that need to know
+    // which keys were pressed and doesn't know the mapping
+    // done by the scene events.
+    private _wasLeftKeyPressed: boolean = false;
+    private _wasRightKeyPressed: boolean = false;
+    private _wasForwardKeyPressed: boolean = false;
+    private _wasBackwardKeyPressed: boolean = false;
+    private _wasJumpKeyPressed: boolean = false;
 
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
@@ -178,22 +186,36 @@ namespace gdjs {
       if (oldBehaviorData.maxFallingSpeed !== newBehaviorData.maxFallingSpeed) {
         this.setMaxFallingSpeed(newBehaviorData.maxFallingSpeed);
       }
-      if (oldBehaviorData.forwardAcceleration !== newBehaviorData.forwardAcceleration) {
+      if (
+        oldBehaviorData.forwardAcceleration !==
+        newBehaviorData.forwardAcceleration
+      ) {
         this.setForwardAcceleration(newBehaviorData.forwardAcceleration);
       }
-      if (oldBehaviorData.forwardDeceleration !== newBehaviorData.forwardDeceleration) {
+      if (
+        oldBehaviorData.forwardDeceleration !==
+        newBehaviorData.forwardDeceleration
+      ) {
         this.setForwardDeceleration(newBehaviorData.forwardDeceleration);
       }
       if (oldBehaviorData.forwardSpeedMax !== newBehaviorData.forwardSpeedMax) {
         this.setForwardSpeedMax(newBehaviorData.forwardSpeedMax);
       }
-      if (oldBehaviorData.sidewaysAcceleration !== newBehaviorData.sidewaysAcceleration) {
+      if (
+        oldBehaviorData.sidewaysAcceleration !==
+        newBehaviorData.sidewaysAcceleration
+      ) {
         this.setSidewaysAcceleration(newBehaviorData.sidewaysAcceleration);
       }
-      if (oldBehaviorData.sidewaysDeceleration !== newBehaviorData.sidewaysDeceleration) {
+      if (
+        oldBehaviorData.sidewaysDeceleration !==
+        newBehaviorData.sidewaysDeceleration
+      ) {
         this.setSidewaysDeceleration(newBehaviorData.sidewaysDeceleration);
       }
-      if (oldBehaviorData.sidewaysSpeedMax !== newBehaviorData.sidewaysSpeedMax) {
+      if (
+        oldBehaviorData.sidewaysSpeedMax !== newBehaviorData.sidewaysSpeedMax
+      ) {
         this.setSidewaysSpeedMax(newBehaviorData.sidewaysSpeedMax);
       }
       if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
@@ -555,14 +577,6 @@ namespace gdjs {
       if (this.isOnFloor()) {
         this._currentFallSpeed = 0;
         this._currentJumpSpeed = 0;
-
-        if (this.hasPressedJumpKey && !this.hasJumpKeyBeenConsumed) {
-          this._currentJumpSpeed = this._jumpSpeed;
-          this.hasJumpKeyBeenConsumed = true;
-          this._jumpKeyHeldSinceJumpStart = true;
-          this._timeSinceCurrentJumpStart = 0;
-          hasJustJumped = true;
-        }
       } else {
         // Check if the jump key is continuously held since
         // the beginning of the jump.
@@ -570,6 +584,19 @@ namespace gdjs {
           this._jumpKeyHeldSinceJumpStart = false;
         }
         this._timeSinceCurrentJumpStart += timeDelta;
+      }
+      if (
+        this._canJump &&
+        this.hasPressedJumpKey &&
+        !this.hasJumpKeyBeenConsumed
+      ) {
+        this._currentJumpSpeed = this._jumpSpeed;
+        this._currentFallSpeed = 0;
+        this._canJump = false;
+        this.hasJumpKeyBeenConsumed = true;
+        this._jumpKeyHeldSinceJumpStart = true;
+        this._timeSinceCurrentJumpStart = 0;
+        hasJustJumped = true;
       }
       // When a jump starts isOnFloor will only become false after ExtendedUpdate is called.
       if (!this.isOnFloor() || hasJustJumped) {
@@ -784,6 +811,12 @@ namespace gdjs {
       //     ' ' +
       //     this.character.GetGroundNormal().GetZ()
       // );
+
+      this._wasForwardKeyPressed = this.hasPressedForwardKey;
+      this._wasBackwardKeyPressed = this.hasPressedBackwardKey;
+      this._wasRightKeyPressed = this.hasPressedRightKey;
+      this._wasLeftKeyPressed = this.hasPressedLeftKey;
+      this._wasJumpKeyPressed = this.hasPressedJumpKey;
 
       if (!this._dontClearInputsBetweenFrames) {
         this.hasPressedForwardKey = false;
@@ -1146,6 +1179,10 @@ namespace gdjs {
 
     simulateJumpKey(): void {
       this.hasPressedJumpKey = true;
+    }
+
+    wasJumpKeyPressed(): boolean {
+      return this._wasJumpKeyPressed;
     }
 
     simulateStick(stickAngle: float, stickForce: float) {

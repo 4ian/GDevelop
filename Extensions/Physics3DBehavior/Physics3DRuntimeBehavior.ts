@@ -78,8 +78,9 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
-    private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
-      [];
+    private _physics3DHooks: Array<
+      gdjs.Physics3DRuntimeBehavior.Physics3DHook
+    > = [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
@@ -172,8 +173,9 @@ namespace gdjs {
     ): gdjs.Physics3DSharedData {
       // Create one if needed
       if (!runtimeScene.physics3DSharedData) {
-        const initialData =
-          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
+        const initialData = runtimeScene.getInitialSharedDataForBehavior(
+          behaviorName
+        );
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
@@ -197,8 +199,9 @@ namespace gdjs {
       const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
       );
-      const broadPhaseLayerInterfaceMask =
-        new Jolt.BroadPhaseLayerInterfaceMask(2);
+      const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
+        2
+      );
       broadPhaseLayerInterfaceMask.ConfigureLayer(
         staticBroadPhaseLayer,
         gdjs.Physics3DSharedData.staticLayersMask,
@@ -215,10 +218,9 @@ namespace gdjs {
 
       settings.mObjectLayerPairFilter = objectFilter;
       settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-      settings.mObjectVsBroadPhaseLayerFilter =
-        new Jolt.ObjectVsBroadPhaseLayerFilterMask(
-          broadPhaseLayerInterfaceMask
-        );
+      settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+        broadPhaseLayerInterfaceMask
+      );
     }
 
     /**

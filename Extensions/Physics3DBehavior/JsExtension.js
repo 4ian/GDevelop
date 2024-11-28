@@ -2142,9 +2142,9 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .useStandardParameters(
           'number',
-          gd.ParameterOptions
-            .makeNewOptions()
-            .setDescription(_('Speed to compare to (in pixels per second)'))
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed to compare to (in pixels per second)')
+          )
         )
         .markAsAdvanced()
         .setFunctionName('getCurrentFallSpeed');

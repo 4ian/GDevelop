@@ -23,6 +23,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import Checkbox from '../../UI/Checkbox';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -160,6 +161,7 @@ export const EventsFunctionPropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  const { isMobile } = useResponsiveWindowSize();
 
   const type = eventsFunction.getFunctionType();
   const isABehaviorLifecycleEventsFunction =
@@ -256,8 +258,9 @@ export const EventsFunctionPropertiesEditor = ({
                   <ResponsiveLineStackLayout
                     alignItems="center"
                     noMargin
+                    // Allow to be displayed on a column when this component is in a side panel.
                     forceMobileLayout={!!containerWidth && containerWidth < 650}
-                    noResponsiveLandscape
+                    noResponsiveLandscape={isMobile}
                   >
                     <Line alignItems="center" noMargin>
                       <SelectField

@@ -7,6 +7,7 @@
 #define GDCORE_OBJECTSCONTAINER_H
 #include <memory>
 #include <vector>
+#include <set>
 #include "GDCore/String.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectFolderOrObject.h"
@@ -40,7 +41,7 @@ class GD_CORE_API ObjectsContainer {
    */
   ObjectsContainer();
   virtual ~ObjectsContainer();
-  
+
   ObjectsContainer(const ObjectsContainer&);
   ObjectsContainer& operator=(const ObjectsContainer& rhs);
 
@@ -168,6 +169,8 @@ class GD_CORE_API ObjectsContainer {
   const std::vector<std::unique_ptr<gd::Object> >& GetObjects() const {
     return initialObjects;
   }
+
+  std::set<gd::String> GetAllObjectNames() const;
   ///@}
 
   /**

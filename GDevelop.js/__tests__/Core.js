@@ -4262,14 +4262,26 @@ describe('libGD.js', function () {
         .setDescription('The second object to be used, a sprite');
 
       parameters
+        .addNewParameter('MyFirstBehavior')
+        .setType('behavior')
+        .setExtraInfo('SomeBehavior::FirstBehaviorType')
+        .setDescription('The first behavior of the first sprite');
+
+      parameters
+        .addNewParameter('MySecondBehavior')
+        .setType('behavior')
+        .setExtraInfo('SomeBehavior::SecondBehaviorType')
+        .setDescription('The first behavior of the first sprite');
+
+      parameters
         .addNewParameter('MySpriteObject2')
         .setType('objectList')
         .setExtraInfo('Sprite')
         .setDescription('The second object to be used, a sprite');
-      expect(parameters.getParametersCount()).toBe(6);
+      expect(parameters.getParametersCount()).toBe(8);
 
       parameters.removeParameter('MySpriteObject2');
-      expect(parameters.getParametersCount()).toBe(5);
+      expect(parameters.getParametersCount()).toBe(7);
 
       objectsContainer = new gd.ObjectsContainer();
       gd.ParameterMetadataTools.parametersToObjectsContainer(
@@ -4278,16 +4290,100 @@ describe('libGD.js', function () {
         objectsContainer
       );
 
+      // Check that object parameters are considered as objects in the objects container.
       expect(objectsContainer.getObjectsCount()).toBe(2);
       expect(objectsContainer.hasObjectNamed('MyObjectWithoutType')).toBe(true);
-      expect(objectsContainer.getObject('MyObjectWithoutType').getType()).toBe(
+      expect(objectsContainer.hasObjectNamed('MySpriteObject')).toBe(true);
+
+      const objectWithoutType = objectsContainer.getObject('MyObjectWithoutType');
+      expect(objectWithoutType.getType()).toBe(
         ''
       );
-      expect(objectsContainer.hasObjectNamed('MySpriteObject')).toBe(true);
+      const mySpriteObject = objectsContainer.getObject('MySpriteObject');
       expect(objectsContainer.getObject('MySpriteObject').getType()).toBe(
         'Sprite'
       );
 
+      // Check that behaviors were also added.
+      expect(objectsContainer.getObject('MySpriteObject').getAllBehaviorNames().toJSArray()).toEqual(
+        ['MyFirstBehavior', 'MySecondBehavior']
+      );
+
+      // Call a second time and verify no changes.
+      gd.ParameterMetadataTools.parametersToObjectsContainer(
+        project,
+        parameters,
+        objectsContainer
+      );
+      expect(objectsContainer.getObjectsCount()).toBe(2);
+      expect(objectsContainer.hasObjectNamed('MyObjectWithoutType')).toBe(true);
+      expect(objectsContainer.hasObjectNamed('MySpriteObject')).toBe(true);
+      expect(objectsContainer.getObject('MySpriteObject').getAllBehaviorNames().toJSArray()).toEqual(
+        ['MyFirstBehavior', 'MySecondBehavior']
+      );
+
+      // Verify that objects are even stable in memory.
+      expect(objectWithoutType).toBe(objectsContainer.getObject('MyObjectWithoutType'));
+      expect(gd.getPointer(objectWithoutType)).toBe(gd.getPointer(objectsContainer.getObject('MyObjectWithoutType')));
+      expect(mySpriteObject).toBe(objectsContainer.getObject('MySpriteObject'));
+      expect(gd.getPointer(mySpriteObject)).toBe(gd.getPointer(objectsContainer.getObject('MySpriteObject')));
+
+      // Change an object type, rename a behavior and add a new object.
+      parameters.getParameter("MyObjectWithoutType").setExtraInfo('Sprite');
+      parameters.getParameter("MySecondBehavior").setName("MyRenamedSecondBehavior");
+      parameters
+        .addNewParameter('MySpriteObject3')
+        .setType('objectList')
+        .setExtraInfo('Sprite')
+        .setDescription('The third object to be used, a sprite');
+
+      // Verify changes are propagated.
+      gd.ParameterMetadataTools.parametersToObjectsContainer(
+        project,
+        parameters,
+        objectsContainer
+      );
+      expect(objectsContainer.getObjectsCount()).toBe(3);
+      expect(objectsContainer.hasObjectNamed('MyObjectWithoutType')).toBe(true);
+      expect(objectsContainer.hasObjectNamed('MySpriteObject')).toBe(true);
+      expect(objectsContainer.hasObjectNamed('MySpriteObject3')).toBe(true);
+      expect(objectsContainer.getObject('MySpriteObject').getAllBehaviorNames().toJSArray()).toEqual(
+        ['MyFirstBehavior', 'MyRenamedSecondBehavior']
+      );
+      const updatedObjectWithoutType = objectsContainer.getObject('MyObjectWithoutType');
+      expect(updatedObjectWithoutType.getType()).toEqual('Sprite');
+      const mySpriteObject3 = objectsContainer.getObject('MySpriteObject3');
+      expect(mySpriteObject3.getType()).toEqual('Sprite');
+
+      // Verify that objects are changed in memory if changed in parameters.
+      expect(objectWithoutType).not.toBe(updatedObjectWithoutType);
+      expect(gd.getPointer(objectWithoutType)).not.toBe(gd.getPointer(updatedObjectWithoutType));
+      expect(mySpriteObject).toBe(objectsContainer.getObject('MySpriteObject'));
+      expect(gd.getPointer(mySpriteObject)).toBe(gd.getPointer(objectsContainer.getObject('MySpriteObject')));
+
+      // Remove an object and check that it is removed from the objects container.
+      parameters.removeParameter('MySpriteObject');
+      parameters.removeParameter('MyFirstBehavior');
+      parameters.removeParameter('MyRenamedSecondBehavior');
+
+      // Verify changes are propagated.
+      gd.ParameterMetadataTools.parametersToObjectsContainer(
+        project,
+        parameters,
+        objectsContainer
+      );
+      expect(objectsContainer.getObjectsCount()).toBe(2);
+      expect(objectsContainer.hasObjectNamed('MyObjectWithoutType')).toBe(true);
+      expect(objectsContainer.hasObjectNamed('MySpriteObject')).toBe(false);
+      expect(objectsContainer.hasObjectNamed('MySpriteObject3')).toBe(true);
+
+      // Verify that objects are still stable in memory.
+      expect(updatedObjectWithoutType).toBe(objectsContainer.getObject('MyObjectWithoutType'));
+      expect(gd.getPointer(updatedObjectWithoutType)).toBe(gd.getPointer(objectsContainer.getObject('MyObjectWithoutType')));
+      expect(mySpriteObject3).toBe(objectsContainer.getObject('MySpriteObject3'));
+      expect(gd.getPointer(mySpriteObject3)).toBe(gd.getPointer(objectsContainer.getObject('MySpriteObject3')));
+
+      objectsContainer.delete();
       eventsFunction.delete();
       project.delete();
     });

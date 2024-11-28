@@ -145,11 +145,12 @@ export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
           ? gdevelopTheme.message.answer.backgroundColor
           : gdevelopTheme.paper.backgroundColor.medium,
       marginLeft: 0,
-      border: noMargin
-        ? '0px'
-        : kind === 'answer'
-        ? `2px solid ${gdevelopTheme.message.answer.borderColor}`
-        : `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+      border:
+        kind === 'answer'
+          ? `2px solid ${gdevelopTheme.message.answer.borderColor}`
+          : noMargin
+          ? '0px'
+          : `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
       padding: noMargin ? `0px` : undefined,
       margin: noMargin ? `0px` : undefined,
       borderRadius: kind === 'answer' ? 4 : 0,

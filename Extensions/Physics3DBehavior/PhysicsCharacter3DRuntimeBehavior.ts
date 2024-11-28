@@ -64,7 +64,6 @@ namespace gdjs {
     hasPressedLeftKey: boolean = false;
     hasPressedJumpKey: boolean = false;
     hasJumpKeyBeenConsumed: boolean = false;
-    private _wasStickUsed: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
     _currentForwardSpeed: float = 0;
@@ -279,7 +278,6 @@ namespace gdjs {
     }
 
     createAndAddBody(): Jolt.Body {
-      console.log('Create character');
       const { behavior } = this.getPhysics3D();
       const settings = new Jolt.CharacterVirtualSettings();
       settings.mInnerBodyLayer = behavior.getBodyLayer();
@@ -306,88 +304,12 @@ namespace gdjs {
         capsuleHalfLength -
           capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)))
       );
-      console.log(1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)));
       this.character = new Jolt.CharacterVirtual(
         settings,
         behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
         behavior.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
         this._sharedData.physicsSystem
       );
-      const characterContactListener = new Jolt.CharacterContactListenerJS();
-      characterContactListener.OnAdjustBodyVelocity = (
-        character,
-        body2Ptr,
-        linearVelocityPtr,
-        angularVelocity
-      ) => {
-        // const body2 = Jolt.wrapPointer(body2Ptr, Jolt.Body);
-        // const linearVelocity = Jolt.wrapPointer(linearVelocityPtr, Jolt.Vec3);
-        // console.log(
-        //   'Add: ' +
-        //     body2.GetLinearVelocity().GetX() +
-        //     ' ' +
-        //     body2.GetLinearVelocity().GetY()
-        // );
-        // linearVelocity.Set(
-        //   linearVelocity.GetX() + body2.GetLinearVelocity().GetX(),
-        //   linearVelocity.GetY() + body2.GetLinearVelocity().GetY(),
-        //   linearVelocity.GetZ() + body2.GetLinearVelocity().GetZ()
-        // );
-      };
-      characterContactListener.OnContactValidate = (
-        character,
-        bodyID2,
-        subShapeID2
-      ) => {
-        return true;
-      };
-      characterContactListener.OnCharacterContactValidate = (
-        character,
-        otherCharacter,
-        subShapeID2
-      ) => {
-        return true;
-      };
-      characterContactListener.OnContactAdded = (
-        character,
-        bodyID2,
-        subShapeID2,
-        contactPosition,
-        contactNormal,
-        settings
-      ) => {};
-      characterContactListener.OnCharacterContactAdded = (
-        character,
-        otherCharacter,
-        subShapeID2,
-        contactPosition,
-        contactNormal,
-        settings
-      ) => {};
-      characterContactListener.OnContactSolve = (
-        character,
-        bodyID2,
-        subShapeID2,
-        contactPosition,
-        contactNormal,
-        contactVelocity,
-        contactMaterial,
-        characterVelocity,
-        newCharacterVelocity
-      ) => {};
-      characterContactListener.OnCharacterContactSolve = (
-        character,
-        otherCharacter,
-        subShapeID2,
-        contactPosition,
-        contactNormal,
-        contactVelocity,
-        contactMaterial,
-        characterVelocity,
-        newCharacterVelocity
-      ) => {};
-      this.character.SetListener(characterContactListener);
-
       const body = this._sharedData.physicsSystem
         .GetBodyLockInterface()
         .TryGetBody(this.character.GetInnerBodyID());
@@ -426,18 +348,6 @@ namespace gdjs {
         return;
       }
       const worldInvScale = this._sharedData.worldInvScale;
-      // console.log('Step character');
-
-      // console.log(
-      //   'Character: ' +
-      //     this.character.GetPosition().GetX() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetPosition().GetY() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetPosition().GetZ() * this._sharedData.worldScale
-      // );
 
       const oldX = this.character.GetPosition().GetX();
       const oldY = this.character.GetPosition().GetY();
@@ -749,69 +659,6 @@ namespace gdjs {
         this._canJump = true;
       }
 
-      // console.log(
-      //   'Is on floor: ' +
-      //     this.isOnFloor() +
-      //     ' Jump: ' +
-      //     this._currentJumpSpeed +
-      //     ' Fall: ' +
-      //     this._currentFallSpeed
-      // );
-
-      // console.log(
-      //   'Ground: ' +
-      //     this.character.GetGroundVelocity().GetX() +
-      //     ' ' +
-      //     this.character.GetGroundVelocity().GetY() +
-      //     ' ' +
-      //     this.character.GetGroundVelocity().GetZ()
-      // );
-
-      // console.log(
-      //   'Speed: ' +
-      //     this.character.GetLinearVelocity().GetX() +
-      //     ' ' +
-      //     this.character.GetLinearVelocity().GetY()
-      // );
-      // console.log(
-      //   'Body: ' +
-      //     behavior._body!.GetPosition().GetX() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     behavior._body!.GetPosition().GetY() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     behavior._body!.GetPosition().GetZ() * this._sharedData.worldScale
-      // );
-      // console.log(
-      //   'Object: ' +
-      //     this.owner.getX() +
-      //     ' ' +
-      //     this.owner.getY() +
-      //     ' ' +
-      //     behavior.owner3D.getZ()
-      // );
-
-      // console.log(
-      //   'Ground: ' +
-      //   this.character.GetGroundPosition().GetX() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetGroundPosition().GetY() *
-      //       this._sharedData.worldScale +
-      //     ' ' +
-      //     this.character.GetGroundPosition().GetZ() * this._sharedData.worldScale
-      // );
-
-      // console.log(
-      //   'Ground: ' +
-      //   this.character.GetGroundNormal().GetX() +
-      //     ' ' +
-      //     this.character.GetGroundNormal().GetY() +
-      //     ' ' +
-      //     this.character.GetGroundNormal().GetZ()
-      // );
-
       this._wasForwardKeyPressed = this.hasPressedForwardKey;
       this._wasBackwardKeyPressed = this.hasPressedBackwardKey;
       this._wasRightKeyPressed = this.hasPressedRightKey;
@@ -835,8 +682,6 @@ namespace gdjs {
           PhysicsCharacter3DRuntimeBehavior.epsilon ||
         Math.abs(this.character.GetPosition().GetY() - oldZ) >
           PhysicsCharacter3DRuntimeBehavior.epsilon;
-
-      // console.log('END Step character');
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
@@ -1165,16 +1010,32 @@ namespace gdjs {
       this.hasPressedForwardKey = true;
     }
 
+    wasForwardKeyPressed(): boolean {
+      return this._wasForwardKeyPressed;
+    }
+
     simulateBackwardKey(): void {
       this.hasPressedBackwardKey = true;
+    }
+
+    wasBackwardKeyPressed(): boolean {
+      return this._wasBackwardKeyPressed;
     }
 
     simulateRightKey(): void {
       this.hasPressedRightKey = true;
     }
 
+    wasRightKeyPressed(): boolean {
+      return this._wasRightKeyPressed;
+    }
+
     simulateLeftKey(): void {
       this.hasPressedLeftKey = true;
+    }
+
+    wasLeftKeyPressed(): boolean {
+      return this._wasLeftKeyPressed;
     }
 
     simulateJumpKey(): void {

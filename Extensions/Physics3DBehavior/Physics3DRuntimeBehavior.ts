@@ -607,10 +607,6 @@ namespace gdjs {
     onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
       if (this._body !== null) {
-        // TODO
-        // // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
-        // this._sharedData.clearBodyJoints(this._body);
-
         this._sharedData.bodyInterface.RemoveBody(this._body.GetID());
         this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
         this._body = null;
@@ -660,7 +656,6 @@ namespace gdjs {
 
       const onePixel = this._sharedData.worldInvScale;
 
-      // TODO Handle other shape types.
       let shapeSettings: Jolt.ConvexShapeSettings;
       /** This is fine only because no other Quat is used locally. */
       let quat: Jolt.Quat;
@@ -805,7 +800,6 @@ namespace gdjs {
     }
 
     createAndAddBody(): Jolt.Body {
-      console.log('Create body');
       const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -976,10 +970,6 @@ namespace gdjs {
         this.owner3D.setAngle(gdjs.toDegrees(euler.z));
       }
 
-      // if (this.owner.getName() === "MovingPlatform") {
-      //   console.log("to Object: --> " + this.owner3D.getX() + " " + this.owner3D.getY())
-      // }
-
       // Update cached transform.
       this._objectOldX = this.owner3D.getX();
       this._objectOldY = this.owner3D.getY();
@@ -1022,10 +1012,6 @@ namespace gdjs {
         this._objectOldRotationY !== this.owner3D.getRotationY() ||
         this._objectOldRotationZ !== this.owner3D.getAngle()
       ) {
-        // if (this.owner.getName() === "MovingPlatform") {
-        //   console.log("to Physics: " + this._objectOldX + " " + this._objectOldY + " --> " + this.owner3D.getX() + " " + this.owner3D.getY())
-        // }
-
         this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
           body.GetID(),
           this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
@@ -1118,32 +1104,6 @@ namespace gdjs {
         )
       );
     }
-
-    // TODO
-    // getTimeScale(): float {
-    //   // Get the time scale
-    //   return this._sharedData.timeScale;
-    // }
-
-    // setTimeScale(timeScale: float): void {
-    //   // Invalid value
-    //   if (timeScale < 0) {
-    //     return;
-    //   }
-
-    //   // Set the time scale
-    //   this._sharedData.timeScale = timeScale;
-    // }
-
-    // static setTimeScaleFromObject(object, behaviorName, timeScale) {
-    //   // Check if the object exist and has the behavior
-    //   if (object === null || !object.hasBehavior(behaviorName)) {
-    //     return;
-    //   }
-
-    //   // Set the time scale
-    //   object.getBehavior(behaviorName).setTimeScale(timeScale);
-    // }
 
     isDynamic(): boolean {
       return this.bodyType === 'Dynamic';

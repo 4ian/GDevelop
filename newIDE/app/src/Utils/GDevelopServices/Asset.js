@@ -185,13 +185,21 @@ export type GuidedCourseChapterTask = {|
   answer?: { text?: string, imageUrls?: string[] },
 |};
 
-export type GuidedCourseChapter = {|
+export type UnlockedGuidedCourseChapter = {|
   title: string,
-  videoUrl?: string,
-  isLocked?: boolean,
+  videoUrl: string,
+  isLocked?: false,
   templateUrl: string,
   tasks: Array<GuidedCourseChapterTask>,
 |};
+export type LockedGuidedCourseChapter = {|
+  title: string,
+  videoUrl: string,
+  isLocked: true,
+  priceInCredits: number
+|};
+
+export type GuidedCourseChapter = LockedGuidedCourseChapter | UnlockedGuidedCourseChapter
 
 export type Environment = 'staging' | 'live';
 

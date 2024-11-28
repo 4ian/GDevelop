@@ -371,7 +371,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Claim asset pack'
   | 'Callout in Classroom tab'
   | 'Unlock build type'
-  | 'Manage subscription as teacher';
+  | 'Manage subscription as teacher'
+  | 'Unlock course chapter';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

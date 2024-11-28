@@ -155,3 +155,17 @@ export const Default = () => {
     />
   );
 };
+
+export const Locked = () => {
+  return (
+    <GuidedCourseChapterView
+      guidedCourseChapter={{
+        title: 'Chapter 2 - Build A Scene With Objects',
+        isLocked: true,
+        videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
+        priceInCredits: 400,
+      }}
+      onOpenTemplate={action('open template')}
+    />
+  );
+};

@@ -196,10 +196,12 @@ export type LockedGuidedCourseChapter = {|
   title: string,
   videoUrl: string,
   isLocked: true,
-  priceInCredits: number
+  priceInCredits: number,
 |};
 
-export type GuidedCourseChapter = LockedGuidedCourseChapter | UnlockedGuidedCourseChapter
+export type GuidedCourseChapter =
+  | LockedGuidedCourseChapter
+  | UnlockedGuidedCourseChapter;
 
 export type Environment = 'staging' | 'live';
 

@@ -152,6 +152,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       eventsFunctionsExtension,
     } = this.props;
 
+    const hasLegacyFunctionObjectGroups =
+      eventsFunction.getObjectGroups().count() > 0;
+
     return (
       <Column expand useFullHeight noOverflowParent>
         <Line>
@@ -168,11 +171,13 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                   value: ('parameters': TabNames),
                   label: <Trans>Parameters</Trans>,
                 },
-                {
-                  value: ('groups': TabNames),
-                  label: <Trans>Object groups</Trans>,
-                },
-              ]}
+                hasLegacyFunctionObjectGroups
+                  ? {
+                      value: ('groups': TabNames),
+                      label: <Trans>Object groups</Trans>,
+                    }
+                  : null,
+              ].filter(Boolean)}
             />
           </Column>
         </Line>

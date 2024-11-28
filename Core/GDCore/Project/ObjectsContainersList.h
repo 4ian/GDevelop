@@ -191,14 +191,14 @@ class GD_CORE_API ObjectsContainersList {
                          const gd::Variable& variable)> fn) const;
 
   /**
-   * \brief Return the source type of the container of the variables for the
-   * specified object or group of objects.
+   * \brief Return the source type of the container for the specified object or
+   * group of objects.
    */
   const gd::ObjectsContainer::SourceType GetObjectsContainerSourceType(
       const gd::String& objectOrGroupName) const;
 
   /**
-   * Get the objects container for a given object name.
+   * Get the objects container for for the specified object or group of objects.
    */
   const ObjectsContainer *
   GetObjectsContainerFromObjectName(const gd::String &objectOrGroupName) const;

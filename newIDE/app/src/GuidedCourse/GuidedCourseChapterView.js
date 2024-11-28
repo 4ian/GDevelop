@@ -20,6 +20,7 @@ import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import GuidedCourseChapterTaskItem from './GuidedCourseChapterTaskItem';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   stickyTitle: {
@@ -28,6 +29,15 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     zIndex: 2,
+  },
+  titleContainer: {
+    flex: 1,
+    display: 'flex',
+  },
+  statusContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
   },
 };
 
@@ -41,48 +51,54 @@ const GuidedCourseChapterView = ({
   onOpenTemplate,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  const isMobilePortrait = isMobile && !isLandscape;
   const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-  const completion = { done: 5, total: guidedCourseChapter.tasks.length };
+  const completion = { done: 10, total: guidedCourseChapter.tasks.length };
   const isFinished = completion.done === completion.total;
   return (
     <ColumnStackLayout expand noMargin>
-      <LineStackLayout
-        noMargin
-        alignItems="center"
-        justifyContent="space-beween"
-        expand
+      <div
+        style={{
+          ...styles.titleContainer,
+          flexDirection: isMobilePortrait ? 'column-reverse' : 'row',
+          alignItems: isMobilePortrait ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
+        }}
       >
         <LineStackLayout noMargin alignItems="center" expand>
           <Text size="title">{guidedCourseChapter.title}</Text>
-          {isFinished && (
+          {isFinished && !isMobilePortrait && (
             <div
               style={{
                 color: gdevelopTheme.statusIndicator.success,
               }}
             >
-              <CheckCircle color="success" />
+              <CheckCircle />
             </div>
           )}
         </LineStackLayout>
         {isFinished ? (
           <div
             style={{
+              ...styles.statusContainer,
               color: gdevelopTheme.statusIndicator.success,
             }}
           >
-            <Text color="inherit">
+            {isMobilePortrait && <CheckCircle />}
+            <Text color="inherit" noMargin>
               <Trans>Finished</Trans>
             </Text>
           </div>
         ) : (
-          <Text color="secondary">
+          <Text color="secondary" noMargin>
             <Trans>
               {completion.done} of {completion.total} completed
             </Trans>
           </Text>
         )}
-      </LineStackLayout>
-      <ResponsiveLineStackLayout expand>
+      </div>
+      <ResponsiveLineStackLayout expand noResponsiveLandscape>
         {/* TODO: Video */}
         <Column expand />
         <ColumnStackLayout noMargin>

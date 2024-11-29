@@ -948,7 +948,10 @@ namespace gdjs {
     }
 
     /**
-     * Dispose PixiRenderer, ThreeRenderer.
+     * Dispose the renderers (PixiJS and/or Three.js) as well as DOM elements
+     * used for the game (the canvas, if specified, and the additional DOM container 
+     * created on top of it to allow display HTML elements, for example for text inputs).
+     * 
      * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
     dispose(removeCanvas?: boolean) {

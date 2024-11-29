@@ -61,14 +61,25 @@ namespace gdjs {
 
     /**
      * Create a standard canvas inside canvasArea.
-     *
+     * @param parentElement The parent element to which the canvas will be added.
      */
     createStandardCanvas(parentElement: HTMLElement) {
       this._throwIfDisposed();
 
-      let gameCanvas: HTMLCanvasElement;
+      const gameCanvas = document.createElement('canvas');
+      parentElement.appendChild(gameCanvas);
+
+      this.initializeForCanvas(gameCanvas);
+    }
+
+    /**
+     * Use an existing canvas and initialize the renderer with it.
+     * @param gameCanvas The canvas to use.
+     */
+    initializeForCanvas(gameCanvas: HTMLCanvasElement): void {
+      this._throwIfDisposed();
+
       if (typeof THREE !== 'undefined') {
-        gameCanvas = document.createElement('canvas');
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:
@@ -99,8 +110,6 @@ namespace gdjs {
           backgroundAlpha: 0,
           // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
         });
-
-        gameCanvas = this._threeRenderer.domElement;
       } else {
         // Create the renderer and setup the rendering area.
         // "preserveDrawingBuffer: true" is needed to avoid flickering
@@ -108,11 +117,10 @@ namespace gdjs {
         this._pixiRenderer = PIXI.autoDetectRenderer({
           width: this._game.getGameResolutionWidth(),
           height: this._game.getGameResolutionHeight(),
+          view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
         }) as PIXI.Renderer;
-
-        gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
       }
 
       // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
@@ -121,7 +129,6 @@ namespace gdjs {
       delete this._pixiRenderer.plugins.accessibility;
 
       // Add the renderer view element to the DOM
-      parentElement.appendChild(gameCanvas);
       this._gameCanvas = gameCanvas;
 
       gameCanvas.style.position = 'absolute';
@@ -160,7 +167,7 @@ namespace gdjs {
       // but it seems not to affect us as the `domElementsContainer` has `pointerEvents` set to `none`.
       domElementsContainer.style['-webkit-user-select'] = 'none';
 
-      parentElement.appendChild(domElementsContainer);
+      gameCanvas.parentNode?.appendChild(domElementsContainer);
       this._domElementsContainer = domElementsContainer;
 
       this._resizeCanvas();
@@ -938,14 +945,23 @@ namespace gdjs {
     }
 
     /**
-     * Dispose PixiRenderer, ThreeRenderer and remove canvas from DOM.
+     * Dispose PixiRenderer, ThreeRenderer.
+     * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
-    dispose() {
-      this._pixiRenderer?.destroy(true);
+    dispose(removeCanvas?: boolean) {
+      this._pixiRenderer?.destroy();
       this._threeRenderer?.dispose();
       this._pixiRenderer = null;
       this._threeRenderer = null;
+
+      if (removeCanvas && this._gameCanvas) {
+        this._gameCanvas.parentNode?.removeChild(this._gameCanvas);
+      }
+
       this._gameCanvas = null;
+      this._domElementsContainer?.parentNode?.removeChild(
+        this._domElementsContainer
+      );
       this._domElementsContainer = null;
       this._wasDisposed = true;
     }

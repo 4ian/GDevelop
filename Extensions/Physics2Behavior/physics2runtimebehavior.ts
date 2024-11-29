@@ -676,16 +676,18 @@ namespace gdjs {
         // Average radius from width and height
         if (this.shapeDimensionA > 0) {
           shape.set_m_radius(
-            this.shapeDimensionA *
+            Math.max(0.1, this.shapeDimensionA) *
               this.shapeScale *
               this._sharedData.worldInvScale
           );
         } else {
           const radius =
-            (this.owner.getWidth() * this._sharedData.worldInvScale +
-              this.owner.getHeight() * this._sharedData.worldInvScale) /
+            (Math.max(0.1, this.owner.getWidth()) *
+              this._sharedData.worldInvScale +
+              Math.max(0.1, this.owner.getHeight()) *
+                this._sharedData.worldInvScale) /
             4;
-          shape.set_m_radius(radius > 0 ? radius : 1);
+          shape.set_m_radius(radius);
         }
 
         // Set the offset
@@ -699,11 +701,11 @@ namespace gdjs {
             !this.polygon ||
             !Physics2RuntimeBehavior.isPolygonConvex(this.polygon)
           ) {
-            let width =
-              (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
+            const width =
+              Math.max(0.1, this.owner.getWidth()) *
               this._sharedData.worldInvScale;
-            let height =
-              (this.owner.getHeight() > 0 ? this.owner.getHeight() : 1) *
+            const height =
+              Math.max(0.1, this.owner.getHeight()) *
               this._sharedData.worldInvScale;
 
             // Set the shape box
@@ -773,14 +775,12 @@ namespace gdjs {
             // Length from the custom dimension or from the object width
             const length =
               (this.shapeDimensionA > 0
-                ? this.shapeDimensionA * this.shapeScale
-                : this.owner.getWidth() > 0
-                ? this.owner.getWidth()
-                : 1) * this._sharedData.worldInvScale;
-            let height =
-              this.owner.getHeight() > 0
-                ? this.owner.getHeight() * this._sharedData.worldInvScale
-                : 0;
+                ? Math.max(0.1, this.shapeDimensionA * this.shapeScale)
+                : Math.max(0.1, this.owner.getWidth())) *
+              this._sharedData.worldInvScale;
+            const height =
+              Math.max(0.1, this.owner.getHeight()) *
+              this._sharedData.worldInvScale;
 
             // Angle from custom dimension, otherwise is 0
             const angle = this.shapeDimensionB
@@ -803,18 +803,16 @@ namespace gdjs {
             shape = new Box2D.b2PolygonShape();
 
             // Width and height from custom dimensions or object size
-            let width =
+            const width =
               (this.shapeDimensionA > 0
-                ? this.shapeDimensionA * this.shapeScale
-                : this.owner.getWidth() > 0
-                ? this.owner.getWidth()
-                : 1) * this._sharedData.worldInvScale;
-            let height =
+                ? Math.max(0.1, this.shapeDimensionA * this.shapeScale)
+                : Math.max(0.1, this.owner.getWidth())) *
+              this._sharedData.worldInvScale;
+            const height =
               (this.shapeDimensionB > 0
-                ? this.shapeDimensionB * this.shapeScale
-                : this.owner.getHeight() > 0
-                ? this.owner.getHeight()
-                : 1) * this._sharedData.worldInvScale;
+                ? Math.max(0.1, this.shapeDimensionB * this.shapeScale)
+                : Math.max(0.1, this.owner.getHeight())) *
+              this._sharedData.worldInvScale;
 
             // Set the shape box, the offset must be added here too
             shape.SetAsBox(

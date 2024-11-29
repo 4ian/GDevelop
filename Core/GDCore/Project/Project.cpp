@@ -82,13 +82,11 @@ Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
-std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& objectType, const gd::String& name) const {
-  std::unique_ptr<gd::Object> object = gd::make_unique<Object>(
-      name, objectType, CreateObjectConfiguration(objectType));
-
+void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
   auto& platform = GetCurrentPlatform();
   auto& project = *this;
+  auto& objectType = object.GetType();
+
   auto addDefaultBehavior = [&platform, &project, &object, &objectType](
                                 const gd::String& behaviorType) {
     auto& behaviorMetadata =
@@ -98,16 +96,46 @@ std::unique_ptr<gd::Object> Project::CreateObject(
                      " has an unknown default behavior: " + behaviorType);
       return;
     }
-    auto* behavior = object->AddNewBehavior(
-        project, behaviorType, behaviorMetadata.GetDefaultName());
-    behavior->SetDefaultBehavior(true);
+
+    const gd::String& behaviorName = behaviorMetadata.GetDefaultName();
+
+    // Check if we can keep a behavior that would have been already set up on the object.
+    if (object.HasBehaviorNamed(behaviorName)) {
+      const auto& behavior = object.GetBehavior(behaviorName);
+
+      if (!behavior.IsDefaultBehavior() || behavior.GetTypeName() != behaviorType) {
+        // Behavior type has changed, remove it so it is re-created.
+        object.RemoveBehavior(behaviorName);
+      }
+    }
+
+    if (!object.HasBehaviorNamed(behaviorName)) {
+      auto* behavior = object.AddNewBehavior(
+          project, behaviorType, behaviorName);
+      behavior->SetDefaultBehavior(true);
+    }
   };
 
   auto &objectMetadata =
       gd::MetadataProvider::GetObjectMetadata(platform, objectType);
   if (!MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
-    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+    // Add all default behaviors.
+    const auto& defaultBehaviorTypes = objectMetadata.GetDefaultBehaviors();
+    for (auto &behaviorType : defaultBehaviorTypes) {
       addDefaultBehavior(behaviorType);
+    }
+
+    // Ensure there are no default behaviors that would not be required left on the object.
+    for (const auto& behaviorName : object.GetAllBehaviorNames()) {
+      auto& behavior = object.GetBehavior(behaviorName);
+      if (!behavior.IsDefaultBehavior()) {
+        // Non default behaviors are not handled by this function.
+        continue;
+      }
+
+      if (defaultBehaviorTypes.find(behavior.GetTypeName()) == defaultBehaviorTypes.end()) {
+        object.RemoveBehavior(behaviorName);
+      }
     }
   }
   // During project deserialization, event-based object metadata are not yet
@@ -116,6 +144,14 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   else if (!project.HasEventsBasedObject(objectType)) {
     gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
+}
+
+std::unique_ptr<gd::Object> Project::CreateObject(
+    const gd::String& objectType, const gd::String& name) const {
+  std::unique_ptr<gd::Object> object = gd::make_unique<Object>(
+      name, objectType, CreateObjectConfiguration(objectType));
+
+  EnsureObjectDefaultBehaviors(*object);
 
   return std::move(object);
 }
@@ -927,8 +963,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
     const gd::SerializerElement &eventsFunctionsExtensionsElement) {
-  
-  // Some extension have custom objects, which have child objects coming from other extension. 
+
+  // Some extension have custom objects, which have child objects coming from other extension.
   // These child objects must be loaded completely before the parent custom obejct can be unserialized.
   // This implies: an order on the extension unserialization (and no cycles).
 
@@ -938,8 +974,8 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
   for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i) {
     remainingExtensionNames[i] = eventsFunctionsExtensions.at(i)->GetName();
   }
-    
-  // Helper allowing to find if an extension has an object that depends on 
+
+  // Helper allowing to find if an extension has an object that depends on
   // at least one other object from another extension that is not loaded yet.
   auto isDependentFromRemainingExtensions =
       [&remainingExtensionNames](

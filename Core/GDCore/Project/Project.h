@@ -523,13 +523,7 @@ class GD_CORE_API Project {
   std::unique_ptr<gd::Object> CreateObject(const gd::String& type,
                                            const gd::String& name) const;
 
-  /**
-   * Create an object configuration of the given type.
-   *
-   * \param type The type of the object
-   */
-  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
-      const gd::String& type) const;
+  void EnsureObjectDefaultBehaviors(gd::Object& object) const;
 
   /**
    * Create an event of the given type.
@@ -1078,11 +1072,19 @@ class GD_CORE_API Project {
 
   /**
    * @brief Get the project extensions names in the order they have to be unserialized.
-   * 
+   *
    * Child-objects need the event-based objects they use to be loaded completely
    * before they are unserialized.
    */
   std::vector<gd::String> GetUnserializingOrderExtensionNames(const gd::SerializerElement &eventsFunctionsExtensionsElement);
+
+  /**
+   * Create an object configuration of the given type.
+   *
+   * \param type The type of the object
+   */
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      const gd::String& type) const;
 
   gd::String name;         ///< Game name
   gd::String description;  ///< Game description

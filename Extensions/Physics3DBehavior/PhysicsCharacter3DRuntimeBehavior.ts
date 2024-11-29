@@ -13,6 +13,14 @@ namespace gdjs {
     fs: float;
     js: float;
     cj: boolean;
+    lek: boolean,
+    rik: boolean,
+    upk: boolean,
+    dok: boolean,
+    juk: boolean,
+    us: boolean,
+    sa: float;
+    sf: float;
     tscjs: float;
     jkhsjs: boolean;
   }
@@ -64,6 +72,7 @@ namespace gdjs {
     hasPressedLeftKey: boolean = false;
     hasPressedJumpKey: boolean = false;
     hasJumpKeyBeenConsumed: boolean = false;
+    hasUsedStick: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
     _currentForwardSpeed: float = 0;
@@ -83,6 +92,7 @@ namespace gdjs {
     private _wasForwardKeyPressed: boolean = false;
     private _wasBackwardKeyPressed: boolean = false;
     private _wasJumpKeyPressed: boolean = false;
+    private _wasStickUsed: boolean = false;
 
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
@@ -239,6 +249,14 @@ namespace gdjs {
           fs: this._currentFallSpeed,
           js: this._currentJumpSpeed,
           cj: this._canJump,
+          lek: this._wasLeftKeyPressed,
+          rik: this._wasRightKeyPressed,
+          upk: this._wasForwardKeyPressed,
+          dok: this._wasBackwardKeyPressed,
+          juk: this._wasJumpKeyPressed,
+          us: this._wasStickUsed,
+          sa: this._stickAngle,
+          sf: this._stickForce,
           tscjs: this._timeSinceCurrentJumpStart,
           jkhsjs: this._jumpKeyHeldSinceJumpStart,
         },
@@ -251,27 +269,21 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
-      if (behaviorSpecificProps.fws !== this._currentForwardSpeed) {
-        this._currentForwardSpeed = behaviorSpecificProps.fws;
-      }
-      if (behaviorSpecificProps.sws !== this._currentSidewaysSpeed) {
-        this._currentSidewaysSpeed = behaviorSpecificProps.sws;
-      }
-      if (behaviorSpecificProps.fs !== this._currentFallSpeed) {
-        this._currentFallSpeed = behaviorSpecificProps.fs;
-      }
-      if (behaviorSpecificProps.js !== this._currentJumpSpeed) {
-        this._currentJumpSpeed = behaviorSpecificProps.js;
-      }
-      if (behaviorSpecificProps.cj !== this._canJump) {
-        this._canJump = behaviorSpecificProps.cj;
-      }
-      if (behaviorSpecificProps.tscjs !== this._timeSinceCurrentJumpStart) {
-        this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
-      }
-      if (behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart) {
-        this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
-      }
+      this._currentForwardSpeed = behaviorSpecificProps.fws;
+      this._currentSidewaysSpeed = behaviorSpecificProps.sws;
+      this._currentFallSpeed = behaviorSpecificProps.fs;
+      this._currentJumpSpeed = behaviorSpecificProps.js;
+      this._canJump = behaviorSpecificProps.cj;
+      this.hasPressedForwardKey = behaviorSpecificProps.upk;
+      this.hasPressedBackwardKey = behaviorSpecificProps.dok;
+      this.hasPressedLeftKey = behaviorSpecificProps.lek;
+      this.hasPressedRightKey = behaviorSpecificProps.rik;
+      this.hasPressedJumpKey = behaviorSpecificProps.juk;
+      this.hasUsedStick = behaviorSpecificProps.us;
+      this._stickAngle = behaviorSpecificProps.sa;
+      this._stickForce = behaviorSpecificProps.sf;
+      this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
+      this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
@@ -362,7 +374,7 @@ namespace gdjs {
         } else if (this.hasPressedForwardKey) {
           targetedForwardSpeed = this._forwardSpeedMax;
         }
-      } else if (this._stickForce !== 0) {
+      } else if (this.hasUsedStick) {
         targetedForwardSpeed =
           -this._forwardSpeedMax *
           this._stickForce *
@@ -425,7 +437,7 @@ namespace gdjs {
         } else if (this.hasPressedRightKey) {
           targetedSidewaysSpeed = this._sidewaysSpeedMax;
         }
-      } else if (this._stickForce !== 0) {
+      } else if (this.hasUsedStick) {
         targetedSidewaysSpeed =
           this._sidewaysSpeedMax *
           this._stickForce *
@@ -664,6 +676,7 @@ namespace gdjs {
       this._wasRightKeyPressed = this.hasPressedRightKey;
       this._wasLeftKeyPressed = this.hasPressedLeftKey;
       this._wasJumpKeyPressed = this.hasPressedJumpKey;
+      this._wasStickUsed = this.hasPressedJumpKey;
 
       if (!this._dontClearInputsBetweenFrames) {
         this.hasPressedForwardKey = false;
@@ -671,6 +684,7 @@ namespace gdjs {
         this.hasPressedRightKey = false;
         this.hasPressedLeftKey = false;
         this.hasPressedJumpKey = false;
+        this.hasUsedStick = false;
         this._stickForce = 0;
         this._stickAngle = 0;
       }
@@ -1047,8 +1061,13 @@ namespace gdjs {
     }
 
     simulateStick(stickAngle: float, stickForce: float) {
+      this.hasUsedStick = true;
       this._stickAngle = stickAngle;
       this._stickForce = Math.max(0, Math.min(1, stickForce));
+    }
+
+    wasStickPressed(): boolean {
+      return this._wasStickUsed;
     }
 
     /**

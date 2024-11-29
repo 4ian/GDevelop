@@ -60,7 +60,10 @@ namespace gdjs {
     }
 
     /**
-     * Create a standard canvas inside canvasArea.
+     * Create the canvas on which the game will be rendered, inside the specified DOM element, and
+     * setup the rendering of the game.
+     * If you want to use your own canvas, use `initializeForCanvas` instead.
+     *
      * @param parentElement The parent element to which the canvas will be added.
      */
     createStandardCanvas(parentElement: HTMLElement) {
@@ -73,7 +76,7 @@ namespace gdjs {
     }
 
     /**
-     * Use an existing canvas and initialize the renderer with it.
+     * Setup the rendering of the game to use a canvas that was already created.
      * @param gameCanvas The canvas to use.
      */
     initializeForCanvas(gameCanvas: HTMLCanvasElement): void {

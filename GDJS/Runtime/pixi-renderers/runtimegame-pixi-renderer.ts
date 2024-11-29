@@ -110,6 +110,7 @@ namespace gdjs {
           height: this._game.getGameResolutionHeight(),
           preserveDrawingBuffer: true,
           antialias: false,
+          backgroundAlpha: 0,
         }) as PIXI.Renderer;
 
         gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;

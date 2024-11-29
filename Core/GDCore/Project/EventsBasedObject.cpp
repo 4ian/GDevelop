@@ -91,7 +91,7 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   }
 
   initialInstances.UnserializeFrom(element.GetChild("instances"));
-  if (element.HasAttribute("isUsingLegacyInstancesRenderer")) {
+  if (element.HasChild("isUsingLegacyInstancesRenderer")) {
     isUsingLegacyInstancesRenderer =
         element.GetBoolAttribute("isUsingLegacyInstancesRenderer", false);
   }

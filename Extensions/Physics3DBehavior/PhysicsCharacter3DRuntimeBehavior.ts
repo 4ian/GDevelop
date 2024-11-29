@@ -182,7 +182,10 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
+      // TODO Find a clean way for this.
       behavior.createAndAddBody = () => this.createAndAddBody();
+      behavior.updateObjectFromBody = () => this.updateObjectFromBody();
+      behavior.updateBodyFromObject = () => this.updateBodyFromObject();
       behavior.recreateBody();
 
       return this.physics3D;
@@ -326,8 +329,84 @@ namespace gdjs {
         .GetBodyLockInterface()
         .TryGetBody(this.character.GetInnerBodyID());
       // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
-      body.SetCollideKinematicVsNonDynamic(true);
+      //body.SetCollideKinematicVsNonDynamic(true);
       return body;
+    }
+
+    
+    updateObjectFromBody() {
+      const {
+        behavior,
+      } = this.getPhysics3D();
+
+      if (!this.character) {
+        return;
+      }
+
+      // We can't rely on the body position because of mCharacterPadding
+      const position = this.character.GetPosition();
+      this.owner3D.setX(
+        position.GetX() * this._sharedData.worldScale -
+          this.owner3D.getWidth() / 2 +
+          this.owner3D.getX() -
+          this.owner3D.getDrawableX()
+      );
+      this.owner3D.setY(
+        position.GetY() * this._sharedData.worldScale -
+          this.owner3D.getHeight() / 2 +
+          this.owner3D.getY() -
+          this.owner3D.getDrawableY()
+      );
+      this.owner3D.setZ(
+        position.GetZ() * this._sharedData.worldScale -
+          this.owner3D.getDepth() / 2 +
+          this.owner3D.getZ() -
+          this.owner3D.getDrawableZ()
+      );
+
+      // Update cached transform.
+      behavior._objectOldX = this.owner3D.getX();
+      behavior._objectOldY = this.owner3D.getY();
+      behavior._objectOldZ = this.owner3D.getZ();
+    }
+
+    updateBodyFromObject() {
+      const {
+        behavior,
+      } = this.getPhysics3D();
+
+      if (!this.character) {
+        return;
+      }
+
+      if (behavior.needToRecreateBody) {
+        behavior.recreateBody();
+      }
+
+      // The object size has changed, recreate the shape.
+      // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
+      // The height has changed, the shape is not an edge (edges doesn't have height),
+      // it isn't a box with custom height or a circle with custom radius
+      if (
+        behavior.needToRecreateShape ||
+        behavior._objectOldWidth !== this.owner3D.getWidth() ||
+        behavior._objectOldHeight !== this.owner3D.getHeight() ||
+        behavior._objectOldDepth !== this.owner3D.getDepth()
+      ) {
+        behavior.needToRecreateShape = false;
+        behavior.recreateShape();
+      }
+
+      // The object object transform has changed, update body transform:
+      if (
+        behavior._objectOldX !== this.owner3D.getX() ||
+        behavior._objectOldY !== this.owner3D.getY() ||
+        behavior._objectOldZ !== this.owner3D.getZ()
+      ) {
+        this.character.SetPosition(
+          behavior.getPhysicsPosition(this.getRVec3(0, 0, 0))
+        );
+      }
     }
 
     onDeActivate() {}
@@ -360,6 +439,9 @@ namespace gdjs {
         return;
       }
       const worldInvScale = this._sharedData.worldInvScale;
+
+      //console.log("Object Z: " + this.owner3D.getZ());
+      //this.character.SetPosition(characterBody.GetPosition() + this.character.GetCharacterPadding());
 
       const oldX = this.character.GetPosition().GetX();
       const oldY = this.character.GetPosition().GetY();
@@ -666,6 +748,9 @@ namespace gdjs {
         shapeFilter,
         this._sharedData.jolt.GetTempAllocator()
       );
+
+      // console.log("Character Z: " + this.character.GetPosition().GetZ());
+      // console.log("Body Z: " + characterBody.GetPosition().GetZ());
 
       if (this.isOnFloor()) {
         this._canJump = true;

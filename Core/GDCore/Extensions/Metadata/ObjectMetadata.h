@@ -246,6 +246,11 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
     return *this;
   }
 
+  ObjectMetadata& ResetDefaultBehaviorsJustForTesting() {
+    defaultBehaviorTypes.clear();
+    return *this;
+  }
+
   const gd::String& GetName() const override { return name; }
   const gd::String& GetFullName() const override { return fullname; }
   const gd::String& GetCategoryFullName() const { return categoryFullName; }

@@ -61,27 +61,38 @@ namespace gdjs {
 
     /**
      * Create a standard canvas inside canvasArea.
-     *
+     * @param parentElement The parent element to which the canvas will be added.
      */
     createStandardCanvas(parentElement: HTMLElement) {
       this._throwIfDisposed();
 
-      let gameCanvas: HTMLCanvasElement;
+      const gameCanvas = document.createElement('canvas');
+      parentElement.appendChild(gameCanvas);
+
+      this.initializeForCanvas(gameCanvas);
+    }
+
+    /**
+     * Use an existing canvas and initialize the renderer with it.
+     * @param gameCanvas The canvas to use.
+     */
+    initializeForCanvas(gameCanvas: HTMLCanvasElement): void {
+      this._throwIfDisposed();
+
       if (typeof THREE !== 'undefined') {
-        gameCanvas = document.createElement('canvas');
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:
-            this._game.getAntialiasingMode() !== 'none' &&
-            (this._game.isAntialisingEnabledOnMobile() ||
-              !gdjs.evtTools.common.isMobile()),
+              this._game.getAntialiasingMode() !== 'none' &&
+              (this._game.isAntialisingEnabledOnMobile() ||
+                  !gdjs.evtTools.common.isMobile()),
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
+            this._game.getGameResolutionWidth(),
+            this._game.getGameResolutionHeight()
         );
 
         // Create a PixiJS renderer that use the same GL context as Three.js
@@ -99,8 +110,6 @@ namespace gdjs {
           backgroundAlpha: 0,
           // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
         });
-
-        gameCanvas = this._threeRenderer.domElement;
       } else {
         // Create the renderer and setup the rendering area.
         // "preserveDrawingBuffer: true" is needed to avoid flickering
@@ -108,11 +117,10 @@ namespace gdjs {
         this._pixiRenderer = PIXI.autoDetectRenderer({
           width: this._game.getGameResolutionWidth(),
           height: this._game.getGameResolutionHeight(),
+          view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
         }) as PIXI.Renderer;
-
-        gameCanvas = this._pixiRenderer.view as HTMLCanvasElement;
       }
 
       // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
@@ -121,7 +129,6 @@ namespace gdjs {
       delete this._pixiRenderer.plugins.accessibility;
 
       // Add the renderer view element to the DOM
-      parentElement.appendChild(gameCanvas);
       this._gameCanvas = gameCanvas;
 
       gameCanvas.style.position = 'absolute';
@@ -160,7 +167,7 @@ namespace gdjs {
       // but it seems not to affect us as the `domElementsContainer` has `pointerEvents` set to `none`.
       domElementsContainer.style['-webkit-user-select'] = 'none';
 
-      parentElement.appendChild(domElementsContainer);
+      gameCanvas.parentNode?.appendChild(domElementsContainer);
       this._domElementsContainer = domElementsContainer;
 
       this._resizeCanvas();
@@ -181,120 +188,6 @@ namespace gdjs {
       // Handle resize: immediately adjust the game canvas (and dom element container)
       // and notify the game (that may want to adjust to the new size of the window).
       window.addEventListener('resize', () => {
-        this._game.onWindowInnerSizeChanged();
-        this._resizeCanvas();
-      });
-
-      // Focus the canvas when created.
-      gameCanvas.focus();
-    }
-
-    useCanvas(gameCanvas: HTMLCanvasElement): void {
-      if (typeof THREE !== "undefined") {
-        this._threeRenderer = new THREE.WebGLRenderer({
-          canvas: gameCanvas,
-          antialias:
-              this._game.getAntialiasingMode() !== "none" &&
-              (this._game.isAntialisingEnabledOnMobile() || !gdjs.evtTools.common.isMobile()),
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-        });
-        this._threeRenderer.useLegacyLights = true;
-        this._threeRenderer.autoClear = false;
-        this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
-
-        // Create a PixiJS renderer that use the same GL context as Three.js
-        // so that both can render to the canvas and even have PixiJS rendering
-        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
-        this._pixiRenderer = new PIXI.Renderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
-          view: gameCanvas,
-          // @ts-ignore - reuse the context from Three.js.
-          context: this._threeRenderer.getContext(),
-          clearBeforeRender: false,
-          preserveDrawingBuffer: true, // Keep to true to allow screenshots.
-          antialias: false,
-          backgroundAlpha: 0,
-          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
-        });
-      } else {
-        // Create the renderer and setup the rendering area.
-        // "preserveDrawingBuffer: true" is needed to avoid flickering
-        // and background issues on some mobile phones (see #585 #572 #566 #463).
-        this._pixiRenderer = PIXI.autoDetectRenderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
-          preserveDrawingBuffer: true,
-          antialias: false,
-          view: gameCanvas,
-        }) as PIXI.Renderer;
-      }
-
-      // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
-      // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
-      this._pixiRenderer.plugins.accessibility.destroy();
-      delete this._pixiRenderer.plugins.accessibility;
-
-      // Add the renderer view element to the DOM
-      this._gameCanvas = gameCanvas;
-
-      gameCanvas.style.position = "absolute";
-
-      // Ensure that the canvas has the focus.
-      gameCanvas.tabIndex = 1;
-
-      // Ensure long press can't create a selection
-      gameCanvas.style.userSelect = "none";
-      gameCanvas.style.outline = "none"; // No selection/focus ring on the canvas.
-
-      // Set up the container for HTML elements on top of the game canvas.
-      const domElementsContainer = document.createElement("div");
-      domElementsContainer.style.position = "absolute";
-      domElementsContainer.style.overflow = "hidden"; // Never show anything outside the container.
-      domElementsContainer.style.outline = "none"; // No selection/focus ring on this container.
-      domElementsContainer.style.pointerEvents = "none"; // Clicks go through the container.
-
-      // The container should *never* scroll.
-      // Elements are put inside with the same coordinates (with a scaling factor)
-      // as on the game canvas.
-      domElementsContainer.addEventListener("scroll", (event) => {
-        domElementsContainer.scrollLeft = 0;
-        domElementsContainer.scrollTop = 0;
-        event.preventDefault();
-      });
-
-      // When clicking outside an input, (or other HTML element),
-      // give back focus to the game canvas so that this element is blurred.
-      gameCanvas.addEventListener("pointerdown", () => {
-        gameCanvas.focus();
-      });
-
-      // Prevent magnifying glass on iOS with a long press.
-      // Note that there are related bugs on iOS 15 (see https://bugs.webkit.org/show_bug.cgi?id=231161)
-      // but it seems not to affect us as the `domElementsContainer` has `pointerEvents` set to `none`.
-      domElementsContainer.style["-webkit-user-select"] = "none";
-
-      gameCanvas.parentNode?.appendChild(domElementsContainer);
-      this._domElementsContainer = domElementsContainer;
-
-      this._resizeCanvas();
-
-      // Handle scale mode.
-      if (this._game.getScaleMode() === "nearest") {
-        gameCanvas.style["image-rendering"] = "-moz-crisp-edges";
-        gameCanvas.style["image-rendering"] = "-webkit-optimize-contrast";
-        gameCanvas.style["image-rendering"] = "-webkit-crisp-edges";
-        gameCanvas.style["image-rendering"] = "pixelated";
-      }
-
-      // Handle pixels rounding.
-      if (this._game.getPixelsRounding()) {
-        PIXI.settings.ROUND_PIXELS = true;
-      }
-
-      // Handle resize: immediately adjust the game canvas (and dom element container)
-      // and notify the game (that may want to adjust to the new size of the window).
-      window.addEventListener("resize", () => {
         this._game.onWindowInnerSizeChanged();
         this._resizeCanvas();
       });
@@ -1052,14 +945,21 @@ namespace gdjs {
     }
 
     /**
-     * Dispose PixiRenderer, ThreeRenderer and remove canvas from DOM.
+     * Dispose PixiRenderer, ThreeRenderer.
+     * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
-    dispose() {
-      this._pixiRenderer?.destroy(true);
+    dispose(removeCanvas?: boolean) {
+      this._pixiRenderer?.destroy();
       this._threeRenderer?.dispose();
       this._pixiRenderer = null;
       this._threeRenderer = null;
+
+      if (removeCanvas && this._gameCanvas) {
+        this._gameCanvas.parentNode?.removeChild(this._gameCanvas);
+      }
+
       this._gameCanvas = null;
+      this._domElementsContainer?.parentNode?.removeChild(this._domElementsContainer);
       this._domElementsContainer = null;
       this._wasDisposed = true;
     }

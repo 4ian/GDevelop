@@ -976,11 +976,12 @@ namespace gdjs {
     /**
      * Stop game loop, unload all scenes, dispose renderer and resources.
      * After calling this method, the RuntimeGame should not be used anymore.
+     * @param removeCanvas If true, the canvas will be removed from the DOM.
      */
-    dispose(): void {
+    dispose(removeCanvas?: boolean): void {
       this._renderer.stopGameLoop();
       this._sceneStack.dispose();
-      this._renderer.dispose();
+      this._renderer.dispose(removeCanvas);
       this._resourcesLoader.dispose();
 
       this._wasDisposed = true;

@@ -26,7 +26,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
   // Keep track of all objects and their behaviors names, so we can remove
   // those who are in the container but not in the parameters anymore.
   std::set<gd::String> allObjectNames;
-  std::map<gd::String, std::set<gd::String>> allObjectBehaviorNames;
+  std::map<gd::String, std::set<gd::String>> allObjectNonDefaultBehaviorNames;
 
   gd::String lastObjectName;
   for (std::size_t i = 0; i < parameters.GetParametersCount(); ++i) {
@@ -49,11 +49,15 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
       }
 
       if (outputObjectsContainer.HasObjectNamed(objectName)) {
-        // Keep the existing object - behaviors will be added or removed later.
+        // Keep the existing object, ensure the default behaviors
+        // are all present (and no more than required by the object type).
+        // Non default behaviors coming from parameters will be added or removed later.
+        project.EnsureObjectDefaultBehaviors(outputObjectsContainer.GetObject(objectName));
       } else {
+        // Create a new object (and its default behaviors) if needed.
         outputObjectsContainer.InsertNewObject(
             project,
-            parameter.GetExtraInfo(),
+            objectType,
             objectName,
             outputObjectsContainer.GetObjectsCount());
       }
@@ -71,7 +75,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
           const gd::String& behaviorType = parameter.GetExtraInfo();
 
           gd::Object& object = outputObjectsContainer.GetObject(lastObjectName);
-          allObjectBehaviorNames[lastObjectName].insert(behaviorName);
+          allObjectNonDefaultBehaviorNames[lastObjectName].insert(behaviorName);
 
           // Check if we can keep the existing behavior.
           if (object.HasBehaviorNamed(behaviorName)) {
@@ -108,8 +112,14 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     }
 
     auto& object = outputObjectsContainer.GetObject(objectName);
+    const auto& allBehaviorNames = allObjectNonDefaultBehaviorNames[objectName];
     for (const auto& behaviorName : object.GetAllBehaviorNames()) {
-      const auto& allBehaviorNames = allObjectBehaviorNames[objectName];
+      if (object.GetBehavior(behaviorName).IsDefaultBehavior()) {
+        // Default behaviors are already ensured to be all present
+        // (and no more than required by the object type).
+        continue;
+      }
+
       if (allBehaviorNames.find(behaviorName) == allBehaviorNames.end()) {
         object.RemoveBehavior(behaviorName);
       }

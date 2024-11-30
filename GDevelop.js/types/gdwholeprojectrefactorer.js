@@ -35,7 +35,7 @@ declare class gdWholeProjectRefactorer {
   static objectOrGroupRenamedInScene(project: gdProject, scene: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInScene(project: gdProject, scene: gdLayout, objectName: string): void;
   static behaviorsAddedToObjectInScene(project: gdProject, scene: gdLayout, objectName: string): void;
-  static objectOrGroupRenamedInEventsFunction(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsFunction: gdEventsFunction, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRenamedInEventsFunction(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsFunction: gdEventsFunction, parameterObjectsContainer: gdObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: gdProject, projectScopedContainers: gdProjectScopedContainers, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, objectName: string): void;

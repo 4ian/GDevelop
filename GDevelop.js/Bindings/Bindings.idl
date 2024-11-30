@@ -2437,7 +2437,13 @@ interface VectorEventsSearchResult {
 };
 
 interface EventsRefactorer {
-    void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ProjectScopedContainers projectScopedContainers, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
+    void STATIC_RenameObjectInEvents(
+        [Const, Ref] Platform platform,
+        [Ref] ProjectScopedContainers projectScopedContainers,
+        [Ref] EventsList events,
+        [Const, Ref] ObjectsContainer targetedObjectsContainer,
+        [Const] DOMString oldName,
+        [Const] DOMString newName);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
@@ -2668,6 +2674,7 @@ interface WholeProjectRefactorer {
         [Ref] Project project,
         [Ref] ProjectScopedContainers projectScopedContainers,
         [Ref] EventsFunction eventsFunction,
+        [Const, Ref] ObjectsContainer parameterObjectsContainer,
         [Const] DOMString oldName,
         [Const] DOMString newName,
         boolean isObjectGroup);

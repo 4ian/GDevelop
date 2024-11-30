@@ -819,16 +819,17 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
 
 void WholeProjectRefactorer::RenameParameter(
     gd::Project &project, gd::ProjectScopedContainers &projectScopedContainers,
-    gd::EventsFunction &eventsFunction, const gd::String &oldParameterName,
-    const gd::String &newParameterName) {
+    gd::EventsFunction &eventsFunction,
+    const gd::ObjectsContainer &parameterObjectsContainer,
+    const gd::String &oldParameterName, const gd::String &newParameterName) {
   auto &parameters = eventsFunction.GetParameters();
   if (!parameters.HasParameterNamed(oldParameterName))
     return;
   auto &parameter = parameters.GetParameter(oldParameterName);
   if (parameter.GetValueTypeMetadata().IsObject()) {
     gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-        project, projectScopedContainers, eventsFunction, oldParameterName,
-        newParameterName, false);
+        project, projectScopedContainers, eventsFunction,
+        parameterObjectsContainer, oldParameterName, newParameterName, false);
   } else if (parameter.GetValueTypeMetadata().IsBehavior()) {
     size_t behaviorParameterIndex = parameters.GetParameterPosition(parameter);
     size_t objectParameterIndex =
@@ -1750,6 +1751,15 @@ void WholeProjectRefactorer::BehaviorsAddedToObjectInScene(
 void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
     gd::Project &project, gd::Layout &layout, const gd::String &oldName,
     const gd::String &newName, bool isObjectGroup) {
+  gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
+      project, layout, layout.GetObjects(), oldName, newName, isObjectGroup);
+}
+
+void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
+    gd::Project &project, gd::Layout &layout,
+    const gd::ObjectsContainer &targetedObjectsContainer,
+    const gd::String &oldName, const gd::String &newName, bool isObjectGroup) {
+
   if (oldName == newName || newName.empty() || oldName.empty())
     return;
 
@@ -1759,7 +1769,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   // Rename object in the current layout
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers, layout.GetEvents(),
-      oldName, newName);
+      layout.GetObjects(), oldName, newName);
 
   // Object groups can't have instances or be in other groups
   if (!isObjectGroup) {
@@ -1776,7 +1786,7 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
     auto &externalEvents = project.GetExternalEvents(externalEventsName);
     gd::EventsRefactorer::RenameObjectInEvents(
         project.GetCurrentPlatform(), projectScopedContainers,
-        externalEvents.GetEvents(), oldName, newName);
+        externalEvents.GetEvents(), layout.GetObjects(), oldName, newName);
   }
 
   // Rename object in external layouts
@@ -2022,8 +2032,8 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto *function = functionUniquePtr.get();
     WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-        project, projectScopedContainers, *function, oldName, newName,
-        isObjectGroup);
+        project, projectScopedContainers, *function,
+        eventsBasedObject.GetObjects(), oldName, newName, isObjectGroup);
   }
 
   // Object groups can't have instances or be in other groups
@@ -2040,11 +2050,12 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
 void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
     gd::Project &project,
     const gd::ProjectScopedContainers &projectScopedContainers,
-    gd::EventsFunction &eventsFunction, const gd::String &oldName,
-    const gd::String &newName, bool isObjectGroup) {
+    gd::EventsFunction &eventsFunction,
+    const gd::ObjectsContainer &targetedObjectsContainer,
+    const gd::String &oldName, const gd::String &newName, bool isObjectGroup) {
   gd::EventsRefactorer::RenameObjectInEvents(
       project.GetCurrentPlatform(), projectScopedContainers,
-      eventsFunction.GetEvents(), oldName, newName);
+      eventsFunction.GetEvents(), targetedObjectsContainer, oldName, newName);
 
   // Object groups can't be in other groups
   if (!isObjectGroup) {
@@ -2070,7 +2081,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
     if (layout.GetObjects().HasObjectNamed(oldName))
       continue;
 
-    ObjectOrGroupRenamedInScene(project, layout, oldName, newName,
+    ObjectOrGroupRenamedInScene(project, layout, project.GetObjects(), oldName, newName,
                                  isObjectGroup);
   }
 }

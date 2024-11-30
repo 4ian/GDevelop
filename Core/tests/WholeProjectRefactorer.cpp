@@ -1602,7 +1602,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
-          "Object1", "RenamedObject1",
+          parametersObjectsContainer, "Object1", "RenamedObject1",
           /* isObjectGroup=*/false);
 
       REQUIRE(objectGroup.Find("Object1") == false);
@@ -1637,7 +1637,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Trigger the refactoring after the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
-          "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
+          parametersObjectsContainer, "ObjectWithMyBehavior",
+          "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
 
       // Check object name has been renamed in action parameters.
@@ -2364,8 +2365,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             project, eventsExtension, eventsFunction,
             parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
-        project, projectScopedContainers, eventsFunction, "MyParameter",
-        "MyRenamedParameter");
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
 
     REQUIRE(instruction.GetParameter(0).GetPlainString() ==
             "MyRenamedParameter");
@@ -2403,8 +2404,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             project, eventsExtension, eventsFunction,
             parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
-        project, projectScopedContainers, eventsFunction, "MyObject",
-        "MyRenamedObject");
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyObject", "MyRenamedObject");
 
     REQUIRE(instruction.GetParameter(0).GetPlainString() ==
             "MyRenamedObject");
@@ -2449,8 +2450,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             project, eventsExtension, eventsFunction,
             parametersObjectsContainer, parameterVariablesContainer);
     gd::WholeProjectRefactorer::RenameParameter(
-        project, projectScopedContainers, eventsFunction, "MyBehavior",
-        "MyRenamedBehavior");
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyBehavior", "MyRenamedBehavior");
 
     REQUIRE(instruction.GetParameter(1).GetPlainString() ==
             "MyRenamedBehavior");

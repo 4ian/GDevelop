@@ -102,6 +102,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       project,
       projectScopedContainersAccessor,
       eventsFunction,
+      objectsContainer
     } = this.props;
 
     // newName is supposed to have been already validated
@@ -112,6 +113,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         project,
         projectScopedContainersAccessor.get(),
         eventsFunction,
+        // This is the ObjectsContainer generated from parameters
+        objectsContainer,
         group.getName(),
         newName,
         /* isObjectGroup=*/ true

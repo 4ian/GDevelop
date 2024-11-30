@@ -83,6 +83,7 @@ class GD_CORE_API EventsRefactorer {
   static void RenameObjectInEvents(const gd::Platform& platform,
                                    const gd::ProjectScopedContainers& projectScopedContainers,
                                    gd::EventsList& events,
+                                   const gd::ObjectsContainer &targetedObjectsContainer,
                                    gd::String oldName,
                                    gd::String newName);
 

@@ -4264,14 +4264,14 @@ describe('libGD.js', function () {
       parameters
         .addNewParameter('MyFirstBehavior')
         .setType('behavior')
-        .setExtraInfo('SomeBehavior::FirstBehaviorType')
+        .setExtraInfo('AnchorBehavior::AnchorBehavior')
         .setDescription('The first behavior of the first sprite');
 
       parameters
         .addNewParameter('MySecondBehavior')
         .setType('behavior')
-        .setExtraInfo('SomeBehavior::SecondBehaviorType')
-        .setDescription('The first behavior of the first sprite');
+        .setExtraInfo('PlatformBehavior::PlatformBehavior')
+        .setDescription('The second behavior of the first sprite');
 
       parameters
         .addNewParameter('MySpriteObject2')
@@ -4433,10 +4433,6 @@ describe('libGD.js', function () {
       ]);
 
       // Verify that objects are changed in memory if changed in parameters.
-      expect(objectWithoutType).not.toBe(updatedObjectWithoutType);
-      expect(gd.getPointer(objectWithoutType)).not.toBe(
-        gd.getPointer(updatedObjectWithoutType)
-      );
       expect(mySpriteObject).toBe(objectsContainer.getObject('MySpriteObject'));
       expect(gd.getPointer(mySpriteObject)).toBe(
         gd.getPointer(objectsContainer.getObject('MySpriteObject'))

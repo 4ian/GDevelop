@@ -32,14 +32,12 @@ class GD_CORE_API EventsParameterReplacer
  public:
   EventsParameterReplacer(
       const gd::Platform &platform_,
-      const gd::ParameterMetadataContainer &targetParameterContainer_,
       const std::unordered_map<gd::String, gd::String> &oldToNewPropertyNames_)
       : platform(platform_),
-        targetParameterContainer(targetParameterContainer_),
         oldToNewPropertyNames(oldToNewPropertyNames_){};
   virtual ~EventsParameterReplacer();
 
-  static bool CanContainProperty(const gd::ValueTypeMetadata &valueTypeMetadata);
+  static bool CanContainParameter(const gd::ValueTypeMetadata &valueTypeMetadata);
 
  private:
   bool DoVisitInstruction(gd::Instruction &instruction,
@@ -48,7 +46,6 @@ class GD_CORE_API EventsParameterReplacer
                               const gd::ParameterMetadata &metadata) override;
 
   const gd::Platform &platform;
-  const gd::ParameterMetadataContainer &targetParameterContainer;
   const std::unordered_map<gd::String, gd::String> &oldToNewPropertyNames;
 };
 

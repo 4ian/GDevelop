@@ -55,12 +55,11 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
                      gd::ExpressionNode& node,
                      const gd::String& objectName,
                      const gd::String& objectNewName) {
-    if (gd::ExpressionValidator::HasNoErrors(platform, projectScopedContainers, rootType, node)) {
+      // TODO Use the ProjectScopedContainers to check the targeted ObjectsContainer.
       ExpressionObjectRenamer renamer(platform, projectScopedContainers, rootType, objectName, objectNewName);
       node.Visit(renamer);
 
       return renamer.HasDoneRenaming();
-    }
 
     return false;
   }

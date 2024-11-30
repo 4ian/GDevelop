@@ -52,17 +52,14 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
 
   static bool Rename(const gd::Platform &platform,
                      const gd::ProjectScopedContainers &projectScopedContainers,
-                     const gd::String &rootType,
-                     gd::ExpressionNode& node,
-                     const gd::String& objectName,
-                     const gd::String& objectNewName) {
-      // TODO Use the ProjectScopedContainers to check the targeted ObjectsContainer.
-      ExpressionObjectRenamer renamer(platform, projectScopedContainers, rootType, objectName, objectNewName);
-      node.Visit(renamer);
+                     const gd::String &rootType, gd::ExpressionNode &node,
+                     const gd::String &objectName,
+                     const gd::String &objectNewName) {
+    ExpressionObjectRenamer renamer(platform, projectScopedContainers, rootType,
+                                    objectName, objectNewName);
+    node.Visit(renamer);
 
-      return renamer.HasDoneRenaming();
-
-    return false;
+    return renamer.HasDoneRenaming();
   }
 
   bool HasDoneRenaming() const { return hasDoneRenaming; }
@@ -305,16 +302,24 @@ class GD_CORE_API EventsObjectReplacer
     : public ArbitraryEventsWorkerWithContext {
 public:
   EventsObjectReplacer(const gd::Platform &platform_,
+                       const gd::ObjectsContainer &targetedObjectsContainer_,
                        const gd::String &oldObjectName_,
                        const gd::String &newObjectName_)
-      : platform(platform_), oldObjectName(oldObjectName_),
-        newObjectName(newObjectName_){};
+      : platform(platform_),
+        targetedObjectsContainer(targetedObjectsContainer_),
+        oldObjectName(oldObjectName_), newObjectName(newObjectName_){};
 
   virtual ~EventsObjectReplacer() {}
 
 private:
   bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override {
+    if (&targetedObjectsContainer !=
+        GetProjectScopedContainers()
+            .GetObjectsContainersList()
+            .GetObjectsContainerFromObjectName(oldObjectName)) {
+      return false;
+    }
     const auto &metadata = isCondition
                                ? gd::MetadataProvider::GetConditionMetadata(
                                      platform, instruction.GetType())
@@ -351,6 +356,12 @@ private:
 
   bool DoVisitEventExpression(gd::Expression &expression,
                               const gd::ParameterMetadata &metadata) override {
+    if (&targetedObjectsContainer !=
+        GetProjectScopedContainers()
+            .GetObjectsContainersList()
+            .GetObjectsContainerFromObjectName(oldObjectName)) {
+      return false;
+    }
     if (!gd::EventsObjectReplacer::CanContainObject(
             metadata.GetValueTypeMetadata())) {
       return false;
@@ -376,6 +387,7 @@ private:
   }
 
   const gd::Platform &platform;
+  const gd::ObjectsContainer &targetedObjectsContainer;
   const gd::String &oldObjectName;
   const gd::String &newObjectName;
 };
@@ -383,9 +395,10 @@ private:
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
                                             const gd::ProjectScopedContainers& projectScopedContainers,
                                             gd::EventsList& events,
+                                            const gd::ObjectsContainer &targetedObjectsContainer,
                                             gd::String oldName,
                                             gd::String newName) {
-  gd::EventsObjectReplacer eventsParameterReplacer(platform, oldName, newName);
+  gd::EventsObjectReplacer eventsParameterReplacer(platform, targetedObjectsContainer, oldName, newName);
   eventsParameterReplacer.Launch(events, projectScopedContainers);
 }
 

@@ -180,6 +180,7 @@ class GD_CORE_API WholeProjectRefactorer {
   RenameParameter(gd::Project &project,
                   gd::ProjectScopedContainers &projectScopedContainers,
                   gd::EventsFunction &eventsFunction,
+                  const gd::ObjectsContainer &parameterObjectsContainer,
                   const gd::String &oldParameterName,
                   const gd::String &newParameterName);
 
@@ -556,6 +557,7 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project& project,
       const gd::ProjectScopedContainers &projectScopedContainers,
       gd::EventsFunction& eventsFunction,
+      const gd::ObjectsContainer &targetedObjectsContainer,
       const gd::String& oldName,
       const gd::String& newName,
       bool isObjectGroup);
@@ -676,6 +678,12 @@ class GD_CORE_API WholeProjectRefactorer {
   virtual ~WholeProjectRefactorer(){};
 
  private:
+  static void ObjectOrGroupRenamedInScene(gd::Project &project,
+                                          gd::Layout &scene,
+                                          const gd::ObjectsContainer &targetedObjectsContainer,
+                                          const gd::String &oldName,
+                                          const gd::String &newName,
+                                          bool isObjectGroup);
   static std::vector<gd::String> GetAssociatedExternalLayouts(
       gd::Project& project, gd::Layout& layout);
   static std::vector<gd::String>

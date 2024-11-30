@@ -40,13 +40,11 @@ class GD_CORE_API ExpressionParameterReplacer
   ExpressionParameterReplacer(
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
-      const gd::ParameterMetadataContainer& targetParameterContainer_,
       bool isParentTypeAVariable_,
       const std::unordered_map<gd::String, gd::String>& oldToNewPropertyNames_)
       : hasDoneRenaming(false),
         platform(platform_),
         projectScopedContainers(projectScopedContainers_),
-        targetParameterContainer(targetParameterContainer_),
         isParentTypeAVariable(isParentTypeAVariable_),
         oldToNewPropertyNames(oldToNewPropertyNames_){};
   virtual ~ExpressionParameterReplacer(){};
@@ -113,10 +111,6 @@ class GD_CORE_API ExpressionParameterReplacer
         // Do nothing, it's a variable.
         return;
     }
-
-    auto& propertiesContainersList =
-        projectScopedContainers.GetPropertiesContainersList();
-
     projectScopedContainers.MatchIdentifierWithName<void>(
       // The property name is changed after the refactor operation
       node.identifierName,
@@ -146,7 +140,7 @@ class GD_CORE_API ExpressionParameterReplacer
       }
       const auto &parameterTypeMetadata =
           parameterMetadata->GetValueTypeMetadata();
-      if (gd::EventsParameterReplacer::CanContainProperty(
+      if (gd::EventsParameterReplacer::CanContainParameter(
               parameterTypeMetadata)) {
         isParentTypeAVariable = parameterTypeMetadata.IsVariableOnly();
         parameter->Visit(*this);
@@ -174,8 +168,7 @@ class GD_CORE_API ExpressionParameterReplacer
   const gd::Platform& platform;
   const gd::ProjectScopedContainers& projectScopedContainers;
 
-  // Renaming or removing to do:
-  const gd::ParameterMetadataContainer& targetParameterContainer;
+  // Renaming to do
   const std::unordered_map<gd::String, gd::String>& oldToNewPropertyNames;
 
   gd::String objectNameToUseForVariableAccessor;
@@ -197,14 +190,14 @@ bool EventsParameterReplacer::DoVisitInstruction(gd::Instruction& instruction,
           const gd::Expression& parameterValue,
           size_t parameterIndex,
           const gd::String& lastObjectName) {
-        if (!gd::EventsParameterReplacer::CanContainProperty(
+        if (!gd::EventsParameterReplacer::CanContainParameter(
           parameterMetadata.GetValueTypeMetadata())) {
           return;
         }
         auto node = parameterValue.GetRootNode();
         if (node) {
           ExpressionParameterReplacer renamer(
-              platform, GetProjectScopedContainers(), targetParameterContainer,
+              platform, GetProjectScopedContainers(),
               parameterMetadata.GetValueTypeMetadata().IsVariableOnly(),
               oldToNewPropertyNames);
           node->Visit(renamer);
@@ -221,14 +214,14 @@ bool EventsParameterReplacer::DoVisitInstruction(gd::Instruction& instruction,
 
 bool EventsParameterReplacer::DoVisitEventExpression(
     gd::Expression& expression, const gd::ParameterMetadata& metadata) {
-  if (!gd::EventsParameterReplacer::CanContainProperty(
+  if (!gd::EventsParameterReplacer::CanContainParameter(
           metadata.GetValueTypeMetadata())) {
     return false;
   }
   auto node = expression.GetRootNode();
   if (node) {
     ExpressionParameterReplacer renamer(
-        platform, GetProjectScopedContainers(), targetParameterContainer,
+        platform, GetProjectScopedContainers(),
         metadata.GetValueTypeMetadata().IsVariableOnly(), oldToNewPropertyNames);
     node->Visit(renamer);
 
@@ -240,7 +233,7 @@ bool EventsParameterReplacer::DoVisitEventExpression(
   return false;
 }
 
-bool EventsParameterReplacer::CanContainProperty(
+bool EventsParameterReplacer::CanContainParameter(
     const gd::ValueTypeMetadata &valueTypeMetadata) {
   return valueTypeMetadata.IsVariable() || valueTypeMetadata.IsNumber() ||
          valueTypeMetadata.IsString();

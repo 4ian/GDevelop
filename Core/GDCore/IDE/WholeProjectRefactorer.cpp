@@ -825,15 +825,18 @@ void WholeProjectRefactorer::RenameParameter(
   if (!parameters.HasParameterNamed(oldParameterName))
     return;
   auto &parameter = parameters.GetParameter(oldParameterName);
-  if (parameter.GetType() == "Object") {
+  if (parameter.GetValueTypeMetadata().IsObject()) {
     gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
         project, projectScopedContainers, eventsFunction, oldParameterName,
         newParameterName, false);
-  } else if (parameter.GetType() == "Behavior") {
+  } else if (parameter.GetValueTypeMetadata().IsBehavior()) {
     size_t behaviorParameterIndex = parameters.GetParameterPosition(parameter);
     size_t objectParameterIndex =
         gd::ParameterMetadataTools::GetObjectParameterIndexFor(
             parameters, behaviorParameterIndex);
+    if (objectParameterIndex == gd::String::npos) {
+      return;
+    }
     const gd::String &objectName =
         parameters.GetParameter(objectParameterIndex).GetName();
     gd::EventsBehaviorRenamer behaviorRenamer(project.GetCurrentPlatform(),
@@ -845,7 +848,7 @@ void WholeProjectRefactorer::RenameParameter(
     std::unordered_map<gd::String, gd::String> oldToNewParameterNames = {
         {oldParameterName, newParameterName}};
     gd::EventsParameterReplacer eventsParameterReplacer(
-        project.GetCurrentPlatform(), parameters, oldToNewParameterNames);
+        project.GetCurrentPlatform(), oldToNewParameterNames);
     eventsParameterReplacer.Launch(eventsFunction.GetEvents(),
                                    projectScopedContainers);
 

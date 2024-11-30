@@ -340,8 +340,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                   "",
                   "",
                   "")
-      .AddParameter("object", _("Object 1 parameter"))
-      .AddParameter("object", _("Object 2 parameter"))
+      .AddParameter("object", "Object 1 parameter")
+      .AddParameter("object", "Object 2 parameter")
       .SetFunctionName("doSomethingWithObjects");
 
   extension

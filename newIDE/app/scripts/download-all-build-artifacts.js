@@ -90,17 +90,22 @@ const artifactsToDownload = {
 (async () => {
   shell.mkdir('-p', outputPath);
 
-  for (const key in artifactsToDownload) {
-    const { url, outputFilename } = artifactsToDownload[key];
+  await Promise.all(
+    Object.keys(artifactsToDownload).map(async key => {
+      const { url, outputFilename } = artifactsToDownload[key];
 
-    shell.echo(
-      `ℹ️ Downloading ${key} artifact (${url}) to ${outputFilename}...`
-    );
-    try {
-      await downloadLocalFile(url, path.join(outputPath, outputFilename));
-    } catch (error) {
-      shell.echo(`❌ Error while downloading ${key} artifact. Aborting.`);
-      shell.exit(2);
-    }
-  }
+      shell.echo(
+        `ℹ️ Downloading ${key} artifact (${url}) to ${outputFilename}...`
+      );
+      try {
+        await downloadLocalFile(url, path.join(outputPath, outputFilename));
+        shell.echo(
+          `ℹ️ Done downloading ${key} artifact (${url}) to ${outputFilename}...`
+        );
+      } catch (error) {
+        shell.echo(`❌ Error while downloading ${key} artifact. Aborting.`);
+        shell.exit(2);
+      }
+    })
+  );
 })();

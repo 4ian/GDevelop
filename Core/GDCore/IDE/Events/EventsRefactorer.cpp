@@ -55,11 +55,15 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
                      const gd::String &rootType, gd::ExpressionNode &node,
                      const gd::String &objectName,
                      const gd::String &objectNewName) {
-    ExpressionObjectRenamer renamer(platform, projectScopedContainers, rootType,
-                                    objectName, objectNewName);
-    node.Visit(renamer);
+    if (gd::ExpressionValidator::HasNoErrors(platform, projectScopedContainers,
+                                             rootType, node)) {
+      ExpressionObjectRenamer renamer(platform, projectScopedContainers,
+                                      rootType, objectName, objectNewName);
+      node.Visit(renamer);
 
-    return renamer.HasDoneRenaming();
+      return renamer.HasDoneRenaming();
+    }
+    return false;
   }
 
   bool HasDoneRenaming() const { return hasDoneRenaming; }

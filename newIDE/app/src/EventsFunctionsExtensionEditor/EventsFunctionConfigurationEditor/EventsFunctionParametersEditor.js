@@ -124,6 +124,11 @@ type Props = {|
     newIndex: number,
     done: (boolean) => void
   ) => void,
+  onFunctionParameterWillBeRenamed: (
+    eventsFunction: gdEventsFunction,
+    oldName: string,
+    newName: string
+  ) => void,
 |};
 
 export const EventsFunctionParametersEditor = ({
@@ -140,6 +145,7 @@ export const EventsFunctionParametersEditor = ({
   onMoveFreeEventsParameter,
   onMoveBehaviorEventsParameter,
   onMoveObjectEventsParameter,
+  onFunctionParameterWillBeRenamed,
 }: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -193,18 +199,57 @@ export const EventsFunctionParametersEditor = ({
     [eventsFunction, firstParameterIndex, freezeParameters]
   );
 
+  const renameParameter = React.useCallback(
+    (parameter: gdParameterMetadata, newName: string) => {
+      if (newName === parameter.getName()) {
+        return;
+      }
+      const projectScopedContainers = projectScopedContainersAccessor.get();
+      const validatedNewName = getValidatedParameterName(
+        eventsFunction.getParameters(),
+        projectScopedContainers,
+        newName
+      );
+      onFunctionParameterWillBeRenamed(
+        eventsFunction,
+        parameter.getName(),
+        validatedNewName
+      );
+      parameter.setName(validatedNewName);
+      forceUpdate();
+      onParametersUpdated();
+    },
+    [
+      eventsFunction,
+      forceUpdate,
+      onFunctionParameterWillBeRenamed,
+      onParametersUpdated,
+      projectScopedContainersAccessor,
+    ]
+  );
+
   const addParameterAt = React.useCallback(
     (index: number) => {
       const parameters = eventsFunction.getParameters();
-      const newName = newNameGenerator('Parameter', name =>
-        parameters.hasParameterNamed(name)
+      const projectScopedContainers = projectScopedContainersAccessor.get();
+      const validatedNewName = getValidatedParameterName(
+        eventsFunction.getParameters(),
+        projectScopedContainers,
+        'Parameter'
       );
-      parameters.insertNewParameter(newName, index).setType('objectList');
+      parameters
+        .insertNewParameter(validatedNewName, index)
+        .setType('objectList');
       forceUpdate();
       onParametersUpdated();
-      setJustAddedParameterName(newName);
+      setJustAddedParameterName(validatedNewName);
     },
-    [eventsFunction, forceUpdate, onParametersUpdated]
+    [
+      eventsFunction,
+      forceUpdate,
+      onParametersUpdated,
+      projectScopedContainersAccessor,
+    ]
   );
 
   const addParameter = React.useCallback(
@@ -643,20 +688,9 @@ export const EventsFunctionParametersEditor = ({
                                         margin="none"
                                         translatableHintText={t`Enter the parameter name (mandatory)`}
                                         value={parameter.getName()}
-                                        onChange={newName => {
-                                          if (newName === parameter.getName()) {
-                                            return;
-                                          }
-                                          const projectScopedContainers = projectScopedContainersAccessor.get();
-                                          const validatedNewName = getValidatedParameterName(
-                                            parameters,
-                                            projectScopedContainers,
-                                            newName
-                                          );
-                                          parameter.setName(validatedNewName);
-                                          forceUpdate();
-                                          onParametersUpdated();
-                                        }}
+                                        onChange={newName =>
+                                          renameParameter(parameter, newName)
+                                        }
                                         disabled={isParameterDisabled(i)}
                                         fullWidth
                                       />

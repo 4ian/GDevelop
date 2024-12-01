@@ -326,6 +326,9 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 // Force the dialog to adapt its size
                 this.forceUpdate();
               }}
+              onFunctionParameterWillBeRenamed={() => {
+                // Won't happen as the editor is freezed.
+              }}
               freezeParameters
             />
           )}

@@ -15,6 +15,14 @@
 
 /** @type {ExtensionModule} */
 module.exports = {
+  // todo do we need some special type of importing when dealing with umd modules?
+  // registerInstanceRenderers: function (objectsRenderingService) {
+  //   const bondage = objectsRenderingService.requireModule(
+  //     __dirname,
+  //     'bondage.js/dist/bondage.min.js'
+  //   ); 
+  //   console.log({bondage})
+  // }
   createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
@@ -50,8 +58,8 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DialogueTree/dialoguetools.js')
-      .addIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.min.js')
+      .setIncludeFile('Extensions/DialogueTree/bondage.js/dist/bondage.js')
+      .addIncludeFile('Extensions/DialogueTree/dialoguetools.js')
       .setFunctionName('gdjs.dialogueTree.loadFromSceneVariable');
 
     extension

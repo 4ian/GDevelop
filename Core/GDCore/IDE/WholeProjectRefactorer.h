@@ -176,6 +176,13 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& oldFunctionName,
       const gd::String& newFunctionName);
 
+  /**
+   * \brief Refactor the function **before** a parameter is renamed.
+   *
+   * \warning Do the renaming of the specified parameter after calling this.
+   * This is because the function is expected to have its old name for the
+   * refactoring.
+   */
   static void
   RenameParameter(gd::Project &project,
                   gd::ProjectScopedContainers &projectScopedContainers,

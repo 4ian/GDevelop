@@ -29,8 +29,7 @@
 namespace gd {
 
 /**
- * \brief Go through the nodes and rename parameters,
- * or signal if the instruction must be renamed if a removed property is used.
+ * \brief Go through the nodes and rename parameters.
  *
  * \see gd::ExpressionParser2
  */

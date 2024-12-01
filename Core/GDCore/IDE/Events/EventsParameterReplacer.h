@@ -23,7 +23,7 @@ class Platform;
 namespace gd {
 /**
  * \brief Replace in expressions and in parameters of actions or conditions,
- * references to the name of a property by another.
+ * references to the name of a parameter by another.
  *
  * \ingroup IDE
  */

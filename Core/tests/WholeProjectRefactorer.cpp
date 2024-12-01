@@ -1560,7 +1560,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       auto &layout = project.GetLayout("Scene");
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "ObjectWithMyBehavior",
           "RenamedObjectWithMyBehavior",
@@ -1588,7 +1588,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       auto &layout = project.GetLayout("Scene");
 
-      // Trigger the refactoring after the renaming of a group
+      // Trigger the refactoring before the renaming of a group
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
           /* isObjectGroup=*/true);
@@ -1669,7 +1669,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               project, eventsExtension, eventsFunction,
               parametersObjectsContainer, parameterVariablesContainer);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
           parametersObjectsContainer, "Object1", "RenamedObject1",
@@ -1706,7 +1706,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       objectWithMyBehavior.GetVariables().InsertNew("MyVariable");
       objectWithMyBehavior.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
           parametersObjectsContainer, "ObjectWithMyBehavior",
@@ -1826,7 +1826,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               project, eventsExtension, eventsBasedObject,
               parametersObjectsContainer);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
           project, projectScopedContainers, eventsBasedObject,
           "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",

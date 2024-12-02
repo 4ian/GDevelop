@@ -52,6 +52,7 @@ export type Game = {|
   categories?: string[],
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
+  updatedAt: number,
   publicWebBuildId?: ?string,
   description?: string,
   thumbnailUrl?: string,
@@ -294,7 +295,7 @@ export const registerGame = async (
     gameId: string,
     gameName: string,
     authorName: string,
-    templateSlug: string,
+    templateSlug?: string,
   |}
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();

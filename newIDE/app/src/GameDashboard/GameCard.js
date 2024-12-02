@@ -15,6 +15,7 @@ import {
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import { GameThumbnail } from './GameThumbnail';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   getGameMainImageUrl,
   getGameUrl,
@@ -44,18 +45,20 @@ const styles = {
 
 type Props = {|
   game: Game,
-  isCurrentGame: boolean,
+  isCurrentProjectOpened: boolean,
   onOpenGameManager: () => void,
   storageProviders: Array<StorageProvider>,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  askToCloseProject: () => Promise<boolean>,
 |};
 
 export const GameCard = ({
   storageProviders,
   game,
-  isCurrentGame,
+  isCurrentProjectOpened,
   onOpenGameManager,
   onOpenProject,
+  askToCloseProject,
 }: Props) => {
   useOnResize(useForceUpdate());
   const projectsList = useProjectsListFor(game);
@@ -124,9 +127,14 @@ export const GameCard = ({
 
   const renderTitle = (i18n: I18nType) => (
     <ColumnStackLayout noMargin>
-      <Text color="secondary" noMargin>
-        <Trans>Published on {i18n.date(game.createdAt * 1000)}</Trans>
-      </Text>
+      <LineStackLayout noMargin>
+        <Text color="secondary" noMargin>
+          <Trans>Last edited:</Trans>
+        </Text>
+        <Text color="secondary" noMargin>
+          {i18n.date(game.updatedAt * 1000)}
+        </Text>
+      </LineStackLayout>
       <Text size="block-title" noMargin>
         {game.gameName}
       </Text>
@@ -148,6 +156,52 @@ export const GameCard = ({
     />
   );
 
+  const buildContextMenu = (
+    i18n: I18nType,
+    projectsList: FileMetadataAndStorageProviderName[]
+  ): Array<MenuItemTemplate> => {
+    const actions =
+      projectsList.length > 1
+        ? [
+            ...projectsList.map(fileMetadataAndStorageProviderName => {
+              const name =
+                fileMetadataAndStorageProviderName.fileMetadata.name || '-';
+              const storageProvider = getStorageProviderByInternalName(
+                storageProviders,
+                fileMetadataAndStorageProviderName.storageProviderName
+              );
+              return {
+                label: i18n._(
+                  t`${name} (${
+                    storageProvider ? i18n._(storageProvider.name) : '-'
+                  })`
+                ),
+                click: () => onOpenProject(fileMetadataAndStorageProviderName),
+              };
+            }),
+            { type: 'separator' },
+            {
+              label: i18n._(t`See all in the game dashboard`),
+              click: onOpenGameManager,
+            },
+          ]
+        : [];
+
+    if (isCurrentProjectOpened) {
+      actions.push(
+        { type: 'separator' },
+        {
+          label: i18n._(t`Close project`),
+          click: async () => {
+            await askToCloseProject();
+          },
+        }
+      );
+    }
+
+    return actions;
+  };
+
   const renderButtons = ({ fullWidth }: { fullWidth: boolean }) => {
     return (
       <div styles={styles.buttonsContainer}>
@@ -164,55 +218,41 @@ export const GameCard = ({
             }
             onClick={onOpenGameManager}
           />
-          {projectsList.length === 0 ? null : projectsList.length === 1 ? (
+          {projectsList.length === 0 ? null : projectsList.length === 1 &&
+            !isCurrentProjectOpened ? (
             <FlatButton
               primary
               fullWidth={fullWidth}
-              disabled={isCurrentGame}
               label={
-                isCurrentGame ? (
-                  <Trans>Opened</Trans>
-                ) : isWidthConstrained ? (
+                isWidthConstrained ? (
                   <Trans>Open</Trans>
                 ) : (
                   <Trans>Open project</Trans>
                 )
               }
-              onClick={() => onOpenProject(projectsList[0])}
+              onClick={
+                isCurrentProjectOpened
+                  ? undefined
+                  : () => onOpenProject(projectsList[0])
+              }
             />
           ) : (
             <FlatButtonWithSplitMenu
               primary
               fullWidth={fullWidth}
-              disabled={isCurrentGame}
               label={
-                isCurrentGame ? <Trans>Opened</Trans> : <Trans>Open</Trans>
+                isCurrentProjectOpened ? (
+                  <Trans>Opened</Trans>
+                ) : (
+                  <Trans>Open</Trans>
+                )
               }
-              onClick={() => onOpenProject(projectsList[0])}
-              buildMenuTemplate={i18n => [
-                ...projectsList.map(fileMetadataAndStorageProviderName => {
-                  const name =
-                    fileMetadataAndStorageProviderName.fileMetadata.name || '-';
-                  const storageProvider = getStorageProviderByInternalName(
-                    storageProviders,
-                    fileMetadataAndStorageProviderName.storageProviderName
-                  );
-                  return {
-                    label: i18n._(
-                      t`${name} (${
-                        storageProvider ? i18n._(storageProvider.name) : '-'
-                      })`
-                    ),
-                    click: () =>
-                      onOpenProject(fileMetadataAndStorageProviderName),
-                  };
-                }),
-                { type: 'separator' },
-                {
-                  label: i18n._(t`See all in the game dashboard`),
-                  click: onOpenGameManager,
-                },
-              ]}
+              onClick={
+                isCurrentProjectOpened
+                  ? undefined
+                  : () => onOpenProject(projectsList[0])
+              }
+              buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
             />
           )}
         </LineStackLayout>
@@ -229,7 +269,7 @@ export const GameCard = ({
         <Card
           key={game.id}
           background={'medium'}
-          isHighlighted={isCurrentGame}
+          isHighlighted={isCurrentProjectOpened}
           padding={isMobile ? 8 : 16}
         >
           {isMobile ? (
@@ -250,15 +290,17 @@ export const GameCard = ({
                 justifyContent="space-between"
                 noOverflowParent
               >
-                <LineStackLayout
-                  noMargin
-                  justifyContent="space-between"
-                  alignItems="flex-start"
-                >
-                  {renderTitle(i18n)}
-                  {renderButtons({ fullWidth: false })}
-                </LineStackLayout>
-                {renderPublicInfo()}
+                <ColumnStackLayout noMargin>
+                  <LineStackLayout
+                    noMargin
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                  >
+                    {renderTitle(i18n)}
+                    {renderButtons({ fullWidth: false })}
+                  </LineStackLayout>
+                  {renderPublicInfo()}
+                </ColumnStackLayout>
                 {renderShareUrl(i18n)}
               </ColumnStackLayout>
             </LineStackLayout>

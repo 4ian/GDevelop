@@ -8,7 +8,8 @@ import { Column, Line } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const verticalPadding = 8;
-const fixedHeight = 300;
+const largeFixedHeight = 300;
+const smallFixedHeight = 150;
 
 const styles = {
   paper: {
@@ -25,27 +26,26 @@ const styles = {
     flex: 1,
   },
   maxHeightNotWrapped: {
-    minHeight: fixedHeight,
     height: `calc(100% - ${2 * verticalPadding}px)`,
   },
 };
 
 type Props = {|
   title: React.Node,
-  seeMoreButton?: React.Node,
+  topRightAction?: React.Node,
   renderSubtitle?: ?() => React.Node,
   gridSize: number,
   children?: React.Node,
-  withMinHeight?: boolean,
+  minHeight?: 'small' | 'large',
 |};
 
 const DashboardWidget = ({
   title,
-  seeMoreButton,
+  topRightAction,
   gridSize,
   renderSubtitle,
   children,
-  withMinHeight,
+  minHeight,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
@@ -54,8 +54,12 @@ const DashboardWidget = ({
         background="medium"
         style={{
           ...styles.paper,
-          ...(withMinHeight && !isMobile
-            ? styles.maxHeightNotWrapped
+          ...(minHeight && !isMobile
+            ? {
+                ...styles.maxHeightNotWrapped,
+                minHeight:
+                  minHeight === 'large' ? largeFixedHeight : smallFixedHeight,
+              }
             : undefined),
         }}
       >
@@ -67,7 +71,7 @@ const DashboardWidget = ({
               </Text>
               {renderSubtitle && renderSubtitle()}
             </Column>
-            {seeMoreButton}
+            {topRightAction}
           </Line>
           {children}
         </div>

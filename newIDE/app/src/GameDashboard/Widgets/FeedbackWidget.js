@@ -50,7 +50,7 @@ const FeedbackWidget = ({
         <DashboardWidget
           gridSize={1}
           title={<Trans>Feedbacks</Trans>}
-          seeMoreButton={
+          topRightAction={
             !feedbacks || feedbacks.length === 0 ? null : (
               <FlatButton
                 label={<Trans>See more</Trans>}
@@ -60,7 +60,7 @@ const FeedbackWidget = ({
               />
             )
           }
-          withMinHeight
+          minHeight="large"
           renderSubtitle={() =>
             shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&
               feedbacks ? (

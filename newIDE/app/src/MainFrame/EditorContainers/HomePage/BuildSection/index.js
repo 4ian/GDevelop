@@ -40,7 +40,6 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
 import type { WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 import ExampleStore from '../../../../AssetStore/ExampleStore';
 import ProjectFileList from '../CreateSection/ProjectFileList';
 
@@ -124,17 +123,10 @@ const BuildSection = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
-  const [
-    showCloudProjectsInfoIfNotLoggedIn,
-    setShowCloudProjectsInfoIfNotLoggedIn,
-  ] = React.useState<boolean>(false);
   const {
-    authenticated,
     limits,
     cloudProjectsFetchingErrorLabel,
     onCloudProjectsChanged,
-    onOpenLoginDialog,
   } = authenticatedUser;
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
 
@@ -143,30 +135,6 @@ const BuildSection = ({
   const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
     authenticatedUser
   );
-
-  const refreshCloudProjects = React.useCallback(
-    async () => {
-      if (isRefreshing) return;
-      if (!authenticated) {
-        setShowCloudProjectsInfoIfNotLoggedIn(true);
-        return;
-      }
-      try {
-        setIsRefreshing(true);
-        await onCloudProjectsChanged();
-      } finally {
-        // Wait a bit to avoid spam as we don't have a "loading" state.
-        setTimeout(() => setIsRefreshing(false), 2000);
-      }
-    },
-    [onCloudProjectsChanged, isRefreshing, authenticated]
-  );
-
-  const shouldDisplayPremiumGameTemplates =
-    !authenticatedUser ||
-    !authenticatedUser.limits ||
-    !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hidePremiumProducts;
 
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
@@ -179,9 +147,7 @@ const BuildSection = ({
         i18n,
         numberOfItemsExclusivelyInCarousel: isMobile ? 3 : 5,
         numberOfItemsInCarousel: isMobile ? 8 : 12,
-        privateGameTemplatesPeriodicity: shouldDisplayPremiumGameTemplates
-          ? 2
-          : 0,
+        privateGameTemplatesPeriodicity: 2,
       }),
     [
       authenticatedUser.receivedGameTemplates,
@@ -191,14 +157,8 @@ const BuildSection = ({
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
-      shouldDisplayPremiumGameTemplates,
     ]
   );
-
-  const shouldDisplayAnnouncements =
-    !authenticatedUser.limits ||
-    !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
 
   const pageContent = showAllGameTemplates ? (
     <SectionContainer
@@ -218,7 +178,6 @@ const BuildSection = ({
     </SectionContainer>
   ) : (
     <SectionContainer
-      showUrgentAnnouncements={shouldDisplayAnnouncements}
       renderFooter={
         !isMobile && limits && hasTooManyCloudProjects
           ? () => (
@@ -251,14 +210,6 @@ const BuildSection = ({
           roundedImages
           displayArrowsOnDesktop
         />
-        {shouldDisplayAnnouncements && (
-          <>
-            <Spacer />
-            <Column noMargin>
-              <PromotionsSlideshow />
-            </Column>
-          </>
-        )}
       </SectionRow>
       <SectionRow>
         <ResponsiveLineStackLayout
@@ -272,16 +223,6 @@ const BuildSection = ({
               <Text size="section-title">
                 <Trans>My projects</Trans>
               </Text>
-              <IconButton
-                size="small"
-                onClick={refreshCloudProjects}
-                disabled={isRefreshing}
-                tooltip={t`Refresh cloud projects`}
-              >
-                <div style={styles.refreshIconContainer}>
-                  <Refresh fontSize="inherit" />
-                </div>
-              </IconButton>
             </LineStackLayout>
           </Column>
           <Column noMargin>
@@ -362,25 +303,13 @@ const BuildSection = ({
     </SectionContainer>
   );
 
-  return (
-    <>
-      {pageContent}
-      <InfoBar
-        message={<Trans>Log in to see your cloud projects.</Trans>}
-        visible={showCloudProjectsInfoIfNotLoggedIn}
-        hide={() => setShowCloudProjectsInfoIfNotLoggedIn(false)}
-        duration={5000}
-        onActionClick={onOpenLoginDialog}
-        actionLabel={<Trans>Log in</Trans>}
-      />
-    </>
-  );
+  return pageContent;
 };
 
 const BuildSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Build section</Trans>}
-    scope="start-page-build"
+    scope="start-page-create"
   >
     <BuildSection {...props} />
   </ErrorBoundary>

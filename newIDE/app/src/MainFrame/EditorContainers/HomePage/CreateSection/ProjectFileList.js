@@ -16,11 +16,6 @@ import {
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import {
-  checkIfHasTooManyCloudProjects,
-  MaxProjectCountAlertMessage,
-} from './MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
@@ -101,13 +96,9 @@ const ProjectFileList = ({
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   const {
     profile,
     cloudProjects,
-    limits,
     cloudProjectsFetchingErrorLabel,
     onCloudProjectsChanged,
   } = authenticatedUser;
@@ -136,10 +127,6 @@ const ProjectFileList = ({
       updateModificationInfoByProjectId();
     },
     [cloudProjects, profile]
-  );
-
-  const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
-    authenticatedUser
   );
 
   const onDeleteCloudProject = async (
@@ -315,19 +302,6 @@ const ProjectFileList = ({
                   }
                 />
               ))}
-              {isMobile && limits && hasTooManyCloudProjects && (
-                <MaxProjectCountAlertMessage
-                  margin="dense"
-                  limits={limits}
-                  onUpgrade={() =>
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: 'Cloud Project limit reached',
-                      },
-                    })
-                  }
-                />
-              )}
             </List>
           </Column>
         </Line>

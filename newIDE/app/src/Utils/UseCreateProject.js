@@ -35,7 +35,7 @@ import {
   createPrivateGameTemplateUrl,
   type CourseChapter,
 } from './GDevelopServices/Asset';
-import { getDefaultRegisterGamePropertiesFromProject } from './UseGameAndBuildsManager';
+import { getDefaultRegisterGameProperties } from './UseGameAndBuildsManager';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 
 type Props = {|
@@ -164,8 +164,10 @@ const useCreateProject = ({
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
-              getDefaultRegisterGamePropertiesFromProject({
-                project: currentProject,
+              getDefaultRegisterGameProperties({
+                projectId: currentProject.getProjectUuid(),
+                projectName: currentProject.getName(),
+                projectAuthor: currentProject.getAuthor(),
               })
             );
             await onGameRegistered();

@@ -3,7 +3,7 @@ import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { duplicateLobbyConfiguration } from '../Utils/GDevelopServices/Play';
 import { registerGame } from '../Utils/GDevelopServices/Game';
-import { getDefaultRegisterGamePropertiesFromProject } from '../Utils/UseGameAndBuildsManager';
+import { getDefaultRegisterGameProperties } from '../Utils/UseGameAndBuildsManager';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,7 +46,11 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
           await registerGame(
             getAuthorizationHeader,
             profile.id,
-            getDefaultRegisterGamePropertiesFromProject({ project })
+            getDefaultRegisterGameProperties({
+              projectId: project.getProjectUuid(),
+              projectName: project.getName(),
+              projectAuthor: project.getAuthor(),
+            })
           );
         } catch (error) {
           console.error(

@@ -12,24 +12,29 @@ import {
   type Achievement,
 } from '../../../../Utils/GDevelopServices/Badge';
 import { Column, LargeSpacer } from '../../../../UI/Grid';
-import RaisedButton from '../../../../UI/RaisedButton';
 import Window from '../../../../Utils/Window';
 import Coin from '../../../../Credits/Icons/Coin';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
 import CreditsStatusBanner from '../../../../Credits/CreditsStatusBanner';
-
-type Props = {|
-  achievements: ?Array<Achievement>,
-  badges: ?Array<Badge>,
-  onOpenProfile: () => void,
-|};
+import FlatButton from '../../../../UI/FlatButton';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const getAchievement = (achievements: ?Array<Achievement>, id: string) =>
   achievements && achievements.find(achievement => achievement.id === id);
 
 const hasBadge = (badges: ?Array<Badge>, achievementId: string) =>
   !!badges && badges.some(badge => badge.achievementId === achievementId);
+
+export const hasMissingBadges = (
+  badges: ?Array<Badge>,
+  achievements: ?Array<Achievement>
+) =>
+  // Not connected
+  !badges ||
+  !achievements ||
+  // Connected but some achievements are not yet claimed
+  achievements.some(achievement => !hasBadge(badges, achievement.id));
 
 const styles = {
   badgeContainer: {
@@ -63,21 +68,16 @@ const styles = {
 };
 
 const BadgeItem = ({
-  achievements,
-  badges,
-  achievementId,
+  achievement,
+  hasThisBadge,
   buttonLabel,
   linkUrl,
 }: {|
-  achievements: ?Array<Achievement>,
-  badges: ?Array<Badge>,
-  achievementId: string,
+  achievement: ?Achievement,
+  hasThisBadge: boolean,
   buttonLabel: React.Node,
   linkUrl: string,
 |}) => {
-  const achievement = getAchievement(achievements, achievementId);
-  const hasThisBadge = hasBadge(badges, achievementId);
-
   return (
     <I18n>
       {({ i18n }) => (
@@ -121,14 +121,8 @@ const BadgeItem = ({
                     '-'}
                 </Trans>
               </Text>
-              <Text size="body" noMargin>
-                <Trans>
-                  Worth {achievement ? achievement.rewardValueInCredits : '-'}{' '}
-                  credits.
-                </Trans>
-              </Text>
             </Column>
-            <RaisedButton
+            <FlatButton
               label={buttonLabel}
               primary
               onClick={() => {
@@ -143,42 +137,104 @@ const BadgeItem = ({
   );
 };
 
-export const EarnBadges = ({ achievements, badges, onOpenProfile }: Props) => {
+const allBadgesInfo = [
+  {
+    id: 'github-star',
+    label: <Trans>Star GDevelop</Trans>,
+    linkUrl: 'https://github.com/4ian/GDevelop',
+  },
+  {
+    id: 'twitter-follow',
+    label: <Trans>Follow</Trans>,
+    linkUrl: 'https://www.tiktok.com/@gdevelop',
+  },
+  {
+    id: 'twitter-follow',
+    label: <Trans>Follow</Trans>,
+    linkUrl: 'https://x.com/GDevelopApp',
+  },
+];
+
+type Props = {|
+  achievements: ?Array<Achievement>,
+  badges: ?Array<Badge>,
+  onOpenProfile: () => void,
+  hideStatusBanner?: boolean,
+  showRandomBadge?: boolean,
+|};
+
+export const EarnBadges = ({
+  achievements,
+  badges,
+  onOpenProfile,
+  hideStatusBanner,
+  showRandomBadge,
+}: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
+  const badgesToShow = React.useMemo(
+    () => {
+      const allBadgesWithOwnedStatus = allBadgesInfo.map(badgeInfo => ({
+        ...badgeInfo,
+        hasThisBadge: hasBadge(badges, badgeInfo.id),
+      }));
+      const notOwnedBadges = allBadgesWithOwnedStatus.filter(
+        badge => !badge.hasThisBadge
+      );
+
+      // Only show 1 badge on mobile to avoid taking too much space.
+      if (showRandomBadge || isMobile) {
+        if (notOwnedBadges.length === 0) {
+          const randomIndex = Math.floor(
+            Math.random() * allBadgesWithOwnedStatus.length
+          );
+          return [allBadgesWithOwnedStatus[randomIndex]];
+        }
+
+        const randomIndex = Math.floor(Math.random() * notOwnedBadges.length);
+        return [notOwnedBadges[randomIndex]];
+      }
+
+      return allBadgesWithOwnedStatus;
+    },
+    [badges, showRandomBadge, isMobile]
+  );
+
+  // Slice badges in arrays of two to display them in a responsive way.
+  const badgesSlicedInArraysOfTwo = React.useMemo(
+    () => {
+      const slicedBadges = [];
+      for (let i = 0; i < badgesToShow.length; i += 2) {
+        slicedBadges.push(badgesToShow.slice(i, i + 2));
+      }
+      return slicedBadges;
+    },
+    [badgesToShow]
+  );
+
   return (
     <Column noMargin expand>
-      <CreditsStatusBanner
-        displayPurchaseAction={false}
-        actionButtonLabel={<Trans>Claim credits</Trans>}
-        onActionButtonClick={onOpenProfile}
-      />
+      {!hideStatusBanner && (
+        <CreditsStatusBanner
+          displayPurchaseAction={false}
+          actionButtonLabel={<Trans>Claim credits</Trans>}
+          onActionButtonClick={onOpenProfile}
+        />
+      )}
       <LargeSpacer />
-      <ResponsiveLineStackLayout
-        noMargin
-        expand
-        alignItems="stretch"
-        noResponsiveLandscape
-      >
-        <BadgeItem
-          achievementId={'github-star'}
-          achievements={achievements}
-          badges={badges}
-          buttonLabel={<Trans>Star GDevelop</Trans>}
-          linkUrl={'https://github.com/4ian/GDevelop'}
-        />
-        <BadgeItem
-          achievementId={'tiktok-follow'}
-          achievements={achievements}
-          badges={badges}
-          buttonLabel={<Trans>Follow</Trans>}
-          linkUrl={'https://www.tiktok.com/@gdevelop'}
-        />
-        <BadgeItem
-          achievementId={'twitter-follow'}
-          achievements={achievements}
-          badges={badges}
-          buttonLabel={<Trans>Follow</Trans>}
-          linkUrl={'https://x.com/GDevelopApp'}
-        />
+      <ResponsiveLineStackLayout noMargin expand>
+        {badgesSlicedInArraysOfTwo.map((badges, index) => (
+          <ResponsiveLineStackLayout noMargin>
+            {badges.slice(0, 2).map(badge => (
+              <BadgeItem
+                key={badge.id}
+                achievement={getAchievement(achievements, badge.id)}
+                hasThisBadge={badge.hasThisBadge}
+                buttonLabel={badge.label}
+                linkUrl={badge.linkUrl}
+              />
+            ))}
+          </ResponsiveLineStackLayout>
+        ))}
       </ResponsiveLineStackLayout>
     </Column>
   );

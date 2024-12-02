@@ -196,7 +196,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(
       this
     ),
-    setGamesListOrderBy: this._setGamesListOrderBy.bind(this),
     setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
   };
 
@@ -1002,20 +1001,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           previewCrashReportUploadLevel: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setGamesListOrderBy(
-    newValue: 'createdAt' | 'totalSessions' | 'weeklySessions'
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          gamesListOrderBy: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

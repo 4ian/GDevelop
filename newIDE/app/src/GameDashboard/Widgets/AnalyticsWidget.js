@@ -53,9 +53,9 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
         {({ i18n }) => (
           <DashboardWidget
             gridSize={2}
-            withMinHeight
+            minHeight="large"
             title={<Trans>Analytics</Trans>}
-            seeMoreButton={
+            topRightAction={
               <FlatButton
                 label={<Trans>See all</Trans>}
                 rightIcon={<ArrowRight fontSize="small" />}

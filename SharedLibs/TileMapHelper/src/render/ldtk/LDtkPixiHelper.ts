@@ -22,7 +22,7 @@ function getAtlasTexture(
     texture = getTexture(tileset.relPath);
 
     // @ts-ignore
-    if (texture.baseTexture?.cacheId === "res/error48.png") {
+    if (texture.baseTexture?.cacheId === "res/invalid_texture.png") {
       console.error(`The atlas texture "${tileset.relPath}" can't be loaded`);
 
       texture = null;

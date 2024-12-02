@@ -21,7 +21,7 @@ import AuthenticatedUserContext, {
 import { duplicateLeaderboard } from '../Utils/GDevelopServices/Play';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
-import { getDefaultRegisterGamePropertiesFromProject } from '../Utils/UseGameAndBuildsManager';
+import { getDefaultRegisterGameProperties } from '../Utils/UseGameAndBuildsManager';
 
 const gd: libGDevelop = global.gd;
 
@@ -240,7 +240,11 @@ export const replaceLeaderboardsInProject = async ({
     await registerGame(
       getAuthorizationHeader,
       profile.id,
-      getDefaultRegisterGamePropertiesFromProject({ project })
+      getDefaultRegisterGameProperties({
+        projectId: project.getProjectUuid(),
+        projectName: project.getName(),
+        projectAuthor: project.getAuthor(),
+      })
     );
   } catch (error) {
     console.error(

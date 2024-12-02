@@ -30,6 +30,7 @@ export const WithoutAProjectOpened = () => {
         onRefreshGames={action('onRefreshGames')}
         onOpenGameId={action('onOpenGameId')}
         onOpenProject={action('onOpenProject')}
+        canOpen={true}
       />
     </AuthenticatedUserContext.Provider>
   );

@@ -28,6 +28,7 @@ import { ColumnStackLayout } from '../../../../UI/Layout';
 import {
   type GuidedLessonsRecommendation,
   type PlanRecommendation,
+  type QuickCustomizationRecommendation,
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';

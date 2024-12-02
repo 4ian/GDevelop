@@ -13,12 +13,12 @@ namespace gdjs {
     fs: float;
     js: float;
     cj: boolean;
-    lek: boolean,
-    rik: boolean,
-    upk: boolean,
-    dok: boolean,
-    juk: boolean,
-    us: boolean,
+    lek: boolean;
+    rik: boolean;
+    upk: boolean;
+    dok: boolean;
+    juk: boolean;
+    us: boolean;
     sa: float;
     sf: float;
     tscjs: float;
@@ -143,12 +143,6 @@ namespace gdjs {
       return tempRVec3;
     }
 
-    private getQuat(x: float, y: float, z: float, w: float): Jolt.Quat {
-      const tempQuat = this._sharedData._tempQuat;
-      tempQuat.Set(x, y, z, w);
-      return tempQuat;
-    }
-
     getPhysics3D(): Physics3D {
       if (this.physics3D) {
         return this.physics3D;
@@ -182,10 +176,9 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
-      // TODO Find a clean way for this.
-      behavior.createAndAddBody = () => this.createAndAddBody();
-      behavior.updateObjectFromBody = () => this.updateObjectFromBody();
-      behavior.updateBodyFromObject = () => this.updateBodyFromObject();
+      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
+        this
+      );
       behavior.recreateBody();
 
       return this.physics3D;
@@ -290,123 +283,6 @@ namespace gdjs {
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
-    }
-
-    createAndAddBody(): Jolt.Body {
-      const { behavior } = this.getPhysics3D();
-      const settings = new Jolt.CharacterVirtualSettings();
-      settings.mInnerBodyLayer = behavior.getBodyLayer();
-      settings.mInnerBodyShape = behavior.createShape();
-      settings.mMass = 1000;
-      settings.mMaxSlopeAngle = gdjs.toRad(this._slopeMaxAngle);
-      //settings.mMaxStrength = maxStrength;
-      settings.mShape = behavior.createShape();
-      settings.mUp = Jolt.Vec3.prototype.sAxisZ();
-      settings.mBackFaceMode = Jolt.EBackFaceMode_CollideWithBackFaces;
-      //settings.mCharacterPadding = characterPadding;
-      //settings.mPenetrationRecoverySpeed = penetrationRecoverySpeed;
-      //settings.mPredictiveContactDistance = predictiveContactDistance;
-      const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
-      const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
-      const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
-      // Only the bottom of the capsule can make a contact with the floor.
-      // It avoids characters from sticking to walls.
-      const capsuleHalfLength = depth / 2;
-      const capsuleRadius = Math.sqrt(width * height) / 2;
-      settings.mSupportingVolume = new Jolt.Plane(
-        Jolt.Vec3.prototype.sAxisZ(),
-        // TODO It's strange that the value is positive.
-        capsuleHalfLength -
-          capsuleRadius * (1 - Math.cos(gdjs.toRad(this._slopeMaxAngle)))
-      );
-      this.character = new Jolt.CharacterVirtual(
-        settings,
-        behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
-        behavior.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
-        this._sharedData.physicsSystem
-      );
-      const body = this._sharedData.physicsSystem
-        .GetBodyLockInterface()
-        .TryGetBody(this.character.GetInnerBodyID());
-      // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
-      //body.SetCollideKinematicVsNonDynamic(true);
-      return body;
-    }
-
-    
-    updateObjectFromBody() {
-      const {
-        behavior,
-      } = this.getPhysics3D();
-
-      if (!this.character) {
-        return;
-      }
-
-      // We can't rely on the body position because of mCharacterPadding
-      const position = this.character.GetPosition();
-      this.owner3D.setX(
-        position.GetX() * this._sharedData.worldScale -
-          this.owner3D.getWidth() / 2 +
-          this.owner3D.getX() -
-          this.owner3D.getDrawableX()
-      );
-      this.owner3D.setY(
-        position.GetY() * this._sharedData.worldScale -
-          this.owner3D.getHeight() / 2 +
-          this.owner3D.getY() -
-          this.owner3D.getDrawableY()
-      );
-      this.owner3D.setZ(
-        position.GetZ() * this._sharedData.worldScale -
-          this.owner3D.getDepth() / 2 +
-          this.owner3D.getZ() -
-          this.owner3D.getDrawableZ()
-      );
-
-      // Update cached transform.
-      behavior._objectOldX = this.owner3D.getX();
-      behavior._objectOldY = this.owner3D.getY();
-      behavior._objectOldZ = this.owner3D.getZ();
-    }
-
-    updateBodyFromObject() {
-      const {
-        behavior,
-      } = this.getPhysics3D();
-
-      if (!this.character) {
-        return;
-      }
-
-      if (behavior.needToRecreateBody) {
-        behavior.recreateBody();
-      }
-
-      // The object size has changed, recreate the shape.
-      // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
-      // The height has changed, the shape is not an edge (edges doesn't have height),
-      // it isn't a box with custom height or a circle with custom radius
-      if (
-        behavior.needToRecreateShape ||
-        behavior._objectOldWidth !== this.owner3D.getWidth() ||
-        behavior._objectOldHeight !== this.owner3D.getHeight() ||
-        behavior._objectOldDepth !== this.owner3D.getDepth()
-      ) {
-        behavior.needToRecreateShape = false;
-        behavior.recreateShape();
-      }
-
-      // The object object transform has changed, update body transform:
-      if (
-        behavior._objectOldX !== this.owner3D.getX() ||
-        behavior._objectOldY !== this.owner3D.getY() ||
-        behavior._objectOldZ !== this.owner3D.getZ()
-      ) {
-        this.character.SetPosition(
-          behavior.getPhysicsPosition(this.getRVec3(0, 0, 0))
-        );
-      }
     }
 
     onDeActivate() {}
@@ -1287,4 +1163,91 @@ namespace gdjs {
     'Physics3D::PhysicsCharacter3D',
     gdjs.PhysicsCharacter3DRuntimeBehavior
   );
+
+  export namespace PhysicsCharacter3DRuntimeBehavior {
+    export class CharacterBodyUpdater {
+      characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
+
+      constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
+        this.characterBehavior = characterBehavior;
+      }
+
+      createAndAddBody(): Jolt.Body {
+        const { _slopeMaxAngle, owner3D } = this.characterBehavior;
+        const { behavior } = this.characterBehavior.getPhysics3D();
+        const { _sharedData } = behavior;
+        const settings = new Jolt.CharacterVirtualSettings();
+        settings.mInnerBodyLayer = behavior.getBodyLayer();
+        settings.mInnerBodyShape = behavior.createShape();
+        settings.mMass = 1000;
+        settings.mMaxSlopeAngle = gdjs.toRad(_slopeMaxAngle);
+        //settings.mMaxStrength = maxStrength;
+        settings.mShape = behavior.createShape();
+        settings.mUp = Jolt.Vec3.prototype.sAxisZ();
+        settings.mBackFaceMode = Jolt.EBackFaceMode_CollideWithBackFaces;
+        //settings.mCharacterPadding = characterPadding;
+        //settings.mPenetrationRecoverySpeed = penetrationRecoverySpeed;
+        //settings.mPredictiveContactDistance = predictiveContactDistance;
+        const depth = owner3D.getDepth() * _sharedData.worldInvScale;
+        const width = owner3D.getWidth() * _sharedData.worldInvScale;
+        const height = owner3D.getHeight() * _sharedData.worldInvScale;
+        // Only the bottom of the capsule can make a contact with the floor.
+        // It avoids characters from sticking to walls.
+        const capsuleHalfLength = depth / 2;
+        const capsuleRadius = Math.sqrt(width * height) / 2;
+        settings.mSupportingVolume = new Jolt.Plane(
+          Jolt.Vec3.prototype.sAxisZ(),
+          // TODO It's strange that the value is positive.
+          capsuleHalfLength -
+            capsuleRadius * (1 - Math.cos(gdjs.toRad(_slopeMaxAngle)))
+        );
+        const character = new Jolt.CharacterVirtual(
+          settings,
+          behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          _sharedData.physicsSystem
+        );
+        const body = _sharedData.physicsSystem
+          .GetBodyLockInterface()
+          .TryGetBody(character.GetInnerBodyID());
+        this.characterBehavior.character = character;
+        // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
+        //body.SetCollideKinematicVsNonDynamic(true);
+        return body;
+      }
+
+      updateObjectFromBody() {
+        const { behavior } = this.characterBehavior.getPhysics3D();
+        const { character } = this.characterBehavior;
+
+        if (!character) {
+          return;
+        }
+
+        // We can't rely on the body position because of mCharacterPadding
+        behavior.moveObjectToPhysicsPosition(character.GetPosition());
+      }
+
+      updateBodyFromObject() {
+        const { behavior } = this.characterBehavior.getPhysics3D();
+        const { _sharedData } = behavior;
+        const { character, owner3D } = this.characterBehavior;
+
+        if (!character) {
+          return;
+        }
+
+        // The object object transform has changed, update body transform:
+        if (
+          behavior._objectOldX !== owner3D.getX() ||
+          behavior._objectOldY !== owner3D.getY() ||
+          behavior._objectOldZ !== owner3D.getZ()
+        ) {
+          character.SetPosition(
+            behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0))
+          );
+        }
+      }
+    }
+  }
 }

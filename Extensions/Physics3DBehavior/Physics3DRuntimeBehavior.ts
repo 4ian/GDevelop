@@ -161,10 +161,22 @@ namespace gdjs {
       };
     }
 
-    private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
+    getVec3(x: float, y: float, z: float): Jolt.Vec3 {
       const tempVec3 = this._tempVec3;
       tempVec3.Set(x, y, z);
       return tempVec3;
+    }
+
+    getRVec3(x: float, y: float, z: float): Jolt.RVec3 {
+      const tempRVec3 = this._tempRVec3;
+      tempRVec3.Set(x, y, z);
+      return tempRVec3;
+    }
+
+    getQuat(x: float, y: float, z: float, w: float): Jolt.Quat {
+      const tempQuat = this._tempQuat;
+      tempQuat.Set(x, y, z, w);
+      return tempQuat;
     }
 
     static getSharedData(
@@ -291,6 +303,7 @@ namespace gdjs {
   });
 
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
+    bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
@@ -350,9 +363,9 @@ namespace gdjs {
      */
     _sharedData: Physics3DSharedData;
 
-    _objectOldX: number = 0;
-    _objectOldY: number = 0;
-    _objectOldZ: number = 0;
+    _objectOldX: float = 0;
+    _objectOldY: float = 0;
+    _objectOldZ: float = 0;
     _objectOldRotationX: float = 0;
     _objectOldRotationY: float = 0;
     _objectOldRotationZ: float = 0;
@@ -366,6 +379,9 @@ namespace gdjs {
       owner: gdjs.RuntimeObject3D
     ) {
       super(instanceContainer, behaviorData, owner);
+      this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
@@ -790,68 +806,13 @@ namespace gdjs {
 
       if (!this.activated() || this.destroyedDuringFrameLogic) return false;
 
-      this._body = this.createAndAddBody();
+      this._body = this.bodyUpdater.createAndAddBody();
       this._body.gdjsAssociatedBehavior = this;
 
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
       return true;
-    }
-
-    createAndAddBody(): Jolt.Body {
-      const width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
-      const height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
-      const depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
-
-      const x =
-        this.owner3D.getDrawableX() * this._sharedData.worldInvScale +
-        width / 2;
-      const y =
-        this.owner3D.getDrawableY() * this._sharedData.worldInvScale +
-        height / 2;
-      const z =
-        this.owner3D.getDrawableZ() * this._sharedData.worldInvScale +
-        depth / 2;
-
-      const shape = this.createShape();
-      const threeObject = this.owner3D.get3DRendererObject();
-      const bodyCreationSettings = new Jolt.BodyCreationSettings(
-        shape,
-        this.getRVec3(x, y, z),
-        this.getQuat(
-          threeObject.quaternion.x,
-          threeObject.quaternion.y,
-          threeObject.quaternion.z,
-          threeObject.quaternion.w
-        ),
-        this.bodyType === 'Static'
-          ? Jolt.EMotionType_Static
-          : this.bodyType === 'Kinematic'
-          ? Jolt.EMotionType_Kinematic
-          : Jolt.EMotionType_Dynamic,
-        this.getBodyLayer()
-      );
-      bodyCreationSettings.mMotionQuality = this.bullet
-        ? Jolt.EMotionQuality_LinearCast
-        : Jolt.EMotionQuality_Discrete;
-      bodyCreationSettings.mAllowedDOFs = this.fixedRotation
-        ? Jolt.EAllowedDOFs_TranslationX |
-          Jolt.EAllowedDOFs_TranslationY |
-          Jolt.EAllowedDOFs_TranslationZ
-        : Jolt.EAllowedDOFs_All;
-      bodyCreationSettings.mFriction = this.friction;
-      bodyCreationSettings.mRestitution = this.restitution;
-      bodyCreationSettings.mLinearDamping = this.linearDamping;
-      bodyCreationSettings.mAngularDamping = this.angularDamping;
-      bodyCreationSettings.mGravityFactor = this.gravityScale;
-
-      const bodyInterface = this._sharedData.bodyInterface;
-      const body = bodyInterface.CreateBody(bodyCreationSettings);
-      Jolt.destroy(bodyCreationSettings);
-
-      bodyInterface.AddBody(body.GetID(), Jolt.EActivation_Activate);
-      return body;
     }
 
     /**
@@ -932,43 +893,7 @@ namespace gdjs {
     }
 
     updateObjectFromBody() {
-      // Copy transform from body to the GD object.
-      // It's possible the behavior was either deactivated or the object deleted
-      // just before this doStepPreEvents (for example, another behavior deleted
-      // the object during its own doStepPreEvents). If the body is null, we just
-      // don't do anything (but still run the physics simulation - this is independent).
-      if (this._body !== null) {
-        const position = this._body.GetPosition();
-        this.owner3D.setX(
-          position.GetX() * this._sharedData.worldScale -
-            this.owner3D.getWidth() / 2 +
-            this.owner3D.getX() -
-            this.owner3D.getDrawableX()
-        );
-        this.owner3D.setY(
-          position.GetY() * this._sharedData.worldScale -
-            this.owner3D.getHeight() / 2 +
-            this.owner3D.getY() -
-            this.owner3D.getDrawableY()
-        );
-        this.owner3D.setZ(
-          position.GetZ() * this._sharedData.worldScale -
-            this.owner3D.getDepth() / 2 +
-            this.owner3D.getZ() -
-            this.owner3D.getDrawableZ()
-        );
-        const quaternion = this._body.GetRotation();
-        const threeObject = this.owner3D.get3DRendererObject();
-        threeObject.quaternion.x = quaternion.GetX();
-        threeObject.quaternion.y = quaternion.GetY();
-        threeObject.quaternion.z = quaternion.GetZ();
-        threeObject.quaternion.w = quaternion.GetW();
-        const euler = new THREE.Euler(0, 0, 0, 'ZYX');
-        euler.setFromQuaternion(threeObject.quaternion);
-        this.owner3D.setRotationX(gdjs.toDegrees(euler.x));
-        this.owner3D.setRotationY(gdjs.toDegrees(euler.y));
-        this.owner3D.setAngle(gdjs.toDegrees(euler.z));
-      }
+      this.bodyUpdater.updateObjectFromBody();
 
       // Update cached transform.
       this._objectOldX = this.owner3D.getX();
@@ -983,7 +908,6 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
-      const body = this._body!;
 
       if (this.needToRecreateBody) {
         this.recreateBody();
@@ -1003,22 +927,7 @@ namespace gdjs {
         this.recreateShape();
       }
 
-      // The object object transform has changed, update body transform:
-      if (
-        this._objectOldX !== this.owner3D.getX() ||
-        this._objectOldY !== this.owner3D.getY() ||
-        this._objectOldZ !== this.owner3D.getZ() ||
-        this._objectOldRotationX !== this.owner3D.getRotationX() ||
-        this._objectOldRotationY !== this.owner3D.getRotationY() ||
-        this._objectOldRotationZ !== this.owner3D.getAngle()
-      ) {
-        this._sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
-          body.GetID(),
-          this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
-          this.getPhysicsRotation(this.getQuat(0, 0, 0, 1)),
-          Jolt.EActivation_Activate
-        );
-      }
+      this.bodyUpdater.updateBodyFromObject();
     }
 
     getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
@@ -1042,6 +951,27 @@ namespace gdjs {
         threeObject.quaternion.w
       );
       return result;
+    }
+
+    moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
+      this.owner3D.setX(
+        physicsPosition.GetX() * this._sharedData.worldScale -
+          this.owner3D.getWidth() / 2 +
+          this.owner3D.getX() -
+          this.owner3D.getDrawableX()
+      );
+      this.owner3D.setY(
+        physicsPosition.GetY() * this._sharedData.worldScale -
+          this.owner3D.getHeight() / 2 +
+          this.owner3D.getY() -
+          this.owner3D.getDrawableY()
+      );
+      this.owner3D.setZ(
+        physicsPosition.GetZ() * this._sharedData.worldScale -
+          this.owner3D.getDepth() / 2 +
+          this.owner3D.getZ() -
+          this.owner3D.getDrawableZ()
+      );
     }
 
     getWorldScale(): float {
@@ -1759,6 +1689,109 @@ namespace gdjs {
        * Called before the physics engine step.
        */
       doBeforePhysicsStep(timeDelta: float): void;
+    }
+
+    export interface BodyUpdater {
+      createAndAddBody(): Jolt.Body;
+      updateObjectFromBody(): void;
+      updateBodyFromObject(): void;
+    }
+
+    export class DefaultBodyUpdater {
+      behavior: gdjs.Physics3DRuntimeBehavior;
+
+      constructor(behavior: gdjs.Physics3DRuntimeBehavior) {
+        this.behavior = behavior;
+      }
+
+      createAndAddBody(): Jolt.Body {
+        const { behavior } = this;
+        const { _sharedData } = behavior;
+
+        const shape = behavior.createShape();
+        const bodyCreationSettings = new Jolt.BodyCreationSettings(
+          shape,
+          behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          behavior.bodyType === 'Static'
+            ? Jolt.EMotionType_Static
+            : behavior.bodyType === 'Kinematic'
+            ? Jolt.EMotionType_Kinematic
+            : Jolt.EMotionType_Dynamic,
+          behavior.getBodyLayer()
+        );
+        bodyCreationSettings.mMotionQuality = behavior.bullet
+          ? Jolt.EMotionQuality_LinearCast
+          : Jolt.EMotionQuality_Discrete;
+        bodyCreationSettings.mAllowedDOFs = behavior.fixedRotation
+          ? Jolt.EAllowedDOFs_TranslationX |
+            Jolt.EAllowedDOFs_TranslationY |
+            Jolt.EAllowedDOFs_TranslationZ
+          : Jolt.EAllowedDOFs_All;
+        bodyCreationSettings.mFriction = behavior.friction;
+        bodyCreationSettings.mRestitution = behavior.restitution;
+        bodyCreationSettings.mLinearDamping = behavior.linearDamping;
+        bodyCreationSettings.mAngularDamping = behavior.angularDamping;
+        bodyCreationSettings.mGravityFactor = behavior.gravityScale;
+
+        const bodyInterface = _sharedData.bodyInterface;
+        const body = bodyInterface.CreateBody(bodyCreationSettings);
+        Jolt.destroy(bodyCreationSettings);
+
+        bodyInterface.AddBody(body.GetID(), Jolt.EActivation_Activate);
+        return body;
+      }
+
+      updateObjectFromBody() {
+        const { behavior } = this;
+        const { owner3D, _body } = behavior;
+        // Copy transform from body to the GD object.
+        // It's possible the behavior was either deactivated or the object deleted
+        // just before this doStepPreEvents (for example, another behavior deleted
+        // the object during its own doStepPreEvents). If the body is null, we just
+        // don't do anything (but still run the physics simulation - this is independent).
+        if (_body !== null) {
+          behavior.moveObjectToPhysicsPosition(_body.GetPosition());
+
+          const quaternion = _body.GetRotation();
+          const threeObject = owner3D.get3DRendererObject();
+          threeObject.quaternion.x = quaternion.GetX();
+          threeObject.quaternion.y = quaternion.GetY();
+          threeObject.quaternion.z = quaternion.GetZ();
+          threeObject.quaternion.w = quaternion.GetW();
+          const euler = new THREE.Euler(0, 0, 0, 'ZYX');
+          euler.setFromQuaternion(threeObject.quaternion);
+          owner3D.setRotationX(gdjs.toDegrees(euler.x));
+          owner3D.setRotationY(gdjs.toDegrees(euler.y));
+          owner3D.setAngle(gdjs.toDegrees(euler.z));
+        }
+      }
+
+      updateBodyFromObject() {
+        const { behavior } = this;
+        const { owner3D, _sharedData } = behavior;
+        if (behavior._body === null) {
+          if (!behavior.createBody()) return;
+        }
+        const body = behavior._body!;
+
+        // The object object transform has changed, update body transform:
+        if (
+          this.behavior._objectOldX !== owner3D.getX() ||
+          this.behavior._objectOldY !== owner3D.getY() ||
+          this.behavior._objectOldZ !== owner3D.getZ() ||
+          this.behavior._objectOldRotationX !== owner3D.getRotationX() ||
+          this.behavior._objectOldRotationY !== owner3D.getRotationY() ||
+          this.behavior._objectOldRotationZ !== owner3D.getAngle()
+        ) {
+          _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
+            body.GetID(),
+            this.behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+            this.behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+            Jolt.EActivation_Activate
+          );
+        }
+      }
     }
   }
 }

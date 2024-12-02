@@ -41,7 +41,8 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
+  {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
@@ -84,6 +85,7 @@ namespace gdjs {
     _timeSinceCurrentJumpStart: float = 0;
     _jumpKeyHeldSinceJumpStart: boolean = false;
     private _hasReallyMoved: boolean = false;
+    oldPhysicsPosition: FloatPoint = [0, 0];
 
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
@@ -177,9 +179,8 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
-      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
-        this
-      );
+      behavior.bodyUpdater =
+        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.recreateBody();
 
       return this.physics3D;
@@ -401,13 +402,27 @@ namespace gdjs {
       );
 
       // Keep the character on the floor when walking down-hill.
-      const floorStepDownSpeedZ = Math.min(
-        -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
-        groundVelocityZ
+      const walkingDistance = Math.max(Math.hypot(
+        this.character.GetPosition().GetX() - this.oldPhysicsPosition[0],
+        this.character.GetPosition().GetY() - this.oldPhysicsPosition[1]
+      ), Math.hypot(
+        this.character.GetLinearVelocity().GetX(),
+        this.character.GetLinearVelocity().GetY()
+      ) * timeDelta);
+      this.oldPhysicsPosition[0] = this.character.GetPosition().GetX();
+      this.oldPhysicsPosition[1] = this.character.GetPosition().GetY();
+
+      // TODO This is not precise enough. Is it because of mCharacterPadding?
+      const stickToFloorStepDownZ = 1.01 * Math.max(
+        Math.min(
+          // Follow the platform slope...
+          -walkingDistance * this._slopeClimbingFactor,
+          // ...and follow a platform falling...
+          groundVelocityZ * timeDelta
+        ),
+        // ...but never fall faster than the max fall speed.
+        -this._maxFallingSpeed * worldInvScale * timeDelta
       );
-      const stickToFloorStepDownZ =
-        Math.max(floorStepDownSpeedZ, -this._maxFallingSpeed * worldInvScale) *
-        timeDelta;
       extendedUpdateSettings.mStickToFloorStepDown.Set(
         0,
         0,
@@ -452,7 +467,7 @@ namespace gdjs {
           PhysicsCharacter3DRuntimeBehavior.epsilon ||
         Math.abs(this.character.GetPosition().GetY() - oldY) >
           PhysicsCharacter3DRuntimeBehavior.epsilon ||
-        Math.abs(this.character.GetPosition().GetY() - oldZ) >
+        Math.abs(this.character.GetPosition().GetZ() - oldZ) >
           PhysicsCharacter3DRuntimeBehavior.epsilon;
     }
 

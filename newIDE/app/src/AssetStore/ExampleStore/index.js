@@ -49,6 +49,7 @@ type Props = {|
     row: number,
     element: React.Node,
   |},
+  hideSearch?: boolean,
 |};
 
 const ExampleStore = ({
@@ -58,8 +59,9 @@ const ExampleStore = ({
   onlyShowGames,
   columnsCount,
   rowToInsert,
+  hideSearch,
 }: Props) => {
-  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
@@ -123,7 +125,7 @@ const ExampleStore = ({
   const resultTiles: React.Node[] = React.useMemo(
     () => {
       return getExampleAndTemplateTiles({
-        receivedGameTemplates,
+        receivedGameTemplates: authenticatedUser.receivedGameTemplates,
         privateGameTemplateListingDatas: privateGameTemplateListingDatasSearchResults
           ? privateGameTemplateListingDatasSearchResults
               .map(({ item }) => item)
@@ -160,7 +162,7 @@ const ExampleStore = ({
       }).allGridItems;
     },
     [
-      receivedGameTemplates,
+      authenticatedUser,
       privateGameTemplateListingDatasSearchResults,
       exampleShortHeadersSearchResults,
       onSelectPrivateGameTemplateListingData,
@@ -183,15 +185,17 @@ const ExampleStore = ({
         numberOfTilesToDisplayUntilRowToInsert
       );
       return [
-        <GridList
-          cols={columnsCount}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={2}
-          key="first-tiles"
-        >
-          {firstTiles}
-        </GridList>,
+        firstTiles.length > 0 ? (
+          <GridList
+            cols={columnsCount}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={2}
+            key="first-tiles"
+          >
+            {firstTiles}
+          </GridList>
+        ) : null,
         rowToInsert ? (
           <Line key="inserted-row">{rowToInsert.element}</Line>
         ) : null,
@@ -214,17 +218,19 @@ const ExampleStore = ({
   return (
     <React.Fragment>
       <Column expand noMargin>
-        <Line>
-          <Column expand noMargin>
-            <SearchBar
-              value={localSearchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              ref={searchBarRef}
-              placeholder={t`Search examples`}
-            />
-          </Column>
-        </Line>
+        {!hideSearch && (
+          <Line>
+            <Column expand noMargin>
+              <SearchBar
+                value={localSearchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                ref={searchBarRef}
+                placeholder={t`Search examples`}
+              />
+            </Column>
+          </Line>
+        )}
         {resultTiles.length === 0 ? (
           <Column noMargin expand justifyContent="center">
             <Spacer />

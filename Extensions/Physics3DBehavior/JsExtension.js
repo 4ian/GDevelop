@@ -1685,7 +1685,7 @@ module.exports = {
           .setAdvanced(true);
 
         behaviorProperties
-          .getOrCreate('slopeMaxAngle')
+          .getOrCreate('SlopeMaxAngle')
           .setLabel('Slope max. angle')
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1714,7 +1714,7 @@ module.exports = {
         behaviorContent.addChild('sidewaysAcceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
-        behaviorContent.addChild('slopeMaxAngle').setDoubleValue(60);
+        behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
       };
 
       const aut = extension

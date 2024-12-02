@@ -44,7 +44,7 @@ const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
 const styles = {
   stickyTitle: {
     position: 'sticky',
-    top: 0,
+    top: -1, // If 0, it somehow lets a 1px gap between the parent, letting the user see the text scroll behind.
     display: 'flex',
     flexDirection: 'column',
     zIndex: 2,

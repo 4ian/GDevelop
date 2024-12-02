@@ -71,7 +71,6 @@ namespace gdjs {
     hasPressedRightKey: boolean = false;
     hasPressedLeftKey: boolean = false;
     hasPressedJumpKey: boolean = false;
-    hasJumpKeyBeenConsumed: boolean = false;
     hasUsedStick: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
@@ -316,13 +315,144 @@ namespace gdjs {
       }
       const worldInvScale = this._sharedData.worldInvScale;
 
-      //console.log("Object Z: " + this.owner3D.getZ());
-      //this.character.SetPosition(characterBody.GetPosition() + this.character.GetCharacterPadding());
-
       const oldX = this.character.GetPosition().GetX();
       const oldY = this.character.GetPosition().GetY();
       const oldZ = this.character.GetPosition().GetZ();
 
+      this.updateCharacterSpeedFromInputs(timeDelta);
+
+      if (this._currentJumpSpeed > 0) {
+        this._timeSinceCurrentJumpStart += timeDelta;
+      }
+      // Check if the jump key is continuously held since
+      // the beginning of the jump.
+      if (!this.hasPressedJumpKey) {
+        this._jumpKeyHeldSinceJumpStart = false;
+      }
+      if (
+        this._canJump &&
+        this.hasPressedJumpKey &&
+        // Avoid the character to jump in loop when the jump key is held.
+        !this._jumpKeyHeldSinceJumpStart
+      ) {
+        this._currentJumpSpeed = this._jumpSpeed;
+        this._currentFallSpeed = 0;
+        this._canJump = false;
+        this._jumpKeyHeldSinceJumpStart = true;
+        this._timeSinceCurrentJumpStart = 0;
+      }
+      if (!this.isOnFloor() || this._currentJumpSpeed > 0) {
+        // Decrease jump speed after the (optional) jump sustain time is over.
+        const sustainJumpSpeed =
+          this._jumpKeyHeldSinceJumpStart &&
+          this._timeSinceCurrentJumpStart < this._jumpSustainTime;
+        if (!sustainJumpSpeed) {
+          this._currentJumpSpeed = Math.max(
+            0,
+            this._currentJumpSpeed - this._gravity * timeDelta
+          );
+        }
+        this._currentFallSpeed = Math.min(
+          this._maxFallingSpeed,
+          this._currentFallSpeed + this._gravity * timeDelta
+        );
+      }
+
+      this.updateGroundVelocity(behavior, timeDelta);
+      const groundVelocity = this.character.GetGroundVelocity();
+
+      let forwardSpeed = this._currentForwardSpeed;
+      let sidewaysSpeed = this._currentSidewaysSpeed;
+      if (sidewaysSpeed !== 0 && forwardSpeed !== 0) {
+        // It avoids the speed vector to go outside of an ellipse.
+        const speedNormalizationInverseRatio = Math.hypot(
+          forwardSpeed / this._forwardSpeedMax,
+          sidewaysSpeed / this._sidewaysSpeedMax
+        );
+        if (speedNormalizationInverseRatio > 1) {
+          forwardSpeed /= speedNormalizationInverseRatio;
+          sidewaysSpeed /= speedNormalizationInverseRatio;
+        }
+      }
+      forwardSpeed *= worldInvScale;
+      sidewaysSpeed *= worldInvScale;
+      const angle = gdjs.toRad(this.owner.getAngle());
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+      const speedX = forwardSpeed * cosA - sidewaysSpeed * sinA;
+      const speedY = forwardSpeed * sinA + sidewaysSpeed * cosA;
+      this.character.SetLinearVelocity(
+        this.getVec3(
+          groundVelocity.GetX() + speedX,
+          groundVelocity.GetY() + speedY,
+          // The ground velocity is not added on Z as it's handled by mStickToFloorStepDown.
+          (this._currentJumpSpeed - this._currentFallSpeed) * worldInvScale
+        )
+      );
+
+      // Keep the character on the floor when walking down-hill.
+      const onePixel = worldInvScale;
+      const floorStepDownSpeedZ = Math.min(
+        -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
+        groundVelocity.GetZ()
+      );
+      let stickToFloorStepDownZ = 0;
+      if (
+        Math.abs(floorStepDownSpeedZ) <=
+        this._maxFallingSpeed * worldInvScale
+      ) {
+        stickToFloorStepDownZ = -onePixel + floorStepDownSpeedZ * timeDelta;
+      }
+      extendedUpdateSettings.mStickToFloorStepDown.Set(
+        0,
+        0,
+        stickToFloorStepDownZ
+      );
+
+      this.character.ExtendedUpdate(
+        timeDelta,
+        this.character.GetUp(),
+        extendedUpdateSettings,
+        broadPhaseLayerFilter,
+        objectLayerFilter,
+        bodyFilter,
+        shapeFilter,
+        this._sharedData.jolt.GetTempAllocator()
+      );
+
+      if (this.isOnFloor()) {
+        this._canJump = true;
+        this._currentFallSpeed = 0;
+        this._currentJumpSpeed = 0;
+      }
+
+      this._wasForwardKeyPressed = this.hasPressedForwardKey;
+      this._wasBackwardKeyPressed = this.hasPressedBackwardKey;
+      this._wasRightKeyPressed = this.hasPressedRightKey;
+      this._wasLeftKeyPressed = this.hasPressedLeftKey;
+      this._wasJumpKeyPressed = this.hasPressedJumpKey;
+      this._wasStickUsed = this.hasPressedJumpKey;
+
+      if (!this._dontClearInputsBetweenFrames) {
+        this.hasPressedForwardKey = false;
+        this.hasPressedBackwardKey = false;
+        this.hasPressedRightKey = false;
+        this.hasPressedLeftKey = false;
+        this.hasPressedJumpKey = false;
+        this.hasUsedStick = false;
+      }
+
+      this._hasReallyMoved =
+        Math.abs(this.character.GetPosition().GetX() - oldX) >
+          PhysicsCharacter3DRuntimeBehavior.epsilon ||
+        Math.abs(this.character.GetPosition().GetY() - oldY) >
+          PhysicsCharacter3DRuntimeBehavior.epsilon ||
+        Math.abs(this.character.GetPosition().GetY() - oldZ) >
+          PhysicsCharacter3DRuntimeBehavior.epsilon;
+    }
+
+    private updateCharacterSpeedFromInputs(timeDelta: float) {
+      /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedForwardSpeed = 0;
       // Change the speed according to the player's input.
       // TODO Give priority to the last key for faster reaction time.
@@ -388,6 +518,7 @@ namespace gdjs {
         this._forwardSpeedMax
       );
 
+      /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedSidewaysSpeed = 0;
       if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
         if (this.hasPressedLeftKey) {
@@ -449,53 +580,20 @@ namespace gdjs {
         -this._sidewaysSpeedMax,
         this._sidewaysSpeedMax
       );
+    }
 
-      let hasJustJumped = false;
-      if (!this.hasPressedJumpKey) {
-        this.hasJumpKeyBeenConsumed = false;
+    private updateGroundVelocity(
+      behavior: Physics3DRuntimeBehavior,
+      timeDelta: float
+    ) {
+      if (!this.character) {
+        return;
       }
-      if (this.isOnFloor()) {
-        this._currentFallSpeed = 0;
-        this._currentJumpSpeed = 0;
-      } else {
-        // Check if the jump key is continuously held since
-        // the beginning of the jump.
-        if (!this.hasPressedJumpKey) {
-          this._jumpKeyHeldSinceJumpStart = false;
-        }
-        this._timeSinceCurrentJumpStart += timeDelta;
+      const characterBody = behavior._body;
+      if (!characterBody) {
+        return;
       }
-      if (
-        this._canJump &&
-        this.hasPressedJumpKey &&
-        !this.hasJumpKeyBeenConsumed
-      ) {
-        this._currentJumpSpeed = this._jumpSpeed;
-        this._currentFallSpeed = 0;
-        this._canJump = false;
-        this.hasJumpKeyBeenConsumed = true;
-        this._jumpKeyHeldSinceJumpStart = true;
-        this._timeSinceCurrentJumpStart = 0;
-        hasJustJumped = true;
-      }
-      // When a jump starts isOnFloor will only become false after ExtendedUpdate is called.
-      if (!this.isOnFloor() || hasJustJumped) {
-        // Decrease jump speed after the (optional) jump sustain time is over.
-        const sustainJumpSpeed =
-          this._jumpKeyHeldSinceJumpStart &&
-          this._timeSinceCurrentJumpStart < this._jumpSustainTime;
-        if (!sustainJumpSpeed) {
-          this._currentJumpSpeed = Math.max(
-            0,
-            this._currentJumpSpeed - this._gravity * timeDelta
-          );
-        }
-
-        this._currentFallSpeed = Math.min(
-          this._maxFallingSpeed,
-          this._currentFallSpeed + this._gravity * timeDelta
-        );
-      }
+      const worldInvScale = this._sharedData.worldInvScale;
 
       const groundBody = this._sharedData.physicsSystem
         .GetBodyLockInterface()
@@ -564,99 +662,6 @@ namespace gdjs {
         groundBody.SetLinearVelocity(Jolt.Vec3.prototype.sZero());
         groundBody.SetAngularVelocity(Jolt.Vec3.prototype.sZero());
       }
-      const groundVelocity = this.character.GetGroundVelocity();
-
-      let forwardSpeed = this._currentForwardSpeed;
-      let sidewaysSpeed = this._currentSidewaysSpeed;
-      if (sidewaysSpeed !== 0 && forwardSpeed !== 0) {
-        // It avoids the speed vector to go outside of an ellipse.
-        const speedNormalizationInverseRatio = Math.hypot(
-          forwardSpeed / this._forwardSpeedMax,
-          sidewaysSpeed / this._sidewaysSpeedMax
-        );
-        if (speedNormalizationInverseRatio > 1) {
-          forwardSpeed /= speedNormalizationInverseRatio;
-          sidewaysSpeed /= speedNormalizationInverseRatio;
-        }
-      }
-      forwardSpeed *= worldInvScale;
-      sidewaysSpeed *= worldInvScale;
-      const angle = gdjs.toRad(this.owner.getAngle());
-      const cosA = Math.cos(angle);
-      const sinA = Math.sin(angle);
-      const speedX = forwardSpeed * cosA - sidewaysSpeed * sinA;
-      const speedY = forwardSpeed * sinA + sidewaysSpeed * cosA;
-      this.character.SetLinearVelocity(
-        this.getVec3(
-          groundVelocity.GetX() + speedX,
-          groundVelocity.GetY() + speedY,
-          // The ground velocity is not added on Z as it's handled by mStickToFloorStepDown.
-          (this._currentJumpSpeed - this._currentFallSpeed) * worldInvScale
-        )
-      );
-
-      const onePixel = worldInvScale;
-      const floorStepDownSpeedZ = Math.min(
-        -Math.abs(forwardSpeed) * this._slopeClimbingFactor,
-        groundVelocity.GetZ()
-      );
-      let stickToFloorStepDownZ = 0;
-      if (
-        Math.abs(floorStepDownSpeedZ) <=
-        this._maxFallingSpeed * worldInvScale
-      ) {
-        stickToFloorStepDownZ = -onePixel + floorStepDownSpeedZ * timeDelta;
-      }
-      extendedUpdateSettings.mStickToFloorStepDown.Set(
-        0,
-        0,
-        stickToFloorStepDownZ
-      );
-
-      this.character.SetRotation(characterBody.GetRotation());
-      this.character.ExtendedUpdate(
-        timeDelta,
-        this.character.GetUp(),
-        extendedUpdateSettings,
-        broadPhaseLayerFilter,
-        objectLayerFilter,
-        bodyFilter,
-        shapeFilter,
-        this._sharedData.jolt.GetTempAllocator()
-      );
-
-      // console.log("Character Z: " + this.character.GetPosition().GetZ());
-      // console.log("Body Z: " + characterBody.GetPosition().GetZ());
-
-      if (this.isOnFloor()) {
-        this._canJump = true;
-      }
-
-      this._wasForwardKeyPressed = this.hasPressedForwardKey;
-      this._wasBackwardKeyPressed = this.hasPressedBackwardKey;
-      this._wasRightKeyPressed = this.hasPressedRightKey;
-      this._wasLeftKeyPressed = this.hasPressedLeftKey;
-      this._wasJumpKeyPressed = this.hasPressedJumpKey;
-      this._wasStickUsed = this.hasPressedJumpKey;
-
-      if (!this._dontClearInputsBetweenFrames) {
-        this.hasPressedForwardKey = false;
-        this.hasPressedBackwardKey = false;
-        this.hasPressedRightKey = false;
-        this.hasPressedLeftKey = false;
-        this.hasPressedJumpKey = false;
-        this.hasUsedStick = false;
-        this._stickForce = 0;
-        this._stickAngle = 0;
-      }
-
-      this._hasReallyMoved =
-        Math.abs(this.character.GetPosition().GetX() - oldX) >
-          PhysicsCharacter3DRuntimeBehavior.epsilon ||
-        Math.abs(this.character.GetPosition().GetY() - oldY) >
-          PhysicsCharacter3DRuntimeBehavior.epsilon ||
-        Math.abs(this.character.GetPosition().GetY() - oldZ) >
-          PhysicsCharacter3DRuntimeBehavior.epsilon;
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
@@ -725,7 +730,8 @@ namespace gdjs {
     /**
      * Set the maximum falling speed of the Character.
      * @param maxFallingSpeed The maximum falling speed.
-     * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
+     * @param tryToPreserveAirSpeed If true and if jumping, tune the current
+     * jump speed to preserve the overall speed in the air.
      */
     setMaxFallingSpeed(
       maxFallingSpeed: float,
@@ -915,7 +921,8 @@ namespace gdjs {
     }
 
     /**
-     * Get the speed at which the object is falling. It is 0 when the object is on a floor, and non 0 as soon as the object leaves the floor.
+     * Get the speed at which the object is falling. It is 0 when the object is
+     * on a floor, and non 0 as soon as the object leaves the floor.
      * @returns The current fall speed.
      */
     getCurrentFallSpeed(): float {
@@ -1027,8 +1034,16 @@ namespace gdjs {
       this._stickForce = Math.max(0, Math.min(1, stickForce));
     }
 
-    wasStickPressed(): boolean {
+    wasStickUsed(): boolean {
       return this._wasStickUsed;
+    }
+
+    getStickAngle(): float {
+      return this._wasStickUsed ? this._stickAngle : 0;
+    }
+
+    getStickForce(): float {
+      return this._wasStickUsed ? this._stickForce : 0;
     }
 
     /**
@@ -1176,15 +1191,17 @@ namespace gdjs {
         const { _slopeMaxAngle, owner3D } = this.characterBehavior;
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { _sharedData } = behavior;
+
         const settings = new Jolt.CharacterVirtualSettings();
         settings.mInnerBodyLayer = behavior.getBodyLayer();
         settings.mInnerBodyShape = behavior.createShape();
         settings.mMass = 1000;
         settings.mMaxSlopeAngle = gdjs.toRad(_slopeMaxAngle);
-        //settings.mMaxStrength = maxStrength;
         settings.mShape = behavior.createShape();
         settings.mUp = Jolt.Vec3.prototype.sAxisZ();
         settings.mBackFaceMode = Jolt.EBackFaceMode_CollideWithBackFaces;
+        // TODO Should we make them configurable?
+        //settings.mMaxStrength = maxStrength;
         //settings.mCharacterPadding = characterPadding;
         //settings.mPenetrationRecoverySpeed = penetrationRecoverySpeed;
         //settings.mPredictiveContactDistance = predictiveContactDistance;
@@ -1219,24 +1236,21 @@ namespace gdjs {
       updateObjectFromBody() {
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { character } = this.characterBehavior;
-
         if (!character) {
           return;
         }
-
-        // We can't rely on the body position because of mCharacterPadding
+        // We can't rely on the body position because of mCharacterPadding.
         behavior.moveObjectToPhysicsPosition(character.GetPosition());
+        // No need to update the rotation as CharacterVirtual doesn't change it.
       }
 
       updateBodyFromObject() {
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { _sharedData } = behavior;
         const { character, owner3D } = this.characterBehavior;
-
         if (!character) {
           return;
         }
-
         // The object object transform has changed, update body transform:
         if (
           behavior._objectOldX !== owner3D.getX() ||
@@ -1245,6 +1259,15 @@ namespace gdjs {
         ) {
           character.SetPosition(
             behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0))
+          );
+        }
+        if (
+          behavior._objectOldRotationX !== owner3D.getRotationX() ||
+          behavior._objectOldRotationY !== owner3D.getRotationY() ||
+          behavior._objectOldRotationZ !== owner3D.getAngle()
+        ) {
+          behavior.getPhysicsRotation(
+            behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1))
           );
         }
       }

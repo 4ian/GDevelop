@@ -43,7 +43,7 @@ type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 let loadedBitmapFonts = {};
 let loadedFontFamilies = {};
 let loadedTextures = {};
-const invalidTexture = PIXI.Texture.from('res/error48.png');
+const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
 );

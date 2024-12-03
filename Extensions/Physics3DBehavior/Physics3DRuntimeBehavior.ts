@@ -705,7 +705,10 @@ namespace gdjs {
             : onePixel;
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
-        shapeSettings = new Jolt.CapsuleShapeSettings(capsuleDepth / 2, radius);
+        shapeSettings = new Jolt.CapsuleShapeSettings(
+          capsuleDepth / 2 - radius,
+          radius
+        );
         quat = this._getShapeOrientationQuat();
       } else if (this.shape === 'Cylinder') {
         const radius =
@@ -765,18 +768,7 @@ namespace gdjs {
     }
 
     recreateShape(): void {
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-      const body = this._body!;
-
-      const bodyInterface = this._sharedData.bodyInterface;
-      bodyInterface.SetShape(
-        body.GetID(),
-        this.createShape(),
-        true,
-        Jolt.EActivation_Activate
-      );
+      this.bodyUpdater.recreateShape();
 
       this._objectOldWidth = this.owner3D.getWidth();
       this._objectOldHeight = this.owner3D.getHeight();
@@ -790,7 +782,7 @@ namespace gdjs {
     setShapeScale(shapeScale: float): void {
       if (shapeScale !== this.shapeScale && shapeScale > 0) {
         this.shapeScale = shapeScale;
-        this.recreateShape();
+        this.needToRecreateShape = true;
       }
     }
 
@@ -803,6 +795,7 @@ namespace gdjs {
 
     createBody(): boolean {
       this.needToRecreateBody = false;
+      this.needToRecreateShape = false;
 
       if (!this.activated() || this.destroyedDuringFrameLogic) return false;
 
@@ -1695,6 +1688,7 @@ namespace gdjs {
       createAndAddBody(): Jolt.Body;
       updateObjectFromBody(): void;
       updateBodyFromObject(): void;
+      recreateShape(): void;
     }
 
     export class DefaultBodyUpdater {
@@ -1791,6 +1785,23 @@ namespace gdjs {
             Jolt.EActivation_Activate
           );
         }
+      }
+
+      recreateShape() {
+        const { behavior } = this;
+        const { _sharedData } = behavior;
+        if (behavior._body === null) {
+          if (!behavior.createBody()) return;
+        }
+        const body = behavior._body!;
+
+        const bodyInterface = _sharedData.bodyInterface;
+        bodyInterface.SetShape(
+          body.GetID(),
+          behavior.createShape(),
+          true,
+          Jolt.EActivation_Activate
+        );
       }
     }
   }

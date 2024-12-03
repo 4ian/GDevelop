@@ -1241,13 +1241,14 @@ namespace gdjs {
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { _sharedData } = behavior;
 
+        const shape = behavior.createShape();
+
         const settings = new Jolt.CharacterVirtualSettings();
         settings.mInnerBodyLayer = behavior.getBodyLayer();
-        settings.mInnerBodyShape = behavior.createShape();
-        // TODO We can't rely on behavior.getMass() as the body doesn't exist yet.
-        settings.mMass = 1000;
+        settings.mInnerBodyShape = shape;
+        settings.mMass = shape.GetMassProperties().get_mMass();
         settings.mMaxSlopeAngle = gdjs.toRad(_slopeMaxAngle);
-        settings.mShape = behavior.createShape();
+        settings.mShape = shape;
         settings.mUp = Jolt.Vec3.prototype.sAxisZ();
         settings.mBackFaceMode = Jolt.EBackFaceMode_CollideWithBackFaces;
         // TODO Should we make them configurable?
@@ -1323,6 +1324,36 @@ namespace gdjs {
             behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1))
           );
         }
+      }
+
+      recreateShape() {
+        const {
+          behavior,
+          broadPhaseLayerFilter,
+          objectLayerFilter,
+          bodyFilter,
+          shapeFilter,
+        } = this.characterBehavior.getPhysics3D();
+        const { _sharedData } = behavior;
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return;
+        }
+        const shape = behavior.createShape();
+        const isShapeValid = character.SetShape(
+          shape,
+          Number.MAX_VALUE,
+          broadPhaseLayerFilter,
+          objectLayerFilter,
+          bodyFilter,
+          shapeFilter,
+          _sharedData.jolt.GetTempAllocator()
+        );
+        if (!isShapeValid) {
+          return;
+        }
+        character.SetInnerBodyShape(shape);
+        character.SetMass(shape.GetMassProperties().get_mMass());
       }
     }
   }

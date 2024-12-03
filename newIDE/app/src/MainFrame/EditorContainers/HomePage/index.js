@@ -475,6 +475,8 @@ export const HomePage = React.memo<Props>(
                       i18n={i18n}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
                       onChooseProject={onChooseProject}
+                      onSaveProject={onSave}
+                      canSaveProject={canSave}
                     />
                   )}
                   {activeTab === 'get-started' && (

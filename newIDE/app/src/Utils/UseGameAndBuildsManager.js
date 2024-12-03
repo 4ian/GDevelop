@@ -23,14 +23,17 @@ export const getDefaultRegisterGameProperties = ({
   projectId,
   projectName,
   projectAuthor,
+  isProjectSaved,
 }: {|
   projectId: string,
   projectName: ?string,
   projectAuthor: ?string,
+  isProjectSaved: boolean,
 |}) => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',
+  unsaved: !isProjectSaved,
 });
 
 export type GameManager = {|
@@ -158,6 +161,9 @@ export const useGameManager = ({
               projectId: gameId,
               projectName: project.getName(),
               projectAuthor: project.getAuthor(),
+              // Assume a project going through the export process is not saved yet.
+              // It will be marked as saved when the user saves it next anyway.
+              isProjectSaved: false,
             })
           );
 

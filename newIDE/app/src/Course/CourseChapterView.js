@@ -98,216 +98,216 @@ type Props = {|
   onOpenTemplate: (url: string) => void,
 |};
 
-const CourseChapterView = ({
-  courseChapter,
-  onOpenTemplate,
-}: Props) => {
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
-  const {
-    values: { language },
-  } = React.useContext(PreferencesContext);
-  const userLanguage2LetterCode = language.split('_')[0];
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { isMobile, isLandscape } = useResponsiveWindowSize();
-  const isMobilePortrait = isMobile && !isLandscape;
-  const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-  const completion = courseChapter.tasks
-    ? { done: 10, total: courseChapter.tasks.length }
-    : null;
-  const isFinished = completion ? completion.done === completion.total : false;
-  const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
+const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+  ({ courseChapter, onOpenTemplate }, ref) => {
+    const { openSubscriptionDialog } = React.useContext(
+      SubscriptionSuggestionContext
+    );
+    const {
+      values: { language },
+    } = React.useContext(PreferencesContext);
+    const userLanguage2LetterCode = language.split('_')[0];
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const { isMobile, isLandscape } = useResponsiveWindowSize();
+    const isMobilePortrait = isMobile && !isLandscape;
+    const [openTasks, setOpenTasks] = React.useState<boolean>(false);
+    const completion = courseChapter.tasks
+      ? { done: 10, total: courseChapter.tasks.length }
+      : null;
+    const isFinished = completion
+      ? completion.done === completion.total
+      : false;
+    const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
 
-  return (
-    <ColumnStackLayout expand noMargin>
-      <div
-        style={{
-          ...styles.titleContainer,
-          flexDirection: isMobilePortrait ? 'column-reverse' : 'row',
-          alignItems: isMobilePortrait ? 'flex-start' : 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <LineStackLayout noMargin alignItems="center" expand>
-          <Text size="title">{courseChapter.title}</Text>
-          {isFinished && !isMobilePortrait && (
+    return (
+      <ColumnStackLayout expand noMargin>
+        <div
+          ref={ref}
+          style={{
+            ...styles.titleContainer,
+            flexDirection: isMobilePortrait ? 'column-reverse' : 'row',
+            alignItems: isMobilePortrait ? 'flex-start' : 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <LineStackLayout noMargin alignItems="center" expand>
+            <Text size="title">{courseChapter.title}</Text>
+            {isFinished && !isMobilePortrait && (
+              <div
+                style={{
+                  color: gdevelopTheme.statusIndicator.success,
+                }}
+              >
+                <CheckCircle />
+              </div>
+            )}
+          </LineStackLayout>
+          {isFinished ? (
             <div
               style={{
+                ...styles.statusContainer,
                 color: gdevelopTheme.statusIndicator.success,
               }}
             >
-              <CheckCircle />
+              {isMobilePortrait && <CheckCircle />}
+              <Text color="inherit" noMargin>
+                <Trans>Finished</Trans>
+              </Text>
             </div>
-          )}
-        </LineStackLayout>
-        {isFinished ? (
+          ) : completion ? (
+            <Text color="secondary" noMargin>
+              <Trans>
+                {completion.done} of {completion.total} completed
+              </Trans>
+            </Text>
+          ) : null}
+        </div>
+        {courseChapter.isLocked ? (
+          <ResponsiveLineStackLayout
+            expand
+            noResponsiveLandscape
+            alignItems="stretch"
+          >
+            {youtubeVideoId && (
+              <div style={styles.videoContainer}>
+                <CorsAwareImage
+                  alt={`Video for lesson ${courseChapter.title}`}
+                  style={styles.videoThumbnail}
+                  src={`https://i.ytimg.com/vi/${youtubeVideoId}/sddefault.jpg`}
+                />
+                <LockedOverlay />
+              </div>
+            )}
+            <Line useFullHeight expand noMargin>
+              <Paper background="medium" style={styles.sideBar}>
+                <ColumnStackLayout noMargin justifyContent="center">
+                  <Text noMargin size="sub-title">
+                    <Trans>Unlock this lesson to finish the course</Trans>
+                  </Text>
+                  <Text noMargin>
+                    <Trans>
+                      Use your GDevelop credits to purchase lessons in this
+                      course; or get a subscription to get them for free.
+                    </Trans>
+                  </Text>
+                  <ResponsiveLineStackLayout
+                    noMargin
+                    noResponsiveLandscape
+                    noColumnMargin
+                  >
+                    <RaisedButton
+                      primary
+                      fullWidth
+                      icon={<Gold />}
+                      label={<Trans>Get a subscription</Trans>}
+                      onClick={() =>
+                        openSubscriptionDialog({
+                          analyticsMetadata: {
+                            reason: 'Unlock course chapter',
+                          },
+                        })
+                      }
+                    />
+                    <FlatButton
+                      fullWidth
+                      leftIcon={<Coin fontSize="small" />}
+                      label={
+                        <Trans>
+                          Pay {courseChapter.priceInCredits} credits
+                        </Trans>
+                      }
+                      onClick={() => {}}
+                    />
+                  </ResponsiveLineStackLayout>
+                </ColumnStackLayout>
+              </Paper>
+            </Line>
+          </ResponsiveLineStackLayout>
+        ) : (
+          <ResponsiveLineStackLayout expand noResponsiveLandscape>
+            {youtubeVideoId && (
+              <div style={styles.videoContainer}>
+                <iframe
+                  title={`Video for lesson ${courseChapter.title}`}
+                  type="text/html"
+                  style={styles.videoIFrame}
+                  src={`http://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
+                    // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
+                    'en'
+                  }&hl=${userLanguage2LetterCode}`}
+                  frameBorder="0"
+                />
+              </div>
+            )}
+            <ColumnStackLayout noMargin expand>
+              <Text size="sub-title">Lesson materials</Text>
+              <Paper background="medium" style={styles.sideBar}>
+                <ColumnStackLayout noMargin>
+                  <Text noMargin>
+                    <Trans>Template</Trans>
+                  </Text>
+                  <Line noMargin>
+                    <RaisedButton
+                      primary
+                      label={<Trans>Open template</Trans>}
+                      onClick={() => onOpenTemplate(courseChapter.templateUrl)}
+                    />
+                  </Line>
+                </ColumnStackLayout>
+              </Paper>
+            </ColumnStackLayout>
+          </ResponsiveLineStackLayout>
+        )}
+        {!courseChapter.isLocked && (
           <div
             style={{
-              ...styles.statusContainer,
-              color: gdevelopTheme.statusIndicator.success,
+              ...styles.stickyTitle,
+              backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
             }}
           >
-            {isMobilePortrait && <CheckCircle />}
-            <Text color="inherit" noMargin>
-              <Trans>Finished</Trans>
-            </Text>
+            <Divider />
+            <Spacer />
+            <Line alignItems="center" justifyContent="space-between" noMargin>
+              <Text size="block-title">
+                <Trans>Tasks</Trans>
+              </Text>
+              <FlatButton
+                primary
+                label={
+                  openTasks ? (
+                    <Trans>Close tasks</Trans>
+                  ) : (
+                    <Trans>Open tasks</Trans>
+                  )
+                }
+                leftIcon={
+                  openTasks ? (
+                    <ChevronArrowTop size="small" />
+                  ) : (
+                    <ChevronArrowBottom size="small" />
+                  )
+                }
+                onClick={() => setOpenTasks(!openTasks)}
+              />
+            </Line>
+            <Spacer />
+            <Divider />
           </div>
-        ) : completion ? (
-          <Text color="secondary" noMargin>
-            <Trans>
-              {completion.done} of {completion.total} completed
-            </Trans>
-          </Text>
-        ) : null}
-      </div>
-      {courseChapter.isLocked ? (
-        <ResponsiveLineStackLayout
-          expand
-          noResponsiveLandscape
-          alignItems="stretch"
-        >
-          {youtubeVideoId && (
-            <div style={styles.videoContainer}>
-              <CorsAwareImage
-                alt={`Video for lesson ${courseChapter.title}`}
-                style={styles.videoThumbnail}
-                src={`https://i.ytimg.com/vi/${youtubeVideoId}/sddefault.jpg`}
-              />
-              <LockedOverlay />
-            </div>
-          )}
-          <Line useFullHeight expand noMargin>
-            <Paper background="medium" style={styles.sideBar}>
-              <ColumnStackLayout noMargin justifyContent="center">
-                <Text noMargin size="sub-title">
-                  <Trans>Unlock this lesson to finish the course</Trans>
-                </Text>
-                <Text noMargin>
-                  <Trans>
-                    Use your GDevelop credits to purchase lessons in this
-                    course; or get a subscription to get them for free.
-                  </Trans>
-                </Text>
-                <ResponsiveLineStackLayout
-                  noMargin
-                  noResponsiveLandscape
-                  noColumnMargin
-                >
-                  <RaisedButton
-                    primary
-                    fullWidth
-                    icon={<Gold />}
-                    label={<Trans>Get a subscription</Trans>}
-                    onClick={() =>
-                      openSubscriptionDialog({
-                        analyticsMetadata: {
-                          reason: 'Unlock course chapter',
-                        },
-                      })
-                    }
-                  />
-                  <FlatButton
-                    fullWidth
-                    leftIcon={<Coin fontSize="small" />}
-                    label={
-                      <Trans>
-                        Pay {courseChapter.priceInCredits} credits
-                      </Trans>
-                    }
-                    onClick={() => {}}
-                  />
-                </ResponsiveLineStackLayout>
-              </ColumnStackLayout>
-            </Paper>
-          </Line>
-        </ResponsiveLineStackLayout>
-      ) : (
-        <ResponsiveLineStackLayout expand noResponsiveLandscape>
-          {youtubeVideoId && (
-            <div style={styles.videoContainer}>
-              <iframe
-                title={`Video for lesson ${courseChapter.title}`}
-                type="text/html"
-                style={styles.videoIFrame}
-                src={`http://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
-                  // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
-                  'en'
-                }&hl=${userLanguage2LetterCode}`}
-                frameBorder="0"
-              />
-            </div>
-          )}
-          <ColumnStackLayout noMargin expand>
-            <Text size="sub-title">Lesson materials</Text>
-            <Paper background="medium" style={styles.sideBar}>
-              <ColumnStackLayout noMargin>
-                <Text noMargin>
-                  <Trans>Template</Trans>
-                </Text>
-                <Line noMargin>
-                  <RaisedButton
-                    primary
-                    label={<Trans>Open template</Trans>}
-                    onClick={() =>
-                      onOpenTemplate(courseChapter.templateUrl)
-                    }
-                  />
-                </Line>
-              </ColumnStackLayout>
-            </Paper>
-          </ColumnStackLayout>
-        </ResponsiveLineStackLayout>
-      )}
-      {!courseChapter.isLocked && (
-        <div
-          style={{
-            ...styles.stickyTitle,
-            backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
-          }}
-        >
-          <Divider />
-          <Spacer />
-          <Line alignItems="center" justifyContent="space-between" noMargin>
-            <Text size="block-title">
-              <Trans>Tasks</Trans>
-            </Text>
-            <FlatButton
-              primary
-              label={
-                openTasks ? (
-                  <Trans>Close tasks</Trans>
-                ) : (
-                  <Trans>Open tasks</Trans>
-                )
-              }
-              leftIcon={
-                openTasks ? (
-                  <ChevronArrowTop size="small" />
-                ) : (
-                  <ChevronArrowBottom size="small" />
-                )
-              }
-              onClick={() => setOpenTasks(!openTasks)}
+        )}
+        {!courseChapter.isLocked &&
+          courseChapter.tasks.map((item, index) => (
+            <CourseChapterTaskItem
+              courseChapterTask={item}
+              key={index.toString()}
+              isOpen={openTasks}
+              onCheck={() => {}}
+              isComplete={false}
+              onComplete={() => {}}
             />
-          </Line>
-          <Spacer />
-          <Divider />
-        </div>
-      )}
-      {!courseChapter.isLocked &&
-        courseChapter.tasks.map((item, index) => (
-          <CourseChapterTaskItem
-            courseChapterTask={item}
-            key={index.toString()}
-            isOpen={openTasks}
-            onCheck={() => {}}
-            isComplete={false}
-            onComplete={() => {}}
-          />
-        ))}
-    </ColumnStackLayout>
-  );
-};
+          ))}
+      </ColumnStackLayout>
+    );
+  }
+);
 
 export default CourseChapterView;

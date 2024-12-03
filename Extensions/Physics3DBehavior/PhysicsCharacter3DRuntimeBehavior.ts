@@ -41,8 +41,7 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
-  {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
@@ -179,8 +178,9 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
-      behavior.bodyUpdater =
-        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
+      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
+        this
+      );
       behavior.recreateBody();
 
       return this.physics3D;
@@ -401,33 +401,43 @@ namespace gdjs {
         )
       );
 
-      // Keep the character on the floor when walking down-hill.
-      const walkingDistance = Math.max(Math.hypot(
-        this.character.GetPosition().GetX() - this.oldPhysicsPosition[0],
-        this.character.GetPosition().GetY() - this.oldPhysicsPosition[1]
-      ), Math.hypot(
-        this.character.GetLinearVelocity().GetX(),
-        this.character.GetLinearVelocity().GetY()
-      ) * timeDelta);
-      this.oldPhysicsPosition[0] = this.character.GetPosition().GetX();
-      this.oldPhysicsPosition[1] = this.character.GetPosition().GetY();
+      if (this.isOnFloor()) {
+        // Keep the character on the floor when walking down-hill.
+        const walkingDistance = Math.max(
+          Math.hypot(
+            this.character.GetPosition().GetX() - this.oldPhysicsPosition[0],
+            this.character.GetPosition().GetY() - this.oldPhysicsPosition[1]
+          ),
+          Math.hypot(
+            this.character.GetLinearVelocity().GetX(),
+            this.character.GetLinearVelocity().GetY()
+          ) * timeDelta
+        );
+        this.oldPhysicsPosition[0] = this.character.GetPosition().GetX();
+        this.oldPhysicsPosition[1] = this.character.GetPosition().GetY();
 
-      // TODO This is not precise enough. Is it because of mCharacterPadding?
-      const stickToFloorStepDownZ = 1.01 * Math.max(
-        Math.min(
-          // Follow the platform slope...
-          -walkingDistance * this._slopeClimbingFactor,
-          // ...and follow a platform falling...
-          groundVelocityZ * timeDelta
-        ),
-        // ...but never fall faster than the max fall speed.
-        -this._maxFallingSpeed * worldInvScale * timeDelta
-      );
-      extendedUpdateSettings.mStickToFloorStepDown.Set(
-        0,
-        0,
-        stickToFloorStepDownZ
-      );
+        // A safety margin is taken as if the ground normal is too steep, the
+        // character will fall next step anyway.
+        const stickToFloorStepDownZ = Math.max(
+          -0.01 +
+            1.01 *
+              Math.min(
+                // Follow the platform slope...
+                -walkingDistance * this._slopeClimbingFactor,
+                // ...and follow a platform falling...
+                groundVelocityZ * timeDelta
+              ),
+          // ...but never fall faster than the max fall speed.
+          -this._maxFallingSpeed * worldInvScale * timeDelta
+        );
+        extendedUpdateSettings.mStickToFloorStepDown.Set(
+          0,
+          0,
+          stickToFloorStepDownZ
+        );
+      } else {
+        extendedUpdateSettings.mStickToFloorStepDown.Set(0, 0, 0);
+      }
 
       this.character.ExtendedUpdate(
         timeDelta,
@@ -1077,6 +1087,7 @@ namespace gdjs {
       return this._wasStickUsed ? this._stickForce : 0;
     }
 
+    // TODO Should we add a "is sliding" condition?
     /**
      * Check if the Character is on a floor.
      * @returns Returns true if on a floor and false if not.
@@ -1254,8 +1265,11 @@ namespace gdjs {
         settings.mSupportingVolume = new Jolt.Plane(
           Jolt.Vec3.prototype.sAxisZ(),
           // TODO It's strange that the value is positive.
+          // Use a big safety margin as the ground normal will be checked anyway.
+          // It only avoids to detect walls as ground.
           capsuleHalfLength -
-            capsuleRadius * (1 - Math.cos(gdjs.toRad(_slopeMaxAngle)))
+            capsuleRadius *
+              (1 - Math.cos(gdjs.toRad(Math.min(_slopeMaxAngle + 20, 70))))
         );
         const character = new Jolt.CharacterVirtual(
           settings,

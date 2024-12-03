@@ -76,9 +76,9 @@ const styles = {
   lockedOverlay: {
     position: 'absolute',
     background: 'rgba(0, 0, 0, 0.6)',
-    aspectRatio: '16 / 9',
     borderRadius: 4,
     inset: 0,
+    height: `100%`,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -224,7 +224,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             </Line>
           </ResponsiveLineStackLayout>
         ) : (
-          <ResponsiveLineStackLayout expand noResponsiveLandscape>
+          <ResponsiveLineStackLayout expand noResponsiveLandscape noColumnMargin>
             {youtubeVideoId && (
               <div style={styles.videoContainer}>
                 <iframe

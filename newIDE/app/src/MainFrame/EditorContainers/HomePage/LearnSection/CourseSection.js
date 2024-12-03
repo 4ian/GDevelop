@@ -14,9 +14,11 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Help from '../../../../UI/CustomSvgIcons/Help';
 import RaisedButton from '../../../../UI/RaisedButton';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
-  container: { display: 'flex', gap: 8 },
+  desktopContainer: { display: 'flex', gap: 16 },
+  mobileContainer: { position: 'relative' },
   sideContainer: { maxWidth: 250, position: 'relative' },
   sideContent: {
     position: 'sticky',
@@ -50,6 +52,7 @@ type Props = {|
 
 const CourseSection = ({ courseChapters, onBack }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
 
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
   const chaptersTitleRefs = React.useRef<
@@ -89,7 +92,6 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
   }, []);
 
   const scrollToChapter = React.useCallback((chapterId: string) => {
-    console.log(chapterId, scrollingContainerRef, chaptersTitleRefs);
     const { current: scrollContainer } = scrollingContainerRef;
     if (!scrollContainer) return;
 
@@ -127,8 +129,14 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
         </Trans>
       }
     >
-      <div style={styles.container}>
-        <Column noOverflowParent>
+      <div
+        style={
+          isMobile && !isLandscape
+            ? styles.mobileContainer
+            : styles.desktopContainer
+        }
+      >
+        <Column noOverflowParent noMargin>
           {courseChapters.map((chapter, index) => (
             <CourseChapterView
               courseChapter={chapter}
@@ -146,66 +154,72 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
           ))}
           <div style={styles.footer} />
         </Column>
-        <div style={styles.sideContainer}>
-          <div style={styles.sideContent}>
-            <Paper background="medium" style={styles.tableOfContent}>
-              <Text noMargin size="sub-title">
-                Chapters
-              </Text>
-              {courseChapters.map(chapter => (
-                <div
-                  key={chapter.title}
-                  tabIndex={0}
-                  onClick={() => scrollToChapter(chapter.id)}
-                  style={{
-                    ...styles.navLine,
-                    backgroundColor:
-                      chapter.id === activeChapterId
-                        ? gdevelopTheme.paper.backgroundColor.light
-                        : undefined,
-                  }}
-                >
-                  <Text
-                    noMargin
-                    style={textEllipsisStyle}
-                    color={chapter.isLocked ? 'secondary' : 'primary'}
-                  >
-                    {chapter.title}
-                  </Text>
-                  {chapter.isLocked ? (
-                    <div style={styles.navIcon}>
-                      <Lock fontSize="inherit" />
-                    </div>
-                  ) : (
-                    <Text color="secondary" noMargin>
-                      1/{chapter.tasks.length}
-                    </Text>
-                  )}
-                </div>
-              ))}
-            </Paper>
-            <Paper background="light" style={styles.askAQuestionContainer}>
-              <ColumnStackLayout expand noMargin>
-                <LineStackLayout
-                  expand
-                  alignItems="center"
-                  noMargin
-                  justifyContent="center"
-                >
-                  <Help />
-                  <Text noMargin>
-                    <Trans>Do you need any help?</Trans>
-                  </Text>
-                </LineStackLayout>
-                <RaisedButton
-                  label={<Trans>Ask a question</Trans>}
-                  primary
-                  onClick={() => {}}
-                />
-              </ColumnStackLayout>
-            </Paper>
+        {isMobile && !isLandscape ? (
+          <div style={{ position: 'sticky', bottom: 0 }}>
+            {/* TODO: Add nav */}
           </div>
-        </div>
+        ) : (
+          <div style={styles.sideContainer}>
+            <div style={styles.sideContent}>
+              <Paper background="medium" style={styles.tableOfContent}>
+                <Text noMargin size="sub-title">
+                  Chapters
+                </Text>
+                {courseChapters.map(chapter => (
+                  <div
+                    key={chapter.title}
+                    tabIndex={0}
+                    onClick={() => scrollToChapter(chapter.id)}
+                    style={{
+                      ...styles.navLine,
+                      backgroundColor:
+                        chapter.id === activeChapterId
+                          ? gdevelopTheme.paper.backgroundColor.light
+                          : undefined,
+                    }}
+                  >
+                    <Text
+                      noMargin
+                      style={textEllipsisStyle}
+                      color={chapter.isLocked ? 'secondary' : 'primary'}
+                    >
+                      {chapter.title}
+                    </Text>
+                    {chapter.isLocked ? (
+                      <div style={styles.navIcon}>
+                        <Lock fontSize="inherit" />
+                      </div>
+                    ) : (
+                      <Text color="secondary" noMargin>
+                        1/{chapter.tasks.length}
+                      </Text>
+                    )}
+                  </div>
+                ))}
+              </Paper>
+              <Paper background="light" style={styles.askAQuestionContainer}>
+                <ColumnStackLayout expand noMargin>
+                  <LineStackLayout
+                    expand
+                    alignItems="center"
+                    noMargin
+                    justifyContent="center"
+                  >
+                    <Help />
+                    <Text noMargin>
+                      <Trans>Do you need any help?</Trans>
+                    </Text>
+                  </LineStackLayout>
+                  <RaisedButton
+                    label={<Trans>Ask a question</Trans>}
+                    primary
+                    onClick={() => {}}
+                  />
+                </ColumnStackLayout>
+              </Paper>
+            </div>
+          </div>
+        )}
       </div>
     </SectionContainer>
   );

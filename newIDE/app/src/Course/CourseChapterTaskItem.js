@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import type { GuidedCourseChapterTask } from '../Utils/GDevelopServices/Asset';
+import type { CourseChapterTask } from '../Utils/GDevelopServices/Asset';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
@@ -22,15 +22,15 @@ const styles = {
 };
 
 type Props = {|
-  guidedCourseChapterTask: GuidedCourseChapterTask,
+  courseChapterTask: CourseChapterTask,
   onCheck: () => void,
   isOpen: boolean,
   isComplete: boolean,
   onComplete: boolean => void,
 |};
 
-const GuidedCourseChapterTaskItem = ({
-  guidedCourseChapterTask,
+const CourseChapterTaskItem = ({
+  courseChapterTask,
   onCheck,
   isOpen,
   isComplete,
@@ -55,19 +55,19 @@ const GuidedCourseChapterTaskItem = ({
         <ColumnStackLayout expand noMargin noOverflowParent>
           <Column expand noMargin noOverflowParent>
             <Text noMargin size="sub-title">
-              {guidedCourseChapterTask.title}
+              {courseChapterTask.title}
             </Text>
-            {guidedCourseChapterTask.text && (
+            {courseChapterTask.text && (
               <MarkdownText
                 withTextEllipsis={!isOpen}
-                source={guidedCourseChapterTask.text}
+                source={courseChapterTask.text}
                 allowParagraphs
               />
             )}
           </Column>
           {isOpen &&
-            guidedCourseChapterTask.imageUrls &&
-            guidedCourseChapterTask.imageUrls.map(imageUrl => (
+            courseChapterTask.imageUrls &&
+            courseChapterTask.imageUrls.map(imageUrl => (
               <CorsAwareImage
                 style={styles.image}
                 key={imageUrl}
@@ -75,12 +75,12 @@ const GuidedCourseChapterTaskItem = ({
                 src={imageUrl}
               />
             ))}
-          {isOpen && guidedCourseChapterTask.hint && (
+          {isOpen && courseChapterTask.hint && (
             <AlertMessage kind="info" background="light">
-              <MarkdownText source={guidedCourseChapterTask.hint} />
+              <MarkdownText source={courseChapterTask.hint} />
             </AlertMessage>
           )}
-          {isOpen && guidedCourseChapterTask.answer && (
+          {isOpen && courseChapterTask.answer && (
             <Accordion kind="answer" noMargin>
               <AccordionHeader>
                 <Text size="sub-title">
@@ -88,15 +88,15 @@ const GuidedCourseChapterTaskItem = ({
                 </Text>
               </AccordionHeader>
               <AccordionBody>
-                {!!guidedCourseChapterTask.answer.text && (
+                {!!courseChapterTask.answer.text && (
                   <MarkdownText
-                    source={guidedCourseChapterTask.answer.text}
+                    source={courseChapterTask.answer.text}
                     allowParagraphs
                   />
                 )}
-                {!!guidedCourseChapterTask.answer.imageUrls && (
+                {!!courseChapterTask.answer.imageUrls && (
                   <ColumnStackLayout noMargin noOverflowParent>
-                    {guidedCourseChapterTask.answer.imageUrls.map(imageUrl => (
+                    {courseChapterTask.answer.imageUrls.map(imageUrl => (
                       <CorsAwareImage
                         style={styles.image}
                         key={imageUrl}
@@ -115,4 +115,4 @@ const GuidedCourseChapterTaskItem = ({
   );
 };
 
-export default GuidedCourseChapterTaskItem;
+export default CourseChapterTaskItem;

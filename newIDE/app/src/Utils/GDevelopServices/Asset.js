@@ -176,7 +176,7 @@ export type AllResources = {|
   filters: Filters,
 |};
 
-export type GuidedCourseChapterTask = {|
+export type CourseChapterTask = {|
   title: string,
   subtitle?: string,
   imageUrls?: string[],
@@ -185,23 +185,25 @@ export type GuidedCourseChapterTask = {|
   answer?: { text?: string, imageUrls?: string[] },
 |};
 
-export type UnlockedGuidedCourseChapter = {|
+export type UnlockedCourseChapter = {|
+  id: string,
   title: string,
   videoUrl: string,
   isLocked?: false,
   templateUrl: string,
-  tasks: Array<GuidedCourseChapterTask>,
+  tasks: Array<CourseChapterTask>,
 |};
-export type LockedGuidedCourseChapter = {|
+export type LockedCourseChapter = {|
+  id: string,
   title: string,
   videoUrl: string,
   isLocked: true,
   priceInCredits: number,
 |};
 
-export type GuidedCourseChapter =
-  | LockedGuidedCourseChapter
-  | UnlockedGuidedCourseChapter;
+export type CourseChapter =
+  | LockedCourseChapter
+  | UnlockedCourseChapter;
 
 export type Environment = 'staging' | 'live';
 

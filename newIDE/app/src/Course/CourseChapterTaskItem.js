@@ -17,7 +17,7 @@ const styles = {
   textContainer: { overflow: 'hidden' },
   checkboxContainer: { paddingTop: 6 },
   image: {
-    maxWidth: 600,
+    maxWidth: '100%',
   },
 };
 

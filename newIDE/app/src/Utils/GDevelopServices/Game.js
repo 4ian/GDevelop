@@ -69,6 +69,7 @@ export type Game = {|
   playWithKeyboard: boolean,
   playWithMobile: boolean,
   playWithGamepad: boolean,
+  unsaved?: boolean,
 |};
 
 export type GameUpdatePayload = {|
@@ -87,6 +88,7 @@ export type GameUpdatePayload = {|
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
+  unsaved?: boolean,
 |};
 
 export type GameCategory = {
@@ -291,11 +293,13 @@ export const registerGame = async (
     gameName,
     authorName,
     templateSlug,
+    unsaved,
   }: {|
     gameId: string,
     gameName: string,
     authorName: string,
     templateSlug?: string,
+    unsaved?: boolean,
   |}
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -306,6 +310,7 @@ export const registerGame = async (
       gameName,
       authorName,
       templateSlug,
+      unsaved,
     },
     {
       params: {
@@ -340,6 +345,7 @@ export const updateGame = async (
     acceptsBuildComments,
     acceptsGameComments,
     displayAdsOnGamePage,
+    unsaved,
   }: GameUpdatePayload
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -361,6 +367,7 @@ export const updateGame = async (
       acceptsBuildComments,
       acceptsGameComments,
       displayAdsOnGamePage,
+      unsaved,
     },
     {
       params: {

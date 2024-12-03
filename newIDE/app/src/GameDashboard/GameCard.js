@@ -49,16 +49,24 @@ type Props = {|
   onOpenGameManager: () => void,
   storageProviders: Array<StorageProvider>,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  onUnregisterGame: () => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
+  onSaveProject: () => Promise<void>,
+  disabled: boolean,
+  canSaveProject: boolean,
 |};
 
 export const GameCard = ({
-  storageProviders,
   game,
   isCurrentProjectOpened,
   onOpenGameManager,
+  storageProviders,
   onOpenProject,
+  onUnregisterGame,
   askToCloseProject,
+  onSaveProject,
+  disabled,
+  canSaveProject,
 }: Props) => {
   useOnResize(useForceUpdate());
   const projectsList = useProjectsListFor(game);
@@ -188,15 +196,25 @@ export const GameCard = ({
         : [];
 
     if (isCurrentProjectOpened) {
-      actions.push(
-        { type: 'separator' },
-        {
-          label: i18n._(t`Close project`),
-          click: async () => {
-            await askToCloseProject();
-          },
-        }
-      );
+      if (actions.length > 0) {
+        actions.push({ type: 'separator' });
+      }
+      actions.push({
+        label: i18n._(t`Close project`),
+        click: async () => {
+          await askToCloseProject();
+        },
+      });
+    } else {
+      if (actions.length > 0) {
+        actions.push({ type: 'separator' });
+      }
+      actions.push({
+        label: i18n._(t`Unregister game`),
+        click: async () => {
+          await onUnregisterGame();
+        },
+      });
     }
 
     return actions;
@@ -217,14 +235,33 @@ export const GameCard = ({
               )
             }
             onClick={onOpenGameManager}
+            disabled={disabled}
           />
-          {projectsList.length === 0 ? null : projectsList.length === 1 &&
-            !isCurrentProjectOpened ? (
-            <FlatButton
+          {projectsList.length === 0 ? (
+            isCurrentProjectOpened ? (
+              <FlatButtonWithSplitMenu
+                primary
+                fullWidth={fullWidth}
+                label={
+                  isWidthConstrained ? (
+                    <Trans>Save</Trans>
+                  ) : (
+                    <Trans>Save project</Trans>
+                  )
+                }
+                onClick={onSaveProject}
+                buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
+                disabled={disabled || !canSaveProject}
+              />
+            ) : null
+          ) : (
+            <FlatButtonWithSplitMenu
               primary
               fullWidth={fullWidth}
               label={
-                isWidthConstrained ? (
+                isCurrentProjectOpened ? (
+                  <Trans>Opened</Trans>
+                ) : isWidthConstrained ? (
                   <Trans>Open</Trans>
                 ) : (
                   <Trans>Open project</Trans>
@@ -235,24 +272,8 @@ export const GameCard = ({
                   ? undefined
                   : () => onOpenProject(projectsList[0])
               }
-            />
-          ) : (
-            <FlatButtonWithSplitMenu
-              primary
-              fullWidth={fullWidth}
-              label={
-                isCurrentProjectOpened ? (
-                  <Trans>Opened</Trans>
-                ) : (
-                  <Trans>Open</Trans>
-                )
-              }
-              onClick={
-                isCurrentProjectOpened
-                  ? undefined
-                  : () => onOpenProject(projectsList[0])
-              }
               buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
+              disabled={disabled}
             />
           )}
         </LineStackLayout>

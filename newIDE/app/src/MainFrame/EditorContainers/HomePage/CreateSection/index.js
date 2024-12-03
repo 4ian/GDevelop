@@ -94,6 +94,8 @@ type Props = {|
   setCurrentTab: GameDetailsTab => void,
   onOpenNewProjectSetupDialog: () => void,
   onChooseProject: () => void,
+  onSaveProject: () => Promise<void>,
+  canSaveProject: boolean,
 |};
 
 const CreateSection = ({
@@ -119,6 +121,8 @@ const CreateSection = ({
   setCurrentTab,
   onOpenNewProjectSetupDialog,
   onChooseProject,
+  onSaveProject,
+  canSaveProject,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -133,6 +137,7 @@ const CreateSection = ({
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
   ] = React.useState<?React.Node>(null);
+  const [isUpdatingGame, setIsUpdatingGame] = React.useState(false);
   const [showAllGameTemplates, setShowAllGameTemplates] = React.useState(false);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
@@ -176,20 +181,23 @@ const CreateSection = ({
   );
 
   const unregisterGame = React.useCallback(
-    async (i18n: I18nType) => {
-      if (!profile || !openedGame) return;
+    async (game: Game, i18n: I18nType) => {
+      if (!profile) return;
 
       const answer = await showConfirmation({
         title: t`Unregister game`,
-        message: t`Are you sure you want to unregister this game?${'\n\n'}It will disappear from your games dashboard and you won't get access to player services, unless you register it again.`,
+        message: t`Are you sure you want to unregister this game?${'\n\n'}If you haven't saved it, it will disappear from your games dashboard and you won't get access to player services, unless you register it again.`,
       });
       if (!answer) return;
 
       const { id } = profile;
       setGameUnregisterErrorText(null);
+      setIsUpdatingGame(true);
       try {
-        await deleteGame(getAuthorizationHeader, id, openedGame.id);
-        setOpenedGameId(null);
+        await deleteGame(getAuthorizationHeader, id, game.id);
+        if (openedGame && openedGame.id === game.id) {
+          setOpenedGameId(null);
+        }
       } catch (error) {
         console.error('Unable to delete the game:', error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -214,7 +222,10 @@ const CreateSection = ({
             errorId: 'game-dashboard-unregister-game',
           });
         }
+      } finally {
+        setIsUpdatingGame(false);
       }
+
       onRefreshGames();
     },
     [
@@ -281,7 +292,8 @@ const CreateSection = ({
           game={openedGame}
           onBack={onBack}
           onGameUpdated={onGameUpdated}
-          onUnregisterGame={unregisterGame}
+          isUpdatingGame={isUpdatingGame}
+          onUnregisterGame={() => unregisterGame(openedGame, i18n)}
           gameUnregisterErrorText={gameUnregisterErrorText}
         />
       </SectionContainer>
@@ -365,12 +377,16 @@ const CreateSection = ({
                   onRefreshGames={onRefreshGames}
                   onOpenGameId={setOpenedGameId}
                   onOpenProject={onOpenProject}
+                  isUpdatingGame={isUpdatingGame}
+                  onUnregisterGame={unregisterGame}
                   canOpen={canOpen}
                   onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
                   onChooseProject={onChooseProject}
                   currentFileMetadata={currentFileMetadata}
                   closeProject={closeProject}
                   askToCloseProject={askToCloseProject}
+                  onSaveProject={onSaveProject}
+                  canSaveProject={canSaveProject}
                 />
                 {/* Check if looks ok */}
                 {isMobile && limits && hasTooManyCloudProjects && (

@@ -287,6 +287,27 @@ namespace gdjs {
       this._dontClearInputsBetweenFrames = true;
     }
 
+    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+      const { behavior } = this.getPhysics3D();
+      result.Set(
+        this.owner3D.getX() * this._sharedData.worldInvScale,
+        this.owner3D.getY() * this._sharedData.worldInvScale,
+        this.owner3D.getZ() * this._sharedData.worldInvScale +
+          behavior.shapeHalfDepth
+      );
+      return result;
+    }
+
+    moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
+      const { behavior } = this.getPhysics3D();
+      this.owner3D.setX(physicsPosition.GetX() * this._sharedData.worldScale);
+      this.owner3D.setY(physicsPosition.GetY() * this._sharedData.worldScale);
+      this.owner3D.setZ(
+        (physicsPosition.GetZ() - behavior.shapeHalfDepth) *
+          this._sharedData.worldScale
+      );
+    }
+
     onDeActivate() {}
 
     onActivate() {}
@@ -685,9 +706,10 @@ namespace gdjs {
               groundAngularVelocityZ * timeDelta
           )
         );
+        // TODO Should the character be used instead of the body directly?
         this._sharedData.bodyInterface.SetPositionAndRotation(
           characterBody.GetID(),
-          behavior.getPhysicsPosition(this.getRVec3(0, 0, 0)),
+          this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
           rotation,
           Jolt.EActivation_Activate
         );
@@ -1241,7 +1263,7 @@ namespace gdjs {
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { _sharedData } = behavior;
 
-        const shape = behavior.createShape();
+        const shape = behavior.createShape(0.5);
 
         const settings = new Jolt.CharacterVirtualSettings();
         settings.mInnerBodyLayer = behavior.getBodyLayer();
@@ -1274,7 +1296,9 @@ namespace gdjs {
         );
         const character = new Jolt.CharacterVirtual(
           settings,
-          behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          this.characterBehavior.getPhysicsPosition(
+            _sharedData.getRVec3(0, 0, 0)
+          ),
           behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           _sharedData.physicsSystem
         );
@@ -1294,7 +1318,9 @@ namespace gdjs {
           return;
         }
         // We can't rely on the body position because of mCharacterPadding.
-        behavior.moveObjectToPhysicsPosition(character.GetPosition());
+        this.characterBehavior.moveObjectToPhysicsPosition(
+          character.GetPosition()
+        );
         // No need to update the rotation as CharacterVirtual doesn't change it.
       }
 
@@ -1312,7 +1338,9 @@ namespace gdjs {
           behavior._objectOldZ !== owner3D.getZ()
         ) {
           character.SetPosition(
-            behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0))
+            this.characterBehavior.getPhysicsPosition(
+              _sharedData.getRVec3(0, 0, 0)
+            )
           );
         }
         if (
@@ -1339,7 +1367,7 @@ namespace gdjs {
         if (!character) {
           return;
         }
-        const shape = behavior.createShape();
+        const shape = behavior.createShape(0.5);
         const isShapeValid = character.SetShape(
           shape,
           Number.MAX_VALUE,

@@ -314,9 +314,6 @@ namespace gdjs {
     shapeDimensionA: any;
     shapeDimensionB: any;
     shapeDimensionC: any;
-    shapeOffsetX: float;
-    shapeOffsetY: float;
-    shapeOffsetZ: float;
     density: float;
     friction: float;
     restitution: float;
@@ -355,6 +352,7 @@ namespace gdjs {
     _body: Jolt.Body | null = null;
     needToRecreateBody: boolean = false;
     needToRecreateShape: boolean = false;
+    shapeHalfDepth: float = 0;
 
     /**
      * sharedData is a reference to the shared data of the scene, that registers
@@ -391,9 +389,6 @@ namespace gdjs {
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
-      this.shapeOffsetX = behaviorData.shapeOffsetX;
-      this.shapeOffsetY = behaviorData.shapeOffsetY;
-      this.shapeOffsetZ = behaviorData.shapeOffsetZ;
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -441,14 +436,6 @@ namespace gdjs {
       }
       if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
         this.shapeDimensionB = newBehaviorData.shapeDimensionB;
-        this.needToRecreateShape = true;
-      }
-      if (oldBehaviorData.shapeOffsetX !== newBehaviorData.shapeOffsetX) {
-        this.shapeOffsetX = newBehaviorData.shapeOffsetX;
-        this.needToRecreateShape = true;
-      }
-      if (oldBehaviorData.shapeOffsetY !== newBehaviorData.shapeOffsetY) {
-        this.shapeOffsetY = newBehaviorData.shapeOffsetY;
         this.needToRecreateShape = true;
       }
       if (oldBehaviorData.density !== newBehaviorData.density) {
@@ -646,7 +633,7 @@ namespace gdjs {
       this.onDeActivate();
     }
 
-    createShape(): Jolt.Shape {
+    createShape(offsetZ: float = 0): Jolt.Shape {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -661,10 +648,6 @@ namespace gdjs {
       }
 
       const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
-
-      const shapeOffsetX = this.shapeOffsetX * shapeScale;
-      const shapeOffsetY = this.shapeOffsetY * shapeScale;
-      const shapeOffsetZ = this.shapeOffsetZ * shapeScale;
 
       const shapeDimensionA = this.shapeDimensionA * shapeScale;
       const shapeDimensionB = this.shapeDimensionB * shapeScale;
@@ -696,6 +679,7 @@ namespace gdjs {
           convexRadius
         );
         quat = this.getQuat(0, 0, 0, 1);
+        this.shapeHalfDepth = boxDepth / 2;
       } else if (this.shape === 'Capsule') {
         const radius =
           shapeDimensionA > 0
@@ -710,6 +694,8 @@ namespace gdjs {
           radius
         );
         quat = this._getShapeOrientationQuat();
+        this.shapeHalfDepth =
+          this.shapeOrientation !== 'Z' ? radius : capsuleDepth / 2;
       } else if (this.shape === 'Cylinder') {
         const radius =
           shapeDimensionA > 0
@@ -730,6 +716,8 @@ namespace gdjs {
           convexRadius
         );
         quat = this._getShapeOrientationQuat();
+        this.shapeHalfDepth =
+          this.shapeOrientation !== 'Z' ? radius : cylinderDepth / 2;
       } else {
         // Create a 'Sphere' by default.
         const radius =
@@ -740,10 +728,12 @@ namespace gdjs {
             : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
+        this.shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
       const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-        this.getVec3(shapeOffsetX, shapeOffsetY, shapeOffsetZ),
+        //this.getVec3(shapeOffsetX, shapeOffsetY, shapeOffsetZ),
+        this.getVec3(0, 0, 0), //offsetZ ? offsetZ * shapeDepth : 0),
         quat,
         shapeSettings
       )

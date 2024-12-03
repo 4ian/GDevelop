@@ -50,6 +50,8 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
               projectId: project.getProjectUuid(),
               projectName: project.getName(),
               projectAuthor: project.getAuthor(),
+              // Assume the project is not saved at this stage.
+              isProjectSaved: false,
             })
           );
         } catch (error) {

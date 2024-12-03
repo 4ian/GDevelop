@@ -55,6 +55,7 @@ type Props = {|
   closeProject: () => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
   onRefreshGames: () => Promise<void>,
+  disabled: boolean,
 |};
 
 const ProjectCard = ({
@@ -67,6 +68,7 @@ const ProjectCard = ({
   closeProject,
   askToCloseProject,
   onRefreshGames,
+  disabled,
 }: Props) => {
   useOnResize(useForceUpdate());
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -189,6 +191,8 @@ const ProjectCard = ({
             projectId,
             projectName: fileMetadata.name,
             projectAuthor: username,
+            // A project is always saved when appearing in the list of recent projects.
+            isProjectSaved: true,
           })
         );
         await onRefreshGames();
@@ -289,7 +293,7 @@ const ProjectCard = ({
           <FlatButtonWithSplitMenu
             primary
             fullWidth={fullWidth}
-            disabled={isLoading}
+            disabled={isLoading || disabled}
             label={
               isCurrentProjectOpened ? (
                 <Trans>Opened</Trans>

@@ -1,7 +1,11 @@
 // @flow
 
 import * as React from 'react';
-import { getGames, type Game } from '../Utils/GDevelopServices/Game';
+import {
+  getGames,
+  updateGame,
+  type Game,
+} from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 export type GamesList = {|
@@ -9,6 +13,7 @@ export type GamesList = {|
   gamesFetchingError: ?Error,
   fetchGames: () => Promise<void>,
   onGameUpdated: (updatedGame: Game) => void,
+  markGameAsSavedIfRelevant: (gameId: string) => Promise<void>,
 |};
 
 const useGamesList = (): GamesList => {
@@ -61,11 +66,41 @@ const useGamesList = (): GamesList => {
     [games]
   );
 
+  const markGameAsSavedIfRelevant = React.useCallback(
+    async (gameId: string) => {
+      console.log('markGameAsSavedIfRelevant', gameId, games, firebaseUser);
+      if (!games || !firebaseUser) return;
+      const currentOpenedGame = games && games.find(game => game.id === gameId);
+
+      console.log('currentOpenedGame', currentOpenedGame);
+
+      if (!currentOpenedGame || !currentOpenedGame.unsaved) return;
+
+      try {
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          firebaseUser.uid,
+          currentOpenedGame.id,
+          {
+            unsaved: false,
+          }
+        );
+        console.log('Game marked as saved:', updatedGame);
+        onGameUpdated(updatedGame);
+      } catch (error) {
+        // Catch error, we'll try again later.
+        console.error('Error while marking game as saved:', error);
+      }
+    },
+    [games, onGameUpdated, firebaseUser, getAuthorizationHeader]
+  );
+
   return {
     games,
     gamesFetchingError,
     fetchGames,
     onGameUpdated,
+    markGameAsSavedIfRelevant,
   };
 };
 

@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import Fuse from 'fuse.js';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
@@ -79,7 +81,7 @@ const getDashboardItemLastModifiedAt = (item: DashboardItem): number => {
     );
   }
   // Then the game, if any.
-  return (item.game && item.game.updatedAt) || 0;
+  return (item.game && item.game.updatedAt * 1000) || 0;
 };
 
 const lastModifiedAtSort = (
@@ -117,6 +119,7 @@ const areDashboardItemsEqual = (
 };
 
 const getDashboardItemsToDisplay = ({
+  project,
   currentFileMetadata,
   allDashboardItems,
   searchText,
@@ -124,6 +127,7 @@ const getDashboardItemsToDisplay = ({
   currentPage,
   orderBy,
 }: {|
+  project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
   allDashboardItems: Array<DashboardItem>,
   searchText: string,
@@ -150,36 +154,46 @@ const getDashboardItemsToDisplay = ({
     itemsToDisplay = searchResults.map(result => result.item);
   } else {
     // If a project is opened and no search is performed, display it first.
-    if (currentFileMetadata) {
-      const dashboardItemLinkedToOpenedFileMetadata = allDashboardItems.find(
+    if (project) {
+      const currentProjectId = project.getProjectUuid();
+      const currentFileIdentifier = currentFileMetadata
+        ? currentFileMetadata.fileIdentifier
+        : null;
+      const dashboardItemLinkedToOpenedProject = allDashboardItems.find(
         dashboardItem =>
-          dashboardItem.projectFiles &&
-          dashboardItem.projectFiles.some(
-            projectFile =>
-              projectFile.fileMetadata.gameId === currentFileMetadata.gameId &&
-              projectFile.fileMetadata.fileIdentifier ===
-                currentFileMetadata.fileIdentifier
-          )
+          // Either it's a registered game.
+          (dashboardItem.game && dashboardItem.game.id === currentProjectId) ||
+          // Or it's just a project file.
+          (dashboardItem.projectFiles &&
+            dashboardItem.projectFiles.some(
+              projectFile =>
+                projectFile.fileMetadata.gameId === currentProjectId &&
+                projectFile.fileMetadata.fileIdentifier ===
+                  currentFileIdentifier
+            ))
       );
-      if (dashboardItemLinkedToOpenedFileMetadata) {
+      if (dashboardItemLinkedToOpenedProject) {
         itemsToDisplay = [
-          dashboardItemLinkedToOpenedFileMetadata,
+          dashboardItemLinkedToOpenedProject,
           ...itemsToDisplay.filter(
             item =>
-              !areDashboardItemsEqual(
-                item,
-                dashboardItemLinkedToOpenedFileMetadata
-              )
+              !areDashboardItemsEqual(item, dashboardItemLinkedToOpenedProject)
           ),
         ];
       } else {
-        // Could not find the dashboard item linked to the opened project. This can happen if the project
-        // has been removed from the list of recent projects, for example.
+        // In case a project is opened but not found in the list of recent projects,
+        // either it's been saved but then removed from the list.
+        // or it's never been saved.
         // In this case, add the opened project first in the list.
+        const fileMetadata: FileMetadata = currentFileMetadata || {
+          fileIdentifier: 'unsaved-project',
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+        };
         const openedProjectDashboardItem: DashboardItem = {
           projectFiles: [
             {
-              fileMetadata: currentFileMetadata,
+              fileMetadata,
               // We're not sure about the storage provider, so we leave it empty.
               storageProviderName: '',
             },
@@ -190,7 +204,15 @@ const getDashboardItemsToDisplay = ({
     }
   }
 
-  return itemsToDisplay.slice(
+  const itemsWithoutUnsavedGames = itemsToDisplay.filter(
+    item =>
+      // Filter out unsaved games, unless they are the opened project.
+      !item.game ||
+      !item.game.unsaved ||
+      (project && item.game.id === project.getProjectUuid())
+  );
+
+  return itemsWithoutUnsavedGames.slice(
     currentPage * pageSize,
     (currentPage + 1) * pageSize
   );
@@ -204,11 +226,15 @@ type Props = {|
   onRefreshGames: () => Promise<void>,
   onOpenGameId: (gameId: ?string) => void,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
+  onUnregisterGame: (game: Game, i18n: I18nType) => Promise<void>,
+  isUpdatingGame: boolean,
   canOpen: boolean,
   onOpenNewProjectSetupDialog: () => void,
   onChooseProject: () => void,
   closeProject: () => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
+  onSaveProject: () => Promise<void>,
+  canSaveProject: boolean,
 |};
 
 const GamesList = ({
@@ -218,12 +244,16 @@ const GamesList = ({
   onRefreshGames,
   onOpenGameId,
   onOpenProject,
+  onUnregisterGame,
+  isUpdatingGame,
   storageProviders,
   canOpen,
   onOpenNewProjectSetupDialog,
   onChooseProject,
   closeProject,
   askToCloseProject,
+  onSaveProject,
+  canSaveProject,
 }: Props) => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
@@ -270,6 +300,7 @@ const GamesList = ({
     Array<DashboardItem>
   >(
     getDashboardItemsToDisplay({
+      project,
       currentFileMetadata,
       allDashboardItems,
       searchText,
@@ -283,6 +314,7 @@ const GamesList = ({
     () => {
       setDisplayedDashboardItems(
         getDashboardItemsToDisplay({
+          project,
           currentFileMetadata,
           allDashboardItems,
           searchText,
@@ -298,18 +330,16 @@ const GamesList = ({
     searchText ? 250 : 150
   );
 
-  // Refresh games to display when:
-  // - search text changes (user input)
-  // - games change (refresh following an update for instance)
-  // - user changes page
-  // - opened project changes
+  // Refresh games to display, depending on a few parameters.
   React.useEffect(getDashboardItemsToDisplayDebounced, [
     getDashboardItemsToDisplayDebounced,
-    searchText,
-    games,
-    currentPage,
-    orderBy,
-    currentFileMetadata,
+    searchText, // search text changes (user input)
+    games, // games change (when updating a game for instance)
+    currentPage, // user changes page
+    orderBy, // user changes order
+    currentFileMetadata, // opened project changes (when opening or closing a project from here)
+    allRecentProjectFiles.length, // list of recent projects changes (when a project is removed from list)
+    project, // opened project changes (when closing a project from here)
   ]);
 
   const projectUuid = project ? project.getProjectUuid() : null;
@@ -355,175 +385,195 @@ const GamesList = ({
   );
 
   return (
-    <ColumnStackLayout noMargin>
-      <Line noMargin justifyContent="space-between">
-        <LineStackLayout noMargin alignItems="center">
-          <Text size="section-title" noMargin>
-            <Trans>Games</Trans>
-          </Text>
-          <IconButton
-            size="small"
-            onClick={refreshGamesList}
-            disabled={isRefreshing}
-            tooltip={t`Refresh games`}
-          >
-            <div style={styles.refreshIconContainer}>
-              <Refresh fontSize="inherit" />
-            </div>
-          </IconButton>
-        </LineStackLayout>
-        <LineStackLayout noMargin alignItems="center">
-          <RaisedButton
-            primary
-            fullWidth={!canOpen}
-            label={
-              isMobile ? <Trans>Create</Trans> : <Trans>Create new game</Trans>
-            }
-            onClick={onOpenNewProjectSetupDialog}
-            icon={<Add fontSize="small" />}
-            id="home-create-project-button"
-          />
-          {canOpen && (
-            <FlatButton
-              label={
-                isMobile ? <Trans>Open</Trans> : <Trans>Open a project</Trans>
-              }
-              onClick={onChooseProject}
-            />
-          )}
-        </LineStackLayout>
-      </Line>
-      {allDashboardItems.length > 0 && (
-        <ResponsiveLineStackLayout expand noMargin alignItems="center">
-          <SearchBarSelectField
-            value={orderBy}
-            onChange={(e, i, value: string) =>
-              // $FlowFixMe
-              setGamesListOrderBy(value)
-            }
-          >
-            <SelectOption value="lastModifiedAt" label={t`Last modified`} />
-            <SelectOption
-              value="totalSessions"
-              label={t`Most sessions (all time)`}
-            />
-            <SelectOption
-              value="weeklySessions"
-              label={t`Most sessions (past 7 days)`}
-            />
-          </SearchBarSelectField>
-          <Line noMargin expand alignItems="center">
-            <Column noMargin expand>
-              <SearchBar
-                value={searchText}
-                onChange={setSearchText}
-                // Search is triggered on each search text change
-                onRequestSearch={() => {}}
-                placeholder={t`Search by name`}
-                autoFocus="desktop"
+    <I18n>
+      {({ i18n }) => (
+        <ColumnStackLayout noMargin>
+          <Line noMargin justifyContent="space-between">
+            <LineStackLayout noMargin alignItems="center">
+              <Text size="section-title" noMargin>
+                <Trans>Games</Trans>
+              </Text>
+              <IconButton
+                size="small"
+                onClick={refreshGamesList}
+                disabled={isRefreshing}
+                tooltip={t`Refresh games`}
+              >
+                <div style={styles.refreshIconContainer}>
+                  <Refresh fontSize="inherit" />
+                </div>
+              </IconButton>
+            </LineStackLayout>
+            <LineStackLayout noMargin alignItems="center">
+              <RaisedButton
+                primary
+                fullWidth={!canOpen}
+                label={
+                  isMobile ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create new game</Trans>
+                  )
+                }
+                onClick={onOpenNewProjectSetupDialog}
+                icon={<Add fontSize="small" />}
+                id="home-create-project-button"
+                disabled={isUpdatingGame}
               />
-            </Column>
-            <IconButton
-              tooltip={t`Previous page`}
-              onClick={() => setCurrentPage(currentPage => currentPage - 1)}
-              disabled={!!searchText || currentPage === 0}
-              size="small"
-            >
-              <ChevronArrowLeft />
-            </IconButton>
-            <Text
-              noMargin
-              style={{
-                opacity: searchText ? 0.6 : 1,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {searchText ? 1 : currentPage + 1}
-            </Text>
-            <IconButton
-              tooltip={t`Next page`}
-              onClick={() => setCurrentPage(currentPage => currentPage + 1)}
-              disabled={
-                !!searchText || (currentPage + 1) * pageSize >= games.length
-              }
-              size="small"
-            >
-              <ChevronArrowRight />
-            </IconButton>
+              {canOpen && (
+                <FlatButton
+                  label={
+                    isMobile ? (
+                      <Trans>Open</Trans>
+                    ) : (
+                      <Trans>Open a project</Trans>
+                    )
+                  }
+                  onClick={onChooseProject}
+                  disabled={isUpdatingGame}
+                />
+              )}
+            </LineStackLayout>
           </Line>
-        </ResponsiveLineStackLayout>
-      )}
-      {displayedDashboardItems.length > 0 ? (
-        displayedDashboardItems
-          .map((dashboardItem, index) => {
-            const game = dashboardItem.game;
-            if (game) {
-              return (
-                <GameCard
-                  storageProviders={storageProviders}
-                  key={game.id}
-                  isCurrentProjectOpened={
-                    !!projectUuid && game.id === projectUuid
-                  }
-                  game={game}
-                  onOpenGameManager={() => {
-                    onOpenGameId(game.id);
+          {allDashboardItems.length > 0 && (
+            <ResponsiveLineStackLayout expand noMargin alignItems="center">
+              <SearchBarSelectField
+                value={orderBy}
+                onChange={(e, i, value: string) =>
+                  // $FlowFixMe
+                  setGamesListOrderBy(value)
+                }
+              >
+                <SelectOption value="lastModifiedAt" label={t`Last modified`} />
+                <SelectOption
+                  value="totalSessions"
+                  label={t`Most sessions (all time)`}
+                />
+                <SelectOption
+                  value="weeklySessions"
+                  label={t`Most sessions (past 7 days)`}
+                />
+              </SearchBarSelectField>
+              <Line noMargin expand alignItems="center">
+                <Column noMargin expand>
+                  <SearchBar
+                    value={searchText}
+                    onChange={setSearchText}
+                    // Search is triggered on each search text change
+                    onRequestSearch={() => {}}
+                    placeholder={t`Search by name`}
+                    autoFocus="desktop"
+                  />
+                </Column>
+                <IconButton
+                  tooltip={t`Previous page`}
+                  onClick={() => setCurrentPage(currentPage => currentPage - 1)}
+                  disabled={!!searchText || currentPage === 0}
+                  size="small"
+                >
+                  <ChevronArrowLeft />
+                </IconButton>
+                <Text
+                  noMargin
+                  style={{
+                    opacity: searchText ? 0.6 : 1,
+                    fontVariantNumeric: 'tabular-nums',
                   }}
-                  onOpenProject={onOpenProject}
-                  askToCloseProject={askToCloseProject}
-                />
-              );
-            }
-            const projectFiles = dashboardItem.projectFiles;
-            if (projectFiles) {
-              const projectFileMetadataAndStorageProviderName = projectFiles[0];
-              return (
-                <ProjectCard
-                  projectFileMetadataAndStorageProviderName={
-                    projectFileMetadataAndStorageProviderName
+                >
+                  {searchText ? 1 : currentPage + 1}
+                </Text>
+                <IconButton
+                  tooltip={t`Next page`}
+                  onClick={() => setCurrentPage(currentPage => currentPage + 1)}
+                  disabled={
+                    !!searchText || (currentPage + 1) * pageSize >= games.length
                   }
-                  key={`${projectFileMetadataAndStorageProviderName.fileMetadata
-                    .name || 'project'}-${index}`}
-                  storageProviders={storageProviders}
-                  onOpenProject={() =>
-                    onOpenProject(projectFileMetadataAndStorageProviderName)
-                  }
-                  lastModifiedInfo={
-                    lastModifiedInfoByProjectId[
-                      projectFileMetadataAndStorageProviderName.fileMetadata
-                        .fileIdentifier
-                    ]
-                  }
-                  isCurrentProjectOpened={
-                    !!projectUuid &&
-                    projectFileMetadataAndStorageProviderName.fileMetadata
-                      .gameId === projectUuid
-                  }
-                  currentFileMetadata={currentFileMetadata}
-                  closeProject={closeProject}
-                  askToCloseProject={askToCloseProject}
-                  onRefreshGames={refreshGamesList}
-                />
-              );
-            }
+                  size="small"
+                >
+                  <ChevronArrowRight />
+                </IconButton>
+              </Line>
+            </ResponsiveLineStackLayout>
+          )}
+          {displayedDashboardItems.length > 0 ? (
+            displayedDashboardItems
+              .map((dashboardItem, index) => {
+                const game = dashboardItem.game;
+                if (game) {
+                  return (
+                    <GameCard
+                      storageProviders={storageProviders}
+                      key={game.id}
+                      isCurrentProjectOpened={
+                        !!projectUuid && game.id === projectUuid
+                      }
+                      game={game}
+                      onOpenGameManager={() => {
+                        onOpenGameId(game.id);
+                      }}
+                      onOpenProject={onOpenProject}
+                      onUnregisterGame={() => onUnregisterGame(game, i18n)}
+                      disabled={isUpdatingGame}
+                      canSaveProject={canSaveProject}
+                      askToCloseProject={askToCloseProject}
+                      onSaveProject={onSaveProject}
+                    />
+                  );
+                }
+                const projectFiles = dashboardItem.projectFiles;
+                if (projectFiles) {
+                  const projectFileMetadataAndStorageProviderName =
+                    projectFiles[0];
+                  return (
+                    <ProjectCard
+                      projectFileMetadataAndStorageProviderName={
+                        projectFileMetadataAndStorageProviderName
+                      }
+                      key={`${projectFileMetadataAndStorageProviderName
+                        .fileMetadata.name || 'project'}-${index}`}
+                      storageProviders={storageProviders}
+                      onOpenProject={() =>
+                        onOpenProject(projectFileMetadataAndStorageProviderName)
+                      }
+                      lastModifiedInfo={
+                        lastModifiedInfoByProjectId[
+                          projectFileMetadataAndStorageProviderName.fileMetadata
+                            .fileIdentifier
+                        ]
+                      }
+                      isCurrentProjectOpened={
+                        !!projectUuid &&
+                        projectFileMetadataAndStorageProviderName.fileMetadata
+                          .gameId === projectUuid
+                      }
+                      currentFileMetadata={currentFileMetadata}
+                      disabled={isUpdatingGame}
+                      closeProject={closeProject}
+                      askToCloseProject={askToCloseProject}
+                      onRefreshGames={refreshGamesList}
+                    />
+                  );
+                }
 
-            return null;
-          })
-          .filter(Boolean)
-      ) : !!searchText ? (
-        <Column expand noMargin>
-          <Paper
-            variant="outlined"
-            background="dark"
-            style={styles.noGameMessageContainer}
-          >
-            <BackgroundText>
-              <Trans>No game matching your search.</Trans>
-            </BackgroundText>
-          </Paper>
-        </Column>
-      ) : null}
-    </ColumnStackLayout>
+                return null;
+              })
+              .filter(Boolean)
+          ) : !!searchText ? (
+            <Column expand noMargin>
+              <Paper
+                variant="outlined"
+                background="dark"
+                style={styles.noGameMessageContainer}
+              >
+                <BackgroundText>
+                  <Trans>No game matching your search.</Trans>
+                </BackgroundText>
+              </Paper>
+            </Column>
+          ) : null}
+        </ColumnStackLayout>
+      )}
+    </I18n>
   );
 };
 

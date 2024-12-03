@@ -51,6 +51,7 @@ type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
+  getStorageProvider: () => StorageProvider,
   loadFromProject: (
     project: gdProject,
     fileMetadata: ?FileMetadata
@@ -72,6 +73,7 @@ const useCreateProject = ({
   onSuccessOrError,
   onError,
   getStorageProviderOperations,
+  getStorageProvider,
   loadFromProject,
   openFromFileMetadata,
   onProjectSaved,
@@ -168,6 +170,8 @@ const useCreateProject = ({
                 projectId: currentProject.getProjectUuid(),
                 projectName: currentProject.getName(),
                 projectAuthor: currentProject.getAuthor(),
+                // Project is not saved yet here.
+                isProjectSaved: false,
               })
             );
             await onGameRegistered();
@@ -183,6 +187,8 @@ const useCreateProject = ({
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
         );
+        const newStorageProvider = getStorageProvider();
+        const storageProviderInternalName = newStorageProvider.internalName;
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
@@ -221,13 +227,29 @@ const useCreateProject = ({
             }
           );
 
-          if (wasSaved) {
-            onProjectSaved(fileMetadata);
-            unsavedChanges.sealUnsavedChanges({ setCheckpointTime: true });
-            if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
-              preferences.setHasProjectOpened(true);
-            }
+          if (!wasSaved) {
+            return; // Saving was cancelled.
           }
+
+          if (!fileMetadata) {
+            return;
+          }
+
+          onProjectSaved(fileMetadata);
+          unsavedChanges.sealUnsavedChanges({ setCheckpointTime: true });
+          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+            preferences.setHasProjectOpened(true);
+          }
+
+          // Save was done on a new file/location, so save it in the
+          // recent projects and in the state.
+          const fileMetadataAndStorageProviderName = {
+            fileMetadata,
+            storageProviderName: storageProviderInternalName,
+          };
+          preferences.insertRecentProjectFile(
+            fileMetadataAndStorageProviderName
+          );
         }
 
         // We were able to load and then save the project. We can now close the dialog,
@@ -258,6 +280,7 @@ const useCreateProject = ({
     },
     [
       authenticatedUser,
+      getStorageProvider,
       getStorageProviderOperations,
       loadFromProject,
       onError,

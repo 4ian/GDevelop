@@ -706,7 +706,7 @@ namespace gdjs {
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(
-          capsuleDepth / 2 - radius,
+          Math.max(0, capsuleDepth / 2 - radius),
           radius
         );
         quat = this._getShapeOrientationQuat();
@@ -912,9 +912,10 @@ namespace gdjs {
       // it isn't a box with custom height or a circle with custom radius
       if (
         this.needToRecreateShape ||
-        this._objectOldWidth !== this.owner3D.getWidth() ||
-        this._objectOldHeight !== this.owner3D.getHeight() ||
-        this._objectOldDepth !== this.owner3D.getDepth()
+        (!this.hasCustomShapeDimension() &&
+          (this._objectOldWidth !== this.owner3D.getWidth() ||
+            this._objectOldHeight !== this.owner3D.getHeight() ||
+            this._objectOldDepth !== this.owner3D.getDepth()))
       ) {
         this.needToRecreateShape = false;
         this.recreateShape();
@@ -923,14 +924,19 @@ namespace gdjs {
       this.bodyUpdater.updateBodyFromObject();
     }
 
+    hasCustomShapeDimension() {
+      return (
+        this.shapeDimensionA > 0 ||
+        this.shapeDimensionB > 0 ||
+        this.shapeDimensionC > 0
+      );
+    }
+
     getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       result.Set(
-        (this.owner3D.getDrawableX() + this.owner3D.getWidth() / 2) *
-          this._sharedData.worldInvScale,
-        (this.owner3D.getDrawableY() + this.owner3D.getHeight() / 2) *
-          this._sharedData.worldInvScale,
-        (this.owner3D.getDrawableZ() + this.owner3D.getDepth() / 2) *
-          this._sharedData.worldInvScale
+        this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
+        this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
+        this.owner3D.getCenterZInScene() * this._sharedData.worldInvScale
       );
       return result;
     }
@@ -947,23 +953,14 @@ namespace gdjs {
     }
 
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
-      this.owner3D.setX(
-        physicsPosition.GetX() * this._sharedData.worldScale -
-          this.owner3D.getWidth() / 2 +
-          this.owner3D.getX() -
-          this.owner3D.getDrawableX()
+      this.owner3D.setCenterXInScene(
+        physicsPosition.GetX() * this._sharedData.worldScale
       );
-      this.owner3D.setY(
-        physicsPosition.GetY() * this._sharedData.worldScale -
-          this.owner3D.getHeight() / 2 +
-          this.owner3D.getY() -
-          this.owner3D.getDrawableY()
+      this.owner3D.setCenterYInScene(
+        physicsPosition.GetY() * this._sharedData.worldScale
       );
-      this.owner3D.setZ(
-        physicsPosition.GetZ() * this._sharedData.worldScale -
-          this.owner3D.getDepth() / 2 +
-          this.owner3D.getZ() -
-          this.owner3D.getDrawableZ()
+      this.owner3D.setCenterZInScene(
+        physicsPosition.GetZ() * this._sharedData.worldScale
       );
     }
 

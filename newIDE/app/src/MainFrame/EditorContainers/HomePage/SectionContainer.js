@@ -68,111 +68,118 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer = ({
-  children,
-  title,
-  titleAdornment,
-  titleAction,
-  subtitleText,
-  renderSubtitle,
-  backAction,
-  flexBody,
-  renderFooter,
-  noScroll,
-  applyTopSpacingAsMarginOnChildrenContainer,
-  showUrgentAnnouncements,
-}: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
-  const { announcements } = React.useContext(AnnouncementsFeedContext);
-  const containerStyle: {|
-    paddingTop: number,
-    paddingLeft: number,
-    paddingRight: number,
-  |} = {
-    ...(isMobile ? styles.mobileContainer : styles.desktopContainer),
-    paddingTop: applyTopSpacingAsMarginOnChildrenContainer
-      ? 0
-      : isMobile
-      ? SECTION_MOBILE_SPACING_TOP
-      : SECTION_DESKTOP_SPACING,
-  };
-  const scrollStyle: {| overflowY: string |} = noScroll
-    ? styles.noScrollContainer
-    : styles.scrollContainer;
-  const paperStyle = {
-    ...styles.container,
-    display: flexBody ? 'flex' : 'block',
-    ...containerStyle,
-    ...scrollStyle,
-  };
-  const childrenContainerStyle = {
-    ...styles.childrenContainer,
-    marginTop: applyTopSpacingAsMarginOnChildrenContainer
-      ? isMobile
+const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
+  (
+    {
+      children,
+      title,
+      titleAdornment,
+      titleAction,
+      subtitleText,
+      renderSubtitle,
+      backAction,
+      flexBody,
+      renderFooter,
+      noScroll,
+      applyTopSpacingAsMarginOnChildrenContainer,
+      showUrgentAnnouncements,
+    },
+    ref
+  ) => {
+    const { isMobile } = useResponsiveWindowSize();
+    const { announcements } = React.useContext(AnnouncementsFeedContext);
+    const containerStyle: {|
+      paddingTop: number,
+      paddingLeft: number,
+      paddingRight: number,
+    |} = {
+      ...(isMobile ? styles.mobileContainer : styles.desktopContainer),
+      paddingTop: applyTopSpacingAsMarginOnChildrenContainer
+        ? 0
+        : isMobile
         ? SECTION_MOBILE_SPACING_TOP
-        : SECTION_DESKTOP_SPACING
-      : 0,
-  };
+        : SECTION_DESKTOP_SPACING,
+    };
+    const scrollStyle: {| overflowY: string |} = noScroll
+      ? styles.noScrollContainer
+      : styles.scrollContainer;
+    const paperStyle = {
+      ...styles.container,
+      display: flexBody ? 'flex' : 'block',
+      ...containerStyle,
+      ...scrollStyle,
+    };
+    const childrenContainerStyle = {
+      ...styles.childrenContainer,
+      marginTop: applyTopSpacingAsMarginOnChildrenContainer
+        ? isMobile
+          ? SECTION_MOBILE_SPACING_TOP
+          : SECTION_DESKTOP_SPACING
+        : 0,
+    };
 
-  return (
-    <Column useFullHeight noMargin expand>
-      <Paper style={paperStyle} square background="dark">
-        <div style={childrenContainerStyle}>
-          {showUrgentAnnouncements && (
-            <>
-              <AnnouncementsFeed canClose level="urgent" hideLoader />
-              {announcements && announcements.length > 0 && <Spacer />}
-            </>
-          )}
-          {backAction && (
-            <Line>
-              <TextButton
-                onClick={backAction}
-                icon={<ArrowLeft fontSize="small" />}
-                label={<Trans>Back</Trans>}
-              />
-            </Line>
-          )}
-          {(title || subtitleText || renderSubtitle) && (
-            <SectionRow>
-              {title && (
-                <LineStackLayout
-                  noMargin
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <LineStackLayout noMargin alignItems="center">
-                    <Text size="bold-title" noMargin style={styles.title}>
-                      {title}
-                    </Text>
-                    {titleAction}
+    return (
+      <Column expand useFullHeight noMargin>
+        <Paper style={paperStyle} square background="dark" ref={ref}>
+          <div style={childrenContainerStyle}>
+            {showUrgentAnnouncements && (
+              <>
+                <AnnouncementsFeed canClose level="urgent" hideLoader />
+                {announcements && announcements.length > 0 && <Spacer />}
+              </>
+            )}
+            {backAction && (
+              <Line>
+                <TextButton
+                  onClick={backAction}
+                  icon={<ArrowLeft fontSize="small" />}
+                  label={<Trans>Back</Trans>}
+                />
+              </Line>
+            )}
+            {(title || subtitleText || renderSubtitle) && (
+              <SectionRow>
+                {title && (
+                  <LineStackLayout
+                    noMargin
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <LineStackLayout noMargin alignItems="center">
+                      <Text size="bold-title" noMargin style={styles.title}>
+                        {title}
+                      </Text>
+                      {titleAction}
+                    </LineStackLayout>
+                    {titleAdornment && (
+                      <Column noMargin>{titleAdornment}</Column>
+                    )}
                   </LineStackLayout>
-                  {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
-                </LineStackLayout>
-              )}
-              {subtitleText && (
-                <Line noMargin>
-                  <Text noMargin>{subtitleText}</Text>
-                </Line>
-              )}
-              {renderSubtitle && renderSubtitle()}
-            </SectionRow>
-          )}
-          {children}
-        </div>
-      </Paper>
-      {renderFooter && (
-        <Paper
-          style={isMobile ? styles.mobileFooter : styles.desktopFooter}
-          square
-          background="dark"
-        >
-          {renderFooter()}
+                )}
+                {subtitleText && (
+                  <Line noMargin>
+                    <Text noMargin>{subtitleText}</Text>
+                  </Line>
+                )}
+                {renderSubtitle && renderSubtitle()}
+              </SectionRow>
+            )}
+            {children}
+          </div>
         </Paper>
-      )}
-    </Column>
-  );
-};
+        {renderFooter && (
+          <Paper
+            style={isMobile ? styles.mobileFooter : styles.desktopFooter}
+            square
+            background="dark"
+          >
+            {renderFooter()}
+          </Paper>
+        )}
+      </Column>
+    );
+  }
+);
 
 export const SectionRow = ({
   children,

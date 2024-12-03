@@ -22,12 +22,12 @@ cache:
   - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
   - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
 install:
-  # Download and install SSL.com eSigner CKA. 
+  # Download and install SSL.com eSigner CKA.
   # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
   #
-  # This is necessary because of "signing to be FIPS-140 compliant". See 
+  # This is necessary because of "signing to be FIPS-140 compliant". See
   # https://github.com/electron-userland/electron-builder/issues/6158
-  # 
+  #
   # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
   # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
   - ps: >-
@@ -42,13 +42,13 @@ install:
       Remove-Item eSigner_CKA_Setup.zip
 
       Move-Item -Destination "eSigner_CKA_Installer.exe" -Path "eSigner_CKA_*\*.exe"
-      
+
       # Install it. See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
 
       New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
 
       ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
-      
+
       # Disable logger.
 
       # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
@@ -68,9 +68,9 @@ install:
 
       cd emsdk
 
-      emsdk install 3.1.21
+      emsdk install 3.1.66
 
-      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
+      CMD /C "emsdk activate 3.1.66 && cd .. && npm run build"
 
       cd ..\..
 

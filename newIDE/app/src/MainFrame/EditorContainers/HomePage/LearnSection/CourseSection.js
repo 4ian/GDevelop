@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { type GuidedCourseChapter } from '../../../../Utils/GDevelopServices/Asset';
+import { type CourseChapter } from '../../../../Utils/GDevelopServices/Asset';
 import SectionContainer from '../SectionContainer';
-import GuidedCourseChapterView from '../../../../GuidedCourse/GuidedCourseChapterView';
+import CourseChapterView from '../../../../Course/CourseChapterView';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
@@ -34,7 +34,7 @@ const styles = {
 };
 
 type Props = {|
-  courseChapters: GuidedCourseChapter[],
+  courseChapters: CourseChapter[],
   onBack: () => void,
 |};
 
@@ -56,8 +56,8 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
       <div style={styles.container}>
         <Column noOverflowParent>
           {courseChapters.map(chapter => (
-            <GuidedCourseChapterView
-              guidedCourseChapter={chapter}
+            <CourseChapterView
+              courseChapter={chapter}
               onOpenTemplate={() => {}}
               key={chapter.title}
             />

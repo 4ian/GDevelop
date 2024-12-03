@@ -1,18 +1,19 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import type { GuidedCourseChapter } from '../../../Utils/GDevelopServices/Asset';
-import GuidedCourseChapterView from '../../../GuidedCourse/GuidedCourseChapterView';
+import type { CourseChapter } from '../../../Utils/GDevelopServices/Asset';
+import CourseChapterView from '../../../Course/CourseChapterView';
 
 import paperDecorator from '../../PaperDecorator';
 
 export default {
-  title: 'GuidedCourse/GuidedCourseChapterView',
-  component: GuidedCourseChapterView,
+  title: 'Course/CourseChapterView',
+  component: CourseChapterView,
   decorators: [paperDecorator],
 };
 
-const guidedCourseChapter: GuidedCourseChapter = {
+const courseChapter: CourseChapter = {
+  id: 'objects',
   title: 'Chapter 2 - Build A Scene With Objects',
   tasks: [
     {
@@ -149,8 +150,8 @@ const guidedCourseChapter: GuidedCourseChapter = {
 
 export const Default = () => {
   return (
-    <GuidedCourseChapterView
-      guidedCourseChapter={guidedCourseChapter}
+    <CourseChapterView
+      courseChapter={courseChapter}
       onOpenTemplate={action('open template')}
     />
   );
@@ -158,8 +159,9 @@ export const Default = () => {
 
 export const Locked = () => {
   return (
-    <GuidedCourseChapterView
-      guidedCourseChapter={{
+    <CourseChapterView
+      courseChapter={{
+        id: 'objects',
         title: 'Chapter 2 - Build A Scene With Objects',
         isLocked: true,
         videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',

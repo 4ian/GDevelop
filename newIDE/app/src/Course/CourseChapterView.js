@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import type { GuidedCourseChapter } from '../Utils/GDevelopServices/Asset';
+import type { CourseChapter } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import {
   ColumnStackLayout,
@@ -19,7 +19,7 @@ import { Divider } from '@material-ui/core';
 import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
-import GuidedCourseChapterTaskItem from './GuidedCourseChapterTaskItem';
+import CourseChapterTaskItem from './CourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -94,12 +94,12 @@ const LockedOverlay = () => (
 );
 
 type Props = {|
-  guidedCourseChapter: GuidedCourseChapter,
+  courseChapter: CourseChapter,
   onOpenTemplate: (url: string) => void,
 |};
 
-const GuidedCourseChapterView = ({
-  guidedCourseChapter,
+const CourseChapterView = ({
+  courseChapter,
   onOpenTemplate,
 }: Props) => {
   const { openSubscriptionDialog } = React.useContext(
@@ -113,11 +113,11 @@ const GuidedCourseChapterView = ({
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const isMobilePortrait = isMobile && !isLandscape;
   const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-  const completion = guidedCourseChapter.tasks
-    ? { done: 10, total: guidedCourseChapter.tasks.length }
+  const completion = courseChapter.tasks
+    ? { done: 10, total: courseChapter.tasks.length }
     : null;
   const isFinished = completion ? completion.done === completion.total : false;
-  const youtubeVideoId = getYoutubeVideoIdFromUrl(guidedCourseChapter.videoUrl);
+  const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
 
   return (
     <ColumnStackLayout expand noMargin>
@@ -130,7 +130,7 @@ const GuidedCourseChapterView = ({
         }}
       >
         <LineStackLayout noMargin alignItems="center" expand>
-          <Text size="title">{guidedCourseChapter.title}</Text>
+          <Text size="title">{courseChapter.title}</Text>
           {isFinished && !isMobilePortrait && (
             <div
               style={{
@@ -161,7 +161,7 @@ const GuidedCourseChapterView = ({
           </Text>
         ) : null}
       </div>
-      {guidedCourseChapter.isLocked ? (
+      {courseChapter.isLocked ? (
         <ResponsiveLineStackLayout
           expand
           noResponsiveLandscape
@@ -170,7 +170,7 @@ const GuidedCourseChapterView = ({
           {youtubeVideoId && (
             <div style={styles.videoContainer}>
               <CorsAwareImage
-                alt={`Video for lesson ${guidedCourseChapter.title}`}
+                alt={`Video for lesson ${courseChapter.title}`}
                 style={styles.videoThumbnail}
                 src={`https://i.ytimg.com/vi/${youtubeVideoId}/sddefault.jpg`}
               />
@@ -212,7 +212,7 @@ const GuidedCourseChapterView = ({
                     leftIcon={<Coin fontSize="small" />}
                     label={
                       <Trans>
-                        Pay {guidedCourseChapter.priceInCredits} credits
+                        Pay {courseChapter.priceInCredits} credits
                       </Trans>
                     }
                     onClick={() => {}}
@@ -227,7 +227,7 @@ const GuidedCourseChapterView = ({
           {youtubeVideoId && (
             <div style={styles.videoContainer}>
               <iframe
-                title={`Video for lesson ${guidedCourseChapter.title}`}
+                title={`Video for lesson ${courseChapter.title}`}
                 type="text/html"
                 style={styles.videoIFrame}
                 src={`http://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
@@ -250,7 +250,7 @@ const GuidedCourseChapterView = ({
                     primary
                     label={<Trans>Open template</Trans>}
                     onClick={() =>
-                      onOpenTemplate(guidedCourseChapter.templateUrl)
+                      onOpenTemplate(courseChapter.templateUrl)
                     }
                   />
                 </Line>
@@ -259,7 +259,7 @@ const GuidedCourseChapterView = ({
           </ColumnStackLayout>
         </ResponsiveLineStackLayout>
       )}
-      {!guidedCourseChapter.isLocked && (
+      {!courseChapter.isLocked && (
         <div
           style={{
             ...styles.stickyTitle,
@@ -295,10 +295,10 @@ const GuidedCourseChapterView = ({
           <Divider />
         </div>
       )}
-      {!guidedCourseChapter.isLocked &&
-        guidedCourseChapter.tasks.map((item, index) => (
-          <GuidedCourseChapterTaskItem
-            guidedCourseChapterTask={item}
+      {!courseChapter.isLocked &&
+        courseChapter.tasks.map((item, index) => (
+          <CourseChapterTaskItem
+            courseChapterTask={item}
             key={index.toString()}
             isOpen={openTasks}
             onCheck={() => {}}
@@ -310,4 +310,4 @@ const GuidedCourseChapterView = ({
   );
 };
 
-export default GuidedCourseChapterView;
+export default CourseChapterView;

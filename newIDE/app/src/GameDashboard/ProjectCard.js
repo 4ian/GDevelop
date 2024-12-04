@@ -301,10 +301,14 @@ const ProjectCard = ({
     return actions;
   };
 
+  // Empty full width button on mobile to make sure the buttons are aligned
+  const ManageButtonPlacerHolder = () => <div style={{ width: '100%' }} />;
+
   const renderButtons = ({ fullWidth }: { fullWidth: boolean }) => {
     return (
-      <div styles={styles.buttonsContainer}>
-        <LineStackLayout noMargin>
+      <div style={styles.buttonsContainer}>
+        <LineStackLayout noMargin expand>
+          {fullWidth ? <ManageButtonPlacerHolder /> : null}
           <FlatButtonWithSplitMenu
             primary
             fullWidth={fullWidth}

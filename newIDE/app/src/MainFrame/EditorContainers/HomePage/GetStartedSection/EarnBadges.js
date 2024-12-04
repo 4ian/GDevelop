@@ -161,6 +161,7 @@ type Props = {|
   onOpenProfile: () => void,
   hideStatusBanner?: boolean,
   showRandomBadge?: boolean,
+  showAllBadges?: boolean,
 |};
 
 export const EarnBadges = ({
@@ -169,6 +170,7 @@ export const EarnBadges = ({
   onOpenProfile,
   hideStatusBanner,
   showRandomBadge,
+  showAllBadges,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const badgesToShow = React.useMemo(
@@ -181,8 +183,8 @@ export const EarnBadges = ({
         badge => !badge.hasThisBadge
       );
 
-      // Only show 1 badge on mobile to avoid taking too much space.
-      if (showRandomBadge || isMobile) {
+      // If on mobile, and not forcing all badges, show only 1 badge to avoid taking too much space.
+      if (showRandomBadge || (isMobile && !showAllBadges)) {
         if (notOwnedBadges.length === 0) {
           const randomIndex = Math.floor(
             Math.random() * allBadgesWithOwnedStatus.length
@@ -196,7 +198,7 @@ export const EarnBadges = ({
 
       return allBadgesWithOwnedStatus;
     },
-    [badges, showRandomBadge, isMobile]
+    [badges, showRandomBadge, isMobile, showAllBadges]
   );
 
   // Slice badges in arrays of two to display them in a responsive way.

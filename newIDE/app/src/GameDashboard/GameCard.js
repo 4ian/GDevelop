@@ -220,10 +220,13 @@ const GameCard = ({
     return actions;
   };
 
+  // Empty full width button on mobile to make sure the buttons are aligned
+  const OpenButtonPlacerHolder = () => <div style={{ width: '100%' }} />;
+
   const renderButtons = ({ fullWidth }: { fullWidth: boolean }) => {
     return (
-      <div styles={styles.buttonsContainer}>
-        <LineStackLayout noMargin>
+      <div style={styles.buttonsContainer}>
+        <LineStackLayout noMargin expand>
           <FlatButton
             primary
             fullWidth={fullWidth}
@@ -253,6 +256,8 @@ const GameCard = ({
                 buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
                 disabled={disabled || !canSaveProject}
               />
+            ) : fullWidth ? (
+              <OpenButtonPlacerHolder />
             ) : null
           ) : (
             <FlatButtonWithSplitMenu

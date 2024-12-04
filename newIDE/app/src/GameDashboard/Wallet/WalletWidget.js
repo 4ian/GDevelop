@@ -12,14 +12,21 @@ import {
   hasMissingBadges,
 } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
 import FlatButton from '../../UI/FlatButton';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   onOpenProfile: () => void,
   fullWidth?: boolean,
   showRandomBadge?: boolean,
+  showAllBadges?: boolean,
 |};
 
-const WalletWidget = ({ onOpenProfile, fullWidth, showRandomBadge }: Props) => {
+const WalletWidget = ({
+  onOpenProfile,
+  fullWidth,
+  showRandomBadge,
+  showAllBadges,
+}: Props) => {
   const {
     profile,
     limits,
@@ -28,6 +35,7 @@ const WalletWidget = ({ onOpenProfile, fullWidth, showRandomBadge }: Props) => {
     onOpenCreateAccountDialog,
   } = React.useContext(AuthenticatedUserContext);
   const creditsAvailable = limits ? limits.credits.userBalance.amount : 0;
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   return (
     <DashboardWidget
       gridSize={fullWidth ? 3 : 1.5}
@@ -36,7 +44,13 @@ const WalletWidget = ({ onOpenProfile, fullWidth, showRandomBadge }: Props) => {
         <LineStackLayout alignItems="center" noMargin>
           {hasMissingBadges(badges, achievements) && (
             <FlatButton
-              label={<Trans>Claim in profile</Trans>}
+              label={
+                isMobile || isMediumScreen ? (
+                  <Trans>Claim</Trans>
+                ) : (
+                  <Trans>Claim in profile</Trans>
+                )
+              }
               onClick={profile ? onOpenProfile : onOpenCreateAccountDialog}
             />
           )}
@@ -54,6 +68,7 @@ const WalletWidget = ({ onOpenProfile, fullWidth, showRandomBadge }: Props) => {
           badges={badges}
           onOpenProfile={onOpenProfile}
           showRandomBadge={showRandomBadge}
+          showAllBadges={showAllBadges}
           hideStatusBanner
         />
       </ColumnStackLayout>

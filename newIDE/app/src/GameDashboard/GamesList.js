@@ -393,16 +393,18 @@ const GamesList = ({
               <Text size="section-title" noMargin>
                 <Trans>Games</Trans>
               </Text>
-              <IconButton
-                size="small"
-                onClick={refreshGamesList}
-                disabled={isRefreshing}
-                tooltip={t`Refresh games`}
-              >
-                <div style={styles.refreshIconContainer}>
-                  <Refresh fontSize="inherit" />
-                </div>
-              </IconButton>
+              {allDashboardItems.length > 0 && (
+                <IconButton
+                  size="small"
+                  onClick={refreshGamesList}
+                  disabled={isRefreshing}
+                  tooltip={t`Refresh games`}
+                >
+                  <div style={styles.refreshIconContainer}>
+                    <Refresh fontSize="inherit" />
+                  </div>
+                </IconButton>
+              )}
             </LineStackLayout>
             <LineStackLayout noMargin alignItems="center">
               <RaisedButton

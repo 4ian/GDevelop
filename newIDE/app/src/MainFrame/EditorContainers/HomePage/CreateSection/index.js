@@ -139,6 +139,10 @@ const CreateSection = ({
   ] = React.useState<?React.Node>(null);
   const [isUpdatingGame, setIsUpdatingGame] = React.useState(false);
   const [showAllGameTemplates, setShowAllGameTemplates] = React.useState(false);
+  const [
+    showPerformanceDashboard,
+    setShowPerformanceDashboard,
+  ] = React.useState(false);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
@@ -160,6 +164,10 @@ const CreateSection = ({
   const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
     authenticatedUser
   );
+  const hidePerformanceDashboard =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideSocials;
 
   React.useEffect(
     () => {
@@ -320,6 +328,32 @@ const CreateSection = ({
     );
   }
 
+  if (showPerformanceDashboard) {
+    return (
+      <SectionContainer
+        backAction={() => setShowPerformanceDashboard(false)}
+        flexBody
+      >
+        <SectionRow expand>
+          <Line>
+            <Text size="section-title" noMargin>
+              <Trans>Performance Dashboard</Trans>
+            </Text>
+          </Line>
+          <Grid container spacing={2}>
+            <UserEarningsWidget />
+            <TotalPlaysWidget fullWidth games={games || []} />
+            <WalletWidget
+              fullWidth
+              showAllBadges
+              onOpenProfile={onOpenProfile}
+            />
+          </Grid>
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -349,26 +383,33 @@ const CreateSection = ({
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (
               <ColumnStackLayout noMargin>
-                {games && games.length !== 0 ? (
+                {hidePerformanceDashboard ? null : (
                   <ColumnStackLayout noMargin>
-                    <Line noMargin>
+                    <Line noMargin justifyContent="space-between">
                       <Text size="section-title" noMargin>
                         <Trans>Performance Dashboard</Trans>
                       </Text>
-                    </Line>
-                    <Grid container spacing={2}>
-                      <UserEarningsWidget />
-                      <TotalPlaysWidget games={games} />
-                      <WalletWidget
-                        onOpenProfile={onOpenProfile}
-                        showRandomBadge
+                      <FlatButton
+                        onClick={() => setShowPerformanceDashboard(true)}
+                        label={<Trans>See more</Trans>}
+                        leftIcon={<ChevronArrowRight fontSize="small" />}
                       />
-                    </Grid>
+                    </Line>
+                    {games && games.length !== 0 ? (
+                      <Grid container spacing={2}>
+                        <UserEarningsWidget />
+                        <TotalPlaysWidget games={games} />
+                        <WalletWidget
+                          onOpenProfile={onOpenProfile}
+                          showRandomBadge
+                        />
+                      </Grid>
+                    ) : (
+                      <Grid container spacing={2}>
+                        <WalletWidget onOpenProfile={onOpenProfile} fullWidth />
+                      </Grid>
+                    )}
                   </ColumnStackLayout>
-                ) : (
-                  <Grid container spacing={2}>
-                    <WalletWidget onOpenProfile={onOpenProfile} fullWidth />
-                  </Grid>
                 )}
                 <GamesList
                   storageProviders={storageProviders}

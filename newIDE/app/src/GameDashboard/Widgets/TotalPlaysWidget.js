@@ -25,9 +25,10 @@ export const formatPlays = (plays: number) => {
 
 type Props = {|
   games: Array<Game>,
+  fullWidth?: boolean,
 |};
 
-const TotalPlaysWidget = ({ games }: Props) => {
+const TotalPlaysWidget = ({ games, fullWidth }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
 
   const {
@@ -60,7 +61,7 @@ const TotalPlaysWidget = ({ games }: Props) => {
 
   return (
     <DashboardWidget
-      gridSize={1.5}
+      gridSize={fullWidth ? 3 : 1.5}
       title={<Trans>Total plays</Trans>}
       minHeight="small"
     >

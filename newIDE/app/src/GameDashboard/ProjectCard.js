@@ -80,7 +80,7 @@ const ProjectCard = ({
     showAlert,
   } = useAlertDialog();
   const fileMetadata = projectFileMetadataAndStorageProviderName.fileMetadata;
-  const projectName = fileMetadata.name || 'Unknown project';
+  const projectName = fileMetadata.name;
   const storageProvider = getStorageProviderByInternalName(
     storageProviders,
     projectFileMetadataAndStorageProviderName.storageProviderName
@@ -250,12 +250,14 @@ const ProjectCard = ({
   ): Array<MenuItemTemplate> => {
     if (!file) return [];
 
-    const actions = [
-      {
+    const actions = [];
+
+    if (authenticatedUser.profile) {
+      actions.push({
         label: i18n._(t`Register the game online`),
         click: () => onRegisterProject(),
-      },
-    ];
+      });
+    }
 
     if (file.storageProviderName === 'Cloud') {
       actions.push({
@@ -272,30 +274,30 @@ const ProjectCard = ({
 
       // Don't allow removing project if opened, as it would not result in any change in the list.
       if (!isCurrentProjectOpened) {
-        actions.push(
-          {
+        if (actions.length > 0) {
+          actions.push({
             type: 'separator',
-          },
-          {
-            label: i18n._(t`Remove from list`),
-            click: () => onRemoveRecentProjectFile(file),
-          }
-        );
+          });
+        }
+        actions.push({
+          label: i18n._(t`Remove from list`),
+          click: () => onRemoveRecentProjectFile(file),
+        });
       }
     }
 
     if (isCurrentProjectOpened) {
-      actions.push(
-        {
+      if (actions.length > 0) {
+        actions.push({
           type: 'separator',
+        });
+      }
+      actions.push({
+        label: i18n._(t`Close project`),
+        click: async () => {
+          await askToCloseProject();
         },
-        {
-          label: i18n._(t`Close project`),
-          click: async () => {
-            await askToCloseProject();
-          },
-        }
-      );
+      });
     }
 
     return actions;

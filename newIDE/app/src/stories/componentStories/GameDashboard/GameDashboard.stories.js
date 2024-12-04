@@ -341,6 +341,7 @@ export const Default = ({
           }
           gameUnregisterErrorText={gameUnregisterErrorText}
           closeProject={action('closeProject')}
+          disabled={false}
         />
       </MarketingPlansStoreStateProvider>
     </AuthenticatedUserContext.Provider>

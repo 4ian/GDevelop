@@ -72,8 +72,6 @@ const useGamesList = (): GamesList => {
       if (!games || !firebaseUser) return;
       const currentOpenedGame = games && games.find(game => game.id === gameId);
 
-      console.log('currentOpenedGame', currentOpenedGame);
-
       if (!currentOpenedGame || !currentOpenedGame.unsaved) return;
 
       try {

@@ -56,7 +56,7 @@ type Props = {|
   canSaveProject: boolean,
 |};
 
-export const GameCard = ({
+const GameCard = ({
   game,
   isCurrentProjectOpened,
   onOpenGameManager,
@@ -331,3 +331,5 @@ export const GameCard = ({
     </I18n>
   );
 };
+
+export default GameCard;

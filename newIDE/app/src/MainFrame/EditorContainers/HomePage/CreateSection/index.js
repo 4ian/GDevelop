@@ -402,68 +402,74 @@ const CreateSection = ({
                     }
                   />
                 )}
-                {(!games || games.length === 0) &&
-                  !project &&
-                  quickCustomizationRecommendation && (
-                    <ColumnStackLayout noMargin>
-                      <Line noMargin>
-                        <Text size="block-title" noMargin>
+                {quickCustomizationRecommendation && (
+                  <ColumnStackLayout noMargin>
+                    <Line noMargin>
+                      <Text size="block-title">
+                        {!games || games.length === 0 ? (
                           <Trans>Publish your first game</Trans>
-                        </Text>
-                      </Line>
-                      <QuickCustomizationGameTiles
-                        onSelectExampleShortHeader={async exampleShortHeader => {
-                          const projectIsClosed = await askToCloseProject();
-                          if (!projectIsClosed) {
-                            return;
-                          }
-
-                          const newProjectSetup: NewProjectSetup = {
-                            storageProvider: UrlStorageProvider,
-                            saveAsLocation: null,
-                            openQuickCustomizationDialog: true,
-                          };
-                          onCreateProjectFromExample(
-                            exampleShortHeader,
-                            newProjectSetup,
-                            i18n
-                          );
-                        }}
-                        quickCustomizationRecommendation={
-                          quickCustomizationRecommendation
-                        }
-                      />
-                      <Line noMargin justifyContent="space-between">
-                        <Text size="block-title" noMargin>
-                          <Trans>Remix an existing game</Trans>
-                        </Text>
-                        <FlatButton
-                          onClick={() => setShowAllGameTemplates(true)}
-                          label={
-                            isMobile ? (
-                              <Trans>Browse</Trans>
-                            ) : (
-                              <Trans>Browse all templates</Trans>
-                            )
-                          }
-                          leftIcon={<ChevronArrowRight fontSize="small" />}
-                        />
-                      </Line>
-                      <ExampleStore
-                        onSelectExampleShortHeader={onSelectExampleShortHeader}
-                        onSelectPrivateGameTemplateListingData={
-                          onSelectPrivateGameTemplateListingData
-                        }
-                        i18n={i18n}
-                        columnsCount={getExampleItemsColumns(
-                          windowSize,
-                          isLandscape
+                        ) : (
+                          <Trans>Publish a game in 1 minute</Trans>
                         )}
-                        hideSearch
-                        onlyShowGames
+                      </Text>
+                    </Line>
+                    <QuickCustomizationGameTiles
+                      onSelectExampleShortHeader={async exampleShortHeader => {
+                        const projectIsClosed = await askToCloseProject();
+                        if (!projectIsClosed) {
+                          return;
+                        }
+
+                        const newProjectSetup: NewProjectSetup = {
+                          storageProvider: UrlStorageProvider,
+                          saveAsLocation: null,
+                          openQuickCustomizationDialog: true,
+                        };
+                        onCreateProjectFromExample(
+                          exampleShortHeader,
+                          newProjectSetup,
+                          i18n
+                        );
+                      }}
+                      quickCustomizationRecommendation={
+                        quickCustomizationRecommendation
+                      }
+                    />
+                  </ColumnStackLayout>
+                )}
+                {(!games || games.length === 0) && !project && (
+                  <ColumnStackLayout noMargin>
+                    <Line noMargin justifyContent="space-between">
+                      <Text size="block-title" noMargin>
+                        <Trans>Remix an existing game</Trans>
+                      </Text>
+                      <FlatButton
+                        onClick={() => setShowAllGameTemplates(true)}
+                        label={
+                          isMobile ? (
+                            <Trans>Browse</Trans>
+                          ) : (
+                            <Trans>Browse all templates</Trans>
+                          )
+                        }
+                        leftIcon={<ChevronArrowRight fontSize="small" />}
                       />
-                    </ColumnStackLayout>
-                  )}
+                    </Line>
+                    <ExampleStore
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
+                      onSelectPrivateGameTemplateListingData={
+                        onSelectPrivateGameTemplateListingData
+                      }
+                      i18n={i18n}
+                      columnsCount={getExampleItemsColumns(
+                        windowSize,
+                        isLandscape
+                      )}
+                      hideSearch
+                      onlyShowGames
+                    />
+                  </ColumnStackLayout>
+                )}
               </ColumnStackLayout>
             ) : gamesFetchingError ? (
               <PlaceholderError onRetry={onRefreshGames}>

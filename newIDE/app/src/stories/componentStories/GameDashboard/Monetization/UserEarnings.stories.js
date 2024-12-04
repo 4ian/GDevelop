@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import paperDecorator from '../../../PaperDecorator';
-import UserEarnings from '../../../../GameDashboard/Monetization/UserEarnings';
+import UserEarningsWidget from '../../../../GameDashboard/Monetization/UserEarningsWidget';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 import { fakeSilverAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
@@ -12,8 +12,8 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 export default {
-  title: 'GameDashboard/Monetization/UserEarnings',
-  component: UserEarnings,
+  title: 'GameDashboard/Monetization/UserEarningsWidget',
+  component: UserEarningsWidget,
   decorators: [paperDecorator],
 };
 
@@ -30,7 +30,7 @@ export const Errored = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarnings />
+      <UserEarningsWidget />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -58,7 +58,7 @@ export const NoEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarnings />
+      <UserEarningsWidget />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -86,7 +86,7 @@ export const LittleEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarnings />
+      <UserEarningsWidget />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -114,7 +114,7 @@ export const SomeEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarnings />
+      <UserEarningsWidget />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -142,7 +142,7 @@ export const ALotOfEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarnings />
+      <UserEarningsWidget />
     </AuthenticatedUserContext.Provider>
   );
 };

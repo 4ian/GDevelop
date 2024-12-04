@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
-import { GameCard } from './GameCard';
+import GameCard from './GameCard';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -464,7 +464,6 @@ const GamesList = ({
                     // Search is triggered on each search text change
                     onRequestSearch={() => {}}
                     placeholder={t`Search by name`}
-                    autoFocus="desktop"
                   />
                 </Column>
                 <IconButton

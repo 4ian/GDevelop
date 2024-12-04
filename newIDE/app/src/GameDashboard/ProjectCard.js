@@ -176,6 +176,21 @@ const ProjectCard = ({
     }
   };
 
+  const onRemoveRecentProjectFile = React.useCallback(
+    async (file: FileMetadataAndStorageProviderName) => {
+      const result = await showConfirmation({
+        title: t`Remove project from list`,
+        message: t`You are about to remove "${
+          file.fileMetadata.name
+        }" from the list of your projects.${'\n\n'}It will not delete it from your disk and you can always re-open it later. Do you want to proceed?`,
+        confirmButtonLabel: t`Remove`,
+      });
+      if (!result) return;
+      removeRecentProjectFile(file);
+    },
+    [removeRecentProjectFile, showConfirmation]
+  );
+
   const onRegisterProject = React.useCallback(
     async () => {
       const projectId = fileMetadata.gameId;
@@ -263,7 +278,7 @@ const ProjectCard = ({
           },
           {
             label: i18n._(t`Remove from list`),
-            click: () => removeRecentProjectFile(file),
+            click: () => onRemoveRecentProjectFile(file),
           }
         );
       }

@@ -512,7 +512,6 @@ const NewProjectSetupDialog = ({
                       }}
                       i18n={i18n}
                       columnsCount={getItemsColumns(windowSize, isLandscape)}
-                      onlyShowGames
                       rowToInsert={{
                         row: 2,
                         element: (
@@ -531,6 +530,7 @@ const NewProjectSetupDialog = ({
                           />
                         ),
                       }}
+                      hideStartingPoints
                     />
                   </>
                 )}

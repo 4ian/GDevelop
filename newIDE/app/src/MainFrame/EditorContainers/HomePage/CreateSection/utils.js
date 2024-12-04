@@ -111,6 +111,9 @@ export const useProjectsListFor = (game: ?Game) => {
     file => !game || (file.fileMetadata && file.fileMetadata.gameId === game.id)
   );
 
+  console.log(projectFiles);
+  console.log(getRecentProjectFiles());
+
   if (cloudProjects) {
     projectFiles = projectFiles.concat(
       transformCloudProjectsIntoFileMetadataWithStorageProviderName(

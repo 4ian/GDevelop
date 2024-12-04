@@ -1715,6 +1715,7 @@ module.exports = {
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
+        // TODO Add a property to make the angle of movement follow the object angle.
       };
 
       const aut = extension
@@ -1951,6 +1952,55 @@ module.exports = {
         .setFunctionName('isFalling');
 
       aut
+        .addScopedCondition(
+          'IsForwardAngleAround',
+          _('Forward angle'),
+          _('Compare the angle used by the character to go forward.'),
+          _('Forward angle of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
+          _('Character state'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .addParameter('expression', _('Angle (in degrees)'))
+        .addParameter('expression', _('Tolerance (in degrees)'))
+        .setFunctionName('isForwardAngleAround');
+
+      aut
+        .addScopedAction(
+          'SetForwardAngle',
+          _('Forward angle'),
+          _('Change the angle used by the character to go forward.'),
+          _('the forward angle'),
+          _('Character state'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
+        .setFunctionName('setForwardAngle')
+        .setGetter('getForwardAngle');
+
+      aut
+        .addExpression(
+          'ForwardAngle',
+          _('Forward angle of the character'),
+          _('Return the angle used by the character to go forward.'),
+          _('Character state'),
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .setFunctionName('getForwardAngle');
+
+      aut
         .addExpressionAndConditionAndAction(
           'number',
           'CurrentForwardSpeed',
@@ -2170,7 +2220,8 @@ module.exports = {
           )
         )
         .markAsAdvanced()
-        .setFunctionName('setCurrentFallSpeed');
+        .setFunctionName('setCurrentFallSpeed')
+        .setGetter('getCurrentFallSpeed');
 
       aut
         .addExpressionAndCondition(

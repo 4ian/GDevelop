@@ -57,6 +57,7 @@ namespace gdjs {
     _slopeMaxAngle: float;
     _slopeClimbingFactor: float = 1;
     _slopeClimbingMinNormalZ: float = Math.cos(Math.PI / 4);
+    private _forwardAngle: float = 0;
     _forwardAcceleration: float;
     _forwardDeceleration: float;
     _forwardSpeedMax: float;
@@ -182,6 +183,9 @@ namespace gdjs {
         this
       );
       behavior.recreateBody();
+
+      // Begin in the direction of the object.
+      this._forwardAngle = this.owner.getAngle();
 
       return this.physics3D;
     }
@@ -408,7 +412,7 @@ namespace gdjs {
       }
       forwardSpeed *= worldInvScale;
       sidewaysSpeed *= worldInvScale;
-      const angle = gdjs.toRad(this.owner.getAngle());
+      const angle = gdjs.toRad(this._forwardAngle);
       const cosA = Math.cos(angle);
       const sinA = Math.sin(angle);
       const speedX = forwardSpeed * cosA - sidewaysSpeed * sinA;
@@ -943,6 +947,22 @@ namespace gdjs {
       this._jumpSustainTime = jumpSustainTime;
     }
 
+    getForwardAngle(): float {
+      return this._forwardAngle;
+    }
+
+    setForwardAngle(angle: float): void {
+      this._forwardAngle = angle;
+    }
+
+    isForwardAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._forwardAngle, degreeAngle)
+        ) <= tolerance
+      );
+    }
+
     /**
      * Get the current speed of the Character.
      * @returns The current speed.
@@ -955,7 +975,7 @@ namespace gdjs {
      * Set the current speed of the Character.
      * @param currentForwardSpeed The current speed.
      */
-    setForwardCurrentSpeed(currentForwardSpeed: float): void {
+    setCurrentForwardSpeed(currentForwardSpeed: float): void {
       this._currentForwardSpeed = gdjs.evtTools.common.clamp(
         currentForwardSpeed,
         -this._currentForwardSpeed,
@@ -975,7 +995,7 @@ namespace gdjs {
      * Set the current speed of the Character.
      * @param currentSidewaysSpeed The current speed.
      */
-    setForwardSidewaysSpeed(currentSidewaysSpeed: float): void {
+    setCurrentSidewaysSpeed(currentSidewaysSpeed: float): void {
       this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
         currentSidewaysSpeed,
         -this._currentSidewaysSpeed,
@@ -1312,7 +1332,6 @@ namespace gdjs {
       }
 
       updateObjectFromBody() {
-        const { behavior } = this.characterBehavior.getPhysics3D();
         const { character } = this.characterBehavior;
         if (!character) {
           return;

@@ -258,6 +258,7 @@ export const PublicGamePropertiesDialog = ({
           onClick={onUnregisterGame}
           label={<Trans>Unregister game</Trans>}
           leftIcon={<CircledClose fontSize="small" />}
+          disabled={isLoading}
         />
       </Line>
     </Dialog>

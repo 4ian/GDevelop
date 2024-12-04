@@ -292,7 +292,7 @@ const CreateSection = ({
           game={openedGame}
           onBack={onBack}
           onGameUpdated={onGameUpdated}
-          isUpdatingGame={isUpdatingGame}
+          disabled={isUpdatingGame}
           onUnregisterGame={() => unregisterGame(openedGame, i18n)}
           gameUnregisterErrorText={gameUnregisterErrorText}
         />

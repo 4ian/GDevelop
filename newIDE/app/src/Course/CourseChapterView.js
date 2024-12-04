@@ -224,7 +224,11 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             </Line>
           </ResponsiveLineStackLayout>
         ) : (
-          <ResponsiveLineStackLayout expand noResponsiveLandscape noColumnMargin>
+          <ResponsiveLineStackLayout
+            expand
+            noResponsiveLandscape
+            noColumnMargin
+          >
             {youtubeVideoId && (
               <div style={styles.videoContainer}>
                 <iframe

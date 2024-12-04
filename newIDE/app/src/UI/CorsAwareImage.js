@@ -1,5 +1,8 @@
 // @flow
 import * as React from 'react';
+import InnerImageZoom from 'react-inner-image-zoom';
+import './CorsAwareImage.css';
+import classNames from 'classnames';
 
 type Props = {|
   src: ?string,
@@ -10,6 +13,7 @@ type Props = {|
   title?: ?string,
   onError?: (?Error) => void,
   onLoad?: (e: any) => void,
+  withInnerZoom?: boolean,
 |};
 
 const addSearchParameterToUrl = (
@@ -35,31 +39,50 @@ const addSearchParameterToUrl = (
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-export const CorsAwareImage = (props: Props) => (
-  <img // eslint-disable-line jsx-a11y/alt-text
-    {...props}
-    src={
-      // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
-      // By doing so, we force browser to consider this URL as different than the one traditionally
-      // used to render the resource in the editor (usually as an `<img>` or as a background image).
-      // If we don't add this distinct parameter, it can happen that browsers fail to load the image
-      // as it's already in the **browser cache** but with slightly different request parameters -
-      // making the CORS checks fail (even if it's coming from the browser cache).
-      //
-      // It's happening sometimes (according to loading order probably) in Chrome and (more often)
-      // in Safari. It might be linked to Amazon S3 + CloudFront that "doesn't support the Vary: Origin header".
-      // To be safe, we entirely avoid the issue with this parameter, making the browsers consider
-      // the resources for use in Pixi.js and for the rest of the editor as entirely separate.
-      //
-      // See:
-      // - https://stackoverflow.com/questions/26140487/cross-origin-amazon-s3-not-working-using-chrome
-      // - https://stackoverflow.com/questions/20253472/cors-problems-with-amazon-s3-on-the-latest-chomium-and-google-canary
-      // - https://stackoverflow.com/a/20299333
-      //
-      // Search for "cors-cache-workaround" in the codebase for the same workarounds.
-      props.src
-        ? addSearchParameterToUrl(props.src, 'gdUsage', 'img')
-        : undefined
-    }
-  />
-);
+export const CorsAwareImage = ({ withInnerZoom, src, ...props }: Props) => {
+  const [isZoomedIn, setIsZoomedIn] = React.useState<boolean>(false);
+  const correctedSrc =
+    // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
+    // By doing so, we force browser to consider this URL as different than the one traditionally
+    // used to render the resource in the editor (usually as an `<img>` or as a background image).
+    // If we don't add this distinct parameter, it can happen that browsers fail to load the image
+    // as it's already in the **browser cache** but with slightly different request parameters -
+    // making the CORS checks fail (even if it's coming from the browser cache).
+    //
+    // It's happening sometimes (according to loading order probably) in Chrome and (more often)
+    // in Safari. It might be linked to Amazon S3 + CloudFront that "doesn't support the Vary: Origin header".
+    // To be safe, we entirely avoid the issue with this parameter, making the browsers consider
+    // the resources for use in Pixi.js and for the rest of the editor as entirely separate.
+    //
+    // See:
+    // - https://stackoverflow.com/questions/26140487/cross-origin-amazon-s3-not-working-using-chrome
+    // - https://stackoverflow.com/questions/20253472/cors-problems-with-amazon-s3-on-the-latest-chomium-and-google-canary
+    // - https://stackoverflow.com/a/20299333
+    //
+    // Search for "cors-cache-workaround" in the codebase for the same workarounds.
+    src ? addSearchParameterToUrl(src, 'gdUsage', 'img') : undefined;
+  if (withInnerZoom) {
+    return (
+      <InnerImageZoom
+        src={correctedSrc}
+        {...props}
+        className={classNames({
+          'with-min-height': isZoomedIn,
+          'with-grab-cursor': isZoomedIn,
+        })}
+        afterZoomIn={() => setIsZoomedIn(true)}
+        afterZoomOut={() => setIsZoomedIn(false)}
+        zoomType="click"
+        moveType="drag"
+        hideHint
+        zoomScale={0.8}
+      />
+    );
+  }
+  return (
+    <img // eslint-disable-line jsx-a11y/alt-text
+      {...props}
+      src={correctedSrc}
+    />
+  );
+};

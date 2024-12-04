@@ -201,9 +201,7 @@ export type LockedCourseChapter = {|
   priceInCredits: number,
 |};
 
-export type CourseChapter =
-  | LockedCourseChapter
-  | UnlockedCourseChapter;
+export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
 
 export type Environment = 'staging' | 'live';
 

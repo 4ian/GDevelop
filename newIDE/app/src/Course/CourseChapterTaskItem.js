@@ -73,6 +73,7 @@ const CourseChapterTaskItem = ({
                 key={imageUrl}
                 alt=""
                 src={imageUrl}
+                withInnerZoom
               />
             ))}
           {isOpen && courseChapterTask.hint && (
@@ -102,6 +103,7 @@ const CourseChapterTaskItem = ({
                         key={imageUrl}
                         alt=""
                         src={imageUrl}
+                        withInnerZoom
                       />
                     ))}
                   </ColumnStackLayout>

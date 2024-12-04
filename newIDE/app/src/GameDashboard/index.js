@@ -84,6 +84,7 @@ type Props = {|
   currentView: GameDetailsTab,
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
+  disabled: boolean,
 |};
 
 const GameDashboard = ({
@@ -104,6 +105,7 @@ const GameDashboard = ({
   currentView,
   setCurrentView,
   onBack,
+  disabled,
 }: Props) => {
   const [
     gameDetailsDialogOpen,
@@ -578,7 +580,7 @@ const GameDashboard = ({
               i18n={i18n}
               onClose={() => setGameDetailsDialogOpen(false)}
               publicGame={publicGame}
-              isLoading={isUpdatingGame}
+              isLoading={isUpdatingGame || disabled}
               onApply={async properties => {
                 const updatedGame = await onUpdateGame(i18n, properties);
                 if (updatedGame) {

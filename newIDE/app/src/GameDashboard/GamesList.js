@@ -350,7 +350,7 @@ const GamesList = ({
       if (isRefreshing) return;
       try {
         setIsRefreshing(true);
-        await Promise.all([onCloudProjectsChanged, onRefreshGames]);
+        await Promise.all([onCloudProjectsChanged(), onRefreshGames()]);
       } finally {
         // Wait a bit to avoid spam as we don't have a "loading" state.
         setTimeout(() => setIsRefreshing(false), 2000);

@@ -33,7 +33,7 @@ export const getDefaultRegisterGameProperties = ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',
-  unsaved: !isProjectSaved,
+  savedStatus: isProjectSaved ? 'saved' : 'draft',
 });
 
 export type GameManager = {|

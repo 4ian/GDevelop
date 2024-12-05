@@ -208,7 +208,7 @@ const getDashboardItemsToDisplay = ({
     item =>
       // Filter out unsaved games, unless they are the opened project.
       !item.game ||
-      !item.game.unsaved ||
+      item.game.savedStatus !== 'draft' ||
       (project && item.game.id === project.getProjectUuid())
   );
 

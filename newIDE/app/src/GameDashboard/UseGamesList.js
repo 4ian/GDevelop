@@ -68,11 +68,11 @@ const useGamesList = (): GamesList => {
 
   const markGameAsSavedIfRelevant = React.useCallback(
     async (gameId: string) => {
-      console.log('markGameAsSavedIfRelevant', gameId, games, firebaseUser);
       if (!games || !firebaseUser) return;
       const currentOpenedGame = games && games.find(game => game.id === gameId);
 
-      if (!currentOpenedGame || !currentOpenedGame.unsaved) return;
+      if (!currentOpenedGame || currentOpenedGame.savedStatus !== 'draft')
+        return;
 
       try {
         const updatedGame = await updateGame(
@@ -80,10 +80,9 @@ const useGamesList = (): GamesList => {
           firebaseUser.uid,
           currentOpenedGame.id,
           {
-            unsaved: false,
+            savedStatus: 'saved',
           }
         );
-        console.log('Game marked as saved:', updatedGame);
         onGameUpdated(updatedGame);
       } catch (error) {
         // Catch error, we'll try again later.

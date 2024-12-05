@@ -73,7 +73,8 @@ const ProjectCard = ({
   useOnResize(useForceUpdate());
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const isWidthConstrained = windowSize === 'small' || windowSize === 'medium';
   const {
     showDeleteConfirmation,
     showConfirmation,
@@ -318,8 +319,10 @@ const ProjectCard = ({
             label={
               isCurrentProjectOpened ? (
                 <Trans>Opened</Trans>
-              ) : (
+              ) : isWidthConstrained ? (
                 <Trans>Open</Trans>
+              ) : (
+                <Trans>Open Project</Trans>
               )
             }
             onClick={isCurrentProjectOpened ? undefined : onOpenProject}

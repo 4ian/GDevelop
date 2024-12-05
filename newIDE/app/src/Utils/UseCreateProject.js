@@ -170,8 +170,11 @@ const useCreateProject = ({
                 projectId: currentProject.getProjectUuid(),
                 projectName: currentProject.getName(),
                 projectAuthor: currentProject.getAuthor(),
-                // Project is not saved yet here.
-                isProjectSaved: false,
+                // Project is saved if choosing cloud or local storage provider.
+                isProjectSaved:
+                  newProjectSetup.storageProvider.internalName ===
+                    'LocalFile' ||
+                  newProjectSetup.storageProvider.internalName === 'Cloud',
               })
             );
             await onGameRegistered();

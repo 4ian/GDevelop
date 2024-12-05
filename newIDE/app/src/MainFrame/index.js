@@ -186,6 +186,7 @@ import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
@@ -1127,6 +1128,7 @@ const MainFrame = (props: Props) => {
     createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
+    createProjectFromCourseChapter,
     createProjectFromAIGeneration,
   } = useCreateProject({
     beforeCreatingProject: () => {
@@ -3148,6 +3150,34 @@ const MainFrame = (props: Props) => {
     [askToCloseProject, createProjectFromTutorial, i18n]
   );
 
+  const openTemplateFromCourseChapter = React.useCallback(
+    async (courseChapter: CourseChapter) => {
+      const projectIsClosed = await askToCloseProject();
+      if (!projectIsClosed) {
+        return;
+      }
+      try {
+        await createProjectFromCourseChapter(courseChapter, {
+          storageProvider: emptyStorageProvider,
+          saveAsLocation: null,
+          // Remaining will be set by the template.
+        });
+      } catch (error) {
+        showErrorBox({
+          message: i18n._(
+            t`Unable to create a new project for the course chapter. Try again later.`
+          ),
+          rawError: new Error(
+            `Can't create project from template of course chapter "${courseChapter.id}"`
+          ),
+          errorId: 'cannot-create-project-from-course-chapter-template',
+        });
+        return;
+      }
+    },
+    [askToCloseProject, createProjectFromCourseChapter, i18n]
+  );
+
   const startSelectedTutorial = React.useCallback(
     async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
@@ -3638,6 +3668,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
+                    onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
                     onOpenLayout: name => {

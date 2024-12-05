@@ -82,6 +82,20 @@ export const createNewProjectFromTutorialTemplate = (
   return newProjectSource;
 };
 
+export const createNewProjectFromCourseChapterTemplate = (
+  templateUrl: string,
+  courseChapterId: string
+): NewProjectSource => {
+  // TODO: Send event?
+  sendNewGameCreated({
+    exampleUrl: templateUrl,
+    exampleSlug: courseChapterId,
+  });
+  const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
+  newProjectSource.templateSlug = courseChapterId;
+  return newProjectSource;
+};
+
 export const createNewProjectFromPrivateGameTemplate = (
   privateGameTemplateUrl: string,
   privateGameTemplateTag: string

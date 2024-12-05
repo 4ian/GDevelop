@@ -1283,7 +1283,7 @@ namespace gdjs {
         const { behavior } = this.characterBehavior.getPhysics3D();
         const { _sharedData } = behavior;
 
-        const shape = behavior.createShape(0.5);
+        const shape = behavior.createShape();
 
         const settings = new Jolt.CharacterVirtualSettings();
         settings.mInnerBodyLayer = behavior.getBodyLayer();
@@ -1386,7 +1386,7 @@ namespace gdjs {
         if (!character) {
           return;
         }
-        const shape = behavior.createShape(0.5);
+        const shape = behavior.createShape();
         const isShapeValid = character.SetShape(
           shape,
           Number.MAX_VALUE,

@@ -272,32 +272,6 @@ const Physics3DEditor = (props: Props) => {
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
         <NumericProperty
-          properties={properties}
-          propertyName={'shapeOffsetX'}
-          step={1}
-          onUpdate={newValue =>
-            updateBehaviorProperty('shapeOffsetX', newValue)
-          }
-        />
-        <NumericProperty
-          properties={properties}
-          propertyName={'shapeOffsetY'}
-          step={1}
-          onUpdate={newValue =>
-            updateBehaviorProperty('shapeOffsetY', newValue)
-          }
-        />
-        <NumericProperty
-          properties={properties}
-          propertyName={'shapeOffsetZ'}
-          step={1}
-          onUpdate={newValue =>
-            updateBehaviorProperty('shapeOffsetZ', newValue)
-          }
-        />
-      </ResponsiveLineStackLayout>
-      <ResponsiveLineStackLayout>
-        <NumericProperty
           id="physics3d-parameter-density"
           properties={properties}
           propertyName={'density'}

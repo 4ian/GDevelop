@@ -97,33 +97,6 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'shapeOffsetX') {
-          const newValueAsNumber = parseFloat(newValue);
-          if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent
-            .getChild('shapeOffsetX')
-            .setDoubleValue(newValueAsNumber);
-          return true;
-        }
-
-        if (propertyName === 'shapeOffsetY') {
-          const newValueAsNumber = parseFloat(newValue);
-          if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent
-            .getChild('shapeOffsetY')
-            .setDoubleValue(newValueAsNumber);
-          return true;
-        }
-
-        if (propertyName === 'shapeOffsetZ') {
-          const newValueAsNumber = parseFloat(newValue);
-          if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent
-            .getChild('shapeOffsetZ')
-            .setDoubleValue(newValueAsNumber);
-          return true;
-        }
-
         if (propertyName === 'density') {
           behaviorContent
             .getChild('density')
@@ -305,45 +278,6 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setHidden(true); // Hidden as required to be changed in the full editor.
         behaviorProperties
-          .getOrCreate('shapeOffsetX')
-          .setValue(
-            behaviorContent
-              .getChild('shapeOffsetX')
-              .getDoubleValue()
-              .toString(10)
-          )
-          .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Offset X')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
-        behaviorProperties
-          .getOrCreate('shapeOffsetY')
-          .setValue(
-            behaviorContent
-              .getChild('shapeOffsetY')
-              .getDoubleValue()
-              .toString(10)
-          )
-          .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Offset Y')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
-        behaviorProperties
-          .getOrCreate('shapeOffsetZ')
-          .setValue(
-            behaviorContent
-              .getChild('shapeOffsetZ')
-              .getDoubleValue()
-              .toString(10)
-          )
-          .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setLabel('Shape Offset Z')
-          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .setHidden(true); // Hidden as required to be changed in the full editor.
-        behaviorProperties
           .getOrCreate('density')
           .setValue(
             behaviorContent.getChild('density').getDoubleValue().toString(10)
@@ -451,9 +385,6 @@ module.exports = {
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionC').setDoubleValue(0);
-        behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
-        behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
-        behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
         behaviorContent.addChild('density').setDoubleValue(1.0);
         behaviorContent.addChild('friction').setDoubleValue(0.3);
         behaviorContent.addChild('restitution').setDoubleValue(0.1);
@@ -770,7 +701,7 @@ module.exports = {
           'ShapeScale',
           _('Shape scale'),
           _(
-            'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
+            'Modify an object shape scale. It affects custom shape dimensions, if custom dimensions are not set the body will be scaled automatically to the object size.'
           ),
           _('the shape scale'),
           _('Body settings'),

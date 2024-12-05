@@ -633,7 +633,7 @@ namespace gdjs {
       this.onDeActivate();
     }
 
-    createShape(offsetZ: float = 0): Jolt.Shape {
+    createShape(): Jolt.Shape {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -732,8 +732,7 @@ namespace gdjs {
       }
       shapeSettings.mDensity = this.density;
       const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-        //this.getVec3(shapeOffsetX, shapeOffsetY, shapeOffsetZ),
-        this.getVec3(0, 0, 0), //offsetZ ? offsetZ * shapeDepth : 0),
+        this.getVec3(0, 0, 0),
         quat,
         shapeSettings
       )

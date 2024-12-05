@@ -98,7 +98,7 @@ const LockedOverlay = () => (
 type Props = {|
   chapterIndex: number,
   courseChapter: CourseChapter,
-  onOpenTemplate: (url: string) => void,
+  onOpenTemplate: () => void,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
@@ -271,7 +271,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                       primary
                       icon={<Cloud fontSize="small" />}
                       label={<Trans>Open template</Trans>}
-                      onClick={() => onOpenTemplate(courseChapter.templateUrl)}
+                      onClick={onOpenTemplate}
                     />
                   </Line>
                 </ColumnStackLayout>

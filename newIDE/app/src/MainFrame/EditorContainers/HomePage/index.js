@@ -43,6 +43,7 @@ import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
+import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -135,6 +136,9 @@ type Props = {|
     i18n: I18nType
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    courseChapter: CourseChapter
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -183,6 +187,7 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
+        onOpenTemplateFromCourseChapter,
         gamesList,
       }: Props,
       ref
@@ -514,6 +519,9 @@ export const HomePage = React.memo<Props>(
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
+                      onOpenTemplateFromCourseChapter={
+                        onOpenTemplateFromCourseChapter
+                      }
                       initialCategory={learnInitialCategory}
                     />
                   )}
@@ -593,6 +601,7 @@ export const renderHomePageContainer = (
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenTemplateFromTutorial={props.onOpenTemplateFromTutorial}
+    onOpenTemplateFromCourseChapter={props.onOpenTemplateFromCourseChapter}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}

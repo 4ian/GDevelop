@@ -47,6 +47,9 @@ export const Default = () => (
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -68,6 +71,9 @@ export const NotAuthenticated = () => (
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -91,6 +97,9 @@ export const EducationSubscriber = () => (
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -114,6 +123,9 @@ export const EducationTeacher = () => (
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -134,6 +146,9 @@ export const Loading = () => (
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+        onOpenTemplateFromCourseChapter={action(
+          'onOpenTemplateFromCourseChapter'
+        )}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

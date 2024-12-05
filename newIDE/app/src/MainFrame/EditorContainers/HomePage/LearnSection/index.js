@@ -119,6 +119,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   initialCategory: TutorialCategory | null,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
 |};
 
 const LearnSection = ({
@@ -126,6 +127,7 @@ const LearnSection = ({
   selectInAppTutorial,
   initialCategory,
   onOpenTemplateFromTutorial,
+  onOpenTemplateFromCourseChapter,
 }: Props) => {
   const {
     tutorials,

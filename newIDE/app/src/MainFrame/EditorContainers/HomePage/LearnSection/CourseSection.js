@@ -48,10 +48,15 @@ const styles = {
 
 type Props = {|
   courseChapters: CourseChapter[],
+  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   onBack: () => void,
 |};
 
-const CourseSection = ({ courseChapters, onBack }: Props) => {
+const CourseSection = ({
+  courseChapters,
+  onOpenTemplateFromCourseChapter,
+  onBack,
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
 
@@ -142,7 +147,9 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
             <CourseChapterView
               chapterIndex={index}
               courseChapter={chapter}
-              onOpenTemplate={() => {}}
+              onOpenTemplate={() => {
+                onOpenTemplateFromCourseChapter(chapter);
+              }}
               key={chapter.id}
               ref={_ref => {
                 if (_ref) {

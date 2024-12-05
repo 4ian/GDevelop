@@ -43,7 +43,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import ProjectCard from './ProjectCard';
 
-const pageSize = 10;
+export const pageSize = 10;
 
 const styles = {
   noGameMessageContainer: { padding: 10 },
@@ -213,8 +213,8 @@ const getDashboardItemsToDisplay = ({
   );
 
   return itemsWithoutUnsavedGames.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 };
 
@@ -235,6 +235,8 @@ type Props = {|
   askToCloseProject: () => Promise<boolean>,
   onSaveProject: () => Promise<void>,
   canSaveProject: boolean,
+  currentPage: number,
+  onCurrentPageChange: (currentPage: number) => void,
 |};
 
 const GamesList = ({
@@ -254,6 +256,9 @@ const GamesList = ({
   askToCloseProject,
   onSaveProject,
   canSaveProject,
+  // Make the page controlled, so that it can be saved when navigating to a game.
+  currentPage,
+  onCurrentPageChange,
 }: Props) => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
@@ -262,7 +267,6 @@ const GamesList = ({
     'lastModifiedAt'
   );
   const [searchText, setSearchText] = React.useState<string>('');
-  const [currentPage, setCurrentPage] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 
   const allRecentProjectFiles = useProjectsListFor(null);
@@ -468,8 +472,8 @@ const GamesList = ({
                 </Column>
                 <IconButton
                   tooltip={t`Previous page`}
-                  onClick={() => setCurrentPage(currentPage => currentPage - 1)}
-                  disabled={!!searchText || currentPage === 0}
+                  onClick={() => onCurrentPageChange(currentPage - 1)}
+                  disabled={!!searchText || currentPage === 1}
                   size="small"
                 >
                   <ChevronArrowLeft />
@@ -481,13 +485,13 @@ const GamesList = ({
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {searchText ? 1 : currentPage + 1}
+                  {searchText ? 1 : currentPage}
                 </Text>
                 <IconButton
                   tooltip={t`Next page`}
-                  onClick={() => setCurrentPage(currentPage => currentPage + 1)}
+                  onClick={() => onCurrentPageChange(currentPage + 1)}
                   disabled={
-                    !!searchText || (currentPage + 1) * pageSize >= games.length
+                    !!searchText || currentPage * pageSize >= games.length
                   }
                   size="small"
                 >

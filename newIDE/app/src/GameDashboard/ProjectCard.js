@@ -15,7 +15,6 @@ import {
   getStorageProviderByInternalName,
   type LastModifiedInfo,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/utils';
-import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import LastModificationInfo from '../MainFrame/EditorContainers/HomePage/CreateSection/LastModificationInfo';
@@ -30,6 +29,7 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import { getDefaultRegisterGameProperties } from '../Utils/UseGameAndBuildsManager';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -312,7 +312,7 @@ const ProjectCard = ({
       <div style={styles.buttonsContainer}>
         <LineStackLayout noMargin expand>
           {fullWidth ? <ManageButtonPlacerHolder /> : null}
-          <FlatButtonWithSplitMenu
+          <RaisedButtonWithSplitMenu
             primary
             fullWidth={fullWidth}
             disabled={isLoading || disabled}

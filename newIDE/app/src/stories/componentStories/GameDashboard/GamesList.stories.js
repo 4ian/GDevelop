@@ -59,6 +59,8 @@ export const NoGamesOrProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
+          currentPage={1}
+          onCurrentPageChange={action('onCurrentPageChange')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -105,6 +107,8 @@ export const WithOnlyGames = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
+          currentPage={1}
+          onCurrentPageChange={action('onCurrentPageChange')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -146,6 +150,8 @@ export const WithOnlyProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
+          currentPage={1}
+          onCurrentPageChange={action('onCurrentPageChange')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -194,6 +200,8 @@ export const WithGamesAndProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
+          currentPage={1}
+          onCurrentPageChange={action('onCurrentPageChange')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>

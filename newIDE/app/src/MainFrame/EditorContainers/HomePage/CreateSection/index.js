@@ -6,7 +6,7 @@ import { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import GamesList from '../../../../GameDashboard/GamesList';
+import GamesList, { pageSize } from '../../../../GameDashboard/GamesList';
 import { deleteGame, type Game } from '../../../../Utils/GDevelopServices/Game';
 import { type QuickCustomizationRecommendation } from '../../../../Utils/GDevelopServices/User';
 import PlaceholderError from '../../../../UI/PlaceholderError';
@@ -47,6 +47,7 @@ import {
 } from './MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { useProjectsListFor } from './utils';
+import MarketingPlans from '../../../../MarketingPlans/MarketingPlans';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -190,6 +191,22 @@ const CreateSection = ({
     },
     // Close game view is user logs out.
     [profile, openedGame, setOpenedGameId]
+  );
+
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const onCurrentPageChange = React.useCallback(
+    newPage => {
+      const minPage = 1;
+      const maxPage = games ? Math.ceil(games.length / pageSize) : 1;
+      if (newPage < minPage) {
+        setCurrentPage(minPage);
+      } else if (newPage > maxPage) {
+        setCurrentPage(maxPage);
+      } else {
+        setCurrentPage(newPage);
+      }
+    },
+    [setCurrentPage, games]
   );
 
   const unregisterGame = React.useCallback(
@@ -347,6 +364,11 @@ const CreateSection = ({
           <Grid container spacing={2}>
             <UserEarningsWidget />
             <TotalPlaysWidget fullWidth games={games || []} />
+            <Line>
+              <Column>
+                <MarketingPlans />
+              </Column>
+            </Line>
             <WalletWidget
               fullWidth
               showAllBadges
@@ -432,6 +454,8 @@ const CreateSection = ({
                   askToCloseProject={askToCloseProject}
                   onSaveProject={onSaveProject}
                   canSaveProject={canSaveProject}
+                  currentPage={currentPage}
+                  onCurrentPageChange={onCurrentPageChange}
                 />
                 {isMobile && limits && hasTooManyCloudProjects && (
                   <MaxProjectCountAlertMessage

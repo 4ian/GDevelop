@@ -990,6 +990,69 @@ module.exports = {
         )
         .setFunctionName('getLinearVelocityLength');
 
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AngularVelocityX',
+          _('Angular velocity X'),
+          _('the object angular velocity on X.'),
+          _('the angular velocity on X'),
+          _('Velocity'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angular speed (in degrees per second)')
+          )
+        )
+        .setFunctionName('setAngularVelocityX')
+        .setGetter('getAngularVelocityX');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AngularVelocityY',
+          _('Angular velocity Y'),
+          _('the object angular velocity on Y.'),
+          _('the angular velocity on Y'),
+          _('Velocity'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angular speed (in degrees per second)')
+          )
+        )
+        .setFunctionName('setAngularVelocityY')
+        .setGetter('getAngularVelocityY');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AngularVelocityZ',
+          _('Angular velocity Z'),
+          _('the object angular velocity on Z.'),
+          _('the angular velocity on Z'),
+          _('Velocity'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angular speed (in degrees per second)')
+          )
+        )
+        .setFunctionName('setAngularVelocityZ')
+        .setGetter('getAngularVelocityZ');
+
       // Forces and impulses
       aut
         .addScopedAction(

@@ -1317,6 +1317,81 @@ namespace gdjs {
       return body.GetLinearVelocity().Length() * this._sharedData.worldScale;
     }
 
+    getAngularVelocityX(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return body.GetAngularVelocity().GetX() * this._sharedData.worldScale;
+    }
+
+    setAngularVelocityX(angularVelocityX: float): void {
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.SetAngularVelocity(
+        body.GetID(),
+        this.getVec3(
+          angularVelocityX * this._sharedData.worldInvScale,
+          body.GetAngularVelocity().GetY(),
+          body.GetAngularVelocity().GetZ()
+        )
+      );
+    }
+
+    getAngularVelocityY(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return body.GetAngularVelocity().GetY() * this._sharedData.worldScale;
+    }
+
+    setAngularVelocityY(angularVelocityY: float): void {
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.SetAngularVelocity(
+        body.GetID(),
+        this.getVec3(
+          body.GetAngularVelocity().GetX(),
+          angularVelocityY * this._sharedData.worldInvScale,
+          body.GetAngularVelocity().GetZ()
+        )
+      );
+    }
+
+    getAngularVelocityZ(): float {
+      if (this._body === null) {
+        if (!this.createBody()) return 0;
+      }
+      const body = this._body!;
+
+      return body.GetAngularVelocity().GetZ() * this._sharedData.worldScale;
+    }
+
+    setAngularVelocityZ(angularVelocityZ: float): void {
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      this._sharedData.bodyInterface.SetAngularVelocity(
+        body.GetID(),
+        this.getVec3(
+          body.GetAngularVelocity().GetX(),
+          body.GetAngularVelocity().GetY(),
+          angularVelocityZ * this._sharedData.worldInvScale
+        )
+      );
+    }
+
     applyForce(
       forceX: float,
       forceY: float,

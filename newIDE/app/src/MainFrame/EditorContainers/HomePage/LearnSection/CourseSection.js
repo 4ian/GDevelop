@@ -8,7 +8,7 @@ import CourseChapterView from '../../../../Course/CourseChapterView';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
-import { Column } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Help from '../../../../UI/CustomSvgIcons/Help';
@@ -37,6 +37,7 @@ const styles = {
     padding: '2px 3px',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
     borderRadius: 4,
   },
@@ -139,9 +140,10 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
         <Column noOverflowParent noMargin>
           {courseChapters.map((chapter, index) => (
             <CourseChapterView
+              chapterIndex={index}
               courseChapter={chapter}
               onOpenTemplate={() => {}}
-              key={chapter.title}
+              key={chapter.id}
               ref={_ref => {
                 if (_ref) {
                   chaptersTitleRefs.current[index] = {
@@ -165,9 +167,9 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
                 <Text noMargin size="sub-title">
                   Chapters
                 </Text>
-                {courseChapters.map(chapter => (
+                {courseChapters.map((chapter, chapterIndex) => (
                   <div
-                    key={chapter.title}
+                    key={chapter.id}
                     tabIndex={0}
                     onClick={() => scrollToChapter(chapter.id)}
                     style={{
@@ -178,13 +180,19 @@ const CourseSection = ({ courseChapters, onBack }: Props) => {
                           : undefined,
                     }}
                   >
-                    <Text
-                      noMargin
-                      style={textEllipsisStyle}
-                      color={chapter.isLocked ? 'secondary' : 'primary'}
-                    >
-                      {chapter.title}
-                    </Text>
+                    <Line noMargin>
+                      <Text noMargin color={'secondary'}>
+                        {chapterIndex + 1}.
+                      </Text>
+                      &nbsp;
+                      <Text
+                        noMargin
+                        style={textEllipsisStyle}
+                        color={chapter.isLocked ? 'secondary' : 'primary'}
+                      >
+                        {chapter.title}
+                      </Text>
+                    </Line>
                     {chapter.isLocked ? (
                       <div style={styles.navIcon}>
                         <Lock fontSize="inherit" />

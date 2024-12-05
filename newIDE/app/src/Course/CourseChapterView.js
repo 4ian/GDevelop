@@ -15,10 +15,11 @@ import RaisedButton from '../UI/RaisedButton';
 import { Line, Spacer } from '../UI/Grid';
 import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import { Divider } from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
 import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
+import Cloud from '../UI/CustomSvgIcons/Cloud';
 import CourseChapterTaskItem from './CourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -27,6 +28,7 @@ import { SubscriptionSuggestionContext } from '../Profile/Subscription/Subscript
 import Gold from '../Profile/Subscription/Icons/Gold';
 import Coin from '../Credits/Icons/Coin';
 import Lock from '../UI/CustomSvgIcons/Lock';
+import { rankLabel } from '../Utils/Ordinal';
 
 const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
@@ -94,12 +96,13 @@ const LockedOverlay = () => (
 );
 
 type Props = {|
+  chapterIndex: number,
   courseChapter: CourseChapter,
   onOpenTemplate: (url: string) => void,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
-  ({ courseChapter, onOpenTemplate }, ref) => {
+  ({ chapterIndex, courseChapter, onOpenTemplate }, ref) => {
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
@@ -131,7 +134,9 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           }}
         >
           <LineStackLayout noMargin alignItems="center" expand>
-            <Text size="title">{courseChapter.title}</Text>
+            <Text size="title">
+              {chapterIndex + 1}. {courseChapter.title}
+            </Text>
             {isFinished && !isMobilePortrait && (
               <div
                 style={{
@@ -166,6 +171,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           <ResponsiveLineStackLayout
             expand
             noResponsiveLandscape
+            noColumnMargin
             alignItems="stretch"
           >
             {youtubeVideoId && (
@@ -244,15 +250,26 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               </div>
             )}
             <ColumnStackLayout noMargin expand>
-              <Text size="sub-title">Lesson materials</Text>
+              <Text size="sub-title" noMargin>
+                <Trans>Chapter materials</Trans>
+              </Text>
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin>
-                  <Text noMargin>
-                    <Trans>Template</Trans>
-                  </Text>
+                  <Line noMargin>
+                    <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
+                    &nbsp;
+                    <Text noMargin>
+                      <Trans>Chapter</Trans>
+                    </Text>
+                    &nbsp;-&nbsp;
+                    <Text noMargin>
+                      <Trans>Template</Trans>
+                    </Text>
+                  </Line>
                   <Line noMargin>
                     <RaisedButton
                       primary
+                      icon={<Cloud fontSize="small" />}
                       label={<Trans>Open template</Trans>}
                       onClick={() => onOpenTemplate(courseChapter.templateUrl)}
                     />

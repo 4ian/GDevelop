@@ -8,6 +8,7 @@ namespace Jolt {
 
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
+    fwa: float;
     fws: float;
     sws: float;
     fs: float;
@@ -246,6 +247,7 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         props: {
+          fwa: this._forwardAngle,
           fws: this._currentForwardSpeed,
           sws: this._currentSidewaysSpeed,
           fs: this._currentFallSpeed,
@@ -271,6 +273,7 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
+      this._forwardAngle = behaviorSpecificProps.fwa;
       this._currentForwardSpeed = behaviorSpecificProps.fws;
       this._currentSidewaysSpeed = behaviorSpecificProps.sws;
       this._currentFallSpeed = behaviorSpecificProps.fs;

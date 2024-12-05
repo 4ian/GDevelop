@@ -1279,9 +1279,8 @@ namespace gdjs {
       }
 
       createAndAddBody(): Jolt.Body {
-        const { _slopeMaxAngle, owner3D } = this.characterBehavior;
+        const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
         const { behavior } = this.characterBehavior.getPhysics3D();
-        const { _sharedData } = behavior;
 
         const shape = behavior.createShape();
 
@@ -1345,22 +1344,16 @@ namespace gdjs {
 
       updateBodyFromObject() {
         const { behavior } = this.characterBehavior.getPhysics3D();
-        const { _sharedData } = behavior;
-        const { character, owner3D } = this.characterBehavior;
+        const { character, owner3D, _sharedData } = this.characterBehavior;
         if (!character) {
           return;
         }
-        // The object object transform has changed, update body transform:
         if (
           behavior._objectOldX !== owner3D.getX() ||
           behavior._objectOldY !== owner3D.getY() ||
           behavior._objectOldZ !== owner3D.getZ()
         ) {
-          character.SetPosition(
-            this.characterBehavior.getPhysicsPosition(
-              _sharedData.getRVec3(0, 0, 0)
-            )
-          );
+          this.updateCharacterPosition();
         }
         if (
           behavior._objectOldRotationX !== owner3D.getRotationX() ||
@@ -1373,6 +1366,18 @@ namespace gdjs {
         }
       }
 
+      updateCharacterPosition() {
+        const { character, _sharedData } = this.characterBehavior;
+        if (!character) {
+          return;
+        }
+        character.SetPosition(
+          this.characterBehavior.getPhysicsPosition(
+            _sharedData.getRVec3(0, 0, 0)
+          )
+        );
+      }
+
       recreateShape() {
         const {
           behavior,
@@ -1381,8 +1386,7 @@ namespace gdjs {
           bodyFilter,
           shapeFilter,
         } = this.characterBehavior.getPhysics3D();
-        const { _sharedData } = behavior;
-        const { character } = this.characterBehavior;
+        const { character, _sharedData } = this.characterBehavior;
         if (!character) {
           return;
         }
@@ -1401,6 +1405,9 @@ namespace gdjs {
         }
         character.SetInnerBodyShape(shape);
         character.SetMass(shape.GetMassProperties().get_mMass());
+
+        // shapeHalfDepth may have changed, update the character position accordingly.
+        this.updateCharacterPosition();
       }
     }
   }

@@ -37,6 +37,7 @@ import {
 import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 
 const styles = {
   buttonsContainer: { display: 'flex', flexShrink: 0 },
@@ -259,7 +260,7 @@ const GameCard = ({
           )}
           {projectsList.length === 0 ? (
             isCurrentProjectOpened ? (
-              <FlatButtonWithSplitMenu
+              <RaisedButtonWithSplitMenu
                 primary
                 fullWidth={fullWidth}
                 label={
@@ -276,24 +277,27 @@ const GameCard = ({
             ) : fullWidth ? (
               <OpenButtonPlacerHolder />
             ) : null
-          ) : (
+          ) : isCurrentProjectOpened ? (
             <FlatButtonWithSplitMenu
               primary
               fullWidth={fullWidth}
+              label={<Trans>Opened</Trans>}
+              onClick={undefined}
+              buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
+              disabled={disabled}
+            />
+          ) : (
+            <RaisedButtonWithSplitMenu
+              primary
+              fullWidth={fullWidth}
               label={
-                isCurrentProjectOpened ? (
-                  <Trans>Opened</Trans>
-                ) : isWidthConstrained ? (
+                isWidthConstrained ? (
                   <Trans>Open</Trans>
                 ) : (
                   <Trans>Open project</Trans>
                 )
               }
-              onClick={
-                isCurrentProjectOpened
-                  ? undefined
-                  : () => onOpenProject(projectsList[0])
-              }
+              onClick={() => onOpenProject(projectsList[0])}
               buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
               disabled={disabled}
             />

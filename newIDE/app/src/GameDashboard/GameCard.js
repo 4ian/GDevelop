@@ -227,19 +227,36 @@ const GameCard = ({
     return (
       <div style={styles.buttonsContainer}>
         <LineStackLayout noMargin expand>
-          <FlatButton
-            primary
-            fullWidth={fullWidth}
-            label={
-              isWidthConstrained ? (
-                <Trans>Manage</Trans>
-              ) : (
-                <Trans>Manage game</Trans>
-              )
-            }
-            onClick={onOpenGameManager}
-            disabled={disabled}
-          />
+          {projectsList.length > 0 ? (
+            <FlatButton
+              primary
+              fullWidth={fullWidth}
+              label={
+                isWidthConstrained ? (
+                  <Trans>Manage</Trans>
+                ) : (
+                  <Trans>Manage game</Trans>
+                )
+              }
+              onClick={onOpenGameManager}
+              disabled={disabled}
+            />
+          ) : (
+            <FlatButtonWithSplitMenu
+              primary
+              fullWidth={fullWidth}
+              label={
+                isWidthConstrained ? (
+                  <Trans>Manage</Trans>
+                ) : (
+                  <Trans>Manage game</Trans>
+                )
+              }
+              onClick={onOpenGameManager}
+              buildMenuTemplate={i18n => buildContextMenu(i18n, projectsList)}
+              disabled={disabled}
+            />
+          )}
           {projectsList.length === 0 ? (
             isCurrentProjectOpened ? (
               <FlatButtonWithSplitMenu

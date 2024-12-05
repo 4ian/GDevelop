@@ -10,6 +10,8 @@ import { t } from '@lingui/macro';
 
 export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
 
+export type SavedStatus = 'draft' | 'saved';
+
 export type CachedGameSlug = {
   username: string,
   gameSlug: string,
@@ -69,7 +71,7 @@ export type Game = {|
   playWithKeyboard: boolean,
   playWithMobile: boolean,
   playWithGamepad: boolean,
-  unsaved?: boolean,
+  savedStatus?: SavedStatus,
 |};
 
 export type GameUpdatePayload = {|
@@ -88,7 +90,7 @@ export type GameUpdatePayload = {|
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
-  unsaved?: boolean,
+  savedStatus?: SavedStatus,
 |};
 
 export type GameCategory = {
@@ -293,13 +295,13 @@ export const registerGame = async (
     gameName,
     authorName,
     templateSlug,
-    unsaved,
+    savedStatus,
   }: {|
     gameId: string,
     gameName: string,
     authorName: string,
     templateSlug?: string,
-    unsaved?: boolean,
+    savedStatus?: SavedStatus,
   |}
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -310,7 +312,7 @@ export const registerGame = async (
       gameName,
       authorName,
       templateSlug,
-      unsaved,
+      savedStatus,
     },
     {
       params: {
@@ -345,7 +347,7 @@ export const updateGame = async (
     acceptsBuildComments,
     acceptsGameComments,
     displayAdsOnGamePage,
-    unsaved,
+    savedStatus,
   }: GameUpdatePayload
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -367,7 +369,7 @@ export const updateGame = async (
       acceptsBuildComments,
       acceptsGameComments,
       displayAdsOnGamePage,
-      unsaved,
+      savedStatus,
     },
     {
       params: {

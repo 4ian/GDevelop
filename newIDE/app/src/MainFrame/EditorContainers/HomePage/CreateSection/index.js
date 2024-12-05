@@ -46,6 +46,7 @@ import {
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { useProjectsListFor } from './utils';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -164,6 +165,9 @@ const CreateSection = ({
   const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
     authenticatedUser
   );
+  const allRecentProjectFiles = useProjectsListFor(null);
+  const hasAProjectOpenedOrSavedOrGameRegistered =
+    !!project || (!!games && games.length) || !!allRecentProjectFiles;
   const hidePerformanceDashboard =
     !!limits &&
     !!limits.capabilities.classrooms &&
@@ -395,10 +399,10 @@ const CreateSection = ({
                         leftIcon={<ChevronArrowRight fontSize="small" />}
                       />
                     </Line>
-                    {games && games.length !== 0 ? (
+                    {hasAProjectOpenedOrSavedOrGameRegistered ? (
                       <Grid container spacing={2}>
                         <UserEarningsWidget />
-                        <TotalPlaysWidget games={games} />
+                        <TotalPlaysWidget games={games || []} />
                         <WalletWidget
                           onOpenProfile={onOpenProfile}
                           showRandomBadge
@@ -429,7 +433,6 @@ const CreateSection = ({
                   onSaveProject={onSaveProject}
                   canSaveProject={canSaveProject}
                 />
-                {/* Check if looks ok */}
                 {isMobile && limits && hasTooManyCloudProjects && (
                   <MaxProjectCountAlertMessage
                     margin="dense"
@@ -447,7 +450,7 @@ const CreateSection = ({
                   <ColumnStackLayout noMargin>
                     <Line noMargin>
                       <Text size="block-title">
-                        {!games || games.length === 0 ? (
+                        {hasAProjectOpenedOrSavedOrGameRegistered ? (
                           <Trans>Publish your first game</Trans>
                         ) : (
                           <Trans>Publish a game in 1 minute</Trans>
@@ -478,7 +481,7 @@ const CreateSection = ({
                     />
                   </ColumnStackLayout>
                 )}
-                {(!games || games.length === 0) && !project && (
+                {!hasAProjectOpenedOrSavedOrGameRegistered && (
                   <ColumnStackLayout noMargin>
                     <Line noMargin justifyContent="space-between">
                       <Text size="block-title" noMargin>

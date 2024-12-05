@@ -34,7 +34,7 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
     <DashboardWidget
       gridSize={3}
       title={<Trans>Exports</Trans>}
-      seeMoreButton={
+      topRightAction={
         <FlatButton
           label={<Trans>See all</Trans>}
           rightIcon={<ArrowRight fontSize="small" />}

@@ -224,7 +224,6 @@ export type PreferencesValues = {|
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
-  gamesListOrderBy: 'createdAt' | 'totalSessions' | 'weeklySessions',
   takeScreenshotOnPreview: boolean,
 |};
 
@@ -324,9 +323,6 @@ export type Preferences = {|
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,
-  setGamesListOrderBy: (
-    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
-  ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
 |};
 
@@ -383,7 +379,6 @@ export const initialPreferences = {
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
-    gamesListOrderBy: 'createdAt',
     takeScreenshotOnPreview: true,
   },
   setLanguage: () => {},
@@ -455,9 +450,6 @@ export const initialPreferences = {
   setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
-  setGamesListOrderBy: (
-    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
-  ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
 };
 

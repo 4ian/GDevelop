@@ -44,6 +44,7 @@ import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDi
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
+import useCourses from './UseCourses';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -229,6 +230,12 @@ export const HomePage = React.memo<Props>(
         educationFormStatus,
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
+      const {
+        courses,
+        courseChapters,
+        onSelectCourse,
+        isLoadingChapters,
+      } = useCourses();
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -523,6 +530,10 @@ export const HomePage = React.memo<Props>(
                         onOpenTemplateFromCourseChapter
                       }
                       initialCategory={learnInitialCategory}
+                      courses={courses}
+                      onSelectCourse={onSelectCourse}
+                      courseChapters={courseChapters}
+                      isLoadingChapters={isLoadingChapters}
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}

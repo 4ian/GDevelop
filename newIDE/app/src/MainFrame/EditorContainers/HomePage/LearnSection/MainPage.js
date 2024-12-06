@@ -13,6 +13,8 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
+import type { Course } from '../../../../Utils/GDevelopServices/Asset';
+
 import FlatButton from '../../../../UI/FlatButton';
 import {
   useResponsiveWindowSize,
@@ -37,6 +39,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import Help from '../../../../UI/CustomSvgIcons/Help';
 import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
+import LeftLoader from '../../../../UI/LeftLoader';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -136,6 +139,9 @@ type Props = {|
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
+  onSelectCourse: (?Course) => void,
+  courses: ?(Course[]),
+  isLoadingChapters: boolean,
 |};
 
 const MainPage = ({
@@ -143,6 +149,9 @@ const MainPage = ({
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
+  onSelectCourse,
+  courses,
+  isLoadingChapters,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
@@ -194,6 +203,16 @@ const MainPage = ({
     <SectionContainer>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
+          {courses && (
+            <Line>
+              <LeftLoader isLoading={isLoadingChapters}>
+                <RaisedButton
+                  onClick={() => onSelectCourse(courses[0])}
+                  label={<Trans>See course</Trans>}
+                />
+              </LeftLoader>
+            </Line>
+          )}
           <Line noMargin>
             <GridList
               cols={getColumnsFromWindowSize(windowSize, isLandscape)}

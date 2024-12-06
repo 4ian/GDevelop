@@ -21,6 +21,11 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { formatDuration } from '../../../../Utils/Duration';
+import CourseSection from './CourseSection';
+import type {
+  CourseChapter,
+  Course,
+} from '../../../../Utils/GDevelopServices/Asset';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -120,6 +125,10 @@ type Props = {|
   initialCategory: TutorialCategory | null,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  courses: ?(Course[]),
+  courseChapters: ?(CourseChapter[]),
+  onSelectCourse: (?Course) => void,
+  isLoadingChapters: boolean,
 |};
 
 const LearnSection = ({
@@ -128,6 +137,10 @@ const LearnSection = ({
   initialCategory,
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
+  courses,
+  courseChapters,
+  onSelectCourse,
+  isLoadingChapters,
 }: Props) => {
   const {
     tutorials,
@@ -156,6 +169,16 @@ const LearnSection = ({
     [initialCategory]
   );
 
+  if (courseChapters) {
+    return (
+      <CourseSection
+        courseChapters={courseChapters}
+        onBack={() => onSelectCourse(null)}
+        onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
+      />
+    );
+  }
+
   if (tutorialLoadingError)
     return (
       <Paper square style={styles.paper} background="dark">
@@ -176,6 +199,9 @@ const LearnSection = ({
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
+      courses={courses}
+      onSelectCourse={onSelectCourse}
+      isLoadingChapters={isLoadingChapters}
     />
   ) : (
     <TutorialsCategoryPage

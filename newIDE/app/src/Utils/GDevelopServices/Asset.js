@@ -8,6 +8,7 @@ import {
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import {
   type PrivateGameTemplateListingData,
@@ -202,6 +203,14 @@ export type LockedCourseChapter = {|
 |};
 
 export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
+
+export type Course = {|
+  id: string,
+  titleByLocale: MessageByLocale,
+  shortDescriptionByLocale: MessageByLocale,
+  freeChapters: number,
+  chapterPriceInCredits: number,
+|};
 
 export type Environment = 'staging' | 'live';
 
@@ -525,6 +534,7 @@ const resourceFilenameRegex = new RegExp(
     GDevelopPublicAssetResourcesStorageStagingBaseUrl
   )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
 );
+
 export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   url: string
 ): string => {
@@ -537,4 +547,36 @@ export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
     filenameWithExtension
   );
   return decodedFilenameWithExtension;
+};
+
+export const listCourses = async (): Promise<Array<Course>> => {
+  const response = await client.get(`/course`);
+  return response.data;
+};
+
+export const listCourseChapters = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    courseId,
+  }: {|
+    userId: ?string,
+    courseId: string,
+  |}
+): Promise<Array<CourseChapter>> => {
+  if (userId) {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.get(`/course/${courseId}/chapter`, {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
+  const response = await client.get(`/course/${courseId}/chapter`);
+  return response.data;
 };

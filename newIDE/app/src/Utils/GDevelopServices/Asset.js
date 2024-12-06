@@ -212,6 +212,12 @@ export type Course = {|
   chapterPriceInCredits: number,
 |};
 
+export type UserCourseProgress = {|
+  userId: string,
+  courseId: string,
+  progress: {| chapterId: string, completedTasks: number[] |}[],
+|};
+
 export type Environment = 'staging' | 'live';
 
 export const client = axios.create({

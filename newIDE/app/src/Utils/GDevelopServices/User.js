@@ -17,6 +17,8 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
+import { type UserCourseProgress } from './Asset';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export type BatchCreationResultUser = {|
   email: string,
@@ -716,4 +718,41 @@ export const communityLinksConfig = {
         : undefined,
     maxLength: 150,
   },
+};
+
+export const fetchUserCourseProgress = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  courseId: string
+): Promise<UserCourseProgress | null> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  try {
+    const response = await client.get(`/course/${courseId}/progress`, {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    });
+
+    return response.data.progress;
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+export const updateUserCourseProgress = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userCourseProgress: UserCourseProgress
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.put(
+    `/course/${userCourseProgress.courseId}/progress`,
+    { progress: userCourseProgress.progress },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId: userCourseProgress.userId },
+    }
+  );
 };

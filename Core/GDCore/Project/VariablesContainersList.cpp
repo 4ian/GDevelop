@@ -84,7 +84,7 @@ VariablesContainersList VariablesContainersList::
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 
-  variablesContainersList.firstLocalVariableContainerIndex = 4;
+  variablesContainersList.firstLocalVariableContainerIndex = 5;
   return variablesContainersList;
 }
 

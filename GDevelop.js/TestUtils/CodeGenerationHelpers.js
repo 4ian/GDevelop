@@ -458,6 +458,7 @@ function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
 
 module.exports = {
   generateCompiledEventsForEventsFunction,
+  generateCompiledEventsForEventsFunctionWithContext,
   generateCompiledEventsFromSerializedEvents,
   generateCompiledEventsFunctionFromSerializedEvents,
   generateCompiledEventsForSerializedEventsBasedExtension,

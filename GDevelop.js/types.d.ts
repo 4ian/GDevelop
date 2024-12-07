@@ -1907,6 +1907,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
   static renameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
   static renameParameter(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
+  static changeParameterType(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterName: string): void;
   static moveEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
   static moveObjectEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;

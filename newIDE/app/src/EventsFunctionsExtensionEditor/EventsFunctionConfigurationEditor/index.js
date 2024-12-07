@@ -57,6 +57,10 @@ type Props = {|
     oldName: string,
     newName: string
   ) => void,
+  onFunctionParameterChangedOfType: (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
   getFunctionGroupNames?: () => string[],
 |};
@@ -156,6 +160,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       eventsFunctionsContainer,
       eventsFunctionsExtension,
       onFunctionParameterWillBeRenamed,
+      onFunctionParameterChangedOfType,
     } = this.props;
 
     const hasLegacyFunctionObjectGroups =
@@ -222,6 +227,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
             onMoveObjectEventsParameter={onMoveObjectEventsParameter}
             onFunctionParameterWillBeRenamed={onFunctionParameterWillBeRenamed}
+            onFunctionParameterChangedOfType={onFunctionParameterChangedOfType}
             key={eventsFunction ? eventsFunction.ptr : null}
           />
         ) : null}

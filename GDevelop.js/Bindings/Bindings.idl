@@ -2536,6 +2536,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] ObjectsContainer parameterObjectsContainer,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_ChangeParameterType(
+      [Ref] Project project,
+      [Ref] ProjectScopedContainers projectScopedContainers,
+      [Ref] EventsFunction eventsFunction,
+      [Const, Ref] ObjectsContainer parameterObjectsContainer,
+      [Const] DOMString parameterName);
     void STATIC_MoveEventsFunctionParameter(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

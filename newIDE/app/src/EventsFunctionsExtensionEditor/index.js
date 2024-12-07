@@ -160,6 +160,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer(
     gd.ObjectsContainer.Function
   );
+  _parameterVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
+    gd.VariablesContainer.Parameters
+  );
+  _propertyVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
+    gd.VariablesContainer.Properties
+  );
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
@@ -211,7 +217,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     };
     this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
       scope,
-      this._objectsContainer
+      this._objectsContainer,
+      this._parameterVariablesContainer,
+      this._propertyVariablesContainer
     );
   };
 
@@ -1050,6 +1058,44 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onFunctionParameterWillBeRenamed = (
+    eventsFunction: gdEventsFunction,
+    oldName: string,
+    newName: string
+  ) => {
+    if (!this._projectScopedContainersAccessor) {
+      return;
+    }
+    const projectScopedContainers = this._projectScopedContainersAccessor.get();
+    const { project } = this.props;
+    gd.WholeProjectRefactorer.renameParameter(
+      project,
+      projectScopedContainers,
+      eventsFunction,
+      this._objectsContainer,
+      oldName,
+      newName
+    );
+  };
+
+  _onFunctionParameterChangedOfType = (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => {
+    if (!this._projectScopedContainersAccessor) {
+      return;
+    }
+    const projectScopedContainers = this._projectScopedContainersAccessor.get();
+    const { project } = this.props;
+    gd.WholeProjectRefactorer.changeParameterType(
+      project,
+      projectScopedContainers,
+      eventsFunction,
+      this._objectsContainer,
+      parameterName
+    );
+  };
+
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
@@ -1339,6 +1385,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onMoveObjectEventsParameter={this._makeMoveObjectEventsParameter(
                       i18n
                     )}
+                    onFunctionParameterWillBeRenamed={
+                      this._onFunctionParameterWillBeRenamed
+                    }
+                    onFunctionParameterChangedOfType={
+                      this._onFunctionParameterChangedOfType
+                    }
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
                   />
@@ -1430,6 +1482,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onPropertyTypeChanged={propertyName => {
+                gd.WholeProjectRefactorer.changeEventsBasedBehaviorPropertyType(
+                  project,
+                  eventsFunctionsExtension,
+                  selectedEventsBasedBehavior,
+                  propertyName
+                );
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();
@@ -1454,6 +1514,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   newName
                 )
               }
+              onPropertyTypeChanged={propertyName => {
+                gd.WholeProjectRefactorer.changeEventsBasedObjectPropertyType(
+                  project,
+                  eventsFunctionsExtension,
+                  selectedEventsBasedObject,
+                  propertyName
+                );
+              }}
               onEventsFunctionsAdded={() => {
                 if (this.eventsFunctionList) {
                   this.eventsFunctionList.forceUpdateList();

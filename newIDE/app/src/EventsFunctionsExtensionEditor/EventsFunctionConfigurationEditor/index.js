@@ -52,6 +52,15 @@ type Props = {|
     newIndex: number,
     done: (boolean) => void
   ) => void,
+  onFunctionParameterWillBeRenamed: (
+    eventsFunction: gdEventsFunction,
+    oldName: string,
+    newName: string
+  ) => void,
+  onFunctionParameterChangedOfType: (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
   getFunctionGroupNames?: () => string[],
 |};
@@ -102,6 +111,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       project,
       projectScopedContainersAccessor,
       eventsFunction,
+      objectsContainer,
     } = this.props;
 
     // newName is supposed to have been already validated
@@ -112,6 +122,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
         project,
         projectScopedContainersAccessor.get(),
         eventsFunction,
+        // This is the ObjectsContainer generated from parameters
+        objectsContainer,
         group.getName(),
         newName,
         /* isObjectGroup=*/ true
@@ -147,6 +159,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       getFunctionGroupNames,
       eventsFunctionsContainer,
       eventsFunctionsExtension,
+      onFunctionParameterWillBeRenamed,
+      onFunctionParameterChangedOfType,
     } = this.props;
 
     const hasLegacyFunctionObjectGroups =
@@ -212,6 +226,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onMoveFreeEventsParameter={onMoveFreeEventsParameter}
             onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
             onMoveObjectEventsParameter={onMoveObjectEventsParameter}
+            onFunctionParameterWillBeRenamed={onFunctionParameterWillBeRenamed}
+            onFunctionParameterChangedOfType={onFunctionParameterChangedOfType}
             key={eventsFunction ? eventsFunction.ptr : null}
           />
         ) : null}

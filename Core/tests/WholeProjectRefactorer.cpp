@@ -92,6 +92,37 @@ CreateInstructionWithNumberParameter(gd::Project &project,
 }
 
 const gd::Instruction &
+CreateInstructionWithObjectParameter(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &objectName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("MyExtension::DoSomethingWithObjects");
+  instruction.SetParametersCount(2);
+  instruction.SetParameter(0, objectName);
+  instruction.SetParameter(1, "");
+  return event.GetActions().Insert(instruction);
+}
+
+const gd::Instruction &
+CreateInstructionWithBehaviorParameter(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &objectName,
+                                     const gd::String &behaviorName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("MyExtension::BehaviorDoSomething");
+  instruction.SetParametersCount(2);
+  instruction.SetParameter(0, objectName);
+  instruction.SetParameter(1, behaviorName);
+  return event.GetActions().Insert(instruction);
+}
+
+const gd::Instruction &
 CreateInstructionWithVariableParameter(gd::Project &project,
                                      gd::EventsList &events,
                                      const gd::String &expression) {
@@ -103,6 +134,74 @@ CreateInstructionWithVariableParameter(gd::Project &project,
   instruction.SetParametersCount(1);
   instruction.SetParameter(0, expression);
   return event.GetActions().Insert(instruction);
+}
+
+const gd::Instruction &
+CreateNumberVariableSetterAction(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &variableName,
+                                     const gd::String &expression) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("SetNumberVariable");
+  instruction.SetParametersCount(3);
+  instruction.SetParameter(0, variableName);
+  instruction.SetParameter(1, "=");
+  instruction.SetParameter(2, expression);
+  return event.GetActions().Insert(instruction);
+}
+
+const gd::Instruction &
+CreateNumberVariableGetterCondition(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &variableName,
+                                     const gd::String &expression) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("NumberVariable");
+  instruction.SetParametersCount(3);
+  instruction.SetParameter(0, variableName);
+  instruction.SetParameter(1, "=");
+  instruction.SetParameter(2, expression);
+  return event.GetConditions().Insert(instruction);
+}
+
+const gd::Instruction &
+CreateStringVariableSetterAction(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &variableName,
+                                     const gd::String &expression) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("SetStringVariable");
+  instruction.SetParametersCount(3);
+  instruction.SetParameter(0, variableName);
+  instruction.SetParameter(1, "=");
+  instruction.SetParameter(2, expression);
+  return event.GetActions().Insert(instruction);
+}
+
+const gd::Instruction &
+CreateStringVariableGetterCondition(gd::Project &project,
+                                     gd::EventsList &events,
+                                     const gd::String &variableName,
+                                     const gd::String &expression) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction instruction;
+  instruction.SetType("StringVariable");
+  instruction.SetParametersCount(3);
+  instruction.SetParameter(0, variableName);
+  instruction.SetParameter(1, "=");
+  instruction.SetParameter(2, expression);
+  return event.GetConditions().Insert(instruction);
 }
 
 enum TestEvent {
@@ -1461,7 +1560,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       auto &layout = project.GetLayout("Scene");
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "ObjectWithMyBehavior",
           "RenamedObjectWithMyBehavior",
@@ -1489,7 +1588,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       auto &layout = project.GetLayout("Scene");
 
-      // Trigger the refactoring after the renaming of a group
+      // Trigger the refactoring before the renaming of a group
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
           project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
           /* isObjectGroup=*/true);
@@ -1563,15 +1662,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Create the objects container for the events function
       gd::ObjectsContainer parametersObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
+      gd::VariablesContainer parameterVariablesContainer(
+          gd::VariablesContainer::SourceType::Parameters);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsExtension, eventsFunction,
-              parametersObjectsContainer);
+              parametersObjectsContainer, parameterVariablesContainer);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
-          "Object1", "RenamedObject1",
+          parametersObjectsContainer, "Object1", "RenamedObject1",
           /* isObjectGroup=*/false);
 
       REQUIRE(objectGroup.Find("Object1") == false);
@@ -1592,10 +1693,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Create the objects container for the events function
       gd::ObjectsContainer parametersObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
+      gd::VariablesContainer parameterVariablesContainer(
+          gd::VariablesContainer::SourceType::Parameters);
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsExtension, eventsFunction,
-              parametersObjectsContainer);
+              parametersObjectsContainer, parameterVariablesContainer);
 
       // Simulate a variable in ObjectWithMyBehavior, even if this is not
       // supported by the editor.
@@ -1603,10 +1706,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       objectWithMyBehavior.GetVariables().InsertNew("MyVariable");
       objectWithMyBehavior.GetVariables().InsertNew("MyStructureVariable").CastTo(gd::Variable::Structure);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
           project, projectScopedContainers, eventsFunction,
-          "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
+          parametersObjectsContainer, "ObjectWithMyBehavior",
+          "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
 
       // Check object name has been renamed in action parameters.
@@ -1722,7 +1826,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               project, eventsExtension, eventsBasedObject,
               parametersObjectsContainer);
 
-      // Trigger the refactoring after the renaming of an object
+      // Trigger the refactoring before the renaming of an object
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
           project, projectScopedContainers, eventsBasedObject,
           "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
@@ -2304,6 +2408,375 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(eventsExtension.GetEventsFunction("MyEventsFunctionActionWithOperator")
           .GetGetterName() == "MyRenamedFunctionExpressionAndCondition");
     }
+  }
+
+  SECTION("(Free) number parameter renamed (in expressions)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    auto &instruction = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(), "MyParameter");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyParameter])");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedParameter");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedParameter])");
+  }
+
+  SECTION("(Free) number parameter renamed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    auto &instruction = CreateNumberVariableGetterCondition(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedParameter");
+  }
+
+  SECTION("(Free) number parameter renamed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    auto &instruction = CreateNumberVariableGetterCondition(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedParameter");
+  }
+
+  SECTION("(Free) parameter type changed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableSetterAction(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::ChangeParameterType(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter");
+
+    REQUIRE(instruction.GetType() == "SetNumberVariable");
+  }
+
+  SECTION("(Free) parameter type changed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableGetterCondition(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::ChangeParameterType(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter");
+
+    REQUIRE(instruction.GetType() == "NumberVariable");
+  }
+
+
+  SECTION("(Free) number parameter not renamed (in variable parameter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    // Parameters can't actually be used in "variable" parameters.
+    auto &instruction = CreateInstructionWithVariableParameter(
+        project, eventsFunction.GetEvents(), "MyParameter");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyParameter)");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter", "MyRenamedParameter");
+
+    // "variable" parameters are left untouched.
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyParameter");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyParameter)");
+  }
+
+  SECTION("(Free) object parameter renamed (in expressions)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    auto &instruction = CreateInstructionWithObjectParameter(
+        project, eventsFunction.GetEvents(), "MyObject");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(), "MyObject.GetObjectStringWith1Param(0)");
+    auto &instruction3 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyObject.GetObjectStringWith1Param(0)])");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyObject", "MyRenamedObject");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedObject");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyRenamedObject.GetObjectStringWith1Param(0)");
+    REQUIRE(instruction3.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedObject.GetObjectStringWith1Param(0)])");
+  }
+
+  SECTION("(Free) object parameter not renamed (in variable parameter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    // Parameters can't actually be used in "variable" parameters.
+    auto &instruction = CreateInstructionWithVariableParameter(
+        project, eventsFunction.GetEvents(), "MyObject");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyObject)");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyObject", "MyRenamedObject");
+
+    // "variable" parameters are left untouched.
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyObject");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyObject)");
+  }
+
+  SECTION("(Free) behavior parameter renamed (in expressions)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyBehavior")
+        .GetValueTypeMetadata()
+        .SetName("behavior")
+        .SetExtraInfo("MyExtension::MyBehavior");
+    auto &instruction = CreateInstructionWithBehaviorParameter(
+        project, eventsFunction.GetEvents(), "MyObject", "MyBehavior");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(), "MyObject.MyBehavior::GetBehaviorStringWith1Param(0)");
+    auto &instruction3 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyObject.MyBehavior::GetBehaviorStringWith1Param(0)])");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyBehavior", "MyRenamedBehavior");
+
+    REQUIRE(instruction.GetParameter(1).GetPlainString() ==
+            "MyRenamedBehavior");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyObject.MyRenamedBehavior::GetBehaviorStringWith1Param(0)");
+    REQUIRE(instruction3.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyObject.MyRenamedBehavior::GetBehaviorStringWith1Param(0)])");
+  }
+
+  SECTION("(Free) behavior parameter not renamed (in variable parameter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyObject")
+        .GetValueTypeMetadata()
+        .SetName("objectList")
+        .SetExtraInfo("MyExtension::Sprite");
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyBehavior")
+        .GetValueTypeMetadata()
+        .SetName("behavior")
+        .SetExtraInfo("MyExtension::MyBehavior");
+    // Parameters can't actually be used in "variable" parameters.
+    auto &instruction = CreateInstructionWithVariableParameter(
+        project, eventsFunction.GetEvents(), "MyBehavior");
+    auto &instruction2 = CreateInstructionWithNumberParameter(
+        project, eventsFunction.GetEvents(),
+        "MyExtension::GetVariableAsNumber(MyBehavior)");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::RenameParameter(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyBehavior", "MyRenamedBehavior");
+
+    // "variable" parameters are left untouched.
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyBehavior");
+    REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
+            "MyExtension::GetVariableAsNumber(MyBehavior)");
   }
 
   SECTION("(Free) events action parameter moved") {
@@ -3102,6 +3575,54 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
   }
 
+  SECTION("(Events based behavior) property renamed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    auto &behaviorAction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+    auto &instruction = CreateNumberVariableSetterAction(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
+        project, eventsExtension, eventsBasedBehavior, "MyProperty",
+        "MyRenamedProperty");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedProperty");
+  }
+
+  SECTION("(Events based behavior) property renamed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    auto &behaviorAction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+    auto &instruction = CreateNumberVariableGetterCondition(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
+        project, eventsExtension, eventsBasedBehavior, "MyProperty",
+        "MyRenamedProperty");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedProperty");
+  }
+
   SECTION("(Events based behavior) property not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
@@ -3131,6 +3652,52 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
             "MyExtension::GetVariableAsNumber(MyProperty)");
+  }
+
+  SECTION("(Events based behavior) property type changed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    auto &behaviorAction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableSetterAction(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::ChangeEventsBasedBehaviorPropertyType(
+        project, eventsExtension, eventsBasedBehavior, "MyProperty");
+
+    REQUIRE(instruction.GetType() == "SetNumberVariable");
+  }
+
+  SECTION("(Events based behavior) property type changed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    auto &behaviorAction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableGetterCondition(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::ChangeEventsBasedBehaviorPropertyType(
+        project, eventsExtension, eventsBasedBehavior, "MyProperty");
+
+    REQUIRE(instruction.GetType() == "NumberVariable");
   }
 
   SECTION("(Events based behavior) shared property renamed") {
@@ -3272,6 +3839,54 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
   }
 
+  SECTION("(Events based object) property renamed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+
+    auto &behaviorAction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+    auto &instruction = CreateNumberVariableSetterAction(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::RenameEventsBasedObjectProperty(
+        project, eventsExtension, eventsBasedObject, "MyProperty",
+        "MyRenamedProperty");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedProperty");
+  }
+
+  SECTION("(Events based object) property renamed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+
+    auto &behaviorAction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+    auto &instruction = CreateNumberVariableGetterCondition(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::RenameEventsBasedObjectProperty(
+        project, eventsExtension, eventsBasedObject, "MyProperty",
+        "MyRenamedProperty");
+
+    REQUIRE(instruction.GetParameter(0).GetPlainString() ==
+            "MyRenamedProperty");
+  }
+
   SECTION("(Events based object) property not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
@@ -3301,6 +3916,52 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
             "MyExtension::GetVariableAsNumber(MyProperty)");
+  }
+
+  SECTION("(Events based object) property type changed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+
+    auto &behaviorAction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableSetterAction(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::ChangeEventsBasedObjectPropertyType(
+        project, eventsExtension, eventsBasedObject, "MyProperty");
+
+    REQUIRE(instruction.GetType() == "SetNumberVariable");
+  }
+
+  SECTION("(Events based object) property type changed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+
+    auto &behaviorAction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableGetterCondition(
+        project, behaviorAction.GetEvents(), "MyProperty", "123");
+
+    gd::WholeProjectRefactorer::ChangeEventsBasedObjectPropertyType(
+        project, eventsExtension, eventsBasedObject, "MyProperty");
+
+    REQUIRE(instruction.GetType() == "NumberVariable");
   }
 }
 // TODO: Check that this works when behaviors are attached to a child-object.

@@ -4,7 +4,7 @@ const gd: libGDevelop = global.gd;
 
 describe('EnumerateVariables', () => {
   it('can enumerate variables, including children', () => {
-    const container = new gd.VariablesContainer();
+    const container = new gd.VariablesContainer(gd.VariablesContainer.Unknown);
     container
       .insert('Variable1', new gd.Variable(), 0)
       .setString('A multiline\nstr value');
@@ -44,7 +44,7 @@ describe('EnumerateVariables', () => {
     expect(allNames).toContain('Variable4[2][2]');
   });
   it('can enumerate "invalid" variable names, including children', () => {
-    const container = new gd.VariablesContainer();
+    const container = new gd.VariablesContainer(gd.VariablesContainer.Unknown);
     container.insert('ValidName', new gd.Variable(), 0);
     container.insert('Invalid!Name', new gd.Variable(), 1);
     const variable3 = new gd.Variable();

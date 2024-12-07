@@ -22,6 +22,7 @@
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 
 using namespace std;
 
@@ -51,17 +52,17 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
 
   static bool Rename(const gd::Platform &platform,
                      const gd::ProjectScopedContainers &projectScopedContainers,
-                     const gd::String &rootType,
-                     gd::ExpressionNode& node,
-                     const gd::String& objectName,
-                     const gd::String& objectNewName) {
-    if (gd::ExpressionValidator::HasNoErrors(platform, projectScopedContainers, rootType, node)) {
-      ExpressionObjectRenamer renamer(platform, projectScopedContainers, rootType, objectName, objectNewName);
+                     const gd::String &rootType, gd::ExpressionNode &node,
+                     const gd::String &objectName,
+                     const gd::String &objectNewName) {
+    if (gd::ExpressionValidator::HasNoErrors(platform, projectScopedContainers,
+                                             rootType, node)) {
+      ExpressionObjectRenamer renamer(platform, projectScopedContainers,
+                                      rootType, objectName, objectNewName);
       node.Visit(renamer);
 
       return renamer.HasDoneRenaming();
     }
-
     return false;
   }
 
@@ -83,7 +84,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   void OnVisitVariableNode(VariableNode& node) override {
     auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
 
-    if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
+    if (gd::ValueTypeMetadata::IsVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.name == objectName) {
@@ -119,7 +120,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
         node.identifierName == objectName) {
       hasDoneRenaming = true;
       node.identifierName = objectNewName;
-    } else if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
+    } else if (gd::ValueTypeMetadata::IsVariable(type)) {
       // Nothing to do (this can't reference an object)
     } else {
       if (node.identifierName == objectName) {
@@ -295,183 +296,114 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   const gd::String rootType;
 };
 
-bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
-                                             const gd::ProjectScopedContainers& projectScopedContainers,
-                                             gd::InstructionsList& actions,
-                                             gd::String oldName,
-                                             gd::String newName) {
-  bool somethingModified = false;
+/**
+ * \brief Replace in expressions and in parameters of actions or conditions,
+ * references to the name of an object by another.
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API EventsObjectReplacer
+    : public ArbitraryEventsWorkerWithContext {
+public:
+  EventsObjectReplacer(const gd::Platform &platform_,
+                       const gd::ObjectsContainer &targetedObjectsContainer_,
+                       const gd::String &oldObjectName_,
+                       const gd::String &newObjectName_)
+      : platform(platform_),
+        targetedObjectsContainer(targetedObjectsContainer_),
+        oldObjectName(oldObjectName_), newObjectName(newObjectName_){};
 
-  for (std::size_t aId = 0; aId < actions.size(); ++aId) {
-    const gd::InstructionMetadata& instrInfos =
-        MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
-    for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
-      // Replace object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType()) &&
-          actions[aId].GetParameter(pNb).GetPlainString() == oldName)
-        actions[aId].SetParameter(pNb, gd::Expression(newName));
-      // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = actions[aId].GetParameter(pNb).GetRootNode();
+  virtual ~EventsObjectReplacer() {}
 
-        if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "number", *node, oldName, newName)) {
-          actions[aId].SetParameter(
-              pNb, ExpressionParser2NodePrinter::PrintNode(*node));
-        }
-      }
-      // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = actions[aId].GetParameter(pNb).GetRootNode();
-
-        if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "string", *node, oldName, newName)) {
-          actions[aId].SetParameter(
-              pNb, ExpressionParser2NodePrinter::PrintNode(*node));
-        }
-      }
+private:
+  bool DoVisitInstruction(gd::Instruction &instruction,
+                          bool isCondition) override {
+    if (&targetedObjectsContainer !=
+        GetProjectScopedContainers()
+            .GetObjectsContainersList()
+            .GetObjectsContainerFromObjectName(oldObjectName)) {
+      return false;
     }
+    const auto &metadata = isCondition
+                               ? gd::MetadataProvider::GetConditionMetadata(
+                                     platform, instruction.GetType())
+                               : gd::MetadataProvider::GetActionMetadata(
+                                     platform, instruction.GetType());
 
-    if (!actions[aId].GetSubInstructions().empty())
-      somethingModified =
-          RenameObjectInActions(platform,
-                                projectScopedContainers,
-                                actions[aId].GetSubInstructions(),
-                                oldName,
-                                newName) ||
-          somethingModified;
+    gd::ParameterMetadataTools::IterateOverParametersWithIndex(
+        instruction.GetParameters(), metadata.GetParameters(),
+        [&](const gd::ParameterMetadata &parameterMetadata,
+            const gd::Expression &parameterValue, size_t parameterIndex,
+            const gd::String &lastObjectName) {
+          if (!gd::EventsObjectReplacer::CanContainObject(
+                  parameterMetadata.GetValueTypeMetadata())) {
+            return;
+          }
+          auto node = parameterValue.GetRootNode();
+          if (node) {
+            ExpressionObjectRenamer renamer(
+                platform, GetProjectScopedContainers(),
+                parameterMetadata.GetValueTypeMetadata().GetName(),
+                oldObjectName, newObjectName);
+            node->Visit(renamer);
+
+            if (renamer.HasDoneRenaming()) {
+              instruction.SetParameter(
+                  parameterIndex,
+                  ExpressionParser2NodePrinter::PrintNode(*node));
+            }
+          }
+        });
+
+    return false;
   }
 
-  return somethingModified;
-}
-
-bool EventsRefactorer::RenameObjectInConditions(
-    const gd::Platform& platform,
-    const gd::ProjectScopedContainers& projectScopedContainers,
-    gd::InstructionsList& conditions,
-    gd::String oldName,
-    gd::String newName) {
-  bool somethingModified = false;
-
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
-    const gd::InstructionMetadata& instrInfos =
-        MetadataProvider::GetConditionMetadata(platform,
-                                               conditions[cId].GetType());
-    for (std::size_t pNb = 0; pNb < instrInfos.parameters.GetParametersCount(); ++pNb) {
-      // Replace object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters.GetParameter(pNb).GetType()) &&
-          conditions[cId].GetParameter(pNb).GetPlainString() == oldName)
-        conditions[cId].SetParameter(pNb, gd::Expression(newName));
-      // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
-
-        if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "number", *node, oldName, newName)) {
-          conditions[cId].SetParameter(
-              pNb, ExpressionParser2NodePrinter::PrintNode(*node));
-        }
-      }
-      // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
-
-        if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "string", *node, oldName, newName)) {
-          conditions[cId].SetParameter(
-              pNb, ExpressionParser2NodePrinter::PrintNode(*node));
-        }
-      }
+  bool DoVisitEventExpression(gd::Expression &expression,
+                              const gd::ParameterMetadata &metadata) override {
+    if (&targetedObjectsContainer !=
+        GetProjectScopedContainers()
+            .GetObjectsContainersList()
+            .GetObjectsContainerFromObjectName(oldObjectName)) {
+      return false;
     }
-
-    if (!conditions[cId].GetSubInstructions().empty())
-      somethingModified =
-          RenameObjectInConditions(platform,
-                                   projectScopedContainers,
-                                   conditions[cId].GetSubInstructions(),
-                                   oldName,
-                                   newName) ||
-          somethingModified;
-  }
-
-  return somethingModified;
-}
-
-bool EventsRefactorer::RenameObjectInEventParameters(
-    const gd::Platform& platform,
-    const gd::ProjectScopedContainers& projectScopedContainers,
-    gd::Expression& expression,
-    gd::ParameterMetadata parameterMetadata,
-    gd::String oldName,
-    gd::String newName) {
-  bool somethingModified = false;
-
-  if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()) &&
-      expression.GetPlainString() == oldName)
-    expression = gd::Expression(newName);
-  // Replace object's name in expressions
-  else if (ParameterMetadata::IsExpression("number",
-                                           parameterMetadata.GetType())) {
+    if (!gd::EventsObjectReplacer::CanContainObject(
+            metadata.GetValueTypeMetadata())) {
+      return false;
+    }
     auto node = expression.GetRootNode();
+    if (node) {
+      ExpressionObjectRenamer renamer(platform, GetProjectScopedContainers(),
+                                      metadata.GetValueTypeMetadata().GetName(),
+                                      oldObjectName, newObjectName);
+      node->Visit(renamer);
 
-    if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "number", *node, oldName, newName)) {
-      expression = ExpressionParser2NodePrinter::PrintNode(*node);
+      if (renamer.HasDoneRenaming()) {
+        expression = ExpressionParser2NodePrinter::PrintNode(*node);
+      }
     }
-  }
-  // Replace object's name in text expressions
-  else if (ParameterMetadata::IsExpression("string",
-                                           parameterMetadata.GetType())) {
-    auto node = expression.GetRootNode();
 
-    if (ExpressionObjectRenamer::Rename(platform, projectScopedContainers, "string", *node, oldName, newName)) {
-      expression = ExpressionParser2NodePrinter::PrintNode(*node);
-    }
+    return false;
   }
 
-  return somethingModified;
-}
+  bool CanContainObject(const gd::ValueTypeMetadata &valueTypeMetadata) {
+    return valueTypeMetadata.IsObject() || valueTypeMetadata.IsVariable() ||
+           valueTypeMetadata.IsNumber() || valueTypeMetadata.IsString();
+  }
+
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &targetedObjectsContainer;
+  const gd::String &oldObjectName;
+  const gd::String &newObjectName;
+};
 
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
                                             const gd::ProjectScopedContainers& projectScopedContainers,
                                             gd::EventsList& events,
+                                            const gd::ObjectsContainer &targetedObjectsContainer,
                                             gd::String oldName,
                                             gd::String newName) {
-  for (std::size_t i = 0; i < events.size(); ++i) {
-    vector<gd::InstructionsList*> conditionsVectors =
-        events[i].GetAllConditionsVectors();
-    for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
-      bool somethingModified = RenameObjectInConditions(
-          platform, projectScopedContainers, *conditionsVectors[j], oldName, newName);
-    }
-
-    vector<gd::InstructionsList*> actionsVectors =
-        events[i].GetAllActionsVectors();
-    for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
-      bool somethingModified = RenameObjectInActions(
-          platform, projectScopedContainers, *actionsVectors[j], oldName, newName);
-    }
-
-    vector<pair<gd::Expression*, gd::ParameterMetadata>>
-        expressionsWithMetadata = events[i].GetAllExpressionsWithMetadata();
-    for (std::size_t j = 0; j < expressionsWithMetadata.size(); ++j) {
-      gd::Expression* expression = expressionsWithMetadata[j].first;
-      gd::ParameterMetadata parameterMetadata =
-          expressionsWithMetadata[j].second;
-      bool somethingModified = RenameObjectInEventParameters(platform,
-                                                             projectScopedContainers,
-                                                             *expression,
-                                                             parameterMetadata,
-                                                             oldName,
-                                                             newName);
-    }
-
-    if (events[i].CanHaveSubEvents())
-      RenameObjectInEvents(platform,
-                           projectScopedContainers,
-                           events[i].GetSubEvents(),
-                           oldName,
-                           newName);
-  }
+  gd::EventsObjectReplacer eventsParameterReplacer(platform, targetedObjectsContainer, oldName, newName);
+  eventsParameterReplacer.Launch(events, projectScopedContainers);
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,

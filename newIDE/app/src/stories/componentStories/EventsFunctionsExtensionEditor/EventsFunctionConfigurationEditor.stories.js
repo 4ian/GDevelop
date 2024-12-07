@@ -32,6 +32,12 @@ export const DefaultFreeFunction = () => (
       eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
+      onFunctionParameterWillBeRenamed={action(
+        'onFunctionParameterWillBeRenamed'
+      )}
+      onFunctionParameterChangedOfType={action(
+        'onFunctionParameterChangedOfType'
+      )}
     />
   </FixedHeightFlexContainer>
 );
@@ -52,6 +58,12 @@ export const DefaultBehaviorFunction = () => (
       eventsFunctionsContainer={testProject.testEventsBasedBehavior.getEventsFunctions()}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
+      onFunctionParameterWillBeRenamed={action(
+        'onFunctionParameterWillBeRenamed'
+      )}
+      onFunctionParameterChangedOfType={action(
+        'onFunctionParameterChangedOfType'
+      )}
     />
   </FixedHeightFlexContainer>
 );
@@ -72,6 +84,12 @@ export const DefaultBehaviorLifecycleFunction = () => (
       eventsFunctionsContainer={testProject.testEventsBasedBehavior.getEventsFunctions()}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
+      onFunctionParameterWillBeRenamed={action(
+        'onFunctionParameterWillBeRenamed'
+      )}
+      onFunctionParameterChangedOfType={action(
+        'onFunctionParameterChangedOfType'
+      )}
     />
   </FixedHeightFlexContainer>
 );
@@ -92,6 +110,12 @@ export const DefaultObjectFunction = () => (
       eventsFunctionsContainer={testProject.testEventsBasedObject.getEventsFunctions()}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
+      onFunctionParameterWillBeRenamed={action(
+        'onFunctionParameterWillBeRenamed'
+      )}
+      onFunctionParameterChangedOfType={action(
+        'onFunctionParameterChangedOfType'
+      )}
     />
   </FixedHeightFlexContainer>
 );

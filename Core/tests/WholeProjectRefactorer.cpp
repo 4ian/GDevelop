@@ -2508,6 +2508,68 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyRenamedParameter");
   }
 
+  SECTION("(Free function) parameter type changed (in variable setter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableSetterAction(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::ChangeParameterType(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter");
+
+    REQUIRE(instruction.GetType() == "SetNumberVariable");
+  }
+
+  SECTION("(Free function) parameter type changed (in variable getter)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsFunction =
+        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+    eventsFunction.GetParameters()
+        .AddNewParameter("MyParameter")
+        .GetValueTypeMetadata()
+        .SetName("number");
+    // The property was of type "string".
+    auto &instruction = CreateStringVariableGetterCondition(
+        project, eventsFunction.GetEvents(), "MyParameter", "123");
+
+    gd::ObjectsContainer parametersObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    auto projectScopedContainers = gd::ProjectScopedContainers::
+        MakeNewProjectScopedContainersForFreeEventsFunction(
+            project, eventsExtension, eventsFunction,
+            parametersObjectsContainer, parameterVariablesContainer);
+    gd::WholeProjectRefactorer::ChangeParameterType(
+        project, projectScopedContainers, eventsFunction,
+        parametersObjectsContainer, "MyParameter");
+
+    REQUIRE(instruction.GetType() == "NumberVariable");
+  }
+
   SECTION("(Free function) number parameter not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;

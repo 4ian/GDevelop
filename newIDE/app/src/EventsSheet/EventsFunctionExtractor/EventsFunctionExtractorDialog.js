@@ -329,6 +329,9 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               onFunctionParameterWillBeRenamed={() => {
                 // Won't happen as the editor is freezed.
               }}
+              onFunctionParameterChangedOfType={() => {
+                // Won't happen as the editor is freezed.
+              }}
               freezeParameters
             />
           )}

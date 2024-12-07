@@ -862,6 +862,23 @@ void WholeProjectRefactorer::RenameParameter(
   }
 }
 
+void WholeProjectRefactorer::ChangeParameterType(
+    gd::Project &project, gd::ProjectScopedContainers &projectScopedContainers,
+    gd::EventsFunction &eventsFunction,
+    const gd::ObjectsContainer &parameterObjectsContainer,
+    const gd::String &parameterName) {
+  std::unordered_set<gd::String> typeChangedPropertyNames;
+  typeChangedPropertyNames.insert(parameterName);
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
+  gd::EventsVariableInstructionTypeSwitcher
+      eventsVariableInstructionTypeSwitcher(project.GetCurrentPlatform(),
+                                            typeChangedPropertyNames,
+                                            propertyVariablesContainer);
+  eventsVariableInstructionTypeSwitcher.Launch(eventsFunction.GetEvents(),
+                                               projectScopedContainers);
+}
+
 void WholeProjectRefactorer::MoveEventsFunctionParameter(
     gd::Project &project,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,

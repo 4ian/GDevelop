@@ -1078,6 +1078,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onFunctionParameterChangedOfType = (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => {
+    if (!this._projectScopedContainersAccessor) {
+      return;
+    }
+    const projectScopedContainers = this._projectScopedContainersAccessor.get();
+    const { project } = this.props;
+    gd.WholeProjectRefactorer.changeParameterType(
+      project,
+      projectScopedContainers,
+      eventsFunction,
+      this._objectsContainer,
+      parameterName
+    );
+  };
+
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
@@ -1369,6 +1387,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     )}
                     onFunctionParameterWillBeRenamed={
                       this._onFunctionParameterWillBeRenamed
+                    }
+                    onFunctionParameterChangedOfType={
+                      this._onFunctionParameterChangedOfType
                     }
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}

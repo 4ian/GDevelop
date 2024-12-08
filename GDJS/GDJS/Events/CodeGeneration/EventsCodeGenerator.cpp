@@ -1541,7 +1541,7 @@ gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
                  property.GetName())
            : BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
                  property.GetName())) +
-      "(" + operandCode + ")";
+      "(" + operandCode + ")\n";
   return propertySetterCode;
 }
 

@@ -63,24 +63,25 @@ const useCourses = () => {
       const fetchCourseChapters = async (courseId: string) => {
         setIsLoadingChapters(true);
         try {
-          const fetchedChapters = await listCourseChapters(
-            getAuthorizationHeader,
-            {
+          const [fetchedChapters, userProgress] = await Promise.all([
+            listCourseChapters(getAuthorizationHeader, {
               courseId,
               userId,
-            }
-          );
-
-          if (userId) {
-            const userProgress = await fetchUserCourseProgress(
-              getAuthorizationHeader,
-              userId,
-              courseId
-            );
-            setUserProgressWithoutCallingFunction(userProgress);
-          } else {
-            setUserProgressWithoutCallingFunction(null);
-          }
+            }),
+            (async () => {
+              if (userId) {
+                const userProgress = await fetchUserCourseProgress(
+                  getAuthorizationHeader,
+                  userId,
+                  courseId
+                );
+                return userProgress;
+              } else {
+                return null;
+              }
+            })(),
+          ]);
+          setUserProgressWithoutCallingFunction(userProgress);
           setCourseChapters(fetchedChapters);
         } finally {
           setIsLoadingChapters(false);

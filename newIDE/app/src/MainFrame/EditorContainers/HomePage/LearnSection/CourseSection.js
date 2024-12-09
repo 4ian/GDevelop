@@ -8,7 +8,7 @@ import CourseChapterView from '../../../../Course/CourseChapterView';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
-import { Column, Line } from '../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Help from '../../../../UI/CustomSvgIcons/Help';
@@ -17,6 +17,7 @@ import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import type { CourseChapterCompletion } from '../UseCourses';
 import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
+import LinearProgress from '../../../../UI/LinearProgress';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -59,7 +60,7 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
-  getCourseCompletion: () => ?number,
+  getCourseCompletion: () => number | null,
 |};
 
 const CourseSection = ({
@@ -73,6 +74,7 @@ const CourseSection = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
+  const courseCompletion = getCourseCompletion();
 
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
   const chaptersTitleRefs = React.useRef<
@@ -191,6 +193,17 @@ const CourseSection = ({
                 <Text noMargin size="sub-title">
                   Chapters
                 </Text>
+                {courseCompletion !== null && (
+                  <Line noMargin>
+                    <LinearProgress
+                      value={courseCompletion * 100}
+                      variant="determinate"
+                      style={{ borderRadius: 4 }}
+                      color="success"
+                    />
+                  </Line>
+                )}
+                <Spacer />
                 {courseChapters.map((chapter, chapterIndex) => {
                   const chapterCompletion = getChapterCompletion(chapter.id);
                   return (

@@ -43,6 +43,12 @@ export const Default = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -67,6 +73,12 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -93,6 +105,12 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -119,6 +137,12 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -142,6 +166,12 @@ export const Loading = () => (
       }}
     >
       <LearnSection
+        courseChapters={null}
+        courses={null}
+        isCourseTaskCompleted={() => false}
+        onSelectCourse={action('onSelectCourse')}
+        isLoadingChapters={false}
+        onCompleteCourseTask={action('onCompleteCourseTask')}
         initialCategory={null}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}

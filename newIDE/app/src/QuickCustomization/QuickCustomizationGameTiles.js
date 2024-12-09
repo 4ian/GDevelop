@@ -9,13 +9,6 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import { type QuickCustomizationRecommendation } from '../Utils/GDevelopServices/User';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
-type Props = {|
-  onSelectExampleShortHeader: (
-    exampleShortHeader: ExampleShortHeader
-  ) => Promise<void>,
-  quickCustomizationRecommendation: QuickCustomizationRecommendation,
-|};
-
 const styles = {
   grid: {
     margin: 0,
@@ -25,16 +18,36 @@ const styles = {
   cellSpacing: 2,
 };
 
+const getColumnsCount = (windowSize: string, isLandscape: boolean) => {
+  if (windowSize === 'small') {
+    return isLandscape ? 3 : 2;
+  } else if (windowSize === 'medium') {
+    return 3;
+  } else if (windowSize === 'large') {
+    return 4;
+  } else {
+    return 6;
+  }
+};
+
+type Props = {|
+  onSelectExampleShortHeader: (
+    exampleShortHeader: ExampleShortHeader
+  ) => Promise<void>,
+  quickCustomizationRecommendation: QuickCustomizationRecommendation,
+|};
+
 export const QuickCustomizationGameTiles = ({
   onSelectExampleShortHeader,
   quickCustomizationRecommendation,
 }: Props) => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
+  const columnsCount = getColumnsCount(windowSize, isLandscape);
 
   const displayedExampleShortHeaders = React.useMemo(
-    () =>
-      exampleShortHeaders
+    () => {
+      const allQuickCustomizationExampleShortHeaders = exampleShortHeaders
         ? quickCustomizationRecommendation.list
             .map(({ type, exampleSlug, thumbnailTitleByLocale }) => {
               if (type !== 'example') {
@@ -52,7 +65,10 @@ export const QuickCustomizationGameTiles = ({
               };
             })
             .filter(Boolean)
-        : null,
+        : null;
+
+      return allQuickCustomizationExampleShortHeaders;
+    },
     [exampleShortHeaders, quickCustomizationRecommendation.list]
   );
 
@@ -60,15 +76,7 @@ export const QuickCustomizationGameTiles = ({
     <I18n>
       {({ i18n }) => (
         <GridList
-          cols={
-            windowSize === 'small'
-              ? isLandscape
-                ? 3
-                : 2
-              : windowSize === 'medium'
-              ? 3
-              : 4
-          }
+          cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
           spacing={styles.cellSpacing}

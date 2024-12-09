@@ -6,46 +6,39 @@ import Paper from '../../UI/Paper';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { ColumnStackLayout } from '../../UI/Layout';
 
-const verticalPadding = 8;
+const padding = 16;
 const fixedHeight = 300;
 
 const styles = {
   paper: {
-    padding: `${verticalPadding}px 12px`,
+    padding: `${padding}px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minHeight: 0,
-    flex: 1,
   },
   maxHeightNotWrapped: {
-    minHeight: fixedHeight,
-    height: `calc(100% - ${2 * verticalPadding}px)`,
+    height: `calc(100% - ${2 * padding}px)`,
   },
 };
 
 type Props = {|
   title: React.Node,
-  seeMoreButton?: React.Node,
+  topRightAction?: React.Node,
   renderSubtitle?: ?() => React.Node,
   gridSize: number,
   children?: React.Node,
-  withMinHeight?: boolean,
+  minHeight?: boolean,
 |};
 
 const DashboardWidget = ({
   title,
-  seeMoreButton,
+  topRightAction,
   gridSize,
   renderSubtitle,
   children,
-  withMinHeight,
+  minHeight,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
@@ -54,23 +47,26 @@ const DashboardWidget = ({
         background="medium"
         style={{
           ...styles.paper,
-          ...(withMinHeight && !isMobile
-            ? styles.maxHeightNotWrapped
-            : undefined),
+          ...styles.maxHeightNotWrapped,
+          ...(minHeight && !isMobile
+            ? {
+                minHeight: minHeight ? fixedHeight : 120,
+              }
+            : {}),
         }}
       >
-        <div style={styles.content}>
-          <Line alignItems="center" justifyContent="space-between">
+        <ColumnStackLayout noMargin expand useFullHeight>
+          <Line alignItems="center" justifyContent="space-between" noMargin>
             <Column noMargin>
-              <Text size="section-title" noMargin>
+              <Text size="block-title" noMargin>
                 {title}
               </Text>
               {renderSubtitle && renderSubtitle()}
             </Column>
-            {seeMoreButton}
+            {topRightAction}
           </Line>
           {children}
-        </div>
+        </ColumnStackLayout>
       </Paper>
     </Grid>
   );

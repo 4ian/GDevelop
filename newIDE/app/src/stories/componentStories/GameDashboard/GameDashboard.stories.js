@@ -341,6 +341,8 @@ export const Default = ({
           }
           gameUnregisterErrorText={gameUnregisterErrorText}
           closeProject={action('closeProject')}
+          disabled={false}
+          onDeleteCloudProject={action('onDeleteCloudProject')}
         />
       </MarketingPlansStoreStateProvider>
     </AuthenticatedUserContext.Provider>

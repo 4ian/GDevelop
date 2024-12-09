@@ -19,6 +19,7 @@ import {
 } from './HomePageMenu';
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { SECTION_PADDING } from './SectionContainer';
 
 const iconSize = 20;
 const iconButtonPaddingTop = 8;
@@ -40,7 +41,7 @@ export const homepageMediumMenuBarWidth =
 
 export const styles = {
   desktopMenu: {
-    paddingTop: 40,
+    paddingTop: SECTION_PADDING, // To align with the top of the sections
     paddingBottom: 10,
     minWidth: homepageDesktopMenuBarWidth,
     display: 'flex',

@@ -9,7 +9,8 @@ export type Route =
   | 'games-dashboard'
   | 'asset-store' // For compatibility when there was only asset packs.
   | 'store' // New way of opening the store.
-  | 'build'
+  | 'build' // Old way of opening the build section
+  | 'create' // New way of opening the build section
   | 'education'
   | 'play'
   | 'get-started';

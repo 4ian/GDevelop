@@ -73,6 +73,10 @@ type Props = {|
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   closeProject: () => Promise<void>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
 
   // Current game:
   game: Game,
@@ -84,6 +88,7 @@ type Props = {|
   currentView: GameDetailsTab,
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
+  disabled: boolean,
 |};
 
 const GameDashboard = ({
@@ -93,6 +98,7 @@ const GameDashboard = ({
   onOpenProject,
   storageProviders,
   closeProject,
+  onDeleteCloudProject,
 
   // Current game:
   game,
@@ -104,6 +110,7 @@ const GameDashboard = ({
   currentView,
   setCurrentView,
   onBack,
+  disabled,
 }: Props) => {
   const [
     gameDetailsDialogOpen,
@@ -564,6 +571,8 @@ const GameDashboard = ({
                     onOpenProject={onOpenProject}
                     storageProviders={storageProviders}
                     closeProject={closeProject}
+                    onDeleteCloudProject={onDeleteCloudProject}
+                    disabled={disabled}
                   />
                   <BuildsWidget
                     builds={builds}
@@ -578,7 +587,7 @@ const GameDashboard = ({
               i18n={i18n}
               onClose={() => setGameDetailsDialogOpen(false)}
               publicGame={publicGame}
-              isLoading={isUpdatingGame}
+              isLoading={isUpdatingGame || disabled}
               onApply={async properties => {
                 const updatedGame = await onUpdateGame(i18n, properties);
                 if (updatedGame) {

@@ -19,7 +19,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
-  game: Game,
+  game: ?Game,
   activeGameFeaturings?: ?(GameFeaturing[]),
   fetchGameFeaturings: () => Promise<void>,
 |};
@@ -39,7 +39,13 @@ const usePurchaseMarketingPlan = ({
 
   const onPurchase = React.useCallback(
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
-      if (!profile || !limits) return;
+      if (!game || !profile || !limits) {
+        await showAlert({
+          title: t`Select a game`,
+          message: t`In order to purchase a marketing boost, log-in and select a game in your dashboard.`,
+        });
+        return;
+      }
 
       const {
         id,

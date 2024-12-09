@@ -1133,6 +1133,7 @@ const MainFrame = (props: Props) => {
       setIsProjectOpening(true);
     },
     getStorageProviderOperations,
+    getStorageProvider,
     afterCreatingProject: async ({
       project,
       editorTabs,
@@ -2645,6 +2646,10 @@ const MainFrame = (props: Props) => {
           return;
         }
 
+        if (fileMetadata.gameId) {
+          await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+        }
+
         // Save was done on a new file/location, so save it in the
         // recent projects and in the state.
         const fileMetadataAndStorageProviderName = {
@@ -2716,6 +2721,7 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       showAlert,
       showConfirmation,
+      gamesList,
     ]
   );
 
@@ -2834,6 +2840,12 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          // If project was saved, and a game is registered, ensure the game is
+          // marked as saved.
+          if (fileMetadata.gameId) {
+            await gamesList.markGameAsSavedIfRelevant(fileMetadata.gameId);
+          }
+
           setCloudProjectSaveChoiceOpen(false);
           setCloudProjectRecoveryOpenedVersionId(null);
 
@@ -2911,6 +2923,7 @@ const MainFrame = (props: Props) => {
       showAlert,
       showConfirmation,
       checkedOutVersionStatus,
+      gamesList,
     ]
   );
 

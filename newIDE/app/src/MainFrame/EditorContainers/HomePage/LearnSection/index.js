@@ -139,7 +139,7 @@ type Props = {|
   getCourseChapterCompletion: (
     chapterId: string
   ) => CourseChapterCompletion | null,
-  getCourseCompletion: () => ?number,
+  getCourseCompletion: () => number | null,
 |};
 
 const LearnSection = ({

@@ -185,7 +185,7 @@ const useCourses = () => {
   );
 
   const getCourseCompletion = React.useCallback(
-    (): ?number => {
+    (): number | null => {
       if (!courseChapters) return null;
       if (!userCourseProgress) return 0;
 

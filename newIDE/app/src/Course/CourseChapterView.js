@@ -29,6 +29,7 @@ import GoldCompact from '../Profile/Subscription/Icons/GoldCompact';
 import Coin from '../Credits/Icons/Coin';
 import Lock from '../UI/CustomSvgIcons/Lock';
 import { rankLabel } from '../Utils/Ordinal';
+import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
 
 const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
@@ -105,6 +106,7 @@ type Props = {|
     completed: boolean
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
+  getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
@@ -115,6 +117,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
       onOpenTemplate,
       onCompleteTask,
       isTaskCompleted,
+      getChapterCompletion,
     },
     ref
   ) => {
@@ -129,11 +132,9 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
     const isMobilePortrait = isMobile && !isLandscape;
     const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-    const completion = courseChapter.tasks
-      ? { done: 10, total: courseChapter.tasks.length }
-      : null;
+    const completion = getChapterCompletion(courseChapter.id);
     const isFinished = completion
-      ? completion.done === completion.total
+      ? completion.completedTasks >= completion.tasks
       : false;
     const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
 
@@ -155,6 +156,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             {isFinished && !isMobilePortrait && (
               <div
                 style={{
+                  display: 'flex',
                   color: gdevelopTheme.statusIndicator.success,
                 }}
               >
@@ -177,7 +179,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           ) : completion ? (
             <Text color="secondary" noMargin>
               <Trans>
-                {completion.done} of {completion.total} completed
+                {completion.completedTasks} of {completion.tasks} completed
               </Trans>
             </Text>
           ) : null}

@@ -15,6 +15,8 @@ import Help from '../../../../UI/CustomSvgIcons/Help';
 import RaisedButton from '../../../../UI/RaisedButton';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import type { CourseChapterCompletion } from '../UseCourses';
+import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -55,11 +57,9 @@ type Props = {|
     taskIndex: number,
     completed: boolean
   ) => void,
-  isTaskCompleted: (
-    chapterId: string,
-    taskIndex: number,
-  ) => boolean,
-
+  isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
+  getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
+  getCourseCompletion: () => ?number,
 |};
 
 const CourseSection = ({
@@ -68,6 +68,8 @@ const CourseSection = ({
   onBack,
   onCompleteTask,
   isTaskCompleted,
+  getChapterCompletion,
+  getCourseCompletion,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
@@ -164,6 +166,7 @@ const CourseSection = ({
               }}
               onCompleteTask={onCompleteTask}
               isTaskCompleted={isTaskCompleted}
+              getChapterCompletion={getChapterCompletion}
               key={chapter.id}
               ref={_ref => {
                 if (_ref) {
@@ -188,43 +191,60 @@ const CourseSection = ({
                 <Text noMargin size="sub-title">
                   Chapters
                 </Text>
-                {courseChapters.map((chapter, chapterIndex) => (
-                  <div
-                    key={chapter.id}
-                    tabIndex={0}
-                    onClick={() => scrollToChapter(chapter.id)}
-                    style={{
-                      ...styles.navLine,
-                      backgroundColor:
-                        chapter.id === activeChapterId
-                          ? gdevelopTheme.paper.backgroundColor.light
-                          : undefined,
-                    }}
-                  >
-                    <Line noMargin>
-                      <Text noMargin color={'secondary'}>
-                        {chapterIndex + 1}.
-                      </Text>
-                      &nbsp;
-                      <Text
-                        noMargin
-                        style={textEllipsisStyle}
-                        color={chapter.isLocked ? 'secondary' : 'primary'}
-                      >
-                        {chapter.title}
-                      </Text>
-                    </Line>
-                    {chapter.isLocked ? (
-                      <div style={styles.navIcon}>
-                        <Lock fontSize="inherit" />
-                      </div>
-                    ) : (
-                      <Text color="secondary" noMargin>
-                        1/{chapter.tasks.length}
-                      </Text>
-                    )}
-                  </div>
-                ))}
+                {courseChapters.map((chapter, chapterIndex) => {
+                  const chapterCompletion = getChapterCompletion(chapter.id);
+                  return (
+                    <div
+                      key={chapter.id}
+                      tabIndex={0}
+                      onClick={() => scrollToChapter(chapter.id)}
+                      style={{
+                        ...styles.navLine,
+                        backgroundColor:
+                          chapter.id === activeChapterId
+                            ? gdevelopTheme.paper.backgroundColor.light
+                            : undefined,
+                      }}
+                    >
+                      <Line noMargin>
+                        <Text noMargin color={'secondary'}>
+                          {chapterIndex + 1}.
+                        </Text>
+                        &nbsp;
+                        <Text
+                          noMargin
+                          style={textEllipsisStyle}
+                          color={chapter.isLocked ? 'secondary' : 'primary'}
+                        >
+                          {chapter.title}
+                        </Text>
+                      </Line>
+                      {chapter.isLocked ? (
+                        <div style={styles.navIcon}>
+                          <Lock fontSize="inherit" />
+                        </div>
+                      ) : chapterCompletion ? (
+                        chapterCompletion.completedTasks >=
+                        chapterCompletion.tasks ? (
+                          <div
+                            style={{
+                              display: 'flex',
+                              fontSize: 20,
+                              color: gdevelopTheme.statusIndicator.success,
+                            }}
+                          >
+                            <CheckCircle fontSize="inherit" />
+                          </div>
+                        ) : (
+                          <Text color="secondary" noMargin>
+                            {chapterCompletion.completedTasks}/
+                            {chapterCompletion.tasks}
+                          </Text>
+                        )
+                      ) : null}
+                    </div>
+                  );
+                })}
               </Paper>
               <Paper background="light" style={styles.askAQuestionContainer}>
                 <ColumnStackLayout expand noMargin>

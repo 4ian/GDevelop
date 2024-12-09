@@ -168,7 +168,7 @@ const CreateSection = ({
   );
   const allRecentProjectFiles = useProjectsListFor(null);
   const hasAProjectOpenedOrSavedOrGameRegistered =
-    !!project || (!!games && games.length) || !!allRecentProjectFiles;
+    !!project || (!!games && games.length) || !!allRecentProjectFiles.length;
   const hidePerformanceDashboard =
     !!limits &&
     !!limits.capabilities.classrooms &&
@@ -474,7 +474,7 @@ const CreateSection = ({
                   <ColumnStackLayout noMargin>
                     <Line noMargin>
                       <Text size="block-title">
-                        {hasAProjectOpenedOrSavedOrGameRegistered ? (
+                        {!hasAProjectOpenedOrSavedOrGameRegistered ? (
                           <Trans>Publish your first game</Trans>
                         ) : (
                           <Trans>Publish a game in 1 minute</Trans>

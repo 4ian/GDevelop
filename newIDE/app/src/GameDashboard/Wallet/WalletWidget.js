@@ -1,18 +1,12 @@
 // @flow
 
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import DashboardWidget from '../Widgets/DashboardWidget';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import Coin from '../../Credits/Icons/Coin';
-import Text from '../../UI/Text';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import {
-  EarnBadges,
-  hasMissingBadges,
-} from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
-import FlatButton from '../../UI/FlatButton';
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { EarnBadges } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
+import TextButton from '../../UI/TextButton';
 
 type Props = {|
   onOpenProfile: () => void,
@@ -35,32 +29,17 @@ const WalletWidget = ({
     onOpenCreateAccountDialog,
   } = React.useContext(AuthenticatedUserContext);
   const creditsAvailable = limits ? limits.credits.userBalance.amount : 0;
-  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   return (
     <DashboardWidget
-      gridSize={fullWidth ? 3 : 1.5}
-      title={<Trans>Wallet</Trans>}
+      gridSize={fullWidth ? 3 : 1}
+      title={null}
       topRightAction={
-        <LineStackLayout alignItems="center" noMargin>
-          {hasMissingBadges(badges, achievements) && (
-            <FlatButton
-              label={
-                isMobile || isMediumScreen ? (
-                  <Trans>Claim</Trans>
-                ) : (
-                  <Trans>Claim in profile</Trans>
-                )
-              }
-              onClick={profile ? onOpenProfile : onOpenCreateAccountDialog}
-            />
-          )}
-          <Coin />
-          <Text noMargin color="inherit">
-            <Trans>{creditsAvailable} Credits</Trans>
-          </Text>
-        </LineStackLayout>
+        <TextButton
+          icon={<Coin fontSize="small" />}
+          label={creditsAvailable.toString()}
+          onClick={profile ? onOpenProfile : onOpenCreateAccountDialog}
+        />
       }
-      minHeight="small"
     >
       <ColumnStackLayout noMargin expand>
         <EarnBadges
@@ -69,7 +48,6 @@ const WalletWidget = ({
           onOpenProfile={onOpenProfile}
           showRandomBadge={showRandomBadge}
           showAllBadges={showAllBadges}
-          hideStatusBanner
         />
       </ColumnStackLayout>
     </DashboardWidget>

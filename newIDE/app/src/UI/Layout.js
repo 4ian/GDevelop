@@ -171,6 +171,7 @@ export const ResponsiveLineStackLayout = ({
     <ColumnStackLayout
       id={id}
       noMargin={noMargin || noColumnMargin}
+      justifyContent={justifyContent}
       expand
       useLargeSpacer={useLargeSpacer}
     >

@@ -28,7 +28,7 @@ type Props = {|
 |};
 
 const MarketingPlans = ({ game }: Props) => {
-  const { profile, limits, getAuthorizationHeader } = React.useContext(
+  const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
   const {
@@ -101,8 +101,6 @@ const MarketingPlans = ({ game }: Props) => {
     activeGameFeaturings,
     fetchGameFeaturings,
   });
-
-  if (!profile || !limits) return null;
 
   return (
     <I18n>

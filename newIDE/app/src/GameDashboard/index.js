@@ -73,6 +73,10 @@ type Props = {|
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   closeProject: () => Promise<void>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
 
   // Current game:
   game: Game,
@@ -94,6 +98,7 @@ const GameDashboard = ({
   onOpenProject,
   storageProviders,
   closeProject,
+  onDeleteCloudProject,
 
   // Current game:
   game,
@@ -566,6 +571,8 @@ const GameDashboard = ({
                     onOpenProject={onOpenProject}
                     storageProviders={storageProviders}
                     closeProject={closeProject}
+                    onDeleteCloudProject={onDeleteCloudProject}
+                    disabled={disabled}
                   />
                   <BuildsWidget
                     builds={builds}

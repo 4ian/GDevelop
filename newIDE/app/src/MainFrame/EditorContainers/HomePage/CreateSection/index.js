@@ -7,7 +7,11 @@ import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import GamesList, { pageSize } from '../../../../GameDashboard/GamesList';
-import { deleteGame, type Game } from '../../../../Utils/GDevelopServices/Game';
+import {
+  deleteGame,
+  registerGame,
+  type Game,
+} from '../../../../Utils/GDevelopServices/Game';
 import { type QuickCustomizationRecommendation } from '../../../../Utils/GDevelopServices/User';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
@@ -28,7 +32,6 @@ import {
 import Text from '../../../../UI/Text';
 import Grid from '@material-ui/core/Grid';
 import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
-import TotalPlaysWidget from '../../../../GameDashboard/Widgets/TotalPlaysWidget';
 import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
 import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
@@ -47,7 +50,8 @@ import {
 } from './MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { useProjectsListFor } from './utils';
-import MarketingPlans from '../../../../MarketingPlans/MarketingPlans';
+import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
+import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
 
 const getExampleItemsColumns = (
   windowSize: WindowSizeType,
@@ -134,17 +138,17 @@ const CreateSection = ({
     recommendations,
     limits,
   } = authenticatedUser;
-  const { showAlert, showConfirmation } = useAlertDialog();
+  const {
+    showDeleteConfirmation,
+    showConfirmation,
+    showAlert,
+  } = useAlertDialog();
   const [
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
   ] = React.useState<?React.Node>(null);
   const [isUpdatingGame, setIsUpdatingGame] = React.useState(false);
   const [showAllGameTemplates, setShowAllGameTemplates] = React.useState(false);
-  const [
-    showPerformanceDashboard,
-    setShowPerformanceDashboard,
-  ] = React.useState(false);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
@@ -163,6 +167,8 @@ const CreateSection = ({
     [recommendations]
   );
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
+  const isMobileOrMediumWidth =
+    windowSize === 'small' || windowSize === 'medium';
   const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
     authenticatedUser
   );
@@ -210,7 +216,7 @@ const CreateSection = ({
   );
 
   const unregisterGame = React.useCallback(
-    async (game: Game, i18n: I18nType) => {
+    async (gameId: string, i18n: I18nType) => {
       if (!profile) return;
 
       const answer = await showConfirmation({
@@ -223,8 +229,8 @@ const CreateSection = ({
       setGameUnregisterErrorText(null);
       setIsUpdatingGame(true);
       try {
-        await deleteGame(getAuthorizationHeader, id, game.id);
-        if (openedGame && openedGame.id === game.id) {
+        await deleteGame(getAuthorizationHeader, id, gameId);
+        if (openedGame && openedGame.id === gameId) {
           setOpenedGameId(null);
         }
       } catch (error) {
@@ -307,6 +313,127 @@ const CreateSection = ({
     [setCurrentTab, setOpenedGameId]
   );
 
+  const onDeleteCloudProject = async (
+    i18n: I18nType,
+    { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
+  ) => {
+    if (storageProviderName !== 'Cloud') return;
+    const projectName = fileMetadata.name;
+    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
+
+    const isCurrentProjectOpened =
+      !!project &&
+      !!currentFileMetadata &&
+      fileMetadata.gameId === currentFileMetadata.gameId;
+
+    if (isCurrentProjectOpened) {
+      const result = await showConfirmation({
+        title: t`Project is opened`,
+        message: t`You are about to delete the project ${projectName}, which is currently opened. If you proceed, the project will be closed and you will lose any unsaved changes. Do you want to proceed?`,
+        confirmButtonLabel: t`Continue`,
+      });
+      if (!result) return;
+      await closeProject();
+    }
+
+    // Extract word translation to ensure it is not wrongly translated in the sentence.
+    const translatedConfirmText = i18n._(t`delete`);
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Permanently delete the project?`,
+      message: t`Project ${projectName} will be deleted. You will no longer be able to access it.`,
+      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
+      confirmText: translatedConfirmText,
+      confirmButtonLabel: t`Delete project`,
+    });
+    if (!deleteAnswer) return;
+
+    try {
+      setIsUpdatingGame(true);
+      if (fileMetadata.gameId) {
+        await unregisterGame(fileMetadata.gameId, i18n);
+      }
+      await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
+      authenticatedUser.onCloudProjectsChanged();
+    } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      const message =
+        extractedStatusAndCode && extractedStatusAndCode.status === 403
+          ? t`You don't have permissions to delete this project.`
+          : t`An error occurred when saving the project. Please try again later.`;
+      showAlert({
+        title: t`Unable to delete the project`,
+        message,
+      });
+    } finally {
+      setIsUpdatingGame(false);
+    }
+  };
+
+  const onRegisterProject = React.useCallback(
+    async (file: FileMetadataAndStorageProviderName) => {
+      const projectId = file.fileMetadata.gameId;
+
+      if (!authenticatedUser.profile) return;
+
+      if (!projectId) {
+        console.error('No project id found for registering the game.');
+        showAlert({
+          title: t`Unable to register the game`,
+          message: t`An error happened while registering the game. Verify your internet connection
+          or retry later.`,
+        });
+        return;
+
+        // TODO: should we generate a gameId in this case?
+      }
+
+      const { id, username } = authenticatedUser.profile;
+      try {
+        setIsUpdatingGame(true);
+        await registerGame(
+          authenticatedUser.getAuthorizationHeader,
+          id,
+          getDefaultRegisterGameProperties({
+            projectId,
+            projectName: file.fileMetadata.name,
+            projectAuthor: username,
+            // A project is always saved when appearing in the list of recent projects.
+            isProjectSaved: true,
+          })
+        );
+      } catch (error) {
+        console.error('Unable to register the game.', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+          await showAlert({
+            title: t`Game already registered`,
+            message: t`The project currently opened is registered online but you don't have
+          access to it. Ask the original owner of the game to share it with you
+          to be able to manage it.`,
+          });
+        } else {
+          await showAlert({
+            title: t`Unable to register the game`,
+            message: t`An error happened while registering the game. Verify your internet connection
+          or retry later.`,
+          });
+        }
+      } finally {
+        setIsUpdatingGame(false);
+      }
+    },
+    [
+      authenticatedUser.getAuthorizationHeader,
+      authenticatedUser.profile,
+      showAlert,
+    ]
+  );
+
   if (openedGame) {
     return (
       <SectionContainer flexBody>
@@ -322,8 +449,9 @@ const CreateSection = ({
           onBack={onBack}
           onGameUpdated={onGameUpdated}
           disabled={isUpdatingGame}
-          onUnregisterGame={() => unregisterGame(openedGame, i18n)}
+          onUnregisterGame={() => unregisterGame(openedGame.id, i18n)}
           gameUnregisterErrorText={gameUnregisterErrorText}
+          onDeleteCloudProject={onDeleteCloudProject}
         />
       </SectionContainer>
     );
@@ -344,37 +472,6 @@ const CreateSection = ({
             i18n={i18n}
             columnsCount={getExampleItemsColumns(windowSize, isLandscape)}
           />
-        </SectionRow>
-      </SectionContainer>
-    );
-  }
-
-  if (showPerformanceDashboard) {
-    return (
-      <SectionContainer
-        backAction={() => setShowPerformanceDashboard(false)}
-        flexBody
-      >
-        <SectionRow expand>
-          <Line>
-            <Text size="section-title" noMargin>
-              <Trans>Performance Dashboard</Trans>
-            </Text>
-          </Line>
-          <Grid container spacing={2}>
-            <UserEarningsWidget />
-            <TotalPlaysWidget fullWidth games={games || []} />
-            <Line>
-              <Column>
-                <MarketingPlans />
-              </Column>
-            </Line>
-            <WalletWidget
-              fullWidth
-              showAllBadges
-              onOpenProfile={onOpenProfile}
-            />
-          </Grid>
         </SectionRow>
       </SectionContainer>
     );
@@ -409,33 +506,21 @@ const CreateSection = ({
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (
               <ColumnStackLayout noMargin>
-                {hidePerformanceDashboard ? null : (
+                {hidePerformanceDashboard ? null : hasAProjectOpenedOrSavedOrGameRegistered ? (
                   <ColumnStackLayout noMargin>
-                    <Line noMargin justifyContent="space-between">
-                      <Text size="section-title" noMargin>
-                        <Trans>Performance Dashboard</Trans>
-                      </Text>
-                      <FlatButton
-                        onClick={() => setShowPerformanceDashboard(true)}
-                        label={<Trans>See more</Trans>}
-                        leftIcon={<ChevronArrowRight fontSize="small" />}
+                    <Grid container spacing={2}>
+                      <UserEarningsWidget fullWidth={isMobileOrMediumWidth} />
+                      <WalletWidget
+                        onOpenProfile={onOpenProfile}
+                        showRandomBadge
+                        fullWidth={isMobileOrMediumWidth}
                       />
-                    </Line>
-                    {hasAProjectOpenedOrSavedOrGameRegistered ? (
-                      <Grid container spacing={2}>
-                        <UserEarningsWidget />
-                        <TotalPlaysWidget games={games || []} />
-                        <WalletWidget
-                          onOpenProfile={onOpenProfile}
-                          showRandomBadge
-                        />
-                      </Grid>
-                    ) : (
-                      <Grid container spacing={2}>
-                        <WalletWidget onOpenProfile={onOpenProfile} fullWidth />
-                      </Grid>
-                    )}
+                    </Grid>
                   </ColumnStackLayout>
+                ) : (
+                  <Grid container spacing={2}>
+                    <WalletWidget onOpenProfile={onOpenProfile} fullWidth />
+                  </Grid>
                 )}
                 <GamesList
                   storageProviders={storageProviders}
@@ -456,6 +541,8 @@ const CreateSection = ({
                   canSaveProject={canSaveProject}
                   currentPage={currentPage}
                   onCurrentPageChange={onCurrentPageChange}
+                  onDeleteCloudProject={onDeleteCloudProject}
+                  onRegisterProject={onRegisterProject}
                 />
                 {isMobile && limits && hasTooManyCloudProjects && (
                   <MaxProjectCountAlertMessage

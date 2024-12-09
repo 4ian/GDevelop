@@ -26,6 +26,7 @@ import type {
   CourseChapter,
   Course,
 } from '../../../../Utils/GDevelopServices/Asset';
+import type { CourseChapterCompletion } from '../UseCourses';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -134,10 +135,11 @@ type Props = {|
     taskIndex: number,
     completed: boolean
   ) => void,
-  isCourseTaskCompleted: (
-    chapterId: string,
-    taskIndex: number,
-  ) => boolean,
+  isCourseTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
+  getCourseChapterCompletion: (
+    chapterId: string
+  ) => CourseChapterCompletion | null,
+  getCourseCompletion: () => ?number,
 |};
 
 const LearnSection = ({
@@ -152,6 +154,8 @@ const LearnSection = ({
   isLoadingChapters,
   onCompleteCourseTask,
   isCourseTaskCompleted,
+  getCourseChapterCompletion,
+  getCourseCompletion,
 }: Props) => {
   const {
     tutorials,
@@ -188,6 +192,8 @@ const LearnSection = ({
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
         onCompleteTask={onCompleteCourseTask}
         isTaskCompleted={isCourseTaskCompleted}
+        getChapterCompletion={getCourseChapterCompletion}
+        getCourseCompletion={getCourseCompletion}
       />
     );
   }

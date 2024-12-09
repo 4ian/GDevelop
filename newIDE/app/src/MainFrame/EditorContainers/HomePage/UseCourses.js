@@ -15,6 +15,11 @@ import {
 } from '../../../Utils/GDevelopServices/User';
 import { useOptimisticState } from '../../../Utils/UseOptimisticState';
 
+export type CourseChapterCompletion = {|
+  completedTasks: number,
+  tasks: number,
+|};
+
 const useCourses = () => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
@@ -144,7 +149,7 @@ const useCourses = () => {
   const isTaskCompleted = React.useCallback(
     (chapterId: string, taskIndex: number) => {
       if (!userCourseProgress) return false;
-      console.log(userCourseProgress)
+
       const currentChapterProgress = userCourseProgress.progress.find(
         task => task.chapterId === chapterId
       );
@@ -153,6 +158,55 @@ const useCourses = () => {
       return currentChapterProgress.completedTasks.indexOf(taskIndex) >= 0;
     },
     [userCourseProgress]
+  );
+
+  const getChapterCompletion = React.useCallback(
+    (chapterId: string): CourseChapterCompletion | null => {
+      if (!courseChapters) return null;
+
+      const chapter = courseChapters.find(chapter => chapter.id === chapterId);
+      if (!chapter || chapter.isLocked) return null;
+
+      const tasksCount = chapter.tasks.length;
+
+      if (!userCourseProgress) return { completedTasks: 0, tasks: tasksCount };
+
+      const chapterProgress = userCourseProgress.progress.find(
+        chapterProgress => chapterProgress.chapterId === chapterId
+      );
+      if (!chapterProgress) return { completedTasks: 0, tasks: tasksCount };
+
+      return {
+        completedTasks: chapterProgress.completedTasks.length,
+        tasks: tasksCount,
+      };
+    },
+    [userCourseProgress, courseChapters]
+  );
+
+  const getCourseCompletion = React.useCallback(
+    (): ?number => {
+      if (!courseChapters) return null;
+      if (!userCourseProgress) return 0;
+
+      let completion = 0;
+      const chapterProportion = 1 / courseChapters.length;
+      courseChapters.forEach(chapter => {
+        if (chapter.isLocked) return;
+
+        const chapterProgress = userCourseProgress.progress.find(
+          chapterProgress => chapterProgress.chapterId === chapter.id
+        );
+        if (!chapterProgress) return;
+
+        completion +=
+          (chapterProgress.completedTasks.length / chapter.tasks.length) *
+          chapterProportion;
+      });
+
+      return completion;
+    },
+    [userCourseProgress, courseChapters]
   );
 
   React.useEffect(
@@ -169,6 +223,8 @@ const useCourses = () => {
     isLoadingChapters,
     onCompleteTask,
     isTaskCompleted,
+    getChapterCompletion,
+    getCourseCompletion,
   };
 };
 

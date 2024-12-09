@@ -237,6 +237,8 @@ export const HomePage = React.memo<Props>(
         isLoadingChapters,
         onCompleteTask,
         isTaskCompleted,
+        getChapterCompletion,
+        getCourseCompletion,
       } = useCourses();
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -534,6 +536,8 @@ export const HomePage = React.memo<Props>(
                       isLoadingChapters={isLoadingChapters}
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
+                      getCourseChapterCompletion={getChapterCompletion}
+                      getCourseCompletion={getCourseCompletion}
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}

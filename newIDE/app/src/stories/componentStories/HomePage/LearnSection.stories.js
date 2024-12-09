@@ -49,6 +49,8 @@ export const Default = () => (
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -79,6 +81,8 @@ export const NotAuthenticated = () => (
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -111,6 +115,8 @@ export const EducationSubscriber = () => (
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -143,6 +149,8 @@ export const EducationTeacher = () => (
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -172,6 +180,8 @@ export const Loading = () => (
         onSelectCourse={action('onSelectCourse')}
         isLoadingChapters={false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
+        getCourseChapterCompletion={() => null}
+        getCourseCompletion={() => 0}
         initialCategory={null}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}

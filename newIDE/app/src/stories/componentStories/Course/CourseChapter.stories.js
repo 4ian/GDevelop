@@ -155,6 +155,7 @@ export const Default = () => {
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
+      getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
     />
   );
@@ -173,6 +174,7 @@ export const Locked = () => {
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
+      getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
     />
   );

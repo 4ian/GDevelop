@@ -135,7 +135,17 @@ class GD_CORE_API ValueTypeMetadata {
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
   bool IsVariable() const {
-    return gd::ValueTypeMetadata::GetPrimitiveValueType(name) == "variable";
+    return gd::ValueTypeMetadata::IsVariable(name);
+  }
+
+  /**
+   * \brief Return true if the type of the parameter is a variable.
+   * \note If you had a new type of parameter, also add it in the IDE (
+   * see EventsFunctionParametersEditor, ParameterRenderingService
+   * and ExpressionAutocompletion) and in the EventsCodeGenerator.
+   */
+  static bool IsVariable(const gd::String &type) {
+    return gd::ValueTypeMetadata::GetPrimitiveValueType(type) == "variable";
   }
 
   /**

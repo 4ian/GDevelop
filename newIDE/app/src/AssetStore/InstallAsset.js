@@ -20,6 +20,7 @@ import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtension
 import { mapVector } from '../Utils/MapFor';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
+import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
 
@@ -110,30 +111,17 @@ export const installResource = (
     return;
   }
 
-  // The resource does not exist yet, add it. Note that the "origin" will be preserved.
-  let newResource = null;
-  if (serializedResource.kind === 'image') {
-    newResource = new gd.ImageResource();
-  } else if (serializedResource.kind === 'audio') {
-    newResource = new gd.AudioResource();
-  } else if (serializedResource.kind === 'font') {
-    newResource = new gd.FontResource();
-  } else if (serializedResource.kind === 'video') {
-    newResource = new gd.VideoResource();
-  } else if (serializedResource.kind === 'json') {
-    newResource = new gd.JsonResource();
-  } else if (serializedResource.kind === 'model3D') {
-    newResource = new gd.Model3DResource();
-  } else if (serializedResource.kind === 'atlas') {
-    newResource = new gd.AtlasResource();
-  } else if (serializedResource.kind === 'spine') {
-    newResource = new gd.SpineResource();
-  } else {
+  const resourceKindMetadata = allResourceKindsAndMetadata.find(
+    resourceKind => resourceKind.kind === serializedResource.kind
+  );
+  if (!resourceKindMetadata) {
     throw new Error(
       `Resource of kind "${serializedResource.kind}" is not supported.`
     );
   }
 
+  // The resource does not exist yet, add it. Note that the "origin" will be preserved.
+  const newResource = resourceKindMetadata.createNewResource();
   unserializeFromJSObject(newResource, serializedResource);
 
   if (newResource.getKind() === 'image') {

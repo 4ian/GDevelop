@@ -28,7 +28,6 @@ import { ColumnStackLayout } from '../../../../UI/Layout';
 import {
   type GuidedLessonsRecommendation,
   type PlanRecommendation,
-  type QuickCustomizationRecommendation,
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
@@ -36,13 +35,10 @@ import { SurveyCard } from './SurveyCard';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
-import { EarnBadges } from './EarnBadges';
 import FlatButton from '../../../../UI/FlatButton';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
 import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
@@ -212,13 +208,7 @@ const RecommendationList = ({
   onCreateProjectFromExample,
   askToCloseProject,
 }: Props) => {
-  const {
-    recommendations,
-    subscription,
-    limits,
-    badges,
-    achievements,
-  } = authenticatedUser;
+  const { recommendations, subscription, limits } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const {
     getTutorialProgress,
@@ -265,11 +255,6 @@ const RecommendationList = ({
     recommendation => recommendation.type === 'plan'
   );
 
-  // $FlowIgnore
-  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = recommendations.find(
-    recommendation => recommendation.type === 'quick-customization'
-  );
-
   const getInAppTutorialPartProgress = ({
     tutorialId,
   }: {
@@ -299,59 +284,6 @@ const RecommendationList = ({
               />
             </SectionRow>
           );
-
-        if (quickCustomizationRecommendation) {
-          items.push(
-            <SectionRow key="customize-and-publish">
-              <Text size="section-title" noMargin>
-                <Trans>Create your game in 1 minute</Trans>
-              </Text>
-              <Spacer />
-              <QuickCustomizationGameTiles
-                quickCustomizationRecommendation={
-                  quickCustomizationRecommendation
-                }
-                onSelectExampleShortHeader={async exampleShortHeader => {
-                  const projectIsClosed = await askToCloseProject();
-                  if (!projectIsClosed) {
-                    return;
-                  }
-
-                  const newProjectSetup: NewProjectSetup = {
-                    storageProvider: UrlStorageProvider,
-                    saveAsLocation: null,
-                    openQuickCustomizationDialog: true,
-                  };
-                  onCreateProjectFromExample(
-                    exampleShortHeader,
-                    newProjectSetup,
-                    i18n
-                  );
-                }}
-              />
-            </SectionRow>
-          );
-        }
-
-        if (
-          !limits ||
-          !limits.capabilities.classrooms ||
-          !limits.capabilities.classrooms.hidePlayTab
-        ) {
-          items.push(
-            <SectionRow key="earn-badges">
-              <Text size="section-title" noMargin>
-                <Trans>Earn badges and credits</Trans>
-              </Text>
-              <Spacer />
-              <EarnBadges
-                achievements={achievements}
-                badges={badges}
-                onOpenProfile={onOpenProfile}
-              />
-            </SectionRow>
-          );
-        }
 
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds

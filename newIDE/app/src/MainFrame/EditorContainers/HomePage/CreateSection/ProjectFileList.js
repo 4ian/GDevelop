@@ -61,7 +61,7 @@ const styles = {
 type Props = {|
   i18n: I18nType,
 
-  game: ?Game,
+  game: Game,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
 
@@ -208,10 +208,13 @@ const ProjectFileList = ({
       { label: i18n._(t`Open`), click: () => onOpenProject(file) },
     ];
     if (file.storageProviderName === 'Cloud') {
-      actions.push({
-        label: i18n._(t`Delete`),
-        click: () => onDeleteCloudProject(i18n, file),
-      });
+      actions.push(
+        { type: 'separator' },
+        {
+          label: i18n._(t`Delete`),
+          click: () => onDeleteCloudProject(i18n, file),
+        }
+      );
     } else if (file.storageProviderName === 'LocalFile') {
       actions.push(
         ...[
@@ -219,6 +222,7 @@ const ProjectFileList = ({
             label: i18n._(t`Show in local folder`),
             click: () => locateProjectFile(file),
           },
+          { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
             click: () => onRemoveRecentProjectFile(file),
@@ -226,10 +230,13 @@ const ProjectFileList = ({
         ]
       );
     } else {
-      actions.push({
-        label: i18n._(t`Remove from list`),
-        click: () => onRemoveRecentProjectFile(file),
-      });
+      actions.push(
+        { type: 'separator' },
+        {
+          label: i18n._(t`Remove from list`),
+          click: () => onRemoveRecentProjectFile(file),
+        }
+      );
     }
 
     return actions;

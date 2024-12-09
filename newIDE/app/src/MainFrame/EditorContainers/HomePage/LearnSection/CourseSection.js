@@ -50,12 +50,24 @@ type Props = {|
   courseChapters: CourseChapter[],
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   onBack: () => void,
+  onCompleteTask: (
+    chapterId: string,
+    taskIndex: number,
+    completed: boolean
+  ) => void,
+  isTaskCompleted: (
+    chapterId: string,
+    taskIndex: number,
+  ) => boolean,
+
 |};
 
 const CourseSection = ({
   courseChapters,
   onOpenTemplateFromCourseChapter,
   onBack,
+  onCompleteTask,
+  isTaskCompleted,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
@@ -150,6 +162,8 @@ const CourseSection = ({
               onOpenTemplate={() => {
                 onOpenTemplateFromCourseChapter(chapter);
               }}
+              onCompleteTask={onCompleteTask}
+              isTaskCompleted={isTaskCompleted}
               key={chapter.id}
               ref={_ref => {
                 if (_ref) {

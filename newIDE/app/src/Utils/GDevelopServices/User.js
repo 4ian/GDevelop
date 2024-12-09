@@ -732,7 +732,7 @@ export const fetchUserCourseProgress = async (
       params: { userId },
     });
 
-    return response.data.progress;
+    return response.data;
   } catch (error) {
     const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
     if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {

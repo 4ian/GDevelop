@@ -65,17 +65,18 @@ const useCourses = () => {
               userId,
             }
           );
-          setCourseChapters(fetchedChapters);
-          if (userId && selectedCourse) {
+
+          if (userId) {
             const userProgress = await fetchUserCourseProgress(
               getAuthorizationHeader,
               userId,
-              selectedCourse.id
+              courseId
             );
             setUserProgressWithoutCallingFunction(userProgress);
           } else {
             setUserProgressWithoutCallingFunction(null);
           }
+          setCourseChapters(fetchedChapters);
         } finally {
           setIsLoadingChapters(false);
         }
@@ -100,6 +101,60 @@ const useCourses = () => {
     ]
   );
 
+  const onCompleteTask = React.useCallback(
+    (chapterId: string, taskIndex: number, completed: boolean) => {
+      if (!selectedCourse || !userId) return;
+      // TODO: if no userId, force to subscribe.
+
+      const newUserCourseProgress: UserCourseProgress = userCourseProgress
+        ? { ...userCourseProgress }
+        : {
+            courseId: selectedCourse.id,
+            userId,
+            progress: [],
+          };
+      let currentChapterProgress = newUserCourseProgress.progress.find(
+        task => task.chapterId === chapterId
+      );
+      if (!currentChapterProgress) {
+        newUserCourseProgress.progress.push({ chapterId, completedTasks: [] });
+        currentChapterProgress =
+          newUserCourseProgress.progress[
+            newUserCourseProgress.progress.length - 1
+          ];
+      }
+
+      const indexInList = currentChapterProgress.completedTasks.indexOf(
+        taskIndex
+      );
+      if (completed) {
+        if (indexInList === -1) {
+          currentChapterProgress.completedTasks.push(taskIndex);
+        }
+      } else {
+        if (indexInList !== -1) {
+          currentChapterProgress.completedTasks.splice(indexInList, 1);
+        }
+      }
+      setUserCourseProgress(newUserCourseProgress);
+    },
+    [userCourseProgress, userId, selectedCourse, setUserCourseProgress]
+  );
+
+  const isTaskCompleted = React.useCallback(
+    (chapterId: string, taskIndex: number) => {
+      if (!userCourseProgress) return false;
+      console.log(userCourseProgress)
+      const currentChapterProgress = userCourseProgress.progress.find(
+        task => task.chapterId === chapterId
+      );
+      if (!currentChapterProgress) return false;
+
+      return currentChapterProgress.completedTasks.indexOf(taskIndex) >= 0;
+    },
+    [userCourseProgress]
+  );
+
   React.useEffect(
     () => {
       fetchCourses();
@@ -112,6 +167,8 @@ const useCourses = () => {
     courseChapters,
     onSelectCourse: setSelectedCourse,
     isLoadingChapters,
+    onCompleteTask,
+    isTaskCompleted,
   };
 };
 

@@ -99,10 +99,25 @@ type Props = {|
   chapterIndex: number,
   courseChapter: CourseChapter,
   onOpenTemplate: () => void,
+  onCompleteTask: (
+    chapterId: string,
+    taskIndex: number,
+    completed: boolean
+  ) => void,
+  isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
-  ({ chapterIndex, courseChapter, onOpenTemplate }, ref) => {
+  (
+    {
+      chapterIndex,
+      courseChapter,
+      onOpenTemplate,
+      onCompleteTask,
+      isTaskCompleted,
+    },
+    ref
+  ) => {
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
@@ -316,14 +331,15 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           </div>
         )}
         {!courseChapter.isLocked &&
-          courseChapter.tasks.map((item, index) => (
+          courseChapter.tasks.map((item, taskIndex) => (
             <CourseChapterTaskItem
               courseChapterTask={item}
-              key={index.toString()}
+              key={taskIndex.toString()}
               isOpen={openTasks}
-              onCheck={() => {}}
-              isComplete={false}
-              onComplete={() => {}}
+              isComplete={isTaskCompleted(courseChapter.id, taskIndex)}
+              onComplete={isCompleted =>
+                onCompleteTask(courseChapter.id, taskIndex, isCompleted)
+              }
             />
           ))}
       </ColumnStackLayout>

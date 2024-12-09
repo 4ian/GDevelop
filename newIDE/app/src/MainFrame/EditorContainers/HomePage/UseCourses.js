@@ -21,9 +21,12 @@ export type CourseChapterCompletion = {|
 |};
 
 const useCourses = () => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    profile,
+    getAuthorizationHeader,
+    onOpenCreateAccountDialog,
+  } = React.useContext(AuthenticatedUserContext);
+
   const [courses, setCourses] = React.useState<?(Course[])>(null);
 
   const updateUserCourseProgress = React.useCallback(
@@ -109,8 +112,11 @@ const useCourses = () => {
 
   const onCompleteTask = React.useCallback(
     (chapterId: string, taskIndex: number, completed: boolean) => {
-      if (!selectedCourse || !userId) return;
-      // TODO: if no userId, force to subscribe.
+      if (!selectedCourse) return;
+      if (!userId) {
+        onOpenCreateAccountDialog();
+        return;
+      }
 
       const newUserCourseProgress: UserCourseProgress = userCourseProgress
         ? { ...userCourseProgress }
@@ -144,7 +150,13 @@ const useCourses = () => {
       }
       setUserCourseProgress(newUserCourseProgress);
     },
-    [userCourseProgress, userId, selectedCourse, setUserCourseProgress]
+    [
+      userCourseProgress,
+      userId,
+      selectedCourse,
+      setUserCourseProgress,
+      onOpenCreateAccountDialog,
+    ]
   );
 
   const isTaskCompleted = React.useCallback(

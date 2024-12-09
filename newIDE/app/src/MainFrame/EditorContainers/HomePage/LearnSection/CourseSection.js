@@ -18,6 +18,10 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import type { CourseChapterCompletion } from '../UseCourses';
 import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
 import LinearProgress from '../../../../UI/LinearProgress';
+import AlertMessage from '../../../../UI/AlertMessage';
+import PreferencesContext, {
+  allAlertMessages,
+} from '../../../Preferences/PreferencesContext';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -49,6 +53,8 @@ const styles = {
   askAQuestionContainer: { display: 'flex', padding: 8 },
 };
 
+const alertMessageKey = 'course-subtitles-in-user-language';
+
 type Props = {|
   courseChapters: CourseChapter[],
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
@@ -73,6 +79,7 @@ const CourseSection = ({
   getCourseCompletion,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
 
@@ -84,6 +91,10 @@ const CourseSection = ({
     |}[]
   >(new Array(courseChapters.length));
   const [activeChapterId, setActiveChapterId] = React.useState<?string>(null);
+
+  const subtitleHint = allAlertMessages.find(
+    message => message.key === alertMessageKey
+  );
 
   const onScroll = React.useCallback((e: Event) => {
     setActiveChapterId(() => {
@@ -159,6 +170,17 @@ const CourseSection = ({
         }
       >
         <Column noOverflowParent noMargin>
+          {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (
+            <Line>
+              <AlertMessage
+                kind="info"
+                background="light"
+                onHide={() => showAlertMessage(alertMessageKey, false)}
+              >
+                {subtitleHint.label}
+              </AlertMessage>
+            </Line>
+          )}
           {courseChapters.map((chapter, index) => (
             <CourseChapterView
               chapterIndex={index}

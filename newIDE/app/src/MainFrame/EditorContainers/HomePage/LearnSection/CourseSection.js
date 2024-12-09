@@ -30,7 +30,6 @@ import {
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
-  mobileContainer: { position: 'relative' },
   sideContainer: { maxWidth: 250, position: 'relative' },
   sideContent: {
     position: 'sticky',
@@ -239,11 +238,7 @@ const CourseSection = ({
         }
       >
         <div
-          style={
-            isMobile && !isLandscape
-              ? styles.mobileContainer
-              : styles.desktopContainer
-          }
+          style={isMobile && !isLandscape ? undefined : styles.desktopContainer}
         >
           <Column noOverflowParent noMargin>
             {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (

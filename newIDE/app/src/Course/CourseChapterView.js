@@ -126,7 +126,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     } = React.useContext(PreferencesContext);
     const userLanguage2LetterCode = language.split('_')[0];
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const { isMobile, isLandscape } = useResponsiveWindowSize();
+    const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
     const isMobilePortrait = isMobile && !isLandscape;
     const [openTasks, setOpenTasks] = React.useState<boolean>(false);
     const completion = courseChapter.tasks
@@ -213,8 +213,10 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                   </Text>
                   <ResponsiveLineStackLayout
                     noMargin
-                    noResponsiveLandscape
                     noColumnMargin
+                    forceMobileLayout={
+                      windowSize === 'small' || windowSize === 'medium'
+                    }
                   >
                     <RaisedButton
                       primary

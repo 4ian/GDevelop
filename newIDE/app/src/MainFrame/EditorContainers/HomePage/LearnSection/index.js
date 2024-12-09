@@ -129,6 +129,15 @@ type Props = {|
   courseChapters: ?(CourseChapter[]),
   onSelectCourse: (?Course) => void,
   isLoadingChapters: boolean,
+  onCompleteCourseTask: (
+    chapterId: string,
+    taskIndex: number,
+    completed: boolean
+  ) => void,
+  isCourseTaskCompleted: (
+    chapterId: string,
+    taskIndex: number,
+  ) => boolean,
 |};
 
 const LearnSection = ({
@@ -141,6 +150,8 @@ const LearnSection = ({
   courseChapters,
   onSelectCourse,
   isLoadingChapters,
+  onCompleteCourseTask,
+  isCourseTaskCompleted,
 }: Props) => {
   const {
     tutorials,
@@ -175,6 +186,8 @@ const LearnSection = ({
         courseChapters={courseChapters}
         onBack={() => onSelectCourse(null)}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
+        onCompleteTask={onCompleteCourseTask}
+        isTaskCompleted={isCourseTaskCompleted}
       />
     );
   }

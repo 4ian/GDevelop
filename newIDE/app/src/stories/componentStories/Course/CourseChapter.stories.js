@@ -153,6 +153,9 @@ export const Default = () => {
     <CourseChapterView
       courseChapter={courseChapter}
       onOpenTemplate={action('open template')}
+      onCompleteTask={action('onCompleteTask')}
+      isTaskCompleted={action('isTaskCompleted')}
+      chapterIndex={0}
     />
   );
 };
@@ -168,6 +171,9 @@ export const Locked = () => {
         priceInCredits: 400,
       }}
       onOpenTemplate={action('open template')}
+      onCompleteTask={action('onCompleteTask')}
+      isTaskCompleted={action('isTaskCompleted')}
+      chapterIndex={0}
     />
   );
 };

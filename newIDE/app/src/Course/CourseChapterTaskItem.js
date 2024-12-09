@@ -23,7 +23,6 @@ const styles = {
 
 type Props = {|
   courseChapterTask: CourseChapterTask,
-  onCheck: () => void,
   isOpen: boolean,
   isComplete: boolean,
   onComplete: boolean => void,
@@ -31,7 +30,6 @@ type Props = {|
 
 const CourseChapterTaskItem = ({
   courseChapterTask,
-  onCheck,
   isOpen,
   isComplete,
   onComplete,

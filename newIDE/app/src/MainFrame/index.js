@@ -3168,7 +3168,9 @@ const MainFrame = (props: Props) => {
             t`Unable to create a new project for the course chapter. Try again later.`
           ),
           rawError: new Error(
-            `Can't create project from template of course chapter "${courseChapter.id}"`
+            `Can't create project from template of course chapter "${
+              courseChapter.id
+            }"`
           ),
           errorId: 'cannot-create-project-from-course-chapter-template',
         });

@@ -25,7 +25,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
-import Gold from '../Profile/Subscription/Icons/Gold';
+import GoldCompact from '../Profile/Subscription/Icons/GoldCompact';
 import Coin from '../Credits/Icons/Coin';
 import Lock from '../UI/CustomSvgIcons/Lock';
 import { rankLabel } from '../Utils/Ordinal';
@@ -221,7 +221,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                     <RaisedButton
                       primary
                       fullWidth
-                      icon={<Gold />}
+                      icon={<GoldCompact fontSize="small" />}
                       label={<Trans>Get a subscription</Trans>}
                       onClick={() =>
                         openSubscriptionDialog({

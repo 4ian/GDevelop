@@ -140,7 +140,7 @@ type Props = {|
     chapterId: string
   ) => CourseChapterCompletion | null,
   getCourseCompletion: () => number | null,
-  onBuyCourseChapterWithCredits: CourseChapter => Promise<void>,
+  onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
 const LearnSection = ({

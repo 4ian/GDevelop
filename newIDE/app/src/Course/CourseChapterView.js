@@ -29,6 +29,8 @@ import Coin from '../Credits/Icons/Coin';
 import Lock from '../UI/CustomSvgIcons/Lock';
 import { rankLabel } from '../Utils/Ordinal';
 import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
+import Window from '../Utils/Window';
+import PasswordPromptDialog from '../AssetStore/PasswordPromptDialog';
 
 const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
@@ -111,7 +113,7 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
-  onBuyWithCredits: CourseChapter => Promise<void>,
+  onBuyWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
@@ -133,6 +135,11 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     const {
       values: { language },
     } = React.useContext(PreferencesContext);
+    const [
+      displayPasswordPrompt,
+      setDisplayPasswordPrompt,
+    ] = React.useState<boolean>(false);
+    const [password, setPassword] = React.useState<string>('');
     const userLanguage2LetterCode = language.split('_')[0];
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
@@ -149,14 +156,24 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
       async () => {
         if (!courseChapter.isLocked) return;
 
+        setDisplayPasswordPrompt(false);
         setIsPurchasing(true);
         try {
-          await onBuyWithCredits(courseChapter);
+          await onBuyWithCredits(courseChapter, password);
         } finally {
           setIsPurchasing(false);
         }
       },
-      [courseChapter, onBuyWithCredits]
+      [courseChapter, onBuyWithCredits, password]
+    );
+
+    const onWillBuyWithCredits = React.useCallback(
+      async () => {
+        // Password is required in dev environment only so that one cannot freely claim asset packs.
+        if (Window.isDev()) setDisplayPasswordPrompt(true);
+        else onClickBuyWithCredits();
+      },
+      [onClickBuyWithCredits]
     );
 
     return (
@@ -265,7 +282,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                             Pay {courseChapter.priceInCredits} credits
                           </Trans>
                         }
-                        onClick={onClickBuyWithCredits}
+                        onClick={onWillBuyWithCredits}
                       />
                     )}
                   </ResponsiveLineStackLayout>
@@ -371,6 +388,14 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               }
             />
           ))}
+        {displayPasswordPrompt && (
+          <PasswordPromptDialog
+            onApply={onClickBuyWithCredits}
+            onClose={() => setDisplayPasswordPrompt(false)}
+            passwordValue={password}
+            setPasswordValue={setPassword}
+          />
+        )}
       </ColumnStackLayout>
     );
   }

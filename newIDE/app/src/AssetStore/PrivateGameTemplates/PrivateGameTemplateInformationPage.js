@@ -58,6 +58,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../../UI/RaisedButton';
 import Play from '../../UI/CustomSvgIcons/Play';
 import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
+import PasswordPromptDialog from '../PasswordPromptDialog';
 
 const cellSpacing = 8;
 
@@ -165,6 +166,11 @@ const PrivateGameTemplateInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
+  const [
+    displayPasswordPrompt,
+    setDisplayPasswordPrompt,
+  ] = React.useState<boolean>(false);
+  const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const {
     windowSize,
@@ -323,6 +329,8 @@ const PrivateGameTemplateInformationPage = ({
     async () => {
       if (!privateGameTemplateListingData || !gameTemplate) return;
 
+      setDisplayPasswordPrompt(false);
+
       if (!profile || !limits) {
         // User not logged in, suggest to log in.
         onOpenLoginDialog();
@@ -374,6 +382,7 @@ const PrivateGameTemplateInformationPage = ({
             productId: privateGameTemplateListingData.id,
             usageType: selectedUsageType,
             userId: profile.id,
+            password,
           }),
         successMessage: <Trans>🎉 You can now use your template!</Trans>,
       });
@@ -390,8 +399,15 @@ const PrivateGameTemplateInformationPage = ({
       openCreditsUsageDialog,
       getAuthorizationHeader,
       onOpenLoginDialog,
+      password,
     ]
   );
+
+  const onWillBuyWithCredits = () => {
+    // Password is required in dev environment only so that one cannot freely claim asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    else onClickBuyWithCredits();
+  };
 
   const mediaItems = React.useMemo(
     () =>
@@ -637,6 +653,14 @@ const PrivateGameTemplateInformationPage = ({
                     }
                   : undefined
               }
+            />
+          )}
+          {displayPasswordPrompt && (
+            <PasswordPromptDialog
+              onApply={onWillBuyWithCredits}
+              onClose={() => setDisplayPasswordPrompt(false)}
+              passwordValue={password}
+              setPasswordValue={setPassword}
             />
           )}
           {!!purchasingPrivateGameTemplateListingData && (

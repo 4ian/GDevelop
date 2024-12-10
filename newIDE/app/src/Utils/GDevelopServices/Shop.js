@@ -380,13 +380,19 @@ export const buyProductWithCredits = async (
     productId,
     usageType,
     userId,
+    password,
   }: {|
     productId: string,
     usageType: string,
     userId: string,
+    password?: string,
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+
+  const queryParams: {| userId: string, password?: string |} = { userId };
+  if (password) queryParams.password = password;
+
   await client.post(
     `/product/${productId}/action/buy-with-credits`,
     {
@@ -394,9 +400,7 @@ export const buyProductWithCredits = async (
       priceUsageType: usageType,
     },
     {
-      params: {
-        userId,
-      },
+      params: queryParams,
       headers: {
         Authorization: authorizationHeader,
       },

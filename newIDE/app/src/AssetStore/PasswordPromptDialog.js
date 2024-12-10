@@ -11,7 +11,7 @@ type Props = {|
   passwordValue: string,
   setPasswordValue: (newValue: string) => void,
   onClose: () => void,
-  onApply: () => Promise<void>,
+  onApply: () => Promise<void> | void,
 |};
 
 const PasswordPromptDialog = (props: Props) => (

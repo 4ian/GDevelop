@@ -237,7 +237,7 @@ const useCourses = () => {
   );
 
   const onBuyCourseChapterWithCredits = React.useCallback(
-    async (courseChapter: CourseChapter) => {
+    async (courseChapter: CourseChapter, password: string) => {
       if (
         !courseChapter.isLocked ||
         !courseChapter.priceInCredits ||
@@ -285,7 +285,7 @@ const useCourses = () => {
         message: (
           <Trans>
             You are about to use {creditsAmount} credits to purchase the chapter
-            {courseChapter.title}. Continue?
+            "{courseChapter.title}". Continue?
           </Trans>
         ),
         onConfirm: async () => {
@@ -293,6 +293,7 @@ const useCourses = () => {
             productId: listedCourseChapter.id,
             usageType: 'default',
             userId,
+            password,
           });
           if (selectedCourse) await fetchCourseChapters(selectedCourse.id);
         },

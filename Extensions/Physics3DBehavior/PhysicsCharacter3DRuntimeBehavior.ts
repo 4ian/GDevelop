@@ -537,9 +537,11 @@ namespace gdjs {
           this._currentForwardSpeed -= this._forwardAcceleration * timeDelta;
         } else {
           // Turn back at least as fast as it would stop.
-          this._currentForwardSpeed -=
+          this._currentForwardSpeed = Math.max(
+            targetedForwardSpeed,
+            this._currentForwardSpeed - 
             Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-            timeDelta;
+            timeDelta);
         }
       } else if (targetedForwardSpeed > 0) {
         if (this._currentForwardSpeed >= targetedForwardSpeed) {
@@ -552,19 +554,21 @@ namespace gdjs {
           this._currentForwardSpeed += this._forwardAcceleration * timeDelta;
         } else {
           // Turn back at least as fast as it would stop.
-          this._currentForwardSpeed +=
+          this._currentForwardSpeed = Math.min(
+            targetedForwardSpeed,
+            this._currentForwardSpeed + 
             Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-            timeDelta;
+            timeDelta);
         }
       } else {
         if (this._currentForwardSpeed < 0) {
-          this._currentForwardSpeed = Math.max(
+          this._currentForwardSpeed = Math.min(
             this._currentForwardSpeed + this._forwardDeceleration * timeDelta,
             0
           );
         }
         if (this._currentForwardSpeed > 0) {
-          this._currentForwardSpeed = Math.min(
+          this._currentForwardSpeed = Math.max(
             this._currentForwardSpeed - this._forwardDeceleration * timeDelta,
             0
           );

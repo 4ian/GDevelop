@@ -224,14 +224,17 @@ export const sendExampleDetailsOpened = (slug: string) => {
 export const sendNewGameCreated = ({
   exampleUrl,
   exampleSlug,
+  isCourseChapterTemplate,
 }: {|
   exampleUrl: string,
   exampleSlug: string,
+  isCourseChapterTemplate?: true,
 |}) => {
   recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
     templateName: exampleUrl,
     exampleSlug,
+    isCourseChapterTemplate,
   });
 };
 

@@ -86,10 +86,10 @@ export const createNewProjectFromCourseChapterTemplate = (
   templateUrl: string,
   courseChapterId: string
 ): NewProjectSource => {
-  // TODO: Send event?
   sendNewGameCreated({
     exampleUrl: templateUrl,
     exampleSlug: courseChapterId,
+    isCourseChapterTemplate: true,
   });
   const newProjectSource = getNewProjectSourceFromUrl(templateUrl);
   newProjectSource.templateSlug = courseChapterId;

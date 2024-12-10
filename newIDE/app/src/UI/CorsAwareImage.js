@@ -1,8 +1,5 @@
 // @flow
 import * as React from 'react';
-import InnerImageZoom from 'react-inner-image-zoom';
-import './CorsAwareImage.css';
-import classNames from 'classnames';
 
 type Props = {|
   src: ?string,
@@ -13,7 +10,6 @@ type Props = {|
   title?: ?string,
   onError?: (?Error) => void,
   onLoad?: (e: any) => void,
-  withInnerZoom?: boolean,
 |};
 
 const addSearchParameterToUrl = (
@@ -39,8 +35,7 @@ const addSearchParameterToUrl = (
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-export const CorsAwareImage = ({ withInnerZoom, src, ...props }: Props) => {
-  const [isZoomedIn, setIsZoomedIn] = React.useState<boolean>(false);
+export const CorsAwareImage = ({ src, ...props }: Props) => {
   const correctedSrc =
     // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
     // By doing so, we force browser to consider this URL as different than the one traditionally
@@ -61,24 +56,7 @@ export const CorsAwareImage = ({ withInnerZoom, src, ...props }: Props) => {
     //
     // Search for "cors-cache-workaround" in the codebase for the same workarounds.
     src ? addSearchParameterToUrl(src, 'gdUsage', 'img') : undefined;
-  if (withInnerZoom) {
-    return (
-      <InnerImageZoom
-        src={correctedSrc}
-        {...props}
-        className={classNames({
-          'with-min-height': isZoomedIn,
-          'with-grab-cursor': isZoomedIn,
-        })}
-        afterZoomIn={() => setIsZoomedIn(true)}
-        afterZoomOut={() => setIsZoomedIn(false)}
-        zoomType="click"
-        moveType="drag"
-        hideHint
-        zoomScale={0.8}
-      />
-    );
-  }
+
   return (
     <img // eslint-disable-line jsx-a11y/alt-text
       {...props}

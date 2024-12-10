@@ -23,7 +23,6 @@ import Cloud from '../UI/CustomSvgIcons/Cloud';
 import CourseChapterTaskItem from './CourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import GoldCompact from '../Profile/Subscription/Icons/GoldCompact';
 import Coin from '../Credits/Icons/Coin';
@@ -210,7 +209,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           >
             {youtubeVideoId && (
               <div style={styles.videoContainer}>
-                <CorsAwareImage
+                <img
                   alt={`Video for lesson ${courseChapter.title}`}
                   style={styles.videoThumbnail}
                   src={`https://i.ytimg.com/vi/${youtubeVideoId}/sddefault.jpg`}

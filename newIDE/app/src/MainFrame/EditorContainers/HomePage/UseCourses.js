@@ -49,7 +49,7 @@ const useCourses = () => {
   const [
     userCourseProgress,
     setUserCourseProgress,
-    setUserProgressWithoutCallingFunction,
+    setUserCourseProgressImmediately,
   ] = useOptimisticState<UserCourseProgress | null>(
     null,
     updateUserCourseProgress
@@ -92,13 +92,13 @@ const useCourses = () => {
             }
           })(),
         ]);
-        setUserProgressWithoutCallingFunction(userProgress);
+        setUserCourseProgressImmediately(userProgress);
         setCourseChapters(fetchedChapters);
       } finally {
         setIsLoadingChapters(false);
       }
     },
-    [getAuthorizationHeader, userId, setUserProgressWithoutCallingFunction]
+    [getAuthorizationHeader, userId, setUserCourseProgressImmediately]
   );
 
   React.useEffect(
@@ -107,7 +107,7 @@ const useCourses = () => {
         fetchCourseChapters(selectedCourse.id);
       } else {
         setCourseChapters(null);
-        setUserProgressWithoutCallingFunction(null);
+        setUserCourseProgressImmediately(null);
       }
     },
     /**
@@ -119,7 +119,7 @@ const useCourses = () => {
       selectedCourse,
       userId,
       getAuthorizationHeader,
-      setUserProgressWithoutCallingFunction,
+      setUserCourseProgressImmediately,
       fetchCourseChapters,
     ]
   );

@@ -8,7 +8,7 @@ import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
-import { CorsAwareImage } from '../UI/CorsAwareImage';
+import ZoomableImage from '../UI/ZoomableImage';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { MarkdownText } from '../UI/MarkdownText';
 import AlertMessage from '../UI/AlertMessage';
@@ -66,12 +66,11 @@ const CourseChapterTaskItem = ({
           {isOpen &&
             courseChapterTask.imageUrls &&
             courseChapterTask.imageUrls.map(imageUrl => (
-              <CorsAwareImage
+              <ZoomableImage
                 style={styles.image}
                 key={imageUrl}
                 alt=""
                 src={imageUrl}
-                withInnerZoom
               />
             ))}
           {isOpen && courseChapterTask.hint && (
@@ -96,12 +95,11 @@ const CourseChapterTaskItem = ({
                 {!!courseChapterTask.answer.imageUrls && (
                   <ColumnStackLayout noMargin noOverflowParent>
                     {courseChapterTask.answer.imageUrls.map(imageUrl => (
-                      <CorsAwareImage
+                      <ZoomableImage
                         style={styles.image}
                         key={imageUrl}
                         alt=""
                         src={imageUrl}
-                        withInnerZoom
                       />
                     ))}
                   </ColumnStackLayout>

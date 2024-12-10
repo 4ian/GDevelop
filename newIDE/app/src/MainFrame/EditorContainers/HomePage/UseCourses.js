@@ -14,6 +14,10 @@ import {
   updateUserCourseProgress as doUpdateUserCourseProgress,
 } from '../../../Utils/GDevelopServices/User';
 import { useOptimisticState } from '../../../Utils/UseOptimisticState';
+import CourseChapterStoreContext from '../../../Course/CourseChapterStoreContext';
+import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { Trans } from '@lingui/macro';
+import { buyProductWithCredits } from '../../../Utils/GDevelopServices/Shop';
 
 export type CourseChapterCompletion = {|
   completedTasks: number,
@@ -23,11 +27,16 @@ export type CourseChapterCompletion = {|
 const useCourses = () => {
   const {
     profile,
+    limits,
     getAuthorizationHeader,
-    onOpenCreateAccountDialog,
+    onOpenLoginDialog,
   } = React.useContext(AuthenticatedUserContext);
 
   const [courses, setCourses] = React.useState<?(Course[])>(null);
+  const { listedCourseChapters } = React.useContext(CourseChapterStoreContext);
+  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
 
   const updateUserCourseProgress = React.useCallback(
     async (userCourseProgress: UserCourseProgress | null) => {
@@ -61,35 +70,39 @@ const useCourses = () => {
     setCourses(fetchedCourses);
   }, []);
 
+  const fetchCourseChapters = React.useCallback(
+    async (courseId: string) => {
+      setIsLoadingChapters(true);
+      try {
+        const [fetchedChapters, userProgress] = await Promise.all([
+          listCourseChapters(getAuthorizationHeader, {
+            courseId,
+            userId,
+          }),
+          (async () => {
+            if (userId) {
+              const userProgress = await fetchUserCourseProgress(
+                getAuthorizationHeader,
+                userId,
+                courseId
+              );
+              return userProgress;
+            } else {
+              return null;
+            }
+          })(),
+        ]);
+        setUserProgressWithoutCallingFunction(userProgress);
+        setCourseChapters(fetchedChapters);
+      } finally {
+        setIsLoadingChapters(false);
+      }
+    },
+    [getAuthorizationHeader, userId, setUserProgressWithoutCallingFunction]
+  );
+
   React.useEffect(
     () => {
-      const fetchCourseChapters = async (courseId: string) => {
-        setIsLoadingChapters(true);
-        try {
-          const [fetchedChapters, userProgress] = await Promise.all([
-            listCourseChapters(getAuthorizationHeader, {
-              courseId,
-              userId,
-            }),
-            (async () => {
-              if (userId) {
-                const userProgress = await fetchUserCourseProgress(
-                  getAuthorizationHeader,
-                  userId,
-                  courseId
-                );
-                return userProgress;
-              } else {
-                return null;
-              }
-            })(),
-          ]);
-          setUserProgressWithoutCallingFunction(userProgress);
-          setCourseChapters(fetchedChapters);
-        } finally {
-          setIsLoadingChapters(false);
-        }
-      };
       if (selectedCourse) {
         fetchCourseChapters(selectedCourse.id);
       } else {
@@ -107,6 +120,7 @@ const useCourses = () => {
       userId,
       getAuthorizationHeader,
       setUserProgressWithoutCallingFunction,
+      fetchCourseChapters,
     ]
   );
 
@@ -114,7 +128,7 @@ const useCourses = () => {
     (chapterId: string, taskIndex: number, completed: boolean) => {
       if (!selectedCourse) return;
       if (!userId) {
-        onOpenCreateAccountDialog();
+        onOpenLoginDialog();
         return;
       }
 
@@ -155,7 +169,7 @@ const useCourses = () => {
       userId,
       selectedCourse,
       setUserCourseProgress,
-      onOpenCreateAccountDialog,
+      onOpenLoginDialog,
     ]
   );
 
@@ -222,6 +236,77 @@ const useCourses = () => {
     [userCourseProgress, courseChapters]
   );
 
+  const onBuyCourseChapterWithCredits = React.useCallback(
+    async (courseChapter: CourseChapter) => {
+      if (!courseChapter.isLocked || !listedCourseChapters) return;
+
+      if (!userId || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
+
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const listedCourseChapter = listedCourseChapters.find(
+        chapter => chapter.id === courseChapter.productId
+      );
+      if (!listedCourseChapter) {
+        console.error(
+          `Couldn't find course chapter with id ${
+            courseChapter.productId
+          } in Shop API.`
+        );
+        return;
+      }
+      const priceForUsageType = listedCourseChapter.creditPrices.find(
+        price => price.usageType === 'default'
+      );
+      if (!priceForUsageType) {
+        console.error(
+          'Unable to find the credits price for the default usage type'
+        );
+        return;
+      }
+      const creditsAmount = priceForUsageType.amount;
+      if (currentCreditsAmount < creditsAmount) {
+        openCreditsPackageDialog({
+          missingCredits: creditsAmount - currentCreditsAmount,
+        });
+        return;
+      }
+
+      openCreditsUsageDialog({
+        title: <Trans>Purchase {courseChapter.title}</Trans>,
+        message: (
+          <Trans>
+            You are about to use {creditsAmount} credits to purchase the chapter
+            {courseChapter.title}. Continue?
+          </Trans>
+        ),
+        onConfirm: async () => {
+          await buyProductWithCredits(getAuthorizationHeader, {
+            productId: listedCourseChapter.id,
+            usageType: 'default',
+            userId,
+          });
+          if (selectedCourse) await fetchCourseChapters(selectedCourse.id);
+        },
+        successMessage: <Trans>🎉 You can now follow your new chapter!</Trans>,
+      });
+    },
+    [
+      userId,
+      limits,
+      listedCourseChapters,
+      openCreditsPackageDialog,
+      openCreditsUsageDialog,
+      getAuthorizationHeader,
+      onOpenLoginDialog,
+      fetchCourseChapters,
+      selectedCourse,
+    ]
+  );
+
   React.useEffect(
     () => {
       fetchCourses();
@@ -238,6 +323,7 @@ const useCourses = () => {
     isTaskCompleted,
     getChapterCompletion,
     getCourseCompletion,
+    onBuyCourseChapterWithCredits,
   };
 };
 

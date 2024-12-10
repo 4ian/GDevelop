@@ -107,6 +107,7 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
+  onBuyWithCredits: CourseChapter => Promise<void>,
 |};
 
 const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
@@ -118,6 +119,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
       onCompleteTask,
       isTaskCompleted,
       getChapterCompletion,
+      onBuyWithCredits,
     },
     ref
   ) => {
@@ -137,6 +139,21 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
       ? completion.completedTasks >= completion.tasks
       : false;
     const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
+    const [isPurchasing, setIsPurchasing] = React.useState<boolean>(false);
+
+    const onClickBuyWithCredits = React.useCallback(
+      async () => {
+        if (!courseChapter.isLocked) return;
+
+        setIsPurchasing(true);
+        try {
+          await onBuyWithCredits(courseChapter);
+        } finally {
+          setIsPurchasing(false);
+        }
+      },
+      [courseChapter, onBuyWithCredits]
+    );
 
     return (
       <ColumnStackLayout expand noMargin>
@@ -224,6 +241,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                       primary
                       fullWidth
                       icon={<GoldCompact fontSize="small" />}
+                      disabled={isPurchasing}
                       label={<Trans>Get a subscription</Trans>}
                       onClick={() =>
                         openSubscriptionDialog({
@@ -236,12 +254,13 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                     <FlatButton
                       fullWidth
                       leftIcon={<Coin fontSize="small" />}
+                      disabled={isPurchasing}
                       label={
                         <Trans>
                           Pay {courseChapter.priceInCredits} credits
                         </Trans>
                       }
-                      onClick={() => {}}
+                      onClick={onClickBuyWithCredits}
                     />
                   </ResponsiveLineStackLayout>
                 </ColumnStackLayout>

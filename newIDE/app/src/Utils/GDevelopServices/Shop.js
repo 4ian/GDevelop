@@ -94,6 +94,13 @@ export type CreditsPackageListingData = {|
   listing: 'CREDITS_PACKAGE',
 |};
 
+export type CourseChapterListingData = {|
+  ...ProductListingData,
+  ...CreditsClaimableAttributes,
+  productType: 'COURSE_CHAPTER',
+  listing: 'COURSE_CHAPTER',
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -153,6 +160,18 @@ export const listListedCreditsPackages = async (): Promise<
   }
 
   return creditsPackages;
+};
+
+export const listListedCourseChapters = async (): Promise<
+  Array<CourseChapterListingData>
+> => {
+  const response = await client.get('/course-chapter');
+  const courseChapters = response.data;
+  if (!Array.isArray(courseChapters)) {
+    throw new Error('Invalid response from the course chapters API');
+  }
+
+  return courseChapters;
 };
 
 export const listSellerAssetPacks = async ({

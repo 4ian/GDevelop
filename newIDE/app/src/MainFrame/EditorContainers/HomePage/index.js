@@ -239,6 +239,7 @@ export const HomePage = React.memo<Props>(
         isTaskCompleted,
         getChapterCompletion,
         getCourseCompletion,
+        onBuyCourseChapterWithCredits,
       } = useCourses();
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -542,6 +543,9 @@ export const HomePage = React.memo<Props>(
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}
                       getCourseCompletion={getCourseCompletion}
+                      onBuyCourseChapterWithCredits={
+                        onBuyCourseChapterWithCredits
+                      }
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}

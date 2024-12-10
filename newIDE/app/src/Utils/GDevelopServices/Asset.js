@@ -200,6 +200,7 @@ export type LockedCourseChapter = {|
   videoUrl: string,
   isLocked: true,
   priceInCredits: number,
+  productId: string,
 |};
 
 export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;

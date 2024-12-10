@@ -86,6 +86,7 @@ type Props = {|
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
   getCourseCompletion: () => number | null,
+  onBuyCourseChapterWithCredits: CourseChapter => Promise<void>,
 |};
 
 const CourseSection = ({
@@ -96,6 +97,7 @@ const CourseSection = ({
   isTaskCompleted,
   getChapterCompletion,
   getCourseCompletion,
+  onBuyCourseChapterWithCredits,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlertMessage, values } = React.useContext(PreferencesContext);
@@ -219,8 +221,6 @@ const CourseSection = ({
     [onScroll]
   );
 
-  console.log(courseCompletion);
-
   return (
     <>
       <SectionContainer
@@ -263,6 +263,7 @@ const CourseSection = ({
                 isTaskCompleted={isTaskCompleted}
                 getChapterCompletion={getChapterCompletion}
                 key={chapter.id}
+                onBuyWithCredits={onBuyCourseChapterWithCredits}
                 ref={_ref => {
                   if (_ref) {
                     chaptersTitleRefs.current[index] = {

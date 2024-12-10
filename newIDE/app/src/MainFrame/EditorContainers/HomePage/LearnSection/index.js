@@ -140,6 +140,7 @@ type Props = {|
     chapterId: string
   ) => CourseChapterCompletion | null,
   getCourseCompletion: () => number | null,
+  onBuyCourseChapterWithCredits: CourseChapter => Promise<void>,
 |};
 
 const LearnSection = ({
@@ -156,6 +157,7 @@ const LearnSection = ({
   isCourseTaskCompleted,
   getCourseChapterCompletion,
   getCourseCompletion,
+  onBuyCourseChapterWithCredits,
 }: Props) => {
   const {
     tutorials,
@@ -194,6 +196,7 @@ const LearnSection = ({
         isTaskCompleted={isCourseTaskCompleted}
         getChapterCompletion={getCourseChapterCompletion}
         getCourseCompletion={getCourseCompletion}
+        onBuyCourseChapterWithCredits={onBuyCourseChapterWithCredits}
       />
     );
   }

@@ -40,6 +40,7 @@ import { Trans } from '@lingui/macro';
 import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
+import { CourseChapterStoreStateProvider } from '../Course/CourseChapterStoreContext';
 
 type Props = {|
   authentication: Authentication,
@@ -113,23 +114,25 @@ const Providers = ({
                                                 }
                                               >
                                                 <CreditsPackageStoreStateProvider>
-                                                  <ProductLicenseStoreStateProvider>
-                                                    <MarketingPlansStoreStateProvider>
-                                                      <ExtensionStoreStateProvider>
-                                                        <BehaviorStoreStateProvider>
-                                                          <TutorialStateProvider>
-                                                            <AnnouncementsFeedStateProvider>
-                                                              <PrivateAssetsAuthorizationProvider>
-                                                                {children({
-                                                                  i18n,
-                                                                })}
-                                                              </PrivateAssetsAuthorizationProvider>
-                                                            </AnnouncementsFeedStateProvider>
-                                                          </TutorialStateProvider>
-                                                        </BehaviorStoreStateProvider>
-                                                      </ExtensionStoreStateProvider>
-                                                    </MarketingPlansStoreStateProvider>
-                                                  </ProductLicenseStoreStateProvider>
+                                                  <CourseChapterStoreStateProvider>
+                                                    <ProductLicenseStoreStateProvider>
+                                                      <MarketingPlansStoreStateProvider>
+                                                        <ExtensionStoreStateProvider>
+                                                          <BehaviorStoreStateProvider>
+                                                            <TutorialStateProvider>
+                                                              <AnnouncementsFeedStateProvider>
+                                                                <PrivateAssetsAuthorizationProvider>
+                                                                  {children({
+                                                                    i18n,
+                                                                  })}
+                                                                </PrivateAssetsAuthorizationProvider>
+                                                              </AnnouncementsFeedStateProvider>
+                                                            </TutorialStateProvider>
+                                                          </BehaviorStoreStateProvider>
+                                                        </ExtensionStoreStateProvider>
+                                                      </MarketingPlansStoreStateProvider>
+                                                    </ProductLicenseStoreStateProvider>
+                                                  </CourseChapterStoreStateProvider>
                                                 </CreditsPackageStoreStateProvider>
                                               </PrivateGameTemplateStoreStateProvider>
                                             </ExampleStoreStateProvider>

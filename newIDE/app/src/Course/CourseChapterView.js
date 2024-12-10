@@ -255,17 +255,19 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                         })
                       }
                     />
-                    <FlatButton
-                      fullWidth
-                      leftIcon={<Coin fontSize="small" />}
-                      disabled={isPurchasing}
-                      label={
-                        <Trans>
-                          Pay {courseChapter.priceInCredits} credits
-                        </Trans>
-                      }
-                      onClick={onClickBuyWithCredits}
-                    />
+                    {courseChapter.priceInCredits && (
+                      <FlatButton
+                        fullWidth
+                        leftIcon={<Coin fontSize="small" />}
+                        disabled={isPurchasing}
+                        label={
+                          <Trans>
+                            Pay {courseChapter.priceInCredits} credits
+                          </Trans>
+                        }
+                        onClick={onClickBuyWithCredits}
+                      />
+                    )}
                   </ResponsiveLineStackLayout>
                 </ColumnStackLayout>
               </Paper>

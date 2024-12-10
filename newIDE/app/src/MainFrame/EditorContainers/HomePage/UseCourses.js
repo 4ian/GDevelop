@@ -238,7 +238,12 @@ const useCourses = () => {
 
   const onBuyCourseChapterWithCredits = React.useCallback(
     async (courseChapter: CourseChapter) => {
-      if (!courseChapter.isLocked || !listedCourseChapters) return;
+      if (
+        !courseChapter.isLocked ||
+        !courseChapter.priceInCredits ||
+        !listedCourseChapters
+      )
+        return;
 
       if (!userId || !limits) {
         // User not logged in, suggest to log in.

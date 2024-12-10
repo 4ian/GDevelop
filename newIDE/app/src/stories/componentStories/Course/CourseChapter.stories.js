@@ -157,6 +157,7 @@ export const Default = () => {
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
+      onBuyWithCredits={action('onBuyWithCredits')}
     />
   );
 };
@@ -170,12 +171,14 @@ export const Locked = () => {
         isLocked: true,
         videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
         priceInCredits: 400,
+        productId: 'premium-course_objects',
       }}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
+      onBuyWithCredits={action('onBuyWithCredits')}
     />
   );
 };

@@ -58,6 +58,9 @@ export const Default = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -89,6 +92,9 @@ export const NotAuthenticated = () => (
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
+          )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
           )}
         />
       </TutorialContext.Provider>
@@ -124,6 +130,9 @@ export const EducationSubscriber = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -158,6 +167,9 @@ export const EducationTeacher = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -189,6 +201,7 @@ export const Loading = () => (
         onOpenTemplateFromCourseChapter={action(
           'onOpenTemplateFromCourseChapter'
         )}
+        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

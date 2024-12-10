@@ -49,6 +49,7 @@ import WarningRound from '../UI/CustomSvgIcons/WarningRound';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
+import TextButton from '../UI/TextButton';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -64,10 +65,10 @@ const styles = {
     ...textEllipsisStyle,
     overflowWrap: 'break-word',
   },
+  projectFilesButton: { minWidth: 32 },
   fileIcon: {
     width: 16,
     height: 16,
-    marginRight: 4,
   },
 };
 
@@ -263,13 +264,20 @@ const GameDashboardCard = ({
       <Text size="block-title" noMargin style={styles.title}>
         {gameName}
       </Text>
-      {projectsList.length > 0 && (
+      {projectsList.length > 0 && game && (
         <>
           <Spacer />
-          <FileWithLines style={styles.fileIcon} />
-          <Text noMargin color="secondary">
-            {projectsList.length}
-          </Text>
+          <TextButton
+            onClick={() => onOpenGameManager(game)}
+            icon={<FileWithLines style={styles.fileIcon} />}
+            label={
+              <Text noMargin color="secondary">
+                {projectsList.length}
+              </Text>
+            }
+            disabled={disabled}
+            style={styles.projectFilesButton}
+          />
         </>
       )}
     </Line>
@@ -309,6 +317,8 @@ const GameDashboardCard = ({
     );
     const name = itemStorageProvider ? (
       i18n._(itemStorageProvider.name)
+    ) : isCurrentProjectOpened ? (
+      <Trans>Project not saved</Trans>
     ) : (
       <Trans>Project not found</Trans>
     );
@@ -411,16 +421,16 @@ const GameDashboardCard = ({
             });
           }
 
-          if (actions.length > 0) {
-            actions.push({
-              type: 'separator',
-            });
-          }
-
           // Delete actions.
           // Don't allow removing project if opened, as it would not result in any change in the list.
           // (because an opened project is always displayed)
           if (!isCurrentProjectOpened && projectsList.length < 2) {
+            if (actions.length > 0) {
+              actions.push({
+                type: 'separator',
+              });
+            }
+
             const file = projectsList[0];
             actions.push({
               label: i18n._(t`Delete`),
@@ -517,7 +527,7 @@ const GameDashboardCard = ({
       : () => {
           showAlert({
             title: t`No project found`,
-            message: t`We couldn't find a project for this game. Try to open the project file manually to get it automatically linked.`,
+            message: t`We couldn't find a project for this game. You may have saved it in a different location? You can open it manually to get it linked to this game.`,
           });
         };
 

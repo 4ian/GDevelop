@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
-import { Column, Spacer } from '../../UI/Grid';
+import { Spacer } from '../../UI/Grid';
 import BackgroundText from '../../UI/BackgroundText';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
@@ -12,11 +12,11 @@ import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../../UI/PlaceholderError';
-import Bank from '../../UI/CustomSvgIcons/Bank';
 import { Tooltip } from '@material-ui/core';
 import CreditOutDialog from './CashOutDialog';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import DashboardWidget from '../Widgets/DashboardWidget';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   separator: {
@@ -29,11 +29,16 @@ const styles = {
   },
 };
 
-const UserEarningsWidget = () => {
+type Props = {|
+  fullWidth?: boolean,
+|};
+
+const UserEarningsWidget = ({ fullWidth }: Props) => {
   const { userEarningsBalance, onRefreshEarningsBalance } = React.useContext(
     AuthenticatedUserContext
   );
   const theme = React.useContext(GDevelopThemeContext);
+  const { isMobile } = useResponsiveWindowSize();
 
   const [earningsInMilliUsd, setEarningsInMilliUsd] = React.useState(0);
   const [earningsInCredits, setEarningsInCredits] = React.useState(0);
@@ -126,7 +131,7 @@ const UserEarningsWidget = () => {
       justifyContent="space-between"
       expand
     >
-      <BackgroundText align="left">
+      <BackgroundText align={isMobile ? 'center' : 'left'}>
         <Link
           href="https://wiki.gdevelop.io/gdevelop5/monetization/"
           onClick={() =>
@@ -140,17 +145,17 @@ const UserEarningsWidget = () => {
       </BackgroundText>
       <LineStackLayout noMargin alignItems="center">
         <ResponsiveLineStackLayout alignItems="center" noMargin>
-          <Column noMargin>
+          <LineStackLayout noMargin alignItems="center" justifyContent="center">
+            <BackgroundText>USD</BackgroundText>
             <Text
-              size="block-title"
+              size="sub-title"
               align="center"
               noMargin
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {(earningsInMilliUsd / 1000).toFixed(2)}
             </Text>
-            <BackgroundText>USD</BackgroundText>
-          </Column>
+          </LineStackLayout>
           <Spacer />
           <Tooltip
             title={
@@ -169,7 +174,6 @@ const UserEarningsWidget = () => {
                   can display even if the button is disabled. */}
             <div style={styles.buttonContainer}>
               <RaisedButton
-                icon={<Bank fontSize="small" />}
                 disabled={!canCashout}
                 primary
                 label={<Trans>Cash out</Trans>}
@@ -189,20 +193,19 @@ const UserEarningsWidget = () => {
         />
         <Spacer />
         <ResponsiveLineStackLayout alignItems="center" noMargin>
-          <Column noMargin>
+          <LineStackLayout noMargin alignItems="center" justifyContent="center">
+            <Coin fontSize="small" />
             <Text
-              size="block-title"
+              size="sub-title"
               align="center"
               noMargin
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {earningsInCredits.toFixed(0)}
             </Text>
-            <BackgroundText>Credits</BackgroundText>
-          </Column>
+          </LineStackLayout>
           <Spacer />
           <RaisedButton
-            icon={<Coin fontSize="small" />}
             primary
             disabled={earningsInCredits === 0}
             label={<Trans>Credit out</Trans>}
@@ -217,7 +220,7 @@ const UserEarningsWidget = () => {
 
   return (
     <>
-      <DashboardWidget gridSize={3} title={<Trans>Total earnings</Trans>}>
+      <DashboardWidget gridSize={fullWidth ? 3 : 2} title={null}>
         {content}
       </DashboardWidget>
       {selectedCashOutType && userEarningsBalance && (

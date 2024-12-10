@@ -16,24 +16,20 @@ import {
 import { uploadBlobFile } from '../ExportAndShare/BrowserExporters/BrowserFileUploader';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 
+const defaultThumbnailWidth = 272;
+const mobileThumbnailWidth = 150;
+
 const styles = {
   image: {
     display: 'block',
     objectFit: 'scale-down', // Match gd.games format.
+    aspectRatio: '16 / 9',
   },
   fullWidthContainer: {
     width: '100%',
     aspectRatio: '16 / 9',
     height: 'auto',
     justifyContent: 'center',
-  },
-  thumbnail: {
-    aspectRatio: '16 / 9',
-    width: 272,
-  },
-  mobileThumbnail: {
-    aspectRatio: '16 / 9',
-    width: 150,
   },
   fullWidthThumbnail: {
     width: '100%',
@@ -159,7 +155,11 @@ export const GameThumbnail = ({
     }
   };
 
-  const thumbnailWidth = width ? width : isMobile && !isLandscape ? 150 : 272;
+  const thumbnailWidth = width
+    ? width
+    : isMobile && !isLandscape
+    ? mobileThumbnailWidth
+    : defaultThumbnailWidth;
   const thumbnailHeight = Math.floor(thumbnailWidth / (16 / 9));
 
   return (
@@ -182,17 +182,16 @@ export const GameThumbnail = ({
             src={thumbnailUrl}
             style={{
               ...styles.image,
-              ...(isMobile && !isLandscape
-                ? fullWidthOnMobile
-                  ? styles.fullWidthThumbnail
-                  : styles.mobileThumbnail
-                : styles.thumbnail),
+              width: thumbnailWidth,
+              ...(isMobile && !isLandscape && fullWidthOnMobile
+                ? styles.fullWidthThumbnail
+                : {}),
             }}
             alt={gameName}
           />
         ) : (
           <EmptyMessage>
-            <Trans>No thumbnail set</Trans>
+            <Trans>No thumbnail</Trans>
           </EmptyMessage>
         )}
       </Paper>

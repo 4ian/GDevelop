@@ -6,27 +6,20 @@ import Paper from '../../UI/Paper';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { ColumnStackLayout } from '../../UI/Layout';
 
-const verticalPadding = 8;
-const largeFixedHeight = 300;
-const smallFixedHeight = 150;
+const padding = 16;
+const fixedHeight = 300;
 
 const styles = {
   paper: {
-    padding: `${verticalPadding}px 12px`,
+    padding: `${padding}px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    minHeight: 0,
-    flex: 1,
   },
   maxHeightNotWrapped: {
-    height: `calc(100% - ${2 * verticalPadding}px)`,
+    height: `calc(100% - ${2 * padding}px)`,
   },
 };
 
@@ -36,7 +29,7 @@ type Props = {|
   renderSubtitle?: ?() => React.Node,
   gridSize: number,
   children?: React.Node,
-  minHeight?: 'small' | 'large',
+  minHeight?: boolean,
 |};
 
 const DashboardWidget = ({
@@ -54,19 +47,18 @@ const DashboardWidget = ({
         background="medium"
         style={{
           ...styles.paper,
+          ...styles.maxHeightNotWrapped,
           ...(minHeight && !isMobile
             ? {
-                ...styles.maxHeightNotWrapped,
-                minHeight:
-                  minHeight === 'large' ? largeFixedHeight : smallFixedHeight,
+                minHeight: minHeight ? fixedHeight : 120,
               }
-            : undefined),
+            : {}),
         }}
       >
-        <div style={styles.content}>
-          <Line alignItems="center" justifyContent="space-between">
+        <ColumnStackLayout noMargin expand useFullHeight>
+          <Line alignItems="center" justifyContent="space-between" noMargin>
             <Column noMargin>
-              <Text size="section-title" noMargin>
+              <Text size="block-title" noMargin>
                 {title}
               </Text>
               {renderSubtitle && renderSubtitle()}
@@ -74,7 +66,7 @@ const DashboardWidget = ({
             {topRightAction}
           </Line>
           {children}
-        </div>
+        </ColumnStackLayout>
       </Paper>
     </Grid>
   );

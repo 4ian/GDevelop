@@ -42,7 +42,7 @@ const ServicesWidget = ({
       <ResponsiveLineStackLayout noColumnMargin noMargin expand>
         <Column expand noMargin>
           <Line noMargin justifyContent="space-between" alignItems="center">
-            <Text size="block-title">
+            <Text size="sub-title">
               <Trans>Game leaderboards</Trans>
             </Text>
             <FlatButton
@@ -114,7 +114,7 @@ const ServicesWidget = ({
         )}
         <Column expand noMargin>
           <Line noMargin justifyContent="space-between" alignItems="center">
-            <Text size="block-title">
+            <Text size="sub-title">
               <Trans>Multiplayer lobbies</Trans>
             </Text>
             <FlatButton

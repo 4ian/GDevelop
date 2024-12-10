@@ -180,9 +180,9 @@ export const GameRegistration = ({
     return (
       <AlertMessage kind="error">
         <Trans>
-          The project currently opened is registered online but you don't have
-          access to it. Ask the original owner of the game to share it with you
-          to be able to manage it.
+          This game is registered online but you don't have access to it. Ask
+          the owner of the game to add your account to the list of owners to be
+          able to manage it.
         </Trans>
       </AlertMessage>
     );

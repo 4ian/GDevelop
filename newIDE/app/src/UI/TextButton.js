@@ -14,6 +14,7 @@ type Props = {|
   keyboardFocused?: boolean,
   fullWidth?: boolean,
   icon?: React.Node,
+  rightIcon?: React.Node,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -36,6 +37,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       primary,
       secondary,
       icon,
+      rightIcon,
       keyboardFocused,
       disabled,
       id,
@@ -67,6 +69,8 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
         {icon && <Spacer />}
         {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
         {label ? <span>{label}</span> : null}
+        {rightIcon && <Spacer />}
+        {rightIcon}
       </Button>
     );
   }

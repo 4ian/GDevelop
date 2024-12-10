@@ -61,6 +61,8 @@ export const NoGamesOrProjects = () => {
           onUnregisterGame={action('onUnregisterGame')}
           currentPage={1}
           onCurrentPageChange={action('onCurrentPageChange')}
+          onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRegisterProject={action('onRegisterProject')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -109,6 +111,8 @@ export const WithOnlyGames = () => {
           onUnregisterGame={action('onUnregisterGame')}
           currentPage={1}
           onCurrentPageChange={action('onCurrentPageChange')}
+          onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRegisterProject={action('onRegisterProject')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -152,6 +156,8 @@ export const WithOnlyProjects = () => {
           onUnregisterGame={action('onUnregisterGame')}
           currentPage={1}
           onCurrentPageChange={action('onCurrentPageChange')}
+          onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRegisterProject={action('onRegisterProject')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -202,6 +208,8 @@ export const WithGamesAndProjects = () => {
           onUnregisterGame={action('onUnregisterGame')}
           currentPage={1}
           onCurrentPageChange={action('onCurrentPageChange')}
+          onDeleteCloudProject={action('onDeleteCloudProject')}
+          onRegisterProject={action('onRegisterProject')}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>

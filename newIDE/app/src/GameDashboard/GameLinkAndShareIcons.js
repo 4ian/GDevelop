@@ -4,13 +4,11 @@ import * as React from 'react';
 import { LineStackLayout } from '../UI/Layout';
 import SocialShareButtons from '../UI/ShareDialog/SocialShareButtons';
 import ShareLink from '../UI/ShareDialog/ShareLink';
-import { marginsSize } from '../UI/Grid';
+import { Spacer } from '../UI/Grid';
 
 const styles = {
   buttonsContainer: {
     flexShrink: 0,
-    marginTop: marginsSize,
-    marginBottom: marginsSize,
   },
   columnContainer: { display: 'grid' },
 };
@@ -42,6 +40,7 @@ const GameLinkAndShareIcons = ({ url, display }: Props) => {
   return (
     <Layout>
       <ShareLink url={url} />
+      {display === 'column' && <Spacer />}
       <div style={styles.buttonsContainer}>
         <SocialShareButtons url={url} />
       </div>

@@ -39,12 +39,10 @@ const usePurchaseMarketingPlan = ({
 
   const onPurchase = React.useCallback(
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
-      if (!profile || !limits) return;
-
-      if (!game) {
+      if (!game || !profile || !limits) {
         await showAlert({
           title: t`Select a game`,
-          message: t`In order to purchase a marketing boost, select a game in your dashboard.`,
+          message: t`In order to purchase a marketing boost, log-in and select a game in your dashboard.`,
         });
         return;
       }

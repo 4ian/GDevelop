@@ -42,7 +42,8 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
+  {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
@@ -180,9 +181,8 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
-      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
-        this
-      );
+      behavior.bodyUpdater =
+        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.recreateBody();
 
       // Begin in the direction of the object.
@@ -526,60 +526,15 @@ namespace gdjs {
           this._stickForce *
           Math.sin(gdjs.toRad(this._stickAngle));
       }
-      if (targetedForwardSpeed < 0) {
-        if (this._currentForwardSpeed <= targetedForwardSpeed) {
-          // Reduce the speed to match the stick force.
-          this._currentForwardSpeed = Math.min(
-            targetedForwardSpeed,
-            this._currentForwardSpeed + this._forwardDeceleration * timeDelta
-          );
-        } else if (this._currentForwardSpeed <= 0) {
-          this._currentForwardSpeed -= this._forwardAcceleration * timeDelta;
-        } else {
-          // Turn back at least as fast as it would stop.
-          this._currentForwardSpeed = Math.max(
-            targetedForwardSpeed,
-            this._currentForwardSpeed - 
-            Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-            timeDelta);
-        }
-      } else if (targetedForwardSpeed > 0) {
-        if (this._currentForwardSpeed >= targetedForwardSpeed) {
-          // Reduce the speed to match the stick force.
-          this._currentForwardSpeed = Math.max(
-            targetedForwardSpeed,
-            this._currentForwardSpeed - this._forwardDeceleration * timeDelta
-          );
-        } else if (this._currentForwardSpeed >= 0) {
-          this._currentForwardSpeed += this._forwardAcceleration * timeDelta;
-        } else {
-          // Turn back at least as fast as it would stop.
-          this._currentForwardSpeed = Math.min(
-            targetedForwardSpeed,
-            this._currentForwardSpeed + 
-            Math.max(this._forwardAcceleration, this._forwardDeceleration) *
-            timeDelta);
-        }
-      } else {
-        if (this._currentForwardSpeed < 0) {
-          this._currentForwardSpeed = Math.min(
-            this._currentForwardSpeed + this._forwardDeceleration * timeDelta,
-            0
-          );
-        }
-        if (this._currentForwardSpeed > 0) {
-          this._currentForwardSpeed = Math.max(
-            this._currentForwardSpeed - this._forwardDeceleration * timeDelta,
-            0
-          );
-        }
-      }
-      this._currentForwardSpeed = gdjs.evtTools.common.clamp(
-        this._currentForwardSpeed,
-        -this._forwardSpeedMax,
-        this._forwardSpeedMax
-      );
-
+      this._currentForwardSpeed =
+        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+          this._currentForwardSpeed,
+          targetedForwardSpeed,
+          this._forwardSpeedMax,
+          this._forwardAcceleration,
+          this._forwardDeceleration,
+          timeDelta
+        );
       /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedSidewaysSpeed = 0;
       if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
@@ -594,54 +549,67 @@ namespace gdjs {
           this._stickForce *
           Math.cos(gdjs.toRad(this._stickAngle));
       }
-      if (targetedSidewaysSpeed < 0) {
-        if (this._currentSidewaysSpeed <= targetedSidewaysSpeed) {
+      this._currentSidewaysSpeed =
+        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+          this._currentSidewaysSpeed,
+          targetedSidewaysSpeed,
+          this._sidewaysSpeedMax,
+          this._sidewaysAcceleration,
+          this._sidewaysDeceleration,
+          timeDelta
+        );
+    }
+
+    private static getAcceleratedSpeed(
+      currentSpeed: float,
+      targetedSpeed: float,
+      speedMax: float,
+      acceleration: float,
+      deceleration: float,
+      timeDelta: float
+    ): float {
+      let newSpeed = currentSpeed;
+      if (targetedSpeed < 0) {
+        if (currentSpeed <= targetedSpeed) {
           // Reduce the speed to match the stick force.
-          this._currentSidewaysSpeed = Math.min(
-            targetedSidewaysSpeed,
-            this._currentSidewaysSpeed + this._sidewaysDeceleration * timeDelta
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + deceleration * timeDelta
           );
-        } else if (this._currentSidewaysSpeed <= 0) {
-          this._currentSidewaysSpeed -= this._sidewaysAcceleration * timeDelta;
+        } else if (currentSpeed <= 0) {
+          newSpeed -= acceleration * timeDelta;
         } else {
           // Turn back at least as fast as it would stop.
-          this._currentSidewaysSpeed -=
-            Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
-            timeDelta;
-        }
-      } else if (targetedSidewaysSpeed > 0) {
-        if (this._currentSidewaysSpeed >= targetedSidewaysSpeed) {
-          // Reduce the speed to match the stick force.
-          this._currentSidewaysSpeed = Math.max(
-            targetedSidewaysSpeed,
-            this._currentSidewaysSpeed - this._sidewaysDeceleration * timeDelta
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - Math.max(acceleration, deceleration) * timeDelta
           );
-        } else if (this._currentSidewaysSpeed >= 0) {
-          this._currentSidewaysSpeed += this._sidewaysAcceleration * timeDelta;
+        }
+      } else if (targetedSpeed > 0) {
+        if (currentSpeed >= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - deceleration * timeDelta
+          );
+        } else if (currentSpeed >= 0) {
+          newSpeed += acceleration * timeDelta;
         } else {
-          this._currentSidewaysSpeed +=
-            Math.max(this._sidewaysAcceleration, this._sidewaysDeceleration) *
-            timeDelta;
+          // Turn back at least as fast as it would stop.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + Math.max(acceleration, deceleration) * timeDelta
+          );
         }
       } else {
-        if (this._currentSidewaysSpeed < 0) {
-          this._currentSidewaysSpeed = Math.max(
-            this._currentSidewaysSpeed + this._sidewaysDeceleration * timeDelta,
-            0
-          );
+        if (currentSpeed < 0) {
+          newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
         }
-        if (this._currentSidewaysSpeed > 0) {
-          this._currentSidewaysSpeed = Math.min(
-            this._currentSidewaysSpeed - this._sidewaysDeceleration * timeDelta,
-            0
-          );
+        if (currentSpeed > 0) {
+          newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
         }
       }
-      this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
-        this._currentSidewaysSpeed,
-        -this._sidewaysSpeedMax,
-        this._sidewaysSpeedMax
-      );
+      return gdjs.evtTools.common.clamp(newSpeed, -speedMax, speedMax);
     }
 
     private updateGroundVelocity(

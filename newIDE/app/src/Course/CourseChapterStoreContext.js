@@ -39,7 +39,6 @@ export const CourseChapterStoreStateProvider = (props: Props) => {
     }
   }, []);
 
-  // Preload the in-app tutorial short headers when the app loads.
   React.useEffect(
     () => {
       const timeoutId = setTimeout(() => {

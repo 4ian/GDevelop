@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import InnerImageZoom from 'react-inner-image-zoom';
-import './ZoomableImage.css';
+import './ImageWithZoom.css';
 import classNames from 'classnames';
 
 type Props = {|
@@ -20,7 +20,7 @@ type Props = {|
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-const ZoomableImage = ({ src, ...props }: Props) => {
+const ImageWithZoom = ({ src, ...props }: Props) => {
   const [isZoomedIn, setIsZoomedIn] = React.useState<boolean>(false);
   return (
     <InnerImageZoom
@@ -40,4 +40,4 @@ const ZoomableImage = ({ src, ...props }: Props) => {
   );
 };
 
-export default ZoomableImage;
+export default ImageWithZoom;

@@ -8,7 +8,7 @@ import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
 import { Column, Line } from '../UI/Grid';
 import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
-import ZoomableImage from '../UI/ZoomableImage';
+import ImageWithZoom from '../UI/ImageWithZoom';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { MarkdownText } from '../UI/MarkdownText';
 import AlertMessage from '../UI/AlertMessage';
@@ -66,7 +66,7 @@ const CourseChapterTaskItem = ({
           {isOpen &&
             courseChapterTask.imageUrls &&
             courseChapterTask.imageUrls.map(imageUrl => (
-              <ZoomableImage
+              <ImageWithZoom
                 style={styles.image}
                 key={imageUrl}
                 alt=""
@@ -95,7 +95,7 @@ const CourseChapterTaskItem = ({
                 {!!courseChapterTask.answer.imageUrls && (
                   <ColumnStackLayout noMargin noOverflowParent>
                     {courseChapterTask.answer.imageUrls.map(imageUrl => (
-                      <ZoomableImage
+                      <ImageWithZoom
                         style={styles.image}
                         key={imageUrl}
                         alt=""

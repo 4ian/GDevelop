@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import { LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Spacer } from '../../UI/Grid';
 import BackgroundText from '../../UI/BackgroundText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import DashboardWidget from './DashboardWidget';
@@ -61,9 +61,8 @@ const TotalPlaysWidget = ({ games, fullWidth }: Props) => {
 
   return (
     <DashboardWidget
-      gridSize={fullWidth ? 3 : 1.5}
+      gridSize={fullWidth ? 3 : 1}
       title={<Trans>Total plays</Trans>}
-      minHeight="small"
     >
       <LineStackLayout
         noMargin
@@ -71,51 +70,54 @@ const TotalPlaysWidget = ({ games, fullWidth }: Props) => {
         justifyContent="flex-end"
         expand
       >
-        <ColumnStackLayout alignItems="center" noMargin>
-          <Line noMargin alignItems="center" justifyContent="center" expand>
-            <Column noMargin>
-              <Text size="block-title" align="center" noMargin>
-                {formatPlays(allGamesTotalPlays)}
-              </Text>
-              <BackgroundText>
-                <Trans>Overall</Trans>
-              </BackgroundText>
-            </Column>
-            <Spacer />
-          </Line>
-          <LineStackLayout
-            noMargin
-            alignItems="center"
-            justifyContent="center"
-            expand
-          >
-            <Column noMargin>
-              <Text size="block-title" align="center" noMargin>
-                {formatPlays(allGamesLastWeekPlays)}
-              </Text>
-              <BackgroundText>
-                <Trans>Last week</Trans>
-              </BackgroundText>
-            </Column>
-            <Spacer />
-            <div
-              style={{
-                ...styles.separator,
-                border: `1px solid ${theme.home.separator.color}`,
-              }}
-            />
-            <Spacer />
-            <Column noMargin>
-              <Text size="block-title" align="center" noMargin>
-                {formatPlays(allGamesLastYearPlays)}
-              </Text>
-              <BackgroundText>
-                <Trans>Last year</Trans>
-              </BackgroundText>
-            </Column>
-            <Spacer />
-          </LineStackLayout>
-        </ColumnStackLayout>
+        <LineStackLayout
+          noMargin
+          alignItems="center"
+          justifyContent="flex-end"
+          expand
+        >
+          <Column noMargin>
+            <Text size="block-title" align="center" noMargin>
+              {formatPlays(allGamesLastWeekPlays)}
+            </Text>
+            <BackgroundText>
+              <Trans>Last week</Trans>
+            </BackgroundText>
+          </Column>
+          <Spacer />
+          <div
+            style={{
+              ...styles.separator,
+              border: `1px solid ${theme.home.separator.color}`,
+            }}
+          />
+          <Spacer />
+          <Column noMargin>
+            <Text size="block-title" align="center" noMargin>
+              {formatPlays(allGamesLastYearPlays)}
+            </Text>
+            <BackgroundText>
+              <Trans>Last year</Trans>
+            </BackgroundText>
+          </Column>
+          <Spacer />
+          <div
+            style={{
+              ...styles.separator,
+              border: `1px solid ${theme.home.separator.color}`,
+            }}
+          />
+          <Spacer />
+          <Column noMargin>
+            <Text size="block-title" align="center" noMargin>
+              {formatPlays(allGamesTotalPlays)}
+            </Text>
+            <BackgroundText>
+              <Trans>Overall</Trans>
+            </BackgroundText>
+          </Column>
+          <Spacer />
+        </LineStackLayout>
       </LineStackLayout>
     </DashboardWidget>
   );

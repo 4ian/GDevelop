@@ -60,7 +60,7 @@ const FeedbackWidget = ({
               />
             )
           }
-          minHeight="large"
+          minHeight
           renderSubtitle={() =>
             shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&
               feedbacks ? (
@@ -151,7 +151,7 @@ const FeedbackWidget = ({
               </Text>
             </ColumnStackLayout>
           ) : gameUrl ? (
-            <ColumnStackLayout noMargin justifyContent="center" expand>
+            <ColumnStackLayout noMargin expand justifyContent="center">
               <Spacer />
               <Text color="secondary" noMargin>
                 <Trans>
@@ -162,7 +162,12 @@ const FeedbackWidget = ({
               <GameLinkAndShareIcons url={gameUrl} display="column" />
             </ColumnStackLayout>
           ) : (
-            <ColumnStackLayout noMargin justifyContent="center" expand>
+            <ColumnStackLayout
+              noMargin
+              expand
+              justifyContent="center"
+              alignItems="center"
+            >
               <Spacer />
               <Text color="secondary" noMargin>
                 <Trans>

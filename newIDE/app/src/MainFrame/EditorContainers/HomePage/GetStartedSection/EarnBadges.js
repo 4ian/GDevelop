@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
 import {
-  ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
@@ -11,14 +10,13 @@ import {
   type Badge,
   type Achievement,
 } from '../../../../Utils/GDevelopServices/Badge';
-import { Column, LargeSpacer } from '../../../../UI/Grid';
+import { Column } from '../../../../UI/Grid';
 import Window from '../../../../Utils/Window';
 import Coin from '../../../../Credits/Icons/Coin';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
-import CreditsStatusBanner from '../../../../Credits/CreditsStatusBanner';
-import FlatButton from '../../../../UI/FlatButton';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import TextButton from '../../../../UI/TextButton';
 
 const getAchievement = (achievements: ?Array<Achievement>, id: string) =>
   achievements && achievements.find(achievement => achievement.id === id);
@@ -65,6 +63,10 @@ const styles = {
     gap: 4,
     color: 'white',
   },
+  badgeItemPlaceholder: {
+    display: 'flex',
+    flex: 1,
+  },
 };
 
 const BadgeItem = ({
@@ -81,7 +83,7 @@ const BadgeItem = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <LineStackLayout expand alignItems="center">
+        <LineStackLayout expand alignItems="center" noMargin>
           <div style={styles.badgeContainer}>
             <img
               src={
@@ -100,37 +102,35 @@ const BadgeItem = ({
               </div>
             )}
           </div>
-          <ColumnStackLayout noMargin expand alignItems="flex-start">
-            <Column noMargin expand>
-              <Text size="body" noMargin>
-                <b>
-                  <Trans>
-                    {(achievement &&
-                      selectMessageByLocale(i18n, achievement.nameByLocale)) ||
-                      '-'}
-                  </Trans>
-                </b>
-              </Text>
-              <Text size="body" noMargin>
+          <Column noMargin expand>
+            <Text size="body" noMargin>
+              <b>
                 <Trans>
                   {(achievement &&
-                    selectMessageByLocale(
-                      i18n,
-                      achievement.shortDescriptionByLocale
-                    )) ||
+                    selectMessageByLocale(i18n, achievement.nameByLocale)) ||
                     '-'}
                 </Trans>
-              </Text>
-            </Column>
-            <FlatButton
-              label={buttonLabel}
-              primary
-              onClick={() => {
-                Window.openExternalURL(linkUrl);
-              }}
-              disabled={hasThisBadge}
-            />
-          </ColumnStackLayout>
+              </b>
+            </Text>
+            <Text size="body" noMargin color="secondary">
+              <Trans>
+                {(achievement &&
+                  selectMessageByLocale(
+                    i18n,
+                    achievement.shortDescriptionByLocale
+                  )) ||
+                  '-'}
+              </Trans>
+            </Text>
+          </Column>
+          <TextButton
+            label={buttonLabel}
+            secondary
+            onClick={() => {
+              Window.openExternalURL(linkUrl);
+            }}
+            disabled={hasThisBadge}
+          />
         </LineStackLayout>
       )}
     </I18n>
@@ -144,7 +144,7 @@ const allBadgesInfo = [
     linkUrl: 'https://github.com/4ian/GDevelop',
   },
   {
-    id: 'twitter-follow',
+    id: 'tiktok-follow',
     label: <Trans>Follow</Trans>,
     linkUrl: 'https://www.tiktok.com/@gdevelop',
   },
@@ -159,7 +159,6 @@ type Props = {|
   achievements: ?Array<Achievement>,
   badges: ?Array<Badge>,
   onOpenProfile: () => void,
-  hideStatusBanner?: boolean,
   showRandomBadge?: boolean,
   showAllBadges?: boolean,
 |};
@@ -168,11 +167,13 @@ export const EarnBadges = ({
   achievements,
   badges,
   onOpenProfile,
-  hideStatusBanner,
   showRandomBadge,
   showAllBadges,
 }: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
+  const { windowSize, isMobile } = useResponsiveWindowSize();
+  const isMobileOrMediumWidth =
+    windowSize === 'small' || windowSize === 'medium';
+
   const badgesToShow = React.useMemo(
     () => {
       const allBadgesWithOwnedStatus = allBadgesInfo.map(badgeInfo => ({
@@ -213,20 +214,18 @@ export const EarnBadges = ({
     [badgesToShow]
   );
 
+  const onlyOneBadgeDisplayed = badgesToShow.length === 1;
+
   return (
     <Column noMargin expand>
-      {!hideStatusBanner && (
-        <CreditsStatusBanner
-          displayPurchaseAction={false}
-          actionButtonLabel={<Trans>Claim credits</Trans>}
-          onActionButtonClick={onOpenProfile}
-        />
-      )}
-      <LargeSpacer />
-      <ResponsiveLineStackLayout noMargin expand>
+      <ResponsiveLineStackLayout
+        noMargin
+        expand
+        forceMobileLayout={isMobileOrMediumWidth}
+      >
         {badgesSlicedInArraysOfTwo.map((badges, index) => (
-          <ResponsiveLineStackLayout noMargin>
-            {badges.slice(0, 2).map(badge => (
+          <ResponsiveLineStackLayout noMargin expand={onlyOneBadgeDisplayed}>
+            {badges.map(badge => (
               <BadgeItem
                 key={badge.id}
                 achievement={getAchievement(achievements, badge.id)}
@@ -235,6 +234,11 @@ export const EarnBadges = ({
                 linkUrl={badge.linkUrl}
               />
             ))}
+            {badges.length === 1 &&
+              !onlyOneBadgeDisplayed &&
+              isMobileOrMediumWidth && (
+                <div style={styles.badgeItemPlaceholder} />
+              )}
           </ResponsiveLineStackLayout>
         ))}
       </ResponsiveLineStackLayout>

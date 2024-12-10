@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { I18n } from '@lingui/react';
+import { I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import {
@@ -15,6 +15,11 @@ type Props = {|
   game: Game,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
+  disabled: boolean,
 
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -23,13 +28,9 @@ type Props = {|
 
 const ProjectsWidget = (props: Props) => {
   return (
-    <I18n>
-      {({ i18n }) => (
-        <DashboardWidget gridSize={3} title={<Trans>Projects</Trans>}>
-          <ProjectFileList {...props} i18n={i18n} />
-        </DashboardWidget>
-      )}
-    </I18n>
+    <DashboardWidget gridSize={3} title={<Trans>Projects</Trans>}>
+      <ProjectFileList {...props} />
+    </DashboardWidget>
   );
 };
 

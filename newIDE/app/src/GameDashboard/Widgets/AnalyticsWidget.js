@@ -53,7 +53,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
         {({ i18n }) => (
           <DashboardWidget
             gridSize={2}
-            minHeight="large"
+            minHeight
             title={<Trans>Analytics</Trans>}
             topRightAction={
               <FlatButton
@@ -84,7 +84,12 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                     <GameLinkAndShareIcons display="column" url={gameUrl} />
                   </ColumnStackLayout>
                 ) : (
-                  <ColumnStackLayout noMargin expand>
+                  <ColumnStackLayout
+                    noMargin
+                    expand
+                    justifyContent="center"
+                    alignItems="center"
+                  >
                     <Spacer />
                     <Text color="secondary" noMargin>
                       <Trans>

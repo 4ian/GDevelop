@@ -73,12 +73,15 @@ type Props = {|
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   closeProject: () => Promise<void>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
 
   // Current game:
   game: Game,
   onGameUpdated: (game: Game) => void,
   onUnregisterGame: (i18n: I18nType) => Promise<void>,
-  gameUnregisterErrorText: ?React.Node,
 
   // Navigation:
   currentView: GameDetailsTab,
@@ -94,12 +97,12 @@ const GameDashboard = ({
   onOpenProject,
   storageProviders,
   closeProject,
+  onDeleteCloudProject,
 
   // Current game:
   game,
   onGameUpdated,
   onUnregisterGame,
-  gameUnregisterErrorText,
 
   // Navigation:
   currentView,
@@ -566,6 +569,8 @@ const GameDashboard = ({
                     onOpenProject={onOpenProject}
                     storageProviders={storageProviders}
                     closeProject={closeProject}
+                    onDeleteCloudProject={onDeleteCloudProject}
+                    disabled={disabled}
                   />
                   <BuildsWidget
                     builds={builds}
@@ -592,7 +597,6 @@ const GameDashboard = ({
               onGameUpdated={_onGameUpdated}
               onUpdatingGame={setIsUpdatingGame}
               onUnregisterGame={() => onUnregisterGame(i18n)}
-              gameUnregisterErrorText={gameUnregisterErrorText}
             />
           )}
         </>

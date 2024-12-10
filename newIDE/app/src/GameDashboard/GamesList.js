@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
-import GameCard from './GameCard';
+import GameDashboardCard, { type DashboardItem } from './GameDashboardCard';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -34,14 +34,17 @@ import {
 import RaisedButton from '../UI/RaisedButton';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../UI/CustomSvgIcons/Add';
-import FlatButton from '../UI/FlatButton';
 import {
   getLastModifiedInfoByProjectId,
   useProjectsListFor,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
-import ProjectCard from './ProjectCard';
+import optionalRequire from '../Utils/OptionalRequire';
+import TextButton from '../UI/TextButton';
+const electron = optionalRequire('electron');
+
+const isDesktop = !!electron;
 
 export const pageSize = 10;
 
@@ -51,11 +54,6 @@ const styles = {
 };
 
 type OrderBy = 'totalSessions' | 'weeklySessions' | 'lastModifiedAt';
-
-type DashboardItem = {|
-  game?: Game, // A project can not be published, and thus not have a game.
-  projectFiles?: Array<FileMetadataAndStorageProviderName>, // A game can have no or multiple projects.
-|};
 
 const totalSessionsSort = (
   itemA: DashboardItem,
@@ -226,7 +224,14 @@ type Props = {|
   onRefreshGames: () => Promise<void>,
   onOpenGameId: (gameId: ?string) => void,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
-  onUnregisterGame: (game: Game, i18n: I18nType) => Promise<void>,
+  onUnregisterGame: (
+    gameId: string,
+    i18n: I18nType,
+    options?: { skipConfirmation: boolean, throwOnError: boolean }
+  ) => Promise<void>,
+  onRegisterProject: (
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<?Game>,
   isUpdatingGame: boolean,
   canOpen: boolean,
   onOpenNewProjectSetupDialog: () => void,
@@ -237,6 +242,11 @@ type Props = {|
   canSaveProject: boolean,
   currentPage: number,
   onCurrentPageChange: (currentPage: number) => void,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName,
+    options?: { skipConfirmation: boolean }
+  ) => Promise<void>,
 |};
 
 const GamesList = ({
@@ -247,6 +257,8 @@ const GamesList = ({
   onOpenGameId,
   onOpenProject,
   onUnregisterGame,
+  onRegisterProject,
+  onDeleteCloudProject,
   isUpdatingGame,
   storageProviders,
   canOpen,
@@ -388,6 +400,13 @@ const GamesList = ({
     [cloudProjects, profile]
   );
 
+  const shouldShowOpenProject =
+    canOpen &&
+    // Only show on large screens.
+    !isMobile &&
+    // Only show on desktop as otherwise, cloud projects are the only ones that can be opened.
+    isDesktop;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -413,7 +432,6 @@ const GamesList = ({
             <LineStackLayout noMargin alignItems="center">
               <RaisedButton
                 primary
-                fullWidth={!canOpen}
                 label={
                   isMobile ? (
                     <Trans>Create</Trans>
@@ -426,8 +444,8 @@ const GamesList = ({
                 id="home-create-project-button"
                 disabled={isUpdatingGame}
               />
-              {canOpen && (
-                <FlatButton
+              {shouldShowOpenProject && (
+                <TextButton
                   label={
                     isMobile ? (
                       <Trans>Open</Trans>
@@ -504,63 +522,59 @@ const GamesList = ({
             displayedDashboardItems
               .map((dashboardItem, index) => {
                 const game = dashboardItem.game;
-                if (game) {
-                  return (
-                    <GameCard
-                      storageProviders={storageProviders}
-                      key={game.id}
-                      isCurrentProjectOpened={
-                        !!projectUuid && game.id === projectUuid
-                      }
-                      game={game}
-                      onOpenGameManager={() => {
-                        onOpenGameId(game.id);
-                      }}
-                      onOpenProject={onOpenProject}
-                      onUnregisterGame={() => onUnregisterGame(game, i18n)}
-                      disabled={isUpdatingGame}
-                      canSaveProject={canSaveProject}
-                      askToCloseProject={askToCloseProject}
-                      onSaveProject={onSaveProject}
-                    />
-                  );
-                }
-                const projectFiles = dashboardItem.projectFiles;
-                if (projectFiles) {
-                  const projectFileMetadataAndStorageProviderName =
-                    projectFiles[0];
-                  return (
-                    <ProjectCard
-                      projectFileMetadataAndStorageProviderName={
-                        projectFileMetadataAndStorageProviderName
-                      }
-                      key={`${projectFileMetadataAndStorageProviderName
-                        .fileMetadata.name || 'project'}-${index}`}
-                      storageProviders={storageProviders}
-                      onOpenProject={() =>
-                        onOpenProject(projectFileMetadataAndStorageProviderName)
-                      }
-                      lastModifiedInfo={
-                        lastModifiedInfoByProjectId[
-                          projectFileMetadataAndStorageProviderName.fileMetadata
-                            .fileIdentifier
-                        ]
-                      }
-                      isCurrentProjectOpened={
-                        !!projectUuid &&
-                        projectFileMetadataAndStorageProviderName.fileMetadata
-                          .gameId === projectUuid
-                      }
-                      currentFileMetadata={currentFileMetadata}
-                      disabled={isUpdatingGame}
-                      closeProject={closeProject}
-                      askToCloseProject={askToCloseProject}
-                      onRefreshGames={refreshGamesList}
-                    />
-                  );
-                }
+                const projectFileMetadataAndStorageProviderName = dashboardItem.projectFiles
+                  ? dashboardItem.projectFiles[0]
+                  : null;
 
-                return null;
+                const key = game
+                  ? game.id
+                  : projectFileMetadataAndStorageProviderName
+                  ? `${projectFileMetadataAndStorageProviderName.fileMetadata
+                      .name || 'project'}-${index}`
+                  : '';
+                const isCurrentProjectOpened =
+                  (!!projectUuid && (!!game && game.id === projectUuid)) ||
+                  (!!projectFileMetadataAndStorageProviderName &&
+                    projectFileMetadataAndStorageProviderName.fileMetadata
+                      .gameId === projectUuid);
+
+                return (
+                  <GameDashboardCard
+                    key={key}
+                    dashboardItem={dashboardItem}
+                    storageProviders={storageProviders}
+                    isCurrentProjectOpened={isCurrentProjectOpened}
+                    onOpenGameManager={(gameToOpen: Game) => {
+                      onOpenGameId(gameToOpen.id);
+                    }}
+                    onOpenProject={onOpenProject}
+                    onUnregisterGame={async () => {
+                      if (!game) return;
+                      await onUnregisterGame(game.id, i18n, {
+                        // Unregistering is done as part of the project deletion, so no need to ask for extra confirmation.
+                        skipConfirmation: true,
+                        // Ensure we throw to stop the project deletion if an error occurs.
+                        throwOnError: true,
+                      });
+                    }}
+                    onRegisterProject={onRegisterProject}
+                    disabled={isUpdatingGame}
+                    canSaveProject={canSaveProject}
+                    askToCloseProject={askToCloseProject}
+                    closeProject={closeProject}
+                    onSaveProject={onSaveProject}
+                    lastModifiedInfoByProjectId={lastModifiedInfoByProjectId}
+                    currentFileMetadata={currentFileMetadata}
+                    onRefreshGames={refreshGamesList}
+                    onDeleteCloudProject={async (
+                      file: FileMetadataAndStorageProviderName
+                    ) => {
+                      await onDeleteCloudProject(i18n, file, {
+                        skipConfirmation: true,
+                      });
+                    }}
+                  />
+                );
               })
               .filter(Boolean)
           ) : !!searchText ? (

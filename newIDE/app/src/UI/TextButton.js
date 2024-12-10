@@ -22,6 +22,7 @@ type Props = {|
     marginRight?: number,
     margin?: number,
     flexShrink?: 0,
+    minWidth?: number,
   |},
   target?: '_blank',
   id?: ?string,

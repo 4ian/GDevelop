@@ -261,7 +261,7 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
 
 export const createCloudProject = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProjectCreationPayload: {| name: string, gameId?: string |}
+  cloudProjectCreationPayload: {| name: string, gameId: string |}
 ): Promise<?CloudProject> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return null;

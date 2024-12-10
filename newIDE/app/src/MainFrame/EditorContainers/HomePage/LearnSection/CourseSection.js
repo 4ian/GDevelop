@@ -27,6 +27,7 @@ import {
   AccordionBody,
   AccordionHeader,
 } from '../../../../UI/Accordion';
+import AnyQuestionDialog from '../AnyQuestionDialog';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -103,6 +104,9 @@ const CourseSection = ({
   const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
+  const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
+    false
+  );
 
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
   const chaptersTitleRefs = React.useRef<
@@ -312,7 +316,7 @@ const CourseSection = ({
                     <RaisedButton
                       label={<Trans>Ask a question</Trans>}
                       primary
-                      onClick={() => {}}
+                      onClick={() => setIsAnyQuestionDialogOpen(true)}
                     />
                   </ColumnStackLayout>
                 </Paper>
@@ -321,6 +325,9 @@ const CourseSection = ({
           )}
         </div>
       </SectionContainer>
+      {isAnyQuestionDialogOpen && (
+        <AnyQuestionDialog onClose={() => setIsAnyQuestionDialogOpen(false)} />
+      )}
       {isMobile && !isLandscape && (
         <div
           style={{

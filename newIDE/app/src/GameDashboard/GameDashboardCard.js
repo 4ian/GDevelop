@@ -41,7 +41,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import LastModificationInfo from '../MainFrame/EditorContainers/HomePage/CreateSection/LastModificationInfo';
 import optionalRequire from '../Utils/OptionalRequire';
 import RaisedButton from '../UI/RaisedButton';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
@@ -193,7 +193,9 @@ const GameDashboardCard = ({
       'Unknown game'
     : 'Unknown game';
 
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const isSmallOrMediumScreen =
+    windowSize === 'small' || windowSize === 'medium';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const itemStorageProvider = projectFileMetadataAndStorageProviderName
     ? getStorageProviderByInternalName(
@@ -296,10 +298,10 @@ const GameDashboardCard = ({
       />
     ) : game ? (
       <LineStackLayout noMargin expand>
-        <Text color="secondary" noMargin>
+        <Text color="secondary" noMargin size="body-small">
           <Trans>Last edited:</Trans>
         </Text>
-        <Text color="secondary" noMargin>
+        <Text color="secondary" noMargin size="body-small">
           {i18n.date(game.updatedAt * 1000)}
         </Text>
       </LineStackLayout>
@@ -567,7 +569,12 @@ const GameDashboardCard = ({
   };
 
   const renderShareUrl = (i18n: I18nType) =>
-    gameUrl ? <GameLinkAndShareIcons url={gameUrl} display="line" /> : null;
+    gameUrl ? (
+      <GameLinkAndShareIcons
+        url={gameUrl}
+        display={isSmallOrMediumScreen ? 'column' : 'line'}
+      />
+    ) : null;
 
   return (
     <I18n>
@@ -579,15 +586,14 @@ const GameDashboardCard = ({
         >
           {isMobile ? (
             <ColumnStackLayout>
-              <LineStackLayout
-                noMargin
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                {renderTitle()}
-                {renderLastModification(i18n)}
+              <LineStackLayout noMargin justifyContent="space-between">
+                <Column noMargin>
+                  {renderTitle()}
+                  {renderLastModification(i18n)}
+                </Column>
+                {renderAdditionalActions()}
               </LineStackLayout>
-              <LineStackLayout>
+              <LineStackLayout noMargin>
                 {renderThumbnail()}
                 {renderPublicInfo()}
               </LineStackLayout>
@@ -613,7 +619,7 @@ const GameDashboardCard = ({
                       {renderTitle()}
                     </ColumnStackLayout>
                     <LineStackLayout noMargin>
-                      {renderStorageProvider(i18n)}
+                      {!isSmallOrMediumScreen && renderStorageProvider(i18n)}
                       {renderAdditionalActions()}
                     </LineStackLayout>
                   </LineStackLayout>

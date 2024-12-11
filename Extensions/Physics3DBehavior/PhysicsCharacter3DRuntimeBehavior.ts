@@ -136,10 +136,6 @@ namespace gdjs {
       this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
       this._shouldBindObjectAndForwardAngle =
         behaviorData.shouldBindObjectAndForwardAngle;
-      console.log(
-        'this._shouldBindObjectAndForwardAngle: ' +
-          this._shouldBindObjectAndForwardAngle
-      );
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -416,6 +412,7 @@ namespace gdjs {
         );
       }
 
+      // Follow moving platforms.
       let groundVelocityX = 0;
       let groundVelocityY = 0;
       let groundVelocityZ = 0;
@@ -427,6 +424,7 @@ namespace gdjs {
         groundVelocityZ = groundVelocity.GetZ();
       }
 
+      // Update walking speed
       let forwardSpeed = this._currentForwardSpeed;
       let sidewaysSpeed = this._currentSidewaysSpeed;
       if (sidewaysSpeed !== 0 && forwardSpeed !== 0) {
@@ -602,6 +600,7 @@ namespace gdjs {
             currentSpeed + deceleration * timeDelta
           );
         } else if (currentSpeed <= 0) {
+          // Accelerate
           newSpeed -= acceleration * timeDelta;
         } else {
           // Turn back at least as fast as it would stop.
@@ -618,6 +617,7 @@ namespace gdjs {
             currentSpeed - deceleration * timeDelta
           );
         } else if (currentSpeed >= 0) {
+          // Accelerate
           newSpeed += acceleration * timeDelta;
         } else {
           // Turn back at least as fast as it would stop.
@@ -627,6 +627,7 @@ namespace gdjs {
           );
         }
       } else {
+        // Decelerate and stop.
         if (currentSpeed < 0) {
           newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
         }

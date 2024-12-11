@@ -183,7 +183,6 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       behaviorName: string
     ): gdjs.Physics3DSharedData {
-      // Create one if needed
       if (!runtimeScene.physics3DSharedData) {
         const initialData = runtimeScene.getInitialSharedDataForBehavior(
           behaviorName
@@ -203,7 +202,7 @@ namespace gdjs {
     static readonly staticBroadPhaseLayerIndex = 1;
     static readonly dynamicBroadPhaseLayerIndex = 1;
 
-    static setupCollisionFiltering(settings: Jolt.JoltSettings) {
+    private static setupCollisionFiltering(settings: Jolt.JoltSettings): void {
       const objectFilter = new Jolt.ObjectLayerPairFilterMask();
       const staticBroadPhaseLayer = new Jolt.BroadPhaseLayer(
         gdjs.Physics3DSharedData.staticBroadPhaseLayerIndex
@@ -252,7 +251,6 @@ namespace gdjs {
     }
 
     step(deltaTime: float): void {
-      // Reset started and ended contacts array for all physics instances.
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior._contactsStartedThisFrame.length = 0;
         physicsBehavior._contactsEndedThisFrame.length = 0;
@@ -264,10 +262,7 @@ namespace gdjs {
         physics3DHook.doBeforePhysicsStep(deltaTime);
       }
 
-      // When running below 55 Hz, do 2 steps instead of 1
       const numSteps = deltaTime > 1.0 / 55.0 ? 2 : 1;
-
-      // Step the physics world
       this.jolt.Step(deltaTime, numSteps);
       this.stepped = true;
 
@@ -350,8 +345,17 @@ namespace gdjs {
 
     private _destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
+    /**
+     * When set to `true` the body will be recreated before the next physics step.
+     */
     private _needToRecreateBody: boolean = false;
+    /**
+     * When set to `true` the shape will be recreated before the next physics step.
+     */
     private _needToRecreateShape: boolean = false;
+    /**
+     * Used by {@link gdjs.PhysicsCharacter3DRuntimeBehavior} to convert coordinates.
+     */
     _shapeHalfDepth: float = 0;
 
     /**
@@ -756,7 +760,7 @@ namespace gdjs {
       }
     }
 
-    recreateShape(): void {
+    private _recreateShape(): void {
       this.bodyUpdater.recreateShape();
 
       this._objectOldWidth = this.owner3D.getWidth();
@@ -777,12 +781,12 @@ namespace gdjs {
 
     getBody(): Jolt.Body {
       if (this._body === null) {
-        this.createBody();
+        this._createBody();
       }
       return this._body!;
     }
 
-    createBody(): boolean {
+    _createBody(): boolean {
       this._needToRecreateBody = false;
       this._needToRecreateShape = false;
 
@@ -838,7 +842,7 @@ namespace gdjs {
 
     recreateBody() {
       if (!this._body) {
-        this.createBody();
+        this._createBody();
         return;
       }
 
@@ -859,7 +863,7 @@ namespace gdjs {
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
 
-      this.createBody();
+      this._createBody();
       if (!this._body) {
         return;
       }
@@ -888,7 +892,7 @@ namespace gdjs {
 
     updateBodyFromObject() {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
 
       if (this._needToRecreateBody) {
@@ -907,7 +911,7 @@ namespace gdjs {
             this._objectOldDepth !== this.owner3D.getDepth()))
       ) {
         this._needToRecreateShape = false;
-        this.recreateShape();
+        this._recreateShape();
       }
 
       this.bodyUpdater.updateBodyFromObject();
@@ -1037,7 +1041,7 @@ namespace gdjs {
       this.bullet = enable;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1092,7 +1096,7 @@ namespace gdjs {
       this.friction = friction;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1114,7 +1118,7 @@ namespace gdjs {
       this.restitution = restitution;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1136,7 +1140,7 @@ namespace gdjs {
       this.linearDamping = linearDamping;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1158,7 +1162,7 @@ namespace gdjs {
       this.angularDamping = angularDamping;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1176,7 +1180,7 @@ namespace gdjs {
       this.gravityScale = gravityScale;
 
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1235,7 +1239,7 @@ namespace gdjs {
 
     getLinearVelocityX(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1244,7 +1248,7 @@ namespace gdjs {
 
     setLinearVelocityX(linearVelocityX: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1260,7 +1264,7 @@ namespace gdjs {
 
     getLinearVelocityY(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1269,7 +1273,7 @@ namespace gdjs {
 
     setLinearVelocityY(linearVelocityY: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1285,7 +1289,7 @@ namespace gdjs {
 
     getLinearVelocityZ(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1294,7 +1298,7 @@ namespace gdjs {
 
     setLinearVelocityZ(linearVelocityZ: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1310,7 +1314,7 @@ namespace gdjs {
 
     getLinearVelocityLength(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1319,7 +1323,7 @@ namespace gdjs {
 
     getAngularVelocityX(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1328,7 +1332,7 @@ namespace gdjs {
 
     setAngularVelocityX(angularVelocityX: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1344,7 +1348,7 @@ namespace gdjs {
 
     getAngularVelocityY(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1353,7 +1357,7 @@ namespace gdjs {
 
     setAngularVelocityY(angularVelocityY: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1369,7 +1373,7 @@ namespace gdjs {
 
     getAngularVelocityZ(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1378,7 +1382,7 @@ namespace gdjs {
 
     setAngularVelocityZ(angularVelocityZ: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1401,7 +1405,7 @@ namespace gdjs {
       positionZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1419,7 +1423,7 @@ namespace gdjs {
 
     applyForceAtCenter(forceX: float, forceY: float, forceZ: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1437,7 +1441,7 @@ namespace gdjs {
       towardZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1466,7 +1470,7 @@ namespace gdjs {
       positionZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1487,7 +1491,7 @@ namespace gdjs {
       impulseZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1507,7 +1511,7 @@ namespace gdjs {
       originZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1533,7 +1537,7 @@ namespace gdjs {
 
     applyTorque(torqueX: float, torqueY: float, torqueZ: float): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1550,7 +1554,7 @@ namespace gdjs {
       angularImpulseZ: float
     ): void {
       if (this._body === null) {
-        if (!this.createBody()) return;
+        if (!this._createBody()) return;
       }
       const body = this._body!;
 
@@ -1562,7 +1566,7 @@ namespace gdjs {
 
     getMass(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1575,7 +1579,7 @@ namespace gdjs {
      */
     getInertiaAroundX(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1588,7 +1592,7 @@ namespace gdjs {
      */
     getInertiaAroundY(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1601,7 +1605,7 @@ namespace gdjs {
      */
     getInertiaAroundZ(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1610,7 +1614,7 @@ namespace gdjs {
 
     getMassCenterX(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1621,7 +1625,7 @@ namespace gdjs {
 
     getMassCenterY(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1632,7 +1636,7 @@ namespace gdjs {
 
     getMassCenterZ(): float {
       if (this._body === null) {
-        if (!this.createBody()) return 0;
+        if (!this._createBody()) return 0;
       }
       const body = this._body!;
 
@@ -1669,14 +1673,15 @@ namespace gdjs {
       object2: gdjs.RuntimeObject,
       behaviorName: string
     ): boolean {
-      // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
 
       if (
-        behavior1._currentContacts.some((behavior) => behavior.owner === object2)
+        behavior1._currentContacts.some(
+          (behavior) => behavior.owner === object2
+        )
       ) {
         return true;
       }
@@ -1700,7 +1705,6 @@ namespace gdjs {
       object2: gdjs.RuntimeObject,
       behaviorName: string
     ): boolean {
-      // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
@@ -1716,7 +1720,6 @@ namespace gdjs {
       object2: gdjs.RuntimeObject,
       behaviorName: string
     ): boolean {
-      // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
@@ -1826,10 +1829,11 @@ namespace gdjs {
         const { behavior } = this;
         const { owner3D, _sharedData } = behavior;
         if (behavior._body === null) {
-          if (!behavior.createBody()) return;
+          if (!behavior._createBody()) return;
         }
         const body = behavior._body!;
 
+        // TODO the `if` is probably unnecessary because `SetPositionAndRotationWhenChanged` already check this.
         // The object object transform has changed, update body transform:
         if (
           this.behavior._objectOldX !== owner3D.getX() ||
@@ -1852,7 +1856,7 @@ namespace gdjs {
         const { behavior } = this;
         const { _sharedData } = behavior;
         if (behavior._body === null) {
-          if (!behavior.createBody()) return;
+          if (!behavior._createBody()) return;
         }
         const body = behavior._body!;
 

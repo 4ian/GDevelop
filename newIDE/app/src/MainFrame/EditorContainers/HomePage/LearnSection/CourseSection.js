@@ -116,10 +116,10 @@ const CourseSection = ({
   );
 
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
-  const chaptersTitleRefs = React.useRef<
+  const chapterTitleRefs = React.useRef<
     {|
       chapterId: string,
-      offset: number,
+      ref: HTMLDivElement,
     |}[]
   >(new Array(courseChapters.length));
   const [activeChapterId, setActiveChapterId] = React.useState<?string>(null);
@@ -188,21 +188,23 @@ const CourseSection = ({
       if (scrollTop === undefined) return;
 
       let newActiveChapterId;
-      for (const chapterAndOffset of chaptersTitleRefs.current) {
+      for (const chapterTitleRef of chapterTitleRefs.current) {
+        const chapterTitleElement = chapterTitleRef.ref;
+
         if (
-          chapterAndOffset.offset &&
-          chapterAndOffset.offset < scrollTop + (offsetHeight || 0) / 3
+          chapterTitleElement.offsetTop <
+          scrollTop + (offsetHeight || 0) / 3
         ) {
-          newActiveChapterId = chapterAndOffset.chapterId;
+          newActiveChapterId = chapterTitleRef.chapterId;
         } else break;
       }
 
       if (
         !newActiveChapterId &&
-        chaptersTitleRefs.current[0] &&
-        chaptersTitleRefs.current[0].chapterId
+        chapterTitleRefs.current[0] &&
+        chapterTitleRefs.current[0].chapterId
       ) {
-        newActiveChapterId = chaptersTitleRefs.current[0].chapterId;
+        newActiveChapterId = chapterTitleRefs.current[0].chapterId;
       }
 
       return newActiveChapterId;
@@ -213,12 +215,12 @@ const CourseSection = ({
     const { current: scrollContainer } = scrollingContainerRef;
     if (!scrollContainer) return;
 
-    const chapterAndOffset = chaptersTitleRefs.current.find(
-      chapterAndOffset => chapterAndOffset.chapterId === chapterId
+    const chapterTitleRef = chapterTitleRefs.current.find(
+      chapterTitleRef => chapterTitleRef.chapterId === chapterId
     );
-    if (!chapterAndOffset) return;
+    if (!chapterTitleRef) return;
 
-    scrollContainer.scrollTo(0, chapterAndOffset.offset);
+    scrollContainer.scrollTo(0, chapterTitleRef.ref.offsetTop);
   }, []);
 
   React.useEffect(
@@ -277,9 +279,9 @@ const CourseSection = ({
                     onBuyWithCredits={onBuyCourseChapterWithCredits}
                     ref={_ref => {
                       if (_ref) {
-                        chaptersTitleRefs.current[index] = {
+                        chapterTitleRefs.current[index] = {
                           chapterId: chapter.id,
-                          offset: _ref.offsetTop,
+                          ref: _ref,
                         };
                       }
                     }}

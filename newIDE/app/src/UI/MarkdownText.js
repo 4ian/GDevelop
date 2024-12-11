@@ -10,7 +10,8 @@ import Window from '../Utils/Window';
 // Sensible defaults for react-markdown
 const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
-  allowParagraphs: boolean
+  allowParagraphs: boolean,
+  withTextEllipsis: boolean
 ) => ({
   // Ensure link are opened in a new page
   a: props =>
@@ -30,12 +31,24 @@ const makeMarkdownCustomComponents = (
       props.children
     ),
   // Add paragraphs only if we explicitly opt in.
-  p: props =>
-    isStandaloneText || allowParagraphs ? (
+  p: props => {
+    if (
+      withTextEllipsis &&
+      !(
+        props.node.position.start.line === 1 &&
+        props.node.position.start.column === 1 &&
+        props.node.position.start.offset === 0
+      )
+    ) {
+      // Display first paragraph only if text ellipsis is requested.
+      return null;
+    }
+    return isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (
       props.children
-    ),
+    );
+  },
   // eslint-disable-next-line jsx-a11y/alt-text
   img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
 });
@@ -45,6 +58,10 @@ type Props = {|
   translatableSource?: MessageDescriptor,
   isStandaloneText?: boolean,
   allowParagraphs?: boolean,
+  /**
+   * Props to display only the first line of content.
+   */
+  withTextEllipsis?: boolean,
 |};
 
 /**
@@ -55,9 +72,10 @@ export const MarkdownText = (props: Props) => {
     () =>
       makeMarkdownCustomComponents(
         props.isStandaloneText || false,
-        props.allowParagraphs || false
+        props.allowParagraphs || false,
+        props.withTextEllipsis || false
       ),
-    [props.isStandaloneText, props.allowParagraphs]
+    [props.isStandaloneText, props.allowParagraphs, props.withTextEllipsis]
   );
 
   const markdownElement = (
@@ -78,6 +96,7 @@ export const MarkdownText = (props: Props) => {
   const className = classNames({
     'gd-markdown': true,
     'standalone-text-container': props.isStandaloneText,
+    'text-ellipsis': props.withTextEllipsis,
   });
 
   return props.isStandaloneText ? (

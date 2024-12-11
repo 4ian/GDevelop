@@ -13,6 +13,7 @@ import {
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { type CourseChapter } from '../../Utils/GDevelopServices/Asset';
 import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
@@ -123,6 +124,7 @@ export type RenderEditorContainerProps = {|
     i18n: I18nType
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
+  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
 
   // Project save

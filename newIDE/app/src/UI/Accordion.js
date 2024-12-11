@@ -117,6 +117,7 @@ type AccordionProps = {|
 
   defaultExpanded?: boolean,
   disabled?: boolean,
+  kind?: 'answer',
 
   // If `true`, renders body only if accordion is open
   costlyBody?: boolean,
@@ -135,28 +136,33 @@ type AccordionProps = {|
  */
 export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
-    const { costlyBody, noMargin, ...otherProps } = props;
+    const { costlyBody, noMargin, kind, ...otherProps } = props;
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+    const style = {
+      backgroundColor:
+        kind === 'answer'
+          ? gdevelopTheme.message.answer.backgroundColor
+          : gdevelopTheme.paper.backgroundColor.medium,
+      marginLeft: 0,
+      border:
+        kind === 'answer'
+          ? `2px solid ${gdevelopTheme.message.answer.borderColor}`
+          : noMargin
+          ? '0px'
+          : `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+      padding: noMargin ? `0px` : undefined,
+      margin: noMargin ? `0px` : undefined,
+      borderRadius: kind === 'answer' ? 4 : 0,
+    };
 
     return (
       <MUIAccordion
         {...otherProps}
         ref={ref}
-        square
+        square={kind !== 'answer'}
         elevation={0}
-        style={{
-          ...{
-            border:
-              !noMargin && `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
-            backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
-            marginLeft: 0,
-          },
-          ...(noMargin && {
-            border: `0px`,
-            padding: `0px`,
-            margin: `0px`,
-          }),
-        }}
+        style={style}
         TransitionProps={{ unmountOnExit: !!costlyBody }}
       />
     );

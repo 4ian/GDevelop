@@ -21,6 +21,12 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { formatDuration } from '../../../../Utils/Duration';
+import CourseSection from './CourseSection';
+import type {
+  CourseChapter,
+  Course,
+} from '../../../../Utils/GDevelopServices/Asset';
+import type { CourseChapterCompletion } from '../UseCourses';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -119,6 +125,23 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   initialCategory: TutorialCategory | null,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  courses: ?(Course[]),
+  selectedCourse: Course | null,
+  courseChapters: ?(CourseChapter[]),
+  onSelectCourse: (Course | null) => void,
+  isLoadingChapters: boolean,
+  onCompleteCourseTask: (
+    chapterId: string,
+    taskIndex: number,
+    completed: boolean
+  ) => void,
+  isCourseTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
+  getCourseChapterCompletion: (
+    chapterId: string
+  ) => CourseChapterCompletion | null,
+  getCourseCompletion: () => number | null,
+  onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
 const LearnSection = ({
@@ -126,6 +149,17 @@ const LearnSection = ({
   selectInAppTutorial,
   initialCategory,
   onOpenTemplateFromTutorial,
+  onOpenTemplateFromCourseChapter,
+  courses,
+  selectedCourse,
+  courseChapters,
+  onSelectCourse,
+  isLoadingChapters,
+  onCompleteCourseTask,
+  isCourseTaskCompleted,
+  getCourseChapterCompletion,
+  getCourseCompletion,
+  onBuyCourseChapterWithCredits,
 }: Props) => {
   const {
     tutorials,
@@ -154,6 +188,22 @@ const LearnSection = ({
     [initialCategory]
   );
 
+  if (courseChapters && selectedCourse) {
+    return (
+      <CourseSection
+        course={selectedCourse}
+        courseChapters={courseChapters}
+        onBack={() => onSelectCourse(null)}
+        onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
+        onCompleteTask={onCompleteCourseTask}
+        isTaskCompleted={isCourseTaskCompleted}
+        getChapterCompletion={getCourseChapterCompletion}
+        getCourseCompletion={getCourseCompletion}
+        onBuyCourseChapterWithCredits={onBuyCourseChapterWithCredits}
+      />
+    );
+  }
+
   if (tutorialLoadingError)
     return (
       <Paper square style={styles.paper} background="dark">
@@ -174,6 +224,9 @@ const LearnSection = ({
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
+      courses={courses}
+      onSelectCourse={onSelectCourse}
+      isLoadingChapters={isLoadingChapters}
     />
   ) : (
     <TutorialsCategoryPage

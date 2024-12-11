@@ -29,6 +29,7 @@ type Props = {|
   renderLeftIcon?: () => React.Node,
   renderRightButton?: ?() => React.Node,
   markdownImageOnly?: boolean,
+  background?: 'dark' | 'medium' | 'light',
 |};
 
 /**
@@ -43,6 +44,7 @@ const AlertMessage = ({
   renderRightButton,
   renderLeftIcon,
   markdownImageOnly,
+  background = 'dark',
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const theme = useTheme();
@@ -68,7 +70,7 @@ const AlertMessage = ({
   }
 
   return (
-    <Paper variant="outlined" style={paperStyle} background="dark">
+    <Paper variant="outlined" style={paperStyle} background={background}>
       {markdownImageOnly ? (
         children
       ) : (

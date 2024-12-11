@@ -43,6 +43,8 @@ import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
+import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
+import useCourses from './UseCourses';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -135,6 +137,9 @@ type Props = {|
     i18n: I18nType
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    courseChapter: CourseChapter
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -183,6 +188,7 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
+        onOpenTemplateFromCourseChapter,
         gamesList,
       }: Props,
       ref
@@ -224,6 +230,18 @@ export const HomePage = React.memo<Props>(
         educationFormStatus,
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
+      const {
+        courses,
+        selectedCourse,
+        courseChapters,
+        onSelectCourse,
+        isLoadingChapters,
+        onCompleteTask,
+        isTaskCompleted,
+        getChapterCompletion,
+        getCourseCompletion,
+        onBuyCourseChapterWithCredits,
+      } = useCourses();
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -514,7 +532,22 @@ export const HomePage = React.memo<Props>(
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
+                      onOpenTemplateFromCourseChapter={
+                        onOpenTemplateFromCourseChapter
+                      }
                       initialCategory={learnInitialCategory}
+                      courses={courses}
+                      selectedCourse={selectedCourse}
+                      onSelectCourse={onSelectCourse}
+                      courseChapters={courseChapters}
+                      isLoadingChapters={isLoadingChapters}
+                      onCompleteCourseTask={onCompleteTask}
+                      isCourseTaskCompleted={isTaskCompleted}
+                      getCourseChapterCompletion={getChapterCompletion}
+                      getCourseCompletion={getCourseCompletion}
+                      onBuyCourseChapterWithCredits={
+                        onBuyCourseChapterWithCredits
+                      }
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}
@@ -593,6 +626,7 @@ export const renderHomePageContainer = (
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenTemplateFromTutorial={props.onOpenTemplateFromTutorial}
+    onOpenTemplateFromCourseChapter={props.onOpenTemplateFromCourseChapter}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}

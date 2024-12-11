@@ -126,13 +126,15 @@ const FeedbackCard = ({
     }
   };
 
-  const [processed, setProcessed] = useOptimisticState(
+  const [processed, setProcessed] = useOptimisticState<boolean>(
     !!comment.processedAt,
     processComment
   );
   const canRateComment = canCommentBeRatedByOwner(comment);
 
-  const [ownerQualityRating, setOwnerQualityRating] = useOptimisticState(
+  const [ownerQualityRating, setOwnerQualityRating] = useOptimisticState<
+    string | null
+  >(
     (comment.qualityRatingPerRole && comment.qualityRatingPerRole.owner) ||
       null,
     async (qualityRating, i18n) => {
@@ -144,7 +146,7 @@ const FeedbackCard = ({
           {
             gameId: comment.gameId,
             commentId: comment.id,
-            qualityRating,
+            qualityRating: qualityRating || undefined,
           }
         );
         onCommentUpdated(updatedComment);

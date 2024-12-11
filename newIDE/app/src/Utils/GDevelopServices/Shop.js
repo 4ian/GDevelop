@@ -94,6 +94,13 @@ export type CreditsPackageListingData = {|
   listing: 'CREDITS_PACKAGE',
 |};
 
+export type CourseChapterListingData = {|
+  ...ProductListingData,
+  ...CreditsClaimableAttributes,
+  productType: 'COURSE_CHAPTER',
+  listing: 'COURSE_CHAPTER',
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -153,6 +160,18 @@ export const listListedCreditsPackages = async (): Promise<
   }
 
   return creditsPackages;
+};
+
+export const listListedCourseChapters = async (): Promise<
+  Array<CourseChapterListingData>
+> => {
+  const response = await client.get('/course-chapter');
+  const courseChapters = response.data;
+  if (!Array.isArray(courseChapters)) {
+    throw new Error('Invalid response from the course chapters API');
+  }
+
+  return courseChapters;
 };
 
 export const listSellerAssetPacks = async ({
@@ -361,13 +380,19 @@ export const buyProductWithCredits = async (
     productId,
     usageType,
     userId,
+    password,
   }: {|
     productId: string,
     usageType: string,
     userId: string,
+    password?: string,
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+
+  const queryParams: {| userId: string, password?: string |} = { userId };
+  if (password) queryParams.password = password;
+
   await client.post(
     `/product/${productId}/action/buy-with-credits`,
     {
@@ -375,9 +400,7 @@ export const buyProductWithCredits = async (
       priceUsageType: usageType,
     },
     {
-      params: {
-        userId,
-      },
+      params: queryParams,
       headers: {
         Authorization: authorizationHeader,
       },

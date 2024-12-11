@@ -7,23 +7,25 @@ import { useDebounce } from './UseDebounce';
  * call based on said state. functionToDebounce must throw in case of error to ensure that
  * the states are well updated.
  */
-export const useOptimisticState = (
-  initialState: any,
-  functionToDebounce: (newState: any, args: any) => Promise<void>
-) => {
-  const [pending, setPending] = React.useState<?any>(null);
-  const debouncedFunction = useDebounce(async (newState, ...args) => {
+export const useOptimisticState = <T>(
+  initialState: T,
+  functionToDebounce: (newState: T, args: any) => Promise<void>
+): [T, (T, any) => void, (T) => void] => {
+  const [state, setState] = React.useState<T>(initialState);
+  const [pending, setPending] = React.useState<T | null>(null);
+  const debouncedFunction = useDebounce(async (newState: T, ...args) => {
     try {
       await functionToDebounce(newState, ...args);
+      setState(newState);
     } catch (error) {
       console.error(`Error while updating optimistic state: `, error);
     } finally {
       setPending(null);
     }
   }, 500);
-  const setNewState = (newState: any, args: any) => {
+  const setNewState = (newState: T, args: any) => {
     setPending(newState);
     debouncedFunction(newState, args);
   };
-  return [pending !== null ? pending : initialState, setNewState];
+  return [pending !== null ? pending : state, setNewState, setState];
 };

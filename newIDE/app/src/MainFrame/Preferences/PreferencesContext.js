@@ -43,7 +43,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'course-subtitles-in-user-language';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -166,6 +167,15 @@ export const allAlertMessages: Array<{
     key: 'project-should-have-unique-package-name',
     label: (
       <Trans>Project package names should not begin with com.example</Trans>
+    ),
+  },
+  {
+    key: 'course-subtitles-in-user-language',
+    label: (
+      <Trans>
+        This course has subtitles in multiple languages. Find yours in the
+        setting of each video.
+      </Trans>
     ),
   },
 ];

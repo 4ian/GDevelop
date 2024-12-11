@@ -43,10 +43,25 @@ export const Default = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          selectedCourse={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -64,10 +79,25 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          selectedCourse={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -87,10 +117,25 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          selectedCourse={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -110,10 +155,25 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
+          courseChapters={null}
+          courses={null}
+          selectedCourse={null}
+          isCourseTaskCompleted={() => false}
+          onSelectCourse={action('onSelectCourse')}
+          isLoadingChapters={false}
+          onCompleteCourseTask={action('onCompleteCourseTask')}
+          getCourseChapterCompletion={() => null}
+          getCourseCompletion={() => 0}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+          onOpenTemplateFromCourseChapter={action(
+            'onOpenTemplateFromCourseChapter'
+          )}
+          onBuyCourseChapterWithCredits={action(
+            'onBuyCourseChapterWithCredits'
+          )}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -130,10 +190,23 @@ export const Loading = () => (
       }}
     >
       <LearnSection
+        courseChapters={null}
+        courses={null}
+        selectedCourse={null}
+        isCourseTaskCompleted={() => false}
+        onSelectCourse={action('onSelectCourse')}
+        isLoadingChapters={false}
+        onCompleteCourseTask={action('onCompleteCourseTask')}
+        getCourseChapterCompletion={() => null}
+        getCourseCompletion={() => 0}
         initialCategory={null}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+        onOpenTemplateFromCourseChapter={action(
+          'onOpenTemplateFromCourseChapter'
+        )}
+        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

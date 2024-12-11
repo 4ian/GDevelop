@@ -8,6 +8,7 @@ import {
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
+  createNewProjectFromCourseChapterTemplate,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -30,7 +31,10 @@ import {
   getAuthorizationTokenForPrivateGameTemplates,
   type PrivateGameTemplateListingData,
 } from './GDevelopServices/Shop';
-import { createPrivateGameTemplateUrl } from './GDevelopServices/Asset';
+import {
+  createPrivateGameTemplateUrl,
+  type CourseChapter,
+} from './GDevelopServices/Asset';
 import { getDefaultRegisterGamePropertiesFromProject } from './UseGameAndBuildsManager';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 
@@ -378,6 +382,27 @@ const useCreateProject = ({
     [beforeCreatingProject, createProject, tutorials]
   );
 
+  const createProjectFromCourseChapter = React.useCallback(
+    async (courseChapter: CourseChapter, newProjectSetup: NewProjectSetup) => {
+      if (courseChapter.isLocked) return;
+      beforeCreatingProject();
+      const { templateUrl } = courseChapter;
+      if (!templateUrl) {
+        throw new Error(
+          `No template URL for the course chapter "${courseChapter.id}"`
+        );
+      }
+      const newProjectSource = await createNewProjectFromCourseChapterTemplate(
+        templateUrl,
+        courseChapter.id
+      );
+      await createProject(newProjectSource, newProjectSetup, {
+        openAllScenes: true,
+      });
+    },
+    [beforeCreatingProject, createProject]
+  );
+
   const createProjectFromAIGeneration = React.useCallback(
     async (projectFileUrl: string, newProjectSetup: NewProjectSetup) => {
       beforeCreatingProject();
@@ -395,6 +420,7 @@ const useCreateProject = ({
     createProjectFromPrivateGameTemplate,
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
+    createProjectFromCourseChapter,
     createProjectFromAIGeneration,
   };
 };

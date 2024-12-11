@@ -27,31 +27,26 @@ export const getBackgroundColor = (
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper = ({
-  id,
-  children,
-  background,
-  elevation,
-  variant,
-  style,
-  square,
-}: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = getBackgroundColor(gdevelopTheme, background);
-  return (
-    <MuiPaper
-      id={id}
-      variant={variant}
-      elevation={elevation || 0}
-      style={{
-        backgroundColor,
-        ...style,
-      }}
-      square={!!square}
-    >
-      {children}
-    </MuiPaper>
-  );
-};
+const Paper = React.forwardRef<Props, HTMLDivElement>(
+  ({ id, children, background, elevation, variant, style, square }, ref) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const backgroundColor = getBackgroundColor(gdevelopTheme, background);
+    return (
+      <MuiPaper
+        id={id}
+        ref={ref}
+        variant={variant}
+        elevation={elevation || 0}
+        style={{
+          backgroundColor,
+          ...style,
+        }}
+        square={!!square}
+      >
+        {children}
+      </MuiPaper>
+    );
+  }
+);
 
 export default Paper;

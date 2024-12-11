@@ -224,14 +224,17 @@ export const sendExampleDetailsOpened = (slug: string) => {
 export const sendNewGameCreated = ({
   exampleUrl,
   exampleSlug,
+  isCourseChapterTemplate,
 }: {|
   exampleUrl: string,
   exampleSlug: string,
+  isCourseChapterTemplate?: true,
 |}) => {
   recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
     templateName: exampleUrl,
     exampleSlug,
+    isCourseChapterTemplate,
   });
 };
 
@@ -371,7 +374,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Claim asset pack'
   | 'Callout in Classroom tab'
   | 'Unlock build type'
-  | 'Manage subscription as teacher';
+  | 'Manage subscription as teacher'
+  | 'Unlock course chapter';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

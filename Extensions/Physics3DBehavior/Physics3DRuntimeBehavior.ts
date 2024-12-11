@@ -957,6 +957,20 @@ namespace gdjs {
       );
     }
 
+    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+      const threeObject = this.owner3D.get3DRendererObject();
+      threeObject.quaternion.x = physicsRotation.GetX();
+      threeObject.quaternion.y = physicsRotation.GetY();
+      threeObject.quaternion.z = physicsRotation.GetZ();
+      threeObject.quaternion.w = physicsRotation.GetW();
+      // TODO Avoid this instantiation
+      const euler = new THREE.Euler(0, 0, 0, 'ZYX');
+      euler.setFromQuaternion(threeObject.quaternion);
+      this.owner3D.setRotationX(gdjs.toDegrees(euler.x));
+      this.owner3D.setRotationY(gdjs.toDegrees(euler.y));
+      this.owner3D.setAngle(gdjs.toDegrees(euler.z));
+    }
+
     getWorldScale(): float {
       return this._sharedData.worldScale;
     }
@@ -1810,7 +1824,7 @@ namespace gdjs {
 
       updateObjectFromBody() {
         const { behavior } = this;
-        const { owner3D, _body } = behavior;
+        const { _body } = behavior;
         // Copy transform from body to the GD object.
         // It's possible the behavior was either deactivated or the object deleted
         // just before this doStepPreEvents (for example, another behavior deleted
@@ -1818,18 +1832,7 @@ namespace gdjs {
         // don't do anything (but still run the physics simulation - this is independent).
         if (_body !== null) {
           behavior.moveObjectToPhysicsPosition(_body.GetPosition());
-
-          const quaternion = _body.GetRotation();
-          const threeObject = owner3D.get3DRendererObject();
-          threeObject.quaternion.x = quaternion.GetX();
-          threeObject.quaternion.y = quaternion.GetY();
-          threeObject.quaternion.z = quaternion.GetZ();
-          threeObject.quaternion.w = quaternion.GetW();
-          const euler = new THREE.Euler(0, 0, 0, 'ZYX');
-          euler.setFromQuaternion(threeObject.quaternion);
-          owner3D.setRotationX(gdjs.toDegrees(euler.x));
-          owner3D.setRotationY(gdjs.toDegrees(euler.y));
-          owner3D.setAngle(gdjs.toDegrees(euler.z));
+          behavior.moveObjectToPhysicsRotation(_body.GetRotation());
         }
       }
 

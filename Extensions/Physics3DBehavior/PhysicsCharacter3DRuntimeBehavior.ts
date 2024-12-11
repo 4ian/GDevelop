@@ -701,23 +701,21 @@ namespace gdjs {
       const groundAngularVelocityZ = groundBody.GetAngularVelocity().GetZ();
       if (groundAngularVelocityZ !== 0) {
         // Make the character rotate with the platform on Z axis.
-        const rotation = Jolt.Quat.prototype.sEulerAngles(
-          this.getVec3(
-            0,
-            0,
-            characterBody
-              .GetRotation()
-              .GetRotationAngle(Jolt.Vec3.prototype.sAxisZ()) +
-              groundAngularVelocityZ * timeDelta
+        const angleDelta = groundAngularVelocityZ * timeDelta;
+        this.character.SetRotation(
+          Jolt.Quat.prototype.sEulerAngles(
+            this.getVec3(
+              0,
+              0,
+              this.character
+                .GetRotation()
+                .GetRotationAngle(Jolt.Vec3.prototype.sAxisZ()) + angleDelta
+            )
           )
         );
-        // TODO Should the character be used instead of the body directly?
-        this._sharedData.bodyInterface.SetPositionAndRotation(
-          characterBody.GetID(),
-          this.getPhysicsPosition(this.getRVec3(0, 0, 0)),
-          rotation,
-          Jolt.EActivation_Activate
-        );
+        // Also update the forward angle to make sure it stays the same
+        // relatively to the object angle.
+        this._forwardAngle += gdjs.toDegrees(angleDelta);
       }
       if (stillKinematicPlatform) {
         groundBody.SetLinearVelocity(Jolt.Vec3.prototype.sZero());
@@ -1345,6 +1343,7 @@ namespace gdjs {
       }
 
       updateObjectFromBody() {
+        const { behavior } = this.characterBehavior.getPhysics3D();
         const { character } = this.characterBehavior;
         if (!character) {
           return;
@@ -1353,7 +1352,8 @@ namespace gdjs {
         this.characterBehavior.moveObjectToPhysicsPosition(
           character.GetPosition()
         );
-        // No need to update the rotation as CharacterVirtual doesn't change it.
+        // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
+        behavior.moveObjectToPhysicsRotation(character.GetRotation());
       }
 
       updateBodyFromObject() {
@@ -1374,7 +1374,8 @@ namespace gdjs {
           behavior._objectOldRotationY !== owner3D.getRotationY() ||
           behavior._objectOldRotationZ !== owner3D.getAngle()
         ) {
-          behavior.getPhysicsRotation(
+          // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
+          character.SetRotation(
             behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1))
           );
         }

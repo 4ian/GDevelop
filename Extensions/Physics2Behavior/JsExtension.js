@@ -790,9 +790,9 @@ module.exports = {
     aut
       .addCondition(
         'IsBullet',
-        _('Is treat as bullet'),
-        _('Check if an object is being treat as a bullet.'),
-        _('_PARAM0_ is bullet'),
+        _('Is treated as a bullet'),
+        _('Check if the object is being treated as a bullet.'),
+        _('_PARAM0_ is treated as a bullet'),
         _('Dynamics'),
         'res/physics32.png',
         'res/physics32.png'
@@ -4203,7 +4203,7 @@ module.exports = {
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
       .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
-      .setFunctionName('gdjs.physics2.objectsCollide');
+      .setFunctionName('gdjs.physics2.areObjectsColliding');
 
     extension
       .addCondition(

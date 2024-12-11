@@ -165,7 +165,7 @@ module.exports = {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
         behaviorProperties
-          .getOrCreate('Object3D')
+          .getOrCreate('object3D')
           .setValue(behaviorContent.getChild('Object3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
@@ -630,9 +630,9 @@ module.exports = {
       aut
         .addScopedCondition(
           'IsBullet',
-          _('Is treat as bullet'),
-          _('Check if an object is being treat as a bullet.'),
-          _('_PARAM0_ is bullet'),
+          _('Is treated as a bullet'),
+          _('Check if the object is being treated as a bullet.'),
+          _('_PARAM0_ is treated as a bullet'),
           _('Dynamics'),
           'JsPlatform/Extensions/physics3d.svg',
           'JsPlatform/Extensions/physics3d.svg'
@@ -1377,7 +1377,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )
-      .setFunctionName('gdjs.physics3d.objectsCollide');
+      .setFunctionName('gdjs.physics3d.areObjectsColliding');
 
     extension
       .addCondition(
@@ -1431,7 +1431,7 @@ module.exports = {
         newValue
       ) {
         if (propertyName === 'physics3D') {
-          behaviorContent.getChild('Physics3D').setStringValue(newValue);
+          behaviorContent.getChild('physics3D').setStringValue(newValue);
           return true;
         }
 

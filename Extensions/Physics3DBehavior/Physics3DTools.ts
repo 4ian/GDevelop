@@ -1,6 +1,6 @@
 namespace gdjs {
   export namespace physics3d {
-    export const objectsCollide = function (
+    export const areObjectsColliding = function (
       objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
       behaviorName: string,
       objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,

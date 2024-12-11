@@ -60,6 +60,7 @@ namespace gdjs {
     _slopeClimbingFactor: float = 1;
     _slopeClimbingMinNormalZ: float = Math.cos(Math.PI / 4);
     private _forwardAngle: float = 0;
+    private _shouldBindObjectAndForwardAngle: boolean;
     _forwardAcceleration: float;
     _forwardDeceleration: float;
     _forwardSpeedMax: float;
@@ -116,7 +117,7 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
-      this.physics3DBehaviorName = behaviorData.Physics3D;
+      this.physics3DBehaviorName = behaviorData.physics3D;
       this._sharedData = gdjs.Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.Physics3D
@@ -134,6 +135,9 @@ namespace gdjs {
       this._maxFallingSpeed = behaviorData.fallingSpeedMax;
       this._jumpSustainTime = behaviorData.jumpSustainTime;
       this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
+      this._shouldBindObjectAndForwardAngle =
+        behaviorData.shouldBindObjectAndForwardAngle;
+      console.log("this._shouldBindObjectAndForwardAngle: " + this._shouldBindObjectAndForwardAngle);
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -185,7 +189,7 @@ namespace gdjs {
         new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.recreateBody();
 
-      // Begin in the direction of the object.
+      // Always begin in the direction of the object.
       this._forwardAngle = this.owner.getAngle();
 
       return this.physics3D;
@@ -235,6 +239,9 @@ namespace gdjs {
       }
       if (oldBehaviorData.jumpHeight !== newBehaviorData.jumpHeight) {
         this.setJumpSpeed(this.getJumpSpeedToReach(newBehaviorData.jumpHeight));
+      }
+      if (oldBehaviorData.shouldBindObjectAndForwardAngle !== newBehaviorData.shouldBindObjectAndForwardAngle) {
+        this.setShouldBindObjectAndForwardAngle(newBehaviorData.shouldBindObjectAndForwardAngle);
       }
       return true;
     }
@@ -349,6 +356,10 @@ namespace gdjs {
       const oldX = this.character.GetPosition().GetX();
       const oldY = this.character.GetPosition().GetY();
       const oldZ = this.character.GetPosition().GetZ();
+
+      if (this._shouldBindObjectAndForwardAngle) {
+        this._forwardAngle = this.owner.getAngle();
+      }
 
       this.updateCharacterSpeedFromInputs(timeDelta);
 
@@ -928,6 +939,9 @@ namespace gdjs {
 
     setForwardAngle(angle: float): void {
       this._forwardAngle = angle;
+      if (this._shouldBindObjectAndForwardAngle) {
+        this.owner.setAngle(angle);
+      }
     }
 
     isForwardAngleAround(degreeAngle: float, tolerance: float) {
@@ -936,6 +950,16 @@ namespace gdjs {
           gdjs.evtTools.common.angleDifference(this._forwardAngle, degreeAngle)
         ) <= tolerance
       );
+    }
+
+    shouldBindObjectAndForwardAngle(): boolean {
+      return this._shouldBindObjectAndForwardAngle;
+    }
+
+    setShouldBindObjectAndForwardAngle(
+      shouldBindObjectAndForwardAngle: boolean
+    ): void {
+      this._shouldBindObjectAndForwardAngle = shouldBindObjectAndForwardAngle;
     }
 
     /**

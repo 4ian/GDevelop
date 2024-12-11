@@ -38,8 +38,8 @@ module.exports = {
         propertyName,
         newValue
       ) {
-        if (propertyName === 'Object3D') {
-          behaviorContent.getChild('Object3D').setStringValue(newValue);
+        if (propertyName === 'object3D') {
+          behaviorContent.getChild('object3D').setStringValue(newValue);
           return true;
         }
 
@@ -223,10 +223,10 @@ module.exports = {
           .setType('Choice')
           .setLabel('Shape')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
-          .addExtraInfo('Sphere')
           .addExtraInfo('Box')
           .addExtraInfo('Capsule')
-          .addExtraInfo('Cylinder');
+          .addExtraInfo('Cylinder')
+          .addExtraInfo('Sphere');
         behaviorProperties
           .getOrCreate('shapeOrientation')
           .setValue(
@@ -376,11 +376,11 @@ module.exports = {
       };
 
       behavior.initializeContent = function (behaviorContent) {
-        behaviorContent.addChild('Object3D').setStringValue('');
+        behaviorContent.addChild('object3D').setStringValue('');
         behaviorContent.addChild('bodyType').setStringValue('Dynamic');
         behaviorContent.addChild('bullet').setBoolValue(false);
         behaviorContent.addChild('fixedRotation').setBoolValue(false);
-        behaviorContent.addChild('shape').setStringValue('Sphere');
+        behaviorContent.addChild('shape').setStringValue('Box');
         behaviorContent.addChild('shapeOrientation').setStringValue('Z');
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
@@ -1430,12 +1430,12 @@ module.exports = {
         propertyName,
         newValue
       ) {
-        if (propertyName === 'Physics3D') {
+        if (propertyName === 'physics3D') {
           behaviorContent.getChild('Physics3D').setStringValue(newValue);
           return true;
         }
 
-        if (propertyName === 'JumpHeight') {
+        if (propertyName === 'jumpHeight') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1444,7 +1444,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'JumpSustainTime') {
+        if (propertyName === 'jumpSustainTime') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1453,14 +1453,14 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'Gravity') {
+        if (propertyName === 'gravity') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent.getChild('gravity').setDoubleValue(newValueAsNumber);
           return true;
         }
 
-        if (propertyName === 'FallingSpeedMax') {
+        if (propertyName === 'fallingSpeedMax') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1469,7 +1469,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'ForwardAcceleration') {
+        if (propertyName === 'forwardAcceleration') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1478,7 +1478,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'ForwardDeceleration') {
+        if (propertyName === 'forwardDeceleration') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1487,7 +1487,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'ForwardSpeedMax') {
+        if (propertyName === 'forwardSpeedMax') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1496,7 +1496,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'SidewaysAcceleration') {
+        if (propertyName === 'sidewaysAcceleration') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1505,7 +1505,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'SidewaysDeceleration') {
+        if (propertyName === 'sidewaysDeceleration') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1514,7 +1514,7 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'SidewaysSpeedMax') {
+        if (propertyName === 'sidewaysSpeedMax') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
@@ -1523,12 +1523,19 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'SlopeMaxAngle') {
+        if (propertyName === 'slopeMaxAngle') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
             .getChild('slopeMaxAngle')
             .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'shouldBindObjectAndForwardAngle') {
+          behaviorContent
+            .getChild('shouldBindObjectAndForwardAngle')
+            .setBoolValue(newValue === '1');
           return true;
         }
 
@@ -1538,15 +1545,15 @@ module.exports = {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
         behaviorProperties
-          .getOrCreate('Physics3D')
-          .setValue(behaviorContent.getChild('Physics3D').getStringValue())
+          .getOrCreate('physics3D')
+          .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
         behaviorProperties
-          .getOrCreate('JumpHeight')
+          .getOrCreate('jumpHeight')
           .setLabel(_('Jump height'))
           .setGroup(_('Jump'))
           .setType('Number')
@@ -1556,7 +1563,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('JumpSustainTime')
+          .getOrCreate('jumpSustainTime')
           .setLabel(_('Jump sustain time'))
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setGroup(_('Jump'))
@@ -1575,7 +1582,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('Gravity')
+          .getOrCreate('gravity')
           .setLabel(_('Gravity'))
           .setGroup(_('Jump'))
           .setType('Number')
@@ -1585,7 +1592,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('FallingSpeedMax')
+          .getOrCreate('fallingSpeedMax')
           .setLabel(_('Max. falling speed'))
           .setGroup(_('Jump'))
           .setType('Number')
@@ -1598,7 +1605,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('ForwardAcceleration')
+          .getOrCreate('forwardAcceleration')
           .setLabel(_('Forward acceleration'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1611,7 +1618,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('ForwardDeceleration')
+          .getOrCreate('forwardDeceleration')
           .setLabel(_('Forward deceleration'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1624,7 +1631,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('ForwardSpeedMax')
+          .getOrCreate('forwardSpeedMax')
           .setLabel(_('Max. forward speed'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1637,7 +1644,7 @@ module.exports = {
           );
 
         behaviorProperties
-          .getOrCreate('SidewaysAcceleration')
+          .getOrCreate('sidewaysAcceleration')
           .setLabel(_('Sideways acceleration'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1651,7 +1658,7 @@ module.exports = {
           .setAdvanced(true);
 
         behaviorProperties
-          .getOrCreate('SidewaysDeceleration')
+          .getOrCreate('sidewaysDeceleration')
           .setLabel(_('Sideways deceleration'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1665,7 +1672,7 @@ module.exports = {
           .setAdvanced(true);
 
         behaviorProperties
-          .getOrCreate('SidewaysSpeedMax')
+          .getOrCreate('sidewaysSpeedMax')
           .setLabel(_('Max. sideways speed'))
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1679,7 +1686,7 @@ module.exports = {
           .setAdvanced(true);
 
         behaviorProperties
-          .getOrCreate('SlopeMaxAngle')
+          .getOrCreate('slopeMaxAngle')
           .setLabel('Slope max. angle')
           .setGroup(_('Walk'))
           .setType('Number')
@@ -1693,11 +1700,22 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        behaviorProperties
+          .getOrCreate('shouldBindObjectAndForwardAngle')
+          .setLabel('Keep object angle and forward direction the same')
+          .setGroup(_('Walk'))
+          .setType('Boolean')
+          .setValue(
+            behaviorContent.getChild('shouldBindObjectAndForwardAngle').getBoolValue() ? 'true' : 'false'
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return behaviorProperties;
       };
 
       behavior.initializeContent = function (behaviorContent) {
-        behaviorContent.addChild('Physics3D').setStringValue('');
+        behaviorContent.addChild('physics3D').setStringValue('');
         behaviorContent.addChild('jumpHeight').setDoubleValue(200);
         behaviorContent.addChild('jumpSustainTime').setDoubleValue(0.2);
         behaviorContent.addChild('gravity').setDoubleValue(1000);
@@ -1709,7 +1727,7 @@ module.exports = {
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
-        // TODO Add a property to make the angle of movement follow the object angle.
+        behaviorContent.addChild('shouldBindObjectAndForwardAngle').setBoolValue(true);
       };
 
       const aut = extension
@@ -1826,7 +1844,7 @@ module.exports = {
             "When this action is executed, the object is able to jump again, even if it is in the air: this can be useful to allow a double jump for example. This is not a permanent effect: you must call again this action every time you want to allow the object to jump (apart if it's on the floor)."
           ),
           _('Allow _PARAM0_ to jump again'),
-          _('Platformer state'),
+          _('Character state'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -1843,7 +1861,7 @@ module.exports = {
             'This revokes the effect of "Allow jumping again". The object is made unable to jump while in mid air. This has no effect if the object is not in the air.'
           ),
           _('Forbid _PARAM0_ to air jump'),
-          _('Platformer state'),
+          _('Character state'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -1859,7 +1877,7 @@ module.exports = {
             "Abort the current jump and stop the object vertically. This action doesn't have any effect when the character is not jumping."
           ),
           _('Abort the current jump of _PARAM0_'),
-          _('Platformer state'),
+          _('Character state'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -1873,7 +1891,7 @@ module.exports = {
           _('Can jump'),
           _('Check if the object can jump.'),
           _('_PARAM0_ can jump'),
-          _('Platformer state'),
+          _('Character state'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -1944,6 +1962,40 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('isFalling');
+
+        aut
+        .addScopedCondition(
+          'ShouldBindObjectAndForwardAngle',
+          _('Should bind object and forward angle'),
+          _('Check if the object angle and forward angle should be kept the same.'),
+          _('Keep _PARAM0_ angle and forward angle the same'),
+          _('Character configuration'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .getCodeExtraInformation()
+        .setFunctionName('shouldBindObjectAndForwardAngle');
+
+      aut
+        .addScopedAction(
+          'SetShouldBindObjectAndForwardAngle',
+          _('Should bind object and forward angle'),
+          _(
+            "Enable or disable keeping the object angle and forward angle the same."
+          ),
+          _('Should bind _PARAM0_ angle and forward angle: _PARAM2_'),
+          _('Character configuration'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
+        .addParameter('yesorno', _('Keep object angle and forward direction the same'), '', false)
+        .setDefaultValue('false')
+        .getCodeExtraInformation()
+        .setFunctionName('setShouldBindObjectAndForwardAngle');
 
       aut
         .addScopedCondition(
@@ -2358,7 +2410,7 @@ module.exports = {
       .addCondition(
         'IsObjectOnGivenFloor',
         _('Character is on given platform'),
-        _('Check if a platformer character is on a given platform.'),
+        _('Check if a 3D physics character is on a given platform.'),
         _('_PARAM0_ is on platform _PARAM2_'),
         _('Collision'),
         'JsPlatform/Extensions/physics_character3d.svg',

@@ -18,6 +18,7 @@ import CourseChapterStoreContext from '../../../Course/CourseChapterStoreContext
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { Trans } from '@lingui/macro';
 import { buyProductWithCredits } from '../../../Utils/GDevelopServices/Shop';
+import PreferencesContext from '../../Preferences/PreferencesContext';
 
 export type CourseChapterCompletion = {|
   completedTasks: number,
@@ -31,6 +32,10 @@ const useCourses = () => {
     getAuthorizationHeader,
     onOpenLoginDialog,
   } = React.useContext(AuthenticatedUserContext);
+  const {
+    values: { language },
+  } = React.useContext(PreferencesContext);
+  const userLanguage2LetterCode = language.split('_')[0].toLowerCase();
 
   const [courses, setCourses] = React.useState<?(Course[])>(null);
   const { listedCourseChapters } = React.useContext(CourseChapterStoreContext);
@@ -78,6 +83,7 @@ const useCourses = () => {
           listCourseChapters(getAuthorizationHeader, {
             courseId,
             userId,
+            lang: userLanguage2LetterCode,
           }),
           (async () => {
             if (userId) {
@@ -98,7 +104,12 @@ const useCourses = () => {
         setIsLoadingChapters(false);
       }
     },
-    [getAuthorizationHeader, userId, setUserCourseProgressImmediately]
+    [
+      getAuthorizationHeader,
+      userId,
+      setUserCourseProgressImmediately,
+      userLanguage2LetterCode,
+    ]
   );
 
   React.useEffect(

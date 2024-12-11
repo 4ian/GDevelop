@@ -566,9 +566,11 @@ export const listCourseChapters = async (
   {
     userId,
     courseId,
+    lang,
   }: {|
     userId: ?string,
     courseId: string,
+    lang: string,
   |}
 ): Promise<Array<CourseChapter>> => {
   if (userId) {
@@ -577,6 +579,7 @@ export const listCourseChapters = async (
     const response = await client.get(`/course/${courseId}/chapter`, {
       params: {
         userId,
+        lang,
       },
       headers: {
         Authorization: authorizationHeader,

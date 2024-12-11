@@ -1327,7 +1327,7 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      return body.GetAngularVelocity().GetX() * this._sharedData.worldScale;
+      return gdjs.toDegrees(body.GetAngularVelocity().GetX());
     }
 
     setAngularVelocityX(angularVelocityX: float): void {
@@ -1339,7 +1339,7 @@ namespace gdjs {
       this._sharedData.bodyInterface.SetAngularVelocity(
         body.GetID(),
         this.getVec3(
-          angularVelocityX * this._sharedData.worldInvScale,
+          gdjs.toRad(angularVelocityX),
           body.GetAngularVelocity().GetY(),
           body.GetAngularVelocity().GetZ()
         )
@@ -1352,7 +1352,7 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      return body.GetAngularVelocity().GetY() * this._sharedData.worldScale;
+      return gdjs.toDegrees(body.GetAngularVelocity().GetY());
     }
 
     setAngularVelocityY(angularVelocityY: float): void {
@@ -1365,7 +1365,7 @@ namespace gdjs {
         body.GetID(),
         this.getVec3(
           body.GetAngularVelocity().GetX(),
-          angularVelocityY * this._sharedData.worldInvScale,
+          gdjs.toRad(angularVelocityY),
           body.GetAngularVelocity().GetZ()
         )
       );
@@ -1377,7 +1377,7 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      return body.GetAngularVelocity().GetZ() * this._sharedData.worldScale;
+      return gdjs.toDegrees(body.GetAngularVelocity().GetZ());
     }
 
     setAngularVelocityZ(angularVelocityZ: float): void {
@@ -1391,7 +1391,7 @@ namespace gdjs {
         this.getVec3(
           body.GetAngularVelocity().GetX(),
           body.GetAngularVelocity().GetY(),
-          angularVelocityZ * this._sharedData.worldInvScale
+          gdjs.toRad(angularVelocityZ)
         )
       );
     }
@@ -1543,7 +1543,11 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddTorque(
         body.GetID(),
-        this.getVec3(torqueX, torqueY, torqueZ),
+        this.getVec3(
+          gdjs.toRad(torqueX),
+          gdjs.toRad(torqueY),
+          gdjs.toRad(torqueZ)
+        ),
         Jolt.EActivation_Activate
       );
     }
@@ -1560,7 +1564,11 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddAngularImpulse(
         body.GetID(),
-        this.getVec3(angularImpulseX, angularImpulseY, angularImpulseZ)
+        this.getVec3(
+          gdjs.toRad(angularImpulseX),
+          gdjs.toRad(angularImpulseY),
+          gdjs.toRad(angularImpulseZ)
+        )
       );
     }
 

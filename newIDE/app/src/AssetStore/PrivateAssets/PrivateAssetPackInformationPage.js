@@ -503,7 +503,7 @@ const PrivateAssetPackInformationPage = ({
       openCreditsUsageDialog,
       getAuthorizationHeader,
       onOpenLoginDialog,
-      password
+      password,
     ]
   );
 

@@ -63,6 +63,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                 primary
               />
             }
+            widgetName="analytics"
           >
             <ResponsiveLineStackLayout expand noColumnMargin noMargin>
               {!gameMetrics ? (

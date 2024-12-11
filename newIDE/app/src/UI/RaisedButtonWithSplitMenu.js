@@ -41,6 +41,8 @@ const styles = {
     minWidth: 30,
     paddingLeft: 0,
     paddingRight: 0,
+    // Make the button shrink to its minimum size.
+    flexBasis: 0,
   },
 };
 

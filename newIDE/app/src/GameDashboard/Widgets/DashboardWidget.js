@@ -23,6 +23,15 @@ const styles = {
   },
 };
 
+type GameDashboardWidgetName =
+  | 'analytics'
+  | 'feedback'
+  | 'services'
+  | 'projects'
+  | 'builds'
+  | 'wallet'
+  | 'earnings';
+
 type Props = {|
   title: React.Node,
   topRightAction?: React.Node,
@@ -30,6 +39,7 @@ type Props = {|
   gridSize: number,
   children?: React.Node,
   minHeight?: boolean,
+  widgetName: GameDashboardWidgetName,
 |};
 
 const DashboardWidget = ({
@@ -39,10 +49,11 @@ const DashboardWidget = ({
   renderSubtitle,
   children,
   minHeight,
+  widgetName,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
-    <Grid item sm={4 * gridSize} xs={12}>
+    <Grid item sm={4 * gridSize} xs={12} data-widget-name={widgetName}>
       <Paper
         background="medium"
         style={{

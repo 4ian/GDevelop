@@ -40,6 +40,7 @@ const WalletWidget = ({
           onClick={profile ? onOpenProfile : onOpenCreateAccountDialog}
         />
       }
+      widgetName="wallet"
     >
       <ColumnStackLayout noMargin expand>
         <EarnBadges

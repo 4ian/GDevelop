@@ -47,7 +47,7 @@ export const NoGamesOrProjects = () => {
           project={null}
           games={[]}
           onRefreshGames={action('onRefreshGames')}
-          onOpenGameId={action('onOpenGameId')}
+          onOpenGameManager={action('onOpenGameManager')}
           onOpenProject={action('onOpenProject')}
           canOpen={true}
           askToCloseProject={action('askToCloseProject')}
@@ -97,7 +97,7 @@ export const WithOnlyGames = () => {
           project={null}
           games={[game1, game2]}
           onRefreshGames={action('onRefreshGames')}
-          onOpenGameId={action('onOpenGameId')}
+          onOpenGameManager={action('onOpenGameManager')}
           onOpenProject={action('onOpenProject')}
           canOpen={true}
           askToCloseProject={action('askToCloseProject')}
@@ -142,7 +142,7 @@ export const WithOnlyProjects = () => {
           project={null}
           games={[]}
           onRefreshGames={action('onRefreshGames')}
-          onOpenGameId={action('onOpenGameId')}
+          onOpenGameManager={action('onOpenGameManager')}
           onOpenProject={action('onOpenProject')}
           canOpen={true}
           askToCloseProject={action('askToCloseProject')}
@@ -194,7 +194,7 @@ export const WithGamesAndProjects = () => {
           project={null}
           games={[game1, game2]}
           onRefreshGames={action('onRefreshGames')}
-          onOpenGameId={action('onOpenGameId')}
+          onOpenGameManager={action('onOpenGameManager')}
           onOpenProject={action('onOpenProject')}
           canOpen={true}
           askToCloseProject={action('askToCloseProject')}

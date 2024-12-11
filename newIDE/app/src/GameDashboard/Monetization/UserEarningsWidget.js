@@ -220,7 +220,11 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
 
   return (
     <>
-      <DashboardWidget gridSize={fullWidth ? 3 : 2} title={null}>
+      <DashboardWidget
+        gridSize={fullWidth ? 3 : 2}
+        title={null}
+        widgetName="earnings"
+      >
         {content}
       </DashboardWidget>
       {selectedCashOutType && userEarningsBalance && (

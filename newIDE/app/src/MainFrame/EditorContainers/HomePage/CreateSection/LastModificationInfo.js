@@ -77,7 +77,7 @@ const LastModificationInfo = ({
       {({ i18n }) => (
         <LineStackLayout noMargin alignItems="center">
           {textPrefix && (
-            <Text color="secondary" noMargin>
+            <Text color="secondary" noMargin size="body-small">
               {textPrefix}
             </Text>
           )}
@@ -97,7 +97,7 @@ const LastModificationInfo = ({
                 hideStatus={!isProjectOpenedNotTheLatestVersion}
               />
             )}
-          <Text noMargin color={textColor}>
+          <Text noMargin color={textColor} size="body-small">
             {isCurrentProjectOpened ? (
               <Trans>Modifying</Trans>
             ) : (

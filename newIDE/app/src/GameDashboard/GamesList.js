@@ -222,7 +222,10 @@ type Props = {|
   currentFileMetadata: ?FileMetadata,
   games: Array<Game>,
   onRefreshGames: () => Promise<void>,
-  onOpenGameId: (gameId: ?string) => void,
+  onOpenGameManager: ({
+    game: Game,
+    widgetToScrollTo?: 'projects',
+  }) => void,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onUnregisterGame: (
     gameId: string,
@@ -254,7 +257,7 @@ const GamesList = ({
   currentFileMetadata,
   games,
   onRefreshGames,
-  onOpenGameId,
+  onOpenGameManager,
   onOpenProject,
   onUnregisterGame,
   onRegisterProject,
@@ -544,9 +547,7 @@ const GamesList = ({
                     dashboardItem={dashboardItem}
                     storageProviders={storageProviders}
                     isCurrentProjectOpened={isCurrentProjectOpened}
-                    onOpenGameManager={(gameToOpen: Game) => {
-                      onOpenGameId(gameToOpen.id);
-                    }}
+                    onOpenGameManager={onOpenGameManager}
                     onOpenProject={onOpenProject}
                     onUnregisterGame={async () => {
                       if (!game) return;

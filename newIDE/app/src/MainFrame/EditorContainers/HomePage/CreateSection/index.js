@@ -143,6 +143,9 @@ const CreateSection = ({
     showAlert,
   } = useAlertDialog();
   const [isUpdatingGame, setIsUpdatingGame] = React.useState(false);
+  const [initialWidgetToScrollTo, setInitialWidgetToScrollTo] = React.useState(
+    null
+  );
   const [showAllGameTemplates, setShowAllGameTemplates] = React.useState(false);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
@@ -386,8 +389,6 @@ const CreateSection = ({
           or retry later.`,
         });
         return;
-
-        // TODO: should we generate a gameId in this case?
       }
 
       const { id, username } = authenticatedUser.profile;
@@ -451,6 +452,7 @@ const CreateSection = ({
           disabled={isUpdatingGame}
           onUnregisterGame={() => onUnregisterGame(openedGame.id, i18n)}
           onDeleteCloudProject={onDeleteCloudProject}
+          initialWidgetToScrollTo={initialWidgetToScrollTo}
         />
       </SectionContainer>
     );
@@ -527,7 +529,16 @@ const CreateSection = ({
                   project={project}
                   games={games || []}
                   onRefreshGames={onRefreshGames}
-                  onOpenGameId={setOpenedGameId}
+                  onOpenGameManager={({
+                    game,
+                    widgetToScrollTo,
+                  }: {
+                    game: Game,
+                    widgetToScrollTo?: 'projects',
+                  }) => {
+                    setInitialWidgetToScrollTo(widgetToScrollTo);
+                    setOpenedGameId(game.id);
+                  }}
                   onOpenProject={onOpenProject}
                   isUpdatingGame={isUpdatingGame}
                   onUnregisterGame={onUnregisterGame}

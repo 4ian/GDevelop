@@ -28,7 +28,11 @@ type Props = {|
 
 const ProjectsWidget = (props: Props) => {
   return (
-    <DashboardWidget gridSize={3} title={<Trans>Projects</Trans>}>
+    <DashboardWidget
+      gridSize={3}
+      title={<Trans>Projects</Trans>}
+      widgetName="projects"
+    >
       <ProjectFileList {...props} />
     </DashboardWidget>
   );

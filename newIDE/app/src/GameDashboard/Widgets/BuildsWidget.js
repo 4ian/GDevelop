@@ -42,6 +42,7 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
           primary
         />
       }
+      widgetName="builds"
     >
       <ColumnStackLayout noMargin>
         {pendingBuilds && pendingBuilds.length > 0 && (

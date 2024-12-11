@@ -120,7 +120,7 @@ type Props = {|
   dashboardItem: DashboardItem,
   storageProviders: Array<StorageProvider>,
   isCurrentProjectOpened: boolean,
-  onOpenGameManager: (game: Game) => void,
+  onOpenGameManager: ({ game: Game, widgetToScrollTo?: 'projects' }) => void,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onUnregisterGame: () => Promise<void>,
   disabled: boolean,
@@ -270,7 +270,9 @@ const GameDashboardCard = ({
         <>
           <Spacer />
           <TextButton
-            onClick={() => onOpenGameManager(game)}
+            onClick={() =>
+              onOpenGameManager({ game, widgetToScrollTo: 'projects' })
+            }
             icon={<FileWithLines style={styles.fileIcon} />}
             label={
               <Text noMargin color="secondary">
@@ -376,7 +378,7 @@ const GameDashboardCard = ({
           { type: 'separator' },
           {
             label: i18n._(t`See all in the game dashboard`),
-            click: game ? () => onOpenGameManager(game) : undefined,
+            click: game ? () => onOpenGameManager({ game }) : undefined,
           },
         ]
       );
@@ -419,7 +421,7 @@ const GameDashboardCard = ({
             // If there are multiple projects, suggest opening the game dashboard.
             actions.push({
               label: i18n._(t`See all projects`),
-              click: game ? () => onOpenGameManager(game) : undefined,
+              click: game ? () => onOpenGameManager({ game }) : undefined,
             });
           }
 
@@ -484,7 +486,7 @@ const GameDashboardCard = ({
   const onManageGame = React.useCallback(
     async () => {
       if (game) {
-        onOpenGameManager(game);
+        onOpenGameManager({ game });
         return;
       } else {
         if (!authenticatedUser.profile) {
@@ -502,7 +504,7 @@ const GameDashboardCard = ({
         if (!registeredGame) return;
 
         await onRefreshGames();
-        onOpenGameManager(registeredGame);
+        onOpenGameManager({ game: registeredGame });
       }
     },
     [
@@ -586,13 +588,13 @@ const GameDashboardCard = ({
         >
           {isMobile ? (
             <ColumnStackLayout>
-              <LineStackLayout noMargin justifyContent="space-between">
-                <Column noMargin>
+              <Column noMargin>
+                <LineStackLayout noMargin justifyContent="space-between">
                   {renderTitle()}
-                  {renderLastModification(i18n)}
-                </Column>
-                {renderAdditionalActions()}
-              </LineStackLayout>
+                  {renderAdditionalActions()}
+                </LineStackLayout>
+                {renderLastModification(i18n)}
+              </Column>
               <LineStackLayout noMargin>
                 {renderThumbnail()}
                 {renderPublicInfo()}

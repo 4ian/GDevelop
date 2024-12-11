@@ -60,6 +60,7 @@ const FeedbackWidget = ({
               />
             )
           }
+          widgetName="feedback"
           minHeight
           renderSubtitle={() =>
             shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&

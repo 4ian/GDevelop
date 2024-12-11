@@ -88,6 +88,7 @@ type Props = {|
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
   disabled: boolean,
+  initialWidgetToScrollTo?: ?string,
 |};
 
 const GameDashboard = ({
@@ -109,7 +110,12 @@ const GameDashboard = ({
   setCurrentView,
   onBack,
   disabled,
+  initialWidgetToScrollTo,
 }: Props) => {
+  const grid = React.useRef<?HTMLDivElement>(null);
+  const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(
+    initialWidgetToScrollTo
+  );
   const [
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
@@ -416,6 +422,21 @@ const GameDashboard = ({
 
   React.useEffect(
     () => {
+      if (widgetToScrollTo && grid.current) {
+        const widget = grid.current.querySelector(
+          `[data-widget-name="${widgetToScrollTo}"]`
+        );
+        if (widget) {
+          widget.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+          setWidgetToScrollTo(null);
+        }
+      }
+    },
+    [initialWidgetToScrollTo, widgetToScrollTo]
+  );
+
+  React.useEffect(
+    () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
@@ -538,7 +559,7 @@ const GameDashboard = ({
                       : null
                   }
                 />
-                <Grid container spacing={2}>
+                <Grid container spacing={2} ref={grid}>
                   <AnalyticsWidget
                     onSeeAll={() => setCurrentView('analytics')}
                     gameMetrics={gameRollingMetrics}

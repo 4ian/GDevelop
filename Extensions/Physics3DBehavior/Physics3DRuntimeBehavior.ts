@@ -254,8 +254,8 @@ namespace gdjs {
     step(deltaTime: float): void {
       // Reset started and ended contacts array for all physics instances.
       for (const physicsBehavior of this._registeredBehaviors) {
-        physicsBehavior.contactsStartedThisFrame.length = 0;
-        physicsBehavior.contactsEndedThisFrame.length = 0;
+        physicsBehavior._contactsStartedThisFrame.length = 0;
+        physicsBehavior._contactsEndedThisFrame.length = 0;
       }
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
@@ -309,20 +309,20 @@ namespace gdjs {
     bodyType: string;
     bullet: boolean;
     fixedRotation: boolean;
-    shape: string;
-    shapeOrientation: string;
-    shapeDimensionA: any;
-    shapeDimensionB: any;
-    shapeDimensionC: any;
-    density: float;
+    private shape: string;
+    private shapeOrientation: string;
+    private shapeDimensionA: any;
+    private shapeDimensionB: any;
+    private shapeDimensionC: any;
+    private density: float;
     friction: float;
     restitution: float;
     linearDamping: float;
     angularDamping: float;
     gravityScale: float;
-    layers: integer;
-    masks: integer;
-    shapeScale: number = 1;
+    private layers: integer;
+    private masks: integer;
+    private shapeScale: number = 1;
 
     /**
      * Array containing the beginning of contacts reported by onContactBegin. Each contact
@@ -332,27 +332,27 @@ namespace gdjs {
      * the world i.e. in the first preEvent called by a physics behavior. This array is
      * cleared just before stepping the world.
      */
-    contactsStartedThisFrame: Array<Physics3DRuntimeBehavior> = [];
+    _contactsStartedThisFrame: Array<Physics3DRuntimeBehavior> = [];
 
     /**
      * Array containing the end of contacts reported by onContactEnd. The array is updated
      * each time the method onContactEnd is called by the listener, which can be called at
      * any time. This array is cleared just before stepping the world.
      */
-    contactsEndedThisFrame: Array<Physics3DRuntimeBehavior> = [];
+    _contactsEndedThisFrame: Array<Physics3DRuntimeBehavior> = [];
 
     /**
      * Array containing the exact current contacts with the objects. It is updated
      * each time the methods onContactBegin and onContactEnd are called by the contact
      * listener.
      */
-    currentContacts: Array<Physics3DRuntimeBehavior> = [];
+    private _currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
-    destroyedDuringFrameLogic: boolean;
+    private _destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
-    needToRecreateBody: boolean = false;
-    needToRecreateShape: boolean = false;
-    shapeHalfDepth: float = 0;
+    private _needToRecreateBody: boolean = false;
+    private _needToRecreateShape: boolean = false;
+    _shapeHalfDepth: float = 0;
 
     /**
      * sharedData is a reference to the shared data of the scene, that registers
@@ -397,7 +397,7 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this.destroyedDuringFrameLogic = false;
+      this._destroyedDuringFrameLogic = false;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.name
@@ -432,11 +432,11 @@ namespace gdjs {
       }
       if (oldBehaviorData.shapeDimensionA !== newBehaviorData.shapeDimensionA) {
         this.shapeDimensionA = newBehaviorData.shapeDimensionA;
-        this.needToRecreateShape = true;
+        this._needToRecreateShape = true;
       }
       if (oldBehaviorData.shapeDimensionB !== newBehaviorData.shapeDimensionB) {
         this.shapeDimensionB = newBehaviorData.shapeDimensionB;
-        this.needToRecreateShape = true;
+        this._needToRecreateShape = true;
       }
       if (oldBehaviorData.density !== newBehaviorData.density) {
         this.setDensity(newBehaviorData.density);
@@ -614,22 +614,22 @@ namespace gdjs {
         this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
         this._body = null;
       }
-      this.contactsEndedThisFrame.length = 0;
-      this.contactsStartedThisFrame.length = 0;
-      this.currentContacts.length = 0;
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
     }
 
     onActivate() {
       this._sharedData.addToBehaviorsList(this);
 
-      this.contactsEndedThisFrame.length = 0;
-      this.contactsStartedThisFrame.length = 0;
-      this.currentContacts.length = 0;
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
       this.updateBodyFromObject();
     }
 
     onDestroy() {
-      this.destroyedDuringFrameLogic = true;
+      this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
     }
 
@@ -679,7 +679,7 @@ namespace gdjs {
           convexRadius
         );
         quat = this.getQuat(0, 0, 0, 1);
-        this.shapeHalfDepth = boxDepth / 2;
+        this._shapeHalfDepth = boxDepth / 2;
       } else if (this.shape === 'Capsule') {
         const radius =
           shapeDimensionA > 0
@@ -694,7 +694,7 @@ namespace gdjs {
           radius
         );
         quat = this._getShapeOrientationQuat();
-        this.shapeHalfDepth =
+        this._shapeHalfDepth =
           this.shapeOrientation !== 'Z' ? radius : capsuleDepth / 2;
       } else if (this.shape === 'Cylinder') {
         const radius =
@@ -716,7 +716,7 @@ namespace gdjs {
           convexRadius
         );
         quat = this._getShapeOrientationQuat();
-        this.shapeHalfDepth =
+        this._shapeHalfDepth =
           this.shapeOrientation !== 'Z' ? radius : cylinderDepth / 2;
       } else {
         // Create a 'Sphere' by default.
@@ -728,7 +728,7 @@ namespace gdjs {
             : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
-        this.shapeHalfDepth = radius;
+        this._shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
       const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
@@ -771,7 +771,7 @@ namespace gdjs {
     setShapeScale(shapeScale: float): void {
       if (shapeScale !== this.shapeScale && shapeScale > 0) {
         this.shapeScale = shapeScale;
-        this.needToRecreateShape = true;
+        this._needToRecreateShape = true;
       }
     }
 
@@ -783,10 +783,10 @@ namespace gdjs {
     }
 
     createBody(): boolean {
-      this.needToRecreateBody = false;
-      this.needToRecreateShape = false;
+      this._needToRecreateBody = false;
+      this._needToRecreateShape = false;
 
-      if (!this.activated() || this.destroyedDuringFrameLogic) return false;
+      if (!this.activated() || this._destroyedDuringFrameLogic) return false;
 
       this._body = this.bodyUpdater.createAndAddBody();
       this._body.gdjsAssociatedBehavior = this;
@@ -855,9 +855,9 @@ namespace gdjs {
       let bodyID = this._body.GetID();
       bodyInterface.RemoveBody(bodyID);
       bodyInterface.DestroyBody(bodyID);
-      this.contactsEndedThisFrame.length = 0;
-      this.contactsStartedThisFrame.length = 0;
-      this.currentContacts.length = 0;
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
 
       this.createBody();
       if (!this._body) {
@@ -891,7 +891,7 @@ namespace gdjs {
         if (!this.createBody()) return;
       }
 
-      if (this.needToRecreateBody) {
+      if (this._needToRecreateBody) {
         this.recreateBody();
       }
 
@@ -900,13 +900,13 @@ namespace gdjs {
       // The height has changed, the shape is not an edge (edges doesn't have height),
       // it isn't a box with custom height or a circle with custom radius
       if (
-        this.needToRecreateShape ||
+        this._needToRecreateShape ||
         (!this.hasCustomShapeDimension() &&
           (this._objectOldWidth !== this.owner3D.getWidth() ||
             this._objectOldHeight !== this.owner3D.getHeight() ||
             this._objectOldDepth !== this.owner3D.getDepth()))
       ) {
-        this.needToRecreateShape = false;
+        this._needToRecreateShape = false;
         this.recreateShape();
       }
 
@@ -1058,7 +1058,7 @@ namespace gdjs {
         return;
       }
       this.fixedRotation = enable;
-      this.needToRecreateBody = true;
+      this._needToRecreateBody = true;
     }
 
     getDensity() {
@@ -1074,7 +1074,7 @@ namespace gdjs {
         return;
       }
       this.density = density;
-      this.needToRecreateShape = true;
+      this._needToRecreateShape = true;
     }
 
     getFriction(): float {
@@ -1205,7 +1205,7 @@ namespace gdjs {
         this.layers &= ~(1 << (layer - 1));
       }
 
-      this.needToRecreateBody = true;
+      this._needToRecreateBody = true;
     }
 
     maskEnabled(mask: integer): boolean {
@@ -1230,7 +1230,7 @@ namespace gdjs {
         this.masks &= ~(1 << (mask - 1));
       }
 
-      this.needToRecreateBody = true;
+      this._needToRecreateBody = true;
     }
 
     getLinearVelocityX(): float {
@@ -1642,25 +1642,25 @@ namespace gdjs {
     }
 
     onContactBegin(otherBehavior: Physics3DRuntimeBehavior): void {
-      this.currentContacts.push(otherBehavior);
+      this._currentContacts.push(otherBehavior);
 
       // There might be contacts that end during the frame and
       // start again right away. It is considered a glitch
       // and should not be detected.
-      let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
+      let i = this._contactsEndedThisFrame.indexOf(otherBehavior);
       if (i !== -1) {
-        this.contactsEndedThisFrame.splice(i, 1);
+        this._contactsEndedThisFrame.splice(i, 1);
       } else {
-        this.contactsStartedThisFrame.push(otherBehavior);
+        this._contactsStartedThisFrame.push(otherBehavior);
       }
     }
 
     onContactEnd(otherBehavior: Physics3DRuntimeBehavior): void {
-      this.contactsEndedThisFrame.push(otherBehavior);
+      this._contactsEndedThisFrame.push(otherBehavior);
 
-      const index = this.currentContacts.indexOf(otherBehavior);
+      const index = this._currentContacts.indexOf(otherBehavior);
       if (index !== -1) {
-        this.currentContacts.splice(index, 1);
+        this._currentContacts.splice(index, 1);
       }
     }
 
@@ -1676,7 +1676,7 @@ namespace gdjs {
       if (!behavior1) return false;
 
       if (
-        behavior1.currentContacts.some((behavior) => behavior.owner === object2)
+        behavior1._currentContacts.some((behavior) => behavior.owner === object2)
       ) {
         return true;
       }
@@ -1684,7 +1684,7 @@ namespace gdjs {
       // won't appear in current contacts but the condition should return
       // true anyway.
       if (
-        behavior1.contactsStartedThisFrame.some(
+        behavior1._contactsStartedThisFrame.some(
           (behavior) => behavior.owner === object2
         )
       ) {
@@ -1706,7 +1706,7 @@ namespace gdjs {
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
 
-      return behavior1.contactsStartedThisFrame.some(
+      return behavior1._contactsStartedThisFrame.some(
         (behavior) => behavior.owner === object2
       );
     }
@@ -1722,7 +1722,7 @@ namespace gdjs {
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
 
-      return behavior1.contactsEndedThisFrame.some(
+      return behavior1._contactsEndedThisFrame.some(
         (behavior) => behavior.owner === object2
       );
     }

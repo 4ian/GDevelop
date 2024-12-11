@@ -44,8 +44,8 @@ namespace gdjs {
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
     owner3D: gdjs.RuntimeObject3D;
-    physics3DBehaviorName: string;
-    physics3D: Physics3D | null = null;
+    private _physics3DBehaviorName: string;
+    private _physics3D: Physics3D | null = null;
     character: Jolt.CharacterVirtual | null = null;
     /**
      * sharedData is a reference to the shared data of the scene, that registers
@@ -56,38 +56,38 @@ namespace gdjs {
 
     // TODO Should there be angle were the character can climb but will slip?
     _slopeMaxAngle: float;
-    _slopeClimbingFactor: float = 1;
-    _slopeClimbingMinNormalZ: float = Math.cos(Math.PI / 4);
+    private _slopeClimbingFactor: float = 1;
+    private _slopeClimbingMinNormalZ: float = Math.cos(Math.PI / 4);
     private _forwardAngle: float = 0;
     private _shouldBindObjectAndForwardAngle: boolean;
-    _forwardAcceleration: float;
-    _forwardDeceleration: float;
-    _forwardSpeedMax: float;
-    _sidewaysAcceleration: float;
-    _sidewaysDeceleration: float;
-    _sidewaysSpeedMax: float;
-    _gravity: float;
-    _maxFallingSpeed: float;
-    _jumpSpeed: float;
-    _jumpSustainTime: float;
+    private _forwardAcceleration: float;
+    private _forwardDeceleration: float;
+    private _forwardSpeedMax: float;
+    private _sidewaysAcceleration: float;
+    private _sidewaysDeceleration: float;
+    private _sidewaysSpeedMax: float;
+    private _gravity: float;
+    private _maxFallingSpeed: float;
+    private _jumpSpeed: float;
+    private _jumpSustainTime: float;
 
-    hasPressedForwardKey: boolean = false;
-    hasPressedBackwardKey: boolean = false;
-    hasPressedRightKey: boolean = false;
-    hasPressedLeftKey: boolean = false;
-    hasPressedJumpKey: boolean = false;
-    hasUsedStick: boolean = false;
+    private _hasPressedForwardKey: boolean = false;
+    private _hasPressedBackwardKey: boolean = false;
+    private _hasPressedRightKey: boolean = false;
+    private _hasPressedLeftKey: boolean = false;
+    private _hasPressedJumpKey: boolean = false;
+    private _hasUsedStick: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
-    _currentForwardSpeed: float = 0;
-    _currentSidewaysSpeed: float = 0;
-    _currentFallSpeed: float = 0;
-    _canJump: boolean = false;
-    _currentJumpSpeed: float = 0;
-    _timeSinceCurrentJumpStart: float = 0;
-    _jumpKeyHeldSinceJumpStart: boolean = false;
+    private _currentForwardSpeed: float = 0;
+    private _currentSidewaysSpeed: float = 0;
+    private _currentFallSpeed: float = 0;
+    private _canJump: boolean = false;
+    private _currentJumpSpeed: float = 0;
+    private _timeSinceCurrentJumpStart: float = 0;
+    private _jumpKeyHeldSinceJumpStart: boolean = false;
     private _hasReallyMoved: boolean = false;
-    oldPhysicsPosition: FloatPoint = [0, 0];
+    private _oldPhysicsPosition: FloatPoint = [0, 0];
 
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
@@ -102,7 +102,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    _dontClearInputsBetweenFrames: boolean = false;
+    private _dontClearInputsBetweenFrames: boolean = false;
 
     /**
      * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
@@ -116,7 +116,7 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.owner3D = owner;
-      this.physics3DBehaviorName = behaviorData.physics3D;
+      this._physics3DBehaviorName = behaviorData.physics3D;
       this._sharedData = gdjs.Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.Physics3D
@@ -155,11 +155,11 @@ namespace gdjs {
     }
 
     getPhysics3D(): Physics3D {
-      if (this.physics3D) {
-        return this.physics3D;
+      if (this._physics3D) {
+        return this._physics3D;
       }
       const behavior = this.owner.getBehavior(
-        this.physics3DBehaviorName
+        this._physics3DBehaviorName
       ) as gdjs.Physics3DRuntimeBehavior;
 
       const sharedData = behavior._sharedData;
@@ -177,7 +177,7 @@ namespace gdjs {
       const bodyFilter = new Jolt.BodyFilter();
       const shapeFilter = new Jolt.ShapeFilter();
 
-      this.physics3D = {
+      this._physics3D = {
         behavior,
         extendedUpdateSettings,
         broadPhaseLayerFilter,
@@ -195,7 +195,7 @@ namespace gdjs {
       // Always begin in the direction of the object.
       this._forwardAngle = this.owner.getAngle();
 
-      return this.physics3D;
+      return this._physics3D;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -294,12 +294,12 @@ namespace gdjs {
       this._currentFallSpeed = behaviorSpecificProps.fs;
       this._currentJumpSpeed = behaviorSpecificProps.js;
       this._canJump = behaviorSpecificProps.cj;
-      this.hasPressedForwardKey = behaviorSpecificProps.upk;
-      this.hasPressedBackwardKey = behaviorSpecificProps.dok;
-      this.hasPressedLeftKey = behaviorSpecificProps.lek;
-      this.hasPressedRightKey = behaviorSpecificProps.rik;
-      this.hasPressedJumpKey = behaviorSpecificProps.juk;
-      this.hasUsedStick = behaviorSpecificProps.us;
+      this._hasPressedForwardKey = behaviorSpecificProps.upk;
+      this._hasPressedBackwardKey = behaviorSpecificProps.dok;
+      this._hasPressedLeftKey = behaviorSpecificProps.lek;
+      this._hasPressedRightKey = behaviorSpecificProps.rik;
+      this._hasPressedJumpKey = behaviorSpecificProps.juk;
+      this._hasUsedStick = behaviorSpecificProps.us;
       this._stickAngle = behaviorSpecificProps.sa;
       this._stickForce = behaviorSpecificProps.sf;
       this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
@@ -319,7 +319,7 @@ namespace gdjs {
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
         this.owner3D.getZ() * this._sharedData.worldInvScale +
-          behavior.shapeHalfDepth
+          behavior._shapeHalfDepth
       );
       return result;
     }
@@ -333,7 +333,7 @@ namespace gdjs {
         physicsPosition.GetY() * this._sharedData.worldScale
       );
       this.owner3D.setZ(
-        (physicsPosition.GetZ() - behavior.shapeHalfDepth) *
+        (physicsPosition.GetZ() - behavior._shapeHalfDepth) *
           this._sharedData.worldScale
       );
     }
@@ -384,12 +384,12 @@ namespace gdjs {
       }
       // Check if the jump key is continuously held since
       // the beginning of the jump.
-      if (!this.hasPressedJumpKey) {
+      if (!this._hasPressedJumpKey) {
         this._jumpKeyHeldSinceJumpStart = false;
       }
       if (
         this._canJump &&
-        this.hasPressedJumpKey &&
+        this._hasPressedJumpKey &&
         // Avoid the character to jump in loop when the jump key is held.
         !this._jumpKeyHeldSinceJumpStart
       ) {
@@ -460,16 +460,16 @@ namespace gdjs {
         // Keep the character on the floor when walking down-hill.
         const walkingDistance = Math.max(
           Math.hypot(
-            this.character.GetPosition().GetX() - this.oldPhysicsPosition[0],
-            this.character.GetPosition().GetY() - this.oldPhysicsPosition[1]
+            this.character.GetPosition().GetX() - this._oldPhysicsPosition[0],
+            this.character.GetPosition().GetY() - this._oldPhysicsPosition[1]
           ),
           Math.hypot(
             this.character.GetLinearVelocity().GetX(),
             this.character.GetLinearVelocity().GetY()
           ) * timeDelta
         );
-        this.oldPhysicsPosition[0] = this.character.GetPosition().GetX();
-        this.oldPhysicsPosition[1] = this.character.GetPosition().GetY();
+        this._oldPhysicsPosition[0] = this.character.GetPosition().GetX();
+        this._oldPhysicsPosition[1] = this.character.GetPosition().GetY();
 
         // A safety margin is taken as if the ground normal is too steep, the
         // character will fall next step anyway.
@@ -511,20 +511,20 @@ namespace gdjs {
         this._currentJumpSpeed = 0;
       }
 
-      this._wasForwardKeyPressed = this.hasPressedForwardKey;
-      this._wasBackwardKeyPressed = this.hasPressedBackwardKey;
-      this._wasRightKeyPressed = this.hasPressedRightKey;
-      this._wasLeftKeyPressed = this.hasPressedLeftKey;
-      this._wasJumpKeyPressed = this.hasPressedJumpKey;
-      this._wasStickUsed = this.hasPressedJumpKey;
+      this._wasForwardKeyPressed = this._hasPressedForwardKey;
+      this._wasBackwardKeyPressed = this._hasPressedBackwardKey;
+      this._wasRightKeyPressed = this._hasPressedRightKey;
+      this._wasLeftKeyPressed = this._hasPressedLeftKey;
+      this._wasJumpKeyPressed = this._hasPressedJumpKey;
+      this._wasStickUsed = this._hasPressedJumpKey;
 
       if (!this._dontClearInputsBetweenFrames) {
-        this.hasPressedForwardKey = false;
-        this.hasPressedBackwardKey = false;
-        this.hasPressedRightKey = false;
-        this.hasPressedLeftKey = false;
-        this.hasPressedJumpKey = false;
-        this.hasUsedStick = false;
+        this._hasPressedForwardKey = false;
+        this._hasPressedBackwardKey = false;
+        this._hasPressedRightKey = false;
+        this._hasPressedLeftKey = false;
+        this._hasPressedJumpKey = false;
+        this._hasUsedStick = false;
       }
 
       this._hasReallyMoved =
@@ -541,13 +541,13 @@ namespace gdjs {
       let targetedForwardSpeed = 0;
       // Change the speed according to the player's input.
       // TODO Give priority to the last key for faster reaction time.
-      if (this.hasPressedBackwardKey !== this.hasPressedForwardKey) {
-        if (this.hasPressedBackwardKey) {
+      if (this._hasPressedBackwardKey !== this._hasPressedForwardKey) {
+        if (this._hasPressedBackwardKey) {
           targetedForwardSpeed = -this._forwardSpeedMax;
-        } else if (this.hasPressedForwardKey) {
+        } else if (this._hasPressedForwardKey) {
           targetedForwardSpeed = this._forwardSpeedMax;
         }
-      } else if (this.hasUsedStick) {
+      } else if (this._hasUsedStick) {
         targetedForwardSpeed =
           -this._forwardSpeedMax *
           this._stickForce *
@@ -563,13 +563,13 @@ namespace gdjs {
       );
       /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedSidewaysSpeed = 0;
-      if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
-        if (this.hasPressedLeftKey) {
+      if (this._hasPressedLeftKey !== this._hasPressedRightKey) {
+        if (this._hasPressedLeftKey) {
           targetedSidewaysSpeed = -this._sidewaysSpeedMax;
-        } else if (this.hasPressedRightKey) {
+        } else if (this._hasPressedRightKey) {
           targetedSidewaysSpeed = this._sidewaysSpeedMax;
         }
-      } else if (this.hasUsedStick) {
+      } else if (this._hasUsedStick) {
         targetedSidewaysSpeed =
           this._sidewaysSpeedMax *
           this._stickForce *
@@ -1085,7 +1085,7 @@ namespace gdjs {
     }
 
     simulateForwardKey(): void {
-      this.hasPressedForwardKey = true;
+      this._hasPressedForwardKey = true;
     }
 
     wasForwardKeyPressed(): boolean {
@@ -1093,7 +1093,7 @@ namespace gdjs {
     }
 
     simulateBackwardKey(): void {
-      this.hasPressedBackwardKey = true;
+      this._hasPressedBackwardKey = true;
     }
 
     wasBackwardKeyPressed(): boolean {
@@ -1101,7 +1101,7 @@ namespace gdjs {
     }
 
     simulateRightKey(): void {
-      this.hasPressedRightKey = true;
+      this._hasPressedRightKey = true;
     }
 
     wasRightKeyPressed(): boolean {
@@ -1109,7 +1109,7 @@ namespace gdjs {
     }
 
     simulateLeftKey(): void {
-      this.hasPressedLeftKey = true;
+      this._hasPressedLeftKey = true;
     }
 
     wasLeftKeyPressed(): boolean {
@@ -1117,7 +1117,7 @@ namespace gdjs {
     }
 
     simulateJumpKey(): void {
-      this.hasPressedJumpKey = true;
+      this._hasPressedJumpKey = true;
     }
 
     wasJumpKeyPressed(): boolean {
@@ -1125,7 +1125,7 @@ namespace gdjs {
     }
 
     simulateStick(stickAngle: float, stickForce: float) {
-      this.hasUsedStick = true;
+      this._hasUsedStick = true;
       this._stickAngle = stickAngle;
       this._stickForce = Math.max(0, Math.min(1, stickForce));
     }

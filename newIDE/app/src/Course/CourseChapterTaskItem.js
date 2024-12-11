@@ -34,7 +34,22 @@ const CourseChapterTaskItem = ({
   isComplete,
   onComplete,
 }: Props) => {
+  const [isOpenIndividually, setIsOpenIndividually] = React.useState<boolean>(
+    isOpen
+  );
   const { isMobile, isLandscape } = useResponsiveWindowSize();
+
+  React.useEffect(
+    () => {
+      if (!isOpen) {
+        // If the parent closes the task, the child state should follow.
+        setIsOpenIndividually(false);
+      }
+    },
+    [isOpen]
+  );
+
+  const displayContent = isOpen || isOpenIndividually;
   return (
     <LineStackLayout alignItems="flex-start" noMargin>
       <div
@@ -51,19 +66,26 @@ const CourseChapterTaskItem = ({
       </div>
       <Line>
         <ColumnStackLayout expand noMargin noOverflowParent>
-          <Column expand noMargin noOverflowParent>
-            <Text noMargin size="sub-title">
-              {courseChapterTask.title}
-            </Text>
-            {courseChapterTask.text && (
-              <MarkdownText
-                withTextEllipsis={!isOpen}
-                source={courseChapterTask.text}
-                allowParagraphs
-              />
-            )}
-          </Column>
-          {isOpen &&
+          <div
+            onClick={() => {
+              setIsOpenIndividually(true);
+            }}
+            style={{ pointerEvents: displayContent ? 'none' : 'all' }}
+          >
+            <Column expand noMargin noOverflowParent>
+              <Text noMargin size="sub-title">
+                {courseChapterTask.title}
+              </Text>
+              {courseChapterTask.text && (
+                <MarkdownText
+                  withTextEllipsis={!displayContent}
+                  source={courseChapterTask.text}
+                  allowParagraphs
+                />
+              )}
+            </Column>
+          </div>
+          {displayContent &&
             courseChapterTask.imageUrls &&
             courseChapterTask.imageUrls.map(imageUrl => (
               <ImageWithZoom
@@ -73,12 +95,12 @@ const CourseChapterTaskItem = ({
                 src={imageUrl}
               />
             ))}
-          {isOpen && courseChapterTask.hint && (
+          {displayContent && courseChapterTask.hint && (
             <AlertMessage kind="info" background="light">
               <MarkdownText source={courseChapterTask.hint} />
             </AlertMessage>
           )}
-          {isOpen &&
+          {displayContent &&
             courseChapterTask.answer &&
             (courseChapterTask.answer.text ||
               courseChapterTask.answer.imageUrls) && (

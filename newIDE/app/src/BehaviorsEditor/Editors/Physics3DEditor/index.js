@@ -173,7 +173,7 @@ const Physics3DEditor = (props: Props) => {
       </ResponsiveLineStackLayout>
       <Line>
         <DismissableAlertMessage
-          identifier="physics3d-shape-collisions"
+          identifier="physics2-shape-collisions"
           kind="info"
         >
           <Trans>

@@ -45,6 +45,7 @@ export const Default = () => (
         <LearnSection
           courseChapters={null}
           courses={null}
+          selectedCourse={null}
           isCourseTaskCompleted={() => false}
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
@@ -80,6 +81,7 @@ export const NotAuthenticated = () => (
         <LearnSection
           courseChapters={null}
           courses={null}
+          selectedCourse={null}
           isCourseTaskCompleted={() => false}
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
@@ -117,6 +119,7 @@ export const EducationSubscriber = () => (
         <LearnSection
           courseChapters={null}
           courses={null}
+          selectedCourse={null}
           isCourseTaskCompleted={() => false}
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
@@ -154,6 +157,7 @@ export const EducationTeacher = () => (
         <LearnSection
           courseChapters={null}
           courses={null}
+          selectedCourse={null}
           isCourseTaskCompleted={() => false}
           onSelectCourse={action('onSelectCourse')}
           isLoadingChapters={false}
@@ -188,6 +192,7 @@ export const Loading = () => (
       <LearnSection
         courseChapters={null}
         courses={null}
+        selectedCourse={null}
         isCourseTaskCompleted={() => false}
         onSelectCourse={action('onSelectCourse')}
         isLoadingChapters={false}

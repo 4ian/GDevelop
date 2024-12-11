@@ -67,8 +67,26 @@ const styles = {
     alignItems: 'center',
     gap: 4,
   },
+  videoAndMaterialsContainer: {
+    display: 'flex',
+    marginTop: 8,
+    gap: 8,
+    alignItems: 'stretch',
+    flexWrap: 'wrap',
+    marginBottom: 8,
+    flex: 1,
+    minWidth: 0,
+  },
+  lockedChapterTextContainer: {
+    // Similar to Line component but without the minWidth:0 that somehow
+    // prevents container to wrap when overflowing.
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+  },
   videoContainer: {
     flex: 2,
+    minWidth: 300,
     maxWidth: 640,
     display: 'flex',
     position: 'relative',
@@ -223,12 +241,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           ) : null}
         </div>
         {courseChapter.isLocked ? (
-          <ResponsiveLineStackLayout
-            expand
-            noResponsiveLandscape
-            noColumnMargin
-            alignItems="stretch"
-          >
+          <div style={styles.videoAndMaterialsContainer}>
             {youtubeVideoId && (
               <div style={styles.videoContainer}>
                 <img
@@ -239,7 +252,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                 <LockedOverlay />
               </div>
             )}
-            <Line useFullHeight expand noMargin>
+            <div style={styles.lockedChapterTextContainer}>
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin justifyContent="center">
                   <Text noMargin size="sub-title">
@@ -288,14 +301,10 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                   </ResponsiveLineStackLayout>
                 </ColumnStackLayout>
               </Paper>
-            </Line>
-          </ResponsiveLineStackLayout>
+            </div>
+          </div>
         ) : (
-          <ResponsiveLineStackLayout
-            expand
-            noResponsiveLandscape
-            noColumnMargin
-          >
+          <div style={styles.videoAndMaterialsContainer}>
             {youtubeVideoId && (
               <div style={styles.videoContainer}>
                 <iframe
@@ -338,7 +347,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                 </ColumnStackLayout>
               </Paper>
             </ColumnStackLayout>
-          </ResponsiveLineStackLayout>
+          </div>
         )}
         {!courseChapter.isLocked && (
           <div

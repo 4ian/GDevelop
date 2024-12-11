@@ -127,8 +127,9 @@ type Props = {|
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   courses: ?(Course[]),
+  selectedCourse: Course | null,
   courseChapters: ?(CourseChapter[]),
-  onSelectCourse: (?Course) => void,
+  onSelectCourse: (Course | null) => void,
   isLoadingChapters: boolean,
   onCompleteCourseTask: (
     chapterId: string,
@@ -150,6 +151,7 @@ const LearnSection = ({
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
   courses,
+  selectedCourse,
   courseChapters,
   onSelectCourse,
   isLoadingChapters,
@@ -186,9 +188,10 @@ const LearnSection = ({
     [initialCategory]
   );
 
-  if (courseChapters) {
+  if (courseChapters && selectedCourse) {
     return (
       <CourseSection
+        course={selectedCourse}
         courseChapters={courseChapters}
         onBack={() => onSelectCourse(null)}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}

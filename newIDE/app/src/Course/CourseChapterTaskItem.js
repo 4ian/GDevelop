@@ -78,35 +78,38 @@ const CourseChapterTaskItem = ({
               <MarkdownText source={courseChapterTask.hint} />
             </AlertMessage>
           )}
-          {isOpen && courseChapterTask.answer && (
-            <Accordion kind="answer" noMargin>
-              <AccordionHeader>
-                <Text size="sub-title">
-                  <Trans>Answer</Trans>
-                </Text>
-              </AccordionHeader>
-              <AccordionBody>
-                {!!courseChapterTask.answer.text && (
-                  <MarkdownText
-                    source={courseChapterTask.answer.text}
-                    allowParagraphs
-                  />
-                )}
-                {!!courseChapterTask.answer.imageUrls && (
-                  <ColumnStackLayout noMargin noOverflowParent>
-                    {courseChapterTask.answer.imageUrls.map(imageUrl => (
-                      <ImageWithZoom
-                        style={styles.image}
-                        key={imageUrl}
-                        alt=""
-                        src={imageUrl}
-                      />
-                    ))}
-                  </ColumnStackLayout>
-                )}
-              </AccordionBody>
-            </Accordion>
-          )}
+          {isOpen &&
+            courseChapterTask.answer &&
+            (courseChapterTask.answer.text ||
+              courseChapterTask.answer.imageUrls) && (
+              <Accordion kind="answer" noMargin>
+                <AccordionHeader>
+                  <Text size="sub-title">
+                    <Trans>Answer</Trans>
+                  </Text>
+                </AccordionHeader>
+                <AccordionBody>
+                  {!!courseChapterTask.answer.text && (
+                    <MarkdownText
+                      source={courseChapterTask.answer.text}
+                      allowParagraphs
+                    />
+                  )}
+                  {!!courseChapterTask.answer.imageUrls && (
+                    <ColumnStackLayout noMargin noOverflowParent>
+                      {courseChapterTask.answer.imageUrls.map(imageUrl => (
+                        <ImageWithZoom
+                          style={styles.image}
+                          key={imageUrl}
+                          alt=""
+                          src={imageUrl}
+                        />
+                      ))}
+                    </ColumnStackLayout>
+                  )}
+                </AccordionBody>
+              </Accordion>
+            )}
         </ColumnStackLayout>
       </Line>
     </LineStackLayout>

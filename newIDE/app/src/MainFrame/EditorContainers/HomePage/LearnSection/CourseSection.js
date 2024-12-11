@@ -2,7 +2,11 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { type CourseChapter } from '../../../../Utils/GDevelopServices/Asset';
+import { I18n } from '@lingui/react';
+import {
+  type CourseChapter,
+  type Course,
+} from '../../../../Utils/GDevelopServices/Asset';
 import SectionContainer from '../SectionContainer';
 import CourseChapterView from '../../../../Course/CourseChapterView';
 import Paper from '../../../../UI/Paper';
@@ -28,6 +32,7 @@ import {
   AccordionHeader,
 } from '../../../../UI/Accordion';
 import AnyQuestionDialog from '../AnyQuestionDialog';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -76,6 +81,7 @@ const styles = {
 const alertMessageKey = 'course-subtitles-in-user-language';
 
 type Props = {|
+  course: Course,
   courseChapters: CourseChapter[],
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   onBack: () => void,
@@ -91,6 +97,7 @@ type Props = {|
 |};
 
 const CourseSection = ({
+  course,
   courseChapters,
   onOpenTemplateFromCourseChapter,
   onBack,
@@ -226,143 +233,155 @@ const CourseSection = ({
   );
 
   return (
-    <>
-      <SectionContainer
-        ref={scrollingContainerRef}
-        applyTopSpacingAsMarginOnChildrenContainer
-        backAction={onBack}
-        title={<Trans>GDevelop design basics</Trans>}
-        subtitleText={
-          <Trans>
-            This is a beginner-friendly course designed to introduce you to the
-            fundamentals of game development using GDevelop. By the end of the
-            course, you’ll have the confidence and technical skills to start
-            building your own games.
-          </Trans>
-        }
-      >
-        <div
-          style={isMobile && !isLandscape ? undefined : styles.desktopContainer}
-        >
-          <Column noOverflowParent noMargin>
-            {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (
-              <Line>
-                <AlertMessage
-                  kind="info"
-                  background="light"
-                  onHide={() => showAlertMessage(alertMessageKey, false)}
-                >
-                  {subtitleHint.label}
-                </AlertMessage>
-              </Line>
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <SectionContainer
+            ref={scrollingContainerRef}
+            applyTopSpacingAsMarginOnChildrenContainer
+            backAction={onBack}
+            title={selectMessageByLocale(i18n, course.titleByLocale)}
+            subtitleText={selectMessageByLocale(
+              i18n,
+              course.shortDescriptionByLocale
             )}
-            {courseChapters.map((chapter, index) => (
-              <CourseChapterView
-                chapterIndex={index}
-                courseChapter={chapter}
-                onOpenTemplate={() => {
-                  onOpenTemplateFromCourseChapter(chapter);
-                }}
-                onCompleteTask={onCompleteTask}
-                isTaskCompleted={isTaskCompleted}
-                getChapterCompletion={getChapterCompletion}
-                key={chapter.id}
-                onBuyWithCredits={onBuyCourseChapterWithCredits}
-                ref={_ref => {
-                  if (_ref) {
-                    chaptersTitleRefs.current[index] = {
-                      chapterId: chapter.id,
-                      offset: _ref.offsetTop,
-                    };
-                  }
-                }}
-              />
-            ))}
-            <div style={styles.footer} />
-          </Column>
-          {isMobile && !isLandscape ? null : (
-            <div style={styles.sideContainer}>
-              <div style={styles.sideContent}>
-                <Paper background="medium" style={styles.desktopTableOfContent}>
-                  <Text noMargin size="sub-title">
-                    Chapters
-                  </Text>
-                  {courseCompletion !== null && (
-                    <Line noMargin>
-                      <LinearProgress
-                        value={courseCompletion * 100}
-                        variant="determinate"
-                        style={styles.progress}
-                        color="success"
-                      />
-                    </Line>
-                  )}
-                  <Spacer />
-                  {tableOfContent}
-                </Paper>
-                <Paper background="light" style={styles.askAQuestionContainer}>
-                  <ColumnStackLayout expand noMargin>
-                    <LineStackLayout
-                      expand
-                      alignItems="center"
-                      noMargin
-                      justifyContent="center"
+          >
+            <div
+              style={
+                isMobile && !isLandscape ? undefined : styles.desktopContainer
+              }
+            >
+              <Column noOverflowParent noMargin>
+                {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (
+                  <Line>
+                    <AlertMessage
+                      kind="info"
+                      background="light"
+                      onHide={() => showAlertMessage(alertMessageKey, false)}
                     >
-                      <Help />
-                      <Text noMargin>
-                        <Trans>Do you need any help?</Trans>
+                      {subtitleHint.label}
+                    </AlertMessage>
+                  </Line>
+                )}
+                {courseChapters.map((chapter, index) => (
+                  <CourseChapterView
+                    chapterIndex={index}
+                    courseChapter={chapter}
+                    onOpenTemplate={() => {
+                      onOpenTemplateFromCourseChapter(chapter);
+                    }}
+                    onCompleteTask={onCompleteTask}
+                    isTaskCompleted={isTaskCompleted}
+                    getChapterCompletion={getChapterCompletion}
+                    key={chapter.id}
+                    onBuyWithCredits={onBuyCourseChapterWithCredits}
+                    ref={_ref => {
+                      if (_ref) {
+                        chaptersTitleRefs.current[index] = {
+                          chapterId: chapter.id,
+                          offset: _ref.offsetTop,
+                        };
+                      }
+                    }}
+                  />
+                ))}
+                <div style={styles.footer} />
+              </Column>
+              {isMobile && !isLandscape ? null : (
+                <div style={styles.sideContainer}>
+                  <div style={styles.sideContent}>
+                    <Paper
+                      background="medium"
+                      style={styles.desktopTableOfContent}
+                    >
+                      <Text noMargin size="sub-title">
+                        Chapters
                       </Text>
+                      {courseCompletion !== null && (
+                        <Line noMargin>
+                          <LinearProgress
+                            value={courseCompletion * 100}
+                            variant="determinate"
+                            style={styles.progress}
+                            color="success"
+                          />
+                        </Line>
+                      )}
+                      <Spacer />
+                      {tableOfContent}
+                    </Paper>
+                    <Paper
+                      background="light"
+                      style={styles.askAQuestionContainer}
+                    >
+                      <ColumnStackLayout expand noMargin>
+                        <LineStackLayout
+                          expand
+                          alignItems="center"
+                          noMargin
+                          justifyContent="center"
+                        >
+                          <Help />
+                          <Text noMargin>
+                            <Trans>Do you need any help?</Trans>
+                          </Text>
+                        </LineStackLayout>
+                        <RaisedButton
+                          label={<Trans>Ask a question</Trans>}
+                          primary
+                          onClick={() => setIsAnyQuestionDialogOpen(true)}
+                        />
+                      </ColumnStackLayout>
+                    </Paper>
+                  </div>
+                </div>
+              )}
+            </div>
+          </SectionContainer>
+          {isAnyQuestionDialogOpen && (
+            <AnyQuestionDialog
+              onClose={() => setIsAnyQuestionDialogOpen(false)}
+            />
+          )}
+          {isMobile && !isLandscape && (
+            <div
+              style={{
+                ...styles.mobileStickyFooter,
+                borderTop: `2px solid ${gdevelopTheme.home.separator.color}`,
+                borderBottom: `1px solid ${gdevelopTheme.home.separator.color}`,
+              }}
+            >
+              <Paper background="light" square>
+                <Accordion noMargin>
+                  <AccordionHeader>
+                    <LineStackLayout noMargin expand alignItems="center">
+                      <Text noMargin size="sub-title">
+                        Chapters
+                      </Text>
+                      {courseCompletion !== null && (
+                        <Line noMargin expand alignItems="center">
+                          <LinearProgress
+                            value={courseCompletion * 100}
+                            variant="determinate"
+                            style={styles.progress}
+                            color="success"
+                          />
+                        </Line>
+                      )}
                     </LineStackLayout>
-                    <RaisedButton
-                      label={<Trans>Ask a question</Trans>}
-                      primary
-                      onClick={() => setIsAnyQuestionDialogOpen(true)}
-                    />
-                  </ColumnStackLayout>
-                </Paper>
-              </div>
+                  </AccordionHeader>
+                  <AccordionBody>
+                    <div style={styles.mobileTableOfContent}>
+                      {tableOfContent}
+                    </div>
+                  </AccordionBody>
+                </Accordion>
+              </Paper>
             </div>
           )}
-        </div>
-      </SectionContainer>
-      {isAnyQuestionDialogOpen && (
-        <AnyQuestionDialog onClose={() => setIsAnyQuestionDialogOpen(false)} />
+        </>
       )}
-      {isMobile && !isLandscape && (
-        <div
-          style={{
-            ...styles.mobileStickyFooter,
-            borderTop: `2px solid ${gdevelopTheme.home.separator.color}`,
-            borderBottom: `1px solid ${gdevelopTheme.home.separator.color}`,
-          }}
-        >
-          <Paper background="light" square>
-            <Accordion noMargin>
-              <AccordionHeader>
-                <LineStackLayout noMargin expand alignItems="center">
-                  <Text noMargin size="sub-title">
-                    Chapters
-                  </Text>
-                  {courseCompletion !== null && (
-                    <Line noMargin expand alignItems="center">
-                      <LinearProgress
-                        value={courseCompletion * 100}
-                        variant="determinate"
-                        style={styles.progress}
-                        color="success"
-                      />
-                    </Line>
-                  )}
-                </LineStackLayout>
-              </AccordionHeader>
-              <AccordionBody>
-                <div style={styles.mobileTableOfContent}>{tableOfContent}</div>
-              </AccordionBody>
-            </Accordion>
-          </Paper>
-        </div>
-      )}
-    </>
+    </I18n>
   );
 };
 

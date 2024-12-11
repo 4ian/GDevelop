@@ -63,7 +63,9 @@ const useCourses = () => {
   const [isLoadingChapters, setIsLoadingChapters] = React.useState<boolean>(
     false
   );
-  const [selectedCourse, setSelectedCourse] = React.useState<?Course>(null);
+  const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(
+    null
+  );
   const [
     courseChapters,
     setCourseChapters,
@@ -334,6 +336,7 @@ const useCourses = () => {
   return {
     courses,
     courseChapters,
+    selectedCourse,
     onSelectCourse: setSelectedCourse,
     isLoadingChapters,
     onCompleteTask,

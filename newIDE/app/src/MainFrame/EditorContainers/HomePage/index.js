@@ -232,6 +232,7 @@ export const HomePage = React.memo<Props>(
       } = useEducationForm({ authenticatedUser });
       const {
         courses,
+        selectedCourse,
         courseChapters,
         onSelectCourse,
         isLoadingChapters,
@@ -536,6 +537,7 @@ export const HomePage = React.memo<Props>(
                       }
                       initialCategory={learnInitialCategory}
                       courses={courses}
+                      selectedCourse={selectedCourse}
                       onSelectCourse={onSelectCourse}
                       courseChapters={courseChapters}
                       isLoadingChapters={isLoadingChapters}

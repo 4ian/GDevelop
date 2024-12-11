@@ -139,7 +139,7 @@ type Props = {|
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
-  onSelectCourse: (?Course) => void,
+  onSelectCourse: (Course | null) => void,
   courses: ?(Course[]),
   isLoadingChapters: boolean,
 |};

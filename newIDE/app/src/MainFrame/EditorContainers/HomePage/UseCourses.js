@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import {
   listCourseChapters,
   listCourses,
@@ -16,7 +17,6 @@ import {
 import { useOptimisticState } from '../../../Utils/UseOptimisticState';
 import CourseChapterStoreContext from '../../../Course/CourseChapterStoreContext';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
-import { Trans } from '@lingui/macro';
 import { buyProductWithCredits } from '../../../Utils/GDevelopServices/Shop';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 

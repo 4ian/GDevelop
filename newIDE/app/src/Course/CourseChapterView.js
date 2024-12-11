@@ -302,7 +302,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                   title={`Video for lesson ${courseChapter.title}`}
                   type="text/html"
                   style={styles.videoIFrame}
-                  src={`http://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
+                  src={`https://www.youtube.com/embed/${youtubeVideoId}?cc_load_policy=1&cc_lang_pref=${
                     // Having another language than `en` as the requested caption language prevents the player from displaying the auto-translated captions.
                     'en'
                   }&hl=${userLanguage2LetterCode}`}

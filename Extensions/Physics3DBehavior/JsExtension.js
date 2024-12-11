@@ -1706,7 +1706,11 @@ module.exports = {
           .setGroup(_('Walk'))
           .setType('Boolean')
           .setValue(
-            behaviorContent.getChild('shouldBindObjectAndForwardAngle').getBoolValue() ? 'true' : 'false'
+            behaviorContent
+              .getChild('shouldBindObjectAndForwardAngle')
+              .getBoolValue()
+              ? 'true'
+              : 'false'
           )
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
@@ -1727,7 +1731,9 @@ module.exports = {
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
-        behaviorContent.addChild('shouldBindObjectAndForwardAngle').setBoolValue(true);
+        behaviorContent
+          .addChild('shouldBindObjectAndForwardAngle')
+          .setBoolValue(true);
       };
 
       const aut = extension
@@ -1963,11 +1969,13 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
         .setFunctionName('isFalling');
 
-        aut
+      aut
         .addScopedCondition(
           'ShouldBindObjectAndForwardAngle',
           _('Should bind object and forward angle'),
-          _('Check if the object angle and forward angle should be kept the same.'),
+          _(
+            'Check if the object angle and forward angle should be kept the same.'
+          ),
           _('Keep _PARAM0_ angle and forward angle the same'),
           _('Character configuration'),
           'JsPlatform/Extensions/physics_character3d.svg',
@@ -1983,7 +1991,7 @@ module.exports = {
           'SetShouldBindObjectAndForwardAngle',
           _('Should bind object and forward angle'),
           _(
-            "Enable or disable keeping the object angle and forward angle the same."
+            'Enable or disable keeping the object angle and forward angle the same.'
           ),
           _('Should bind _PARAM0_ angle and forward angle: _PARAM2_'),
           _('Character configuration'),
@@ -1992,7 +2000,12 @@ module.exports = {
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
-        .addParameter('yesorno', _('Keep object angle and forward direction the same'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Keep object angle and forward direction the same'),
+          '',
+          false
+        )
         .setDefaultValue('false')
         .getCodeExtraInformation()
         .setFunctionName('setShouldBindObjectAndForwardAngle');

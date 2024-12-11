@@ -42,8 +42,7 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
-  {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
     owner3D: gdjs.RuntimeObject3D;
     physics3DBehaviorName: string;
     physics3D: Physics3D | null = null;
@@ -137,7 +136,10 @@ namespace gdjs {
       this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
       this._shouldBindObjectAndForwardAngle =
         behaviorData.shouldBindObjectAndForwardAngle;
-      console.log("this._shouldBindObjectAndForwardAngle: " + this._shouldBindObjectAndForwardAngle);
+      console.log(
+        'this._shouldBindObjectAndForwardAngle: ' +
+          this._shouldBindObjectAndForwardAngle
+      );
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -185,8 +187,9 @@ namespace gdjs {
       };
       sharedData.registerHook(this);
 
-      behavior.bodyUpdater =
-        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
+      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
+        this
+      );
       behavior.recreateBody();
 
       // Always begin in the direction of the object.
@@ -240,8 +243,13 @@ namespace gdjs {
       if (oldBehaviorData.jumpHeight !== newBehaviorData.jumpHeight) {
         this.setJumpSpeed(this.getJumpSpeedToReach(newBehaviorData.jumpHeight));
       }
-      if (oldBehaviorData.shouldBindObjectAndForwardAngle !== newBehaviorData.shouldBindObjectAndForwardAngle) {
-        this.setShouldBindObjectAndForwardAngle(newBehaviorData.shouldBindObjectAndForwardAngle);
+      if (
+        oldBehaviorData.shouldBindObjectAndForwardAngle !==
+        newBehaviorData.shouldBindObjectAndForwardAngle
+      ) {
+        this.setShouldBindObjectAndForwardAngle(
+          newBehaviorData.shouldBindObjectAndForwardAngle
+        );
       }
       return true;
     }
@@ -318,8 +326,12 @@ namespace gdjs {
 
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       const { behavior } = this.getPhysics3D();
-      this.owner3D.setCenterXInScene(physicsPosition.GetX() * this._sharedData.worldScale);
-      this.owner3D.setCenterYInScene(physicsPosition.GetY() * this._sharedData.worldScale);
+      this.owner3D.setCenterXInScene(
+        physicsPosition.GetX() * this._sharedData.worldScale
+      );
+      this.owner3D.setCenterYInScene(
+        physicsPosition.GetY() * this._sharedData.worldScale
+      );
       this.owner3D.setZ(
         (physicsPosition.GetZ() - behavior.shapeHalfDepth) *
           this._sharedData.worldScale
@@ -541,15 +553,14 @@ namespace gdjs {
           this._stickForce *
           Math.sin(gdjs.toRad(this._stickAngle));
       }
-      this._currentForwardSpeed =
-        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
-          this._currentForwardSpeed,
-          targetedForwardSpeed,
-          this._forwardSpeedMax,
-          this._forwardAcceleration,
-          this._forwardDeceleration,
-          timeDelta
-        );
+      this._currentForwardSpeed = PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+        this._currentForwardSpeed,
+        targetedForwardSpeed,
+        this._forwardSpeedMax,
+        this._forwardAcceleration,
+        this._forwardDeceleration,
+        timeDelta
+      );
       /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedSidewaysSpeed = 0;
       if (this.hasPressedLeftKey !== this.hasPressedRightKey) {
@@ -564,15 +575,14 @@ namespace gdjs {
           this._stickForce *
           Math.cos(gdjs.toRad(this._stickAngle));
       }
-      this._currentSidewaysSpeed =
-        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
-          this._currentSidewaysSpeed,
-          targetedSidewaysSpeed,
-          this._sidewaysSpeedMax,
-          this._sidewaysAcceleration,
-          this._sidewaysDeceleration,
-          timeDelta
-        );
+      this._currentSidewaysSpeed = PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+        this._currentSidewaysSpeed,
+        targetedSidewaysSpeed,
+        this._sidewaysSpeedMax,
+        this._sidewaysAcceleration,
+        this._sidewaysDeceleration,
+        timeDelta
+      );
     }
 
     private static getAcceleratedSpeed(

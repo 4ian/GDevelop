@@ -203,7 +203,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
 
-    if (parentType == Type::Variable) {
+    if (parentType == Type::Variable ||
+        parentType == Type::VariableOrProperty ||
+        parentType == Type::VariableOrPropertyOrParameter) {
       childType = parentType;
 
       CheckVariableExistence(node.location, node.name);
@@ -216,7 +218,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (node.child) {
         node.child->Visit(*this);
       }
-    } else if (parentType == Type::String || parentType == Type::Number || parentType == Type::NumberOrString) {
+    } else if (parentType == Type::String || parentType == Type::Number ||
+               parentType == Type::NumberOrString) {
       // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
       childType = parentType;
 
@@ -336,11 +339,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             _("You must enter a number or a text, wrapped inside double quotes (example: \"Hello world\"), or a variable name."),
             node.location);
       }
-    }
-    else if (parentType == Type::Variable) {
+    } else if (parentType == Type::Variable ||
+               parentType == Type::VariableOrProperty ||
+               parentType == Type::VariableOrPropertyOrParameter) {
       CheckVariableExistence(node.location, node.identifierName);
-    }
-    else if (parentType != Type::Object && parentType != Type::LegacyVariable) {
+    } else if (parentType != Type::Object &&
+               parentType != Type::LegacyVariable) {
       // It can't happen.
       RaiseTypeError(
           _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
@@ -376,8 +380,19 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     childType = Type::Empty;
   }
 
- private:
-  enum Type {Unknown = 0, Number, String, NumberOrString, Variable, LegacyVariable, Object, Empty};
+private:
+  enum Type {
+    Unknown = 0,
+    Number,
+    String,
+    NumberOrString,
+    Variable,
+    LegacyVariable,
+    Object,
+    Empty,
+    VariableOrProperty,
+    VariableOrPropertyOrParameter
+  };
   Type ValidateFunction(const gd::FunctionCallNode& function);
   bool ValidateObjectVariableOrVariableOrProperty(const gd::IdentifierNode& identifier);
   bool ValidateObjectVariableOrVariableOrProperty(
@@ -402,19 +417,22 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           },
           [&]() {
             // This is a property.
-            // This error won't happen unless the priority is changed.
-            RaiseVariableNameCollisionError(
-                _("This variable has the same name as a property. Consider "
-                  "renaming one or the other."),
-                location, name);
+            if (parentType != Type::VariableOrProperty &&
+                parentType != Type::VariableOrPropertyOrParameter) {
+              RaiseVariableNameCollisionError(
+                  _("This variable has the same name as a property. Consider "
+                    "renaming one or the other."),
+                  location, name);
+            }
           },
           [&]() {
             // This is a parameter.
-            // This error won't happen unless the priority is changed.
-            RaiseVariableNameCollisionError(
-                _("This variable has the same name as a parameter. Consider "
-                  "renaming one or the other."),
-                location, name);
+            if (parentType != Type::VariableOrPropertyOrParameter) {
+              RaiseVariableNameCollisionError(
+                  _("This variable has the same name as a parameter. Consider "
+                    "renaming one or the other."),
+                  location, name);
+            }
           },
           [&]() {
             // This is something else.

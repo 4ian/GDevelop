@@ -177,6 +177,31 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the function **before** a parameter is renamed.
+   *
+   * \warning Do the renaming of the specified parameter after calling this.
+   * This is because the function is expected to have its old name for the
+   * refactoring.
+   */
+  static void
+  RenameParameter(gd::Project &project,
+                  gd::ProjectScopedContainers &projectScopedContainers,
+                  gd::EventsFunction &eventsFunction,
+                  const gd::ObjectsContainer &parameterObjectsContainer,
+                  const gd::String &oldParameterName,
+                  const gd::String &newParameterName);
+
+  /**
+   * \brief Refactor the function **after** a parameter has changed of type.
+   */
+  static void
+  ChangeParameterType(gd::Project &project,
+                      gd::ProjectScopedContainers &projectScopedContainers,
+                      gd::EventsFunction &eventsFunction,
+                      const gd::ObjectsContainer &parameterObjectsContainer,
+                      const gd::String &parameterName);
+
+  /**
    * \brief Refactor the project **before** an events function parameter
    * is moved.
    *
@@ -267,6 +292,26 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& oldPropertyName,
       const gd::String& newPropertyName);
+
+  /**
+   * \brief Refactor the project **after** a property of a behavior has
+   * changed of type.
+   */
+  static void ChangeEventsBasedBehaviorPropertyType(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::String &propertyName);
+
+  /**
+   * \brief Refactor the project **after** a property of an object has
+   * changed of type.
+   */
+  static void ChangeEventsBasedObjectPropertyType(
+      gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::String &propertyName);
 
   /**
    * \brief Add a behavior to an object and add required behaviors if necessary
@@ -529,6 +574,7 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project& project,
       const gd::ProjectScopedContainers &projectScopedContainers,
       gd::EventsFunction& eventsFunction,
+      const gd::ObjectsContainer &targetedObjectsContainer,
       const gd::String& oldName,
       const gd::String& newName,
       bool isObjectGroup);
@@ -649,6 +695,12 @@ class GD_CORE_API WholeProjectRefactorer {
   virtual ~WholeProjectRefactorer(){};
 
  private:
+  static void ObjectOrGroupRenamedInScene(gd::Project &project,
+                                          gd::Layout &scene,
+                                          const gd::ObjectsContainer &targetedObjectsContainer,
+                                          const gd::String &oldName,
+                                          const gd::String &newName,
+                                          bool isObjectGroup);
   static std::vector<gd::String> GetAssociatedExternalLayouts(
       gd::Project& project, gd::Layout& layout);
   static std::vector<gd::String>

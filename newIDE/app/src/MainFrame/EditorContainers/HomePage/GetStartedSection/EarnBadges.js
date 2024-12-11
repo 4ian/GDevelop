@@ -224,7 +224,11 @@ export const EarnBadges = ({
         forceMobileLayout={isMobileOrMediumWidth}
       >
         {badgesSlicedInArraysOfTwo.map((badges, index) => (
-          <ResponsiveLineStackLayout noMargin expand={onlyOneBadgeDisplayed}>
+          <ResponsiveLineStackLayout
+            noMargin
+            expand={onlyOneBadgeDisplayed}
+            key={`badge-line-${index}`}
+          >
             {badges.map(badge => (
               <BadgeItem
                 key={badge.id}

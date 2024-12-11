@@ -14,7 +14,7 @@ import {
 import SearchBar from '../UI/SearchBar';
 import { useDebounce } from '../Utils/UseDebounce';
 import {
-  getFuseSearchQueryForSimpleArray,
+  getFuseSearchQueryForMultipleKeys,
   sharedFuseConfiguration,
 } from '../UI/Search/UseSearchStructuredItem';
 import IconButton from '../UI/IconButton';
@@ -135,22 +135,25 @@ const getDashboardItemsToDisplay = ({
 |}): Array<DashboardItem> => {
   let itemsToDisplay: DashboardItem[] = allDashboardItems;
 
-  // Always order items, with or without search.
-  itemsToDisplay =
-    orderBy === 'totalSessions'
-      ? itemsToDisplay.sort(totalSessionsSort)
-      : orderBy === 'weeklySessions'
-      ? itemsToDisplay.sort(lastWeekSessionsSort)
-      : orderBy === 'lastModifiedAt'
-      ? itemsToDisplay.sort(lastModifiedAtSort)
-      : itemsToDisplay;
-
   if (searchText) {
     const searchResults = searchClient.search(
-      getFuseSearchQueryForSimpleArray(searchText)
+      getFuseSearchQueryForMultipleKeys(searchText, [
+        'game.gameName',
+        'projectFiles.fileMetadata.name',
+      ])
     );
     itemsToDisplay = searchResults.map(result => result.item);
   } else {
+    // Order items first.
+    itemsToDisplay =
+      orderBy === 'totalSessions'
+        ? itemsToDisplay.sort(totalSessionsSort)
+        : orderBy === 'weeklySessions'
+        ? itemsToDisplay.sort(lastWeekSessionsSort)
+        : orderBy === 'lastModifiedAt'
+        ? itemsToDisplay.sort(lastModifiedAtSort)
+        : itemsToDisplay;
+
     // If a project is opened and no search is performed, display it first.
     if (project) {
       const currentProjectId = project.getProjectUuid();

@@ -303,9 +303,13 @@ namespace gdjs {
 
     getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       const { behavior } = this.getPhysics3D();
+      // The character origin is at its feet:
+      // - the center is used for X and Y because Box3D origin is at the top-left corner
+      // - the origin is used for Z because, when the character is made smaller,
+      //   it must stay on the ground and not fell from its old size.
       result.Set(
-        this.owner3D.getX() * this._sharedData.worldInvScale,
-        this.owner3D.getY() * this._sharedData.worldInvScale,
+        this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
+        this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
         this.owner3D.getZ() * this._sharedData.worldInvScale +
           behavior.shapeHalfDepth
       );
@@ -314,8 +318,8 @@ namespace gdjs {
 
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       const { behavior } = this.getPhysics3D();
-      this.owner3D.setX(physicsPosition.GetX() * this._sharedData.worldScale);
-      this.owner3D.setY(physicsPosition.GetY() * this._sharedData.worldScale);
+      this.owner3D.setCenterXInScene(physicsPosition.GetX() * this._sharedData.worldScale);
+      this.owner3D.setCenterYInScene(physicsPosition.GetY() * this._sharedData.worldScale);
       this.owner3D.setZ(
         (physicsPosition.GetZ() - behavior.shapeHalfDepth) *
           this._sharedData.worldScale

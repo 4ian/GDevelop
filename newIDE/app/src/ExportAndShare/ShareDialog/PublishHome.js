@@ -73,7 +73,7 @@ const styles = {
   },
 };
 
-const getSectionLabel = ({ section }: { section: ExporterSection }) => {
+const getSectionLabel = ({ section }: {| section: ExporterSection |}) => {
   switch (section) {
     case 'browser':
       return <Trans>Browser</Trans>;

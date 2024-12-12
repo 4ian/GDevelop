@@ -361,7 +361,7 @@ export const updateBuild = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   buildId: string,
-  { name, description }: { name?: string, description?: string }
+  { name, description }: {| name?: string, description?: string |}
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>

@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -67,7 +66,7 @@ export default function EventsBasedBehaviorEditor({
 
   return (
     <I18n>
-      {({ i18n }: { i18n: I18nType }) => (
+      {({ i18n }) => (
         <ColumnStackLayout expand noMargin>
           <DismissableAlertMessage
             identifier="events-based-behavior-explanation"

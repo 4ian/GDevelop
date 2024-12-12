@@ -54,7 +54,7 @@ import { Tooltip } from '@material-ui/core';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
-export const getThumbnailWidth = ({ isMobile }: { isMobile: boolean }) =>
+export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
 
 const styles = {
@@ -176,6 +176,7 @@ const GameDashboardCard = ({
     : null;
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile, onOpenLoginDialog } = authenticatedUser;
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const {
     showAlert,
@@ -193,9 +194,8 @@ const GameDashboardCard = ({
   const gameName = game
     ? game.gameName
     : projectFileMetadataAndStorageProviderName
-    ? projectFileMetadataAndStorageProviderName.fileMetadata.name ||
-      'Unknown game'
-    : 'Unknown game';
+    ? projectFileMetadataAndStorageProviderName.fileMetadata.name
+    : null;
 
   const { isMobile, windowSize } = useResponsiveWindowSize();
   const isSmallOrMediumScreen =
@@ -268,7 +268,7 @@ const GameDashboardCard = ({
   const renderTitle = () => (
     <Line noMargin expand alignItems="center">
       <Text size="block-title" noMargin style={styles.title}>
-        {gameName}
+        {gameName || <Trans>Unknown game</Trans>}
       </Text>
       {projectsList.length > 0 && game && (
         <>
@@ -358,7 +358,7 @@ const GameDashboardCard = ({
 
   const renderThumbnail = () => (
     <GameThumbnail
-      gameName={gameName}
+      gameName={gameName || 'unknown game'}
       gameId={game ? game.id : undefined}
       thumbnailUrl={gameThumbnailUrl}
       background="light"
@@ -366,9 +366,8 @@ const GameDashboardCard = ({
     />
   );
 
-  const buildOpenContextMenu = (
-    i18n: I18nType,
-    projectsList: FileMetadataAndStorageProviderName[]
+  const buildOpenProjectContextMenu = (
+    i18n: I18nType
   ): Array<MenuItemTemplate> => {
     const actions = [];
     if (projectsList.length > 1) {
@@ -384,13 +383,20 @@ const GameDashboardCard = ({
               click: () => onOpenProject(fileMetadataAndStorageProviderName),
             };
           }),
-          { type: 'separator' },
-          {
-            label: i18n._(t`See all in the game dashboard`),
-            click: game ? () => onOpenGameManager({ game }) : undefined,
-          },
         ]
       );
+
+      if (game) {
+        actions.push(
+          ...[
+            { type: 'separator' },
+            {
+              label: i18n._(t`See all in the game dashboard`),
+              click: () => onOpenGameManager({ game }),
+            },
+          ]
+        );
+      }
     }
 
     return actions;
@@ -418,7 +424,11 @@ const GameDashboardCard = ({
           }
 
           // Management actions.
-          if (projectsList.length < 2) {
+          if (projectsList.length === 0) {
+            // No management possible, it's a game without a project found.
+          }
+
+          if (projectsList.length === 1) {
             const file = projectsList[0];
             if (file && file.storageProviderName === 'LocalFile') {
               actions.push({
@@ -426,7 +436,9 @@ const GameDashboardCard = ({
                 click: () => locateProjectFile(file),
               });
             }
-          } else {
+          }
+
+          if (projectsList.length > 1) {
             // If there are multiple projects, suggest opening the game dashboard.
             actions.push({
               label: i18n._(t`See all projects`),
@@ -437,14 +449,15 @@ const GameDashboardCard = ({
           // Delete actions.
           // Don't allow removing project if opened, as it would not result in any change in the list.
           // (because an opened project is always displayed)
-          if (!isCurrentProjectOpened && projectsList.length < 2) {
+          if (isCurrentProjectOpened || projectsList.length > 1) {
+            // No delete action possible.
+          } else {
             if (actions.length > 0) {
               actions.push({
                 type: 'separator',
               });
             }
 
-            const file = projectsList[0];
             actions.push({
               label: i18n._(t`Delete`),
               click: async () => {
@@ -473,6 +486,8 @@ const GameDashboardCard = ({
                 }
 
                 // If there is a project file (local or cloud), remove it.
+                // There can be only one here, thanks to the check above.
+                const file = projectsList[0];
                 if (file) {
                   if (file.storageProviderName === 'Cloud') {
                     await onDeleteCloudProject(file);
@@ -498,8 +513,8 @@ const GameDashboardCard = ({
         onOpenGameManager({ game });
         return;
       } else {
-        if (!authenticatedUser.profile) {
-          authenticatedUser.onOpenLoginDialog();
+        if (!profile) {
+          onOpenLoginDialog();
           return;
         }
         const answer = await showConfirmation({
@@ -523,11 +538,12 @@ const GameDashboardCard = ({
       onRegisterProject,
       projectsList,
       onRefreshGames,
-      authenticatedUser,
+      onOpenLoginDialog,
+      profile,
     ]
   );
 
-  const renderButtons = ({ fullWidth }: { fullWidth: boolean }) => {
+  const renderButtons = ({ fullWidth }: {| fullWidth: boolean |}) => {
     const openProjectLabel = isCurrentProjectOpened ? (
       <Trans>Save</Trans>
     ) : (
@@ -568,9 +584,7 @@ const GameDashboardCard = ({
               fullWidth={fullWidth}
               label={openProjectLabel}
               onClick={mainAction}
-              buildMenuTemplate={i18n =>
-                buildOpenContextMenu(i18n, projectsList)
-              }
+              buildMenuTemplate={i18n => buildOpenProjectContextMenu(i18n)}
               disabled={disabled || (isCurrentProjectOpened && !canSaveProject)}
             />
           )}

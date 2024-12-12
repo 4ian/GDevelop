@@ -124,7 +124,7 @@ class InstancesList extends Component<Props, State> {
     if (this.instanceRowRenderer) this.instanceRowRenderer.delete();
   }
 
-  _onRowClick = ({ index }: { index: number }) => {
+  _onRowClick = ({ index }: {| index: number |}) => {
     if (!this.renderedRows[index]) return;
 
     this.props.onSelectInstances(
@@ -133,11 +133,11 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
-  _rowGetter = ({ index }: { index: number }) => {
+  _rowGetter = ({ index }: {| index: number |}) => {
     return this.renderedRows[index];
   };
 
-  _rowClassName = ({ index }: { index: number }) => {
+  _rowClassName = ({ index }: {| index: number |}) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {

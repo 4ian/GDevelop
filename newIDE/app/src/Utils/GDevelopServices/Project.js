@@ -705,7 +705,7 @@ export const deleteProjectUserAcl = async (
 
 export const listProjectUserAcls = async (
   authenticatedUser: AuthenticatedUser,
-  { projectId }: { projectId: string }
+  { projectId }: {| projectId: string |}
 ): Promise<Array<ProjectUserAclWithEmail>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return [];

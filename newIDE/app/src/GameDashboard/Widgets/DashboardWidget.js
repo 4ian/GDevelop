@@ -24,6 +24,23 @@ const styles = {
   },
 };
 
+export type DashboardWidgetSize = 'full' | 'half' | 'oneThird' | 'twoThirds';
+
+const getGridSizeFromWidgetSize = (size: DashboardWidgetSize) => {
+  switch (size) {
+    case 'full':
+      return 12;
+    case 'half':
+      return 6;
+    case 'oneThird':
+      return 4;
+    case 'twoThirds':
+      return 8;
+    default:
+      return 12;
+  }
+};
+
 type GameDashboardWidgetName =
   | 'analytics'
   | 'feedback'
@@ -37,7 +54,7 @@ type Props = {|
   title: React.Node,
   topRightAction?: React.Node,
   renderSubtitle?: ?() => React.Node,
-  gridSize: number,
+  widgetSize: DashboardWidgetSize,
   children?: React.Node,
   minHeight?: boolean,
   widgetName: GameDashboardWidgetName,
@@ -46,7 +63,7 @@ type Props = {|
 const DashboardWidget = ({
   title,
   topRightAction,
-  gridSize,
+  widgetSize,
   renderSubtitle,
   children,
   minHeight,
@@ -54,7 +71,12 @@ const DashboardWidget = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
-    <Grid item sm={4 * gridSize} xs={12} {...dataObjectToProps({ widgetName })}>
+    <Grid
+      item
+      sm={getGridSizeFromWidgetSize(widgetSize)}
+      xs={12}
+      {...dataObjectToProps({ widgetName })}
+    >
       <Paper
         background="medium"
         style={{

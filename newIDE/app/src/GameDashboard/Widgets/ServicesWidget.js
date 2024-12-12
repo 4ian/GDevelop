@@ -39,7 +39,7 @@ const ServicesWidget = ({
   );
   return (
     <DashboardWidget
-      gridSize={3}
+      widgetSize={'full'}
       title={<Trans>Player services</Trans>}
       widgetName="services"
     >

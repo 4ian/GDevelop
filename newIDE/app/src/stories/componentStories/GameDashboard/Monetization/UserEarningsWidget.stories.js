@@ -30,7 +30,7 @@ export const Errored = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarningsWidget />
+      <UserEarningsWidget size="full" />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -58,7 +58,7 @@ export const NoEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarningsWidget />
+      <UserEarningsWidget size="full" />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -86,7 +86,7 @@ export const LittleEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarningsWidget />
+      <UserEarningsWidget size="full" />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -114,7 +114,7 @@ export const SomeEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarningsWidget />
+      <UserEarningsWidget size="full" />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -142,7 +142,7 @@ export const ALotOfEarnings = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      <UserEarningsWidget />
+      <UserEarningsWidget size="full" />
     </AuthenticatedUserContext.Provider>
   );
 };

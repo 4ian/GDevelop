@@ -29,7 +29,7 @@ type Props = {|
 const ProjectsWidget = (props: Props) => {
   return (
     <DashboardWidget
-      gridSize={3}
+      widgetSize={'full'}
       title={<Trans>Projects</Trans>}
       widgetName="projects"
     >

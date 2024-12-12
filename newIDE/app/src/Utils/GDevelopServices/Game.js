@@ -54,7 +54,7 @@ export type Game = {|
   categories?: string[],
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
-  updatedAt: number,
+  updatedAt?: number, // Some old games don't have this field
   publicWebBuildId?: ?string,
   description?: string,
   thumbnailUrl?: string,

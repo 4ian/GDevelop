@@ -60,7 +60,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
       <I18n>
         {({ i18n }) => (
           <DashboardWidget
-            gridSize={2}
+            widgetSize={'twoThirds'}
             minHeight
             title={<Trans>Analytics</Trans>}
             topRightAction={

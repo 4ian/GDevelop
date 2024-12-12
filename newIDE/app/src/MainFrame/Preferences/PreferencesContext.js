@@ -10,6 +10,7 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
+import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import { isWebGLSupported } from '../../Utils/WebGL';
@@ -224,6 +225,7 @@ export type PreferencesValues = {|
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
+  gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
 |};
 
@@ -323,6 +325,9 @@ export type Preferences = {|
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,
+  setGamesDashboardOrderBy: (
+    orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
+  ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
 |};
 
@@ -379,6 +384,7 @@ export const initialPreferences = {
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
+    gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
   },
   setLanguage: () => {},
@@ -450,6 +456,9 @@ export const initialPreferences = {
   setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
+  setGamesDashboardOrderBy: (
+    orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
+  ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
 };
 

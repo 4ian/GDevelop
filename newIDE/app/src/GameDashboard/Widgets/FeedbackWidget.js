@@ -48,7 +48,7 @@ const FeedbackWidget = ({
     <I18n>
       {({ i18n }) => (
         <DashboardWidget
-          gridSize={1}
+          widgetSize={'oneThird'}
           title={<Trans>Feedbacks</Trans>}
           topRightAction={
             !feedbacks || feedbacks.length === 0 ? null : (

@@ -46,14 +46,14 @@ const electron = optionalRequire('electron');
 
 const isDesktop = !!electron;
 
-export const pageSize = 10;
+const pageSize = 10;
 
 const styles = {
   noGameMessageContainer: { padding: 10 },
   refreshIconContainer: { fontSize: 20, display: 'flex', alignItems: 'center' },
 };
 
-type OrderBy = 'totalSessions' | 'weeklySessions' | 'lastModifiedAt';
+export type OrderBy = 'totalSessions' | 'weeklySessions' | 'lastModifiedAt';
 
 const totalSessionsSort = (
   itemA: DashboardItem,
@@ -203,19 +203,19 @@ const getDashboardItemsToDisplay = ({
         itemsToDisplay = [openedProjectDashboardItem, ...itemsToDisplay];
       }
     }
+
+    itemsToDisplay = itemsToDisplay.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
   }
 
-  const itemsWithoutUnsavedGames = itemsToDisplay.filter(
+  return itemsToDisplay.filter(
     item =>
       // Filter out unsaved games, unless they are the opened project.
       !item.game ||
       item.game.savedStatus !== 'draft' ||
       (project && item.game.id === project.getProjectUuid())
-  );
-
-  return itemsWithoutUnsavedGames.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
   );
 };
 
@@ -246,13 +246,18 @@ type Props = {|
   askToCloseProject: () => Promise<boolean>,
   onSaveProject: () => Promise<void>,
   canSaveProject: boolean,
-  currentPage: number,
-  onCurrentPageChange: (currentPage: number) => void,
   onDeleteCloudProject: (
     i18n: I18nType,
     file: FileMetadataAndStorageProviderName,
     options?: { skipConfirmation: boolean }
   ) => Promise<void>,
+  // Controls
+  currentPage: number,
+  setCurrentPage: (currentPage: number) => void,
+  orderBy: OrderBy,
+  setGamesListOrderBy: (orderBy: OrderBy) => void,
+  searchText: string,
+  setSearchText: (searchText: string) => void,
 |};
 
 const GamesList = ({
@@ -276,15 +281,15 @@ const GamesList = ({
   canSaveProject,
   // Make the page controlled, so that it can be saved when navigating to a game.
   currentPage,
-  onCurrentPageChange,
+  setCurrentPage,
+  orderBy,
+  setGamesListOrderBy,
+  searchText,
+  setSearchText,
 }: Props) => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );
-  const [orderBy, setGamesListOrderBy] = React.useState<OrderBy>(
-    'lastModifiedAt'
-  );
-  const [searchText, setSearchText] = React.useState<string>('');
   const { isMobile } = useResponsiveWindowSize();
 
   const allRecentProjectFiles = useProjectsListFor(null);
@@ -304,6 +309,22 @@ const GamesList = ({
       return [...projectFilesWithGame, ...projectFilesWithoutGame];
     },
     [games, allRecentProjectFiles]
+  );
+
+  const totalNumberOfPages = Math.ceil(allDashboardItems.length / pageSize);
+  const onCurrentPageChange = React.useCallback(
+    newPage => {
+      const minPage = 1;
+      const maxPage = totalNumberOfPages;
+      if (newPage < minPage) {
+        setCurrentPage(minPage);
+      } else if (newPage > maxPage) {
+        setCurrentPage(maxPage);
+      } else {
+        setCurrentPage(newPage);
+      }
+    },
+    [setCurrentPage, totalNumberOfPages]
   );
 
   const searchClient = React.useMemo(
@@ -467,60 +488,70 @@ const GamesList = ({
           </Line>
           {allDashboardItems.length > 0 && (
             <ResponsiveLineStackLayout expand noMargin alignItems="center">
-              <SearchBarSelectField
-                value={orderBy}
-                onChange={(e, i, value: string) =>
-                  // $FlowFixMe
-                  setGamesListOrderBy(value)
-                }
-              >
-                <SelectOption value="lastModifiedAt" label={t`Last modified`} />
-                <SelectOption
-                  value="totalSessions"
-                  label={t`Most sessions (all time)`}
+              <Column noMargin expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={setSearchText}
+                  // Search is triggered on each search text change
+                  onRequestSearch={() => {}}
+                  placeholder={t`Search by name`}
                 />
-                <SelectOption
-                  value="weeklySessions"
-                  label={t`Most sessions (past 7 days)`}
-                />
-              </SearchBarSelectField>
-              <Line noMargin expand alignItems="center">
-                <Column noMargin expand>
-                  <SearchBar
-                    value={searchText}
-                    onChange={setSearchText}
-                    // Search is triggered on each search text change
-                    onRequestSearch={() => {}}
-                    placeholder={t`Search by name`}
-                  />
-                </Column>
-                <IconButton
-                  tooltip={t`Previous page`}
-                  onClick={() => onCurrentPageChange(currentPage - 1)}
-                  disabled={!!searchText || currentPage === 1}
-                  size="small"
-                >
-                  <ChevronArrowLeft />
-                </IconButton>
-                <Text
-                  noMargin
-                  style={{
-                    opacity: searchText ? 0.6 : 1,
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {searchText ? 1 : currentPage}
-                </Text>
-                <IconButton
-                  tooltip={t`Next page`}
-                  onClick={() => onCurrentPageChange(currentPage + 1)}
-                  disabled={
-                    !!searchText || currentPage * pageSize >= games.length
+              </Column>
+              <Line noMargin justifyContent="space-between">
+                <SearchBarSelectField
+                  value={orderBy}
+                  onChange={(e, i, value: string) =>
+                    // $FlowFixMe
+                    setGamesListOrderBy(value)
                   }
-                  size="small"
                 >
-                  <ChevronArrowRight />
-                </IconButton>
+                  <SelectOption
+                    value="lastModifiedAt"
+                    label={t`Last modified`}
+                  />
+                  <SelectOption
+                    value="totalSessions"
+                    label={t`Most sessions (all time)`}
+                  />
+                  <SelectOption
+                    value="weeklySessions"
+                    label={t`Most sessions (past 7 days)`}
+                  />
+                </SearchBarSelectField>
+                <Line
+                  noMargin
+                  expand
+                  alignItems="center"
+                  justifyContent="flex-end"
+                >
+                  <IconButton
+                    tooltip={t`Previous page`}
+                    onClick={() => onCurrentPageChange(currentPage - 1)}
+                    disabled={!!searchText || currentPage === 1}
+                    size="small"
+                  >
+                    <ChevronArrowLeft />
+                  </IconButton>
+                  <Text
+                    noMargin
+                    style={{
+                      opacity: searchText ? 0.6 : 1,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {searchText || totalNumberOfPages === 1
+                      ? 1
+                      : `${currentPage}/${totalNumberOfPages}`}
+                  </Text>
+                  <IconButton
+                    tooltip={t`Next page`}
+                    onClick={() => onCurrentPageChange(currentPage + 1)}
+                    disabled={!!searchText || currentPage >= totalNumberOfPages}
+                    size="small"
+                  >
+                    <ChevronArrowRight />
+                  </IconButton>
+                </Line>
               </Line>
             </ResponsiveLineStackLayout>
           )}

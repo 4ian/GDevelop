@@ -73,14 +73,6 @@ import Paper from '../../UI/Paper';
 import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
-type Props = {|
-  onLoading: boolean => void,
-  project?: gdProject,
-  leaderboardIdToSelectAtOpening?: string,
-|};
-
-type ContainerProps = {| ...Props, gameId: string |};
-
 type ApiError = {|
   action:
     | 'entriesFetching'
@@ -186,6 +178,12 @@ const getSortOrderText = (currentLeaderboard: Leaderboard) => {
   }
   return <Trans>Higher is better</Trans>;
 };
+
+type Props = {|
+  onLoading: boolean => void,
+  project?: gdProject,
+  leaderboardIdToSelectAtOpening?: string,
+|};
 
 export const LeaderboardAdmin = ({
   onLoading,
@@ -1155,6 +1153,8 @@ export const LeaderboardAdmin = ({
     </I18n>
   );
 };
+
+type ContainerProps = {| ...Props, gameId: string |};
 
 const LeaderboardAdminContainer = ({
   gameId,

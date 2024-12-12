@@ -7,6 +7,7 @@ import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { EarnBadges } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
 import TextButton from '../../UI/TextButton';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   onOpenProfile: () => void,
@@ -32,7 +33,7 @@ const WalletWidget = ({
   return (
     <DashboardWidget
       gridSize={fullWidth ? 3 : 1}
-      title={null}
+      title={<Trans>Wallet</Trans>}
       topRightAction={
         <TextButton
           icon={<Coin fontSize="small" />}

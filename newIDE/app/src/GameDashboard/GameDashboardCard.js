@@ -50,6 +50,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
+import { Tooltip } from '@material-ui/core';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -269,19 +270,29 @@ const GameDashboardCard = ({
       {projectsList.length > 0 && game && (
         <>
           <Spacer />
-          <TextButton
-            onClick={() =>
-              onOpenGameManager({ game, widgetToScrollTo: 'projects' })
+          <Tooltip
+            title={
+              projectsList.length === 1 ? (
+                <Trans>{projectsList.length} project</Trans>
+              ) : (
+                <Trans>{projectsList.length} projects</Trans>
+              )
             }
-            icon={<FileWithLines style={styles.fileIcon} />}
-            label={
-              <Text noMargin color="secondary">
-                {projectsList.length}
-              </Text>
-            }
-            disabled={disabled}
-            style={styles.projectFilesButton}
-          />
+          >
+            <TextButton
+              onClick={() =>
+                onOpenGameManager({ game, widgetToScrollTo: 'projects' })
+              }
+              icon={<FileWithLines style={styles.fileIcon} />}
+              label={
+                <Text noMargin color="secondary">
+                  {projectsList.length}
+                </Text>
+              }
+              disabled={disabled}
+              style={styles.projectFilesButton}
+            />
+          </Tooltip>
         </>
       )}
     </Line>

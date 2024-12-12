@@ -61,7 +61,7 @@ const SocialShareButtons = ({ url }: Props) => {
         url={url}
         className={classNames.root}
         style={styles.icon}
-        quote={`Try the game I just created with GDevelop.io`}
+        // Quote has been deprecated by Facebook, we can't fill the text of the share dialog, only the hashtag.
         hashtag="#gdevelop"
       >
         <Facebook />

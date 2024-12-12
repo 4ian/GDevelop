@@ -11,6 +11,7 @@ import {
   registerGame,
   setGameUserAcls,
   type Game,
+  type SavedStatus,
 } from './GDevelopServices/Game';
 import { extractGDevelopApiErrorStatusAndCode } from './GDevelopServices/Errors';
 import { useMultiplayerLobbyConfigurator } from '../MainFrame/UseMultiplayerLobbyConfigurator';
@@ -23,17 +24,17 @@ export const getDefaultRegisterGameProperties = ({
   projectId,
   projectName,
   projectAuthor,
-  isProjectSaved,
+  savedStatus,
 }: {|
   projectId: string,
   projectName: ?string,
   projectAuthor: ?string,
-  isProjectSaved: boolean,
+  savedStatus: SavedStatus,
 |}) => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',
-  savedStatus: isProjectSaved ? 'saved' : 'draft',
+  savedStatus,
 });
 
 export type GameManager = {|
@@ -163,7 +164,7 @@ export const useGameManager = ({
               projectAuthor: project.getAuthor(),
               // Assume a project going through the export process is not saved yet.
               // It will be marked as saved when the user saves it next anyway.
-              isProjectSaved: false,
+              savedStatus: 'draft',
             })
           );
 

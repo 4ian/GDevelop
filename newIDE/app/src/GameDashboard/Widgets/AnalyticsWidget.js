@@ -22,10 +22,7 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import Link from '../../UI/Link';
 
-const publishingHelpLink = getHelpLink(
-  'gdevelop5/publishing',
-  'publish-your-game'
-);
+const publishingHelpLink = getHelpLink('/publishing', 'publish-your-game');
 
 const styles = { loadingSpace: { height: 100 } };
 

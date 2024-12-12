@@ -144,12 +144,6 @@ namespace gdjs {
       return tempVec3;
     }
 
-    private getRVec3(x: float, y: float, z: float): Jolt.RVec3 {
-      const tempRVec3 = this._sharedData._tempRVec3;
-      tempRVec3.Set(x, y, z);
-      return tempRVec3;
-    }
-
     getPhysics3D(): Physics3D {
       if (this._physics3D) {
         return this._physics3D;

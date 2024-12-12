@@ -555,8 +555,8 @@ const GameDashboardCard = ({
       ? () => onOpenProject(projectsList[0])
       : () => {
           showAlert({
-            title: t`No project found`,
-            message: t`We couldn't find a project for this game. You may have saved it in a different location? You can open it manually to get it linked to this game.`,
+            title: t`No project to open`,
+            message: t`Looks like your project isn't there!\n\nYou may be using a different computer or opening GDevelop on the web and your project is saved locally.`,
           });
         };
 

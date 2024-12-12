@@ -7,6 +7,7 @@ import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { dataObjectToProps } from '../../Utils/HTMLDataset';
 
 const padding = 16;
 const fixedHeight = 300;
@@ -53,7 +54,7 @@ const DashboardWidget = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
-    <Grid item sm={4 * gridSize} xs={12} data-widget-name={widgetName}>
+    <Grid item sm={4 * gridSize} xs={12} {...dataObjectToProps({ widgetName })}>
       <Paper
         background="medium"
         style={{

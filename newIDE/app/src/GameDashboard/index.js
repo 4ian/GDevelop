@@ -58,6 +58,8 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import ProjectsWidget from './Widgets/ProjectsWidget';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { formatISO, subDays } from 'date-fns';
+import { daysShownForYear } from './GameAnalyticsEvaluator';
 
 const styles = {
   mobileFooter: {
@@ -152,9 +154,9 @@ const GameDashboard = ({
   const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
     null
   );
-  const oneWeekAgo = React.useRef<Date>(
-    new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
-  );
+  const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
+    representation: 'date',
+  });
 
   const webBuilds = builds
     ? builds.filter(build => build.type === 'web-build')
@@ -474,7 +476,7 @@ const GameDashboard = ({
           getAuthorizationHeader,
           profile.id,
           game.id,
-          oneWeekAgo.current.toISOString()
+          lastYearIsoDate
         ),
         listGameActiveLeaderboards(getAuthorizationHeader, profile.id, game.id),
         getRecommendedMarketingPlan(getAuthorizationHeader, {
@@ -489,7 +491,13 @@ const GameDashboard = ({
       setLeaderboards(leaderboards);
       setRecommendedMarketingPlan(recommendedMarketingPlan);
     },
-    [fetchGameFeaturings, game.id, getAuthorizationHeader, profile]
+    [
+      fetchGameFeaturings,
+      game.id,
+      getAuthorizationHeader,
+      profile,
+      lastYearIsoDate,
+    ]
   );
 
   React.useEffect(

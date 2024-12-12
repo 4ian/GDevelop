@@ -36,13 +36,24 @@ type Props = {|
 const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const { isMobile } = useResponsiveWindowSize();
-  const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
-    gameMetrics,
-  ]);
+  const oneWeekAgoIsoDate = new Date(
+    new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000
+  ).toISOString();
   const [
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
+
+  const chartData = React.useMemo(
+    () => {
+      const lastWeekGameMetrics = gameMetrics
+        ? gameMetrics.filter(metrics => metrics.date > oneWeekAgoIsoDate)
+        : null;
+
+      return buildLastWeekChartData(lastWeekGameMetrics);
+    },
+    [gameMetrics, oneWeekAgoIsoDate]
+  );
 
   return (
     <>

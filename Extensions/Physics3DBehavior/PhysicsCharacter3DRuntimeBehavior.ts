@@ -984,8 +984,8 @@ namespace gdjs {
     setCurrentForwardSpeed(currentForwardSpeed: float): void {
       this._currentForwardSpeed = gdjs.evtTools.common.clamp(
         currentForwardSpeed,
-        -this._currentForwardSpeed,
-        this._currentForwardSpeed
+        -this._forwardSpeedMax,
+        this._forwardSpeedMax
       );
     }
 
@@ -1004,8 +1004,8 @@ namespace gdjs {
     setCurrentSidewaysSpeed(currentSidewaysSpeed: float): void {
       this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
         currentSidewaysSpeed,
-        -this._currentSidewaysSpeed,
-        this._currentSidewaysSpeed
+        -this._sidewaysSpeedMax,
+        this._sidewaysSpeedMax
       );
     }
 

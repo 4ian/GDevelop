@@ -98,7 +98,11 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
 
-  const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
+  const getTutorialPartProgress = ({
+    tutorialId,
+  }: {|
+    tutorialId: string,
+  |}) => {
     const tutorialProgress = getTutorialProgress({
       tutorialId,
       userId: authenticatedUser.profile

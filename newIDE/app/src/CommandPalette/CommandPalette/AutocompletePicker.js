@@ -55,7 +55,7 @@ type Item = NamedCommand | CommandOption | GoToWikiCommand;
 
 const HitPrimaryText = (
   hit: any,
-  { removeLastLevel }: { removeLastLevel: boolean }
+  { removeLastLevel }: {| removeLastLevel: boolean |}
 ) => {
   const classes = useStyles();
 

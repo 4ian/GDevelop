@@ -341,7 +341,7 @@ const SpritesList = ({
   );
 
   const onSortEnd = React.useCallback(
-    ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) => {
+    ({ oldIndex, newIndex }: {| oldIndex: number, newIndex: number |}) => {
       if (oldIndex === newIndex) return;
       // We store the selection value of the moved sprite, as its pointer will
       // be changed by the move.

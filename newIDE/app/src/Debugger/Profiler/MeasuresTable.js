@@ -89,7 +89,7 @@ const MeasuresTable = (props: Props) => {
     });
   };
 
-  const rowClassName = ({ index }: { index: number }) => {
+  const rowClassName = ({ index }: {| index: number |}) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -97,7 +97,11 @@ const MeasuresTable = (props: Props) => {
     }
   };
 
-  const renderSectionNameCell = ({ rowData }: { rowData: ProfilerRowData }) => {
+  const renderSectionNameCell = ({
+    rowData,
+  }: {|
+    rowData: ProfilerRowData,
+  |}) => {
     return (
       <div style={styles.indent}>
         <div style={{ width: rowData.depth * 8 }} />

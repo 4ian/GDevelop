@@ -71,7 +71,7 @@ const pushOrCreateKey = (
 const groupFeedbacks = (
   i18n: I18nType,
   feedbacks: Array<Comment>,
-  { build, date }: { build: boolean, date: boolean }
+  { build, date }: {| build: boolean, date: boolean |}
 ): { [buildIdOrDate: string]: Array<Comment> } => {
   const feedbacksByBuild = feedbacks.reduce((acc, feedback) => {
     if (build) {

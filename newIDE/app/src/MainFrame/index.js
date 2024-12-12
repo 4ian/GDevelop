@@ -1793,7 +1793,7 @@ const MainFrame = (props: Props) => {
       {
         openEventsEditor,
         openSceneEditor,
-      }: { openEventsEditor: boolean, openSceneEditor: boolean }
+      }: {| openEventsEditor: boolean, openSceneEditor: boolean |}
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
@@ -1821,7 +1821,7 @@ const MainFrame = (props: Props) => {
       {
         openEventsEditor = true,
         openSceneEditor = true,
-      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
+      }: {| openEventsEditor: boolean, openSceneEditor: boolean |} = {},
       editorTabs?: EditorTabsState
     ): void => {
       setState(state => ({

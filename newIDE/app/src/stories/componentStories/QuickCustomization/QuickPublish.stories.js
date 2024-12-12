@@ -50,7 +50,7 @@ const erroringOnlineWebExporter: Exporter = {
   exportPipeline: fakeErroringBrowserOnlineWebExportPipeline,
 };
 
-const Template = ({ children }: { children: React.Node }) => {
+const Template = ({ children }: {| children: React.Node |}) => {
   const fakeGame = fakeGameAndBuildsManager.game;
   if (!fakeGame)
     throw new Error(

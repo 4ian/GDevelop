@@ -148,7 +148,11 @@ const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
 
 // Customize scrollbar inside Dialog so that it gives a bit of space
 // to the content.
-const useStylesForDialogContent = ({ forceScroll }: { forceScroll: boolean }) =>
+const useStylesForDialogContent = ({
+  forceScroll,
+}: {|
+  forceScroll: boolean,
+|}) =>
   makeStyles({
     root: {
       ...(forceScroll ? { overflowY: 'scroll' } : {}), // Force a scrollbar to prevent layout shifts.

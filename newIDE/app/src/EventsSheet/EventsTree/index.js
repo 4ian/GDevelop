@@ -349,7 +349,7 @@ type EventsTreeProps = {|
 // event, except for the buttons at the bottom of the sheet and the tutorial.
 export type SortableTreeNode = {|
   // Necessary attributes for react-sortable-tree.
-  title: (node: { node: SortableTreeNode }) => Node,
+  title: (node: {| node: SortableTreeNode |}) => Node,
   children: Array<any>,
   expanded: boolean,
 
@@ -700,7 +700,7 @@ export default class ThemableEventsTree extends Component<
     }
   };
 
-  _onVisibilityToggle = ({ node }: { node: SortableTreeNode }) => {
+  _onVisibilityToggle = ({ node }: {| node: SortableTreeNode |}) => {
     const { event } = node;
     if (!event) return;
 
@@ -768,7 +768,7 @@ export default class ThemableEventsTree extends Component<
     this.forceEventsUpdate();
   };
 
-  _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
+  _getRowHeight = ({ node }: {| node: ?SortableTreeNode |}) => {
     if (!node) return 0;
     if (!node.event) return node.fixedHeight || 0;
 
@@ -787,7 +787,7 @@ export default class ThemableEventsTree extends Component<
     }
   };
 
-  _renderEvent = ({ node }: { node: SortableTreeNode }) => {
+  _renderEvent = ({ node }: {| node: SortableTreeNode |}) => {
     const { event, depth, disabled } = node;
     if (!event) return null;
     const { DragSourceAndDropTarget, DropTarget } = this;

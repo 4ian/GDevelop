@@ -75,7 +75,7 @@ const mockFailedApiDataForPublicAsset1 = [
   },
 ];
 
-const Wrapper = ({ children }: { children: React.Node }) => {
+const Wrapper = ({ children }: {| children: React.Node |}) => {
   const navigationState = useShopNavigation();
   return (
     <EventsFunctionsExtensionsContext.Provider

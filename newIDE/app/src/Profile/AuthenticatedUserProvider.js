@@ -1322,7 +1322,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  showUserSnackbar = ({ message }: { message: ?React.Node }) => {
+  showUserSnackbar = ({ message }: {| message: ?React.Node |}) => {
     this.setState({
       // The message is wrapped here to prevent crashes when Google Translate
       // translates the website. See https://github.com/4ian/GDevelop/issues/3453.

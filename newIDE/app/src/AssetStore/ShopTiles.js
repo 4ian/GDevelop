@@ -112,7 +112,7 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = ({ disabled }: { disabled?: boolean }) =>
+const useStylesForGridListItem = ({ disabled }: {| disabled?: boolean |}) =>
   makeStyles(theme =>
     createStyles({
       tile: !disabled

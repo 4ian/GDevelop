@@ -139,8 +139,8 @@ type Props = {|
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
-  onSelectCourse: (Course | null) => void,
-  courses: ?(Course[]),
+  course: ?Course,
+  onDisplayCourse: boolean => void,
   isLoadingChapters: boolean,
 |};
 
@@ -149,8 +149,8 @@ const MainPage = ({
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
-  onSelectCourse,
-  courses,
+  course,
+  onDisplayCourse,
   isLoadingChapters,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
@@ -203,11 +203,11 @@ const MainPage = ({
     <SectionContainer>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
-          {courses && (
+          {course && (
             <Line>
               <LeftLoader isLoading={isLoadingChapters}>
                 <RaisedButton
-                  onClick={() => onSelectCourse(courses[0])}
+                  onClick={() => onDisplayCourse(true)}
                   label={<Trans>See course</Trans>}
                 />
               </LeftLoader>

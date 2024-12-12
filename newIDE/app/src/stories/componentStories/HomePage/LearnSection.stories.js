@@ -44,10 +44,10 @@ export const Default = () => (
       >
         <LearnSection
           courseChapters={null}
-          courses={null}
-          selectedCourse={null}
+          course={null}
           isCourseTaskCompleted={() => false}
-          onSelectCourse={action('onSelectCourse')}
+          displayCourse={false}
+          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -80,10 +80,10 @@ export const NotAuthenticated = () => (
       >
         <LearnSection
           courseChapters={null}
-          courses={null}
-          selectedCourse={null}
+          course={null}
           isCourseTaskCompleted={() => false}
-          onSelectCourse={action('onSelectCourse')}
+          displayCourse={false}
+          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -118,10 +118,10 @@ export const EducationSubscriber = () => (
       >
         <LearnSection
           courseChapters={null}
-          courses={null}
-          selectedCourse={null}
+          course={null}
           isCourseTaskCompleted={() => false}
-          onSelectCourse={action('onSelectCourse')}
+          displayCourse={false}
+          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -156,10 +156,10 @@ export const EducationTeacher = () => (
       >
         <LearnSection
           courseChapters={null}
-          courses={null}
-          selectedCourse={null}
+          course={null}
           isCourseTaskCompleted={() => false}
-          onSelectCourse={action('onSelectCourse')}
+          displayCourse={false}
+          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -191,10 +191,10 @@ export const Loading = () => (
     >
       <LearnSection
         courseChapters={null}
-        courses={null}
-        selectedCourse={null}
+        course={null}
         isCourseTaskCompleted={() => false}
-        onSelectCourse={action('onSelectCourse')}
+        displayCourse={false}
+        onDisplayCourse={action('onDisplayCourse')}
         isLoadingChapters={false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}

@@ -126,10 +126,10 @@ type Props = {|
   initialCategory: TutorialCategory | null,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
-  courses: ?(Course[]),
-  selectedCourse: Course | null,
+  course: ?Course,
+  displayCourse: boolean,
+  onDisplayCourse: boolean => void,
   courseChapters: ?(CourseChapter[]),
-  onSelectCourse: (Course | null) => void,
   isLoadingChapters: boolean,
   onCompleteCourseTask: (
     chapterId: string,
@@ -150,10 +150,10 @@ const LearnSection = ({
   initialCategory,
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
-  courses,
-  selectedCourse,
+  displayCourse,
+  course,
   courseChapters,
-  onSelectCourse,
+  onDisplayCourse,
   isLoadingChapters,
   onCompleteCourseTask,
   isCourseTaskCompleted,
@@ -188,12 +188,12 @@ const LearnSection = ({
     [initialCategory]
   );
 
-  if (courseChapters && selectedCourse) {
+  if (displayCourse && courseChapters && course) {
     return (
       <CourseSection
-        course={selectedCourse}
+        course={course}
         courseChapters={courseChapters}
-        onBack={() => onSelectCourse(null)}
+        onBack={() => onDisplayCourse(false)}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
         onCompleteTask={onCompleteCourseTask}
         isTaskCompleted={isCourseTaskCompleted}
@@ -224,8 +224,8 @@ const LearnSection = ({
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
-      courses={courses}
-      onSelectCourse={onSelectCourse}
+      course={course}
+      onDisplayCourse={onDisplayCourse}
       isLoadingChapters={isLoadingChapters}
     />
   ) : (

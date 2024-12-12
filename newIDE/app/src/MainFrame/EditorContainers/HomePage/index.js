@@ -231,10 +231,8 @@ export const HomePage = React.memo<Props>(
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
       const {
-        courses,
         selectedCourse,
         courseChapters,
-        onSelectCourse,
         isLoadingChapters,
         onCompleteTask,
         isTaskCompleted,
@@ -242,6 +240,7 @@ export const HomePage = React.memo<Props>(
         getCourseCompletion,
         onBuyCourseChapterWithCredits,
       } = useCourses();
+      const [displayCourse, setDisplayCourse] = React.useState<boolean>(false);
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -536,9 +535,9 @@ export const HomePage = React.memo<Props>(
                         onOpenTemplateFromCourseChapter
                       }
                       initialCategory={learnInitialCategory}
-                      courses={courses}
-                      selectedCourse={selectedCourse}
-                      onSelectCourse={onSelectCourse}
+                      course={selectedCourse}
+                      displayCourse={displayCourse}
+                      onDisplayCourse={setDisplayCourse}
                       courseChapters={courseChapters}
                       isLoadingChapters={isLoadingChapters}
                       onCompleteCourseTask={onCompleteTask}

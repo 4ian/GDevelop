@@ -211,6 +211,7 @@ export type Course = {|
   shortDescriptionByLocale: MessageByLocale,
   freeChapters: number,
   chapterPriceInCredits: number,
+  chaptersTargetCount: number,
 |};
 
 export type UserCourseProgress = {|

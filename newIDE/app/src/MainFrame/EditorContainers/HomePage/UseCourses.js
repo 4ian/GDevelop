@@ -63,9 +63,6 @@ const useCourses = () => {
   const [isLoadingChapters, setIsLoadingChapters] = React.useState<boolean>(
     false
   );
-  const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(
-    null
-  );
   const [
     courseChapters,
     setCourseChapters,
@@ -76,6 +73,8 @@ const useCourses = () => {
     const fetchedCourses = await listCourses();
     setCourses(fetchedCourses);
   }, []);
+
+  const selectedCourse = courses ? courses[0] : null;
 
   const fetchCourseChapters = React.useCallback(
     async (courseId: string) => {
@@ -116,25 +115,13 @@ const useCourses = () => {
 
   React.useEffect(
     () => {
-      if (selectedCourse) {
-        fetchCourseChapters(selectedCourse.id);
-      } else {
+      if (!selectedCourse) {
         setCourseChapters(null);
-        setUserCourseProgressImmediately(null);
+        return;
       }
+      fetchCourseChapters(selectedCourse.id);
     },
-    /**
-     * Fetch chapters when:
-     * - Selected course changes
-     * - when user logs in/out
-     */
-    [
-      selectedCourse,
-      userId,
-      getAuthorizationHeader,
-      setUserCourseProgressImmediately,
-      fetchCourseChapters,
-    ]
+    [selectedCourse, fetchCourseChapters]
   );
 
   const onCompleteTask = React.useCallback(
@@ -337,7 +324,6 @@ const useCourses = () => {
     courses,
     courseChapters,
     selectedCourse,
-    onSelectCourse: setSelectedCourse,
     isLoadingChapters,
     onCompleteTask,
     isTaskCompleted,

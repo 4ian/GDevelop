@@ -57,6 +57,16 @@ import PublicGamePropertiesDialog, {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import ProjectsWidget from './Widgets/ProjectsWidget';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+
+const styles = {
+  mobileFooter: {
+    height: 150,
+  },
+  desktopFooter: {
+    height: 200,
+  },
+};
 
 export type GameDetailsTab =
   | 'details'
@@ -113,6 +123,7 @@ const GameDashboard = ({
   initialWidgetToScrollTo,
 }: Props) => {
   const grid = React.useRef<?HTMLDivElement>(null);
+  const { isMobile } = useResponsiveWindowSize();
   const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(
     initialWidgetToScrollTo
   );
@@ -599,6 +610,9 @@ const GameDashboard = ({
                     onSeeAllBuilds={() => setCurrentView('builds')}
                   />
                 </Grid>
+                <div
+                  style={isMobile ? styles.mobileFooter : styles.desktopFooter}
+                />
               </ColumnStackLayout>
             )}
           </Column>

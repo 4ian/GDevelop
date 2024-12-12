@@ -517,7 +517,7 @@ const CreateSection = ({
                 <GamesList
                   storageProviders={storageProviders}
                   project={project}
-                  games={games || []}
+                  games={games}
                   onRefreshGames={onRefreshGames}
                   onOpenGameManager={({
                     game,

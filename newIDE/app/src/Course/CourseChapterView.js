@@ -87,7 +87,6 @@ const styles = {
   videoContainer: {
     flex: 2,
     minWidth: 300,
-    maxWidth: 640,
     display: 'flex',
     position: 'relative',
   },
@@ -243,7 +242,12 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
         {courseChapter.isLocked ? (
           <div style={styles.videoAndMaterialsContainer}>
             {youtubeVideoId && (
-              <div style={styles.videoContainer}>
+              <div
+                style={{
+                  ...styles.videoContainer,
+                  maxWidth: windowSize === 'xlarge' ? 960 : 640,
+                }}
+              >
                 <img
                   alt={`Video for lesson ${courseChapter.title}`}
                   style={styles.videoThumbnail}
@@ -306,7 +310,12 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
         ) : (
           <div style={styles.videoAndMaterialsContainer}>
             {youtubeVideoId && (
-              <div style={styles.videoContainer}>
+              <div
+                style={{
+                  ...styles.videoContainer,
+                  maxWidth: windowSize === 'xlarge' ? 960 : 640,
+                }}
+              >
                 <iframe
                   title={`Video for lesson ${courseChapter.title}`}
                   type="text/html"
@@ -366,9 +375,9 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                 primary
                 label={
                   openTasks ? (
-                    <Trans>Close tasks</Trans>
+                    <Trans>Close all tasks</Trans>
                   ) : (
-                    <Trans>Open tasks</Trans>
+                    <Trans>Open all tasks</Trans>
                   )
                 }
                 leftIcon={

@@ -54,6 +54,9 @@ import { Tooltip } from '@material-ui/core';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
+export const getThumbnailWidth = ({ isMobile }: { isMobile: boolean }) =>
+  isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
+
 const styles = {
   buttonsContainer: {
     display: 'flex',
@@ -359,12 +362,7 @@ const GameDashboardCard = ({
       gameId={game ? game.id : undefined}
       thumbnailUrl={gameThumbnailUrl}
       background="light"
-      width={
-        isMobile
-          ? undefined
-          : // On medium/large screens, adapt the size to the width of the window.
-            Math.min(245, Math.max(130, window.innerWidth / 4))
-      }
+      width={getThumbnailWidth({ isMobile })}
     />
   );
 

@@ -5,7 +5,10 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import { type Game } from '../Utils/GDevelopServices/Game';
-import GameDashboardCard, { type DashboardItem } from './GameDashboardCard';
+import GameDashboardCard, {
+  getThumbnailWidth,
+  type DashboardItem,
+} from './GameDashboardCard';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -42,6 +45,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import optionalRequire from '../Utils/OptionalRequire';
 import TextButton from '../UI/TextButton';
+import Skeleton from '@material-ui/lab/Skeleton';
 const electron = optionalRequire('electron');
 
 const isDesktop = !!electron;
@@ -51,6 +55,10 @@ const pageSize = 10;
 const styles = {
   noGameMessageContainer: { padding: 10 },
   refreshIconContainer: { fontSize: 20, display: 'flex', alignItems: 'center' },
+  gameLoadingSkeleton: {
+    // Display a skeleton with the same aspect and border as the game card:
+    borderRadius: 8,
+  },
 };
 
 export type OrderBy = 'totalSessions' | 'weeklySessions' | 'lastModifiedAt';
@@ -127,12 +135,13 @@ const getDashboardItemsToDisplay = ({
 }: {|
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
-  allDashboardItems: Array<DashboardItem>,
+  allDashboardItems: ?Array<DashboardItem>,
   searchText: string,
   searchClient: Fuse,
   currentPage: number,
   orderBy: OrderBy,
-|}): Array<DashboardItem> => {
+|}): ?Array<DashboardItem> => {
+  if (!allDashboardItems) return null;
   let itemsToDisplay: DashboardItem[] = allDashboardItems;
 
   if (searchText) {
@@ -223,7 +232,7 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
-  games: Array<Game>,
+  games: ?Array<Game>,
   onRefreshGames: () => Promise<void>,
   onOpenGameManager: ({
     game: Game,
@@ -291,10 +300,12 @@ const GamesList = ({
     AuthenticatedUserContext
   );
   const { isMobile } = useResponsiveWindowSize();
+  const gameThumbnailWidth = getThumbnailWidth({ isMobile });
 
   const allRecentProjectFiles = useProjectsListFor(null);
-  const allDashboardItems: DashboardItem[] = React.useMemo(
+  const allDashboardItems: ?(DashboardItem[]) = React.useMemo(
     () => {
+      if (!games) return null;
       const projectFilesWithGame = games.map(game => {
         const projectFiles = allRecentProjectFiles.filter(
           file => file.fileMetadata.gameId === game.id
@@ -311,7 +322,9 @@ const GamesList = ({
     [games, allRecentProjectFiles]
   );
 
-  const totalNumberOfPages = Math.ceil(allDashboardItems.length / pageSize);
+  const totalNumberOfPages = allDashboardItems
+    ? Math.ceil(allDashboardItems.length / pageSize)
+    : 1;
   const onCurrentPageChange = React.useCallback(
     newPage => {
       const minPage = 1;
@@ -329,7 +342,7 @@ const GamesList = ({
 
   const searchClient = React.useMemo(
     () =>
-      new Fuse(allDashboardItems, {
+      new Fuse(allDashboardItems || [], {
         ...sharedFuseConfiguration,
         keys: [
           { name: 'game.gameName', weight: 1 },
@@ -339,9 +352,10 @@ const GamesList = ({
     [allDashboardItems]
   );
 
-  const [displayedDashboardItems, setDisplayedDashboardItems] = React.useState<
-    Array<DashboardItem>
-  >(
+  const [
+    displayedDashboardItems,
+    setDisplayedDashboardItems,
+  ] = React.useState<?Array<DashboardItem>>(
     getDashboardItemsToDisplay({
       project,
       currentFileMetadata,
@@ -443,18 +457,20 @@ const GamesList = ({
               <Text size="section-title" noMargin>
                 <Trans>Games</Trans>
               </Text>
-              {allDashboardItems.length > 0 && (
-                <IconButton
-                  size="small"
-                  onClick={refreshGamesList}
-                  disabled={isRefreshing}
-                  tooltip={t`Refresh games`}
-                >
-                  <div style={styles.refreshIconContainer}>
-                    <Refresh fontSize="inherit" />
-                  </div>
-                </IconButton>
-              )}
+              <IconButton
+                size="small"
+                onClick={refreshGamesList}
+                disabled={
+                  isRefreshing ||
+                  !allDashboardItems ||
+                  !allDashboardItems.length
+                }
+                tooltip={t`Refresh games`}
+              >
+                <div style={styles.refreshIconContainer}>
+                  <Refresh fontSize="inherit" />
+                </div>
+              </IconButton>
             </LineStackLayout>
             <LineStackLayout noMargin alignItems="center">
               <RaisedButton
@@ -486,7 +502,7 @@ const GamesList = ({
               )}
             </LineStackLayout>
           </Line>
-          {allDashboardItems.length > 0 && (
+          {allDashboardItems && allDashboardItems.length > 0 && (
             <ResponsiveLineStackLayout expand noMargin alignItems="center">
               <Column noMargin expand>
                 <SearchBar
@@ -555,7 +571,22 @@ const GamesList = ({
               </Line>
             </ResponsiveLineStackLayout>
           )}
-          {displayedDashboardItems.length > 0 ? (
+          {!displayedDashboardItems &&
+            Array.from({ length: pageSize }).map((_, i) => (
+              <Line key={i} expand>
+                <Skeleton
+                  variant="rect"
+                  height={
+                    gameThumbnailWidth
+                      ? (gameThumbnailWidth * 9) / 16
+                      : (window.innerWidth * 9) / 16
+                  }
+                  width="100%"
+                  style={styles.gameLoadingSkeleton}
+                />
+              </Line>
+            ))}
+          {displayedDashboardItems && displayedDashboardItems.length > 0 ? (
             displayedDashboardItems
               .map((dashboardItem, index) => {
                 const game = dashboardItem.game;

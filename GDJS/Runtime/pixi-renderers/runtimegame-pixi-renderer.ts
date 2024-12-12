@@ -90,16 +90,16 @@ namespace gdjs {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:
-              this._game.getAntialiasingMode() !== 'none' &&
-              (this._game.isAntialisingEnabledOnMobile() ||
-                  !gdjs.evtTools.common.isMobile()),
+            this._game.getAntialiasingMode() !== 'none' &&
+            (this._game.isAntialisingEnabledOnMobile() ||
+              !gdjs.evtTools.common.isMobile()),
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
-            this._game.getGameResolutionWidth(),
-            this._game.getGameResolutionHeight()
+          this._game.getGameResolutionWidth(),
+          this._game.getGameResolutionHeight()
         );
 
         // Create a PixiJS renderer that use the same GL context as Three.js

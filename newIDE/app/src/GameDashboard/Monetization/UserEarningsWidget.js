@@ -12,11 +12,14 @@ import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../../UI/PlaceholderError';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 import CreditOutDialog from './CashOutDialog';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import DashboardWidget from '../Widgets/DashboardWidget';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { getHelpLink } from '../../Utils/HelpLink';
+
+const monetizationHelpLink = getHelpLink('/monetization');
 
 const styles = {
   separator: {
@@ -51,7 +54,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
     ?'cash' | 'credits'
   >(null);
 
-  const fetchUserEarningsBalance = React.useCallback(
+  const animateEarnings = React.useCallback(
     async () => {
       if (!userEarningsBalance) return;
 
@@ -64,11 +67,11 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
         const steps = 30;
         const intervalTime = duration / steps;
 
-        const milliUsdIncrement = (targetMilliUsd - earningsInMilliUsd) / steps;
-        const creditsIncrement = (targetCredits - earningsInCredits) / steps;
+        const milliUsdIncrement = targetMilliUsd / steps;
+        const creditsIncrement = targetCredits / steps;
 
-        let currentMilliUsd = earningsInMilliUsd;
-        let currentCredits = earningsInCredits;
+        let currentMilliUsd = 0;
+        let currentCredits = 0;
         let step = 0;
 
         intervalValuesUpdate.current = setInterval(() => {
@@ -91,16 +94,14 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
         setError(error);
       }
     },
-    [userEarningsBalance, earningsInMilliUsd, earningsInCredits]
+    [userEarningsBalance]
   );
 
   React.useEffect(
     () => {
-      fetchUserEarningsBalance();
+      animateEarnings();
     },
-    // Fetch the earnings once on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [animateEarnings]
   );
 
   React.useEffect(
@@ -115,8 +116,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
 
   const onCashOrCreditOut = React.useCallback(
     async () => {
-      await onRefreshEarningsBalance();
-      await onRefreshLimits();
+      await Promise.all([onRefreshEarningsBalance(), onRefreshLimits()]);
     },
     [onRefreshEarningsBalance, onRefreshLimits]
   );
@@ -129,7 +129,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
     <LineStackLayout noMargin alignItems="center">
       <PlaceholderError onRetry={onRefreshEarningsBalance}>
         <Trans>
-          Can't load the total earnings. Verify your internet connection or try
+          Can't load your game earnings. Verify your internet connection or try
           again later.
         </Trans>
       </PlaceholderError>
@@ -143,12 +143,8 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
     >
       <BackgroundText align={isMobile ? 'center' : 'left'}>
         <Link
-          href="https://wiki.gdevelop.io/gdevelop5/monetization/"
-          onClick={() =>
-            Window.openExternalURL(
-              'https://wiki.gdevelop.io/gdevelop5/monetization/'
-            )
-          }
+          href={monetizationHelpLink}
+          onClick={() => Window.openExternalURL(monetizationHelpLink)}
         >
           <Trans>Learn about revenue on gd.games</Trans>
         </Link>

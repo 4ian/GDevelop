@@ -76,7 +76,7 @@ const ExampleStore = ({
   rowToInsert,
   hideSearch,
 }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
@@ -140,7 +140,7 @@ const ExampleStore = ({
   const resultTiles: React.Node[] = React.useMemo(
     () => {
       return getExampleAndTemplateTiles({
-        receivedGameTemplates: authenticatedUser.receivedGameTemplates,
+        receivedGameTemplates,
         privateGameTemplateListingDatas: privateGameTemplateListingDatasSearchResults
           ? privateGameTemplateListingDatasSearchResults
               .map(({ item }) => item)
@@ -187,7 +187,7 @@ const ExampleStore = ({
       }).allGridItems;
     },
     [
-      authenticatedUser,
+      receivedGameTemplates,
       privateGameTemplateListingDatasSearchResults,
       exampleShortHeadersSearchResults,
       onSelectPrivateGameTemplateListingData,

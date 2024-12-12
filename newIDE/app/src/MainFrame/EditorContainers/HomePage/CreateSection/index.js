@@ -193,7 +193,7 @@ const CreateSection = ({
         setOpenedGameId(null);
       }
     },
-    // Close game view is user logs out.
+    // Close game view if user logs out.
     [profile, openedGame, setOpenedGameId]
   );
 

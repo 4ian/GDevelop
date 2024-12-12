@@ -51,7 +51,7 @@ export const Default = () => (
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
-          getCourseCompletion={() => 0}
+          getCourseCompletion={() => null}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -87,7 +87,7 @@ export const NotAuthenticated = () => (
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
-          getCourseCompletion={() => 0}
+          getCourseCompletion={() => null}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -125,7 +125,7 @@ export const EducationSubscriber = () => (
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
-          getCourseCompletion={() => 0}
+          getCourseCompletion={() => null}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -163,7 +163,7 @@ export const EducationTeacher = () => (
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
-          getCourseCompletion={() => 0}
+          getCourseCompletion={() => null}
           initialCategory={null}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -198,7 +198,7 @@ export const Loading = () => (
         isLoadingChapters={false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}
-        getCourseCompletion={() => 0}
+        getCourseCompletion={() => null}
         initialCategory={null}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}

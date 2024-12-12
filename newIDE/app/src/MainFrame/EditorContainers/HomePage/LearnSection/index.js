@@ -26,7 +26,7 @@ import type {
   CourseChapter,
   Course,
 } from '../../../../Utils/GDevelopServices/Asset';
-import type { CourseChapterCompletion } from '../UseCourses';
+import type { CourseChapterCompletion, CourseCompletion } from '../UseCourses';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -140,7 +140,7 @@ type Props = {|
   getCourseChapterCompletion: (
     chapterId: string
   ) => CourseChapterCompletion | null,
-  getCourseCompletion: () => number | null,
+  getCourseCompletion: () => CourseCompletion | null,
   onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
@@ -225,9 +225,11 @@ const LearnSection = ({
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
       course={course}
+      courseChapters={courseChapters}
       onDisplayCourse={onDisplayCourse}
       isLoadingChapters={isLoadingChapters}
       getCourseCompletion={getCourseCompletion}
+      getCourseChapterCompletion={getCourseChapterCompletion}
     />
   ) : (
     <TutorialsCategoryPage

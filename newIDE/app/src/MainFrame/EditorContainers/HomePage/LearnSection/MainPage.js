@@ -13,8 +13,11 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
-import type { Course } from '../../../../Utils/GDevelopServices/Asset';
-import type { CourseCompletion } from '../UseCourses';
+import type {
+  Course,
+  CourseChapter,
+} from '../../../../Utils/GDevelopServices/Asset';
+import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import FlatButton from '../../../../UI/FlatButton';
 import {
   useResponsiveWindowSize,
@@ -140,9 +143,13 @@ type Props = {|
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
   course: ?Course,
+  courseChapters: ?(CourseChapter[]),
   onDisplayCourse: boolean => void,
   isLoadingChapters: boolean,
   getCourseCompletion: () => CourseCompletion | null,
+  getCourseChapterCompletion: (
+    chapterId: string
+  ) => CourseChapterCompletion | null,
 |};
 
 const MainPage = ({
@@ -151,9 +158,11 @@ const MainPage = ({
   tutorials,
   selectInAppTutorial,
   course,
+  courseChapters,
   onDisplayCourse,
   isLoadingChapters,
   getCourseCompletion,
+  getCourseChapterCompletion,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
@@ -205,10 +214,12 @@ const MainPage = ({
     <SectionContainer>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
-          {course && (
+          {course && courseChapters && (
             <CoursePreviewBanner
               course={course}
+              courseChapters={courseChapters}
               getCourseCompletion={getCourseCompletion}
+              getCourseChapterCompletion={getCourseChapterCompletion}
               onDisplayCourse={onDisplayCourse}
             />
           )}

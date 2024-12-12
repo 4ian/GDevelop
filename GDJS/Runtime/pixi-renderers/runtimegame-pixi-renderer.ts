@@ -81,21 +81,25 @@ namespace gdjs {
      */
     initializeForCanvas(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
+      this.initializeRenderers(gameCanvas);
+      this.initializeCanvas(gameCanvas);
+    }
 
+    initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
           antialias:
-            this._game.getAntialiasingMode() !== 'none' &&
-            (this._game.isAntialisingEnabledOnMobile() ||
-              !gdjs.evtTools.common.isMobile()),
+              this._game.getAntialiasingMode() !== 'none' &&
+              (this._game.isAntialisingEnabledOnMobile() ||
+                  !gdjs.evtTools.common.isMobile()),
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
+            this._game.getGameResolutionWidth(),
+            this._game.getGameResolutionHeight()
         );
 
         // Create a PixiJS renderer that use the same GL context as Three.js
@@ -130,7 +134,9 @@ namespace gdjs {
       // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
       this._pixiRenderer.plugins.accessibility.destroy();
       delete this._pixiRenderer.plugins.accessibility;
+    }
 
+    initializeCanvas(gameCanvas: HTMLCanvasElement): void {
       // Add the renderer view element to the DOM
       this._gameCanvas = gameCanvas;
 

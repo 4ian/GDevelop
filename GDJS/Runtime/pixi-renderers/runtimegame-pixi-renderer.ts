@@ -81,7 +81,11 @@ namespace gdjs {
      */
     initializeForCanvas(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
+      this.initializeRenderers(gameCanvas);
+      this.initializeCanvas(gameCanvas);
+    }
 
+    initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
@@ -130,7 +134,9 @@ namespace gdjs {
       // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
       this._pixiRenderer.plugins.accessibility.destroy();
       delete this._pixiRenderer.plugins.accessibility;
+    }
 
+    initializeCanvas(gameCanvas: HTMLCanvasElement): void {
       // Add the renderer view element to the DOM
       this._gameCanvas = gameCanvas;
 

@@ -39,6 +39,10 @@ export const NoGamesOrProjects = () => {
     getRecentProjectFiles: () => projectFiles,
   };
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
+  const [searchText, setSearchText] = React.useState('');
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -59,10 +63,14 @@ export const NoGamesOrProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
-          currentPage={1}
-          onCurrentPageChange={action('onCurrentPageChange')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
           onRegisterProject={action('onRegisterProject')}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          orderBy={orderBy}
+          setGamesListOrderBy={setOrderBy}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -89,6 +97,10 @@ export const WithOnlyGames = () => {
     getRecentProjectFiles: () => projectFiles,
   };
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
+  const [searchText, setSearchText] = React.useState('');
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -109,10 +121,14 @@ export const WithOnlyGames = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
-          currentPage={1}
-          onCurrentPageChange={action('onCurrentPageChange')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
           onRegisterProject={action('onRegisterProject')}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          orderBy={orderBy}
+          setGamesListOrderBy={setOrderBy}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -134,6 +150,10 @@ export const WithOnlyProjects = () => {
     getRecentProjectFiles: () => projectFiles,
   };
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
+  const [searchText, setSearchText] = React.useState('');
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -154,10 +174,14 @@ export const WithOnlyProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
-          currentPage={1}
-          onCurrentPageChange={action('onCurrentPageChange')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
           onRegisterProject={action('onRegisterProject')}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          orderBy={orderBy}
+          setGamesListOrderBy={setOrderBy}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>
@@ -186,6 +210,10 @@ export const WithGamesAndProjects = () => {
     getRecentProjectFiles: () => projectFiles,
   };
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
+  const [searchText, setSearchText] = React.useState('');
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -206,10 +234,14 @@ export const WithGamesAndProjects = () => {
           onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
           onSaveProject={action('onSaveProject')}
           onUnregisterGame={action('onUnregisterGame')}
-          currentPage={1}
-          onCurrentPageChange={action('onCurrentPageChange')}
           onDeleteCloudProject={action('onDeleteCloudProject')}
           onRegisterProject={action('onRegisterProject')}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          orderBy={orderBy}
+          setGamesListOrderBy={setOrderBy}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
       </AuthenticatedUserContext.Provider>
     </PreferencesContext.Provider>

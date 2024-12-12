@@ -34,9 +34,11 @@ type Props = {|
 |};
 
 const UserEarningsWidget = ({ fullWidth }: Props) => {
-  const { userEarningsBalance, onRefreshEarningsBalance } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    userEarningsBalance,
+    onRefreshEarningsBalance,
+    onRefreshLimits,
+  } = React.useContext(AuthenticatedUserContext);
   const theme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -109,6 +111,14 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
       }
     },
     []
+  );
+
+  const onCashOrCreditOut = React.useCallback(
+    async () => {
+      await onRefreshEarningsBalance();
+      await onRefreshLimits();
+    },
+    [onRefreshEarningsBalance, onRefreshLimits]
   );
 
   const canCashout =
@@ -222,7 +232,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
     <>
       <DashboardWidget
         gridSize={fullWidth ? 3 : 2}
-        title={null}
+        title={<Trans>Game earnings</Trans>}
         widgetName="earnings"
       >
         {content}
@@ -231,7 +241,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
         <CreditOutDialog
           userEarningsBalance={userEarningsBalance}
           onClose={() => setSelectedCashOutType(null)}
-          onSuccess={onRefreshEarningsBalance}
+          onSuccess={onCashOrCreditOut}
           type={selectedCashOutType}
         />
       )}

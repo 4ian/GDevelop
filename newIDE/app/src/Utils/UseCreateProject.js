@@ -171,10 +171,12 @@ const useCreateProject = ({
                 projectName: currentProject.getName(),
                 projectAuthor: currentProject.getAuthor(),
                 // Project is saved if choosing cloud or local storage provider.
-                isProjectSaved:
+                savedStatus:
                   newProjectSetup.storageProvider.internalName ===
                     'LocalFile' ||
-                  newProjectSetup.storageProvider.internalName === 'Cloud',
+                  newProjectSetup.storageProvider.internalName === 'Cloud'
+                    ? 'saved'
+                    : 'draft',
               })
             );
             await onGameRegistered();

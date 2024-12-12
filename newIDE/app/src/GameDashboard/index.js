@@ -435,8 +435,8 @@ const GameDashboard = ({
     [initialWidgetToScrollTo, widgetToScrollTo]
   );
 
-  React.useEffect(
-    () => {
+  const fetchAuthenticatedData = React.useCallback(
+    async () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
@@ -447,46 +447,45 @@ const GameDashboard = ({
         return;
       }
 
-      const fetchAuthenticatedData = async () => {
-        const [
-          feedbacks,
-          builds,
-          gameRollingMetrics,
-          leaderboards,
-          recommendedMarketingPlan,
-        ] = await Promise.all([
-          listComments(getAuthorizationHeader, profile.id, {
-            gameId: game.id,
-            type: 'FEEDBACK',
-          }),
-          getBuilds(getAuthorizationHeader, profile.id, game.id),
-          getGameMetricsFrom(
-            getAuthorizationHeader,
-            profile.id,
-            game.id,
-            oneWeekAgo.current.toISOString()
-          ),
-          listGameActiveLeaderboards(
-            getAuthorizationHeader,
-            profile.id,
-            game.id
-          ),
-          getRecommendedMarketingPlan(getAuthorizationHeader, {
-            gameId: game.id,
-            userId: profile.id,
-          }),
-          fetchGameFeaturings(),
-        ]);
-        setFeedbacks(feedbacks);
-        setBuilds(builds);
-        setGameMetrics(gameRollingMetrics);
-        setLeaderboards(leaderboards);
-        setRecommendedMarketingPlan(recommendedMarketingPlan);
-      };
+      const [
+        feedbacks,
+        builds,
+        gameRollingMetrics,
+        leaderboards,
+        recommendedMarketingPlan,
+      ] = await Promise.all([
+        listComments(getAuthorizationHeader, profile.id, {
+          gameId: game.id,
+          type: 'FEEDBACK',
+        }),
+        getBuilds(getAuthorizationHeader, profile.id, game.id),
+        getGameMetricsFrom(
+          getAuthorizationHeader,
+          profile.id,
+          game.id,
+          oneWeekAgo.current.toISOString()
+        ),
+        listGameActiveLeaderboards(getAuthorizationHeader, profile.id, game.id),
+        getRecommendedMarketingPlan(getAuthorizationHeader, {
+          gameId: game.id,
+          userId: profile.id,
+        }),
+        fetchGameFeaturings(),
+      ]);
+      setFeedbacks(feedbacks);
+      setBuilds(builds);
+      setGameMetrics(gameRollingMetrics);
+      setLeaderboards(leaderboards);
+      setRecommendedMarketingPlan(recommendedMarketingPlan);
+    },
+    [fetchGameFeaturings, game.id, getAuthorizationHeader, profile]
+  );
 
+  React.useEffect(
+    () => {
       fetchAuthenticatedData();
     },
-    [getAuthorizationHeader, profile, fetchGameFeaturings, game.id]
+    [fetchAuthenticatedData]
   );
 
   const onClickBack = React.useCallback(
@@ -494,10 +493,12 @@ const GameDashboard = ({
       if (currentView === 'details') {
         onBack();
       } else {
+        // Refresh the data when going back to the main view.
+        fetchAuthenticatedData();
         setCurrentView('details');
       }
     },
-    [currentView, onBack, setCurrentView]
+    [currentView, onBack, setCurrentView, fetchAuthenticatedData]
   );
 
   return (

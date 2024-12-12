@@ -245,7 +245,7 @@ export const replaceLeaderboardsInProject = async ({
         projectName: project.getName(),
         projectAuthor: project.getAuthor(),
         // Assume the project is not saved at this stage.
-        isProjectSaved: false,
+        savedStatus: 'draft',
       })
     );
   } catch (error) {

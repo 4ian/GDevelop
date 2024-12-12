@@ -25,6 +25,12 @@ export type CourseChapterCompletion = {|
   tasks: number,
 |};
 
+export type CourseCompletion = {|
+  percentage: number,
+  completedChapters: number,
+  chapters: number,
+|};
+
 const useCourses = () => {
   const {
     profile,
@@ -212,12 +218,15 @@ const useCourses = () => {
   );
 
   const getCourseCompletion = React.useCallback(
-    (): number | null => {
-      if (!courseChapters) return null;
-      if (!userCourseProgress) return 0;
+    (): CourseCompletion | null => {
+      if (!courseChapters || !selectedCourse) return null;
+      const chaptersCount = selectedCourse.chaptersTargetCount;
+      if (!userCourseProgress)
+        return { percentage: 0, completedChapters: 0, chapters: chaptersCount };
 
       let completion = 0;
-      const chapterProportion = 1 / courseChapters.length;
+      let completedChapters = 0;
+      const chapterProportion = 1 / chaptersCount;
       courseChapters.forEach(chapter => {
         if (chapter.isLocked) return;
 
@@ -226,14 +235,22 @@ const useCourses = () => {
         );
         if (!chapterProgress) return;
 
+        const isChapterCompleted =
+          chapterProgress.completedTasks.length >= chapter.tasks.length;
+        if (isChapterCompleted) completedChapters++;
+
         completion +=
           (chapterProgress.completedTasks.length / chapter.tasks.length) *
           chapterProportion;
       });
 
-      return completion;
+      return {
+        percentage: completion,
+        chapters: chaptersCount,
+        completedChapters,
+      };
     },
-    [userCourseProgress, courseChapters]
+    [userCourseProgress, courseChapters, selectedCourse]
   );
 
   const onBuyCourseChapterWithCredits = React.useCallback(

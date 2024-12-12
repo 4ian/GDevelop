@@ -19,7 +19,7 @@ import Help from '../../../../UI/CustomSvgIcons/Help';
 import RaisedButton from '../../../../UI/RaisedButton';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import type { CourseChapterCompletion } from '../UseCourses';
+import type { CourseChapterCompletion, CourseCompletion } from '../UseCourses';
 import CheckCircle from '../../../../UI/CustomSvgIcons/CheckCircle';
 import LinearProgress from '../../../../UI/LinearProgress';
 import AlertMessage from '../../../../UI/AlertMessage';
@@ -92,7 +92,7 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
-  getCourseCompletion: () => number | null,
+  getCourseCompletion: () => CourseCompletion | null,
   onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
@@ -302,7 +302,7 @@ const CourseSection = ({
                       {courseCompletion !== null && (
                         <Line noMargin>
                           <LinearProgress
-                            value={courseCompletion * 100}
+                            value={courseCompletion.percentage * 100}
                             variant="determinate"
                             style={styles.progress}
                             color="success"
@@ -363,7 +363,7 @@ const CourseSection = ({
                       {courseCompletion !== null && (
                         <Line noMargin expand alignItems="center">
                           <LinearProgress
-                            value={courseCompletion * 100}
+                            value={courseCompletion.percentage * 100}
                             variant="determinate"
                             style={styles.progress}
                             color="success"

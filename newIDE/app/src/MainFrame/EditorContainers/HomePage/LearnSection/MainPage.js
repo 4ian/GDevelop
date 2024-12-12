@@ -14,7 +14,7 @@ import {
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import type { Course } from '../../../../Utils/GDevelopServices/Asset';
-
+import type { CourseCompletion } from '../UseCourses';
 import FlatButton from '../../../../UI/FlatButton';
 import {
   useResponsiveWindowSize,
@@ -39,7 +39,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import Help from '../../../../UI/CustomSvgIcons/Help';
 import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
-import LeftLoader from '../../../../UI/LeftLoader';
+import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -142,6 +142,7 @@ type Props = {|
   course: ?Course,
   onDisplayCourse: boolean => void,
   isLoadingChapters: boolean,
+  getCourseCompletion: () => CourseCompletion | null,
 |};
 
 const MainPage = ({
@@ -152,6 +153,7 @@ const MainPage = ({
   course,
   onDisplayCourse,
   isLoadingChapters,
+  getCourseCompletion,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
@@ -204,14 +206,11 @@ const MainPage = ({
       <SectionRow>
         <ColumnStackLayout noMargin expand>
           {course && (
-            <Line>
-              <LeftLoader isLoading={isLoadingChapters}>
-                <RaisedButton
-                  onClick={() => onDisplayCourse(true)}
-                  label={<Trans>See course</Trans>}
-                />
-              </LeftLoader>
-            </Line>
+            <CoursePreviewBanner
+              course={course}
+              getCourseCompletion={getCourseCompletion}
+              onDisplayCourse={onDisplayCourse}
+            />
           )}
           <Line noMargin>
             <GridList

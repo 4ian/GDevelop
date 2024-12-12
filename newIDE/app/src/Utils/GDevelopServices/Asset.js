@@ -209,8 +209,8 @@ export type Course = {|
   id: string,
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
-  freeChapters: number,
-  chapterPriceInCredits: number,
+  levelByLocale: MessageByLocale,
+  durationInWeeks: number,
   chaptersTargetCount: number,
 |};
 

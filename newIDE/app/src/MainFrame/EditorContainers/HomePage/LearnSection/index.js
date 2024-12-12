@@ -227,6 +227,7 @@ const LearnSection = ({
       course={course}
       onDisplayCourse={onDisplayCourse}
       isLoadingChapters={isLoadingChapters}
+      getCourseCompletion={getCourseCompletion}
     />
   ) : (
     <TutorialsCategoryPage

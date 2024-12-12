@@ -15,7 +15,9 @@ import PlaceholderError from '../../UI/PlaceholderError';
 import Tooltip from '@material-ui/core/Tooltip';
 import CreditOutDialog from './CashOutDialog';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import DashboardWidget from '../Widgets/DashboardWidget';
+import DashboardWidget, {
+  type DashboardWidgetSize,
+} from '../Widgets/DashboardWidget';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { getHelpLink } from '../../Utils/HelpLink';
 
@@ -33,10 +35,10 @@ const styles = {
 };
 
 type Props = {|
-  fullWidth?: boolean,
+  size: DashboardWidgetSize,
 |};
 
-const UserEarningsWidget = ({ fullWidth }: Props) => {
+const UserEarningsWidget = ({ size }: Props) => {
   const {
     userEarningsBalance,
     onRefreshEarningsBalance,
@@ -227,7 +229,7 @@ const UserEarningsWidget = ({ fullWidth }: Props) => {
   return (
     <>
       <DashboardWidget
-        gridSize={fullWidth ? 3 : 2}
+        widgetSize={size}
         title={<Trans>Game earnings</Trans>}
         widgetName="earnings"
       >

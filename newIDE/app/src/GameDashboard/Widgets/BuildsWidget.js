@@ -32,7 +32,7 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
 
   return (
     <DashboardWidget
-      gridSize={3}
+      widgetSize={'full'}
       title={<Trans>Exports</Trans>}
       topRightAction={
         <FlatButton

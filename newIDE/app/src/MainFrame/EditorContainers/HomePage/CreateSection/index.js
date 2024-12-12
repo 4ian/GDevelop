@@ -6,7 +6,7 @@ import { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import GamesList, { type OrderBy } from '../../../../GameDashboard/GamesList';
+import GamesList from '../../../../GameDashboard/GamesList';
 import {
   deleteGame,
   registerGame,
@@ -198,9 +198,6 @@ const CreateSection = ({
   );
 
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [orderBy, setGamesListOrderBy] = React.useState<OrderBy>(
-    'lastModifiedAt'
-  );
   const [searchText, setSearchText] = React.useState<string>('');
 
   const onUnregisterGame = React.useCallback(
@@ -500,17 +497,31 @@ const CreateSection = ({
                 {hidePerformanceDashboard ? null : hasAProjectOpenedOrSavedOrGameRegistered ? (
                   <ColumnStackLayout noMargin>
                     <Grid container spacing={2}>
-                      <UserEarningsWidget fullWidth={isMobileOrMediumWidth} />
+                      <UserEarningsWidget
+                        size={
+                          isMobile && isLandscape
+                            ? 'half'
+                            : isMobileOrMediumWidth
+                            ? 'full'
+                            : 'twoThirds'
+                        }
+                      />
                       <WalletWidget
                         onOpenProfile={onOpenProfile}
                         showRandomBadge
-                        fullWidth={isMobileOrMediumWidth}
+                        size={
+                          isMobile && isLandscape
+                            ? 'half'
+                            : isMobileOrMediumWidth
+                            ? 'full'
+                            : 'oneThird'
+                        }
                       />
                     </Grid>
                   </ColumnStackLayout>
                 ) : (
                   <Grid container spacing={2}>
-                    <WalletWidget onOpenProfile={onOpenProfile} fullWidth />
+                    <WalletWidget onOpenProfile={onOpenProfile} size="full" />
                   </Grid>
                 )}
                 <LargeSpacer />
@@ -545,8 +556,6 @@ const CreateSection = ({
                   // Controls
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
-                  orderBy={orderBy}
-                  setGamesListOrderBy={setGamesListOrderBy}
                   searchText={searchText}
                   setSearchText={setSearchText}
                 />

@@ -84,13 +84,19 @@ const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
 };
 
 const getFileNameWithoutExtensionFromPath = (path: string) => {
-  const fileName = path.split('/').pop();
-  return fileName
-    ? fileName
-        .split('.')
-        .slice(0, -1)
-        .join('.')
-    : '';
+  // Normalize path separators for cross-platform compatibility
+  const normalizedPath = path.replace(/\\/g, '/');
+
+  // Extract file name
+  const fileName = normalizedPath.split('/').pop();
+
+  // Handle dotfiles and files without extensions
+  if (fileName) {
+    const parts = fileName.split('.');
+    return parts.length > 1 ? parts.slice(0, -1).join('.') : fileName;
+  }
+
+  return '';
 };
 
 const getProjectItemLabel = (
@@ -197,7 +203,7 @@ const GameDashboardCard = ({
     ? projectFileMetadataAndStorageProviderName.fileMetadata.name
     : null;
 
-  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const { isMobile, windowSize, isLandscape } = useResponsiveWindowSize();
   const isSmallOrMediumScreen =
     windowSize === 'small' || windowSize === 'medium';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -318,7 +324,7 @@ const GameDashboardCard = ({
           <Trans>Last edited:</Trans>
         </Text>
         <Text color="secondary" noMargin size="body-small">
-          {i18n.date(game.updatedAt * 1000)}
+          {i18n.date((game.updatedAt || 0) * 1000)}
         </Text>
       </LineStackLayout>
     ) : null;
@@ -609,7 +615,7 @@ const GameDashboardCard = ({
           isHighlighted={isCurrentProjectOpened}
           padding={isMobile ? 8 : 16}
         >
-          {isMobile ? (
+          {isMobile && !isLandscape ? (
             <ColumnStackLayout>
               <Column noMargin>
                 <LineStackLayout noMargin justifyContent="space-between">

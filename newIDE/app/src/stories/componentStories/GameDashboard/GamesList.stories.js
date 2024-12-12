@@ -40,7 +40,6 @@ export const NoGamesOrProjects = () => {
   };
 
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
   const [searchText, setSearchText] = React.useState('');
 
   return (
@@ -67,8 +66,6 @@ export const NoGamesOrProjects = () => {
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          orderBy={orderBy}
-          setGamesListOrderBy={setOrderBy}
           searchText={searchText}
           setSearchText={setSearchText}
         />
@@ -98,7 +95,6 @@ export const WithOnlyGames = () => {
   };
 
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
   const [searchText, setSearchText] = React.useState('');
 
   return (
@@ -125,8 +121,6 @@ export const WithOnlyGames = () => {
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          orderBy={orderBy}
-          setGamesListOrderBy={setOrderBy}
           searchText={searchText}
           setSearchText={setSearchText}
         />
@@ -151,7 +145,6 @@ export const WithOnlyProjects = () => {
   };
 
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
   const [searchText, setSearchText] = React.useState('');
 
   return (
@@ -178,8 +171,6 @@ export const WithOnlyProjects = () => {
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          orderBy={orderBy}
-          setGamesListOrderBy={setOrderBy}
           searchText={searchText}
           setSearchText={setSearchText}
         />
@@ -211,7 +202,6 @@ export const WithGamesAndProjects = () => {
   };
 
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [orderBy, setOrderBy] = React.useState('lastModifiedAt');
   const [searchText, setSearchText] = React.useState('');
 
   return (
@@ -238,8 +228,6 @@ export const WithGamesAndProjects = () => {
           onRegisterProject={action('onRegisterProject')}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          orderBy={orderBy}
-          setGamesListOrderBy={setOrderBy}
           searchText={searchText}
           setSearchText={setSearchText}
         />

@@ -46,6 +46,7 @@ import Refresh from '../UI/CustomSvgIcons/Refresh';
 import optionalRequire from '../Utils/OptionalRequire';
 import TextButton from '../UI/TextButton';
 import Skeleton from '@material-ui/lab/Skeleton';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const electron = optionalRequire('electron');
 
 const isDesktop = !!electron;
@@ -61,7 +62,10 @@ const styles = {
   },
 };
 
-export type OrderBy = 'totalSessions' | 'weeklySessions' | 'lastModifiedAt';
+export type GamesDashboardOrderBy =
+  | 'totalSessions'
+  | 'weeklySessions'
+  | 'lastModifiedAt';
 
 const totalSessionsSort = (
   itemA: DashboardItem,
@@ -87,7 +91,7 @@ const getDashboardItemLastModifiedAt = (item: DashboardItem): number => {
     );
   }
   // Then the game, if any.
-  return (item.game && item.game.updatedAt * 1000) || 0;
+  return (item.game && (item.game.updatedAt || 0) * 1000) || 0;
 };
 
 const lastModifiedAtSort = (
@@ -139,7 +143,7 @@ const getDashboardItemsToDisplay = ({
   searchText: string,
   searchClient: Fuse,
   currentPage: number,
-  orderBy: OrderBy,
+  orderBy: GamesDashboardOrderBy,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
   let itemsToDisplay: DashboardItem[] = allDashboardItems;
@@ -163,8 +167,9 @@ const getDashboardItemsToDisplay = ({
         ? itemsToDisplay.sort(lastModifiedAtSort)
         : itemsToDisplay;
 
-    // If a project is opened and no search is performed, display it first.
-    if (project) {
+    // If a project is opened, no search is done, and sorted by last modified date,
+    // then the opened project should be displayed first.
+    if (project && orderBy === 'lastModifiedAt') {
       const currentProjectId = project.getProjectUuid();
       const currentFileIdentifier = currentFileMetadata
         ? currentFileMetadata.fileIdentifier
@@ -263,8 +268,6 @@ type Props = {|
   // Controls
   currentPage: number,
   setCurrentPage: (currentPage: number) => void,
-  orderBy: OrderBy,
-  setGamesListOrderBy: (orderBy: OrderBy) => void,
   searchText: string,
   setSearchText: (searchText: string) => void,
 |};
@@ -291,14 +294,17 @@ const GamesList = ({
   // Make the page controlled, so that it can be saved when navigating to a game.
   currentPage,
   setCurrentPage,
-  orderBy,
-  setGamesListOrderBy,
   searchText,
   setSearchText,
 }: Props) => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );
+  const {
+    values: { gamesDashboardOrderBy: orderBy },
+    setGamesDashboardOrderBy,
+  } = React.useContext(PreferencesContext);
+
   const { isMobile } = useResponsiveWindowSize();
   const gameThumbnailWidth = getThumbnailWidth({ isMobile });
 
@@ -503,7 +509,12 @@ const GamesList = ({
             </LineStackLayout>
           </Line>
           {allDashboardItems && allDashboardItems.length > 0 && (
-            <ResponsiveLineStackLayout expand noMargin alignItems="center">
+            <ResponsiveLineStackLayout
+              expand
+              noMargin
+              alignItems="center"
+              noResponsiveLandscape
+            >
               <Column noMargin expand>
                 <SearchBar
                   value={searchText}
@@ -518,7 +529,7 @@ const GamesList = ({
                   value={orderBy}
                   onChange={(e, i, value: string) =>
                     // $FlowFixMe
-                    setGamesListOrderBy(value)
+                    setGamesDashboardOrderBy(value)
                   }
                 >
                   <SelectOption

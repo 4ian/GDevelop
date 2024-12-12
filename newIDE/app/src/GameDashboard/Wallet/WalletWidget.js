@@ -1,7 +1,9 @@
 // @flow
 
 import * as React from 'react';
-import DashboardWidget from '../Widgets/DashboardWidget';
+import DashboardWidget, {
+  type DashboardWidgetSize,
+} from '../Widgets/DashboardWidget';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -11,14 +13,14 @@ import { Trans } from '@lingui/macro';
 
 type Props = {|
   onOpenProfile: () => void,
-  fullWidth?: boolean,
+  size: DashboardWidgetSize,
   showRandomBadge?: boolean,
   showAllBadges?: boolean,
 |};
 
 const WalletWidget = ({
   onOpenProfile,
-  fullWidth,
+  size,
   showRandomBadge,
   showAllBadges,
 }: Props) => {
@@ -32,7 +34,7 @@ const WalletWidget = ({
   const creditsAvailable = limits ? limits.credits.userBalance.amount : 0;
   return (
     <DashboardWidget
-      gridSize={fullWidth ? 3 : 1}
+      widgetSize={size}
       title={<Trans>Wallet</Trans>}
       topRightAction={
         <TextButton

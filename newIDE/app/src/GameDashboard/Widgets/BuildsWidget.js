@@ -32,9 +32,9 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
 
   return (
     <DashboardWidget
-      gridSize={3}
+      widgetSize={'full'}
       title={<Trans>Exports</Trans>}
-      seeMoreButton={
+      topRightAction={
         <FlatButton
           label={<Trans>See all</Trans>}
           rightIcon={<ArrowRight fontSize="small" />}
@@ -42,6 +42,7 @@ const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
           primary
         />
       }
+      widgetName="builds"
     >
       <ColumnStackLayout noMargin>
         {pendingBuilds && pendingBuilds.length > 0 && (

@@ -9,6 +9,7 @@ type Props = {|
   style?: Object,
   children: ?React.Node,
   allowSelection?: boolean,
+  align?: 'center' | 'left' | 'right',
 |};
 
 const BackgroundText = (props: Props) => {
@@ -16,7 +17,7 @@ const BackgroundText = (props: Props) => {
   return (
     <Typography
       variant="body2"
-      align="center"
+      align={props.align || 'center'}
       component="div"
       style={{
         opacity: 0.6,

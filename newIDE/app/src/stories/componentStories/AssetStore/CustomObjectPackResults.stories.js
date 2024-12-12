@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-const Wrapper = ({ children }: { children: React.Node }) => {
+const Wrapper = ({ children }: {| children: React.Node |}) => {
   const navigationState = useShopNavigation();
   return (
     <FixedHeightFlexContainer height={500}>

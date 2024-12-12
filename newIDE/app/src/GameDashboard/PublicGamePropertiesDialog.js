@@ -18,8 +18,7 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import CircledClose from '../UI/CustomSvgIcons/CircledClose';
-import { Column, Line } from '../UI/Grid';
-import AlertMessage from '../UI/AlertMessage';
+import { Line } from '../UI/Grid';
 import LeftLoader from '../UI/LeftLoader';
 
 type PublicProjectProperties = {|
@@ -91,7 +90,6 @@ type Props = {|
   onGameUpdated?: (game: Game) => void,
   canBePublishedOnGdGames: boolean,
   onUnregisterGame: () => Promise<void>,
-  gameUnregisterErrorText: ?React.Node,
 |};
 
 export const PublicGamePropertiesDialog = ({
@@ -104,7 +102,6 @@ export const PublicGamePropertiesDialog = ({
   onGameUpdated,
   canBePublishedOnGdGames,
   onUnregisterGame,
-  gameUnregisterErrorText,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -247,17 +244,13 @@ export const PublicGamePropertiesDialog = ({
         disabled={isLoading}
         canBePublishedOnGdGames={canBePublishedOnGdGames}
       />
-      {gameUnregisterErrorText && (
-        <Column justifyContent="stretch" expand noMargin>
-          <AlertMessage kind="error">{gameUnregisterErrorText}</AlertMessage>
-        </Column>
-      )}
       <Line>
         <FlatButton
           primary
           onClick={onUnregisterGame}
           label={<Trans>Unregister game</Trans>}
           leftIcon={<CircledClose fontSize="small" />}
+          disabled={isLoading}
         />
       </Line>
     </Dialog>

@@ -26,6 +26,7 @@ import {
   setLanguageInDOM,
   selectLanguageOrLocale,
 } from '../../Utils/Language';
+import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import { CHECK_APP_UPDATES_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -196,7 +197,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(
       this
     ),
-    setGamesListOrderBy: this._setGamesListOrderBy.bind(this),
+    setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
     setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
   };
 
@@ -1008,14 +1009,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setGamesListOrderBy(
-    newValue: 'createdAt' | 'totalSessions' | 'weeklySessions'
-  ) {
+  _setGamesDashboardOrderBy(newValue: GamesDashboardOrderBy) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          gamesListOrderBy: newValue,
+          gamesDashboardOrderBy: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

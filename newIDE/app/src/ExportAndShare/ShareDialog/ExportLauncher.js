@@ -58,7 +58,7 @@ type Props = {|
   uiMode?: 'minimal',
 
   onExportLaunched?: () => void,
-  onExportSucceeded?: ({ build: ?Build }) => Promise<void>,
+  onExportSucceeded?: ({| build: ?Build |}) => Promise<void>,
   onExportErrored?: () => void,
 |};
 

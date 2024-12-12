@@ -57,6 +57,18 @@ import PublicGamePropertiesDialog, {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import ProjectsWidget from './Widgets/ProjectsWidget';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { formatISO, subDays } from 'date-fns';
+import { daysShownForYear } from './GameAnalyticsEvaluator';
+
+const styles = {
+  mobileFooter: {
+    height: 150,
+  },
+  desktopFooter: {
+    height: 200,
+  },
+};
 
 export type GameDetailsTab =
   | 'details'
@@ -73,17 +85,22 @@ type Props = {|
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   closeProject: () => Promise<void>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
 
   // Current game:
   game: Game,
   onGameUpdated: (game: Game) => void,
   onUnregisterGame: (i18n: I18nType) => Promise<void>,
-  gameUnregisterErrorText: ?React.Node,
 
   // Navigation:
   currentView: GameDetailsTab,
   setCurrentView: GameDetailsTab => void,
   onBack: () => void,
+  disabled: boolean,
+  initialWidgetToScrollTo?: ?string,
 |};
 
 const GameDashboard = ({
@@ -93,18 +110,25 @@ const GameDashboard = ({
   onOpenProject,
   storageProviders,
   closeProject,
+  onDeleteCloudProject,
 
   // Current game:
   game,
   onGameUpdated,
   onUnregisterGame,
-  gameUnregisterErrorText,
 
   // Navigation:
   currentView,
   setCurrentView,
   onBack,
+  disabled,
+  initialWidgetToScrollTo,
 }: Props) => {
+  const grid = React.useRef<?HTMLDivElement>(null);
+  const { isMobile } = useResponsiveWindowSize();
+  const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(
+    initialWidgetToScrollTo
+  );
   const [
     gameDetailsDialogOpen,
     setGameDetailsDialogOpen,
@@ -130,9 +154,9 @@ const GameDashboard = ({
   const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
     null
   );
-  const oneWeekAgo = React.useRef<Date>(
-    new Date(new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000)
-  );
+  const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
+    representation: 'date',
+  });
 
   const webBuilds = builds
     ? builds.filter(build => build.type === 'web-build')
@@ -411,6 +435,21 @@ const GameDashboard = ({
 
   React.useEffect(
     () => {
+      if (widgetToScrollTo && grid.current) {
+        const widget = grid.current.querySelector(
+          `[data-widget-name="${widgetToScrollTo}"]`
+        );
+        if (widget) {
+          widget.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+          setWidgetToScrollTo(null);
+        }
+      }
+    },
+    [initialWidgetToScrollTo, widgetToScrollTo]
+  );
+
+  const fetchAuthenticatedData = React.useCallback(
+    async () => {
       if (!profile) {
         setFeedbacks(null);
         setBuilds(null);
@@ -421,46 +460,51 @@ const GameDashboard = ({
         return;
       }
 
-      const fetchAuthenticatedData = async () => {
-        const [
-          feedbacks,
-          builds,
-          gameRollingMetrics,
-          leaderboards,
-          recommendedMarketingPlan,
-        ] = await Promise.all([
-          listComments(getAuthorizationHeader, profile.id, {
-            gameId: game.id,
-            type: 'FEEDBACK',
-          }),
-          getBuilds(getAuthorizationHeader, profile.id, game.id),
-          getGameMetricsFrom(
-            getAuthorizationHeader,
-            profile.id,
-            game.id,
-            oneWeekAgo.current.toISOString()
-          ),
-          listGameActiveLeaderboards(
-            getAuthorizationHeader,
-            profile.id,
-            game.id
-          ),
-          getRecommendedMarketingPlan(getAuthorizationHeader, {
-            gameId: game.id,
-            userId: profile.id,
-          }),
-          fetchGameFeaturings(),
-        ]);
-        setFeedbacks(feedbacks);
-        setBuilds(builds);
-        setGameMetrics(gameRollingMetrics);
-        setLeaderboards(leaderboards);
-        setRecommendedMarketingPlan(recommendedMarketingPlan);
-      };
+      const [
+        feedbacks,
+        builds,
+        gameRollingMetrics,
+        leaderboards,
+        recommendedMarketingPlan,
+      ] = await Promise.all([
+        listComments(getAuthorizationHeader, profile.id, {
+          gameId: game.id,
+          type: 'FEEDBACK',
+        }),
+        getBuilds(getAuthorizationHeader, profile.id, game.id),
+        getGameMetricsFrom(
+          getAuthorizationHeader,
+          profile.id,
+          game.id,
+          lastYearIsoDate
+        ),
+        listGameActiveLeaderboards(getAuthorizationHeader, profile.id, game.id),
+        getRecommendedMarketingPlan(getAuthorizationHeader, {
+          gameId: game.id,
+          userId: profile.id,
+        }),
+        fetchGameFeaturings(),
+      ]);
+      setFeedbacks(feedbacks);
+      setBuilds(builds);
+      setGameMetrics(gameRollingMetrics);
+      setLeaderboards(leaderboards);
+      setRecommendedMarketingPlan(recommendedMarketingPlan);
+    },
+    [
+      fetchGameFeaturings,
+      game.id,
+      getAuthorizationHeader,
+      profile,
+      lastYearIsoDate,
+    ]
+  );
 
+  React.useEffect(
+    () => {
       fetchAuthenticatedData();
     },
-    [getAuthorizationHeader, profile, fetchGameFeaturings, game.id]
+    [fetchAuthenticatedData]
   );
 
   const onClickBack = React.useCallback(
@@ -468,10 +512,12 @@ const GameDashboard = ({
       if (currentView === 'details') {
         onBack();
       } else {
+        // Refresh the data when going back to the main view.
+        fetchAuthenticatedData();
         setCurrentView('details');
       }
     },
-    [currentView, onBack, setCurrentView]
+    [currentView, onBack, setCurrentView, fetchAuthenticatedData]
   );
 
   return (
@@ -533,7 +579,7 @@ const GameDashboard = ({
                       : null
                   }
                 />
-                <Grid container spacing={2}>
+                <Grid container spacing={2} ref={grid}>
                   <AnalyticsWidget
                     onSeeAll={() => setCurrentView('analytics')}
                     gameMetrics={gameRollingMetrics}
@@ -564,12 +610,17 @@ const GameDashboard = ({
                     onOpenProject={onOpenProject}
                     storageProviders={storageProviders}
                     closeProject={closeProject}
+                    onDeleteCloudProject={onDeleteCloudProject}
+                    disabled={disabled}
                   />
                   <BuildsWidget
                     builds={builds}
                     onSeeAllBuilds={() => setCurrentView('builds')}
                   />
                 </Grid>
+                <div
+                  style={isMobile ? styles.mobileFooter : styles.desktopFooter}
+                />
               </ColumnStackLayout>
             )}
           </Column>
@@ -578,7 +629,7 @@ const GameDashboard = ({
               i18n={i18n}
               onClose={() => setGameDetailsDialogOpen(false)}
               publicGame={publicGame}
-              isLoading={isUpdatingGame}
+              isLoading={isUpdatingGame || disabled}
               onApply={async properties => {
                 const updatedGame = await onUpdateGame(i18n, properties);
                 if (updatedGame) {
@@ -590,7 +641,6 @@ const GameDashboard = ({
               onGameUpdated={_onGameUpdated}
               onUpdatingGame={setIsUpdatingGame}
               onUnregisterGame={() => onUnregisterGame(i18n)}
-              gameUnregisterErrorText={gameUnregisterErrorText}
             />
           )}
         </>

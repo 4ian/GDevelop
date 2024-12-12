@@ -38,7 +38,7 @@ const getDefaultMembership = ({
   createdAt: 16798698390,
 });
 
-const getDefaultGroup = ({ id }: { id: string }) => ({
+const getDefaultGroup = ({ id }: {| id: string |}) => ({
   id,
   name: 'Group',
 });

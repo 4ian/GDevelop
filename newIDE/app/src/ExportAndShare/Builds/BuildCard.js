@@ -96,7 +96,7 @@ const getIcon = (
   }
 };
 
-const BuildAndCreatedAt = ({ build }: { build: Build }) => (
+const BuildAndCreatedAt = ({ build }: {| build: Build |}) => (
   <Line alignItems="end">
     <Line noMargin alignItems="center">
       {getIcon(build.type)}

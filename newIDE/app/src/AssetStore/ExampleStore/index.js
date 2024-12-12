@@ -18,6 +18,7 @@ import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { isStartingPointExampleShortHeader } from '../../ProjectCreation/EmptyAndStartingPointProjects';
 
 const styles = {
   grid: {
@@ -39,16 +40,30 @@ const gameFilter = (
   return true;
 };
 
+const noStartingPointFilter = (
+  item: PrivateGameTemplateListingData | ExampleShortHeader
+) => {
+  if (item.previewImageUrls) {
+    // It's an example, filter out the starting points.
+    return !isStartingPointExampleShortHeader(item);
+  }
+
+  // It's a game template, always show.
+  return true;
+};
+
 type Props = {|
   onSelectExampleShortHeader: ExampleShortHeader => void,
   onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   i18n: I18nType,
   onlyShowGames?: boolean,
+  hideStartingPoints?: boolean,
   columnsCount: number,
   rowToInsert?: {|
     row: number,
     element: React.Node,
   |},
+  hideSearch?: boolean,
 |};
 
 const ExampleStore = ({
@@ -56,8 +71,10 @@ const ExampleStore = ({
   onSelectPrivateGameTemplateListingData,
   i18n,
   onlyShowGames,
+  hideStartingPoints,
   columnsCount,
   rowToInsert,
+  hideSearch,
 }: Props) => {
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
@@ -131,6 +148,11 @@ const ExampleStore = ({
                 privateGameTemplateListingData =>
                   !onlyShowGames || gameFilter(privateGameTemplateListingData)
               )
+              .filter(
+                privateGameTemplateListingData =>
+                  !hideStartingPoints ||
+                  noStartingPointFilter(privateGameTemplateListingData)
+              )
           : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
           ? exampleShortHeadersSearchResults
@@ -138,6 +160,11 @@ const ExampleStore = ({
               .filter(
                 exampleShortHeader =>
                   !onlyShowGames || gameFilter(exampleShortHeader)
+              )
+              .filter(
+                exampleShortHeader =>
+                  !hideStartingPoints ||
+                  noStartingPointFilter(exampleShortHeader)
               )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
@@ -167,6 +194,7 @@ const ExampleStore = ({
       onSelectExampleShortHeader,
       i18n,
       onlyShowGames,
+      hideStartingPoints,
     ]
   );
 
@@ -183,15 +211,17 @@ const ExampleStore = ({
         numberOfTilesToDisplayUntilRowToInsert
       );
       return [
-        <GridList
-          cols={columnsCount}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={2}
-          key="first-tiles"
-        >
-          {firstTiles}
-        </GridList>,
+        firstTiles.length > 0 ? (
+          <GridList
+            cols={columnsCount}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={2}
+            key="first-tiles"
+          >
+            {firstTiles}
+          </GridList>
+        ) : null,
         rowToInsert ? (
           <Line key="inserted-row">{rowToInsert.element}</Line>
         ) : null,
@@ -214,17 +244,19 @@ const ExampleStore = ({
   return (
     <React.Fragment>
       <Column expand noMargin>
-        <Line>
-          <Column expand noMargin>
-            <SearchBar
-              value={localSearchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              ref={searchBarRef}
-              placeholder={t`Search examples`}
-            />
-          </Column>
-        </Line>
+        {!hideSearch && (
+          <Line>
+            <Column expand noMargin>
+              <SearchBar
+                value={localSearchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                ref={searchBarRef}
+                placeholder={t`Search examples`}
+              />
+            </Column>
+          </Line>
+        )}
         {resultTiles.length === 0 ? (
           <Column noMargin expand justifyContent="center">
             <Spacer />

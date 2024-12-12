@@ -132,7 +132,7 @@ export const QuickPublish = ({
   );
 
   const onExportSucceeded = React.useCallback(
-    async ({ build }: { build: ?Build }) => {
+    async ({ build }: {| build: ?Build |}) => {
       try {
         if (profile && game && build) {
           setExportState('updating-game');

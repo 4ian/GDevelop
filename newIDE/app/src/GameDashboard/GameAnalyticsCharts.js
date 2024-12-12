@@ -75,7 +75,7 @@ const CustomTooltip = ({
                 name,
                 unit,
                 value,
-              }: { name: string, unit: ?string, value: number },
+              }: {| name: string, unit: ?string, value: number |},
               index
             ) => (
               <Text noMargin key={index}>{`${name}: ${

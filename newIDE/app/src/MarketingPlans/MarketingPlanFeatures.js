@@ -82,11 +82,9 @@ const MarketingPlanFeatures = ({
     [gameFeaturings]
   );
 
-  const planCreditsAmount = getMarketingPlanPrice(marketingPlan, limits);
-  if (!planCreditsAmount) {
-    console.error(`Could not find price for marketing plan ${id}, hiding it.`);
-    return null;
-  }
+  const planCreditsAmount = limits
+    ? getMarketingPlanPrice(marketingPlan, limits)
+    : null;
   const hasErrors = requirementsErrors.length > 0;
 
   const bulletPointsToDisplay = isPlanActive
@@ -126,9 +124,11 @@ const MarketingPlanFeatures = ({
                     {selectMessageByLocale(i18n, nameByLocale)}
                   </Text>
                 </LineStackLayout>
-                <Text size="body-small" color="secondary">
-                  <Trans>{planCreditsAmount} credits</Trans>
-                </Text>
+                {planCreditsAmount && (
+                  <Text size="body-small" color="secondary">
+                    <Trans>{planCreditsAmount} credits</Trans>
+                  </Text>
+                )}
               </LineStackLayout>
             </div>
 

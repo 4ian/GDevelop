@@ -102,7 +102,7 @@ VariablesExtension::VariablesExtension() {
                 codeGenerator, context, "variable",
                 instruction.GetParameters()[0].GetPlainString());
         bool isOperandTrue =
-            instruction.GetParameters()[1].GetPlainString() != "False";
+            instruction.GetParameters()[1].GetPlainString() == "True";
 
         const auto variablesContainersList =
             codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();

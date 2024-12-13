@@ -151,14 +151,14 @@ const CoursePreviewBanner = ({
   onDisplayCourse,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
 
-  const numberOfTilesToDisplay = isMobile ? 2 : 4;
+  const numberOfTilesToDisplay = isMobile ? 2 : windowSize === 'xlarge' ? 5 : 4;
 
   const chapterTiles = React.useMemo(
     () => {
-      const chapterCompletion = new Array(course.chaptersTargetCount)
+      const completionByChapter = new Array(course.chaptersTargetCount)
         .fill(0)
         .map((_, index) => {
           const chapter = courseChapters[index];
@@ -169,12 +169,30 @@ const CoursePreviewBanner = ({
           if (!chapterCompletion) return false;
           return chapterCompletion.completedTasks >= chapterCompletion.tasks;
         });
-      const lastCompletedChapterIndex = chapterCompletion.lastIndexOf(true);
-      const startChapterIndex =
-        lastCompletedChapterIndex === -1 ? 0 : lastCompletedChapterIndex;
+      let lastCompletedChapterIndex = -1;
+      // Find last chapter completed among the first completed chapters.
+      // For instance, if completion looks like:
+      // 1 2 3 4 5 6 7 8 9
+      // ✓ ✓ ✓ ✓ ✗ ✓ ✗ ✗ ✗
+      // We want to display the chapters starting from chapter 4.
+      for (const chapterCompletion of completionByChapter) {
+        if (chapterCompletion) lastCompletedChapterIndex++;
+        else break;
+      }
+      const startChapterIndex = Math.max(
+        // If no completed chapter, make sure the first chapter is displayed.
+        0,
+        Math.min(
+          // If the course is near its end, make sure the X last chapters are displayed.
+          course.chaptersTargetCount - numberOfTilesToDisplay,
+          lastCompletedChapterIndex
+        )
+      );
 
       return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
         const chapterIndex = startChapterIndex + index;
+        if (chapterIndex >= course.chaptersTargetCount) return null;
+
         const chapter = courseChapters[chapterIndex];
         return (
           <React.Fragment key={`chapter-${chapterIndex}`}>
@@ -193,7 +211,7 @@ const CoursePreviewBanner = ({
               chapter={chapter}
               chapterIndex={chapterIndex}
               gdevelopTheme={gdevelopTheme}
-              isComplete={chapterCompletion[chapterIndex]}
+              isComplete={completionByChapter[chapterIndex]}
             />
           </React.Fragment>
         );

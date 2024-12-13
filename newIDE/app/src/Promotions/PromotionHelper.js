@@ -7,11 +7,11 @@ const getRouteNavigationParamsFromLink = (
   link: string
 ): {| route: Route, params: RouteArguments |} | null => {
   if (link.startsWith('https://editor.gdevelop.io')) {
-    const urlParams = new URLSearchParams(link.replace(/.*\?/, ''));
+    const url = new URL(link)
     // $FlowFixMe - Assume that the arguments are always valid.
-    const route: ?Route = urlParams.get('initial-dialog');
+    const route: ?Route = url.searchParams.get('initial-dialog');
     const otherParams = {};
-    urlParams.forEach((value, key) => {
+    url.searchParams.forEach((value, key) => {
       if (key !== 'initial-dialog') otherParams[key] = value;
     });
     if (route) {

@@ -60,6 +60,8 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'team-view';
   } else if (routeArguments['initial-dialog'] === 'play') {
     return 'play';
+  } else if (routeArguments['initial-dialog'] === 'learn') {
+    return 'learn';
   } else if (routeArguments['initial-dialog'] === 'get-started') {
     return 'get-started';
   }
@@ -309,12 +311,20 @@ export const HomePage = React.memo<Props>(
                 }
               }
             }
+          } else if (requestedTab === 'learn') {
+            const courseId = routeArguments['course-id'];
+
+            if (courseId && selectedCourse && selectedCourse.id === courseId) {
+              setDisplayCourse(true);
+              removeRouteArguments(['course-id']);
+            }
           }
 
           removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,
+          selectedCourse,
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,

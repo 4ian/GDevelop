@@ -571,7 +571,7 @@ const GameDashboardCard = ({
       : () => {
           showAlert({
             title: t`No project to open`,
-            message: t`Looks like your project isn't there!\n\nYou may be using a different computer or opening GDevelop on the web and your project is saved locally.`,
+            message: t`Looks like your project isn't there!${'\n\n'}You may be using a different computer or opening GDevelop on the web and your project is saved locally.`,
           });
         };
 

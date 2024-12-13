@@ -114,7 +114,21 @@ const CourseSection = ({
   const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
     false
   );
+  const firstIncompleteChapterIdRef = React.useRef<string | null>(
+    courseChapters.reduce((alreadyFoundIncompleteChapterId, chapter) => {
+      if (alreadyFoundIncompleteChapterId)
+        return alreadyFoundIncompleteChapterId;
+      const chapterCompletion = getChapterCompletion(chapter.id);
 
+      if (
+        !chapterCompletion ||
+        chapterCompletion.completedTasks < chapterCompletion.tasks
+      ) {
+        return chapter.id;
+      }
+      return null;
+    }, null)
+  );
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
   const chapterTitleRefs = React.useRef<
     {|
@@ -220,7 +234,10 @@ const CourseSection = ({
     );
     if (!chapterTitleRef) return;
 
-    scrollContainer.scrollTo(0, chapterTitleRef.ref.offsetTop);
+    scrollContainer.scrollTo({
+      top: chapterTitleRef.ref.offsetTop,
+      behavior: 'smooth',
+    });
   }, []);
 
   React.useEffect(
@@ -232,6 +249,15 @@ const CourseSection = ({
       }
     },
     [onScroll]
+  );
+
+  React.useEffect(
+    () => {
+      if (firstIncompleteChapterIdRef.current) {
+        scrollToChapter(firstIncompleteChapterIdRef.current);
+      }
+    },
+    [scrollToChapter]
   );
 
   return (

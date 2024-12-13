@@ -42,7 +42,7 @@ export const CourseChapterStoreStateProvider = (props: Props) => {
   React.useEffect(
     () => {
       const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching in-app tutorials...');
+        console.info('Pre-fetching course chapters...');
         loadCourseChapters();
       }, COURSE_CHAPTERS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);

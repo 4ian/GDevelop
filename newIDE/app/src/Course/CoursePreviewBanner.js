@@ -291,6 +291,7 @@ const CoursePreviewBanner = ({
                 src="https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg"
                 alt="Red hero buffed by knowledge"
                 style={styles.thumbnail}
+                onClick={() => onDisplayCourse(true)}
               />
             </div>
             <ColumnStackLayout expand noMargin>

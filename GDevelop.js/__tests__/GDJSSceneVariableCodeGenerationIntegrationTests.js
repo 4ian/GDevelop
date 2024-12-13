@@ -181,12 +181,77 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a scene boolean variable condition that is true', function () {
+  it('can generate a scene boolean variable condition that checks true', function () {
     scene.getVariables().insertNew('MyVariable', 0).setBool(true);
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
         type: { inverted: false, value: 'BooleanVariable' },
-        parameters: ['MyVariable'],
+        parameters: ['MyVariable', 'True', ''],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a scene boolean variable condition that checks true (inverted)', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setBool(false);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: true, value: 'BooleanVariable' },
+        parameters: ['MyVariable', 'True', ''],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a scene boolean variable condition that checks false', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setBool(false);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: false, value: 'BooleanVariable' },
+        parameters: ['MyVariable', 'False', ''],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a scene boolean variable condition that checks false (inverted)', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setBool(true);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: true, value: 'BooleanVariable' },
+        parameters: ['MyVariable', 'False', ''],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a scene boolean variable condition that checks false (defaulted from an empty string)', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setBool(false);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: false, value: 'BooleanVariable' },
+        parameters: ['MyVariable', '', ''],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a scene boolean variable condition that checks false (defaulted from an empty string, inverted)', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setBool(true);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: true, value: 'BooleanVariable' },
+        parameters: ['MyVariable', '', ''],
       },
     ]);
     expect(
@@ -198,7 +263,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     scene.getVariables().insertNew('MyVariable', 0).setString('Same value');
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
-        type: { inverted: false, value: 'BooleanVariable' },
+        type: { inverted: false, value: 'StringVariable' },
         parameters: ['MyVariable', '=', '"Same value"'],
       },
     ]);

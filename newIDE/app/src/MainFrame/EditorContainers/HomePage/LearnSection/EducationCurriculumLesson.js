@@ -181,7 +181,7 @@ const EducationCurriculumLesson = ({
           <div style={{ ...styles.textContainer, opacity: isLocked ? 0.6 : 1 }}>
             <ColumnStackLayout justifyContent="space-between" noMargin expand>
               <ColumnStackLayout noMargin expand>
-                {!isMobile && !isLandscape && title}
+                {!(isMobile && !isLandscape) && title}
                 {gameLink &&
                   isMobile &&
                   !isLandscape &&

@@ -8,6 +8,263 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+class MockedChildRenderedInstance implements ChildRenderedInstance {
+  _instance: gdInitialInstance;
+  _pixiObject: { height: number };
+  defaultWidth: number;
+  defaultHeight: number;
+  originX: number;
+  originY: number;
+  // TODO use this attribute to simulate TextObject children.
+  heightAfterUpdate: ?number;
+
+  constructor(
+    childInstance: gdInitialInstance,
+    {
+      defaultWidth,
+      defaultHeight,
+      originX,
+      originY,
+    }: MockedRenderedInstanceConfiguration
+  ) {
+    this._instance = childInstance;
+    this._pixiObject = { height: 0 };
+    this.defaultWidth = defaultWidth;
+    this.defaultHeight = defaultHeight;
+    this.originX = originX || 0;
+    this.originY = originY || 0;
+    this.heightAfterUpdate = defaultHeight;
+  }
+
+  getWidth(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomWidth()
+      : this.getDefaultWidth();
+  }
+
+  getHeight(): number {
+    return this._instance.hasCustomSize()
+      ? this._instance.getCustomHeight()
+      : this.getDefaultHeight();
+  }
+
+  getDefaultWidth(): number {
+    return this.defaultWidth;
+  }
+
+  getDefaultHeight(): number {
+    return this.defaultHeight;
+  }
+
+  getOriginX(): number {
+    return (this.originX * this.getWidth()) / this.getDefaultWidth();
+  }
+
+  getOriginY(): number {
+    return (this.originY * this.getHeight()) / this.getDefaultHeight();
+  }
+
+  update(): void {
+    this._pixiObject.height =
+      this.heightAfterUpdate ||
+      (this._instance.hasCustomSize()
+        ? this._instance.getCustomHeight()
+        : this.defaultHeight);
+  }
+}
+
+type MockedRenderedInstanceConfiguration = {|
+  defaultWidth: number,
+  defaultHeight: number,
+  originX?: number,
+  originY?: number,
+|};
+
+class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
+  eventBasedObject: gdEventsBasedObject | null;
+  width: number;
+  height: number;
+  renderedInstances = new Map<number, MockedChildRenderedInstance>();
+  layoutedInstances = new Map<number, LayoutedInstance>();
+  mockedRenderedInstanceConfigurations = new Map<
+    string,
+    MockedRenderedInstanceConfiguration
+  >();
+
+  constructor(
+    eventBasedObject: gdEventsBasedObject,
+    width: number,
+    height: number
+  ) {
+    this.eventBasedObject = eventBasedObject;
+    this.width = width;
+    this.height = height;
+  }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return this.height;
+  }
+
+  getDepth() {
+    return 0;
+  }
+
+  getLayoutedInstance = (instance: gdInitialInstance): LayoutedInstance => {
+    let layoutedInstance = this.layoutedInstances.get(instance.ptr);
+    if (!layoutedInstance) {
+      layoutedInstance = new LayoutedInstance(instance);
+      this.layoutedInstances.set(instance.ptr, layoutedInstance);
+    }
+    return layoutedInstance;
+  };
+
+  getRendererOfInstance = (
+    instance: gdInitialInstance
+  ): MockedChildRenderedInstance => {
+    let renderedInstance = this.renderedInstances.get(instance.ptr);
+    if (!renderedInstance) {
+      const configuration = this.mockedRenderedInstanceConfigurations.get(
+        instance.getObjectName()
+      );
+      if (!configuration) {
+        throw new Error('Unregisted child: ' + instance.getObjectName());
+      }
+      renderedInstance = new MockedChildRenderedInstance(
+        instance,
+        configuration
+      );
+      this.renderedInstances.set(instance.ptr, renderedInstance);
+    }
+    return renderedInstance;
+  };
+
+  registerChild(
+    name: string,
+    configuration: MockedRenderedInstanceConfiguration
+  ) {
+    this.mockedRenderedInstanceConfigurations.set(name, configuration);
+  }
+}
+
+const getHorizontalAnchorFor = (
+  anchor: ?CustomObjectConfiguration_EdgeAnchor
+) =>
+  anchor === gd.CustomObjectConfiguration.MinEdge
+    ? 'Window left'
+    : anchor === gd.CustomObjectConfiguration.MaxEdge
+    ? 'Window right'
+    : anchor === gd.CustomObjectConfiguration.Center
+    ? 'Window center'
+    : anchor === gd.CustomObjectConfiguration.Proportional
+    ? 'Proportional'
+    : 'None';
+
+const getVerticalAnchorFor = (anchor: ?CustomObjectConfiguration_EdgeAnchor) =>
+  anchor === gd.CustomObjectConfiguration.MinEdge
+    ? 'Window top'
+    : anchor === gd.CustomObjectConfiguration.MaxEdge
+    ? 'Window bottom'
+    : anchor === gd.CustomObjectConfiguration.Center
+    ? 'Window center'
+    : anchor === gd.CustomObjectConfiguration.Proportional
+    ? 'Proportional'
+    : 'None';
+
+const getLayoutedRenderedInstanceFor = (props: {
+  project: gdProject,
+  innerArea: {
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+  },
+  parent: { width: number, height: number },
+  child: MockedRenderedInstanceConfiguration,
+  instance: {
+    x: number,
+    y: number,
+    customSize: { width: number, height: number } | null,
+  },
+  anchor: {
+    left?: CustomObjectConfiguration_EdgeAnchor,
+    top?: CustomObjectConfiguration_EdgeAnchor,
+    right?: CustomObjectConfiguration_EdgeAnchor,
+    bottom?: CustomObjectConfiguration_EdgeAnchor,
+  } | null,
+}) => {
+  const project = props.project;
+  const extension = project.insertNewEventsFunctionsExtension('MyExtension', 0);
+  const eventBasedObject = extension
+    .getEventsBasedObjects()
+    .insertNew('MyCustomObject', 0);
+  eventBasedObject.markAsInnerAreaFollowingParentSize(true);
+  eventBasedObject.setAreaMinX(props.innerArea.minX);
+  eventBasedObject.setAreaMinY(props.innerArea.minY);
+  eventBasedObject.setAreaMaxX(props.innerArea.maxX);
+  eventBasedObject.setAreaMaxY(props.innerArea.maxY);
+  const childrenObjects = eventBasedObject.getObjects();
+  const childObject = childrenObjects.insertNewObject(
+    props.project,
+    'Sprite',
+    'Child',
+    0
+  );
+  const anchorProps = props.anchor;
+  if (anchorProps) {
+    const anchor = childObject.addNewBehavior(
+      project,
+      'AnchorBehavior::AnchorBehavior',
+      'Anchor'
+    );
+    anchor.updateProperty(
+      'leftEdgeAnchor',
+      getHorizontalAnchorFor(anchorProps.left)
+    );
+    anchor.updateProperty(
+      'topEdgeAnchor',
+      getVerticalAnchorFor(anchorProps.top)
+    );
+    anchor.updateProperty(
+      'rightEdgeAnchor',
+      getHorizontalAnchorFor(anchorProps.right)
+    );
+    anchor.updateProperty(
+      'bottomEdgeAnchor',
+      getVerticalAnchorFor(anchorProps.bottom)
+    );
+  }
+  const initialInstances = eventBasedObject.getInitialInstances();
+  const initialInstance = initialInstances.insertNewInitialInstance();
+  initialInstance.setObjectName('Child');
+  initialInstance.setX(props.instance.x);
+  initialInstance.setY(props.instance.y);
+  const customSize = props.instance.customSize;
+  if (customSize) {
+    initialInstance.setHasCustomSize(true);
+    initialInstance.setCustomWidth(customSize.width);
+    initialInstance.setCustomHeight(customSize.height);
+  }
+  const parent = new MockedParent(
+    eventBasedObject,
+    props.parent.width,
+    props.parent.height
+  );
+  parent.registerChild('Child', props.child);
+
+  const layoutedRenderedInstance = getLayoutedRenderedInstance(
+    parent,
+    initialInstance
+  );
+  if (!layoutedRenderedInstance) {
+    throw new Error('No layouted instance returned');
+  }
+  return layoutedRenderedInstance;
+};
+
 describe('getLayoutedRenderedInstance', () => {
   it('can fill the parent with a child (with custom size)', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
@@ -435,260 +692,3 @@ describe('getLayoutedRenderedInstance', () => {
     });
   });
 });
-
-const getLayoutedRenderedInstanceFor = (props: {
-  project: gdProject,
-  innerArea: {
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-  },
-  parent: { width: number, height: number },
-  child: MockedRenderedInstanceConfiguration,
-  instance: {
-    x: number,
-    y: number,
-    customSize: { width: number, height: number } | null,
-  },
-  anchor: {
-    left?: CustomObjectConfiguration_EdgeAnchor,
-    top?: CustomObjectConfiguration_EdgeAnchor,
-    right?: CustomObjectConfiguration_EdgeAnchor,
-    bottom?: CustomObjectConfiguration_EdgeAnchor,
-  } | null,
-}) => {
-  const project = props.project;
-  const extension = project.insertNewEventsFunctionsExtension('MyExtension', 0);
-  const eventBasedObject = extension
-    .getEventsBasedObjects()
-    .insertNew('MyCustomObject', 0);
-  eventBasedObject.markAsInnerAreaFollowingParentSize(true);
-  eventBasedObject.setAreaMinX(props.innerArea.minX);
-  eventBasedObject.setAreaMinY(props.innerArea.minY);
-  eventBasedObject.setAreaMaxX(props.innerArea.maxX);
-  eventBasedObject.setAreaMaxY(props.innerArea.maxY);
-  const childrenObjects = eventBasedObject.getObjects();
-  const childObject = childrenObjects.insertNewObject(
-    props.project,
-    'Sprite',
-    'Child',
-    0
-  );
-  const anchorProps = props.anchor;
-  if (anchorProps) {
-    const anchor = childObject.addNewBehavior(
-      project,
-      'AnchorBehavior::AnchorBehavior',
-      'Anchor'
-    );
-    anchor.updateProperty(
-      'leftEdgeAnchor',
-      getHorizontalAnchorFor(anchorProps.left)
-    );
-    anchor.updateProperty(
-      'topEdgeAnchor',
-      getVerticalAnchorFor(anchorProps.top)
-    );
-    anchor.updateProperty(
-      'rightEdgeAnchor',
-      getHorizontalAnchorFor(anchorProps.right)
-    );
-    anchor.updateProperty(
-      'bottomEdgeAnchor',
-      getVerticalAnchorFor(anchorProps.bottom)
-    );
-  }
-  const initialInstances = eventBasedObject.getInitialInstances();
-  const initialInstance = initialInstances.insertNewInitialInstance();
-  initialInstance.setObjectName('Child');
-  initialInstance.setX(props.instance.x);
-  initialInstance.setY(props.instance.y);
-  const customSize = props.instance.customSize;
-  if (customSize) {
-    initialInstance.setHasCustomSize(true);
-    initialInstance.setCustomWidth(customSize.width);
-    initialInstance.setCustomHeight(customSize.height);
-  }
-  const parent = new MockedParent(
-    eventBasedObject,
-    props.parent.width,
-    props.parent.height
-  );
-  parent.registerChild('Child', props.child);
-
-  const layoutedRenderedInstance = getLayoutedRenderedInstance(
-    parent,
-    initialInstance
-  );
-  if (!layoutedRenderedInstance) {
-    throw new Error('No layouted instance returned');
-  }
-  return layoutedRenderedInstance;
-};
-
-const getHorizontalAnchorFor = (
-  anchor: ?CustomObjectConfiguration_EdgeAnchor
-) =>
-  anchor === gd.CustomObjectConfiguration.MinEdge
-    ? 'Window left'
-    : anchor === gd.CustomObjectConfiguration.MaxEdge
-    ? 'Window right'
-    : anchor === gd.CustomObjectConfiguration.Center
-    ? 'Window center'
-    : anchor === gd.CustomObjectConfiguration.Proportional
-    ? 'Proportional'
-    : 'None';
-
-const getVerticalAnchorFor = (anchor: ?CustomObjectConfiguration_EdgeAnchor) =>
-  anchor === gd.CustomObjectConfiguration.MinEdge
-    ? 'Window top'
-    : anchor === gd.CustomObjectConfiguration.MaxEdge
-    ? 'Window bottom'
-    : anchor === gd.CustomObjectConfiguration.Center
-    ? 'Window center'
-    : anchor === gd.CustomObjectConfiguration.Proportional
-    ? 'Proportional'
-    : 'None';
-
-class MockedChildRenderedInstance implements ChildRenderedInstance {
-  _instance: gdInitialInstance;
-  _pixiObject: { height: number };
-  defaultWidth: number;
-  defaultHeight: number;
-  originX: number;
-  originY: number;
-  // TODO use this attribute to simulate TextObject children.
-  heightAfterUpdate: ?number;
-
-  constructor(
-    childInstance: gdInitialInstance,
-    {
-      defaultWidth,
-      defaultHeight,
-      originX,
-      originY,
-    }: MockedRenderedInstanceConfiguration
-  ) {
-    this._instance = childInstance;
-    this._pixiObject = { height: 0 };
-    this.defaultWidth = defaultWidth;
-    this.defaultHeight = defaultHeight;
-    this.originX = originX || 0;
-    this.originY = originY || 0;
-    this.heightAfterUpdate = defaultHeight;
-  }
-
-  getWidth(): number {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
-      : this.getDefaultWidth();
-  }
-
-  getHeight(): number {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
-      : this.getDefaultHeight();
-  }
-
-  getDefaultWidth(): number {
-    return this.defaultWidth;
-  }
-
-  getDefaultHeight(): number {
-    return this.defaultHeight;
-  }
-
-  getOriginX(): number {
-    return (this.originX * this.getWidth()) / this.getDefaultWidth();
-  }
-
-  getOriginY(): number {
-    return (this.originY * this.getHeight()) / this.getDefaultHeight();
-  }
-
-  update(): void {
-    this._pixiObject.height =
-      this.heightAfterUpdate ||
-      (this._instance.hasCustomSize()
-        ? this._instance.getCustomHeight()
-        : this.defaultHeight);
-  }
-}
-
-type MockedRenderedInstanceConfiguration = {|
-  defaultWidth: number,
-  defaultHeight: number,
-  originX?: number,
-  originY?: number,
-|};
-
-class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
-  eventBasedObject: gdEventsBasedObject | null;
-  width: number;
-  height: number;
-  renderedInstances = new Map<number, MockedChildRenderedInstance>();
-  layoutedInstances = new Map<number, LayoutedInstance>();
-  mockedRenderedInstanceConfigurations = new Map<
-    string,
-    MockedRenderedInstanceConfiguration
-  >();
-
-  constructor(
-    eventBasedObject: gdEventsBasedObject,
-    width: number,
-    height: number
-  ) {
-    this.eventBasedObject = eventBasedObject;
-    this.width = width;
-    this.height = height;
-  }
-
-  getWidth() {
-    return this.width;
-  }
-
-  getHeight() {
-    return this.height;
-  }
-
-  getDepth() {
-    return 0;
-  }
-
-  getLayoutedInstance = (instance: gdInitialInstance): LayoutedInstance => {
-    let layoutedInstance = this.layoutedInstances.get(instance.ptr);
-    if (!layoutedInstance) {
-      layoutedInstance = new LayoutedInstance(instance);
-      this.layoutedInstances.set(instance.ptr, layoutedInstance);
-    }
-    return layoutedInstance;
-  };
-
-  getRendererOfInstance = (
-    instance: gdInitialInstance
-  ): MockedChildRenderedInstance => {
-    let renderedInstance = this.renderedInstances.get(instance.ptr);
-    if (!renderedInstance) {
-      const configuration = this.mockedRenderedInstanceConfigurations.get(
-        instance.getObjectName()
-      );
-      if (!configuration) {
-        throw new Error('Unregisted child: ' + instance.getObjectName());
-      }
-      renderedInstance = new MockedChildRenderedInstance(
-        instance,
-        configuration
-      );
-      this.renderedInstances.set(instance.ptr, renderedInstance);
-    }
-    return renderedInstance;
-  };
-
-  registerChild(
-    name: string,
-    configuration: MockedRenderedInstanceConfiguration
-  ) {
-    this.mockedRenderedInstanceConfigurations.set(name, configuration);
-  }
-}

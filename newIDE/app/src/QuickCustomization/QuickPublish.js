@@ -148,6 +148,9 @@ export const QuickPublish = ({
             {
               publicWebBuildId: build.id,
               screenshotUrls: newGameScreenshotUrls,
+              // Here we assume the game is saved, as it just got exported properly,
+              // And the same is happening in the background.
+              savedStatus: 'saved',
             }
           );
           setGame(updatedGame);

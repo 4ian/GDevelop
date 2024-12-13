@@ -146,9 +146,16 @@ const getDashboardItemsToDisplay = ({
   orderBy: GamesDashboardOrderBy,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
-  let itemsToDisplay: DashboardItem[] = allDashboardItems;
+  let itemsToDisplay: DashboardItem[] = allDashboardItems.filter(
+    item =>
+      // First, filter out unsaved games, unless they are the opened project.
+      !item.game ||
+      item.game.savedStatus !== 'draft' ||
+      (project && item.game.id === project.getProjectUuid())
+  );
 
   if (searchText) {
+    // If there is a search, just return those items, ordered by the search relevance.
     const searchResults = searchClient.search(
       getFuseSearchQueryForMultipleKeys(searchText, [
         'game.gameName',
@@ -157,7 +164,7 @@ const getDashboardItemsToDisplay = ({
     );
     itemsToDisplay = searchResults.map(result => result.item);
   } else {
-    // Order items first.
+    // If there is no search, sort the items by the selected order.
     itemsToDisplay =
       orderBy === 'totalSessions'
         ? itemsToDisplay.sort(totalSessionsSort)
@@ -218,19 +225,14 @@ const getDashboardItemsToDisplay = ({
       }
     }
 
+    // Finally, if there is no search, paginate the results.
     itemsToDisplay = itemsToDisplay.slice(
       (currentPage - 1) * pageSize,
       currentPage * pageSize
     );
   }
 
-  return itemsToDisplay.filter(
-    item =>
-      // Filter out unsaved games, unless they are the opened project.
-      !item.game ||
-      item.game.savedStatus !== 'draft' ||
-      (project && item.game.id === project.getProjectUuid())
-  );
+  return itemsToDisplay;
 };
 
 type Props = {|

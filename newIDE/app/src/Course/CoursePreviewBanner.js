@@ -73,7 +73,7 @@ const ChapterTile = ({
       {chapter && chapter.isLocked ? (
         <>
           <Spacer />
-          <Paper background="medium" style={{ padding: 4 }}>
+          <Paper background="light" style={{ padding: 4 }}>
             <LineStackLayout
               noMargin
               alignItems="center"

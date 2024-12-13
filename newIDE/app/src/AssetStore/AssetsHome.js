@@ -28,7 +28,7 @@ import {
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
-import { EarnBadges } from '../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
+import { EarnCredits } from '../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnCredits';
 
 const cellSpacing = 2;
 
@@ -403,7 +403,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
 
             <PromotionsSlideshow />
             {onOpenProfile && (
-              <EarnBadges
+              <EarnCredits
                 achievements={achievements}
                 badges={badges}
                 onOpenProfile={onOpenProfile}

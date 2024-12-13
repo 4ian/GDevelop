@@ -508,7 +508,7 @@ const CreateSection = ({
                       />
                       <WalletWidget
                         onOpenProfile={onOpenProfile}
-                        showRandomBadge
+                        showOneItem
                         size={
                           isMobile && isLandscape
                             ? 'half'
@@ -576,11 +576,7 @@ const CreateSection = ({
                   <ColumnStackLayout noMargin>
                     <Line noMargin>
                       <Text size="block-title">
-                        {!hasAProjectOpenedOrSavedOrGameRegistered ? (
-                          <Trans>Publish your first game</Trans>
-                        ) : (
-                          <Trans>Publish a game in 1 minute</Trans>
-                        )}
+                        <Trans>Remix a game in 2 minutes</Trans>
                       </Text>
                     </Line>
                     <QuickCustomizationGameTiles
@@ -611,7 +607,7 @@ const CreateSection = ({
                   <ColumnStackLayout noMargin>
                     <Line noMargin justifyContent="space-between">
                       <Text size="block-title" noMargin>
-                        <Trans>Remix an existing game</Trans>
+                        <Trans>Start from a template</Trans>
                       </Text>
                       <FlatButton
                         onClick={() => setShowAllGameTemplates(true)}

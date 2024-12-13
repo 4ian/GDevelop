@@ -7,22 +7,22 @@ import DashboardWidget, {
 import { ColumnStackLayout } from '../../UI/Layout';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { EarnBadges } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnBadges';
+import { EarnCredits } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnCredits';
 import TextButton from '../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 
 type Props = {|
   onOpenProfile: () => void,
   size: DashboardWidgetSize,
-  showRandomBadge?: boolean,
-  showAllBadges?: boolean,
+  showOneItem?: boolean,
+  showAllItems?: boolean,
 |};
 
 const WalletWidget = ({
   onOpenProfile,
   size,
-  showRandomBadge,
-  showAllBadges,
+  showOneItem,
+  showAllItems,
 }: Props) => {
   const {
     profile,
@@ -32,6 +32,7 @@ const WalletWidget = ({
     onOpenCreateAccountDialog,
   } = React.useContext(AuthenticatedUserContext);
   const creditsAvailable = limits ? limits.credits.userBalance.amount : 0;
+
   return (
     <DashboardWidget
       widgetSize={size}
@@ -46,12 +47,12 @@ const WalletWidget = ({
       widgetName="wallet"
     >
       <ColumnStackLayout noMargin expand>
-        <EarnBadges
+        <EarnCredits
           achievements={achievements}
           badges={badges}
           onOpenProfile={onOpenProfile}
-          showRandomBadge={showRandomBadge}
-          showAllBadges={showAllBadges}
+          showRandomItem={showOneItem}
+          showAllItems={showAllItems}
         />
       </ColumnStackLayout>
     </DashboardWidget>

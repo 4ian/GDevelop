@@ -1142,6 +1142,20 @@ const MainFrame = (props: Props) => {
       oldProjectId,
       options,
     }) => {
+      // Update the currentFileMetadata based on the updated project, as
+      // it can have been updated in the meantime (gameId, project name, etc...).
+      // Use the ref here to be sure to have the latest file metadata.
+      if (currentFileMetadataRef.current) {
+        const newFileMetadata: FileMetadata = {
+          ...currentFileMetadataRef.current,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+        };
+        setState(state => ({
+          ...state,
+          currentFileMetadata: newFileMetadata,
+        }));
+      }
       setNewProjectSetupDialogOpen(false);
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);

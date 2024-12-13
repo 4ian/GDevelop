@@ -58,6 +58,11 @@ export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
 
 const styles = {
+  tooltipButtonContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
   buttonsContainer: {
     display: 'flex',
     flexShrink: 0,
@@ -288,19 +293,23 @@ const GameDashboardCard = ({
               )
             }
           >
-            <TextButton
-              onClick={() =>
-                onOpenGameManager({ game, widgetToScrollTo: 'projects' })
-              }
-              icon={<FileWithLines style={styles.fileIcon} />}
-              label={
-                <Text noMargin color="secondary">
-                  {projectsList.length}
-                </Text>
-              }
-              disabled={disabled}
-              style={styles.projectFilesButton}
-            />
+            {/* Button must be wrapped in a container so that the parent tooltip
+                  can display even if the button is disabled. */}
+            <div style={styles.tooltipButtonContainer}>
+              <TextButton
+                onClick={() =>
+                  onOpenGameManager({ game, widgetToScrollTo: 'projects' })
+                }
+                icon={<FileWithLines style={styles.fileIcon} />}
+                label={
+                  <Text noMargin color="secondary">
+                    {projectsList.length}
+                  </Text>
+                }
+                disabled={disabled}
+                style={styles.projectFilesButton}
+              />
+            </div>
           </Tooltip>
         </>
       )}

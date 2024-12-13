@@ -8,8 +8,14 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = (color?: 'success', gdevelopTheme: GDevelopTheme) =>
   makeStyles({
+    colorSecondary: {
+      backgroundColor: gdevelopTheme.paper.backgroundColor.light,
+    },
     barColorSecondary: {
-      backgroundColor: gdevelopTheme.statusIndicator.success,
+      backgroundColor:
+        color === 'success'
+          ? gdevelopTheme.statusIndicator.success
+          : gdevelopTheme.palette.secondary,
     },
   })();
 

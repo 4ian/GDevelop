@@ -64,6 +64,10 @@ export const TUTORIAL_CATEGORY_TEXTS = {
       </Trans>
     ),
   },
+  course: {
+    title: 'UNUSED',
+    description: 'UNUSED',
+  },
   recommendations: {
     title: <Trans>Recommendations</Trans>,
     description: null,
@@ -123,12 +127,11 @@ const styles = {
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  initialCategory: TutorialCategory | null,
+  selectedCategory: TutorialCategory | null,
+  onSelectCategory: (TutorialCategory | null) => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   course: ?Course,
-  displayCourse: boolean,
-  onDisplayCourse: boolean => void,
   courseChapters: ?(CourseChapter[]),
   isLoadingChapters: boolean,
   onCompleteCourseTask: (
@@ -147,13 +150,12 @@ type Props = {|
 const LearnSection = ({
   onTabChange,
   selectInAppTutorial,
-  initialCategory,
+  selectedCategory,
+  onSelectCategory,
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
-  displayCourse,
   course,
   courseChapters,
-  onDisplayCourse,
   isLoadingChapters,
   onCompleteCourseTask,
   isCourseTaskCompleted,
@@ -174,26 +176,12 @@ const LearnSection = ({
     [fetchTutorials]
   );
 
-  const [
-    selectedCategory,
-    setSelectedCategory,
-  ] = React.useState<?TutorialCategory>(initialCategory || null);
-
-  React.useEffect(
-    () => {
-      if (initialCategory) {
-        setSelectedCategory(initialCategory);
-      }
-    },
-    [initialCategory]
-  );
-
-  if (displayCourse && courseChapters && course) {
+  if (selectedCategory === 'course' && courseChapters && course) {
     return (
       <CourseSection
         course={course}
         courseChapters={courseChapters}
-        onBack={() => onDisplayCourse(false)}
+        onBack={() => onSelectCategory(null)}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
         onCompleteTask={onCompleteCourseTask}
         isTaskCompleted={isCourseTaskCompleted}
@@ -221,19 +209,18 @@ const LearnSection = ({
   return !selectedCategory ? (
     <MainPage
       onTabChange={onTabChange}
-      onSelectCategory={setSelectedCategory}
+      onSelectCategory={onSelectCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
       course={course}
       courseChapters={courseChapters}
-      onDisplayCourse={onDisplayCourse}
       isLoadingChapters={isLoadingChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
     />
   ) : (
     <TutorialsCategoryPage
-      onBack={() => setSelectedCategory(null)}
+      onBack={() => onSelectCategory(null)}
       category={selectedCategory}
       tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}

@@ -102,7 +102,7 @@ type TutorialsRowProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   category: TutorialCategory,
-  onSelectCategory: TutorialCategory => void,
+  onSelectCategory: (TutorialCategory | null) => void,
   onSelectTutorial: (tutorial: Tutorial) => void,
 |};
 
@@ -139,12 +139,11 @@ export const TutorialsRow = ({
 
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
-  onSelectCategory: (?TutorialCategory) => void,
+  onSelectCategory: (TutorialCategory | null) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
   course: ?Course,
   courseChapters: ?(CourseChapter[]),
-  onDisplayCourse: boolean => void,
   isLoadingChapters: boolean,
   getCourseCompletion: () => CourseCompletion | null,
   getCourseChapterCompletion: (
@@ -159,7 +158,6 @@ const MainPage = ({
   selectInAppTutorial,
   course,
   courseChapters,
-  onDisplayCourse,
   isLoadingChapters,
   getCourseCompletion,
   getCourseChapterCompletion,
@@ -219,7 +217,7 @@ const MainPage = ({
             courseChapters={courseChapters}
             getCourseCompletion={getCourseCompletion}
             getCourseChapterCompletion={getCourseChapterCompletion}
-            onDisplayCourse={onDisplayCourse}
+            onDisplayCourse={() => onSelectCategory('course')}
           />
         )}
       </SectionRow>

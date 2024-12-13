@@ -11,6 +11,11 @@ export type TutorialCategory =
   | 'official-intermediate'
   | 'official-advanced'
   | 'recommendations'
+  // 'course' is not a tutorial category per se (it's not included in the
+  // tutorials database) but it's convenient having it as a category to
+  // make sure the Learn section handles one variable only to know if it
+  // should display the main page, the course or a tutorial's category page.
+  | 'course'
   | 'education-curriculum';
 
 export type Tutorial = {|

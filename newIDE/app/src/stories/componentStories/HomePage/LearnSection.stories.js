@@ -46,13 +46,12 @@ export const Default = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          displayCourse={false}
-          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
-          initialCategory={null}
+          selectedCategory={null}
+          onSelectCategory={action('onSelectCategory')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -82,13 +81,12 @@ export const NotAuthenticated = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          displayCourse={false}
-          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
-          initialCategory={null}
+          selectedCategory={null}
+          onSelectCategory={action('onSelectCategory')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -120,13 +118,12 @@ export const EducationSubscriber = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          displayCourse={false}
-          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
-          initialCategory={null}
+          selectedCategory={null}
+          onSelectCategory={action('onSelectCategory')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -158,13 +155,12 @@ export const EducationTeacher = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          displayCourse={false}
-          onDisplayCourse={action('onDisplayCourse')}
           isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
-          initialCategory={null}
+          selectedCategory={null}
+          onSelectCategory={action('onSelectCategory')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
@@ -193,13 +189,12 @@ export const Loading = () => (
         courseChapters={null}
         course={null}
         isCourseTaskCompleted={() => false}
-        displayCourse={false}
-        onDisplayCourse={action('onDisplayCourse')}
         isLoadingChapters={false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}
         getCourseCompletion={() => null}
-        initialCategory={null}
+        selectedCategory={null}
+        onSelectCategory={action('onSelectCategory')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}

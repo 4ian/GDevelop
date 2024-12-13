@@ -242,7 +242,11 @@ export const HomePage = React.memo<Props>(
         getCourseCompletion,
         onBuyCourseChapterWithCredits,
       } = useCourses();
-      const [displayCourse, setDisplayCourse] = React.useState<boolean>(false);
+      const [
+        learnCategory,
+        setLearnCategory,
+      ] = React.useState<TutorialCategory | null>(null);
+
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -257,10 +261,6 @@ export const HomePage = React.memo<Props>(
         : 'build';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
-      const [
-        learnInitialCategory,
-        setLearnInitialCategory,
-      ] = React.useState<TutorialCategory | null>(null);
 
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
@@ -315,7 +315,7 @@ export const HomePage = React.memo<Props>(
             const courseId = routeArguments['course-id'];
 
             if (courseId && selectedCourse && selectedCourse.id === courseId) {
-              setDisplayCourse(true);
+              setLearnCategory('course');
               removeRouteArguments(['course-id']);
             }
           }
@@ -544,10 +544,9 @@ export const HomePage = React.memo<Props>(
                       onOpenTemplateFromCourseChapter={
                         onOpenTemplateFromCourseChapter
                       }
-                      initialCategory={learnInitialCategory}
+                      selectedCategory={learnCategory}
+                      onSelectCategory={setLearnCategory}
                       course={selectedCourse}
-                      displayCourse={displayCourse}
-                      onDisplayCourse={setDisplayCourse}
                       courseChapters={courseChapters}
                       isLoadingChapters={isLoadingChapters}
                       onCompleteCourseTask={onCompleteTask}
@@ -578,7 +577,7 @@ export const HomePage = React.memo<Props>(
                         storageProviders={storageProviders}
                         currentFileMetadata={fileMetadata}
                         onOpenTeachingResources={() => {
-                          setLearnInitialCategory('education-curriculum');
+                          setLearnCategory('education-curriculum');
                           setActiveTab('learn');
                         }}
                       />

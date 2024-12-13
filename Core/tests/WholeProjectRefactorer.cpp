@@ -2273,7 +2273,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .GetObjectType() == "MyRenamedExtension::MyEventsBasedObject");
   }
 
-  SECTION("(Free) events action renamed") {
+  SECTION("(Free function) events action renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2291,7 +2291,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("(Free) events expression renamed") {
+  SECTION("(Free function) events expression renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2309,7 +2309,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("(Free) events expression and condition renamed") {
+  SECTION("(Free function) events expression and condition renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2338,7 +2338,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("(Free) number parameter renamed (in expressions)") {
+  SECTION("(Free function) number parameter renamed (in expressions)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2372,7 +2372,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedParameter])");
   }
 
-  SECTION("(Free) number parameter not renamed (in variable parameter)") {
+  SECTION("(Free function) number parameter not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2408,7 +2408,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyParameter)");
   }
 
-  SECTION("(Free) object parameter renamed (in expressions)") {
+  SECTION("(Free function) object parameter renamed (in expressions)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2447,7 +2447,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedObject.GetObjectStringWith1Param(0)])");
   }
 
-  SECTION("(Free) object parameter not renamed (in variable parameter)") {
+  SECTION("(Free function) object parameter not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2484,7 +2484,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyObject)");
   }
 
-  SECTION("(Free) behavior parameter renamed (in expressions)") {
+  SECTION("(Free function) behavior parameter renamed (in expressions)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2528,7 +2528,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyObject.MyRenamedBehavior::GetBehaviorStringWith1Param(0)])");
   }
 
-  SECTION("(Free) behavior parameter not renamed (in variable parameter)") {
+  SECTION("(Free function) behavior parameter not renamed (in variable parameter)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2570,7 +2570,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyBehavior)");
   }
 
-  SECTION("(Free) events action parameter moved") {
+  SECTION("(Free function) events action parameter moved") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2592,7 +2592,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("(Free) events expression parameter moved") {
+  SECTION("(Free function) events expression parameter moved") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -2610,7 +2610,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 
-  SECTION("(Free) events expression and condition parameter moved") {
+  SECTION("(Free function) events expression and condition parameter moved") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);

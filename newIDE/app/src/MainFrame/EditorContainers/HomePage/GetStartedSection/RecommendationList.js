@@ -361,7 +361,7 @@ const RecommendationList = ({
 
           items.push(
             <SectionRow key="guided-lessons">
-              <Line justifyContent="space-between" noMargin>
+              <Line justifyContent="space-between" noMargin alignItems="center">
                 <Text size="section-title" noMargin>
                   <Trans>Build game mechanics</Trans>
                 </Text>

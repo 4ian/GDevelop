@@ -43,6 +43,8 @@ import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
+import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
+import useCourses from './UseCourses';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -58,6 +60,8 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'team-view';
   } else if (routeArguments['initial-dialog'] === 'play') {
     return 'play';
+  } else if (routeArguments['initial-dialog'] === 'learn') {
+    return 'learn';
   } else if (routeArguments['initial-dialog'] === 'get-started') {
     return 'get-started';
   }
@@ -135,6 +139,9 @@ type Props = {|
     i18n: I18nType
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    courseChapter: CourseChapter
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -183,6 +190,7 @@ export const HomePage = React.memo<Props>(
         askToCloseProject,
         closeProject,
         onOpenTemplateFromTutorial,
+        onOpenTemplateFromCourseChapter,
         gamesList,
       }: Props,
       ref
@@ -224,6 +232,21 @@ export const HomePage = React.memo<Props>(
         educationFormStatus,
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
+      const {
+        selectedCourse,
+        courseChapters,
+        isLoadingChapters,
+        onCompleteTask,
+        isTaskCompleted,
+        getChapterCompletion,
+        getCourseCompletion,
+        onBuyCourseChapterWithCredits,
+      } = useCourses();
+      const [
+        learnCategory,
+        setLearnCategory,
+      ] = React.useState<TutorialCategory | null>(null);
+
       const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
@@ -238,10 +261,6 @@ export const HomePage = React.memo<Props>(
         : 'build';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
-      const [
-        learnInitialCategory,
-        setLearnInitialCategory,
-      ] = React.useState<TutorialCategory | null>(null);
 
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
@@ -292,12 +311,20 @@ export const HomePage = React.memo<Props>(
                 }
               }
             }
+          } else if (requestedTab === 'learn') {
+            const courseId = routeArguments['course-id'];
+
+            if (courseId && selectedCourse && selectedCourse.id === courseId) {
+              setLearnCategory('course');
+              removeRouteArguments(['course-id']);
+            }
           }
 
           removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,
+          selectedCourse,
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
@@ -514,7 +541,21 @@ export const HomePage = React.memo<Props>(
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
-                      initialCategory={learnInitialCategory}
+                      onOpenTemplateFromCourseChapter={
+                        onOpenTemplateFromCourseChapter
+                      }
+                      selectedCategory={learnCategory}
+                      onSelectCategory={setLearnCategory}
+                      course={selectedCourse}
+                      courseChapters={courseChapters}
+                      isLoadingChapters={isLoadingChapters}
+                      onCompleteCourseTask={onCompleteTask}
+                      isCourseTaskCompleted={isTaskCompleted}
+                      getCourseChapterCompletion={getChapterCompletion}
+                      getCourseCompletion={getCourseCompletion}
+                      onBuyCourseChapterWithCredits={
+                        onBuyCourseChapterWithCredits
+                      }
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}
@@ -536,7 +577,7 @@ export const HomePage = React.memo<Props>(
                         storageProviders={storageProviders}
                         currentFileMetadata={fileMetadata}
                         onOpenTeachingResources={() => {
-                          setLearnInitialCategory('education-curriculum');
+                          setLearnCategory('education-curriculum');
                           setActiveTab('learn');
                         }}
                       />
@@ -593,6 +634,7 @@ export const renderHomePageContainer = (
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenTemplateFromTutorial={props.onOpenTemplateFromTutorial}
+    onOpenTemplateFromCourseChapter={props.onOpenTemplateFromCourseChapter}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onCreateProjectFromExample={props.onCreateProjectFromExample}

@@ -8,6 +8,7 @@ import {
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import {
   type PrivateGameTemplateListingData,
@@ -174,6 +175,49 @@ export type AllResources = {|
   resources: Array<Resource>,
   resourcesV2: Array<ResourceV2>,
   filters: Filters,
+|};
+
+export type CourseChapterTask = {|
+  title: string,
+  subtitle?: string,
+  imageUrls?: string[],
+  hint?: string,
+  text?: string,
+  answer?: { text?: string, imageUrls?: string[] },
+|};
+
+export type UnlockedCourseChapter = {|
+  id: string,
+  title: string,
+  videoUrl: string,
+  isLocked?: false,
+  templateUrl: string,
+  tasks: Array<CourseChapterTask>,
+|};
+export type LockedCourseChapter = {|
+  id: string,
+  title: string,
+  videoUrl: string,
+  isLocked: true,
+  priceInCredits?: number,
+  productId: string,
+|};
+
+export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
+
+export type Course = {|
+  id: string,
+  titleByLocale: MessageByLocale,
+  shortDescriptionByLocale: MessageByLocale,
+  levelByLocale: MessageByLocale,
+  durationInWeeks: number,
+  chaptersTargetCount: number,
+|};
+
+export type UserCourseProgress = {|
+  userId: string,
+  courseId: string,
+  progress: {| chapterId: string, completedTasks: number[] |}[],
 |};
 
 export type Environment = 'staging' | 'live';
@@ -498,6 +542,7 @@ const resourceFilenameRegex = new RegExp(
     GDevelopPublicAssetResourcesStorageStagingBaseUrl
   )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
 );
+
 export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   url: string
 ): string => {
@@ -510,4 +555,39 @@ export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
     filenameWithExtension
   );
   return decodedFilenameWithExtension;
+};
+
+export const listCourses = async (): Promise<Array<Course>> => {
+  const response = await client.get(`/course`);
+  return response.data;
+};
+
+export const listCourseChapters = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    courseId,
+    lang,
+  }: {|
+    userId: ?string,
+    courseId: string,
+    lang: string,
+  |}
+): Promise<Array<CourseChapter>> => {
+  if (userId) {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.get(`/course/${courseId}/chapter`, {
+      params: {
+        userId,
+        lang,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
+  const response = await client.get(`/course/${courseId}/chapter`);
+  return response.data;
 };

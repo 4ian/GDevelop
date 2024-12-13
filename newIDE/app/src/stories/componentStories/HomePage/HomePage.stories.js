@@ -110,6 +110,9 @@ const WrappedHomePage = ({
               onOpenTemplateFromTutorial={() =>
                 action('onOpenTemplateFromTutorial')()
               }
+              onOpenTemplateFromCourseChapter={() =>
+                action('onOpenTemplateFromCourseChapter')()
+              }
               canSave={true}
               onSave={() => action('onSave')()}
               selectInAppTutorial={() => action('select in app tutorial')()}

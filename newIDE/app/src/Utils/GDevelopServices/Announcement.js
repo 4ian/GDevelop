@@ -16,8 +16,12 @@ export type Announcement = {
 
 export interface Promotion {
   id: string;
-  imageUrl: string;
-  mobileImageUrl: string;
+  /** Deprecated, should use the "by locale" attribute instead. */
+  imageUrl?: string;
+  imageUrlByLocale?: MessageByLocale;
+  /** Deprecated, should use the "by locale" attribute instead. */
+  mobileImageUrl?: string;
+  mobileImageUrlByLocale?: MessageByLocale;
   display: 'all' | 'non-native-mobile' | 'native-mobile';
   type: 'game-template' | 'asset-pack' | 'game' | 'other';
   linkUrl?: string;

@@ -35,6 +35,18 @@ export const Default = () => {
           value={(step / STEP_COUNT) * 100}
         />
       </Line>
+      <Text>Indeterminate success color</Text>
+      <Line expand noMargin>
+        <LinearProgress color="success" />
+      </Line>
+      <Text>Determinate success color</Text>
+      <Line expand noMargin>
+        <LinearProgress
+          variant="determinate"
+          value={(step / STEP_COUNT) * 100}
+          color="success"
+        />
+      </Line>
     </ColumnStackLayout>
   );
 };

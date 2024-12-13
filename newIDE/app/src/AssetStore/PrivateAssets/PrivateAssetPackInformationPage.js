@@ -486,6 +486,7 @@ const PrivateAssetPackInformationPage = ({
             productId: privateAssetPackListingData.id,
             usageType: selectedUsageType,
             userId: profile.id,
+            password,
           }),
         successMessage: <Trans>🎉 You can now use your assets!</Trans>,
       });
@@ -502,6 +503,7 @@ const PrivateAssetPackInformationPage = ({
       openCreditsUsageDialog,
       getAuthorizationHeader,
       onOpenLoginDialog,
+      password,
     ]
   );
 

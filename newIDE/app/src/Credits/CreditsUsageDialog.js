@@ -12,6 +12,7 @@ import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   onClose: () => void,
@@ -31,7 +32,7 @@ const CreditsUsageDialog = ({
   closeAutomaticallyAfterSuccess,
 }: Props) => {
   const [isPurchasing, setIsPurchasing] = React.useState(false);
-  const [isPurchaseSuccessful, setisPurchaseSuccessful] = React.useState(false);
+  const [isPurchaseSuccessful, setIsPurchaseSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();
   const {
     onRefreshGameTemplatePurchases,
@@ -54,8 +55,23 @@ const CreditsUsageDialog = ({
         if (closeAutomaticallyAfterSuccess) onClose();
 
         // Show a success message to the user.
-        setisPurchaseSuccessful(true);
+        setIsPurchaseSuccessful(true);
       } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 409 &&
+          extractedStatusAndCode.code ===
+            'product-buy-with-credits/already-purchased'
+        ) {
+          await showAlert({
+            title: t`You already own this product`,
+            message: t`If you don't have access to it, restart GDevelop. If you still can't access it, please contact us.`,
+          });
+          return;
+        }
         console.error('An error happened while purchasing a product:', error);
         await showAlert({
           title: t`Could not purchase this product`,

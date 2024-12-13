@@ -21,6 +21,12 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { formatDuration } from '../../../../Utils/Duration';
+import CourseSection from './CourseSection';
+import type {
+  CourseChapter,
+  Course,
+} from '../../../../Utils/GDevelopServices/Asset';
+import type { CourseChapterCompletion, CourseCompletion } from '../UseCourses';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -57,6 +63,10 @@ export const TUTORIAL_CATEGORY_TEXTS = {
         Ready to use resources for teaching.
       </Trans>
     ),
+  },
+  course: {
+    title: 'UNUSED',
+    description: 'UNUSED',
   },
   recommendations: {
     title: <Trans>Recommendations</Trans>,
@@ -117,15 +127,41 @@ const styles = {
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  initialCategory: TutorialCategory | null,
+  selectedCategory: TutorialCategory | null,
+  onSelectCategory: (TutorialCategory | null) => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  course: ?Course,
+  courseChapters: ?(CourseChapter[]),
+  isLoadingChapters: boolean,
+  onCompleteCourseTask: (
+    chapterId: string,
+    taskIndex: number,
+    completed: boolean
+  ) => void,
+  isCourseTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
+  getCourseChapterCompletion: (
+    chapterId: string
+  ) => CourseChapterCompletion | null,
+  getCourseCompletion: () => CourseCompletion | null,
+  onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
 const LearnSection = ({
   onTabChange,
   selectInAppTutorial,
-  initialCategory,
+  selectedCategory,
+  onSelectCategory,
   onOpenTemplateFromTutorial,
+  onOpenTemplateFromCourseChapter,
+  course,
+  courseChapters,
+  isLoadingChapters,
+  onCompleteCourseTask,
+  isCourseTaskCompleted,
+  getCourseChapterCompletion,
+  getCourseCompletion,
+  onBuyCourseChapterWithCredits,
 }: Props) => {
   const {
     tutorials,
@@ -140,19 +176,21 @@ const LearnSection = ({
     [fetchTutorials]
   );
 
-  const [
-    selectedCategory,
-    setSelectedCategory,
-  ] = React.useState<?TutorialCategory>(initialCategory || null);
-
-  React.useEffect(
-    () => {
-      if (initialCategory) {
-        setSelectedCategory(initialCategory);
-      }
-    },
-    [initialCategory]
-  );
+  if (selectedCategory === 'course' && courseChapters && course) {
+    return (
+      <CourseSection
+        course={course}
+        courseChapters={courseChapters}
+        onBack={() => onSelectCategory(null)}
+        onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
+        onCompleteTask={onCompleteCourseTask}
+        isTaskCompleted={isCourseTaskCompleted}
+        getChapterCompletion={getCourseChapterCompletion}
+        getCourseCompletion={getCourseCompletion}
+        onBuyCourseChapterWithCredits={onBuyCourseChapterWithCredits}
+      />
+    );
+  }
 
   if (tutorialLoadingError)
     return (
@@ -171,13 +209,18 @@ const LearnSection = ({
   return !selectedCategory ? (
     <MainPage
       onTabChange={onTabChange}
-      onSelectCategory={setSelectedCategory}
+      onSelectCategory={onSelectCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
+      course={course}
+      courseChapters={courseChapters}
+      isLoadingChapters={isLoadingChapters}
+      getCourseCompletion={getCourseCompletion}
+      getCourseChapterCompletion={getCourseChapterCompletion}
     />
   ) : (
     <TutorialsCategoryPage
-      onBack={() => setSelectedCategory(null)}
+      onBack={() => onSelectCategory(null)}
       category={selectedCategory}
       tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}

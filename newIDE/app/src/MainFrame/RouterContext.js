@@ -20,6 +20,7 @@ type RouteKey =
   | 'asset-pack'
   | 'game-template'
   | 'tutorial-id'
+  | 'course-id'
   | 'create-from-example';
 export type RouteArguments = { [RouteKey]: string };
 

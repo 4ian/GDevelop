@@ -13,6 +13,11 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
+import type {
+  Course,
+  CourseChapter,
+} from '../../../../Utils/GDevelopServices/Asset';
+import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import FlatButton from '../../../../UI/FlatButton';
 import {
   useResponsiveWindowSize,
@@ -37,6 +42,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import Help from '../../../../UI/CustomSvgIcons/Help';
 import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
+import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -96,7 +102,7 @@ type TutorialsRowProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   category: TutorialCategory,
-  onSelectCategory: TutorialCategory => void,
+  onSelectCategory: (TutorialCategory | null) => void,
   onSelectTutorial: (tutorial: Tutorial) => void,
 |};
 
@@ -133,9 +139,16 @@ export const TutorialsRow = ({
 
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
-  onSelectCategory: (?TutorialCategory) => void,
+  onSelectCategory: (TutorialCategory | null) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
+  course: ?Course,
+  courseChapters: ?(CourseChapter[]),
+  isLoadingChapters: boolean,
+  getCourseCompletion: () => CourseCompletion | null,
+  getCourseChapterCompletion: (
+    chapterId: string
+  ) => CourseChapterCompletion | null,
 |};
 
 const MainPage = ({
@@ -143,6 +156,11 @@ const MainPage = ({
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
+  course,
+  courseChapters,
+  isLoadingChapters,
+  getCourseCompletion,
+  getCourseChapterCompletion,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
@@ -192,6 +210,31 @@ const MainPage = ({
 
   return (
     <SectionContainer>
+      <SectionRow>
+        {!!course && !!courseChapters && (
+          <CoursePreviewBanner
+            course={course}
+            courseChapters={courseChapters}
+            getCourseCompletion={getCourseCompletion}
+            getCourseChapterCompletion={getCourseChapterCompletion}
+            onDisplayCourse={() => onSelectCategory('course')}
+          />
+        )}
+      </SectionRow>
+      <SectionRow>
+        <Line justifyContent="space-between" noMargin alignItems="center">
+          <Text noMargin size="title">
+            <Trans>Guided lessons</Trans>
+          </Text>
+          {showInAppTutorialDeveloperMode && (
+            <FlatButton
+              label={<Trans>Load local lesson</Trans>}
+              onClick={onLoadInAppTutorialFromLocalFile}
+            />
+          )}
+        </Line>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
           <Line noMargin>
@@ -261,20 +304,6 @@ const MainPage = ({
             </GridList>
           </Line>
         </ColumnStackLayout>
-      </SectionRow>
-      <SectionRow>
-        <Line justifyContent="space-between" noMargin>
-          <Text noMargin size="title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          {showInAppTutorialDeveloperMode && (
-            <FlatButton
-              label={<Trans>Load local lesson</Trans>}
-              onClick={onLoadInAppTutorialFromLocalFile}
-            />
-          )}
-        </Line>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
       </SectionRow>
       <>
         <SectionRow>

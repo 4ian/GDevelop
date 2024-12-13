@@ -11,30 +11,29 @@ import { LineStackLayout } from '../../../UI/Layout';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
-export const SECTION_PADDING = 20;
+export const SECTION_DESKTOP_SPACING = 20;
+const SECTION_MOBILE_SPACING_TOP = 10;
 
 const styles = {
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
   mobileContainer: {
-    paddingTop: 10,
     paddingLeft: 5,
     paddingRight: 5,
   },
   desktopContainer: {
-    paddingTop: SECTION_PADDING,
-    paddingLeft: SECTION_PADDING,
-    paddingRight: SECTION_PADDING,
+    paddingLeft: SECTION_DESKTOP_SPACING,
+    paddingRight: SECTION_DESKTOP_SPACING,
   },
   mobileFooter: {
     padding: 5,
   },
   desktopFooter: {
-    paddingLeft: SECTION_PADDING,
+    paddingLeft: SECTION_DESKTOP_SPACING,
   },
   rowContainer: {
     display: 'flex',
     flexDirection: 'column',
-    paddingBottom: SECTION_PADDING,
+    paddingBottom: SECTION_DESKTOP_SPACING,
   },
   container: {
     flex: 1,
@@ -44,6 +43,13 @@ const styles = {
   },
   noScrollContainer: {
     overflowY: 'hidden',
+  },
+  childrenContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    minWidth: 0,
+    flex: 1,
   },
 };
 
@@ -58,98 +64,122 @@ type Props = {|
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,
+  applyTopSpacingAsMarginOnChildrenContainer?: boolean,
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer = ({
-  children,
-  title,
-  titleAdornment,
-  titleAction,
-  subtitleText,
-  renderSubtitle,
-  backAction,
-  flexBody,
-  renderFooter,
-  noScroll,
-  showUrgentAnnouncements,
-}: Props) => {
-  const { isMobile } = useResponsiveWindowSize();
-  const { announcements } = React.useContext(AnnouncementsFeedContext);
-  const containerStyle: {|
-    paddingTop: number,
-    paddingLeft: number,
-    paddingRight: number,
-  |} = isMobile ? styles.mobileContainer : styles.desktopContainer;
-  const scrollStyle: {| overflowY: string |} = noScroll
-    ? styles.noScrollContainer
-    : styles.scrollContainer;
-  const paperStyle = {
-    ...styles.container,
-    display: flexBody ? 'flex' : 'block',
-    ...containerStyle,
-    ...scrollStyle,
-  };
+const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
+  (
+    {
+      children,
+      title,
+      titleAdornment,
+      titleAction,
+      subtitleText,
+      renderSubtitle,
+      backAction,
+      flexBody,
+      renderFooter,
+      noScroll,
+      applyTopSpacingAsMarginOnChildrenContainer,
+      showUrgentAnnouncements,
+    },
+    ref
+  ) => {
+    const { isMobile } = useResponsiveWindowSize();
+    const { announcements } = React.useContext(AnnouncementsFeedContext);
+    const containerStyle: {|
+      paddingTop: number,
+      paddingLeft: number,
+      paddingRight: number,
+    |} = {
+      ...(isMobile ? styles.mobileContainer : styles.desktopContainer),
+      paddingTop: applyTopSpacingAsMarginOnChildrenContainer
+        ? 0
+        : isMobile
+        ? SECTION_MOBILE_SPACING_TOP
+        : SECTION_DESKTOP_SPACING,
+    };
+    const scrollStyle: {| overflowY: string |} = noScroll
+      ? styles.noScrollContainer
+      : styles.scrollContainer;
+    const paperStyle = {
+      ...styles.container,
+      display: flexBody ? 'flex' : 'block',
+      ...containerStyle,
+      ...scrollStyle,
+    };
+    const childrenContainerStyle = {
+      ...styles.childrenContainer,
+      marginTop: applyTopSpacingAsMarginOnChildrenContainer
+        ? isMobile
+          ? SECTION_MOBILE_SPACING_TOP
+          : SECTION_DESKTOP_SPACING
+        : 0,
+    };
 
-  return (
-    <Column useFullHeight noMargin expand>
-      <Paper style={paperStyle} square background="dark">
-        <Column noOverflowParent expand>
-          {showUrgentAnnouncements && (
-            <>
-              <AnnouncementsFeed canClose level="urgent" hideLoader />
-              {announcements && announcements.length > 0 && <Spacer />}
-            </>
-          )}
-          {backAction && (
-            <Line>
-              <TextButton
-                onClick={backAction}
-                icon={<ArrowLeft fontSize="small" />}
-                label={<Trans>Back</Trans>}
-              />
-            </Line>
-          )}
-          {(title || subtitleText || renderSubtitle) && (
-            <SectionRow>
-              {title && (
-                <LineStackLayout
-                  noMargin
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <LineStackLayout noMargin alignItems="center">
-                    <Text size="bold-title" noMargin style={styles.title}>
-                      {title}
-                    </Text>
-                    {titleAction}
+    return (
+      <Column expand useFullHeight noMargin>
+        <Paper style={paperStyle} square background="dark" ref={ref}>
+          <div style={childrenContainerStyle}>
+            {showUrgentAnnouncements && (
+              <>
+                <AnnouncementsFeed canClose level="urgent" hideLoader />
+                {announcements && announcements.length > 0 && <Spacer />}
+              </>
+            )}
+            {backAction && (
+              <Line>
+                <TextButton
+                  onClick={backAction}
+                  icon={<ArrowLeft fontSize="small" />}
+                  label={<Trans>Back</Trans>}
+                />
+              </Line>
+            )}
+            {(title || subtitleText || renderSubtitle) && (
+              <SectionRow>
+                {title && (
+                  <LineStackLayout
+                    noMargin
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <LineStackLayout noMargin alignItems="center">
+                      <Text size="bold-title" noMargin style={styles.title}>
+                        {title}
+                      </Text>
+                      {titleAction}
+                    </LineStackLayout>
+                    {titleAdornment && (
+                      <Column noMargin>{titleAdornment}</Column>
+                    )}
                   </LineStackLayout>
-                  {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
-                </LineStackLayout>
-              )}
-              {subtitleText && (
-                <Line noMargin>
-                  <Text noMargin>{subtitleText}</Text>
-                </Line>
-              )}
-              {renderSubtitle && renderSubtitle()}
-            </SectionRow>
-          )}
-          {children}
-        </Column>
-      </Paper>
-      {renderFooter && (
-        <Paper
-          style={isMobile ? styles.mobileFooter : styles.desktopFooter}
-          square
-          background="dark"
-        >
-          {renderFooter()}
+                )}
+                {subtitleText && (
+                  <Line noMargin>
+                    <Text noMargin>{subtitleText}</Text>
+                  </Line>
+                )}
+                {renderSubtitle && renderSubtitle()}
+              </SectionRow>
+            )}
+            {children}
+          </div>
         </Paper>
-      )}
-    </Column>
-  );
-};
+        {renderFooter && (
+          <Paper
+            style={isMobile ? styles.mobileFooter : styles.desktopFooter}
+            square
+            background="dark"
+          >
+            {renderFooter()}
+          </Paper>
+        )}
+      </Column>
+    );
+  }
+);
 
 export const SectionRow = ({
   children,

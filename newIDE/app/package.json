@@ -73,6 +73,7 @@
     "react-dnd-touch-backend": "0.8.3",
     "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",
+    "react-inner-image-zoom": "^3.0.2",
     "react-instantsearch-hooks": "^6.41.0",
     "react-json-view": "^1.16.1",
     "react-markdown": "^8.0.6",

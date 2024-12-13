@@ -35,6 +35,7 @@ const useCourses = () => {
   const {
     profile,
     limits,
+    subscription,
     getAuthorizationHeader,
     onOpenLoginDialog,
   } = React.useContext(AuthenticatedUserContext);
@@ -111,9 +112,14 @@ const useCourses = () => {
         setIsLoadingChapters(false);
       }
     },
+    // A subscription change will change the displayed chapters sent by the backend.
+    // So the user subscription is added as a dependency to make sure the chapters are
+    // up to date with the user subscription.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       getAuthorizationHeader,
       userId,
+      subscription,
       setUserCourseProgressImmediately,
       userLanguage2LetterCode,
     ]

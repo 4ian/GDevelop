@@ -29,6 +29,7 @@ import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import type { GDevelopTheme } from '../UI/Theme';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Lock from '../UI/CustomSvgIcons/Lock';
+import EmptyBadge from '../UI/CustomSvgIcons/EmptyBadge';
 
 const styles = {
   paper: { padding: 16 },
@@ -39,6 +40,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 8,
+    justifyContent: 'space-between',
   },
   progress: { borderRadius: 4, height: 5 },
   chip: { height: 24 },
@@ -48,6 +50,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     fontSize: 20,
+  },
+  emptyBadgeContainer: {
+    display: 'flex',
+    opacity: 0.5,
   },
 };
 
@@ -233,7 +239,7 @@ const CoursePreviewBanner = ({
     <I18n>
       {({ i18n }) => (
         <Paper
-          background="dark"
+          background="medium"
           style={isMobile && !isLandscape ? styles.mobilePaper : styles.paper}
         >
           <ResponsiveLineStackLayout
@@ -244,7 +250,7 @@ const CoursePreviewBanner = ({
             <div
               style={{
                 ...styles.leftColumn,
-                width: isMobile && !isLandscape ? '100%' : 200,
+                width: isMobile && !isLandscape ? '100%' : 220,
               }}
             >
               <Line noMargin>
@@ -298,7 +304,7 @@ const CoursePreviewBanner = ({
                     ? styles.mobilePaper
                     : styles.badgePaper
                 }
-                background="medium"
+                background="light"
               >
                 <ResponsiveLineStackLayout
                   noResponsiveLandscape
@@ -308,13 +314,15 @@ const CoursePreviewBanner = ({
                   justifyContent="space-between"
                 >
                   <LineStackLayout alignItems="center" noMargin>
-                    <img
-                      src={'res/badges/empty-badge.svg'}
-                      alt="Empty badge"
-                      style={styles.badgeImage}
-                    />
-
-                    <Text>
+                    <div
+                      style={{
+                        ...styles.emptyBadgeContainer,
+                        color: gdevelopTheme.text.color.secondary,
+                      }}
+                    >
+                      <EmptyBadge />
+                    </div>
+                    <Text noMargin>
                       <Trans>Earn an exclusive badge</Trans>
                     </Text>
                   </LineStackLayout>

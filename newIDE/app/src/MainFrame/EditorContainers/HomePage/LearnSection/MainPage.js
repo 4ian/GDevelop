@@ -213,16 +213,32 @@ const MainPage = ({
   return (
     <SectionContainer>
       <SectionRow>
-        <ColumnStackLayout noMargin expand>
-          {course && courseChapters && (
-            <CoursePreviewBanner
-              course={course}
-              courseChapters={courseChapters}
-              getCourseCompletion={getCourseCompletion}
-              getCourseChapterCompletion={getCourseChapterCompletion}
-              onDisplayCourse={onDisplayCourse}
+        {!!course && !!courseChapters && (
+          <CoursePreviewBanner
+            course={course}
+            courseChapters={courseChapters}
+            getCourseCompletion={getCourseCompletion}
+            getCourseChapterCompletion={getCourseChapterCompletion}
+            onDisplayCourse={onDisplayCourse}
+          />
+        )}
+      </SectionRow>
+      <SectionRow>
+        <Line justifyContent="space-between" noMargin alignItems="center">
+          <Text noMargin size="title">
+            <Trans>Guided lessons</Trans>
+          </Text>
+          {showInAppTutorialDeveloperMode && (
+            <FlatButton
+              label={<Trans>Load local lesson</Trans>}
+              onClick={onLoadInAppTutorialFromLocalFile}
             />
           )}
+        </Line>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
+      <SectionRow>
+        <ColumnStackLayout noMargin expand>
           <Line noMargin>
             <GridList
               cols={getColumnsFromWindowSize(windowSize, isLandscape)}
@@ -290,20 +306,6 @@ const MainPage = ({
             </GridList>
           </Line>
         </ColumnStackLayout>
-      </SectionRow>
-      <SectionRow>
-        <Line justifyContent="space-between" noMargin>
-          <Text noMargin size="title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          {showInAppTutorialDeveloperMode && (
-            <FlatButton
-              label={<Trans>Load local lesson</Trans>}
-              onClick={onLoadInAppTutorialFromLocalFile}
-            />
-          )}
-        </Line>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
       </SectionRow>
       <>
         <SectionRow>

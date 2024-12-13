@@ -434,6 +434,14 @@ class RuntimeObject {
     return variable.getAsNumber();
   }
 
+  static getVariableString(variable) {
+    return variable.getAsString();
+  }
+
+  getVariableString(variable) {
+    return variable.getAsString();
+  }
+
   static getVariableBoolean(variable) {
     return variable.getAsBoolean();
   }
@@ -935,7 +943,8 @@ function makeMinimalGDJSMock(options) {
         variable: {
           getVariableNumber: (variable) => variable.getAsNumber(),
           getVariableString: (variable) => variable.getAsString(),
-          getVariableBoolean: (variable) => variable.getAsBoolean(),
+          getVariableBoolean: (variable, compareWith) =>
+            variable.getAsBoolean() === compareWith,
           toggleVariableBoolean: (variable) =>
             variable.setBoolean(!variable.getAsBoolean()),
           variablePushCopy: (array, variable) =>
@@ -946,8 +955,7 @@ function makeMinimalGDJSMock(options) {
             variable.hasChild(childName),
           variableRemoveChild: (variable, childName) =>
             variable.removeChild(childName),
-          variableClearChildren: (variable) =>
-            variable.clearChildren(),
+          variableClearChildren: (variable) => variable.clearChildren(),
         },
         object: {
           createObjectOnScene,

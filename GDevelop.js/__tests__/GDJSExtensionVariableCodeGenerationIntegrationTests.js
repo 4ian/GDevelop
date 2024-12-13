@@ -211,7 +211,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
         type: { inverted: false, value: 'BooleanVariable' },
-        parameters: ['MyVariable'],
+        parameters: ['MyVariable', 'True', ''],
       },
     ]);
     expect(
@@ -229,7 +229,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       .setString('Same value');
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
-        type: { inverted: false, value: 'BooleanVariable' },
+        type: { inverted: false, value: 'StringVariable' },
         parameters: ['MyVariable', '=', '"Same value"'],
       },
     ]);

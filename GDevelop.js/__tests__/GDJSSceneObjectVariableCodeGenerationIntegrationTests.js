@@ -243,7 +243,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     object.getVariables().insertNew('MyVariable', 0).setString('Same value');
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
-        type: { inverted: false, value: 'BooleanObjectVariable' },
+        type: { inverted: false, value: 'StringObjectVariable' },
         parameters: ['MyObject', 'MyVariable', '=', '"Same value"'],
       },
     ]);

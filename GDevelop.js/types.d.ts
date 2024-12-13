@@ -1863,7 +1863,7 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 }
 
 export class EventsRefactorer extends EmscriptenObject {
-  static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, oldName: string, newName: string): void;
+  static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, targetedObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
   static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
 }
@@ -1905,6 +1905,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static renameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
   static renameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
+  static renameParameter(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
   static moveEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
   static moveObjectEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;
@@ -1931,7 +1932,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static objectOrGroupRenamedInScene(project: Project, scene: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInScene(project: Project, scene: Layout, objectName: string): void;
   static behaviorsAddedToObjectInScene(project: Project, scene: Layout, objectName: string): void;
-  static objectOrGroupRenamedInEventsFunction(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRenamedInEventsFunction(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, objectName: string): void;
   static objectOrGroupRenamedInEventsBasedObject(project: Project, projectScopedContainers: ProjectScopedContainers, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, objectName: string): void;

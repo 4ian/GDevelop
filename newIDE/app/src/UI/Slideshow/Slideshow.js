@@ -80,13 +80,15 @@ const useStylesForContainer = () =>
     })
   )();
 
+export type SlideShowItem = {|
+  id: string,
+  imageUrl: string,
+  mobileImageUrl: string,
+  onClick: ?() => void,
+|};
+
 type SlideshowProps = {|
-  items: ?Array<{|
-    id: string,
-    imageUrl: string,
-    mobileImageUrl: string,
-    onClick: ?() => void,
-  |}>,
+  items: ?Array<SlideShowItem>,
   itemDesktopRatio: number,
   itemMobileRatio: number,
   additionalMarginForWidthCalculation?: number,

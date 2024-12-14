@@ -864,36 +864,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   eventsFunctionsExtensions.clear();
   const SerializerElement& eventsFunctionsExtensionsElement =
       element.GetChild("eventsFunctionsExtensions");
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
-      "eventsFunctionsExtension");
-  // First, only unserialize behaviors and objects names.
-  // As event based objects can contains custom behaviors and custom objects,
-  // this allows them to reference EventBasedBehavior and EventBasedObject
-  // respectively.
-  for (std::size_t i = 0;
-       i < eventsFunctionsExtensionsElement.GetChildrenCount();
-       ++i) {
-    const SerializerElement& eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(i);
-
-    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
-        InsertNewEventsFunctionsExtension("",
-                                          GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
-        *this, eventsFunctionsExtensionElement);
-  }
-
-  // Then unserialize functions, behaviors and objects content.
-  for (gd::String &extensionName :
-       GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
-    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
-    const SerializerElement &eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(extensionIndex);
-
-    eventsFunctionsExtensions.at(extensionIndex)
-        ->UnserializeExtensionImplementationFrom(
-            *this, eventsFunctionsExtensionElement);
-  }
+  UnserializeAndInsertExtensionsFrom(eventsFunctionsExtensionsElement);
 
   objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
@@ -958,6 +929,43 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
     gd::SourceFile& newSourceFile = InsertNewSourceFile("", "");
     newSourceFile.UnserializeFrom(sourceFileElement);
+  }
+}
+
+void Project::UnserializeAndInsertExtensionsFrom(
+  const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  // First, only unserialize behaviors and objects names.
+  // As event based objects can contains custom behaviors and custom objects,
+  // this allows them to reference EventBasedBehavior and EventBasedObject
+  // respectively.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+
+    gd::EventsFunctionsExtension& eventsFunctionsExtension =
+        HasEventsFunctionsExtensionNamed(name)
+            ? GetEventsFunctionsExtension(name)
+            : InsertNewEventsFunctionsExtension(
+                  name, GetEventsFunctionsExtensionsCount());
+    eventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+
+  // Then unserialize functions, behaviors and objects content.
+  for (gd::String &extensionName :
+       GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
+    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    const SerializerElement &eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(extensionIndex);
+
+    eventsFunctionsExtensions.at(extensionIndex)
+        ->UnserializeExtensionImplementationFrom(
+            *this, eventsFunctionsExtensionElement);
   }
 }
 

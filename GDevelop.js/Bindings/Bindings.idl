@@ -637,6 +637,7 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
     unsigned long GetEventsFunctionsExtensionPosition([Const] DOMString name);
+    void UnserializeAndInsertExtensionsFrom([Const, Ref] SerializerElement eventsFunctionsExtensionsElement);
 
     boolean HasEventsBasedBehavior([Const] DOMString type);
     [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);

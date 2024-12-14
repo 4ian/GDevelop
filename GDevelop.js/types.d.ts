@@ -597,6 +597,7 @@ export class Project extends EmscriptenObject {
   insertEventsFunctionsExtension(eventsFunctionsExtension: EventsFunctionsExtension, position: number): EventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
   getEventsFunctionsExtensionPosition(name: string): number;
+  unserializeAndInsertExtensionsFrom(eventsFunctionsExtensionsElement: SerializerElement): void;
   hasEventsBasedBehavior(type: string): boolean;
   getEventsBasedBehavior(type: string): EventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;

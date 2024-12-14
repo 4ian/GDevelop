@@ -333,34 +333,43 @@ export const installRequiredExtensions = async ({
  * Add a serialized (JS object) events function extension to the project,
  * triggering reload of extensions.
  */
-export const addSerializedExtensionsToProject = (
+export const addSerializedExtensionsToProject = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   serializedExtensions: Array<SerializedExtension>,
   fromExtensionStore: boolean = true
 ): Promise<void> => {
-  serializedExtensions.forEach(serializedExtension => {
+  const extensionNames = serializedExtensions.map(serializedExtension => {
     const { name } = serializedExtension;
-    if (!name)
-      return Promise.reject(new Error('Malformed extension (missing name).'));
+    if (!name) throw new Error('Malformed extension (missing name).');
 
-    const newEventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
-      name
-    )
-      ? project.getEventsFunctionsExtension(name)
-      : project.insertNewEventsFunctionsExtension(name, 0);
-
-    unserializeFromJSObject(
-      newEventsFunctionsExtension,
-      serializedExtension,
-      'unserializeFrom',
-      project
-    );
-
-    if (fromExtensionStore) {
-      newEventsFunctionsExtension.setOrigin('gdevelop-extension-store', name);
-    }
+    return name;
   });
+
+  // Unserialize the extensions in the project. Let the project do it
+  // (rather than adding extensions one by one) to allow dependencies between extensions.
+  const serializedExtensionsElement = gd.Serializer.fromJSObject(
+    serializedExtensions
+  );
+  project.unserializeAndInsertExtensionsFrom(serializedExtensionsElement);
+  serializedExtensionsElement.delete();
+
+  // Keep track of extensions added from the extension store.
+  if (fromExtensionStore) {
+    extensionNames.forEach(extensionName => {
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+        return;
+      }
+
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      eventsFunctionsExtension.setOrigin(
+        'gdevelop-extension-store',
+        extensionName
+      );
+    });
+  }
 
   return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
     project

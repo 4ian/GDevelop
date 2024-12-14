@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
+import Measure from 'react-measure';
 import EventsTree from './EventsTree';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
@@ -1971,6 +1972,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     screenType={screenType}
                     windowSize={windowSize}
+                    eventsSheetWidth={
+                      this._containerDiv.current
+                        ? this._containerDiv.current.clientWidth
+                        : 0
+                    }
                     eventsSheetHeight={
                       this._containerDiv.current
                         ? this._containerDiv.current.clientHeight

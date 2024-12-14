@@ -314,6 +314,7 @@ export default class ForEachChildVariableEvent extends React.Component<
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
+          eventsSheetWidth={this.props.eventsSheetWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}

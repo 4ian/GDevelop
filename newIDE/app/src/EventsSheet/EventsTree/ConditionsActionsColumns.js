@@ -13,6 +13,7 @@ type Props = {|
   windowSize: WindowSizeType,
   className?: string,
   leftIndentWidth: number,
+  eventsSheetWidth: number,
 |};
 
 const styles = {
@@ -23,6 +24,25 @@ const styles = {
   twoColumnsContainer: {
     display: 'flex',
   },
+};
+
+const getConditionWidthRatio = (eventsSheetWidth: number) => {
+  // Avoid to leave too much empty space between condition and action on big screens.
+  const ratioMin = 0.35;
+  const bigSheetWidth = 1600;
+  // Avoid to squash the condition on small screens.
+  const ratioMax = 0.5;
+  const smallSheetWidth = 800;
+  // Smoothly go from one case to another when the window is resized.
+  return Math.max(
+    ratioMin,
+    Math.min(
+      ratioMax,
+      ratioMin +
+        ((ratioMax - ratioMin) * (bigSheetWidth - eventsSheetWidth)) /
+          (bigSheetWidth - smallSheetWidth)
+    )
+  );
 };
 
 /**
@@ -51,7 +71,9 @@ const ConditionsActionsColumns = (props: Props) => {
     <div style={styles.twoColumnsContainer} className={props.className}>
       {props.renderConditionsList({
         style: {
-          width: `calc(35vw - ${props.leftIndentWidth}px)`,
+          width: `${getConditionWidthRatio(props.eventsSheetWidth) *
+            props.eventsSheetWidth -
+            props.leftIndentWidth}px`,
         },
         className: conditionsContainer,
       })}

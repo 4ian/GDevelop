@@ -163,50 +163,27 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
     return (
       <Column expand useFullHeight noOverflowParent>
-        <Line>
-          <Column noMargin expand noOverflowParent>
-            <Tabs
-              value={this.state.currentTab}
-              onChange={this._chooseTab}
-              options={[
-                {
-                  value: ('config': TabNames),
-                  label: <Trans>Configuration</Trans>,
-                },
-                {
-                  value: ('parameters': TabNames),
-                  label: <Trans>Parameters</Trans>,
-                },
-                hasLegacyFunctionObjectGroups
-                  ? {
-                      value: ('groups': TabNames),
-                      label: <Trans>Object groups</Trans>,
-                    }
-                  : null,
-              ].filter(Boolean)}
-            />
-          </Column>
-        </Line>
-        {this.state.currentTab === 'config' ? (
-          <ScrollView>
-            <Line>
-              <EventsFunctionPropertiesEditor
-                project={project}
-                eventsFunction={eventsFunction}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={eventsBasedObject}
-                eventsFunctionsContainer={eventsFunctionsContainer}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                helpPagePath={helpPagePath}
-                onConfigurationUpdated={onConfigurationUpdated}
-                renderConfigurationHeader={renderConfigurationHeader}
-                freezeEventsFunctionType={freezeEventsFunctionType}
-                getFunctionGroupNames={getFunctionGroupNames}
+        {hasLegacyFunctionObjectGroups ? (
+          <Line>
+            <Column noMargin expand noOverflowParent>
+              <Tabs
+                value={this.state.currentTab}
+                onChange={this._chooseTab}
+                options={[
+                  {
+                    value: ('config': TabNames),
+                    label: <Trans>Configuration</Trans>,
+                  },
+                  {
+                    value: ('groups': TabNames),
+                    label: <Trans>Object groups</Trans>,
+                  },
+                ]}
               />
-            </Line>
-          </ScrollView>
+            </Column>
+          </Line>
         ) : null}
-        {this.state.currentTab === 'parameters' ? (
+        {this.state.currentTab === 'config' ? (
           <EventsFunctionParametersEditor
             project={project}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -223,7 +200,21 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onMoveObjectEventsParameter={onMoveObjectEventsParameter}
             onFunctionParameterWillBeRenamed={onFunctionParameterWillBeRenamed}
             key={eventsFunction ? eventsFunction.ptr : null}
-          />
+          >
+            <EventsFunctionPropertiesEditor
+              project={project}
+              eventsFunction={eventsFunction}
+              eventsBasedBehavior={eventsBasedBehavior}
+              eventsBasedObject={eventsBasedObject}
+              eventsFunctionsContainer={eventsFunctionsContainer}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              helpPagePath={helpPagePath}
+              onConfigurationUpdated={onConfigurationUpdated}
+              renderConfigurationHeader={renderConfigurationHeader}
+              freezeEventsFunctionType={freezeEventsFunctionType}
+              getFunctionGroupNames={getFunctionGroupNames}
+            />
+          </EventsFunctionParametersEditor>
         ) : null}
         {this.state.currentTab === 'groups' ? (
           <ObjectGroupsListWithObjectGroupEditor

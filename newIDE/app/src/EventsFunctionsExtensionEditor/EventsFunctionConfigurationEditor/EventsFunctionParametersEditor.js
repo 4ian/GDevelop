@@ -129,6 +129,7 @@ type Props = {|
     oldName: string,
     newName: string
   ) => void,
+  children?: React.Node,
 |};
 
 export const EventsFunctionParametersEditor = ({
@@ -146,6 +147,7 @@ export const EventsFunctionParametersEditor = ({
   onMoveBehaviorEventsParameter,
   onMoveObjectEventsParameter,
   onFunctionParameterWillBeRenamed,
+  children,
 }: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -616,6 +618,18 @@ export const EventsFunctionParametersEditor = ({
           {parameters.getParametersCount() > 0 || freezeParameters ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
+                {children
+                  ? React.Children.map(children, (child, index) => {
+                      if (!child) return null;
+                      return (
+                        <Line>
+                          <Column noMargin expand>
+                            {child}
+                          </Column>
+                        </Line>
+                      );
+                    })
+                  : null}
                 <Line>
                   <Column noMargin expand>
                     {mapFor(0, parameters.getParametersCount(), i => {

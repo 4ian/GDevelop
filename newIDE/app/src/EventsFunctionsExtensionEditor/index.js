@@ -117,12 +117,12 @@ const getInitialMosaicEditorNodes = () => ({
   direction: 'row',
   first: 'functions-list',
   second: {
-    direction: 'column',
-    first: 'parameters',
-    second: 'events-sheet',
-    splitPercentage: 25,
+    direction: 'row',
+    first: 'events-sheet',
+    second: 'parameters',
+    splitPercentage: 80,
   },
-  splitPercentage: 25,
+  splitPercentage: 20,
 });
 
 export default class EventsFunctionsExtensionEditor extends React.Component<

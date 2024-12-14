@@ -88,6 +88,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
+          eventsSheetWidth={this.props.eventsSheetWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}

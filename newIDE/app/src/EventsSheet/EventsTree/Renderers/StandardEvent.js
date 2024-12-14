@@ -48,6 +48,7 @@ export default class StandardEvent extends React.Component<
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
+          eventsSheetWidth={this.props.eventsSheetWidth}
           className={classNames({
             [executableEventContainer]: true,
           })}

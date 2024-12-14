@@ -50,6 +50,7 @@ export type EventRendererProps = {
 
   screenType: ScreenType,
   windowSize: WindowSizeType,
+  eventsSheetWidth: number,
   eventsSheetHeight: number,
 
   idPrefix: string,

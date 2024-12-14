@@ -127,6 +127,7 @@ type EventsContainerProps = {|
   renderObjectThumbnail: string => Node,
 
   screenType: ScreenType,
+  eventsSheetWidth: number,
   eventsSheetHeight: number,
 
   connectDragSource: ConnectDragSource,
@@ -232,6 +233,7 @@ const EventContainer = (props: EventsContainerProps) => {
               }
               renderObjectThumbnail={props.renderObjectThumbnail}
               screenType={props.screenType}
+              eventsSheetWidth={props.eventsSheetWidth}
               eventsSheetHeight={props.eventsSheetHeight}
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
@@ -334,6 +336,7 @@ type EventsTreeProps = {|
 
   screenType: ScreenType,
   windowSize: WindowSizeType,
+  eventsSheetWidth: number,
   eventsSheetHeight: number,
   fontSize?: number,
   indentScale: number,
@@ -927,6 +930,7 @@ export default class ThemableEventsTree extends Component<
                 }
                 renderObjectThumbnail={this._renderObjectThumbnail}
                 screenType={this.props.screenType}
+                eventsSheetWidth={this.props.eventsSheetWidth}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
                 windowSize={this.props.windowSize}

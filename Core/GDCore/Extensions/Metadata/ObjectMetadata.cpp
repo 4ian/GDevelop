@@ -54,7 +54,7 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                      []() -> std::unique_ptr<gd::ObjectConfiguration> {
       gd::LogFatalError(
           "Error: Event-based objects don't have blueprint. "
-          "This method should not never be called.");
+          "This method should never be called.");
       return nullptr;
     }) {}
 

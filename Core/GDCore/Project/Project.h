@@ -894,6 +894,16 @@ class GD_CORE_API Project {
       std::size_t position);
 
   /**
+   * \brief Unserialize and insert in the project the extensions.
+   *
+   * Unserialization is done in two passe to allow dependencies between extensions.
+   *
+   * \note If an extension with the same name already exists, it will be overwritten.
+   */
+  void UnserializeAndInsertExtensionsFrom(
+      const gd::SerializerElement& eventsFunctionsExtensionsElement);
+
+  /**
    * \brief Delete the events functions extension named "name".
    */
   void RemoveEventsFunctionsExtension(const gd::String& name);
@@ -1071,12 +1081,14 @@ class GD_CORE_API Project {
   void Init(const gd::Project& project);
 
   /**
-   * @brief Get the project extensions names in the order they have to be unserialized.
+   * @brief Get the project extensions names in the order they have to be
+   * unserialized.
    *
    * Child-objects need the event-based objects they use to be loaded completely
    * before they are unserialized.
    */
-  std::vector<gd::String> GetUnserializingOrderExtensionNames(const gd::SerializerElement &eventsFunctionsExtensionsElement);
+  std::vector<gd::String> GetUnserializingOrderExtensionNames(
+      const gd::SerializerElement& eventsFunctionsExtensionsElement);
 
   /**
    * Create an object configuration of the given type.

@@ -99,6 +99,7 @@ declare class gdProject {
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
   getEventsFunctionsExtensionPosition(name: string): number;
+  unserializeAndInsertExtensionsFrom(eventsFunctionsExtensionsElement: gdSerializerElement): void;
   hasEventsBasedBehavior(type: string): boolean;
   getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;

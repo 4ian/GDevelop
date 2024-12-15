@@ -208,7 +208,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         parentType == Type::VariableOrPropertyOrParameter) {
       childType = parentType;
 
-      CheckVariableExistence(node.location, node.name);
+      CheckVariableExistence(node.location, node.name, node.child != nullptr);
       if (node.child) {
         node.child->Visit(*this);
       }
@@ -342,7 +342,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else if (parentType == Type::Variable ||
                parentType == Type::VariableOrProperty ||
                parentType == Type::VariableOrPropertyOrParameter) {
-      CheckVariableExistence(node.location, node.identifierName);
+      CheckVariableExistence(node.location, node.identifierName, !node.childIdentifierName.empty());
     } else if (parentType != Type::Object &&
                parentType != Type::LegacyVariable) {
       // It can't happen.
@@ -401,8 +401,10 @@ private:
       const gd::String &childIdentifierName,
       const gd::ExpressionParserLocation childIdentifierNameLocation);
 
-  void CheckVariableExistence(const ExpressionParserLocation &location, const gd::String& name) {
-    if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+  void CheckVariableExistence(const ExpressionParserLocation &location,
+                              const gd::String &name, bool hasChild) {
+    if (!currentParameterExtraInfo ||
+        *currentParameterExtraInfo != "AllowUndeclaredVariable") {
       projectScopedContainers.MatchIdentifierWithName<void>(
           name,
           [&]() {
@@ -423,6 +425,9 @@ private:
                   _("This variable has the same name as a property. Consider "
                     "renaming one or the other."),
                   location, name);
+            } else if (hasChild) {
+              RaiseMalformedVariableParameter(
+                  _("Properties can't have children."), location, name);
             }
           },
           [&]() {
@@ -432,6 +437,9 @@ private:
                   _("This variable has the same name as a parameter. Consider "
                     "renaming one or the other."),
                   location, name);
+            } else if (hasChild) {
+              RaiseMalformedVariableParameter(
+                  _("Properties can't have children."), location, name);
             }
           },
           [&]() {
@@ -492,6 +500,13 @@ private:
                                     const gd::String &objectName = "") {
     RaiseError(gd::ExpressionParserError::ErrorType::VariableNameCollision,
                message, location, false, variableName, objectName);
+  }
+
+  void RaiseMalformedVariableParameter(const gd::String &message,
+                                   const ExpressionParserLocation &location,
+                                   const gd::String &variableName) {
+    RaiseError(gd::ExpressionParserError::ErrorType::MalformedVariableParameter,
+               message, location, true, variableName, "");
   }
 
   void RaiseTypeError(const gd::String &message,

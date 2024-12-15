@@ -1362,7 +1362,8 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     const gd::String& variableName,
     const VariableScope& scope,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& objectName) {
+    const gd::String& objectName,
+    bool hasChild) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == ANY_VARIABLE) {
@@ -1395,6 +1396,10 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       output = "eventsFunctionContext.sceneVariablesForExtension";
     } else if (sourceType ==
                gd::VariablesContainer::SourceType::Properties) {
+      if (hasChild) {
+        // Properties with children are not supported.
+        return "gdjs.VariablesContainer.badVariablesContainer";
+      }
       const auto &propertiesContainersList =
           GetProjectScopedContainers().GetPropertiesContainersList();
       const auto &propertiesContainerAndProperty =
@@ -1404,6 +1409,10 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
           propertiesContainerAndProperty.second);
     } else if (sourceType ==
                gd::VariablesContainer::SourceType::Parameters) {
+      if (hasChild) {
+        // Parameters with children are not supported.
+        return "gdjs.VariablesContainer.badVariablesContainer";
+      }
       const auto &parametersVectorsList =
           GetProjectScopedContainers().GetParametersVectorsList();
       const auto &parameter =

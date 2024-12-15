@@ -570,7 +570,8 @@ protected:
       const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& objectName) {
+      const gd::String& objectName,
+      bool hasChild) {
     // This code is only used as a mock.
     // See the real implementation in GDJS.
     if (scope == LAYOUT_VARIABLE) {

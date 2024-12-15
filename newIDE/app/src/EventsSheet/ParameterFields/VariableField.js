@@ -60,7 +60,7 @@ type Props = {
   onOpenDialog: (VariableDialogOpeningProps => void) | null,
 };
 
-type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4 | 5;
+type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type VariableFieldInterface = {|
   ...ParameterFieldInterface,
@@ -74,6 +74,8 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_EXPRESSION: 3,
   UNDECLARED_VARIABLE: 4,
   NAME_COLLISION_WITH_OBJECT: 5,
+  PARAMETER_WITH_CHILD: 6,
+  PROPERTY_WITH_CHILD: 7,
 };
 
 export const getRootVariableName = (name: string): string => {
@@ -124,17 +126,6 @@ export const quicklyAnalyzeVariableName = (
   }
 
   const rootVariableName = getRootVariableName(name);
-  if (
-    !isObjectVariable &&
-    projectScopedContainersAccessor &&
-    projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList()
-      .hasObjectOrGroupNamed(rootVariableName)
-  ) {
-    return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
-  }
-
   // Check at least the name of the root variable, it's the best we can do.
   if (
     variablesContainers &&
@@ -144,6 +135,39 @@ export const quicklyAnalyzeVariableName = (
   ) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
+
+  if (!projectScopedContainersAccessor) {
+    return VariableNameQuickAnalyzeResults.OK;
+  }
+  const projectScopedContainers = projectScopedContainersAccessor.get();
+
+  if (
+    !isObjectVariable &&
+    projectScopedContainers
+      .getObjectsContainersList()
+      .hasObjectOrGroupNamed(rootVariableName)
+  ) {
+    return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
+  }
+
+  if (name.length !== rootVariableName.length) {
+    const variablesContainer = projectScopedContainers
+      .getVariablesContainersList()
+      .getVariablesContainerFromVariableName(rootVariableName);
+    if (
+      variablesContainers &&
+      variablesContainers.includes(variablesContainer)
+    ) {
+      const variableSource = variablesContainer.getSourceType();
+      if (variableSource === gd.VariablesContainer.Parameters) {
+        return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
+      }
+      if (variableSource === gd.VariablesContainer.Properties) {
+        return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
+      }
+    }
+  }
+
   return VariableNameQuickAnalyzeResults.OK;
 };
 
@@ -275,10 +299,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           ? field.current.getInputValue()
           : value;
         const isRootVariableDeclared =
-          variablesContainers &&
-          variablesContainers.some(variablesContainer =>
-            variablesContainer.has(getRootVariableName(fieldCurrentValue))
-          );
+          projectScopedContainersAccessor &&
+          projectScopedContainersAccessor
+            .get()
+            .getVariablesContainersList()
+            .has(getRootVariableName(fieldCurrentValue));
 
         onChange(fieldCurrentValue);
         onOpenDialog({
@@ -286,7 +311,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           shouldCreate: !isRootVariableDeclared,
         });
       },
-      [onChange, onOpenDialog, value, variablesContainers]
+      [onChange, onOpenDialog, projectScopedContainersAccessor, value]
     );
 
     const description = parameterMetadata
@@ -335,6 +360,14 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           This variable has the same name as an object. Consider renaming one or
           the other.
         </Trans>
+      ) : forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD ? (
+        <Trans>Parameters can't have children.</Trans>
+      ) : forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD ? (
+        <Trans>Properties can't have children.</Trans>
       ) : null;
     const warningTranslatableText =
       !forceDeclaration &&

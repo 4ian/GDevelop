@@ -307,14 +307,6 @@ const Instruction = (props: Props) => {
               expressionNode.visit(expressionValidator);
               expressionIsValid =
                 expressionValidator.getAllErrors().size() === 0;
-              if (!expressionIsValid)
-                console.log(
-                  'expressionIsValid: ' +
-                    expressionValidator
-                      .getAllErrors()
-                      .at(0)
-                      .getMessage()
-                );
               expressionValidator.delete();
 
               // New object variable instructions require the variable to be

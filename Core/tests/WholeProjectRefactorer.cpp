@@ -2458,7 +2458,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
         .SetName("number");
-    auto &instruction = CreateNumberVariableGetterCondition(
+    auto &instruction = CreateNumberVariableSetterAction(
         project, eventsFunction.GetEvents(), "MyParameter", "123");
 
     gd::ObjectsContainer parametersObjectsContainer(

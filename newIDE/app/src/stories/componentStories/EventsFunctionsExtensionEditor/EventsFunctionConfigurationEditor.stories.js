@@ -35,8 +35,8 @@ export const DefaultFreeFunction = () => (
       onFunctionParameterWillBeRenamed={action(
         'onFunctionParameterWillBeRenamed'
       )}
-      onFunctionParameterChangedOfType={action(
-        'onFunctionParameterChangedOfType'
+      onFunctionParameterTypeChanged={action(
+        'onFunctionParameterTypeChanged'
       )}
     />
   </FixedHeightFlexContainer>
@@ -61,8 +61,8 @@ export const DefaultBehaviorFunction = () => (
       onFunctionParameterWillBeRenamed={action(
         'onFunctionParameterWillBeRenamed'
       )}
-      onFunctionParameterChangedOfType={action(
-        'onFunctionParameterChangedOfType'
+      onFunctionParameterTypeChanged={action(
+        'onFunctionParameterTypeChanged'
       )}
     />
   </FixedHeightFlexContainer>
@@ -87,8 +87,8 @@ export const DefaultBehaviorLifecycleFunction = () => (
       onFunctionParameterWillBeRenamed={action(
         'onFunctionParameterWillBeRenamed'
       )}
-      onFunctionParameterChangedOfType={action(
-        'onFunctionParameterChangedOfType'
+      onFunctionParameterTypeChanged={action(
+        'onFunctionParameterTypeChanged'
       )}
     />
   </FixedHeightFlexContainer>
@@ -113,8 +113,8 @@ export const DefaultObjectFunction = () => (
       onFunctionParameterWillBeRenamed={action(
         'onFunctionParameterWillBeRenamed'
       )}
-      onFunctionParameterChangedOfType={action(
-        'onFunctionParameterChangedOfType'
+      onFunctionParameterTypeChanged={action(
+        'onFunctionParameterTypeChanged'
       )}
     />
   </FixedHeightFlexContainer>

@@ -1388,7 +1388,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onFunctionParameterWillBeRenamed={
                       this._onFunctionParameterWillBeRenamed
                     }
-                    onFunctionParameterChangedOfType={
+                    onFunctionParameterTypeChanged={
                       this._onFunctionParameterChangedOfType
                     }
                     unsavedChanges={this.props.unsavedChanges}

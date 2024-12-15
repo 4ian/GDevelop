@@ -308,7 +308,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& objectName) override;
+      const gd::String& objectName,
+      bool hasChild) override;
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) override {
     // This could be probably optimised by using `getChildNamed`.

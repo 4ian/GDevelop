@@ -29,7 +29,7 @@ VariablesExtension::VariablesExtension() {
         const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator, context, "variable",
+                codeGenerator, context, "variableOrPropertyOrParameter",
                 variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
@@ -64,7 +64,7 @@ VariablesExtension::VariablesExtension() {
         const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator, context, "variable",
+                codeGenerator, context, "variableOrPropertyOrParameter",
                 instruction.GetParameters()[0].GetPlainString());
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
@@ -99,7 +99,7 @@ VariablesExtension::VariablesExtension() {
         const auto &variableName = instruction.GetParameters()[0].GetPlainString();
         gd::String getterCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator, context, "variable",
+                codeGenerator, context, "variableOrPropertyOrParameter",
                 instruction.GetParameters()[0].GetPlainString());
         bool isOperandTrue =
             instruction.GetParameters()[1].GetPlainString() == "True";
@@ -174,7 +174,7 @@ VariablesExtension::VariablesExtension() {
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
-                "variable",
+                "variableOrProperty",
                 variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
 
@@ -231,7 +231,7 @@ VariablesExtension::VariablesExtension() {
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
-                "variable",
+                "variableOrProperty",
                 variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =
@@ -291,7 +291,7 @@ VariablesExtension::VariablesExtension() {
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
-                "variable",
+                "variableOrProperty",
                 variableName);
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         gd::String expressionCode =

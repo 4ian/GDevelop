@@ -2035,6 +2035,319 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid property (in variableOrPropertyOrParameter parameter)") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+
+      auto node = parser.ParseExpression("MyProperty");
+
+      gd::ExpressionValidator validator(platform,
+                                        projectScopedContainersWithProperties,
+                                        "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid property (in variableOrProperty parameter)") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+
+      auto node = parser.ParseExpression("MyProperty");
+
+      gd::ExpressionValidator validator(platform,
+                                        projectScopedContainersWithProperties,
+                                        "variableOrProperty");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid property (in variable parameter)") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+
+      auto node = parser.ParseExpression("MyProperty");
+
+      gd::ExpressionValidator validator(
+          platform, projectScopedContainersWithProperties, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "This variable has the same name as a property. Consider "
+              "renaming one or the other.");
+    }
+  }
+
+  SECTION("Invalid property (property with child in variableOrProperty parameter)") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+
+      {
+        auto node = parser.ParseExpression("MyProperty.MyChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrProperty");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty.MyChild.MyGrandChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrProperty");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty[\"MyChild\"]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrProperty");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty[0]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrProperty");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+    }
+  }
+
+  SECTION("Invalid property (property with child in variableOrPropertyOrParameter parameter)") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("MyProperty");
+
+      {
+        auto node = parser.ParseExpression("MyProperty.MyChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty.MyChild.MyGrandChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty[\"MyChild\"]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyProperty[0]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithProperties,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+    }
+  }
+
+  SECTION("Valid parameter (in variableOrPropertyOrParameter parameter)") {
+    {
+      gd::ParameterMetadataContainer parameters;
+      parameters.InsertNewParameter("MyParameter", 0).SetType("number");
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node = parser.ParseExpression("MyParameter");
+
+      gd::ExpressionValidator validator(platform,
+                                        projectScopedContainersWithParameters,
+                                        "variableOrPropertyOrParameter");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+    }
+  }
+
+  SECTION("Invalid parameter (in variableOrProperty parameter)") {
+    {
+      gd::ParameterMetadataContainer parameters;
+      parameters.InsertNewParameter("MyParameter", 0).SetType("number");
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node = parser.ParseExpression("MyParameter");
+
+      gd::ExpressionValidator validator(platform,
+                                        projectScopedContainersWithParameters,
+                                        "variableOrProperty");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "This variable has the same name as a parameter. Consider "
+              "renaming one or the other.");
+    }
+  }
+
+  SECTION("Invalid parameter (in variable parameter)") {
+    {
+      gd::ParameterMetadataContainer parameters;
+      parameters.InsertNewParameter("MyParameter", 0).SetType("number");
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      auto node = parser.ParseExpression("MyParameter");
+
+      gd::ExpressionValidator validator(
+          platform, projectScopedContainersWithParameters, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetAllErrors().size() == 1);
+      REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+              "This variable has the same name as a parameter. Consider "
+              "renaming one or the other.");
+    }
+  }
+
+  SECTION("Invalid property (property with child in variableOrProperty parameter)") {
+    {
+      gd::ParameterMetadataContainer parameters;
+      parameters.InsertNewParameter("MyParameter", 0).SetType("number");
+
+      auto projectScopedContainersWithParameters = gd::ProjectScopedContainers::
+          MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+      projectScopedContainersWithParameters.AddParameters(parameters);
+
+      {
+        auto node = parser.ParseExpression("MyParameter.MyChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithParameters,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyParameter.MyChild.MyGrandChild");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithParameters,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyParameter[\"MyChild\"]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithParameters,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+
+      {
+        auto node = parser.ParseExpression("MyParameter[0]");
+
+        gd::ExpressionValidator validator(platform,
+                                          projectScopedContainersWithParameters,
+                                          "variableOrPropertyOrParameter");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "Properties can't have children.");
+      }
+    }
+  }
+
   SECTION("Valid parameter") {
       gd::ParameterMetadataContainer parameters;
       parameters.InsertNewParameter("MyParameter1", 0).SetType("number");

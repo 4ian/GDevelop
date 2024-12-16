@@ -297,18 +297,10 @@ const GameDashboardCard = ({
       <Text size="block-title" noMargin style={styles.title}>
         {gameName || <Trans>Unknown game</Trans>}
       </Text>
-      {projectsList.length > 0 && game && (
+      {projectsList.length >= 2 && game && (
         <>
           <Spacer />
-          <Tooltip
-            title={
-              projectsList.length === 1 ? (
-                <Trans>{projectsList.length} project</Trans>
-              ) : (
-                <Trans>{projectsList.length} projects</Trans>
-              )
-            }
-          >
+          <Tooltip title={<Trans>{projectsList.length} projects</Trans>}>
             {/* Button must be wrapped in a container so that the parent tooltip
                   can display even if the button is disabled. */}
             <div style={styles.tooltipButtonContainer}>

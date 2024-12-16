@@ -236,12 +236,14 @@ export const generateOnSaveProjectAs = (
 ) => {
   if (!saveAsLocation)
     throw new Error('A location was not chosen before saving as.');
-  const { name, gameId } = saveAsLocation;
+  const { name } = saveAsLocation;
   if (!name) throw new Error('A name was not chosen before saving as.');
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata: null };
   }
   options.onStartSaving();
+
+  const gameId = saveAsLocation.gameId || project.getProjectUuid();
 
   try {
     // Create a new cloud project.

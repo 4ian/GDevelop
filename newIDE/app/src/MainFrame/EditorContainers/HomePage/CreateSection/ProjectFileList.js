@@ -14,13 +14,7 @@ import {
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
-import PreferencesContext from '../../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import {
-  checkIfHasTooManyCloudProjects,
-  MaxProjectCountAlertMessage,
-} from './MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
@@ -34,14 +28,13 @@ import {
   useProjectsListFor,
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
-import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import optionalRequire from '../../../../Utils/OptionalRequire';
-import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
-import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../../UI/Menu/ContextMenu';
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -64,11 +57,14 @@ const styles = {
 };
 
 type Props = {|
-  i18n: I18nType,
-
-  game: ?Game,
+  game: Game,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
+  onDeleteCloudProject: (
+    i18n: I18nType,
+    file: FileMetadataAndStorageProviderName
+  ) => Promise<void>,
+  disabled: boolean,
 
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -88,26 +84,17 @@ const ProjectFileList = ({
   game,
   onOpenProject,
   storageProviders,
-  i18n,
   closeProject,
+  onDeleteCloudProject,
+  disabled,
 }: Props) => {
-  const {
-    showDeleteConfirmation,
-    showConfirmation,
-    showAlert,
-  } = useAlertDialog();
   const projectFiles = useProjectsListFor(game);
-  const { removeRecentProjectFile } = React.useContext(PreferencesContext);
-  const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   const {
     profile,
     cloudProjects,
-    limits,
     cloudProjectsFetchingErrorLabel,
     onCloudProjectsChanged,
   } = authenticatedUser;
@@ -116,6 +103,7 @@ const ProjectFileList = ({
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
+  const { showConfirmation } = useAlertDialog();
 
   // Look at projects where lastCommittedBy is not the current user, and fetch
   // public profiles of the users that have modified them.
@@ -138,63 +126,20 @@ const ProjectFileList = ({
     [cloudProjects, profile]
   );
 
-  const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
-    authenticatedUser
-  );
-
-  const onDeleteCloudProject = async (
-    i18n: I18nType,
-    { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
-  ) => {
-    if (storageProviderName !== 'Cloud') return;
-    const projectName = fileMetadata.name;
-    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
-
-    const isCurrentProjectOpened =
-      !!currentFileMetadata &&
-      currentFileMetadata.fileIdentifier === fileMetadata.fileIdentifier;
-    if (isCurrentProjectOpened) {
+  const onRemoveRecentProjectFile = React.useCallback(
+    async (file: FileMetadataAndStorageProviderName) => {
       const result = await showConfirmation({
-        title: t`Project is opened`,
-        message: t`You are about to delete the project ${projectName}, which is currently opened. If you proceed, the project will be closed and you will lose any unsaved changes. Do you want to proceed?`,
-        confirmButtonLabel: t`Continue`,
+        title: t`Remove project from list`,
+        message: t`You are about to remove "${
+          file.fileMetadata.name
+        }" from the list of your projects.${'\n\n'}It will not delete it from your disk and you can always re-open it later. Do you want to proceed?`,
+        confirmButtonLabel: t`Remove`,
       });
       if (!result) return;
-      await closeProject();
-    }
-
-    // Extract word translation to ensure it is not wrongly translated in the sentence.
-    const translatedConfirmText = i18n._(t`delete`);
-
-    const deleteAnswer = await showDeleteConfirmation({
-      title: t`Permanently delete the project?`,
-      message: t`Project ${projectName} will be deleted. You will no longer be able to access it.`,
-      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
-      confirmText: translatedConfirmText,
-      confirmButtonLabel: t`Delete project`,
-    });
-    if (!deleteAnswer) return;
-
-    try {
-      setPendingProject(fileMetadata.fileIdentifier);
-      await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
-      authenticatedUser.onCloudProjectsChanged();
-    } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
-      const message =
-        extractedStatusAndCode && extractedStatusAndCode.status === 403
-          ? t`You don't have permissions to delete this project.`
-          : t`An error occurred when saving the project. Please try again later.`;
-      showAlert({
-        title: t`Unable to delete the project`,
-        message,
-      });
-    } finally {
-      setPendingProject(null);
-    }
-  };
+      removeRecentProjectFile(file);
+    },
+    [removeRecentProjectFile, showConfirmation]
+  );
 
   const buildContextMenu = (
     i18n: I18nType,
@@ -206,10 +151,13 @@ const ProjectFileList = ({
       { label: i18n._(t`Open`), click: () => onOpenProject(file) },
     ];
     if (file.storageProviderName === 'Cloud') {
-      actions.push({
-        label: i18n._(t`Delete`),
-        click: () => onDeleteCloudProject(i18n, file),
-      });
+      actions.push(
+        { type: 'separator' },
+        {
+          label: i18n._(t`Delete`),
+          click: () => onDeleteCloudProject(i18n, file),
+        }
+      );
     } else if (file.storageProviderName === 'LocalFile') {
       actions.push(
         ...[
@@ -217,17 +165,21 @@ const ProjectFileList = ({
             label: i18n._(t`Show in local folder`),
             click: () => locateProjectFile(file),
           },
+          { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
-            click: () => removeRecentProjectFile(file),
+            click: () => onRemoveRecentProjectFile(file),
           },
         ]
       );
     } else {
-      actions.push({
-        label: i18n._(t`Remove from list`),
-        click: () => removeRecentProjectFile(file),
-      });
+      actions.push(
+        { type: 'separator' },
+        {
+          label: i18n._(t`Remove from list`),
+          click: () => onRemoveRecentProjectFile(file),
+        }
+      );
     }
 
     return actions;
@@ -301,9 +253,7 @@ const ProjectFileList = ({
                   key={file.fileMetadata.fileIdentifier}
                   file={file}
                   onOpenContextMenu={openContextMenu}
-                  isLoading={
-                    pendingProject === file.fileMetadata.fileIdentifier
-                  }
+                  isLoading={disabled}
                   currentFileMetadata={currentFileMetadata}
                   storageProviders={storageProviders}
                   isWindowSizeMediumOrLarger={!isMobile}
@@ -315,19 +265,6 @@ const ProjectFileList = ({
                   }
                 />
               ))}
-              {isMobile && limits && hasTooManyCloudProjects && (
-                <MaxProjectCountAlertMessage
-                  margin="dense"
-                  limits={limits}
-                  onUpgrade={() =>
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: 'Cloud Project limit reached',
-                      },
-                    })
-                  }
-                />
-              )}
             </List>
           </Column>
         </Line>

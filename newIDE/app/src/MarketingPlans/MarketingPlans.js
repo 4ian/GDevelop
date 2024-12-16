@@ -24,11 +24,11 @@ import MarketingPlanFeatures from './MarketingPlanFeatures';
 import usePurchaseMarketingPlan from './UsePurchaseMarketingPlan';
 
 type Props = {|
-  game: Game,
+  game?: Game,
 |};
 
 const MarketingPlans = ({ game }: Props) => {
-  const { profile, limits, getAuthorizationHeader } = React.useContext(
+  const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
   const {
@@ -63,7 +63,11 @@ const MarketingPlans = ({ game }: Props) => {
 
   const fetchGameFeaturings = React.useCallback(
     async () => {
-      if (!profile) return;
+      if (!profile || !game) {
+        setGameFeaturings([]);
+        return;
+      }
+
       try {
         setGameFeaturingsError(null);
         const gameFeaturings = await listGameFeaturings(
@@ -97,8 +101,6 @@ const MarketingPlans = ({ game }: Props) => {
     activeGameFeaturings,
     fetchGameFeaturings,
   });
-
-  if (!profile || !limits) return null;
 
   return (
     <I18n>
@@ -143,9 +145,10 @@ const MarketingPlans = ({ game }: Props) => {
                   activeGameFeaturings
                 );
 
-                const requirementsErrors = isPlanActive
-                  ? getRequirementsErrors(game, marketingPlan)
-                  : [];
+                const requirementsErrors =
+                  isPlanActive && game
+                    ? getRequirementsErrors(game, marketingPlan)
+                    : [];
 
                 return (
                   <MarketingPlanFeatures

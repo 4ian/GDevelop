@@ -30,7 +30,7 @@ export type LastModifiedInfo = {|
   lastKnownVersionId: ?string,
 |};
 
-type LastModifiedInfoByProjectId = {|
+export type LastModifiedInfoByProjectId = {|
   [projectId: string]: LastModifiedInfo,
 |};
 

@@ -79,7 +79,7 @@ const LockedOverlay = () => (
   </div>
 );
 
-const UpcomingOverlay = ({ message }: { message: React.Node }) => (
+const UpcomingOverlay = ({ message }: {| message: React.Node |}) => (
   <div style={styles.lockedOverlay}>
     <Text color="inherit">{message}</Text>
   </div>

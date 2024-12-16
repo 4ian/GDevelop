@@ -58,6 +58,7 @@ export const Default = () => (
             fetchGames: async () => {},
             gamesFetchingError: null,
             onGameUpdated: () => {},
+            markGameAsSavedIfRelevant: async () => {},
           }}
           onOpenHomePage={action('openHomepage')}
           toggleProjectManager={action('toggleProjectManager')}
@@ -110,6 +111,7 @@ export const ErrorsInFunctions = () => (
             fetchGames: async () => {},
             gamesFetchingError: null,
             onGameUpdated: () => {},
+            markGameAsSavedIfRelevant: async () => {},
           }}
           onOpenHomePage={action('openHomepage')}
           toggleProjectManager={action('toggleProjectManager')}

@@ -14,7 +14,7 @@ type Props = {|
   primary: true, // Force making only primary raised split buttons.
   disabled?: boolean,
   icon?: React.Node,
-  onClick: ?() => void,
+  onClick: ?() => void | Promise<void>,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: {|
     marginTop?: number,
@@ -24,6 +24,7 @@ type Props = {|
     margin?: number,
     flexShrink?: 0,
   |},
+  fullWidth?: boolean,
 |};
 
 const shouldNeverBeCalled = () => {
@@ -40,6 +41,8 @@ const styles = {
     minWidth: 30,
     paddingLeft: 0,
     paddingRight: 0,
+    // Make the button shrink to its minimum size.
+    flexBasis: 0,
   },
 };
 
@@ -48,7 +51,15 @@ const styles = {
  * when the dropdown arrow is clicked.
  */
 const RaisedButtonWithSplitMenu = (props: Props) => {
-  const { id, buildMenuTemplate, onClick, label, icon, disabled } = props;
+  const {
+    id,
+    buildMenuTemplate,
+    onClick,
+    label,
+    icon,
+    disabled,
+    fullWidth,
+  } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
   // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -64,6 +75,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
       disabled={disabled}
       size="small"
       style={props.style}
+      fullWidth={fullWidth}
     >
       <Button
         id={id}

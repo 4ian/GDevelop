@@ -39,6 +39,7 @@ import {
 } from '../../Utils/GDevelopServices/Announcement';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { fakeAchievements } from './FakeAchievements';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -3711,6 +3712,7 @@ export const fakeGame: Game = {
   authorName: 'SonicFan',
   gameName: 'Sonic1995',
   createdAt: 1606065498,
+  updatedAt: 1606065498,
   publicWebBuildId: 'fake-public-web-build-id-sonic',
   displayAdsOnGamePage: true,
   discoverable: true,
@@ -3725,6 +3727,7 @@ export const game1: Game = {
   authorName: 'My company',
   gameName: 'My Great Game',
   createdAt: 1606065498,
+  updatedAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
   displayAdsOnGamePage: true,
   orientation: 'default',
@@ -3738,6 +3741,7 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+  updatedAt: 1606065498,
   playWithKeyboard: true,
   playWithMobile: false,
   playWithGamepad: false,
@@ -3781,6 +3785,26 @@ export const gameWithDisplayAdsOnGamePageEnabled: Game = {
 export const gameWithDisplayAdsOnGamePageDisabled: Game = {
   ...game1,
   displayAdsOnGamePage: false,
+};
+
+export const fakeFileMetadataAndStorageProviderNameForLocalProject: FileMetadataAndStorageProviderName = {
+  fileMetadata: {
+    fileIdentifier: 'localProject',
+    name: 'Local project',
+    lastModifiedDate: Date.now(),
+    gameId: 'localProject',
+  },
+  storageProviderName: 'LocalFile',
+};
+
+export const fakeFileMetadataAndStorageProviderNameForCloudProject: FileMetadataAndStorageProviderName = {
+  fileMetadata: {
+    fileIdentifier: 'cloudProject',
+    name: 'Cloud project',
+    lastModifiedDate: Date.now(),
+    gameId: 'cloudProject',
+  },
+  storageProviderName: 'Cloud',
 };
 
 export const allGameCategoriesMocked = [

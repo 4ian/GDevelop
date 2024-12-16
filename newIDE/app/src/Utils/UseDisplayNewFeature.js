@@ -25,7 +25,7 @@ const useDisplayNewFeature = () => {
   } = React.useContext(PreferencesContext);
 
   const shouldDisplayNewFeatureHighlighting = React.useCallback(
-    ({ featureId }: { featureId: Feature }): boolean => {
+    ({ featureId }: {| featureId: Feature |}): boolean => {
       const programOpeningCount = getProgramOpeningCount();
       const settings = featuresDisplaySettings[featureId];
       if (!settings) return false;
@@ -50,7 +50,7 @@ const useDisplayNewFeature = () => {
   );
 
   const acknowledgeNewFeature = React.useCallback(
-    ({ featureId }: { featureId: Feature }) => {
+    ({ featureId }: {| featureId: Feature |}) => {
       if (!featuresDisplaySettings[featureId]) return;
 
       const acknowledgments = newFeaturesAcknowledgements[featureId];

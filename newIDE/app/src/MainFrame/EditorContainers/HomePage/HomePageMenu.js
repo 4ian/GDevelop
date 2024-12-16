@@ -21,7 +21,6 @@ import {
   type Limits,
 } from '../../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import GraphsIcon from '../../../UI/CustomSvgIcons/Graphs';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 
 export const styles = {
@@ -44,8 +43,7 @@ export const styles = {
 
 export type HomeTab =
   | 'get-started'
-  | 'manage'
-  | 'build'
+  | 'create'
   | 'learn'
   | 'play'
   | 'shop'
@@ -63,7 +61,7 @@ export type HomePageMenuTab = {|
   id: string,
 |};
 
-const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
+const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
   'get-started': {
     label: <Trans>Get Started</Trans>,
     tab: 'get-started',
@@ -72,20 +70,12 @@ const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
       <SunIcon fontSize={fontSize} color={color} />
     ),
   },
-  build: {
-    label: <Trans>Build</Trans>,
-    tab: 'build',
-    id: 'home-build-tab',
+  create: {
+    label: <Trans>Create</Trans>,
+    tab: 'create',
+    id: 'home-create-tab',
     getIcon: ({ color, fontSize }) => (
       <PickAxeIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  manage: {
-    label: <Trans>Manage</Trans>,
-    tab: 'manage',
-    id: 'home-manage-tab',
-    getIcon: ({ color, fontSize }) => (
-      <GraphsIcon fontSize={fontSize} color={color} />
     ),
   },
   shop: {
@@ -139,13 +129,12 @@ export const getTabsToDisplay = ({
       limits.capabilities.classrooms &&
       limits.capabilities.classrooms.hidePremiumProducts
     );
-  const tabs = [
+  const tabs: HomeTab[] = [
     'get-started',
-    'build',
+    'create',
     !shouldHideClassroomTab(limits) && !isNativeMobileApp()
       ? 'team-view'
       : null,
-    'manage',
     displayShopTab ? 'shop' : null,
     'learn',
     displayPlayTab ? 'play' : null,

@@ -45,7 +45,7 @@ const GameHeader = ({
   onPublishOnGdGames,
 }: Props) => {
   useOnResize(useForceUpdate());
-  const { isMobile } = useResponsiveWindowSize();
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const gameMainImageUrl = getGameMainImageUrl(game);
 
@@ -64,7 +64,11 @@ const GameHeader = ({
       fontSize: 'small',
     };
     return (
-      <ResponsiveLineStackLayout alignItems="center" noColumnMargin>
+      <ResponsiveLineStackLayout
+        alignItems="center"
+        noColumnMargin
+        noResponsiveLandscape
+      >
         <div style={styles.iconAndText}>
           <DiscoverabilityIcon {...iconProps} />
           <Text {...textProps}>
@@ -103,7 +107,7 @@ const GameHeader = ({
   const renderTitle = (i18n: I18nType) => (
     <ColumnStackLayout noMargin>
       <Text color="secondary" noMargin>
-        <Trans>Published on {i18n.date(game.createdAt * 1000)}</Trans>
+        <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
       </Text>
       <Text size="block-title" noMargin>
         {game.gameName}
@@ -153,7 +157,7 @@ const GameHeader = ({
     </FixedHeightFlexContainer>
   );
 
-  if (isMobile) {
+  if (isMobile && !isLandscape) {
     return (
       <I18n>
         {({ i18n }) => (

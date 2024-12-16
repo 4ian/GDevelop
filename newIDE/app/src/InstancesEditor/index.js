@@ -1426,7 +1426,7 @@ export default class InstancesEditor extends Component<Props, State> {
 
   fitViewToRectangle(
     rectangle: Rectangle,
-    { adaptZoom }: { adaptZoom: boolean }
+    { adaptZoom }: {| adaptZoom: boolean |}
   ) {
     const idealZoom = this.viewPosition.fitToRectangle(rectangle);
     if (adaptZoom) this.setZoomFactor(idealZoom);

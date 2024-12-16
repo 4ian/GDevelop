@@ -10,6 +10,7 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
+import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import { isWebGLSupported } from '../../Utils/WebGL';
@@ -234,7 +235,7 @@ export type PreferencesValues = {|
   editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
-  gamesListOrderBy: 'createdAt' | 'totalSessions' | 'weeklySessions',
+  gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
 |};
 
@@ -334,8 +335,8 @@ export type Preferences = {|
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,
-  setGamesListOrderBy: (
-    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
+  setGamesDashboardOrderBy: (
+    orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
 |};
@@ -393,7 +394,7 @@ export const initialPreferences = {
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
-    gamesListOrderBy: 'createdAt',
+    gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
   },
   setLanguage: () => {},
@@ -465,8 +466,8 @@ export const initialPreferences = {
   setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
-  setGamesListOrderBy: (
-    orderBy: 'createdAt' | 'totalSessions' | 'weeklySessions'
+  setGamesDashboardOrderBy: (
+    orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
 };

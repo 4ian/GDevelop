@@ -22,10 +22,7 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import Link from '../../UI/Link';
 
-const publishingHelpLink = getHelpLink(
-  'gdevelop5/publishing',
-  'publish-your-game'
-);
+const publishingHelpLink = getHelpLink('/publishing', 'publish-your-game');
 
 const styles = { loadingSpace: { height: 100 } };
 
@@ -39,23 +36,34 @@ type Props = {|
 const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const { isMobile } = useResponsiveWindowSize();
-  const chartData = React.useMemo(() => buildLastWeekChartData(gameMetrics), [
-    gameMetrics,
-  ]);
+  const oneWeekAgoIsoDate = new Date(
+    new Date().setHours(0, 0, 0, 0) - 7 * 24 * 3600 * 1000
+  ).toISOString();
   const [
     marketingPlansDialogOpen,
     setMarketingPlansDialogOpen,
   ] = React.useState<boolean>(false);
+
+  const chartData = React.useMemo(
+    () => {
+      const lastWeekGameMetrics = gameMetrics
+        ? gameMetrics.filter(metrics => metrics.date > oneWeekAgoIsoDate)
+        : null;
+
+      return buildLastWeekChartData(lastWeekGameMetrics);
+    },
+    [gameMetrics, oneWeekAgoIsoDate]
+  );
 
   return (
     <>
       <I18n>
         {({ i18n }) => (
           <DashboardWidget
-            gridSize={2}
-            withMinHeight
+            widgetSize={'twoThirds'}
+            minHeight
             title={<Trans>Analytics</Trans>}
-            seeMoreButton={
+            topRightAction={
               <FlatButton
                 label={<Trans>See all</Trans>}
                 rightIcon={<ArrowRight fontSize="small" />}
@@ -63,6 +71,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                 primary
               />
             }
+            widgetName="analytics"
           >
             <ResponsiveLineStackLayout expand noColumnMargin noMargin>
               {!gameMetrics ? (
@@ -84,7 +93,12 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
                     <GameLinkAndShareIcons display="column" url={gameUrl} />
                   </ColumnStackLayout>
                 ) : (
-                  <ColumnStackLayout noMargin expand>
+                  <ColumnStackLayout
+                    noMargin
+                    expand
+                    justifyContent="center"
+                    alignItems="center"
+                  >
                     <Spacer />
                     <Text color="secondary" noMargin>
                       <Trans>

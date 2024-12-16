@@ -48,9 +48,9 @@ const FeedbackWidget = ({
     <I18n>
       {({ i18n }) => (
         <DashboardWidget
-          gridSize={1}
+          widgetSize={'oneThird'}
           title={<Trans>Feedbacks</Trans>}
-          seeMoreButton={
+          topRightAction={
             !feedbacks || feedbacks.length === 0 ? null : (
               <FlatButton
                 label={<Trans>See more</Trans>}
@@ -60,7 +60,8 @@ const FeedbackWidget = ({
               />
             )
           }
-          withMinHeight
+          widgetName="feedback"
+          minHeight
           renderSubtitle={() =>
             shouldDisplayControlToCollectFeedback ? null : unprocessedFeedbacks &&
               feedbacks ? (
@@ -151,7 +152,7 @@ const FeedbackWidget = ({
               </Text>
             </ColumnStackLayout>
           ) : gameUrl ? (
-            <ColumnStackLayout noMargin justifyContent="center" expand>
+            <ColumnStackLayout noMargin expand justifyContent="center">
               <Spacer />
               <Text color="secondary" noMargin>
                 <Trans>
@@ -162,7 +163,12 @@ const FeedbackWidget = ({
               <GameLinkAndShareIcons url={gameUrl} display="column" />
             </ColumnStackLayout>
           ) : (
-            <ColumnStackLayout noMargin justifyContent="center" expand>
+            <ColumnStackLayout
+              noMargin
+              expand
+              justifyContent="center"
+              alignItems="center"
+            >
               <Spacer />
               <Text color="secondary" noMargin>
                 <Trans>

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import ListItem from '@material-ui/core/ListItem';
 
@@ -11,11 +10,8 @@ import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
-import AuthenticatedUserContext, {
-  type AuthenticatedUser,
-} from '../../../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import CircularProgress from '../../../../UI/CircularProgress';
-import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
@@ -23,16 +19,12 @@ import {
   useLongTouch,
   type ClientCoordinates,
 } from '../../../../Utils/UseLongTouch';
-import Avatar from '@material-ui/core/Avatar';
-import Tooltip from '@material-ui/core/Tooltip';
-import { getGravatarUrl } from '../../../../UI/GravatarUrl';
 import {
   getStorageProviderByInternalName,
   type LastModifiedInfo,
 } from './utils';
-import DotBadge from '../../../../UI/DotBadge';
 import { type FileMetadata } from '../../../../ProjectsStorage';
-import StatusIndicator from './StatusIndicator';
+import LastModificationInfo from './LastModificationInfo';
 
 const styles = {
   listItem: {
@@ -42,137 +34,9 @@ const styles = {
   },
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
-  avatar: {
-    width: 20,
-    height: 20,
-  },
   mobileIconContainer: {
     marginTop: 4, // To align with project title.
   },
-};
-
-type AvatarWithStatusAndTooltipProps = {|
-  avatarUrl: ?string,
-  status: 'success' | 'error',
-  tooltipMessage: ?string,
-  hideStatus?: boolean,
-|};
-
-const AvatarWithStatusAndTooltip = ({
-  avatarUrl,
-  status,
-  tooltipMessage,
-  hideStatus,
-}: AvatarWithStatusAndTooltipProps) =>
-  !!avatarUrl ? (
-    tooltipMessage ? (
-      <DotBadge overlap="circle" color={status} invisible={hideStatus}>
-        <Tooltip title={tooltipMessage}>
-          <Avatar src={avatarUrl} style={styles.avatar} />
-        </Tooltip>
-      </DotBadge>
-    ) : (
-      <DotBadge overlap="circle" color={status} invisible={hideStatus}>
-        <Avatar src={avatarUrl} style={styles.avatar} />
-      </DotBadge>
-    )
-  ) : (
-    <StatusIndicator status="success" />
-  );
-
-type ListItemLastModificationProps = {|
-  file: FileMetadataAndStorageProviderName,
-  lastModifiedInfo?: LastModifiedInfo | null, // If null, the project has been modified last by the current user.
-  storageProvider: ?StorageProvider,
-  authenticatedUser: AuthenticatedUser,
-  currentFileMetadata: ?FileMetadata,
-  textColor?: 'primary' | 'secondary',
-|};
-
-const ListItemLastModification = ({
-  file,
-  lastModifiedInfo,
-  storageProvider,
-  authenticatedUser,
-  currentFileMetadata,
-  textColor = 'primary',
-}: ListItemLastModificationProps) => {
-  const isProjectSavedOnCloud =
-    !!storageProvider && storageProvider.internalName === 'Cloud';
-  const isCurrentProjectOpened =
-    !!currentFileMetadata &&
-    currentFileMetadata.fileIdentifier === file.fileMetadata.fileIdentifier;
-  const lastModifiedAt = !!lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedAt
-    : !!file.fileMetadata.lastModifiedDate
-    ? file.fileMetadata.lastModifiedDate
-    : null;
-  if (!lastModifiedAt) return null;
-
-  // Current user info
-  const currentUserEmail =
-    authenticatedUser.profile && authenticatedUser.profile.email;
-  const currentUserUsername =
-    authenticatedUser.profile && authenticatedUser.profile.username;
-  const currentUserAvatarUrl =
-    isProjectSavedOnCloud && currentUserEmail
-      ? getGravatarUrl(currentUserEmail, {
-          size: 40,
-        })
-      : null;
-
-  // Last editor info
-  const lastEditorUsername = !!lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedByUsername
-    : currentUserUsername;
-  const lastEditorAvatarUrl = !!lastModifiedInfo
-    ? lastModifiedInfo.lastModifiedByIconUrl
-    : currentUserAvatarUrl;
-
-  const isProjectOpenedNotTheLatestVersion =
-    !!isCurrentProjectOpened &&
-    !!currentFileMetadata &&
-    !!lastModifiedInfo &&
-    currentFileMetadata.version !== lastModifiedInfo.lastKnownVersionId;
-
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <LineStackLayout noMargin alignItems="center">
-          {isCurrentProjectOpened && (
-            <AvatarWithStatusAndTooltip
-              avatarUrl={currentUserAvatarUrl}
-              tooltipMessage={currentUserUsername}
-              status="success"
-            />
-          )}
-          {isProjectSavedOnCloud &&
-            (!isCurrentProjectOpened || isProjectOpenedNotTheLatestVersion) && (
-              <AvatarWithStatusAndTooltip
-                avatarUrl={lastEditorAvatarUrl}
-                tooltipMessage={lastEditorUsername}
-                status="error"
-                hideStatus={!isProjectOpenedNotTheLatestVersion}
-              />
-            )}
-          <Text noMargin color={textColor}>
-            {isCurrentProjectOpened ? (
-              <Trans>Modifying</Trans>
-            ) : (
-              getRelativeOrAbsoluteDisplayDate({
-                i18n,
-                dateAsNumber: lastModifiedAt,
-                sameDayFormat: 'todayAndHour',
-                dayBeforeFormat: 'yesterdayAndHour',
-                relativeLimit: 'currentWeek',
-                sameWeekFormat: 'thisWeek',
-              })
-            )}
-          </Text>
-        </LineStackLayout>
-      )}
-    </I18n>
-  );
 };
 
 const PrettyBreakablePath = ({ path }: {| path: string |}) => {
@@ -278,7 +142,7 @@ export const ProjectFileListItem = ({
                   </Text>
                 </Column>
                 <Column expand>
-                  <ListItemLastModification
+                  <LastModificationInfo
                     file={file}
                     lastModifiedInfo={lastModifiedInfo}
                     storageProvider={storageProvider}
@@ -321,8 +185,7 @@ export const ProjectFileListItem = ({
                         />
                       )}
                     </Text>
-
-                    <ListItemLastModification
+                    <LastModificationInfo
                       file={file}
                       lastModifiedInfo={lastModifiedInfo}
                       storageProvider={storageProvider}

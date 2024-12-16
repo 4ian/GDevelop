@@ -15,7 +15,7 @@ export default {
   decorators: [getPaperDecorator('medium')],
 };
 
-const ResourceStoreStory = ({ kind }: { kind: 'audio' | 'font' | 'svg' }) => {
+const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   const [
     selectedResourceIndex,
     setSelectedResourceIndex,

@@ -12,10 +12,6 @@ import useOnResize from '../../Utils/UseOnResize';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const styles = {
-  skeletonContainer: {
-    display: 'flex',
-    flex: 1,
-  },
   itemSkeleton: { borderRadius: 6 },
   slidesContainer: {
     display: 'flex',

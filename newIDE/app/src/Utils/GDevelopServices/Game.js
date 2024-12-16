@@ -10,6 +10,8 @@ import { t } from '@lingui/macro';
 
 export type GameUploadType = 'game-thumbnail' | 'game-screenshot';
 
+export type SavedStatus = 'draft' | 'saved';
+
 export type CachedGameSlug = {
   username: string,
   gameSlug: string,
@@ -52,6 +54,7 @@ export type Game = {|
   categories?: string[],
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
+  updatedAt?: number, // Some old games don't have this field
   publicWebBuildId?: ?string,
   description?: string,
   thumbnailUrl?: string,
@@ -68,6 +71,7 @@ export type Game = {|
   playWithKeyboard: boolean,
   playWithMobile: boolean,
   playWithGamepad: boolean,
+  savedStatus?: SavedStatus,
 |};
 
 export type GameUpdatePayload = {|
@@ -86,6 +90,7 @@ export type GameUpdatePayload = {|
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
+  savedStatus?: SavedStatus,
 |};
 
 export type GameCategory = {
@@ -290,11 +295,13 @@ export const registerGame = async (
     gameName,
     authorName,
     templateSlug,
+    savedStatus,
   }: {|
     gameId: string,
     gameName: string,
     authorName: string,
-    templateSlug: string,
+    templateSlug?: string,
+    savedStatus?: SavedStatus,
   |}
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -305,6 +312,7 @@ export const registerGame = async (
       gameName,
       authorName,
       templateSlug,
+      savedStatus,
     },
     {
       params: {
@@ -339,6 +347,7 @@ export const updateGame = async (
     acceptsBuildComments,
     acceptsGameComments,
     displayAdsOnGamePage,
+    savedStatus,
   }: GameUpdatePayload
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -360,6 +369,7 @@ export const updateGame = async (
       acceptsBuildComments,
       acceptsGameComments,
       displayAdsOnGamePage,
+      savedStatus,
     },
     {
       params: {

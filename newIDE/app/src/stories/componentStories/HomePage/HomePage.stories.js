@@ -128,6 +128,7 @@ const WrappedHomePage = ({
                 fetchGames: async () => {},
                 gamesFetchingError: null,
                 onGameUpdated: () => {},
+                markGameAsSavedIfRelevant: async () => {},
               }}
             />
           </TutorialStateProvider>

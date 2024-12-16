@@ -9,10 +9,9 @@ import {
   type StorageProvider,
 } from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import BuildSection from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
-import ManageSection from './ManageSection';
+import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
 import { type TutorialCategory } from '../../../Utils/GDevelopServices/Tutorial';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
@@ -52,10 +51,14 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     routeArguments['initial-dialog'] === 'store' // New way of opening the store
   ) {
     return 'shop';
-  } else if (routeArguments['initial-dialog'] === 'games-dashboard') {
-    return 'manage';
-  } else if (routeArguments['initial-dialog'] === 'build') {
-    return 'build';
+  } else if (
+    [
+      'games-dashboard',
+      'build', // Compatibility with old links
+      'create',
+    ].includes(routeArguments['initial-dialog'])
+  ) {
+    return 'create';
   } else if (routeArguments['initial-dialog'] === 'education') {
     return 'team-view';
   } else if (routeArguments['initial-dialog'] === 'play') {
@@ -258,7 +261,7 @@ export const HomePage = React.memo<Props>(
         ? tabRequestedAtOpening.current
         : showGetStartedSectionByDefault
         ? 'get-started'
-        : 'build';
+        : 'create';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
 
@@ -356,7 +359,7 @@ export const HomePage = React.memo<Props>(
       // redirects to the games dashboard.
       React.useEffect(
         () => {
-          if ((activeTab === 'manage' || activeTab === 'build') && !games) {
+          if (activeTab === 'create' && !games) {
             fetchGames();
           }
         },
@@ -374,10 +377,10 @@ export const HomePage = React.memo<Props>(
       );
 
       // Refresh games list (as one could have been modified using the game dashboard
-      // in the project manager) when navigating to the "Manage" tab.
+      // in the project manager) when navigating to the "Create" tab.
       React.useEffect(
         () => {
-          if (isActive && activeTab === 'manage' && authenticated) {
+          if (isActive && activeTab === 'create' && authenticated) {
             fetchGames();
           }
         },
@@ -467,28 +470,14 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      const onManageGame = React.useCallback((gameId: string) => {
-        setOpenedGameId(gameId);
-        setActiveTab('manage');
-      }, []);
-
-      const canManageGame = React.useCallback(
-        (gameId: string): boolean => {
-          if (!games) return false;
-          const matchingGameIndex = games.findIndex(game => game.id === gameId);
-          return matchingGameIndex > -1;
-        },
-        [games]
-      );
-
       return (
         <I18n>
           {({ i18n }) => (
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {activeTab === 'manage' && (
-                    <ManageSection
+                  {activeTab === 'create' && (
+                    <CreateSection
                       project={project}
                       currentFileMetadata={fileMetadata}
                       onOpenProject={onOpenRecentFile}
@@ -502,6 +491,19 @@ export const HomePage = React.memo<Props>(
                       setOpenedGameId={setOpenedGameId}
                       currentTab={gameDetailsCurrentTab}
                       setCurrentTab={setGameDetailsCurrentTab}
+                      canOpen={canOpen}
+                      onOpenProfile={onOpenProfile}
+                      askToCloseProject={askToCloseProject}
+                      onCreateProjectFromExample={onCreateProjectFromExample}
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
+                      onSelectPrivateGameTemplateListingData={
+                        onSelectPrivateGameTemplateListingData
+                      }
+                      i18n={i18n}
+                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                      onChooseProject={onChooseProject}
+                      onSaveProject={onSave}
+                      canSaveProject={canSave}
                     />
                   )}
                   {activeTab === 'get-started' && (
@@ -515,25 +517,6 @@ export const HomePage = React.memo<Props>(
                       onOpenProfile={onOpenProfile}
                       onCreateProjectFromExample={onCreateProjectFromExample}
                       askToCloseProject={askToCloseProject}
-                    />
-                  )}
-                  {activeTab === 'build' && (
-                    <BuildSection
-                      project={project}
-                      currentFileMetadata={fileMetadata}
-                      canOpen={canOpen}
-                      onChooseProject={onChooseProject}
-                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                      onSelectExampleShortHeader={onSelectExampleShortHeader}
-                      onSelectPrivateGameTemplateListingData={
-                        onSelectPrivateGameTemplateListingData
-                      }
-                      onOpenRecentFile={onOpenRecentFile}
-                      onManageGame={onManageGame}
-                      canManageGame={canManageGame}
-                      storageProviders={storageProviders}
-                      i18n={i18n}
-                      closeProject={closeProject}
                     />
                   )}
                   {activeTab === 'learn' && (

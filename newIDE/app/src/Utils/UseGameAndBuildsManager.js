@@ -11,6 +11,7 @@ import {
   registerGame,
   setGameUserAcls,
   type Game,
+  type SavedStatus,
 } from './GDevelopServices/Game';
 import { extractGDevelopApiErrorStatusAndCode } from './GDevelopServices/Errors';
 import { useMultiplayerLobbyConfigurator } from '../MainFrame/UseMultiplayerLobbyConfigurator';
@@ -19,17 +20,21 @@ import {
   replaceLeaderboardsInProject,
 } from '../Leaderboard/UseLeaderboardReplacer';
 
-export const getDefaultRegisterGamePropertiesFromProject = ({
-  project,
-  isRemix,
+export const getDefaultRegisterGameProperties = ({
+  projectId,
+  projectName,
+  projectAuthor,
+  savedStatus,
 }: {|
-  project: gdProject,
-  isRemix?: boolean,
+  projectId: string,
+  projectName: ?string,
+  projectAuthor: ?string,
+  savedStatus: SavedStatus,
 |}) => ({
-  gameId: project.getProjectUuid(),
-  authorName: project.getAuthor() || 'Unspecified publisher',
-  gameName: project.getName() + (isRemix ? ' Remix' : '') || 'Untitled game',
-  templateSlug: project.getTemplateSlug(),
+  gameId: projectId,
+  authorName: projectAuthor || 'Unspecified publisher',
+  gameName: projectName || 'Untitled game',
+  savedStatus,
 });
 
 export type GameManager = {|
@@ -153,7 +158,14 @@ export const useGameManager = ({
           await registerGame(
             getAuthorizationHeader,
             userId,
-            getDefaultRegisterGamePropertiesFromProject({ project })
+            getDefaultRegisterGameProperties({
+              projectId: gameId,
+              projectName: project.getName(),
+              projectAuthor: project.getAuthor(),
+              // Assume a project going through the export process is not saved yet.
+              // It will be marked as saved when the user saves it next anyway.
+              savedStatus: 'draft',
+            })
           );
 
           // We don't await for the authors update, as it is not required for publishing.

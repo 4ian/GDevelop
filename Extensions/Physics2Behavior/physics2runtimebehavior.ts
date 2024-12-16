@@ -960,10 +960,10 @@ namespace gdjs {
 
     updateObjectFromBody() {
       // Copy transform from body to the GD object.
-      // It's possible the behavior was either deactivated or the object deleted
-      // just before this doStepPreEvents (for example, another behavior deleted
-      // the object during its own doStepPreEvents). If the body is null, we just
-      // don't do anything (but still run the physics simulation - this is independent).
+      // The body is null when the behavior was either deactivated or the object deleted.
+      // It would be useless to try to recreate it as updateBodyFromObject already does it.
+      // If the body is null, we just don't do anything
+      // (but still run the physics simulation - this is independent).
       if (this._body !== null) {
         this.owner.setX(
           this._body.GetPosition().get_x() * this._sharedData.worldScale -

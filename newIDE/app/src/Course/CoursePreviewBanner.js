@@ -45,7 +45,7 @@ const styles = {
   progress: { borderRadius: 4, height: 5 },
   chip: { height: 24 },
   gdevelopAvatar: { width: 20, height: 20 },
-  thumbnail: { borderRadius: 4 },
+  thumbnail: { borderRadius: 4, aspectRatio: '16 / 9' },
   statusContainer: {
     display: 'flex',
     alignItems: 'center',

@@ -892,25 +892,45 @@ export const EventsFunctionParametersEditor = ({
               )}
             </React.Fragment>
           ) : (
-            <Column noMargin expand justifyContent="center">
-              <EmptyPlaceholder
-                title={<Trans>Add your first parameter</Trans>}
-                description={
-                  <Trans>Parameters allow function users to give data.</Trans>
-                }
-                actionLabel={<Trans>Add a parameter</Trans>}
-                helpPagePath={helpPagePath}
-                helpPageAnchor={'add-and-use-parameters'}
-                onAction={addParameter}
-                secondaryActionIcon={<PasteIcon />}
-                secondaryActionLabel={
-                  isClipboardContainingParameters ? <Trans>Paste</Trans> : null
-                }
-                onSecondaryAction={() => {
-                  pasteParametersAtTheEnd();
-                }}
-              />
-            </Column>
+            <ScrollView>
+              {children
+                ? React.Children.map(children, (child, index) => {
+                    if (!child) return null;
+                    return (
+                      <Line>
+                        <Column noMargin expand>
+                          {child}
+                        </Column>
+                      </Line>
+                    );
+                  })
+                : null}
+              <Line>
+                <Column noMargin expand justifyContent="center">
+                  <EmptyPlaceholder
+                    title={<Trans>Add your first parameter</Trans>}
+                    description={
+                      <Trans>
+                        Parameters allow function users to give data.
+                      </Trans>
+                    }
+                    actionLabel={<Trans>Add a parameter</Trans>}
+                    helpPagePath={helpPagePath}
+                    helpPageAnchor={'add-and-use-parameters'}
+                    onAction={addParameter}
+                    secondaryActionIcon={<PasteIcon />}
+                    secondaryActionLabel={
+                      isClipboardContainingParameters ? (
+                        <Trans>Paste</Trans>
+                      ) : null
+                    }
+                    onSecondaryAction={() => {
+                      pasteParametersAtTheEnd();
+                    }}
+                  />
+                </Column>
+              </Line>
+            </ScrollView>
           )}
         </Column>
       )}

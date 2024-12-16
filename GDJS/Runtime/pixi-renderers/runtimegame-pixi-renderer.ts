@@ -62,7 +62,7 @@ namespace gdjs {
     /**
      * Create the canvas on which the game will be rendered, inside the specified DOM element, and
      * setup the rendering of the game.
-     * If you want to use your own canvas, use `initializeForCanvas` instead.
+     * If you want to use your own canvas, use `initializeRenderers` and `initializeCanvas` instead.
      *
      * @param parentElement The parent element to which the canvas will be added.
      */
@@ -72,20 +72,18 @@ namespace gdjs {
       const gameCanvas = document.createElement('canvas');
       parentElement.appendChild(gameCanvas);
 
-      this.initializeForCanvas(gameCanvas);
-    }
-
-    /**
-     * Setup the rendering of the game to use a canvas that was already created.
-     * @param gameCanvas The canvas to use.
-     */
-    initializeForCanvas(gameCanvas: HTMLCanvasElement): void {
-      this._throwIfDisposed();
       this.initializeRenderers(gameCanvas);
       this.initializeCanvas(gameCanvas);
     }
 
+    /**
+     * Set up the rendering of the game for the given canvas.
+     *
+     * In most cases, you can use `createStandardCanvas` instead to initialize the game.
+     */
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
+      this._throwIfDisposed();
+
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
@@ -136,6 +134,10 @@ namespace gdjs {
       delete this._pixiRenderer.plugins.accessibility;
     }
 
+    /**
+     * Set up the game canvas so that it covers the size required by the game
+     * and has a container for DOM elements required by the game.
+     */
     initializeCanvas(gameCanvas: HTMLCanvasElement): void {
       // Add the renderer view element to the DOM
       this._gameCanvas = gameCanvas;
@@ -537,6 +539,8 @@ namespace gdjs {
 
     /**
      * Add the standard events handler.
+     *
+     * The game canvas must have been initialized before calling this.
      */
     bindStandardEvents(
       manager: gdjs.InputManager,

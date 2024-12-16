@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import Tooltip from '@material-ui/core/Tooltip';
 import Text from '../../../../UI/Text';
 import { LineStackLayout } from '../../../../UI/Layout';
 import {
@@ -9,11 +10,14 @@ import {
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
-import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import { getGravatarUrl } from '../../../../UI/GravatarUrl';
 import { type LastModifiedInfo } from './utils';
 import { type FileMetadata } from '../../../../ProjectsStorage';
 import AvatarWithStatusAndTooltip from './AvatarWithStatusAndTooltip';
+import {
+  getDetailedProjectDisplayDate,
+  getProjectDisplayDate,
+} from '../../../../GameDashboard/GameDashboardCard';
 
 type LastModificationInfoProps = {|
   file: FileMetadataAndStorageProviderName,
@@ -97,20 +101,20 @@ const LastModificationInfo = ({
                 hideStatus={!isProjectOpenedNotTheLatestVersion}
               />
             )}
-          <Text noMargin color={textColor} size="body-small">
-            {isCurrentProjectOpened ? (
+          {isCurrentProjectOpened ? (
+            <Text noMargin color={textColor}>
               <Trans>Modifying</Trans>
-            ) : (
-              getRelativeOrAbsoluteDisplayDate({
-                i18n,
-                dateAsNumber: lastModifiedAt,
-                sameDayFormat: 'todayAndHour',
-                dayBeforeFormat: 'yesterdayAndHour',
-                relativeLimit: 'currentWeek',
-                sameWeekFormat: 'thisWeek',
-              })
-            )}
-          </Text>
+            </Text>
+          ) : (
+            <Tooltip
+              placement="right"
+              title={getDetailedProjectDisplayDate(i18n, lastModifiedAt)}
+            >
+              <Text noMargin color={textColor}>
+                {getProjectDisplayDate(i18n, lastModifiedAt)}
+              </Text>
+            </Tooltip>
+          )}
         </LineStackLayout>
       )}
     </I18n>

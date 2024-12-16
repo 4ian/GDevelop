@@ -1,8 +1,9 @@
 // @flow
+import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -50,12 +51,27 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
-import { Tooltip } from '@material-ui/core';
+import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
 export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
+
+export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
+  getRelativeOrAbsoluteDisplayDate({
+    i18n,
+    dateAsNumber: date,
+    sameDayFormat: 'todayAndHour',
+    dayBeforeFormat: 'yesterdayAndHour',
+    relativeLimit: 'currentWeek',
+    sameWeekFormat: 'thisWeek',
+  });
+export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
+  i18n.date(date, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
 
 const styles = {
   tooltipButtonContainer: {
@@ -330,11 +346,23 @@ const GameDashboardCard = ({
     ) : game ? (
       <LineStackLayout noMargin expand>
         <Text color="secondary" noMargin size="body-small">
-          <Trans>Last edited:</Trans>
+          {!itemStorageProvider && isCurrentProjectOpened ? (
+            <Trans>Draft created:</Trans>
+          ) : (
+            <Trans>Last edited:</Trans>
+          )}
         </Text>
-        <Text color="secondary" noMargin size="body-small">
-          {i18n.date((game.updatedAt || 0) * 1000)}
-        </Text>
+        <Tooltip
+          placement="right"
+          title={getDetailedProjectDisplayDate(
+            i18n,
+            (game.updatedAt || 0) * 1000
+          )}
+        >
+          <Text color="secondary" noMargin size="body-small">
+            {getProjectDisplayDate(i18n, (game.updatedAt || 0) * 1000)}
+          </Text>
+        </Tooltip>
       </LineStackLayout>
     ) : null;
 

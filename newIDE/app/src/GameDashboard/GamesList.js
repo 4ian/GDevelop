@@ -395,17 +395,20 @@ const GamesList = ({
     searchText ? 250 : 150
   );
 
-  // Refresh games to display, depending on a few parameters.
-  React.useEffect(getDashboardItemsToDisplayDebounced, [
+  React.useEffect(
     getDashboardItemsToDisplayDebounced,
-    searchText, // search text changes (user input)
-    games, // games change (when updating a game for instance)
-    currentPage, // user changes page
-    orderBy, // user changes order
-    currentFileMetadata, // opened project changes (when opening or closing a project from here)
-    allRecentProjectFiles.length, // list of recent projects changes (when a project is removed from list)
-    project, // opened project changes (when closing a project from here)
-  ]);
+    // Refresh games to display, depending on a few parameters.
+    [
+      getDashboardItemsToDisplayDebounced,
+      searchText, // search text changes (user input)
+      games, // games change (when updating a game for instance)
+      currentPage, // user changes page
+      orderBy, // user changes order
+      currentFileMetadata, // opened project changes (when opening or closing a project from here)
+      allRecentProjectFiles.length, // list of recent projects changes (when a project is removed from list)
+      project, // opened project changes (when closing a project from here)
+    ]
+  );
 
   const projectUuid = project ? project.getProjectUuid() : null;
 
@@ -428,10 +431,11 @@ const GamesList = ({
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
-  // Look at projects where lastCommittedBy is not the current user (cloud projects only), and fetch
-  // public profiles of the users that have modified them.
+
   React.useEffect(
     () => {
+      // Look at projects where lastCommittedBy is not the current user (cloud projects only), and fetch
+      // public profiles of the users that have modified them.
       const updateModificationInfoByProjectId = async () => {
         if (!cloudProjects || !profile) return;
 
@@ -447,6 +451,15 @@ const GamesList = ({
       updateModificationInfoByProjectId();
     },
     [cloudProjects, profile]
+  );
+
+  React.useEffect(
+    () => {
+      // Reset pagination when modifying the sorting order.
+      setCurrentPage(1);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [orderBy]
   );
 
   const shouldShowOpenProject =

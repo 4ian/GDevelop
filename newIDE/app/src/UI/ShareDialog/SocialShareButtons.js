@@ -20,6 +20,7 @@ const useStyles = () =>
     createStyles({
       root: {
         padding: 5,
+        display: 'flex',
         cursor: 'pointer',
         '& svg': {
           transition: 'color 0.1s',
@@ -50,6 +51,7 @@ const styles = {
   container: {
     display: 'flex',
     flexWrap: 'wrap',
+    alignItems: 'center',
   },
 };
 

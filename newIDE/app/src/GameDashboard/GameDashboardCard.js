@@ -1,8 +1,9 @@
 // @flow
+import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -50,12 +51,36 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
-import { Tooltip } from '@material-ui/core';
+import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
 export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
+
+export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
+  getRelativeOrAbsoluteDisplayDate({
+    i18n,
+    dateAsNumber: date,
+    sameDayFormat: 'todayAndHour',
+    dayBeforeFormat: 'yesterdayAndHour',
+    relativeLimit: 'currentWeek',
+    sameWeekFormat: 'thisWeek',
+  });
+export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
+  i18n.date(date, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+
+const getNoProjectAlertMessage = () => {
+  if (!electron) {
+    // Trying to open a local project from the web app of the mobile app.
+    return t`Looks like your project isn't there!${'\n\n'}Your project must be stored on your computer.`;
+  } else {
+    return t`We couldn't find your project.${'\n\n'}If your project is stored on a different computer, launch GDevelop on that computer.${'\n'}Otherwise, use the "Open project" button and find it in your filesystem.`;
+  }
+};
 
 const styles = {
   tooltipButtonContainer: {
@@ -67,7 +92,7 @@ const styles = {
     display: 'flex',
     flexShrink: 0,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
   title: {
@@ -281,18 +306,10 @@ const GameDashboardCard = ({
       <Text size="block-title" noMargin style={styles.title}>
         {gameName || <Trans>Unknown game</Trans>}
       </Text>
-      {projectsList.length > 0 && game && (
+      {projectsList.length >= 2 && game && (
         <>
           <Spacer />
-          <Tooltip
-            title={
-              projectsList.length === 1 ? (
-                <Trans>{projectsList.length} project</Trans>
-              ) : (
-                <Trans>{projectsList.length} projects</Trans>
-              )
-            }
-          >
+          <Tooltip title={<Trans>{projectsList.length} projects</Trans>}>
             {/* Button must be wrapped in a container so that the parent tooltip
                   can display even if the button is disabled. */}
             <div style={styles.tooltipButtonContainer}>
@@ -325,16 +342,29 @@ const GameDashboardCard = ({
         authenticatedUser={authenticatedUser}
         currentFileMetadata={currentFileMetadata}
         textColor="secondary"
+        textSize="body-small"
         textPrefix={isCurrentProjectOpened ? null : <Trans>Last edited:</Trans>}
       />
     ) : game ? (
       <LineStackLayout noMargin expand>
         <Text color="secondary" noMargin size="body-small">
-          <Trans>Last edited:</Trans>
+          {!itemStorageProvider && isCurrentProjectOpened ? (
+            <Trans>Draft created:</Trans>
+          ) : (
+            <Trans>Last edited:</Trans>
+          )}
         </Text>
-        <Text color="secondary" noMargin size="body-small">
-          {i18n.date((game.updatedAt || 0) * 1000)}
-        </Text>
+        <Tooltip
+          placement="right"
+          title={getDetailedProjectDisplayDate(
+            i18n,
+            (game.updatedAt || 0) * 1000
+          )}
+        >
+          <Text color="secondary" noMargin size="body-small">
+            {getProjectDisplayDate(i18n, (game.updatedAt || 0) * 1000)}
+          </Text>
+        </Tooltip>
       </LineStackLayout>
     ) : null;
 
@@ -571,7 +601,7 @@ const GameDashboardCard = ({
       : () => {
           showAlert({
             title: t`No project to open`,
-            message: t`Looks like your project isn't there!${'\n\n'}You may be using a different computer or opening GDevelop on the web and your project is saved locally.`,
+            message: getNoProjectAlertMessage(),
           });
         };
 

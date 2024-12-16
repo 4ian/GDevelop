@@ -23,6 +23,7 @@ const useGamesList = (): GamesList => {
     authenticated,
     firebaseUser,
     getAuthorizationHeader,
+    loginState,
   } = authenticatedUser;
 
   const [games, setGames] = React.useState<?Array<Game>>(null);
@@ -32,6 +33,8 @@ const useGamesList = (): GamesList => {
 
   const fetchGames = React.useCallback(
     async (): Promise<void> => {
+      if (loginState !== 'done') return;
+
       if (!authenticated || !firebaseUser) {
         setGames([]);
         return;
@@ -53,7 +56,7 @@ const useGamesList = (): GamesList => {
         gamesFetchingPromise.current = null;
       }
     },
-    [authenticated, firebaseUser, getAuthorizationHeader]
+    [authenticated, firebaseUser, getAuthorizationHeader, loginState]
   );
 
   const onGameUpdated = React.useCallback(

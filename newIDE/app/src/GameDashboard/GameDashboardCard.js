@@ -67,7 +67,7 @@ const styles = {
     display: 'flex',
     flexShrink: 0,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   iconAndText: { display: 'flex', gap: 2, alignItems: 'flex-start' },
   title: {

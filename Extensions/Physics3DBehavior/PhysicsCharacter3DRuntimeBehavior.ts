@@ -411,11 +411,13 @@ namespace gdjs {
       let groundVelocityY = 0;
       let groundVelocityZ = 0;
       if (this.character.IsSupported()) {
-        this.updateGroundVelocity(behavior, timeDelta);
-        const groundVelocity = this.character.GetGroundVelocity();
-        groundVelocityX = groundVelocity.GetX();
-        groundVelocityY = groundVelocity.GetY();
-        groundVelocityZ = groundVelocity.GetZ();
+        const shouldFollow = this.updateGroundVelocity(behavior, timeDelta);
+        if (shouldFollow) {
+          const groundVelocity = this.character.GetGroundVelocity();
+          groundVelocityX = groundVelocity.GetX();
+          groundVelocityY = groundVelocity.GetY();
+          groundVelocityZ = groundVelocity.GetZ();
+        }
       }
 
       // Update walking speed
@@ -635,18 +637,18 @@ namespace gdjs {
     private updateGroundVelocity(
       behavior: Physics3DRuntimeBehavior,
       timeDelta: float
-    ) {
+    ): boolean {
       if (!this.character) {
-        return;
+        return false;
       }
       const characterBody = behavior._body;
       if (!characterBody) {
-        return;
+        return false;
       }
       const worldInvScale = this._sharedData.worldInvScale;
 
       if (!this.character.IsSupported()) {
-        return;
+        return false;
       }
 
       const groundBody = this._sharedData.physicsSystem
@@ -715,6 +717,13 @@ namespace gdjs {
         groundBody.SetLinearVelocity(Jolt.Vec3.prototype.sZero());
         groundBody.SetAngularVelocity(Jolt.Vec3.prototype.sZero());
       }
+
+      // Characters should not try to magnet on a body that rolls on the ground.
+      const rollingSpeedMax = (1 * Math.PI) / 180;
+      const shouldFollow =
+        Math.abs(groundBody.GetAngularVelocity().GetX()) < rollingSpeedMax &&
+        Math.abs(groundBody.GetAngularVelocity().GetY()) < rollingSpeedMax;
+      return shouldFollow;
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}

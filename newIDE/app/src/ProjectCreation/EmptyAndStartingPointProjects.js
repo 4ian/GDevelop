@@ -53,6 +53,7 @@ const EmptyProjectTile = ({
               onSelectEmptyProject();
             }
           }}
+          id="empty-project-tile"
         >
           <Column alignItems="center" justifyContent="center" expand>
             <Add />

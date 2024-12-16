@@ -7,25 +7,22 @@ namespace Jolt {
 }
 
 namespace gdjs {
-  gdjs.registerAsynchronouslyLoadingLibraryPromise(
-    new Promise((resolve) => {
-      const tryInitializeJoltPhysics = () => {
-        // @ts-ignore
-        if (globalThis.initializeJoltPhysics) {
-          resolve(
-            // @ts-ignore
-            globalThis.initializeJoltPhysics().then((Jolt: any) => {
-              window.Jolt = Jolt;
-            })
-          );
-          return;
-        }
-        // Jolt is not ready yet, wait another 200ms
-        setTimeout(tryInitializeJoltPhysics, 200);
-      };
-      tryInitializeJoltPhysics();
-    })
-  );
+  const loadJolt = async () => {
+    try {
+      const module = await import('./jolt-physics-0.30.0.wasm-compat.js');
+      const initializeJoltPhysics = module.default;
+      if (!initializeJoltPhysics) {
+        throw new Error('No default export found in Jolt.');
+      }
+
+      const Jolt = await initializeJoltPhysics();
+      window.Jolt = Jolt;
+    } catch (err) {
+      console.error('Unable to load Jolt physics library.', err);
+      throw err;
+    }
+  };
+  gdjs.registerAsynchronouslyLoadingLibraryPromise(loadJolt());
 
   export interface RuntimeScene {
     physics3DSharedData: gdjs.Physics3DSharedData | null;

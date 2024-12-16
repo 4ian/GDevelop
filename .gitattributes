@@ -3,6 +3,7 @@ Extensions/ParticleSystem/SPARK/* linguist-vendored
 Extensions/PhysicsBehavior/Box2D/* linguist-vendored
 Extensions/PhysicsBehavior/box2djs/* linguist-vendored
 Extensions/Physics2Behavior/box2d.js linguist-vendored
+Extensions/Physics3DBehavior/*.wasm-compat.js linguist-vendored
 Extensions/BBText/pixi-multistyle-text/* linguist-vendored
 Extensions/P2P/A_peer.js linguist-vendored
 Extensions/Multiplayer/peer.js linguist-vendored

@@ -146,7 +146,6 @@ const CreateSection = ({
   const [initialWidgetToScrollTo, setInitialWidgetToScrollTo] = React.useState(
     null
   );
-  const [showAllGameTemplates, setShowAllGameTemplates] = React.useState(false);
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
@@ -445,26 +444,6 @@ const CreateSection = ({
     );
   }
 
-  if (showAllGameTemplates) {
-    return (
-      <SectionContainer
-        backAction={() => setShowAllGameTemplates(false)}
-        flexBody
-      >
-        <SectionRow expand>
-          <ExampleStore
-            onSelectExampleShortHeader={onSelectExampleShortHeader}
-            onSelectPrivateGameTemplateListingData={
-              onSelectPrivateGameTemplateListingData
-            }
-            i18n={i18n}
-            columnsCount={getExampleItemsColumns(windowSize, isLandscape)}
-          />
-        </SectionRow>
-      </SectionContainer>
-    );
-  }
-
   return (
     <I18n>
       {({ i18n }) => (
@@ -610,7 +589,7 @@ const CreateSection = ({
                         <Trans>Start from a template</Trans>
                       </Text>
                       <FlatButton
-                        onClick={() => setShowAllGameTemplates(true)}
+                        onClick={onOpenNewProjectSetupDialog}
                         label={
                           isMobile ? (
                             <Trans>Browse</Trans>

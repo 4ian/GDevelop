@@ -76,7 +76,7 @@ export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
 const getNoProjectAlertMessage = () => {
   if (!electron) {
     // Trying to open a local project from the web app of the mobile app.
-    return t`Looks like your project isn't there!${'\n\n'}Your project is surely stored on your computer.`;
+    return t`Looks like your project isn't there!${'\n\n'}Your project must be stored on your computer.`;
   } else {
     return t`We couldn't find your project.${'\n\n'}If your project is stored on a different computer, launch GDevelop on that computer.${'\n'}Otherwise, use the "Open project" button and find it in your filesystem.`;
   }

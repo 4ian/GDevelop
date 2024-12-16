@@ -26,6 +26,7 @@ type LastModificationInfoProps = {|
   authenticatedUser: AuthenticatedUser,
   currentFileMetadata: ?FileMetadata,
   textColor?: 'primary' | 'secondary',
+  textSize?: 'body-small',
   textPrefix?: React.Node,
 |};
 
@@ -36,6 +37,7 @@ const LastModificationInfo = ({
   authenticatedUser,
   currentFileMetadata,
   textColor = 'primary',
+  textSize = 'body',
   textPrefix,
 }: LastModificationInfoProps) => {
   const isProjectSavedOnCloud =
@@ -81,7 +83,7 @@ const LastModificationInfo = ({
       {({ i18n }) => (
         <LineStackLayout noMargin alignItems="center">
           {textPrefix && (
-            <Text color="secondary" noMargin size="body-small">
+            <Text color="secondary" noMargin size={textSize}>
               {textPrefix}
             </Text>
           )}
@@ -102,7 +104,7 @@ const LastModificationInfo = ({
               />
             )}
           {isCurrentProjectOpened ? (
-            <Text noMargin color={textColor}>
+            <Text noMargin color={textColor} size={textSize}>
               <Trans>Modifying</Trans>
             </Text>
           ) : (
@@ -110,7 +112,7 @@ const LastModificationInfo = ({
               placement="right"
               title={getDetailedProjectDisplayDate(i18n, lastModifiedAt)}
             >
-              <Text noMargin color={textColor}>
+              <Text noMargin color={textColor} size={textSize}>
                 {getProjectDisplayDate(i18n, lastModifiedAt)}
               </Text>
             </Tooltip>

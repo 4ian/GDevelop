@@ -333,6 +333,7 @@ const GameDashboardCard = ({
         authenticatedUser={authenticatedUser}
         currentFileMetadata={currentFileMetadata}
         textColor="secondary"
+        textSize="body-small"
         textPrefix={isCurrentProjectOpened ? null : <Trans>Last edited:</Trans>}
       />
     ) : game ? (

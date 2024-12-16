@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block Puzzle Game</title>
+  <link rel="stylesheet" href="styles.css">
+
+<script type='text/javascript' src='//pl25115544.profitablecpmrate.com/69/31/f6/6931f60e6173c03b988ffb72f3db4388.js'></script>
+
+</head>
+<body>
+
+<script type="text/javascript"> 	atOptions = { 		'key' : 'da7f88d4e998233dc8d8f2e42b2b36fc', 		'format' : 'iframe', 		'height' : 60, 		'width' : 468, 		'params' : {} 	}; </script> <script type="text/javascript" src="//www.highperformanceformat.com/da7f88d4e998233dc8d8f2e42b2b36fc/invoke.js"></script>
+
+  <!-- Welcome Screen -->
+  <div class="welcome-screen">
+    <h1>Welcome to Block Puzzle Game</h1>
+    <button id="play-button">Play</button>
+  </div>
+
+  <!-- Game Container -->
+  <div class="game-container hidden">
+    <!-- Scoreboard -->
+    <div id="scoreboard" class="scoreboard">
+      Score: <span id="score">0</span>
+    </div>
+
+    <!-- Game Board -->
+    <div id="game-board" class="game-board"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="left-button">Left</button>
+      <button id="rotate-button">Rotate</button>
+      <button id="right-button">Right</button>
+      <button id="swap-button">Swap</button>
+      <button id="restart-button">Restart</button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="game-over-modal hidden">
+    <p>Game Over</p>
+    <button id="restart-game-over">Restart</button>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html
+
+
+
+
+

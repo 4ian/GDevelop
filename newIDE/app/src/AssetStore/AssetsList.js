@@ -53,7 +53,7 @@ import HelpIcon from '../UI/HelpIcon';
 import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
 import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 
-const ASSETS_DISPLAY_LIMIT = 250;
+const ASSETS_DISPLAY_LIMIT = 60;
 
 const getAssetSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {

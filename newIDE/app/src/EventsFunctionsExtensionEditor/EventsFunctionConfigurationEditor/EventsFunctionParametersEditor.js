@@ -129,6 +129,7 @@ type Props = {|
     oldName: string,
     newName: string
   ) => void,
+  children?: React.Node,
 |};
 
 export const EventsFunctionParametersEditor = ({
@@ -146,6 +147,7 @@ export const EventsFunctionParametersEditor = ({
   onMoveBehaviorEventsParameter,
   onMoveObjectEventsParameter,
   onFunctionParameterWillBeRenamed,
+  children,
 }: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -616,6 +618,18 @@ export const EventsFunctionParametersEditor = ({
           {parameters.getParametersCount() > 0 || freezeParameters ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
+                {children
+                  ? React.Children.map(children, (child, index) => {
+                      if (!child) return null;
+                      return (
+                        <Line>
+                          <Column noMargin expand>
+                            {child}
+                          </Column>
+                        </Line>
+                      );
+                    })
+                  : null}
                 <Line>
                   <Column noMargin expand>
                     {mapFor(0, parameters.getParametersCount(), i => {
@@ -878,25 +892,45 @@ export const EventsFunctionParametersEditor = ({
               )}
             </React.Fragment>
           ) : (
-            <Column noMargin expand justifyContent="center">
-              <EmptyPlaceholder
-                title={<Trans>Add your first parameter</Trans>}
-                description={
-                  <Trans>Parameters allow function users to give data.</Trans>
-                }
-                actionLabel={<Trans>Add a parameter</Trans>}
-                helpPagePath={helpPagePath}
-                helpPageAnchor={'add-and-use-parameters'}
-                onAction={addParameter}
-                secondaryActionIcon={<PasteIcon />}
-                secondaryActionLabel={
-                  isClipboardContainingParameters ? <Trans>Paste</Trans> : null
-                }
-                onSecondaryAction={() => {
-                  pasteParametersAtTheEnd();
-                }}
-              />
-            </Column>
+            <ScrollView>
+              {children
+                ? React.Children.map(children, (child, index) => {
+                    if (!child) return null;
+                    return (
+                      <Line>
+                        <Column noMargin expand>
+                          {child}
+                        </Column>
+                      </Line>
+                    );
+                  })
+                : null}
+              <Line>
+                <Column noMargin expand justifyContent="center">
+                  <EmptyPlaceholder
+                    title={<Trans>Add your first parameter</Trans>}
+                    description={
+                      <Trans>
+                        Parameters allow function users to give data.
+                      </Trans>
+                    }
+                    actionLabel={<Trans>Add a parameter</Trans>}
+                    helpPagePath={helpPagePath}
+                    helpPageAnchor={'add-and-use-parameters'}
+                    onAction={addParameter}
+                    secondaryActionIcon={<PasteIcon />}
+                    secondaryActionLabel={
+                      isClipboardContainingParameters ? (
+                        <Trans>Paste</Trans>
+                      ) : null
+                    }
+                    onSecondaryAction={() => {
+                      pasteParametersAtTheEnd();
+                    }}
+                  />
+                </Column>
+              </Line>
+            </ScrollView>
           )}
         </Column>
       )}

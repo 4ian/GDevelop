@@ -342,8 +342,7 @@ namespace gdjs {
           newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
           newObject.setAngle(instanceData.angle);
           if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(newObject)) {
-            if (instanceData.z !== undefined)
-              newObject.setZ(instanceData.z + zOffset);
+            newObject.setZ((instanceData.z || 0) + zOffset);
             if (instanceData.rotationX !== undefined)
               newObject.setRotationX(instanceData.rotationX);
             if (instanceData.rotationY !== undefined)

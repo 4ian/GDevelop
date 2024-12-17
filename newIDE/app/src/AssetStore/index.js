@@ -649,7 +649,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 }
                 value={searchText}
                 onChange={(newValue: string) => {
-                  if (searchText === newValue) {
+                  if (searchText === newValue || newValue.length === 1) {
                     return;
                   }
                   setSearchText(newValue);

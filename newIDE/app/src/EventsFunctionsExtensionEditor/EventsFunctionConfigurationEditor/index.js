@@ -6,7 +6,6 @@ import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/Object
 import { Tabs } from '../../UI/Tabs';
 import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
 import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
-import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';

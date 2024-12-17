@@ -123,8 +123,8 @@ const MarketingPlans = ({ game }: Props) => {
           <ColumnStackLayout noMargin>
             <Text color="secondary" noMargin>
               <Trans>
-                Get ready-made packs to make your game visible to the GDevelop
-                community.{' '}
+                Make your game visible to the GDevelop community and to the
+                world with Marketing Boosts.{' '}
                 <Link
                   href="https://wiki.gdevelop.io/gdevelop5/interface/games-dashboard/marketing"
                   onClick={() =>

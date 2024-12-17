@@ -232,14 +232,14 @@ export const GameRegistration = ({
             </Text>
             <Text noMargin>
               <Trans>
-                Get ready-made packs to make your game visible to the GDevelop
-                community.
+                Make your game visible to the GDevelop community and to the
+                world with Marketing Boosts.
               </Trans>
             </Text>
             <Line>
               <RightLoader isLoading={!game}>
                 <RaisedButton
-                  label={<Trans>See marketing packs</Trans>}
+                  label={<Trans>See Marketing Boosts</Trans>}
                   primary
                   onClick={() => setMarketingPlansDialogOpen(true)}
                   disabled={!game}

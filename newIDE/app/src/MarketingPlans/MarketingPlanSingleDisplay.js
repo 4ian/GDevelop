@@ -17,6 +17,8 @@ import {
   getRequirementsErrors,
   isMarketingPlanActive,
 } from './MarketingPlanUtils';
+import MarketingPlansDialog from './MarketingPlansDialog';
+import Link from '../UI/Link';
 
 const styles = {
   container: {
@@ -40,6 +42,10 @@ const MarketingPlanSingleDisplay = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
+  const [
+    marketingPlansDialogOpen,
+    setMarketingPlansDialogOpen,
+  ] = React.useState<boolean>(false);
   const activeGameFeaturings: ?(GameFeaturing[]) = React.useMemo(
     () => {
       if (!gameFeaturings) return null;
@@ -90,11 +96,21 @@ const MarketingPlanSingleDisplay = ({
         </Paper>
         <Text size="body-small" color="inherit">
           <Trans>
-            Get ready-made packs to make your game visible to the GDevelop
-            community.
+            Make your game visible to the GDevelop community and to the world
+            with{' '}
+            <Link onClick={() => setMarketingPlansDialogOpen(true)} href="#">
+              <Trans>Marketing Boosts</Trans>
+            </Link>
+            .
           </Trans>
         </Text>
       </Column>
+      {marketingPlansDialogOpen && game && (
+        <MarketingPlansDialog
+          game={game}
+          onClose={() => setMarketingPlansDialogOpen(false)}
+        />
+      )}
     </div>
   );
 };

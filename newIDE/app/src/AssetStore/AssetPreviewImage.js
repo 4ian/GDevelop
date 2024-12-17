@@ -28,9 +28,14 @@ const styles = {
 type Props = {|
   assetShortHeader: AssetShortHeader,
   maxSize?: number,
+  loading?: 'lazy',
 |};
 
-export const AssetPreviewImage = ({ assetShortHeader, maxSize }: Props) => {
+export const AssetPreviewImage = ({
+  assetShortHeader,
+  maxSize,
+  loading,
+}: Props) => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
   const isPrivate = isPrivateAsset(assetShortHeader);
   const [isLoaded, setIsLoaded] = React.useState(false);
@@ -55,6 +60,7 @@ export const AssetPreviewImage = ({ assetShortHeader, maxSize }: Props) => {
       url={previewImageUrl}
       alt={assetShortHeader.name}
       onLoad={onLoad}
+      loading={loading}
     />
   ) : (
     <CorsAwareImage
@@ -63,6 +69,7 @@ export const AssetPreviewImage = ({ assetShortHeader, maxSize }: Props) => {
       src={previewImageUrl}
       alt={assetShortHeader.name}
       onLoad={onLoad}
+      loading={loading}
     />
   );
 };

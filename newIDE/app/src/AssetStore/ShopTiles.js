@@ -244,6 +244,7 @@ export const PublicAssetPackTile = ({
           style={styles.previewImage}
           src={assetPack.thumbnailUrl}
           alt={`Preview image of asset pack ${assetPack.name}`}
+          loading="lazy"
         />
         <Column>
           <Line justifyContent="space-between" noMargin>
@@ -299,6 +300,7 @@ export const PrivateAssetPackTile = ({
             style={styles.previewImage}
             src={assetPackListingData.thumbnailUrls[0]}
             alt={`Preview image of asset pack ${assetPackListingData.name}`}
+            loading="lazy"
           />
           {assetPackListingData.redeemConditions && !owned && (
             <div style={styles.redeemableContainer}>
@@ -367,6 +369,7 @@ export const PromoBundleCard = ({
                   }}
                   src={productListingData.thumbnailUrls[0]}
                   alt={`Preview image of bundle ${productListingData.name}`}
+                  loading="lazy"
                 />
               </div>
               <Column expand alignItems="flex-start" justifyContent="center">
@@ -476,6 +479,7 @@ export const CategoryTile = ({
           }}
           src={imageSource}
           alt={imageAlt}
+          // No lazy loading because categories are the first seen tiles in the shop.
         />
         <Column>
           <Line justifyContent="center" noMargin>
@@ -527,6 +531,7 @@ export const PrivateGameTemplateTile = ({
           alt={`Preview image of game template ${
             privateGameTemplateListingData.name
           }`}
+          loading="lazy"
         />
         <div style={styles.priceTagContainer}>
           <ProductPriceTag
@@ -603,6 +608,7 @@ export const ExampleTile = ({
               style={styles.previewImage}
               src={thumbnailImgUrl}
               alt={`Preview image of example ${exampleShortHeader.name}`}
+              loading="lazy"
             />
           ) : (
             <EmptyMessage

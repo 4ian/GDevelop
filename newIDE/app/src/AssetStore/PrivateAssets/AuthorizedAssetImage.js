@@ -11,6 +11,7 @@ type Props = {|
   onError?: () => void,
   onLoad?: (e: any) => void,
   hideLoader?: boolean,
+  loading?: 'lazy',
 |};
 
 const AuthorizedAssetImage = ({
@@ -20,6 +21,7 @@ const AuthorizedAssetImage = ({
   onError,
   onLoad,
   hideLoader,
+  loading,
 }: Props) => {
   const [authorizedUrl, setAuthorizedUrl] = React.useState(null);
   const [isImageLoaded, setIsImageLoaded] = React.useState(false);
@@ -78,6 +80,7 @@ const AuthorizedAssetImage = ({
       <img
         alt={alt}
         src={authorizedUrl}
+        loading={loading}
         style={{
           ...style,
           // Use display none to load the image in the background, but not

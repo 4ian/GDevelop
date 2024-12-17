@@ -53,7 +53,7 @@ import HelpIcon from '../UI/HelpIcon';
 import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
 import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 
-const ASSETS_DISPLAY_LIMIT = 250;
+const ASSETS_DISPLAY_LIMIT = 60;
 
 const getAssetSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {
@@ -338,7 +338,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         scrollViewElement.scrollToPosition(y);
       },
       setPageBreakIndex: (index: number) => {
-        setPageBreakIndex(0);
+        setPageBreakIndex(index);
       },
     }));
 
@@ -471,6 +471,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (!assetShortHeaders) return null;
         // Don't show assets if filtering on asset packs.)
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
+        const assetSize = getAssetSize(windowSize);
+        const margin = cellSpacing / 2;
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -480,9 +482,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={getAssetSize(windowSize)}
+            size={assetSize}
             key={assetShortHeader.id}
-            margin={cellSpacing / 2}
+            margin={margin}
             hideShortDescription={!!hideDetails}
           />
         ));

@@ -10,6 +10,7 @@ type Props = {|
   title?: ?string,
   onError?: (?Error) => void,
   onLoad?: (e: any) => void,
+  loading?: 'lazy',
 |};
 
 const addSearchParameterToUrl = (

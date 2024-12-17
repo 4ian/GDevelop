@@ -289,8 +289,6 @@ export const useSearchItem = <SearchItem: SearchableItem>(
     [searchItemsById, getItemDescription]
   );
 
-  // Update the search results according to the items, search term
-  // chosen category and chosen filters.
   const searchApi = searchApiRef.current;
   React.useEffect(
     () => {
@@ -351,6 +349,8 @@ export const useSearchItem = <SearchItem: SearchableItem>(
         discardSearch = true;
       };
     },
+    // Update the search results according to the items, search term
+    // chosen category and chosen filters.
     [
       shuffledSearchItems,
       sortedSearchItems,

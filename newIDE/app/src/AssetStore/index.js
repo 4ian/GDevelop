@@ -645,11 +645,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             <Column expand useFullHeight noMargin>
               <SearchBar
                 placeholder={
-                  hideGameTemplates ? t`Search assets` : `Search the shop`
+                  hideGameTemplates ? t`Search assets` : t`Search the shop`
                 }
                 value={searchText}
                 onChange={(newValue: string) => {
-                  if (searchText === newValue) {
+                  if (searchText === newValue || newValue.length === 1) {
                     return;
                   }
                   setSearchText(newValue);

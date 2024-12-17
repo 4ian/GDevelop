@@ -54,7 +54,11 @@ export const AssetCard = ({
     <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
       <div style={{ ...styles.previewContainer, width: size, height: size }}>
         <CheckeredBackground />
-        <AssetPreviewImage assetShortHeader={assetShortHeader} maxSize={128} />
+        <AssetPreviewImage
+          assetShortHeader={assetShortHeader}
+          maxSize={128}
+          loading="lazy"
+        />
       </div>
       <div
         style={{

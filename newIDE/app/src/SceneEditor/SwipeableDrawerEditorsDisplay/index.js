@@ -244,6 +244,13 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     .filter(Boolean);
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
+  const title =
+    selectedEditorId === 'properties' &&
+    instanceOrObjectPropertiesEditorRef.current
+      ? instanceOrObjectPropertiesEditorRef.current.getEditorTitle()
+      : !!selectedEditorId
+      ? editorTitleById[selectedEditorId]
+      : null;
 
   return (
     <FullSizeMeasurer>
@@ -293,9 +300,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>
             <SwipeableDrawer
               maxHeight={height}
-              title={
-                selectedEditorId ? editorTitleById[selectedEditorId] : null
-              }
+              title={title}
               openingState={drawerOpeningState}
               setOpeningState={setDrawerOpeningState}
             >

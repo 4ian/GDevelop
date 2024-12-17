@@ -54,6 +54,7 @@ type Props = {|
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
   forceUpdate: () => void,
+  getEditorTitle: () => React.Node,
 |};
 
 export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
@@ -63,6 +64,12 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,
+    getEditorTitle: () =>
+      lastSelectionType === 'instance' ? (
+        <Trans>Instance properties</Trans>
+      ) : (
+        <Trans>Object properties</Trans>
+      ),
   }));
 
   const {

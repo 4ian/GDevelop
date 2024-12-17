@@ -231,9 +231,13 @@ namespace gdjs {
         ...super.getNetworkSyncData(),
         props: {
           cs: this._currentSpeed,
+
+          // TODO Try to remove these 3 fields from the synch
+          // They are reset every frame and are not part of the state.
           rdx: this._requestedDeltaX,
           rdy: this._requestedDeltaY,
           ldy: this._lastDeltaY,
+
           cfs: this._currentFallSpeed,
           cj: this._canJump,
           ldl: this._lastDirectionIsLeft,

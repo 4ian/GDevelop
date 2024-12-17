@@ -338,7 +338,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         scrollViewElement.scrollToPosition(y);
       },
       setPageBreakIndex: (index: number) => {
-        setPageBreakIndex(0);
+        setPageBreakIndex(index);
       },
     }));
 

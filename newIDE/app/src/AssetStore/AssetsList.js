@@ -471,6 +471,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (!assetShortHeaders) return null;
         // Don't show assets if filtering on asset packs.)
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
+        const assetSize = getAssetSize(windowSize);
+        const margin = cellSpacing / 2;
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -480,9 +482,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={getAssetSize(windowSize)}
+            size={assetSize}
             key={assetShortHeader.id}
-            margin={cellSpacing / 2}
+            margin={margin}
             hideShortDescription={!!hideDetails}
           />
         ));

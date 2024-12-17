@@ -491,7 +491,10 @@ module.exports = {
           'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
         )
         .addRequiredFile(
-          'Extensions/Physics3DBehavior/jolt-physics-0.30.0.wasm-compat.js'
+          'Extensions/Physics3DBehavior/jolt-physics.wasm.js'
+        )
+        .addRequiredFile(
+          'Extensions/Physics3DBehavior/jolt-physics.wasm.wasm'
         )
         .setOpenFullEditorLabel(_('Edit shape and advanced settings'));
 

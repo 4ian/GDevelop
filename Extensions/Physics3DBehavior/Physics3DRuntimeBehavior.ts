@@ -9,7 +9,7 @@ namespace Jolt {
 namespace gdjs {
   const loadJolt = async () => {
     try {
-      const module = await import('./jolt-physics-0.30.0.wasm-compat.js');
+      const module = await import('./jolt-physics.wasm.js');
       const initializeJoltPhysics = module.default;
       if (!initializeJoltPhysics) {
         throw new Error('No default export found in Jolt.');

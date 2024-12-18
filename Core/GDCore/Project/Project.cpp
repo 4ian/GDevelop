@@ -936,6 +936,9 @@ void Project::UnserializeAndInsertExtensionsFrom(
   const gd::SerializerElement &eventsFunctionsExtensionsElement) {
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
+
+  std::map<gd::String, size_t> extensionNameToElementIndex;
+
   // First, only unserialize behaviors and objects names.
   // As event based objects can contains custom behaviors and custom objects,
   // this allows them to reference EventBasedBehavior and EventBasedObject
@@ -946,6 +949,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
     const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(i);
     const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+    extensionNameToElementIndex[name] = i;
 
     gd::EventsFunctionsExtension& eventsFunctionsExtension =
         HasEventsFunctionsExtensionNamed(name)
@@ -959,11 +963,25 @@ void Project::UnserializeAndInsertExtensionsFrom(
   // Then unserialize functions, behaviors and objects content.
   for (gd::String &extensionName :
        GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
-    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
-    const SerializerElement &eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(extensionIndex);
 
-    eventsFunctionsExtensions.at(extensionIndex)
+    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    if (extensionIndex == gd::String::npos) {
+      // Should never happen because the extension was added in the first pass.
+      gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
+      continue;
+    }
+    auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
+
+    if (extensionNameToElementIndex.find(extensionName) == extensionNameToElementIndex.end()) {
+      // Should never happen because the extension element is present.
+      gd::LogError("Can't find extension element to unserialize for " + extensionName + " in second pass of unserialization.");
+      continue;
+    }
+    size_t elementIndex = extensionNameToElementIndex[extensionName];
+    const SerializerElement &eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(elementIndex);
+
+    partiallyLoadedExtension
         ->UnserializeExtensionImplementationFrom(
             *this, eventsFunctionsExtensionElement);
   }
@@ -971,16 +989,24 @@ void Project::UnserializeAndInsertExtensionsFrom(
 
 std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
     const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
 
   // Some extension have custom objects, which have child objects coming from other extension.
   // These child objects must be loaded completely before the parent custom obejct can be unserialized.
   // This implies: an order on the extension unserialization (and no cycles).
 
   // At the beginning, everything is yet to be loaded.
+  std::map<gd::String, size_t> extensionNameToElementIndex;
   std::vector<gd::String> remainingExtensionNames(
-      eventsFunctionsExtensions.size());
-  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i) {
-    remainingExtensionNames[i] = eventsFunctionsExtensions.at(i)->GetName();
+      eventsFunctionsExtensionsElement.GetChildrenCount());
+  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+
+    remainingExtensionNames[i] = name;
+    extensionNameToElementIndex[name] = i;
   }
 
   // Helper allowing to find if an extension has an object that depends on
@@ -1029,10 +1055,10 @@ std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
     foundAnyExtension = false;
     for (std::size_t i = 0; i < remainingExtensionNames.size(); ++i) {
       auto extensionName = remainingExtensionNames[i];
-      size_t extensionIndex =
-          GetEventsFunctionsExtensionPosition(extensionName);
+
+      size_t elementIndex = extensionNameToElementIndex[extensionName];
       const SerializerElement &eventsFunctionsExtensionElement =
-          eventsFunctionsExtensionsElement.GetChild(extensionIndex);
+          eventsFunctionsExtensionsElement.GetChild(elementIndex);
 
       if (!isDependentFromRemainingExtensions(
               eventsFunctionsExtensionElement)) {

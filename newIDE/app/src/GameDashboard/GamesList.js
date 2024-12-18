@@ -629,8 +629,11 @@ const GamesList = ({
                 const isCurrentProjectOpened =
                   (!!projectUuid && (!!game && game.id === projectUuid)) ||
                   (!!projectFileMetadataAndStorageProviderName &&
+                    !!currentFileMetadata &&
                     projectFileMetadataAndStorageProviderName.fileMetadata
-                      .gameId === projectUuid);
+                      .gameId === projectUuid &&
+                    projectFileMetadataAndStorageProviderName.fileMetadata
+                      .fileIdentifier === currentFileMetadata.fileIdentifier);
 
                 return (
                   <GameDashboardCard

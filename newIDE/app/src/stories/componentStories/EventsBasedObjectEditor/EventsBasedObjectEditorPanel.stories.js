@@ -24,6 +24,7 @@ export const Default = () => (
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedObject={testProject.testEventsBasedObject}
       onRenameProperty={action('property rename')}
+      onPropertyTypeChanged={action('onPropertyTypeChanged')}
       onEventsFunctionsAdded={action('functions added')}
       onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
       onEventsBasedObjectChildrenEdited={action(

@@ -24,7 +24,8 @@ describe('gdjs.RuntimeGameRenderer canvas tests', () => {
     it('should correctly initialize external canvas and create domElementsContainer', () => {
         const gameCanvas = document.createElement('canvas');
         gameContainer.appendChild(gameCanvas);
-        renderer.initializeForCanvas(gameCanvas);
+        renderer.initializeRenderers(gameCanvas);
+        renderer.initializeCanvas(gameCanvas);
 
         const actualGameCanvas = renderer.getCanvas();
         const actualDomElementsContainer = renderer.getDomElementContainer();

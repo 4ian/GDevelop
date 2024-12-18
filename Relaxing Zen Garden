@@ -1,0 +1,66 @@
+package com.example.zengarden;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.view.DragEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private MediaPlayer backgroundMusic;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Play background music
+        backgroundMusic = MediaPlayer.create(this, R.raw.relaxing_music);
+        backgroundMusic.setLooping(true);
+        backgroundMusic.start();
+
+        // Draggable object (stone)
+        ImageView stone = findViewById(R.id.stone);
+        FrameLayout gardenArea = findViewById(R.id.gardenArea);
+
+        // Enable dragging
+        stone.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                    view.startDragAndDrop(null, shadowBuilder, view, 0);
+                    view.setVisibility(View.INVISIBLE);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // Enable dropping
+        gardenArea.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View view, DragEvent dragEvent) {
+                if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
+                    View draggedView = (View) dragEvent.getLocalState();
+                    draggedView.setX(dragEvent.getX() - draggedView.getWidth() / 2);
+                    draggedView.setY(dragEvent.getY() - draggedView.getHeight() / 2);
+                    draggedView.setVisibility(View.VISIBLE);
+                }
+                return true;
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (backgroundMusic != null) {
+            backgroundMusic.release();
+        }
+    }
+}

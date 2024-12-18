@@ -60,6 +60,10 @@ import ProjectsWidget from './Widgets/ProjectsWidget';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { formatISO, subDays } from 'date-fns';
 import { daysShownForYear } from './GameAnalyticsEvaluator';
+import {
+  getGameAdEarnings,
+  type GameAdEarning,
+} from '../Utils/GDevelopServices/Usage';
 
 const styles = {
   mobileFooter: {
@@ -140,9 +144,7 @@ const GameDashboard = ({
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
-    null
-  );
+  const [gameMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(null);
   const [
     recommendedMarketingPlan,
     setRecommendedMarketingPlan,
@@ -154,9 +156,10 @@ const GameDashboard = ({
   const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
     null
   );
-  const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
-    representation: 'date',
-  });
+  const [
+    gameAdEarnings,
+    setGameAdEarnings,
+  ] = React.useState<?Array<GameAdEarning>>(null);
 
   const webBuilds = builds
     ? builds.filter(build => build.type === 'web-build')
@@ -457,13 +460,25 @@ const GameDashboard = ({
         setLeaderboards(null);
         setGameFeaturings(null);
         setRecommendedMarketingPlan(null);
+        setGameAdEarnings(null);
         return;
       }
+
+      const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
+        representation: 'date',
+      });
+      const gameCreatioDateIsoDate = formatISO(new Date(game.createdAt), {
+        representation: 'date',
+      });
+      const todayIsoDate = formatISO(new Date(), {
+        representation: 'date',
+      });
 
       const [
         feedbacks,
         builds,
-        gameRollingMetrics,
+        gameMetrics,
+        gameAdEarnings,
         leaderboards,
         recommendedMarketingPlan,
       ] = await Promise.all([
@@ -478,6 +493,11 @@ const GameDashboard = ({
           game.id,
           lastYearIsoDate
         ),
+        getGameAdEarnings(getAuthorizationHeader, profile.id, {
+          gameId: game.id,
+          startIsoDate: gameCreatioDateIsoDate,
+          endIsoDate: todayIsoDate,
+        }),
         listGameActiveLeaderboards(getAuthorizationHeader, profile.id, game.id),
         getRecommendedMarketingPlan(getAuthorizationHeader, {
           gameId: game.id,
@@ -487,16 +507,17 @@ const GameDashboard = ({
       ]);
       setFeedbacks(feedbacks);
       setBuilds(builds);
-      setGameMetrics(gameRollingMetrics);
+      setGameMetrics(gameMetrics);
       setLeaderboards(leaderboards);
       setRecommendedMarketingPlan(recommendedMarketingPlan);
+      setGameAdEarnings(gameAdEarnings);
     },
     [
       fetchGameFeaturings,
       game.id,
       getAuthorizationHeader,
       profile,
-      lastYearIsoDate,
+      game.createdAt,
     ]
   );
 
@@ -582,7 +603,8 @@ const GameDashboard = ({
                 <Grid container spacing={2} ref={grid}>
                   <AnalyticsWidget
                     onSeeAll={() => setCurrentView('analytics')}
-                    gameMetrics={gameRollingMetrics}
+                    gameMetrics={gameMetrics}
+                    gameAdEarnings={gameAdEarnings}
                     game={game}
                     gameUrl={gameUrl}
                   />

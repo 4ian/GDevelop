@@ -2237,7 +2237,7 @@ module.exports = {
         .setGetter('getSidewaysSpeedMax');
 
       aut
-        .addExpressionAndCondition(
+        .addExpressionAndConditionAndAction(
           'number',
           'CurrentFallSpeed',
           _('Current falling speed'),
@@ -2257,34 +2257,11 @@ module.exports = {
           )
         )
         .markAsAdvanced()
-        .setFunctionName('getCurrentFallSpeed');
-
-      aut
-        .addScopedAction(
-          'SetCurrentFallSpeed',
-          _('Current falling speed'),
-          _(
-            "Change the current falling speed of the object. This action doesn't have any effect when the character is not falling or is in the first phase of a jump."
-          ),
-          _('the current falling speed'),
-          _('Character state'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')
-        .useStandardOperatorParameters(
-          'number',
-          gd.ParameterOptions.makeNewOptions().setDescription(
-            _('Speed (in pixels per second)')
-          )
-        )
-        .markAsAdvanced()
         .setFunctionName('setCurrentFallSpeed')
         .setGetter('getCurrentFallSpeed');
 
       aut
-        .addExpressionAndCondition(
+        .addExpressionAndConditionAndAction(
           'number',
           'CurrentJumpSpeed',
           _('Current jump speed'),
@@ -2304,7 +2281,8 @@ module.exports = {
           )
         )
         .markAsAdvanced()
-        .setFunctionName('getCurrentJumpSpeed');
+        .setFunctionName('setCurrentJumpSpeed')
+        .setGetter('getCurrentJumpSpeed');
 
       aut
         .addExpressionAndConditionAndAction(

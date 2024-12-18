@@ -597,7 +597,7 @@ namespace gdjs {
           );
         } else if (currentSpeed <= 0) {
           // Accelerate
-          newSpeed -= acceleration * timeDelta;
+          newSpeed -= Math.max(-speedMax, acceleration * timeDelta);
         } else {
           // Turn back at least as fast as it would stop.
           newSpeed = Math.max(
@@ -614,7 +614,10 @@ namespace gdjs {
           );
         } else if (currentSpeed >= 0) {
           // Accelerate
-          newSpeed += acceleration * timeDelta;
+          newSpeed = Math.min(
+            speedMax,
+            currentSpeed + acceleration * timeDelta
+          );
         } else {
           // Turn back at least as fast as it would stop.
           newSpeed = Math.min(
@@ -631,7 +634,7 @@ namespace gdjs {
           newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
         }
       }
-      return gdjs.evtTools.common.clamp(newSpeed, -speedMax, speedMax);
+      return newSpeed;
     }
 
     private updateGroundVelocity(
@@ -991,11 +994,7 @@ namespace gdjs {
      * @param currentForwardSpeed The current speed.
      */
     setCurrentForwardSpeed(currentForwardSpeed: float): void {
-      this._currentForwardSpeed = gdjs.evtTools.common.clamp(
-        currentForwardSpeed,
-        -this._forwardSpeedMax,
-        this._forwardSpeedMax
-      );
+      this._currentForwardSpeed = currentForwardSpeed;
     }
 
     /**
@@ -1011,11 +1010,7 @@ namespace gdjs {
      * @param currentSidewaysSpeed The current speed.
      */
     setCurrentSidewaysSpeed(currentSidewaysSpeed: float): void {
-      this._currentSidewaysSpeed = gdjs.evtTools.common.clamp(
-        currentSidewaysSpeed,
-        -this._sidewaysSpeedMax,
-        this._sidewaysSpeedMax
-      );
+      this._currentSidewaysSpeed = currentSidewaysSpeed;
     }
 
     /**
@@ -1029,17 +1024,13 @@ namespace gdjs {
 
     /**
      * Set the current fall speed.
-     *
-     * When the character is not in the falling state this method has no effect.
      */
     setCurrentFallSpeed(currentFallSpeed: float) {
-      if (this.isFalling()) {
-        this._currentFallSpeed = gdjs.evtTools.common.clamp(
-          currentFallSpeed,
-          0,
-          this._maxFallingSpeed
-        );
-      }
+      this._currentFallSpeed = gdjs.evtTools.common.clamp(
+        currentFallSpeed,
+        0,
+        this._maxFallingSpeed
+      );
     }
 
     /**
@@ -1048,6 +1039,13 @@ namespace gdjs {
      */
     getCurrentJumpSpeed(): float {
       return this._currentJumpSpeed;
+    }
+
+    /**
+     * Set the current jump speed.
+     */
+    setCurrentJumpSpeed(currentJumpSpeed: float) {
+      this._currentJumpSpeed = Math.max(0, currentJumpSpeed);
     }
 
     /**

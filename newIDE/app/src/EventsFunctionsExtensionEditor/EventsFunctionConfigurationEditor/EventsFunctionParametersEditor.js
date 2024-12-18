@@ -179,6 +179,20 @@ export const EventsFunctionParametersEditor = ({
 
   const forceUpdate = useForceUpdate();
 
+  const isABehaviorLifecycleEventsFunction =
+    !!eventsBasedBehavior &&
+    gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+      eventsFunction.getName()
+    );
+  const isAnObjectLifecycleEventsFunction =
+    !!eventsBasedObject &&
+    !eventsBasedBehavior &&
+    gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+      eventsFunction.getName()
+    );
+  freezeParameters =
+    isABehaviorLifecycleEventsFunction || isAnObjectLifecycleEventsFunction;
+
   const [
     longDescriptionShownIndexes,
     setLongDescriptionShownIndexes,
@@ -560,22 +574,6 @@ export const EventsFunctionParametersEditor = ({
     ? ParametersIndexOffsets.ObjectFunction
     : ParametersIndexOffsets.FreeFunction;
 
-  const isABehaviorLifecycleEventsFunction =
-    !!eventsBasedBehavior &&
-    gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
-      eventsFunction.getName()
-    );
-  if (isABehaviorLifecycleEventsFunction) {
-    return (
-      <EmptyMessage>
-        <Trans>
-          This is a "lifecycle method". It will be called automatically by the
-          game engine and has two parameters: "Object" (the object the behavior
-          is acting on) and "Behavior" (the behavior itself).
-        </Trans>
-      </EmptyMessage>
-    );
-  }
   const isAnExtensionLifecycleEventsFunction =
     !eventsBasedBehavior &&
     gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(

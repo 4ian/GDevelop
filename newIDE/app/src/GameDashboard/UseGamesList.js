@@ -31,6 +31,14 @@ const useGamesList = (): GamesList => {
     null
   );
 
+  React.useEffect(
+    () => {
+      // Reset games when user logs out.
+      if (!userId) setGames(null);
+    },
+    [userId]
+  );
+
   const fetchGames = React.useCallback(
     async (): Promise<void> => {
       if (loginState !== 'done') return;

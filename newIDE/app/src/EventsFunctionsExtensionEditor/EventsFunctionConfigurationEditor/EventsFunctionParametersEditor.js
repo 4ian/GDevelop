@@ -191,7 +191,9 @@ export const EventsFunctionParametersEditor = ({
       eventsFunction.getName()
     );
   freezeParameters =
-    isABehaviorLifecycleEventsFunction || isAnObjectLifecycleEventsFunction;
+    freezeParameters ||
+    isABehaviorLifecycleEventsFunction ||
+    isAnObjectLifecycleEventsFunction;
 
   const [
     longDescriptionShownIndexes,

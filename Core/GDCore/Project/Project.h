@@ -1073,22 +1073,24 @@ class GD_CORE_API Project {
     return wholeProjectDiagnosticReport;
   }
 
- private:
-  /**
-   * Initialize from another game. Used by copy-ctor and assign-op.
-   * Don't forget to update me if members were changed!
-   */
-  void Init(const gd::Project& project);
-
   /**
    * @brief Get the project extensions names in the order they have to be
    * unserialized.
    *
    * Child-objects need the event-based objects they use to be loaded completely
    * before they are unserialized.
+   *
+   * \warning This is only public to allow testing - don't use it in the editor.
    */
-  std::vector<gd::String> GetUnserializingOrderExtensionNames(
+  static std::vector<gd::String> GetUnserializingOrderExtensionNames(
       const gd::SerializerElement& eventsFunctionsExtensionsElement);
+
+ private:
+  /**
+   * Initialize from another game. Used by copy-ctor and assign-op.
+   * Don't forget to update me if members were changed!
+   */
+  void Init(const gd::Project& project);
 
   /**
    * Create an object configuration of the given type.

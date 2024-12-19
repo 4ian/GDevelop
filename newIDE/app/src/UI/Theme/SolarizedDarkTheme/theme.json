@@ -73,6 +73,18 @@
         "comment": "Palette/Grey/100"
       }
     },
+    "premium": {
+      "green": {
+        "value": "#3BF7F4"
+      },
+      "orange": {
+        "value": "#FFBC57"
+      },
+      "text-contrast-color": {
+        "value": "#1D1D26",
+        "comment": "Palette/Grey/100"
+      }
+    },
     "hover": {
       "background-color": {
         "value": "rgba(255, 255, 255, 0.08)"

@@ -406,9 +406,13 @@ export default function SubscriptionDialog({
         .filter(Boolean)
         .filter(plan => {
           if (filter === 'individual') {
-            return ['free', 'gdevelop_silver', 'gdevelop_gold'].includes(
-              plan.id
-            );
+            if (isPlanValid) {
+              return ['free', 'gdevelop_silver', 'gdevelop_gold'].includes(
+                plan.id
+              );
+            } else {
+              return ['gdevelop_silver', 'gdevelop_gold'].includes(plan.id);
+            }
           }
           if (filter === 'team') {
             return ['gdevelop_startup', 'gdevelop_enterprise'].includes(
@@ -419,13 +423,15 @@ export default function SubscriptionDialog({
             return ['gdevelop_education'].includes(plan.id);
           }
 
-          return plan.id !== 'gdevelop_education';
+          return !['gdevelop_education', 'free'].includes(plan.id);
         })
     : null;
 
   const dialogMaxWidth =
     !displayedSubscriptionPlanWithPricingSystems ||
     displayedSubscriptionPlanWithPricingSystems.length === 1
+      ? 'sm'
+      : displayedSubscriptionPlanWithPricingSystems.length < 3
       ? 'md'
       : displayedSubscriptionPlanWithPricingSystems.length < 4
       ? 'lg'
@@ -465,54 +471,51 @@ export default function SubscriptionDialog({
             open={open}
             fixedContent={
               <>
-                {hasValidSubscriptionPlan(authenticatedUser.subscription) &&
-                  userSubscriptionPlanWithPricingSystems && (
-                    <Column noMargin>
-                      <Text>
-                        <Trans>Your plan:</Trans>
-                      </Text>
-                      <Paper
-                        background="medium"
-                        variant="outlined"
-                        style={styles.currentPlanPaper}
+                {isPlanValid && userSubscriptionPlanWithPricingSystems && (
+                  <Column noMargin>
+                    <Text>
+                      <Trans>Your plan:</Trans>
+                    </Text>
+                    <Paper
+                      background="medium"
+                      variant="outlined"
+                      style={styles.currentPlanPaper}
+                    >
+                      <Line
+                        justifyContent="space-between"
+                        alignItems="center"
+                        noMargin
                       >
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                          noMargin
-                        >
-                          <Line alignItems="center" noMargin>
-                            {getPlanIcon({
-                              subscriptionPlan: userSubscriptionPlanWithPricingSystems,
-                              logoSize: 20,
-                            })}
-                            <Text size="block-title">
-                              {selectMessageByLocale(
-                                i18n,
-                                userSubscriptionPlanWithPricingSystems.nameByLocale
-                              )}
-                            </Text>
-                          </Line>
-                          {!hasSubscriptionBeenManuallyAdded(
+                        <Line alignItems="center" noMargin>
+                          {getPlanIcon({
+                            subscriptionPlan: userSubscriptionPlanWithPricingSystems,
+                            logoSize: 20,
+                          })}
+                          <Text size="block-title">
+                            {selectMessageByLocale(
+                              i18n,
+                              userSubscriptionPlanWithPricingSystems.nameByLocale
+                            )}
+                          </Text>
+                        </Line>
+                        {!hasSubscriptionBeenManuallyAdded(
+                          authenticatedUser.subscription
+                        ) &&
+                          !isSubscriptionComingFromTeam(
                             authenticatedUser.subscription
                           ) &&
-                            !isSubscriptionComingFromTeam(
-                              authenticatedUser.subscription
-                            ) &&
-                            !willCancelAtPeriodEnd &&
-                            userPricingSystemId !== 'REDEMPTION_CODE' && (
-                              <FlatButton
-                                primary
-                                label={<Trans>Cancel subscription</Trans>}
-                                onClick={() =>
-                                  buyUpdateOrCancelPlan(i18n, null)
-                                }
-                              />
-                            )}
-                        </Line>
-                      </Paper>
-                    </Column>
-                  )}
+                          !willCancelAtPeriodEnd &&
+                          userPricingSystemId !== 'REDEMPTION_CODE' && (
+                            <FlatButton
+                              primary
+                              label={<Trans>Cancel subscription</Trans>}
+                              onClick={() => buyUpdateOrCancelPlan(i18n, null)}
+                            />
+                          )}
+                      </Line>
+                    </Paper>
+                  </Column>
+                )}
                 <Line justifyContent="space-between" alignItems="center">
                   <Text size="block-title">
                     <Trans>Subscription plans</Trans>

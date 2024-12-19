@@ -37,6 +37,18 @@
         "comment": "Palette/Grey/100"
       }
     },
+    "premium": {
+      "green": {
+        "value": "#3BF7F4"
+      },
+      "orange": {
+        "value": "#FFBC57"
+      },
+      "text-contrast-color": {
+        "value": "#1D1D26",
+        "comment": "Palette/Grey/100"
+      }
+    },
     "warning": {
       "dark": {
         "value": "#FFA929",

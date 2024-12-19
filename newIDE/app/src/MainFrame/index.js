@@ -2614,8 +2614,11 @@ const MainFrame = (props: Props) => {
             project: currentProject,
             fileMetadata: currentFileMetadata,
             displayOptionToGenerateNewProjectUuid:
+              // No need to display the option if current file metadata doesn't have
+              // a gameId...
               !!currentFileMetadata &&
               !!currentFileMetadata.gameId &&
+              // ... or if the project is opened from a URL.
               oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {

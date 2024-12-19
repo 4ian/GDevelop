@@ -15,7 +15,7 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 
 const styles = {
   paper: {
-    zIndex: 2,
+    zIndex: 2, // Make sure the paper is above the background for the border effect.
     flex: 1,
   },
   diamondIcon: {

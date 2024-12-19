@@ -17,7 +17,3 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
-
-.contentContainer {
-    z-index: 2; /* Make it appear above the colored background */
-}

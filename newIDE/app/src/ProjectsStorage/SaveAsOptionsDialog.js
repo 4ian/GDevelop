@@ -81,8 +81,14 @@ const SaveAsOptionsDialog = (props: Props) => {
                 setGenerateNewProjectUuid(newValue === 'generate')
               }
             >
-              <SelectOption label={t`Keep`} value={'keep'} />
-              <SelectOption label={t`Generate`} value={'generate'} />
+              <SelectOption
+                label={t`Keep link between the game and the new project`}
+                value={'keep'}
+              />
+              <SelectOption
+                label={t`Start a new game from this project`}
+                value={'generate'}
+              />
             </SelectField>
           </ColumnStackLayout>
         </Dialog>

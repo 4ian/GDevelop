@@ -93,6 +93,7 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onPropertyTypeChanged: (propertyName: string) => void,
   onEventsFunctionsAdded: () => void,
 |};
 
@@ -129,6 +130,7 @@ export default function EventsBasedObjectPropertiesEditor({
   eventsBasedObject,
   onPropertiesUpdated,
   onRenameProperty,
+  onPropertyTypeChanged,
   onEventsFunctionsAdded,
 }: Props) {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -700,6 +702,9 @@ export default function EventsBasedObjectPropertiesEditor({
                                             );
                                           }
                                           forceUpdate();
+                                          onPropertyTypeChanged(
+                                            property.getName()
+                                          );
                                           onPropertiesUpdated &&
                                             onPropertiesUpdated();
                                         }}

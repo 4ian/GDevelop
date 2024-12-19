@@ -460,6 +460,8 @@ const gd::String& ExpressionValidator::TypeToString(Type type) {
     case Type::NumberOrString:
       return numberOrStringTypeString;
     case Type::Variable:
+    case Type::VariableOrProperty:
+    case Type::VariableOrPropertyOrParameter:
       return variableTypeString;
     case Type::LegacyVariable:
       // This function is only used to display error.
@@ -493,8 +495,11 @@ ExpressionValidator::Type ExpressionValidator::StringToType(
           ExpressionValidator::variableTypeString, type)) {
     if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
       return Type::LegacyVariable;
-    }
-    else {
+    } else if (type == "variableOrProperty") {
+      return Type::VariableOrProperty;
+    } else if (type == "variableOrPropertyOrParameter") {
+      return Type::VariableOrPropertyOrParameter;
+    } else {
       return Type::Variable;
     }
   }

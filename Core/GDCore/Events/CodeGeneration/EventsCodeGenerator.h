@@ -510,6 +510,11 @@ class GD_CORE_API EventsCodeGenerator {
   GenerateAnyOrSceneVariableGetter(const gd::Expression &variableExpression,
                                    EventsCodeGenerationContext &context);
 
+  virtual gd::String GeneratePropertySetterWithoutCasting(
+      const gd::PropertiesContainer &propertiesContainer,
+      const gd::NamedPropertyDescriptor &property,
+      const gd::String &operandCode);
+
 protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
@@ -565,7 +570,8 @@ protected:
       const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& objectName) {
+      const gd::String& objectName,
+      bool hasChild) {
     // This code is only used as a mock.
     // See the real implementation in GDJS.
     if (scope == LAYOUT_VARIABLE) {
@@ -627,10 +633,17 @@ protected:
       const gd::String& type,
       gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GeneratePropertyGetterWithoutCasting(
+      const gd::PropertiesContainer &propertiesContainer,
+      const gd::NamedPropertyDescriptor &property);
+
   virtual gd::String GenerateParameterGetter(
       const gd::ParameterMetadata& parameter,
       const gd::String& type,
       gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String
+  GenerateParameterGetterWithoutCasting(const gd::ParameterMetadata &parameter);
 
   /**
    * \brief Generate the code to reference an object which is

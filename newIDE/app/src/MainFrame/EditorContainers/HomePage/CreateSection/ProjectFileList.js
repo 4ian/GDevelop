@@ -226,7 +226,7 @@ const ProjectFileList = ({
           </ListItem>
         ))
       ) : projectFiles.length > 0 ? (
-        <Line>
+        <Line noMargin>
           <Column noMargin expand>
             {!isMobile && (
               <Line justifyContent="space-between">

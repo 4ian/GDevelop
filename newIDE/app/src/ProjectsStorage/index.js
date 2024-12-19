@@ -50,6 +50,11 @@ export type SaveAsLocation = {|
   // a new location where to save a project to.
 |};
 
+export type SaveAsOptions = {|
+  generateNewProjectUuid?: boolean,
+  setProjectNameFromLocation?: boolean,
+|};
+
 export type FileMetadataAndStorageProviderName = {
   fileMetadata: FileMetadata,
   storageProviderName: string,
@@ -109,8 +114,10 @@ export type StorageProviderOperations = {|
   onChooseSaveProjectAsLocation?: ({|
     project: gdProject,
     fileMetadata: ?FileMetadata, // This is the current location.
+    displayOptionToGenerateNewProjectUuid: boolean,
   |}) => Promise<{|
     saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
+    saveAsOptions: ?SaveAsOptions,
   |}>,
   onSaveProjectAs?: (
     project: gdProject,

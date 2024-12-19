@@ -314,7 +314,7 @@ const CreateSection = ({
     const isCurrentProjectOpened =
       !!project &&
       !!currentFileMetadata &&
-      fileMetadata.gameId === currentFileMetadata.gameId;
+      fileMetadata.fileIdentifier === currentFileMetadata.fileIdentifier;
 
     if (isCurrentProjectOpened) {
       const result = await showConfirmation({

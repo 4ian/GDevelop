@@ -487,7 +487,10 @@ const GameDashboardCard = ({
             // If there are multiple projects, suggest opening the game dashboard.
             actions.push({
               label: i18n._(t`See all projects`),
-              click: game ? () => onOpenGameManager({ game }) : undefined,
+              click: game
+                ? () =>
+                    onOpenGameManager({ game, widgetToScrollTo: 'projects' })
+                : undefined,
             });
           }
 

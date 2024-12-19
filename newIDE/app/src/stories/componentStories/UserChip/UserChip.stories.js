@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import paperDecorator from '../../PaperDecorator';
+import { getPaperDecorator } from '../../PaperDecorator';
 
 import UserChipComponent from '../../../UI/User/UserChip';
 import {
@@ -18,7 +18,7 @@ import Text from '../../../UI/Text';
 export default {
   title: 'User chips/UserChip',
   component: UserChipComponent,
-  decorators: [paperDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 const LoggedOut = () => {

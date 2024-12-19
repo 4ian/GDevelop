@@ -10,7 +10,7 @@ import {
 } from './LocalProjectOpener';
 import {
   onSaveProject,
-  onChooseSaveProjectAsLocation,
+  generateOnChooseSaveProjectAsLocation,
   onSaveProjectAs,
   onAutoSaveProject,
   getWriteErrorMessage,
@@ -57,12 +57,15 @@ export default ({
   getProjectLocation: getProjectLocation,
   renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   setupResourcesWatcher,
-  createOperations: () => ({
+  createOperations: ({ setDialog, closeDialog }) => ({
     onOpenWithPicker,
     onOpen,
     getAutoSaveCreationDate,
     onSaveProject,
-    onChooseSaveProjectAsLocation,
+    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation({
+      setDialog,
+      closeDialog,
+    }),
     onSaveProjectAs,
     onAutoSaveProject,
     onGetAutoSave,

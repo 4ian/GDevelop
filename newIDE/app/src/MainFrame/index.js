@@ -103,6 +103,7 @@ import {
   type StorageProviderOperations,
   type FileMetadata,
   type SaveAsLocation,
+  type SaveAsOptions,
   type FileMetadataAndStorageProviderName,
   type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
@@ -2604,8 +2605,12 @@ const MainFrame = (props: Props) => {
       try {
         let newSaveAsLocation: ?SaveAsLocation =
           options && options.forcedSavedAsLocation;
+        let newSaveAsOptions: ?SaveAsOptions = null;
         if (onChooseSaveProjectAsLocation && !newSaveAsLocation) {
-          const { saveAsLocation } = await onChooseSaveProjectAsLocation({
+          const {
+            saveAsLocation,
+            saveAsOptions,
+          } = await onChooseSaveProjectAsLocation({
             project: currentProject,
             fileMetadata: currentFileMetadata,
           });
@@ -2613,6 +2618,7 @@ const MainFrame = (props: Props) => {
             return; // Save as was cancelled.
           }
           newSaveAsLocation = saveAsLocation;
+          newSaveAsOptions = saveAsOptions;
         }
 
         if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
@@ -2625,6 +2631,13 @@ const MainFrame = (props: Props) => {
           );
 
           if (!canProjectBeSafelySavedAs) return;
+        }
+
+        if (newSaveAsOptions && newSaveAsOptions.generateNewProjectUuid) {
+          currentProject.resetProjectUuid();
+        }
+        if (newSaveAsLocation && newSaveAsLocation.name) {
+          currentProject.setName(newSaveAsLocation.name);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProjectAs(

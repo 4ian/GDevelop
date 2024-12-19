@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { type FileMetadata, type SaveAsLocation } from '..';
+import { type FileMetadata, type SaveAsLocation, type SaveAsOptions } from '..';
 import {
+  CLOUD_PROJECT_NAME_MAX_LENGTH,
   commitVersion,
   createCloudProject,
   getCredentialsForCloudProject,
@@ -11,7 +12,6 @@ import {
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { serializeToJSON } from '../../Utils/Serializer';
-import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
 import {
   createZipWithSingleTextFile,
@@ -21,6 +21,7 @@ import ProjectCache from '../../Utils/ProjectCache';
 import { getProjectCache } from './CloudProjectOpener';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -189,33 +190,39 @@ export const generateOnChooseSaveProjectAsLocation = ({
   fileMetadata: ?FileMetadata,
 |}): Promise<{|
   saveAsLocation: ?SaveAsLocation,
+  saveAsOptions: ?SaveAsOptions,
 |}> => {
   if (!authenticatedUser.authenticated) {
-    return { saveAsLocation: null };
+    return { saveAsLocation: null, saveAsOptions: null };
   }
 
-  const name = await new Promise(resolve => {
+  const options = await new Promise(resolve => {
     setDialog(() => (
-      <CloudSaveAsDialog
+      <SaveAsOptionsDialog
         onCancel={() => {
           closeDialog();
           resolve(null);
         }}
-        nameSuggestion={project.getName()}
-        onSave={(newName: string) => {
+        nameMaxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
+        nameSuggestion={
+          fileMetadata ? `${project.getName()} - Copy` : project.getName()
+        }
+        onSave={options => {
           closeDialog();
-          resolve(newName);
+          resolve(options);
         }}
       />
     ));
   });
 
-  if (!name) return { saveAsLocation: null }; // Save was cancelled.
+  if (!options) return { saveAsLocation: null, saveAsOptions: null }; // Save was cancelled.
 
   return {
     saveAsLocation: {
-      name,
-      gameId: project.getProjectUuid(),
+      name: options.name,
+    },
+    saveAsOptions: {
+      generateNewProjectUuid: options.generateNewProjectUuid,
     },
   };
 };
@@ -243,7 +250,7 @@ export const generateOnSaveProjectAs = (
   }
   options.onStartSaving();
 
-  const gameId = saveAsLocation.gameId || project.getProjectUuid();
+  const gameId = project.getProjectUuid();
 
   try {
     // Create a new cloud project.

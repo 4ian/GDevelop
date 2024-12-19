@@ -1,8 +1,12 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
-import { type FileMetadata, type SaveAsLocation } from '../index';
+import {
+  type FileMetadata,
+  type SaveAsLocation,
+  type SaveAsOptions,
+} from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
   split,
@@ -11,6 +15,7 @@ import {
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
+import SaveAsOptionsDialog from '../SaveAsOptionsDialog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -180,7 +185,13 @@ export const onSaveProject = async (
   };
 };
 
-export const onChooseSaveProjectAsLocation = async ({
+export const generateOnChooseSaveProjectAsLocation = ({
+  setDialog,
+  closeDialog,
+}: {
+  setDialog: (() => React.Node) => void,
+  closeDialog: () => void,
+}) => async ({
   project,
   fileMetadata,
 }: {|
@@ -188,8 +199,34 @@ export const onChooseSaveProjectAsLocation = async ({
   fileMetadata: ?FileMetadata, // This is the current location.
 |}): Promise<{|
   saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
+  saveAsOptions: ?SaveAsOptions,
 |}> => {
-  const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
+  const options = await new Promise(resolve => {
+    setDialog(() => (
+      <SaveAsOptionsDialog
+        onCancel={() => {
+          closeDialog();
+          resolve(null);
+        }}
+        nameSuggestion={
+          fileMetadata ? `${project.getName()} - Copy` : project.getName()
+        }
+        mainActionLabel={<Trans>Continue</Trans>}
+        onSave={options => {
+          closeDialog();
+          resolve(options);
+        }}
+      />
+    ));
+  });
+
+  if (!options) return { saveAsLocation: null, saveAsOptions: null }; // Save was cancelled.
+
+  let defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
+  if (path && defaultPath) {
+    defaultPath = path.join(path.dirname(defaultPath), `${options.name}.json`);
+  }
+
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
@@ -201,12 +238,16 @@ export const onChooseSaveProjectAsLocation = async ({
   }
   const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return { saveAsLocation: null };
+    return { saveAsLocation: null, saveAsOptions: null };
   }
 
   return {
     saveAsLocation: {
+      name: options.name,
       fileIdentifier: filePath,
+    },
+    saveAsOptions: {
+      generateNewProjectUuid: options.generateNewProjectUuid,
     },
   };
 };
@@ -231,6 +272,7 @@ export const onSaveProjectAs = async (
     throw new Error('A file path was not chosen before saving as.');
 
   options.onStartSaving();
+
   // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
     fileIdentifier: filePath,

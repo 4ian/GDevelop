@@ -8,13 +8,13 @@ import TextButton from '../TextButton';
 import { LineStackLayout } from '../Layout';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CircularProgress from '../CircularProgress';
-import User from '../CustomSvgIcons/User';
 import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 import CrownShining from '../CustomSvgIcons/CrownShining';
 import UserAvatar from './UserAvatar';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../IconButton';
+import FlatButton from '../FlatButton';
 
 const styles = {
   buttonContainer: { flexShrink: 0 },
@@ -50,6 +50,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
   const {
     profile,
     onOpenCreateAccountDialog,
+    onOpenLoginDialog,
     loginState,
     subscription,
   } = authenticatedUser;
@@ -86,15 +87,23 @@ const UserChip = ({ onOpenProfile }: Props) => {
   ) : (
     <div style={styles.buttonContainer}>
       <LineStackLayout noMargin alignItems="center">
+        <FlatButton
+          label={
+            <span>
+              <Trans>Log in</Trans>
+            </span>
+          }
+          onClick={onOpenLoginDialog}
+          primary
+        />
         <RaisedButton
           label={
             <span>
-              <Trans>Account</Trans>
+              <Trans>Sign up</Trans>
             </span>
           }
           onClick={onOpenCreateAccountDialog}
           primary
-          icon={<User fontSize="small" />}
         />
       </LineStackLayout>
     </div>

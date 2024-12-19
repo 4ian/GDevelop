@@ -167,6 +167,7 @@ const TeamMemberProjectsView = ({
                     file={file}
                     currentFileMetadata={currentFileMetadata}
                     key={file.fileMetadata.fileIdentifier}
+                    disabled={false}
                     isLoading={false}
                     onOpenContextMenu={openContextMenu}
                     onOpenProject={onOpenRecentFile}

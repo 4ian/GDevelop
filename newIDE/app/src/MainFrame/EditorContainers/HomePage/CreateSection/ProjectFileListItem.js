@@ -62,6 +62,7 @@ type ProjectFileListItemProps = {|
   storageProviders: Array<StorageProvider>,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   isWindowSizeMediumOrLarger: boolean,
+  disabled: boolean,
   isLoading: boolean,
   onOpenContextMenu: (
     event: ClientCoordinates,
@@ -76,6 +77,7 @@ export const ProjectFileListItem = ({
   storageProviders,
   onOpenProject,
   isWindowSizeMediumOrLarger,
+  disabled,
   isLoading,
   onOpenContextMenu,
 }: ProjectFileListItemProps) => {
@@ -86,12 +88,20 @@ export const ProjectFileListItem = ({
     file.storageProviderName
   );
 
+  const onWillOpenContextMenu = React.useCallback(
+    (event: ClientCoordinates, file: FileMetadataAndStorageProviderName) => {
+      if (disabled) return;
+      onOpenContextMenu(event, file);
+    },
+    [disabled, onOpenContextMenu]
+  );
+
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
       event => {
-        onOpenContextMenu(event, file);
+        onWillOpenContextMenu(event, file);
       },
-      [onOpenContextMenu, file]
+      [onWillOpenContextMenu, file]
     )
   );
   return (
@@ -102,10 +112,11 @@ export const ProjectFileListItem = ({
             button
             key={file.fileMetadata.fileIdentifier}
             onClick={() => {
+              if (disabled) return;
               onOpenProject(file);
             }}
             style={styles.listItem}
-            onContextMenu={event => onOpenContextMenu(event, file)}
+            onContextMenu={event => onWillOpenContextMenu(event, file)}
             {...longTouchForContextMenuProps}
           >
             {isWindowSizeMediumOrLarger ? (
@@ -158,7 +169,7 @@ export const ProjectFileListItem = ({
                     onClick={event => {
                       // prevent triggering the click on the list item.
                       event.stopPropagation();
-                      onOpenContextMenu(event, file);
+                      onWillOpenContextMenu(event, file);
                     }}
                   >
                     <ThreeDotsMenu />

@@ -103,6 +103,7 @@ import {
   type StorageProviderOperations,
   type FileMetadata,
   type SaveAsLocation,
+  type SaveAsOptions,
   type FileMetadataAndStorageProviderName,
   type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
@@ -2604,15 +2605,27 @@ const MainFrame = (props: Props) => {
       try {
         let newSaveAsLocation: ?SaveAsLocation =
           options && options.forcedSavedAsLocation;
+        let newSaveAsOptions: ?SaveAsOptions = null;
         if (onChooseSaveProjectAsLocation && !newSaveAsLocation) {
-          const { saveAsLocation } = await onChooseSaveProjectAsLocation({
+          const {
+            saveAsLocation,
+            saveAsOptions,
+          } = await onChooseSaveProjectAsLocation({
             project: currentProject,
             fileMetadata: currentFileMetadata,
+            displayOptionToGenerateNewProjectUuid:
+              // No need to display the option if current file metadata doesn't have
+              // a gameId...
+              !!currentFileMetadata &&
+              !!currentFileMetadata.gameId &&
+              // ... or if the project is opened from a URL.
+              oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
           newSaveAsLocation = saveAsLocation;
+          newSaveAsOptions = saveAsOptions;
         }
 
         if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
@@ -2625,6 +2638,21 @@ const MainFrame = (props: Props) => {
           );
 
           if (!canProjectBeSafelySavedAs) return;
+        }
+
+        let originalProjectUuid = null;
+        if (newSaveAsOptions && newSaveAsOptions.generateNewProjectUuid) {
+          originalProjectUuid = currentProject.getProjectUuid();
+          currentProject.resetProjectUuid();
+        }
+        let originalProjectName = null;
+        const newProjectName =
+          newSaveAsLocation && newSaveAsLocation.name
+            ? newSaveAsLocation.name
+            : null;
+        if (newProjectName) {
+          originalProjectName = currentProject.getName();
+          currentProject.setName(newProjectName);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProjectAs(
@@ -2649,7 +2677,13 @@ const MainFrame = (props: Props) => {
           }
         );
 
-        if (!wasSaved) return; // Save was cancelled, don't do anything.
+        if (!wasSaved) {
+          _replaceSnackMessage(i18n._(t`An error occurred. Please try again.`));
+          if (originalProjectName) currentProject.setName(originalProjectName);
+          if (originalProjectUuid)
+            currentProject.setProjectUuid(originalProjectUuid);
+          return;
+        }
 
         sealUnsavedChanges({ setCheckpointTime: true });
         _replaceSnackMessage(i18n._(t`Project properly saved`));

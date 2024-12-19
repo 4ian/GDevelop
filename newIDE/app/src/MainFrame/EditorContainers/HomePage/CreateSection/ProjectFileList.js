@@ -90,6 +90,7 @@ const ProjectFileList = ({
 }: Props) => {
   const projectFiles = useProjectsListFor(game);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const [loadingProjectId, setLoadingProjectId] = React.useState<?string>(null);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -141,6 +142,18 @@ const ProjectFileList = ({
     [removeRecentProjectFile, showConfirmation]
   );
 
+  const onWillDeleteCloudProject = React.useCallback(
+    async (i18n, file: FileMetadataAndStorageProviderName) => {
+      setLoadingProjectId(file.fileMetadata.fileIdentifier);
+      try {
+        await onDeleteCloudProject(i18n, file);
+      } finally {
+        setLoadingProjectId(null);
+      }
+    },
+    [onDeleteCloudProject]
+  );
+
   const buildContextMenu = (
     i18n: I18nType,
     file: ?FileMetadataAndStorageProviderName
@@ -155,7 +168,7 @@ const ProjectFileList = ({
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
-          click: () => onDeleteCloudProject(i18n, file),
+          click: () => onWillDeleteCloudProject(i18n, file),
         }
       );
     } else if (file.storageProviderName === 'LocalFile') {
@@ -253,7 +266,10 @@ const ProjectFileList = ({
                   key={file.fileMetadata.fileIdentifier}
                   file={file}
                   onOpenContextMenu={openContextMenu}
-                  isLoading={disabled}
+                  disabled={disabled}
+                  isLoading={
+                    file.fileMetadata.fileIdentifier === loadingProjectId
+                  }
                   currentFileMetadata={currentFileMetadata}
                   storageProviders={storageProviders}
                   isWindowSizeMediumOrLarger={!isMobile}

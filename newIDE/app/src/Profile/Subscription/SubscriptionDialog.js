@@ -20,7 +20,6 @@ import {
   hasSubscriptionBeenManuallyAdded,
   isSubscriptionComingFromTeam,
 } from '../../Utils/GDevelopServices/Usage';
-import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   sendSubscriptionDialogShown,

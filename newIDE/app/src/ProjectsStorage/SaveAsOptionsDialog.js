@@ -84,7 +84,7 @@ const SaveAsOptionsDialog = (props: Props) => {
                 }
               >
                 <SelectOption
-                  label={t`Keep link between the game and the new project`}
+                  label={t`Keep the new project linked to this game`}
                   value={'keep'}
                 />
                 <SelectOption

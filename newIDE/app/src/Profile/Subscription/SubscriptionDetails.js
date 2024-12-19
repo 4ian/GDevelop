@@ -63,28 +63,32 @@ const subscriptionOptions: {
     title: React.Node,
     description: React.Node,
     icon: React.Node,
+    buttonColor?: 'primary' | 'premium',
   |},
 } = {
   individual: {
     title: <Trans>For Individuals</Trans>,
     description: <Trans>Hobbyists and indie devs</Trans>,
     icon: <IndividualPlans style={{ width: 115, height: 100 }} />,
+    buttonColor: 'premium',
   },
   team: {
     title: <Trans>For Teams</Trans>,
     description: <Trans>Companies, studios and agencies</Trans>,
     icon: <TeamPlans style={{ width: 175, height: 100 }} />,
+    buttonColor: 'premium',
   },
   education: {
     title: <Trans>For Education</Trans>,
     description: <Trans>Teachers, courses and universities</Trans>,
     icon: <EducationPlans style={{ width: 110, height: 100 }} />,
+    buttonColor: 'primary',
   },
 };
 
 type Props = {
   subscription: ?Subscription,
-  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
@@ -130,7 +134,7 @@ const SubscriptionDetails = ({
         setError(null);
         setIsLoadingUserPrice(true);
         try {
-          if (!subscription) {
+          if (!subscription || !subscriptionPlansWithPricingSystems) {
             setUserSubscriptionPlanWithPricingSystems(null);
             return;
           }
@@ -206,38 +210,56 @@ const SubscriptionDetails = ({
   const isOnOrSimulateMobileApp =
     isNativeMobileApp() || simulateNativeMobileApp;
 
+  const header = (
+    <Line alignItems="center">
+      <Column noMargin>
+        <Text size="block-title">
+          <Trans>Subscriptions</Trans>
+        </Text>
+        <Text size="body" noMargin>
+          <Trans>
+            Publish to Android, iOS, unlock more cloud projects, leaderboards,
+            collaboration features and more online services.{' '}
+            <Link
+              href="https://gdevelop.io/pricing#feature-comparison"
+              onClick={() =>
+                Window.openExternalURL(
+                  'https://gdevelop.io/pricing#feature-comparison'
+                )
+              }
+            >
+              Learn more
+            </Link>
+          </Trans>
+        </Text>
+      </Column>
+    </Line>
+  );
+
   if (error) {
-    return <PlaceholderError>{error}</PlaceholderError>;
+    return (
+      <Column noMargin>
+        {header}
+        <PlaceholderError>{error}</PlaceholderError>
+      </Column>
+    );
   }
-  if (!subscription || isLoadingUserPrice) {
-    return <PlaceholderLoader />;
+  if (
+    !subscription ||
+    !subscriptionPlansWithPricingSystems ||
+    isLoadingUserPrice
+  ) {
+    return (
+      <Column noMargin>
+        {header}
+        <PlaceholderLoader style={{ minHeight: 205 }} />
+      </Column>
+    );
   }
 
   return (
     <Column noMargin>
-      <Line alignItems="center">
-        <Column noMargin>
-          <Text size="block-title">
-            <Trans>Subscriptions</Trans>
-          </Text>
-          <Text size="body" noMargin>
-            <Trans>
-              Publish to Android, iOS, unlock more cloud projects, leaderboards,
-              collaboration features and more online services.{' '}
-              <Link
-                href="https://gdevelop.io/pricing#feature-comparison"
-                onClick={() =>
-                  Window.openExternalURL(
-                    'https://gdevelop.io/pricing#feature-comparison'
-                  )
-                }
-              >
-                Learn more
-              </Link>
-            </Trans>
-          </Text>
-        </Column>
-      </Line>
+      {header}
       {userSubscriptionPlanWithPricingSystems &&
       userSubscriptionPlanWithPricingSystems.id &&
       !isSubscriptionExpired ? (
@@ -401,7 +423,12 @@ const SubscriptionDetails = ({
         ) : (
           <ResponsiveLineStackLayout noColumnMargin noResponsiveLandscape>
             {Object.keys(subscriptionOptions).map(key => {
-              const { title, description, icon } = subscriptionOptions[key];
+              const {
+                title,
+                description,
+                icon,
+                buttonColor,
+              } = subscriptionOptions[key];
               return (
                 <div
                   style={{
@@ -433,7 +460,7 @@ const SubscriptionDetails = ({
                     </Column>
                     <Spacer />
                     <RaisedButton
-                      primary
+                      color={buttonColor}
                       onClick={() =>
                         openSubscriptionDialog({
                           analyticsMetadata: { reason: 'Consult profile' },

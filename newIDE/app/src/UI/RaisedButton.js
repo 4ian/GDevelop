@@ -62,7 +62,7 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
         variant="contained"
         size={size || 'small'}
         disableElevation
-        color={primary ? 'primary' : 'default'}
+        color={primary || color === 'primary' ? 'primary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}

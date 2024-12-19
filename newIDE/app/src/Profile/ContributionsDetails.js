@@ -245,7 +245,7 @@ const ContributionDetails = ({ userId }: Props) => {
           </Column>
         </>
       ) : (
-        <PlaceholderLoader />
+        <PlaceholderLoader style={{ minHeight: 205 }} />
       )}
     </Column>
   );

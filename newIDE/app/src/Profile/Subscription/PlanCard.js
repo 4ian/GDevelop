@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-
 import {
   type SubscriptionPlan,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
 } from '../../Utils/GDevelopServices/Usage';
+import Divider from '@material-ui/core/Divider';
 import Text from '../../UI/Text';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Paper from '../../UI/Paper';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -428,20 +428,23 @@ const PlanCard = (props: Props) => {
             </Line>
             {mainPricingSystem && (
               <Paper background="light" style={styles.planPricesPaper}>
-                {otherPricingSystem && (
-                  <span style={styles.discountedPrice}>
-                    {getPlanPrices({
-                      pricingSystems: [
-                        extrapolateMonthlyPricingSystemToYearlyBasis(
-                          otherPricingSystem
-                        ),
-                      ],
-                    })}
-                  </span>
-                )}
-                {getPlanPrices({
-                  pricingSystems: [mainPricingSystem],
-                })}
+                <LineStackLayout noMargin>
+                  {otherPricingSystem && (
+                    <span style={styles.discountedPrice}>
+                      {getPlanPrices({
+                        pricingSystems: [
+                          extrapolateMonthlyPricingSystemToYearlyBasis(
+                            otherPricingSystem
+                          ),
+                        ],
+                      })}
+                    </span>
+                  )}
+                  {otherPricingSystem && <Divider orientation="vertical" />}
+                  {getPlanPrices({
+                    pricingSystems: [mainPricingSystem],
+                  })}
+                </LineStackLayout>
               </Paper>
             )}
             <Spacer />

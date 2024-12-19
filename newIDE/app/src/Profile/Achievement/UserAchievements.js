@@ -13,6 +13,7 @@ import AchievementList from './AchievementList';
 import Trophy from '../../UI/CustomSvgIcons/Trophy';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import { Column } from '../../UI/Grid';
 
 type Props = {|
   achievements: ?Array<Achievement>,
@@ -46,47 +47,52 @@ const UserAchievements = ({
   const { isMobile } = useResponsiveWindowSize();
 
   return (
-    <ResponsiveLineStackLayout>
-      {!!badges && !!achievements ? (
-        <>
-          <div style={styles.leftContainer}>
-            <div
-              style={{
-                ...styles.summary,
-                padding: isMobile ? '0 20' : '20',
-              }}
-            >
-              <Trophy color="secondary" fontSize="large" />
-              <Text size="block-title">
-                <Trans>
-                  {badges.length}/{achievements.length} achievements
-                </Trans>
-                {badges.length === 0 && (
-                  <>
-                    {' '}
-                    <Trans>(yet!)</Trans>
-                  </>
+    <Column expand noMargin>
+      <Text size="block-title">
+        <Trans>Achievements</Trans>
+      </Text>
+      <ResponsiveLineStackLayout>
+        {!!badges && !!achievements ? (
+          <>
+            <div style={styles.leftContainer}>
+              <div
+                style={{
+                  ...styles.summary,
+                  padding: isMobile ? '0 20' : '20',
+                }}
+              >
+                <Trophy color="secondary" fontSize="large" />
+                <Text size="block-title">
+                  <Trans>
+                    {badges.length}/{achievements.length} achievements
+                  </Trans>
+                  {badges.length === 0 && (
+                    <>
+                      {' '}
+                      <Trans>(yet!)</Trans>
+                    </>
+                  )}
+                </Text>
+              </div>
+            </div>
+            {badges.length > 0 && (
+              <div style={styles.rightContainer}>
+                {badges && achievements && (
+                  <AchievementList
+                    badges={badges}
+                    achievements={achievements}
+                    displayUnclaimedAchievements={displayUnclaimedAchievements}
+                    displayNotifications={displayNotifications}
+                  />
                 )}
-              </Text>
-            </div>
-          </div>
-          {badges.length > 0 && (
-            <div style={styles.rightContainer}>
-              {badges && achievements && (
-                <AchievementList
-                  badges={badges}
-                  achievements={achievements}
-                  displayUnclaimedAchievements={displayUnclaimedAchievements}
-                  displayNotifications={displayNotifications}
-                />
-              )}
-            </div>
-          )}
-        </>
-      ) : (
-        <PlaceholderLoader />
-      )}
-    </ResponsiveLineStackLayout>
+              </div>
+            )}
+          </>
+        ) : (
+          <PlaceholderLoader />
+        )}
+      </ResponsiveLineStackLayout>
+    </Column>
   );
 };
 

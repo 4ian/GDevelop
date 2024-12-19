@@ -181,7 +181,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 authenticatedUser.onOpenChangeEmailDialog
               }
             />
-            {isStudentAccount ? null : subscriptionPlansWithPricingSystems ? (
+            {isStudentAccount ? null : (
               <SubscriptionDetails
                 subscription={authenticatedUser.subscription}
                 subscriptionPlansWithPricingSystems={
@@ -190,8 +190,6 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
               />
-            ) : (
-              <PlaceholderLoader />
             )}
             {!isStudentAccount && !isTeacherAccount && (
               <Column noMargin>

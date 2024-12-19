@@ -17,3 +17,12 @@ button.buttonDanger:hover {
     background-color: var(--theme-error-dark);
     color: var(--theme-error-text-contrast-color);
 }
+
+button.buttonPremium {
+    background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
+    color: var(--theme-premium-text-contrast-color);
+}
+
+button.buttonPremium:hover {
+    background: linear-gradient(90deg, var(--theme-premium-teal-dark) 0%, var(--theme-premium-orange-dark) 100%);
+}

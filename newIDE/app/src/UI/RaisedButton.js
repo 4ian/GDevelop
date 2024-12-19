@@ -11,7 +11,7 @@ import classNames from 'classnames';
 export type RaisedButtonPropsWithoutOnClick = {|
   label?: React.Node,
   primary?: boolean,
-  color?: 'primary' | 'success' | 'danger',
+  color?: 'primary' | 'success' | 'danger' | 'premium',
   size?: 'medium',
   disabled?: boolean,
   keyboardFocused?: boolean,
@@ -69,6 +69,7 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
         className={classNames({
           [classes.buttonSuccess]: color === 'success',
           [classes.buttonDanger]: color === 'danger',
+          [classes.buttonPremium]: color === 'premium',
         })}
         style={
           style || !label

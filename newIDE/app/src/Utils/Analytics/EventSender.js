@@ -375,7 +375,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Callout in Classroom tab'
   | 'Unlock build type'
   | 'Manage subscription as teacher'
-  | 'Unlock course chapter';
+  | 'Unlock course chapter'
+  | 'Account get premium';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

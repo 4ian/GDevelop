@@ -161,7 +161,6 @@ const CurrentUsageDisplayer = ({
               !isFeatureLocked ? 'Build limit reached' : 'Unlock build type'
             }
             label={<Trans>Upgrade your subscription</Trans>}
-            makeButtonRaised
             payWithCreditsOptions={
               hidePurchaseWithCredits
                 ? undefined
@@ -208,7 +207,6 @@ const CurrentUsageDisplayer = ({
             !isFeatureLocked ? 'Build limit reached' : 'Unlock build type'
           }
           label={<Trans>Get a subscription</Trans>}
-          makeButtonRaised={quota.limitReached}
           payWithCreditsOptions={
             !quota.limitReached || hidePurchaseWithCredits
               ? undefined

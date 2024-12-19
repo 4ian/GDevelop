@@ -1,0 +1,19 @@
+.premiumContainer {
+    position: relative;
+    overflow: hidden;
+    padding: 2px;
+    border-radius: 16px;
+    display: flex;
+}
+
+.premiumContainer::before {
+    content: '';
+    display: block;
+    background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
+    width: 100%;
+    padding-bottom: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -224,8 +224,10 @@ export const generateOnChooseSaveProjectAsLocation = ({
   if (!options) return { saveAsLocation: null, saveAsOptions: null }; // Save was cancelled.
 
   let defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  if (path && defaultPath) {
-    defaultPath = path.join(path.dirname(defaultPath), `${options.name}.json`);
+  const { name } = options;
+  if (path && defaultPath && name) {
+    const safeFilename = name.replace(/[<>:"/\\|?*]/g, '_');
+    defaultPath = path.join(path.dirname(defaultPath), `${safeFilename}.json`);
   }
 
   const browserWindow = remote.getCurrentWindow();

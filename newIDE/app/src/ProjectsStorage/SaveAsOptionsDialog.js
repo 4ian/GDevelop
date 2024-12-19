@@ -18,6 +18,7 @@ type Props = {|
   onSave: ({ name: string, generateNewProjectUuid: boolean }) => void,
   nameMaxLength?: number,
   mainActionLabel?: React.Node,
+  shouldAskForGameLinkRemoval: boolean,
 |};
 
 const SaveAsOptionsDialog = (props: Props) => {
@@ -25,7 +26,7 @@ const SaveAsOptionsDialog = (props: Props) => {
   const [
     generateNewProjectUuid,
     setGenerateNewProjectUuid,
-  ] = React.useState<boolean>(false);
+  ] = React.useState<boolean>(props.shouldAskForGameLinkRemoval ? false : true);
   const [error, setError] = React.useState<?string>(null);
 
   const onSave = (i18n: I18nType) => {
@@ -75,21 +76,23 @@ const SaveAsOptionsDialog = (props: Props) => {
                 setName(newName);
               }}
             />
-            <SelectField
-              value={generateNewProjectUuid ? 'generate' : 'keep'}
-              onChange={(_, __, newValue) =>
-                setGenerateNewProjectUuid(newValue === 'generate')
-              }
-            >
-              <SelectOption
-                label={t`Keep link between the game and the new project`}
-                value={'keep'}
-              />
-              <SelectOption
-                label={t`Start a new game from this project`}
-                value={'generate'}
-              />
-            </SelectField>
+            {props.shouldAskForGameLinkRemoval && (
+              <SelectField
+                value={generateNewProjectUuid ? 'generate' : 'keep'}
+                onChange={(_, __, newValue) =>
+                  setGenerateNewProjectUuid(newValue === 'generate')
+                }
+              >
+                <SelectOption
+                  label={t`Keep link between the game and the new project`}
+                  value={'keep'}
+                />
+                <SelectOption
+                  label={t`Start a new game from this project`}
+                  value={'generate'}
+                />
+              </SelectField>
+            )}
           </ColumnStackLayout>
         </Dialog>
       )}

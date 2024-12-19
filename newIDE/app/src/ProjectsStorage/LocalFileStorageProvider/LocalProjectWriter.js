@@ -212,7 +212,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
           fileMetadata ? `${project.getName()} - Copy` : project.getName()
         }
         mainActionLabel={<Trans>Continue</Trans>}
-        shouldAskForGameLinkRemoval={!!fileMetadata && !!fileMetadata.gameId}
+        shouldAskForNewProjectUuid={!!fileMetadata && !!fileMetadata.gameId}
         onSave={options => {
           closeDialog();
           resolve(options);

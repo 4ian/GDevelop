@@ -18,7 +18,7 @@ type Props = {|
   onSave: ({ name: string, generateNewProjectUuid: boolean }) => void,
   nameMaxLength?: number,
   mainActionLabel?: React.Node,
-  shouldAskForNewProjectUuid: boolean,
+  displayOptionToGenerateNewProjectUuid: boolean,
 |};
 
 const SaveAsOptionsDialog = (props: Props) => {
@@ -26,7 +26,9 @@ const SaveAsOptionsDialog = (props: Props) => {
   const [
     generateNewProjectUuid,
     setGenerateNewProjectUuid,
-  ] = React.useState<boolean>(props.shouldAskForNewProjectUuid ? false : true);
+  ] = React.useState<boolean>(
+    props.displayOptionToGenerateNewProjectUuid ? false : true
+  );
   const [error, setError] = React.useState<?string>(null);
 
   const onSave = (i18n: I18nType) => {
@@ -76,7 +78,7 @@ const SaveAsOptionsDialog = (props: Props) => {
                 setName(newName);
               }}
             />
-            {props.shouldAskForNewProjectUuid && (
+            {props.displayOptionToGenerateNewProjectUuid && (
               <SelectField
                 value={generateNewProjectUuid ? 'generate' : 'keep'}
                 onChange={(_, __, newValue) =>

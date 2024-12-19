@@ -2613,6 +2613,10 @@ const MainFrame = (props: Props) => {
           } = await onChooseSaveProjectAsLocation({
             project: currentProject,
             fileMetadata: currentFileMetadata,
+            displayOptionToGenerateNewProjectUuid:
+              !!currentFileMetadata &&
+              !!currentFileMetadata.gameId &&
+              oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {
             return; // Save as was cancelled.

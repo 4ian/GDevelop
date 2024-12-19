@@ -114,6 +114,7 @@ export type StorageProviderOperations = {|
   onChooseSaveProjectAsLocation?: ({|
     project: gdProject,
     fileMetadata: ?FileMetadata, // This is the current location.
+    displayOptionToGenerateNewProjectUuid: boolean,
   |}) => Promise<{|
     saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
     saveAsOptions: ?SaveAsOptions,

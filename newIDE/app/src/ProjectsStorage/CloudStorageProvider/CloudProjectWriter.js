@@ -185,9 +185,11 @@ export const generateOnChooseSaveProjectAsLocation = ({
 |}) => async ({
   project,
   fileMetadata,
+  displayOptionToGenerateNewProjectUuid,
 }: {|
   project: gdProject,
   fileMetadata: ?FileMetadata,
+  displayOptionToGenerateNewProjectUuid: boolean,
 |}): Promise<{|
   saveAsLocation: ?SaveAsLocation,
   saveAsOptions: ?SaveAsOptions,
@@ -207,7 +209,9 @@ export const generateOnChooseSaveProjectAsLocation = ({
         nameSuggestion={
           fileMetadata ? `${project.getName()} - Copy` : project.getName()
         }
-        shouldAskForNewProjectUuid={!!fileMetadata && !!fileMetadata.gameId}
+        displayOptionToGenerateNewProjectUuid={
+          displayOptionToGenerateNewProjectUuid
+        }
         onSave={options => {
           closeDialog();
           resolve(options);

@@ -1,0 +1,55 @@
+{
+  "short_name": "GDevelop",
+  "name": "GDevelop",
+  "icons": [
+    {
+      "src": "favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide-1.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GDevelop"
+    },
+    {
+      "src": "screenshot-wide-2.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GDevelop"
+    },
+    {
+      "src": "screenshot-wide-3.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GDevelop"
+    }
+  ],
+  "description": "GDevelop is the most powerful, open-source, no-code game engine. Make 2D, 3D and multiplayer games without limits. Publish everywhere: iOS, Android, Steam, web, gaming platforms. Reach millions of players like other hit games and experiences powered by GDevelop.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "theme_color": "#252525",
+  "background_color": "#f0f0f0"
+}

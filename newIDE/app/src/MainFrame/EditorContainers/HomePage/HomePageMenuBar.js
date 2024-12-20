@@ -22,19 +22,18 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { SECTION_DESKTOP_SPACING } from './SectionContainer';
 
 const iconSize = 20;
-const iconButtonPaddingTop = 8;
+const iconButtonPadding = 8;
 /**
  * Padding bottom is bigger than padding top to leave space for the Android/iOS
  * bottom navigation bar.
  */
-const iconButtonPaddingBottom = 20;
-const iconButtonPaddingHorizontal = 8;
+const iconButtonMarginBottom = 12;
 const iconButtonLabelPadding = 4;
 const toolbarHeight =
   iconSize +
   2 * iconButtonLabelPadding +
-  iconButtonPaddingTop +
-  iconButtonPaddingBottom;
+  2 * iconButtonPadding +
+  iconButtonMarginBottom;
 export const homepageDesktopMenuBarWidth = 230;
 export const homepageMediumMenuBarWidth =
   verticalTabButtonSize + 2 * marginsSize;
@@ -62,7 +61,8 @@ export const styles = {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
   mobileButton: {
-    padding: `${iconButtonPaddingTop}px ${iconButtonPaddingHorizontal}px ${iconButtonPaddingBottom}px ${iconButtonPaddingHorizontal}px`,
+    padding: iconButtonPadding,
+    marginBottom: iconButtonMarginBottom,
     fontSize: 'inherit',
   },
   buttonLabel: { padding: iconButtonLabelPadding, display: 'flex' },

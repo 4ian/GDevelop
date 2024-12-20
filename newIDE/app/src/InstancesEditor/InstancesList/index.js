@@ -160,7 +160,7 @@ _renderLockCell = ({
     <IconButton
       size="small"
       style={{
-        opacity: instance.isLocked() ? 1 : 0.4, 
+        color: instance.isLocked() ? '#F5F5F7' : '#A6A6AB',
       }}
       onClick={() => {
         if (instance.isSealed()) {
@@ -315,15 +315,6 @@ _renderLockCell = ({
                       )}
                       className={'tableColumn'}
                     />
-                    <RVColumn
-                      label={<Trans>Z Order</Trans>}
-                      dataKey="zOrder"
-                      width={Math.max(
-                        width * 0.1,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                    />
                      <RVColumn
                       label={<Trans><RotateZ></RotateZ></Trans>}
                       dataKey="angle"
@@ -337,6 +328,15 @@ _renderLockCell = ({
                       label={<Trans><LayersIcon></LayersIcon></Trans>}
                       dataKey="layer"
                       width={Math.max(width * 0.1, minimumWidths.layerName)}
+                      className={'tableColumn'}
+                    />
+                      <RVColumn
+                      label={<Trans>Z Order</Trans>}
+                      dataKey="zOrder"
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                      <RVColumn

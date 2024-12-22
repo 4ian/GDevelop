@@ -54,6 +54,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Physics3D',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics3DBehavior/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'ExampleJsExtension',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),

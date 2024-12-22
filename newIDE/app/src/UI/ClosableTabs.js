@@ -202,6 +202,11 @@ export function ClosableTab({
           position: 'relative',
           display: 'inline-block',
           marginRight: 2,
+          // Leave some space when scrolled into view to let the user understand
+          // that there are more tabs.
+          scrollMarginRight: 20,
+          scrollMarginLeft: 20,
+          // Style:
           borderTopRightRadius: 8,
           borderTopLeftRadius: 8,
           borderTop: '1px solid black',

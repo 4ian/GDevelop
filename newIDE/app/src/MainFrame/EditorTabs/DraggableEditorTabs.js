@@ -16,6 +16,7 @@ import {
   ClosableTab,
   type ClosableTabProps,
 } from '../../UI/ClosableTabs';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
   'draggable-closable-tab'
@@ -46,6 +47,7 @@ export function DraggableEditorTabs({
   onDropTab,
 }: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
+  const { windowSize } = useResponsiveWindowSize();
 
   const currentTab = getCurrentTab(editorTabs);
 
@@ -54,10 +56,15 @@ export function DraggableEditorTabs({
       if (!currentTab) return;
       const tabElement = document.getElementById(getTabId(currentTab));
       if (tabElement) {
-        tabElement.scrollIntoView();
+        tabElement.scrollIntoView({
+          behavior: 'smooth',
+          // Use 'end' to keep "Home" tab visible on small screens
+          // when opening a new project.
+          inline: windowSize === 'small' ? 'end' : 'nearest',
+        });
       }
     },
-    [currentTab]
+    [currentTab, windowSize]
   );
 
   return (

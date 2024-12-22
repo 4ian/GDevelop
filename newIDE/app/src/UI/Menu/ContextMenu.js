@@ -76,7 +76,7 @@ const MaterialUIContextMenu = React.forwardRef<
           style: {
             animation: 'swipe-up-ending 0.2s ease-out',
             paddingTop: 4,
-            paddingBottom: 8,
+            paddingBottom: 18,
             maxWidth: 600,
             margin: 'auto',
             maxHeight: '80vh',

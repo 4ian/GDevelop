@@ -158,6 +158,61 @@ namespace gdjs {
     environment?: 'dev';
   };
 
+  class RuntimeEditor {
+    _game: RuntimeGame;
+    _pointer = new THREE.Vector2();
+
+    constructor(game: RuntimeGame) {
+      this._game = game;
+    }
+
+    onPointerMove(event) {
+      // calculate pointer position in normalized device coordinates
+      // (-1 to +1) for both components
+
+      this._pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      this._pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    setupListeners() {
+      const canvas = this._game.getRenderer().getCanvas();
+
+      canvas?.addEventListener('pointermove', this.onPointerMove.bind(this));
+    }
+    cleanListeners() {
+      const canvas = this._game.getRenderer().getCanvas();
+
+      canvas?.removeEventListener('pointermove', this.onPointerMove.bind(this));
+    }
+    activate(enable: boolean) {
+      if (enable) this.setupListeners();
+      else this.cleanListeners();
+    }
+
+    render() {
+      const layerNames = new Array();
+      const currentScene = this._game.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+      currentScene.getAllLayerNames(layerNames);
+      layerNames.forEach((layerName) => {
+        const runtimeLayerRender = currentScene
+          .getLayer(layerName)
+          .getRenderer();
+        const threeCamera = runtimeLayerRender.getThreeCamera();
+        const threeScene = runtimeLayerRender.getThreeScene();
+        if (!threeCamera || !threeScene) return;
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(this._pointer, threeCamera);
+        const intersects = raycaster.intersectObjects(threeScene.children);
+
+        const firstIntersect = intersects[0];
+        if (firstIntersect) {
+          console.log(firstIntersect.object);
+        }
+      });
+    }
+  }
+
   /**
    * Represents a game being played.
    */
@@ -233,6 +288,8 @@ namespace gdjs {
     /** True if the RuntimeGame has been disposed and should not be used anymore. */
     _wasDisposed: boolean = false;
 
+    _editor: RuntimeEditor;
+
     /**
      * @param data The object (usually stored in data.json) containing the full project data
      * @param
@@ -275,7 +332,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
-
+      this._editor = new RuntimeEditor(this);
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -757,6 +814,7 @@ namespace gdjs {
       if (this._paused === enable) return;
 
       this._paused = enable;
+      this._editor.activate(enable);
       if (this._debuggerClient) {
         this._debuggerClient.sendRuntimeGameStatus();
       }

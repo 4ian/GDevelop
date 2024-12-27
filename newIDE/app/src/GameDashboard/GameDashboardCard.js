@@ -417,18 +417,16 @@ const GameDashboardCard = ({
     const actions = [];
     if (projectsList.length > 1) {
       actions.push(
-        ...[
-          ...projectsList.map(fileMetadataAndStorageProviderName => {
-            return {
-              label: getProjectItemLabel(
-                fileMetadataAndStorageProviderName,
-                storageProviders,
-                i18n
-              ),
-              click: () => onOpenProject(fileMetadataAndStorageProviderName),
-            };
-          }),
-        ]
+        ...projectsList.slice(0, 3).map(fileMetadataAndStorageProviderName => {
+          return {
+            label: getProjectItemLabel(
+              fileMetadataAndStorageProviderName,
+              storageProviders,
+              i18n
+            ),
+            click: () => onOpenProject(fileMetadataAndStorageProviderName),
+          };
+        })
       );
 
       if (game) {

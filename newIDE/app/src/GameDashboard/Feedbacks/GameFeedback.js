@@ -395,7 +395,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                           <SelectOption
                             key={'all'}
                             value={''}
-                            label={t`All builds`}
+                            label={t`All exports`}
                           />
                           <SelectOption
                             key={'game-only'}
@@ -419,6 +419,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
               </ResponsiveLineStackLayout>
               <ColumnStackLayout expand noMargin>
                 {!!feedbacks && feedbacks.length > 0 && (
+                  // TODO: Should it display the data for the filtered pieces of feedback only?
                   <FeedbackAverageCard feedbacks={feedbacks} />
                 )}
               </ColumnStackLayout>
@@ -432,7 +433,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                       <EmptyMessage>
                         {isShowingCommentsForASpecificBuild ? (
                           <Trans>
-                            You don't have any unread feedback for this build.
+                            You don't have any unread feedback for this export.
                           </Trans>
                         ) : (
                           <Trans>
@@ -449,7 +450,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                     <EmptyMessage>
                       {isShowingCommentsForASpecificBuild ? (
                         <Trans>
-                          You don't have any feedback for this build.
+                          You don't have any feedback for this export.
                         </Trans>
                       ) : (
                         <Trans>

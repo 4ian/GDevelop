@@ -56,7 +56,7 @@ export const AssetCard = ({
         <CheckeredBackground />
         <AssetPreviewImage
           assetShortHeader={assetShortHeader}
-          maxSize={128}
+          maxSize={size}
           loading="lazy"
         />
       </div>

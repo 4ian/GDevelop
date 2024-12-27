@@ -264,6 +264,14 @@ namespace gdjs {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
         });
+      } else if (data.command === 'requestSceneChange') {
+        const sceneName = data.sceneName || null;
+        if (!sceneName) {
+          logger.warn('No scene name specified, requestSceneChange aborted');
+          return;
+        }
+
+        runtimeGame.getSceneStack().replace(sceneName, true);
       } else if (data.command === 'updateInstances') {
         // TODO: do an update/partial hot reload of the instances
       } else {

@@ -3577,7 +3577,7 @@ const MainFrame = (props: Props) => {
         'main-frame' /* The root styling, done in CSS to read some CSS variables. */
       }
     >
-      <EmbeddedGameFrame />
+      <EmbeddedGameFrame previewDebuggerServer={previewDebuggerServer} />
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },

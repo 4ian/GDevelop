@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 
 type SwitchToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -22,11 +23,16 @@ export const switchToPreview = ({
 export const switchToSceneEdition = ({
   sceneName,
 }: SwitchToSceneEditionOptions) => {
-  if (!onSwitchToSceneEdition) throw new Error('No EmbeddedGameFrame registered.');
+  if (!onSwitchToSceneEdition)
+    throw new Error('No EmbeddedGameFrame registered.');
   onSwitchToSceneEdition({ sceneName });
 };
 
-export const EmbeddedGameFrame = () => {
+type Props = {|
+  previewDebuggerServer: PreviewDebuggerServer | null,
+|};
+
+export const EmbeddedGameFrame = ({ previewDebuggerServer }: Props) => {
   const [
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,
@@ -43,9 +49,17 @@ export const EmbeddedGameFrame = () => {
       }
     };
     onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
-      console.log("TODO: switch to scene edition", options);
+      if (!previewDebuggerServer) return;
+
+      console.log('TODO: switch to scene edition', options);
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'requestSceneChange',
+          sceneName: options.sceneName,
+        });
+      });
     };
-  }, []);
+  }, [previewDebuggerServer]);
 
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>

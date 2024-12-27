@@ -80,6 +80,7 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
+import { switchToSceneEdition } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -141,6 +142,7 @@ type Props = {|
 |};
 
 type State = {|
+  gameEditorMode: 'embedded-game' | 'instances-editor',
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
@@ -196,6 +198,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.instancesSelection = new InstancesSelection();
     this.state = {
+      gameEditorMode: 'embedded-game',
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
@@ -395,6 +398,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           selectedObjectFolderOrObjectsWithContext
         ),
       }));
+
+      if (this.props.layout && this.state.gameEditorMode === 'embedded-game') {
+        switchToSceneEdition({ sceneName: this.props.layout.getName() });
+      }
     }
   }
 
@@ -1955,6 +1962,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
+                gameEditorMode={this.state.gameEditorMode}
                 project={project}
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}

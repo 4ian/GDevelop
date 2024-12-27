@@ -276,24 +276,26 @@ export default class Debugger extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'play' });
 
-    this.setState(
-      state => ({
-        gameIsPaused: { ...state.gameIsPaused, [id]: false },
-      }),
-      () => this.updateToolbar()
-    );
+    // TODO: state should be set by the game (game.paused, game.resumed)
+    // this.setState(
+    //   state => ({
+    //     gameIsPaused: { ...state.gameIsPaused, [id]: false },
+    //   }),
+    //   () => this.updateToolbar()
+    // );
   };
 
   _pause = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'pause' });
 
-    this.setState(
-      state => ({
-        gameIsPaused: { ...state.gameIsPaused, [id]: true },
-      }),
-      () => this.updateToolbar()
-    );
+    // TODO: state should be set by the game (game.paused, game.resumed)
+    // this.setState(
+    //   state => ({
+    //     gameIsPaused: { ...state.gameIsPaused, [id]: true },
+    //   }),
+    //   () => this.updateToolbar()
+    // );
   };
 
   _refresh = (id: DebuggerId) => {

@@ -264,6 +264,8 @@ namespace gdjs {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
         });
+      } else if (data.command === 'updateInstances') {
+        // TODO: do an update/partial hot reload of the instances
       } else {
         logger.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -563,6 +565,15 @@ namespace gdjs {
         circularSafeStringify({
           command: 'game.resumed',
           payload: null,
+        })
+      );
+    }
+
+    sendInstancesUpdated(runtimeObjects: gdjs.RuntimeObject[]): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'instances.updated',
+          payload: 'TODO',
         })
       );
     }

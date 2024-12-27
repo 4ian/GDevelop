@@ -45,6 +45,7 @@ const styles = {
 
 type TabContentContainerProps = {|
   active: boolean,
+  removePointerEvents?: boolean,
   children: React.Node,
 |};
 
@@ -69,6 +70,7 @@ export class TabContentContainer extends React.Component<TabContentContainerProp
         style={{
           ...styles.tabContentContainer,
           ...(active ? undefined : { display: 'none' }),
+          pointerEvents: this.props.removePointerEvents ? 'none' : undefined,
         }}
       >
         {children}

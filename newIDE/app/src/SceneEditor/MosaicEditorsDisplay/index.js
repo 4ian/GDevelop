@@ -82,6 +82,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
+    gameEditorMode,
     project,
     resourceManagementProps,
     layout,
@@ -323,7 +324,7 @@ const MosaicEditorsDisplay = React.forwardRef<
         />
       ),
     },
-    'instances-editor': {
+    'instances-editor': gameEditorMode === 'embedded-game' ? null : {
       type: 'primary',
       noTitleBar: true,
       noSoftKeyboardAvoidance: true,
@@ -448,6 +449,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       ),
     },
   };
+
   return (
     <EditorMosaic
       editors={editors}

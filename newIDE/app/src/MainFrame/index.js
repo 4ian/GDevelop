@@ -200,6 +200,7 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
+import { EmbeddedGameFrame } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -620,6 +621,11 @@ const MainFrame = (props: Props) => {
           <ExtensionIcon />
         ) : null;
 
+
+      // Scene editors can have an embedded game, so they redefine manually
+      // which components can have clicks/touches.
+      const removePointerEvents = kind === 'layout';
+
       const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'start page'
@@ -637,6 +643,7 @@ const MainFrame = (props: Props) => {
             )
           : null,
         closable,
+        removePointerEvents,
         label,
         projectItemName: name,
         tabOptions,
@@ -3570,6 +3577,7 @@ const MainFrame = (props: Props) => {
         'main-frame' /* The root styling, done in CSS to read some CSS variables. */
       }
     >
+      <EmbeddedGameFrame />
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
@@ -3706,7 +3714,11 @@ const MainFrame = (props: Props) => {
           const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+            <TabContentContainer
+              key={editorTab.key}
+              active={isCurrentTab}
+              removePointerEvents={editorTab.removePointerEvents}
+            >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}

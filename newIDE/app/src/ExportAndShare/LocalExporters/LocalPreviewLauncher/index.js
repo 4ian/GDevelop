@@ -22,6 +22,7 @@ import {
 } from './LocalPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
+import { switchToPreview } from '../../../EmbeddedGame/EmbeddedGameFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -327,6 +328,9 @@ export default class LocalPreviewLauncher extends React.Component<
                 hotReloadsCount: state.hotReloadsCount + 1,
               }));
             } else {
+              switchToPreview({
+                previewIndexHtmlLocation: `file://${outputDir}/index.html`,
+              });
               this._openPreviewWindow(project, outputDir, previewOptions);
             }
           },

@@ -38,6 +38,8 @@ import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CircularProgress from '../../UI/CircularProgress';
 import FlatButton from '../../UI/FlatButton';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
 
 const styles = {
   // Make select field width not dependent on build names (name is truncated).
@@ -67,27 +69,31 @@ const pushOrCreateKey = (
   }
   return object;
 };
+const pageSize = 20;
 
 const groupFeedbacks = (
   i18n: I18nType,
   feedbacks: Array<Comment>,
+  currentPage: number,
   { build, date }: {| build: boolean, date: boolean |}
 ): { [buildIdOrDate: string]: Array<Comment> } => {
-  const feedbacksByBuild = feedbacks.reduce((acc, feedback) => {
-    if (build) {
-      if (!feedback.buildId) {
-        return pushOrCreateKey('game-only', feedback, acc);
+  const feedbacksByBuild = feedbacks
+    .slice(pageSize * (currentPage - 1), pageSize * currentPage)
+    .reduce((acc, feedback) => {
+      if (build) {
+        if (!feedback.buildId) {
+          return pushOrCreateKey('game-only', feedback, acc);
+        } else {
+          return pushOrCreateKey(feedback.buildId, feedback, acc);
+        }
       } else {
-        return pushOrCreateKey(feedback.buildId, feedback, acc);
+        const dateKey = i18n.date(feedback.createdAt, {
+          month: 'long',
+          year: 'numeric',
+        });
+        return pushOrCreateKey(dateKey, feedback, acc);
       }
-    } else {
-      const dateKey = i18n.date(feedback.createdAt, {
-        month: 'long',
-        year: 'numeric',
-      });
-      return pushOrCreateKey(dateKey, feedback, acc);
-    }
-  }, {});
+    }, {});
   return feedbacksByBuild;
 };
 
@@ -96,8 +102,9 @@ const getDisplayedFeedbacks = (
   feedbacks: ?Array<Comment>,
   showUnprocessed: boolean,
   sortByDate: boolean,
-  filter: string
-): ?{ [buildIdOrDate: string]: Array<Comment> } => {
+  filter: string,
+  currentPage: number
+): ?Array<Comment> => {
   if (!feedbacks) return null;
   let filteredFeedbacksByBuild = feedbacks;
   if (filter === 'game-only') {
@@ -112,15 +119,7 @@ const getDisplayedFeedbacks = (
     ? filterUnprocessedComments(filteredFeedbacksByBuild)
     : filteredFeedbacksByBuild;
 
-  return sortByDate
-    ? groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnprocessed, {
-        build: false,
-        date: true,
-      })
-    : groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnprocessed, {
-        build: true,
-        date: false,
-      });
+  return filteredFeedbacksByBuildAndUnprocessed;
 };
 
 const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
@@ -137,21 +136,57 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   const [isMarkingAllAsProcessed, setIsMarkingAllAsProcessed] = React.useState(
     false
   );
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const displayedFeedbacks = getDisplayedFeedbacks(
     i18n,
     feedbacks,
     showProcessed,
     sortByDate,
-    filter
+    filter,
+    currentPage
   );
 
-  const displayedFeedbacksArray: Comment[] = displayedFeedbacks
-    ? // $FlowFixMe - Flow doesn't understand that we're flattening the array.
-      Object.values(displayedFeedbacks)
-        .filter(Boolean)
-        .flat()
-    : [];
+  const isShowingCommentsForASpecificBuild =
+    filter !== '' && filter !== 'game-only';
+
+  const displayedFeedbacksByDateOrBuild: ?{
+    [buildIdOrDate: string]: Array<Comment>,
+  } = !displayedFeedbacks
+    ? null
+    : groupFeedbacks(
+        i18n,
+        displayedFeedbacks,
+        currentPage,
+        sortByDate
+          ? {
+              build: false,
+              date: true,
+            }
+          : {
+              build: true,
+              date: false,
+            }
+      );
+
+  const totalNumberOfPages = Math.ceil(
+    !displayedFeedbacks ? 1 : displayedFeedbacks.length / pageSize
+  );
+
+  const onCurrentPageChange = React.useCallback(
+    newPage => {
+      const minPage = 1;
+      const maxPage = totalNumberOfPages;
+      if (newPage < minPage) {
+        setCurrentPage(minPage);
+      } else if (newPage > maxPage) {
+        setCurrentPage(maxPage);
+      } else {
+        setCurrentPage(newPage);
+      }
+    },
+    [setCurrentPage, totalNumberOfPages]
+  );
 
   const getBuildNameOption = (buildId: string) => {
     const shortenedUuid = shortenUuidForDisplay(buildId);
@@ -252,11 +287,11 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   };
 
   const markAllCommentsAsProcessed = async (i18n: I18nType) => {
-    if (!profile || isMarkingAllAsProcessed) return;
+    if (!profile || isMarkingAllAsProcessed || !displayedFeedbacks) return;
     try {
       setIsMarkingAllAsProcessed(true);
       await Promise.all(
-        displayedFeedbacksArray
+        displayedFeedbacks
           .filter(comment => !comment.processedAt)
           .map(comment =>
             updateComment(getAuthorizationHeader, profile.id, {
@@ -303,6 +338,13 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     },
   ];
 
+  React.useEffect(
+    () => {
+      setCurrentPage(1);
+    },
+    [sortByDate, showProcessed, filter]
+  );
+
   return (
     <>
       <Column noMargin expand>
@@ -324,7 +366,10 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
           )}
           {authenticatedUser.authenticated && displayedFeedbacks && (
             <Column expand noMargin>
-              <ResponsiveLineStackLayout justifyContent="space-between">
+              <ResponsiveLineStackLayout
+                justifyContent="space-between"
+                noColumnMargin
+              >
                 <Column justifyContent="center">
                   <LineStackLayout noMargin alignItems="center">
                     <BackgroundText>
@@ -377,86 +422,150 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                   <FeedbackAverageCard feedbacks={feedbacks} />
                 )}
               </ColumnStackLayout>
-              {displayedFeedbacksArray.length === 0 && (
+              {displayedFeedbacks.length === 0 && (
                 <>
                   {showProcessed ? (
                     <LineStackLayout
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <Text>
-                        <Trans>
-                          You don't have any unread feedback for this game.
-                        </Trans>
-                      </Text>
+                      <EmptyMessage>
+                        {isShowingCommentsForASpecificBuild ? (
+                          <Trans>
+                            You don't have any unread feedback for this build.
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            You don't have any unread feedback for this game.
+                          </Trans>
+                        )}
+                      </EmptyMessage>
                       <FlatButton
                         onClick={() => setShowProcessed(false)}
                         label={<Trans>Show all feedbacks</Trans>}
                       />
                     </LineStackLayout>
                   ) : (
-                    <Text>
-                      <Trans>You don't have any feedback for this game.</Trans>
-                    </Text>
+                    <EmptyMessage>
+                      {isShowingCommentsForASpecificBuild ? (
+                        <Trans>
+                          You don't have any feedback for this build.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          You don't have any feedback for this game.
+                        </Trans>
+                      )}
+                    </EmptyMessage>
                   )}
                 </>
               )}
-              {displayedFeedbacksArray.length !== 0 && (
-                <ColumnStackLayout expand noMargin>
-                  {Object.keys(displayedFeedbacks).map((key, index) => {
-                    const title = sortByDate ? key : getBuildNameTitle(key);
-                    return (
-                      <ColumnStackLayout key={key} noMargin>
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Column>
-                            <Text size="block-title">
-                              {title}
-                              {title ? ' - ' : ' '}
-                              {displayedFeedbacks[key].length === 1 ? (
-                                <Trans>1 review</Trans>
-                              ) : (
-                                <Trans>
-                                  {displayedFeedbacks[key].length} reviews
-                                </Trans>
+              {displayedFeedbacks.length !== 0 &&
+                !!displayedFeedbacksByDateOrBuild && (
+                  <ColumnStackLayout expand noMargin>
+                    {Object.keys(displayedFeedbacksByDateOrBuild).map(
+                      (key, index) => {
+                        const title = sortByDate ? key : getBuildNameTitle(key);
+                        return (
+                          <ColumnStackLayout key={key} noMargin>
+                            <Line
+                              justifyContent="space-between"
+                              alignItems="center"
+                            >
+                              <Column>
+                                <Text size="block-title">
+                                  {title}
+                                  {title ? ' - ' : ' '}
+                                  {displayedFeedbacksByDateOrBuild[key]
+                                    .length === 1 ? (
+                                    <Trans>1 review</Trans>
+                                  ) : (
+                                    <Trans>
+                                      {
+                                        displayedFeedbacksByDateOrBuild[key]
+                                          .length
+                                      }{' '}
+                                      reviews
+                                    </Trans>
+                                  )}
+                                </Text>
+                              </Column>
+                              {index === 0 && (
+                                <Line alignItems="center">
+                                  <Line
+                                    noMargin
+                                    expand
+                                    alignItems="center"
+                                    justifyContent="flex-end"
+                                  >
+                                    <IconButton
+                                      tooltip={t`Previous page`}
+                                      onClick={() =>
+                                        onCurrentPageChange(currentPage - 1)
+                                      }
+                                      disabled={currentPage === 1}
+                                      size="small"
+                                    >
+                                      <ChevronArrowLeft />
+                                    </IconButton>
+                                    <Text
+                                      noMargin
+                                      style={{
+                                        opacity: 1,
+                                        fontVariantNumeric: 'tabular-nums',
+                                      }}
+                                    >
+                                      {totalNumberOfPages === 1
+                                        ? 1
+                                        : `${currentPage}/${totalNumberOfPages}`}
+                                    </Text>
+                                    <IconButton
+                                      tooltip={t`Next page`}
+                                      onClick={() =>
+                                        onCurrentPageChange(currentPage + 1)
+                                      }
+                                      disabled={
+                                        currentPage >= totalNumberOfPages
+                                      }
+                                      size="small"
+                                    >
+                                      <ChevronArrowRight />
+                                    </IconButton>
+                                  </Line>
+                                  <IconButton
+                                    disabled={isMarkingAllAsProcessed}
+                                    onClick={event =>
+                                      openOptionsContextMenu(event)
+                                    }
+                                  >
+                                    {!isMarkingAllAsProcessed ? (
+                                      <Options fontSize="small" />
+                                    ) : (
+                                      <CircularProgress size={20} />
+                                    )}
+                                  </IconButton>
+                                </Line>
                               )}
-                            </Text>
-                          </Column>
-                          {index === 0 && (
-                            <Column justifyContent="center">
-                              <IconButton
-                                disabled={isMarkingAllAsProcessed}
-                                onClick={event => openOptionsContextMenu(event)}
-                              >
-                                {!isMarkingAllAsProcessed ? (
-                                  <Options fontSize="small" />
-                                ) : (
-                                  <CircularProgress size={20} />
-                                )}
-                              </IconButton>
-                            </Column>
-                          )}
-                        </Line>
-                        {displayedFeedbacks[key].map(
-                          (comment: Comment, index: number) => (
-                            <FeedbackCard
-                              key={comment.id}
-                              comment={comment}
-                              buildProperties={getBuildPropertiesForComment(
-                                comment
-                              )}
-                              authenticatedUser={authenticatedUser}
-                              onCommentUpdated={onCommentUpdated}
-                            />
-                          )
-                        )}
-                      </ColumnStackLayout>
-                    );
-                  })}
-                </ColumnStackLayout>
-              )}
+                            </Line>
+                            {displayedFeedbacksByDateOrBuild[key].map(
+                              (comment: Comment, index: number) => (
+                                <FeedbackCard
+                                  key={comment.id}
+                                  comment={comment}
+                                  buildProperties={getBuildPropertiesForComment(
+                                    comment
+                                  )}
+                                  authenticatedUser={authenticatedUser}
+                                  onCommentUpdated={onCommentUpdated}
+                                />
+                              )
+                            )}
+                          </ColumnStackLayout>
+                        );
+                      }
+                    )}
+                  </ColumnStackLayout>
+                )}
             </Column>
           )}
         </Line>

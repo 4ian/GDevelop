@@ -351,6 +351,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };
 
+  scrollToPosition = (position: number) => {
+    if (this._eventsTree) this._eventsTree.scrollToPosition(position);
+  };
+
+  getScrollPosition = (): number => {
+    return this._eventsTree ? this._eventsTree.getScrollPosition() : 0;
+  };
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
@@ -2184,6 +2192,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
+  scrollToPosition: (position: number) => void,
+  getScrollPosition: () => number,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2192,6 +2202,8 @@ const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
     onResourceExternallyChanged,
+    scrollToPosition,
+    getScrollPosition,
   }));
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
@@ -2201,6 +2213,12 @@ const EventsSheet = (props, ref) => {
   const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
+  };
+  const scrollToPosition = (position: number) => {
+    if (component.current) component.current.scrollToPosition(position);
+  };
+  const getScrollPosition = (): number => {
+    return component.current ? component.current.getScrollPosition() : 0;
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

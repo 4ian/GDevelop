@@ -43,6 +43,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { delay } from '../Utils/Delay';
 
 const gd: libGDevelop = global.gd;
 
@@ -145,6 +146,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     onAddEventsBasedObjectCb: null,
   };
   editor: ?EventsSheetInterface;
+  _editorScrollPositions = new Map<number, number>();
   eventsFunctionList: ?EventsFunctionsListInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
@@ -295,7 +297,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           selectedEventsBasedBehavior,
           selectedEventsBasedObject,
         },
-        () => this.updateToolbar()
+        () => {
+          this.updateToolbar();
+        }
       );
       return;
     }
@@ -333,6 +337,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           } else {
             this._editorNavigator.openEditor('events-sheet');
           }
+        }
+
+        const editor = this.editor;
+        if (!editor || !selectedEventsFunction) {
+          return;
+        }
+        const scrollPosition = this._editorScrollPositions.get(
+          selectedEventsFunction.ptr
+        );
+        if (scrollPosition) {
+          (async () => {
+            await delay(1000);
+            editor.scrollToPosition(scrollPosition);
+          })();
         }
       }
     );
@@ -588,6 +606,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
     selectedEventsBasedObject: ?gdEventsBasedObject
   ) => {
+    const previousEditor = this.editor;
+    const previousFunction = this.state.selectedEventsFunction;
+    if (previousEditor && previousFunction) {
+      this._editorScrollPositions.set(
+        previousFunction.ptr,
+        previousEditor.getScrollPosition()
+      );
+    }
     this._editBehavior(selectedEventsBasedBehavior);
     this._editObject(selectedEventsBasedObject);
   };

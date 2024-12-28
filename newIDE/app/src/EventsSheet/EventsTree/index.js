@@ -399,6 +399,7 @@ export default class ThemableEventsTree extends Component<
   DropTarget = makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType);
   temporaryUnfoldedNodes: Array<SortableTreeNode>;
   _hoverTimerId: ?TimeoutID;
+  _scrollPosition = 0;
 
   constructor(props: EventsTreeProps) {
     super(props);
@@ -482,6 +483,19 @@ export default class ThemableEventsTree extends Component<
         listWrapper && listWrapper.scrollToRow(row);
       }
     }
+  }
+
+  scrollToPosition(position: number) {
+    const currentList = this._list;
+    if (currentList) {
+      const listWrapper = currentList.wrappedInstance.current;
+      listWrapper && listWrapper.scrollToPosition(position);
+      this._scrollPosition = position;
+    }
+  }
+
+  getScrollPosition(): number {
+    return this._scrollPosition;
   }
 
   /**
@@ -1053,6 +1067,7 @@ export default class ThemableEventsTree extends Component<
           reactVirtualizedListProps={{
             ref: list => (this._list = list),
             onScroll: event => {
+              this._scrollPosition = event.scrollTop;
               this.props.onScroll && this.props.onScroll();
               this.setState({
                 isScrolledTop: event.scrollTop === 0,

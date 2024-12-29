@@ -15,6 +15,7 @@ export type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
+  isForInGameEdition?: {forcedSceneName: string},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
 export type CaptureOptions = {|
@@ -40,6 +41,7 @@ export type PreviewOptions = {|
     playerToken: string,
   },
   numberOfWindows: number,
+  isForInGameEdition: boolean,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,

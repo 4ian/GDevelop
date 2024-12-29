@@ -45,8 +45,12 @@ namespace gdjs {
   export type RuntimeGameOptions = {
     /** if true, force fullscreen. */
     forceFullscreen?: boolean;
+
     /** if true, game is run as a preview launched from an editor. */
     isPreview?: boolean;
+    /** if true, game is run for being edited from the editor. */
+    isInGameEdition?: boolean;
+
     /** The name of the external layout to create in the scene at position 0;0. */
     injectExternalLayout?: string;
     /** Script files, used for hot-reloading. */

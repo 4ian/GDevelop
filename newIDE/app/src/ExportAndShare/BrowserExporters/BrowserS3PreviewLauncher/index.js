@@ -20,7 +20,7 @@ import { displayBlackLoadingScreenOrThrow } from '../../../Utils/BrowserExternal
 import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import { getIDEVersionWithHash } from '../../../Version';
-import { switchToPreview } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { attachToPreview } from '../../../EmbeddedGame/EmbeddedGameFrame';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -159,6 +159,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
       previewExportOptions.setLayoutName(layout.getName());
       previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
+      previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
       if (externalLayout) {
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }
@@ -221,9 +222,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       // Upload any file that must be exported for the preview.
       await browserS3FileSystem.uploadPendingObjects();
 
-      switchToPreview({
-        previewIndexHtmlLocation: outputDir + '/index.html',
-      });
+      if (previewOptions.isForInGameEdition) {
+        attachToPreview({
+          previewIndexHtmlLocation: outputDir + '/index.html',
+        });
+      }
 
       // Change the HTML file displayed by the preview window so that it starts loading
       // the game.

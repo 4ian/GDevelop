@@ -249,6 +249,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+    if (this.props.isActive) {
+      if (this.props.layout && this.state.gameEditorMode === 'embedded-game') {
+        switchToSceneEdition({ sceneName: this.props.layout.getName() });
+      }
+    }
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 
-type SwitchToPreviewOptions = {|
+type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
 |};
 
@@ -10,14 +10,14 @@ type SwitchToSceneEditionOptions = {|
   sceneName: string,
 |};
 
-let onSwitchToPreview: null | (SwitchToPreviewOptions => void) = null;
+let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 
-export const switchToPreview = ({
+export const attachToPreview = ({
   previewIndexHtmlLocation,
-}: SwitchToPreviewOptions) => {
-  if (!onSwitchToPreview) throw new Error('No EmbeddedGameFrame registered.');
-  onSwitchToPreview({ previewIndexHtmlLocation });
+}: AttachToPreviewOptions) => {
+  if (!onAttachToPreview) throw new Error('No EmbeddedGameFrame registered.');
+  onAttachToPreview({ previewIndexHtmlLocation });
 };
 
 export const switchToSceneEdition = ({
@@ -30,36 +30,53 @@ export const switchToSceneEdition = ({
 
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
+  onLaunchPreviewForInGameEdition: ({| sceneName: string |}) => void,
 |};
 
-export const EmbeddedGameFrame = ({ previewDebuggerServer }: Props) => {
+export const EmbeddedGameFrame = ({
+  previewDebuggerServer,
+  onLaunchPreviewForInGameEdition,
+}: Props) => {
   const [
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,
   ] = React.useState<string>('');
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
-  // TODO: display a loader when the preview is being loaded.
 
-  React.useEffect(() => {
-    // TODO: use a real context for this?
-    onSwitchToPreview = (options: SwitchToPreviewOptions) => {
-      setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
-      if (iframeRef.current) {
-        iframeRef.current.contentWindow.focus();
-      }
-    };
-    onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
-      if (!previewDebuggerServer) return;
+  React.useEffect(
+    () => {
+      // TODO: use a real context for this?
+      onAttachToPreview = (options: AttachToPreviewOptions) => {
+        setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
+        if (iframeRef.current) {
+          iframeRef.current.contentWindow.focus();
+        }
+      };
+      onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
+        if (!previewDebuggerServer) return;
 
-      console.log('TODO: switch to scene edition', options);
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'requestSceneChange',
-          sceneName: options.sceneName,
-        });
-      });
-    };
-  }, [previewDebuggerServer]);
+        const { sceneName } = options;
+
+        if (!previewIndexHtmlLocation) {
+          console.info('Launching preview for embedded game.');
+          onLaunchPreviewForInGameEdition({ sceneName });
+        } else {
+          console.info(`Switching previews to scene "${sceneName}".`);
+          previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+            previewDebuggerServer.sendMessage(debuggerId, {
+              command: 'requestSceneReplace',
+              sceneName,
+            });
+          });
+        }
+      };
+    },
+    [
+      previewDebuggerServer,
+      previewIndexHtmlLocation,
+      onLaunchPreviewForInGameEdition,
+    ]
+  );
 
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>

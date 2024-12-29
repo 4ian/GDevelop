@@ -263,15 +263,24 @@ namespace gdjs {
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
+          // TODO: if fatal error, should probably reload. The editor should handle this
+          // as it knows the current scene to show.
         });
-      } else if (data.command === 'requestSceneChange') {
+      } else if (data.command === 'requestSceneReplace') {
         const sceneName = data.sceneName || null;
         if (!sceneName) {
-          logger.warn('No scene name specified, requestSceneChange aborted');
+          logger.warn('No scene name specified, requestSceneReplace aborted');
+          return;
+        }
+
+        const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+        if (currentScene && currentScene.getName() === sceneName) {
           return;
         }
 
         runtimeGame.getSceneStack().replace(sceneName, true);
+        // TODO: if fatal error, should probably reload. The editor should handle this
+        // as it knows the current scene to show.
       } else if (data.command === 'updateInstances') {
         // TODO: do an update/partial hot reload of the instances
       } else {

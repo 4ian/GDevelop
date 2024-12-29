@@ -87,21 +87,21 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
                 click: async () => {
                   await onPreviewWithoutHotReload({ numberOfWindows: 2 });
                 },
-                enabled: isPreviewEnabled && !hasPreviewsRunning,
+                enabled: isPreviewEnabled,
               },
               {
                 label: i18n._(t`3 previews in 3 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 3 });
                 },
-                enabled: isPreviewEnabled && !hasPreviewsRunning,
+                enabled: isPreviewEnabled,
               },
               {
                 label: i18n._(t`4 previews in 4 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 4 });
                 },
-                enabled: isPreviewEnabled && !hasPreviewsRunning,
+                enabled: isPreviewEnabled,
               },
             ],
           },

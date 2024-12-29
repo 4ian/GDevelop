@@ -3843,6 +3843,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
+    [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);

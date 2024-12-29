@@ -13,6 +13,7 @@ declare class gdPreviewExportOptions {
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
+  setIsInGameEdition(enable: boolean): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;

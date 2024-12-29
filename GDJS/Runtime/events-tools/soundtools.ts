@@ -6,8 +6,6 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace sound {
-      const logger = new gdjs.Logger('Audio events');
-
       export const getGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene
       ): float {
@@ -64,9 +62,6 @@ namespace gdjs {
           .getSoundManager()
           .getSoundOnChannel(channel);
         if (sound) sound.stop();
-        else {
-          logger.error(`Cannot stop non-existing sound on channel ${channel}.`);
-        }
       };
 
       export const pauseSoundOnChannel = function (
@@ -78,11 +73,6 @@ namespace gdjs {
           .getSoundManager()
           .getSoundOnChannel(channel);
         if (sound) sound.pause();
-        else {
-          logger.error(
-            `Cannot pause non-existing sound on channel ${channel}.`
-          );
-        }
       };
 
       export const continueSoundOnChannel = function (
@@ -95,10 +85,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) {
           if (!sound.playing()) sound.play();
-        } else {
-          logger.error(
-            `Cannot continue playing non-existing sound on channel ${channel}.`
-          );
         }
       };
 
@@ -123,9 +109,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) return sound.paused();
         else {
-          logger.error(
-            `Cannot check if non-existing sound on channel ${channel} is paused.`
-          );
           return false;
         }
       };
@@ -140,9 +123,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) return sound.stopped();
         else {
-          logger.error(
-            `Cannot check if non-existing sound on channel ${channel} is stopped.`
-          );
           return true;
         }
       };
@@ -157,9 +137,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) return sound.getVolume() * 100;
         else {
-          logger.error(
-            `Cannot get the volume of a non-existing sound on channel ${channel}.`
-          );
           return 100;
         }
       };
@@ -174,11 +151,6 @@ namespace gdjs {
           .getSoundManager()
           .getSoundOnChannel(channel);
         if (sound) sound.setVolume(volume / 100);
-        else {
-          logger.error(
-            `Cannot set the volume of a non-existing sound on channel ${channel}.`
-          );
-        }
       };
 
       export const getSoundOnChannelPlayingOffset = function (
@@ -191,9 +163,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) return sound.getSeek();
         else {
-          logger.error(
-            `Cannot get the playing offset of a non-existing sound on channel ${channel}.`
-          );
           return 0;
         }
       };
@@ -208,11 +177,6 @@ namespace gdjs {
           .getSoundManager()
           .getSoundOnChannel(channel);
         if (sound) sound.setSeek(playingOffset);
-        else {
-          logger.error(
-            `Cannot set the playing offset of a non-existing sound on channel ${channel}.`
-          );
-        }
       };
 
       export const getSoundOnChannelPitch = function (
@@ -225,9 +189,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) return sound.getRate();
         else {
-          logger.error(
-            `Cannot get the pitch of a non-existing sound on channel ${channel}.`
-          );
           return 1;
         }
       };
@@ -242,11 +203,6 @@ namespace gdjs {
           .getSoundManager()
           .getSoundOnChannel(channel);
         if (sound) sound.setRate(pitch);
-        else {
-          logger.error(
-            `Cannot get the pitch of a non-existing sound on channel ${channel}.`
-          );
-        }
       };
 
       export const preloadSound = (
@@ -304,11 +260,6 @@ namespace gdjs {
           .getSoundManager()
           .getMusicOnChannel(channel);
         if (music) music.stop();
-        else {
-          logger.error(
-            `Cannot stop a non-existing music on channel ${channel}.`
-          );
-        }
       };
 
       export const pauseMusicOnChannel = function (
@@ -320,11 +271,6 @@ namespace gdjs {
           .getSoundManager()
           .getMusicOnChannel(channel);
         if (music) music.pause();
-        else {
-          logger.error(
-            `Cannot pause a non-existing music on channel ${channel}.`
-          );
-        }
       };
 
       export const continueMusicOnChannel = function (
@@ -337,10 +283,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) {
           if (!music.playing()) music.play();
-        } else {
-          logger.error(
-            `Cannot stop a non-existing music on channel ${channel}.`
-          );
         }
       };
 
@@ -365,9 +307,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) return music.paused();
         else {
-          logger.error(
-            `Cannot check if non-existing music on channel ${channel} is paused.`
-          );
           return false;
         }
       };
@@ -382,9 +321,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) return music.stopped();
         else {
-          logger.error(
-            `Cannot check if non-existing music on channel ${channel} is stopped.`
-          );
           return true;
         }
       };
@@ -399,9 +335,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) return music.getVolume() * 100;
         else {
-          logger.error(
-            `Cannot get the volume of a non-existing music on channel ${channel}.`
-          );
           return 100;
         }
       };
@@ -416,11 +349,6 @@ namespace gdjs {
           .getSoundManager()
           .getMusicOnChannel(channel);
         if (music) music.setVolume(volume / 100);
-        else {
-          logger.error(
-            `Cannot set the volume of a non-existing music on channel ${channel}.`
-          );
-        }
       };
 
       export const getMusicOnChannelPlayingOffset = function (
@@ -433,9 +361,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) return music.getSeek();
         else {
-          logger.error(
-            `Cannot get the playing offset of a non-existing music on channel ${channel}.`
-          );
           return 0;
         }
       };
@@ -450,11 +375,6 @@ namespace gdjs {
           .getSoundManager()
           .getMusicOnChannel(channel);
         if (music) music.setSeek(playingOffset);
-        else {
-          logger.error(
-            `Cannot set the playing offset of a non-existing music on channel ${channel}.`
-          );
-        }
       };
 
       export const getMusicOnChannelPitch = function (
@@ -467,9 +387,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) return music.getRate();
         else {
-          logger.error(
-            `Cannot get the pitch of a non-existing music on channel ${channel}.`
-          );
           return 1;
         }
       };
@@ -484,11 +401,6 @@ namespace gdjs {
           .getSoundManager()
           .getMusicOnChannel(channel);
         if (music) music.setRate(pitch);
-        else {
-          logger.error(
-            `Cannot get the pitch of a non-existing music on channel ${channel}.`
-          );
-        }
       };
 
       export const preloadMusic = (
@@ -521,10 +433,6 @@ namespace gdjs {
           .getSoundOnChannel(channel);
         if (sound) {
           sound.fade(sound.getVolume(), toVolume / 100, timeOfFade * 1000);
-        } else {
-          logger.error(
-            `Cannot fade the volume of a non-existing sound on channel ${channel}.`
-          );
         }
       };
       export const fadeMusicVolume = (
@@ -539,10 +447,6 @@ namespace gdjs {
           .getMusicOnChannel(channel);
         if (music) {
           music.fade(music.getVolume(), toVolume / 100, timeOfFade * 1000);
-        } else {
-          logger.error(
-            `Cannot fade the volume of a non-existing music on channel ${channel}.`
-          );
         }
       };
     }

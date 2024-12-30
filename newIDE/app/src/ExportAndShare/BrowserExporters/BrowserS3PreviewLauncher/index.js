@@ -159,7 +159,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
       previewExportOptions.setLayoutName(layout.getName());
       previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
-      previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
+      previewExportOptions.setIsInGameEdition(
+        previewOptions.isForInGameEdition
+      );
       if (externalLayout) {
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
       }

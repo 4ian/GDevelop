@@ -307,7 +307,7 @@ export type Props = {|
   requestUpdate?: () => void,
   renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?({|
-    onGDJSUpdated: () => void,
+    onGDJSUpdated: () => Promise<void> | void,
   |}) => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -1808,7 +1808,7 @@ const MainFrame = (props: Props) => {
       const runningInGameEditionPreviewStatus = getInGameEditionPreviewStatus();
 
       if (runningInGameEditionPreviewStatus) {
-        console.info("Relaunching preview for in-game edition...");
+        console.info('Relaunching preview for in-game edition...');
         await launchPreview({
           networkPreview: false,
           hotReload: false,
@@ -1819,7 +1819,7 @@ const MainFrame = (props: Props) => {
           numberOfWindows: 0,
         });
       } else if (hasNonEditionPreviewsRunning) {
-        console.info("Relaunching preview...");
+        console.info('Relaunching preview...');
         await launchPreview({
           networkPreview: false,
           hotReload: false,

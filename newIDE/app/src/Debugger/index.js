@@ -237,7 +237,10 @@ export default class Debugger extends React.Component<Props, State> {
     } else if (data.command === 'status') {
       this.setState(
         state => ({
-          gameIsPaused: { ...state.gameIsPaused, [id]: !!data.payload.isPaused },
+          gameIsPaused: {
+            ...state.gameIsPaused,
+            [id]: !!data.payload.isPaused,
+          },
         }),
         () => this.updateToolbar()
       );

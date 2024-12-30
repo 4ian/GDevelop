@@ -324,46 +324,49 @@ const MosaicEditorsDisplay = React.forwardRef<
         />
       ),
     },
-    'instances-editor': gameEditorMode === 'embedded-game' ? null : {
-      type: 'primary',
-      noTitleBar: true,
-      noSoftKeyboardAvoidance: true,
-      renderEditor: () => (
-        <FullSizeInstancesEditorWithScrollbars
-          project={project}
-          layout={layout}
-          eventsBasedObject={eventsBasedObject}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          layersContainer={layersContainer}
-          selectedLayer={selectedLayer}
-          initialInstances={initialInstances}
-          instancesEditorSettings={props.instancesEditorSettings}
-          onInstancesEditorSettingsMutated={
-            props.onInstancesEditorSettingsMutated
-          }
-          instancesSelection={props.instancesSelection}
-          onInstancesAdded={props.onInstancesAdded}
-          onInstancesSelected={props.onInstancesSelected}
-          onInstanceDoubleClicked={props.onInstanceDoubleClicked}
-          onInstancesMoved={props.onInstancesMoved}
-          onInstancesResized={props.onInstancesResized}
-          onInstancesRotated={props.onInstancesRotated}
-          selectedObjectNames={selectedObjectNames}
-          onContextMenu={props.onContextMenu}
-          isInstanceOf3DObject={props.isInstanceOf3DObject}
-          instancesEditorShortcutsCallbacks={
-            props.instancesEditorShortcutsCallbacks
-          }
-          wrappedEditorRef={editor => {
-            editorRef.current = editor;
-          }}
-          pauseRendering={!props.isActive}
-          tileMapTileSelection={props.tileMapTileSelection}
-          onSelectTileMapTile={props.onSelectTileMapTile}
-        />
-      ),
-    },
+    'instances-editor':
+      gameEditorMode === 'embedded-game'
+        ? null
+        : {
+            type: 'primary',
+            noTitleBar: true,
+            noSoftKeyboardAvoidance: true,
+            renderEditor: () => (
+              <FullSizeInstancesEditorWithScrollbars
+                project={project}
+                layout={layout}
+                eventsBasedObject={eventsBasedObject}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                layersContainer={layersContainer}
+                selectedLayer={selectedLayer}
+                initialInstances={initialInstances}
+                instancesEditorSettings={props.instancesEditorSettings}
+                onInstancesEditorSettingsMutated={
+                  props.onInstancesEditorSettingsMutated
+                }
+                instancesSelection={props.instancesSelection}
+                onInstancesAdded={props.onInstancesAdded}
+                onInstancesSelected={props.onInstancesSelected}
+                onInstanceDoubleClicked={props.onInstanceDoubleClicked}
+                onInstancesMoved={props.onInstancesMoved}
+                onInstancesResized={props.onInstancesResized}
+                onInstancesRotated={props.onInstancesRotated}
+                selectedObjectNames={selectedObjectNames}
+                onContextMenu={props.onContextMenu}
+                isInstanceOf3DObject={props.isInstanceOf3DObject}
+                instancesEditorShortcutsCallbacks={
+                  props.instancesEditorShortcutsCallbacks
+                }
+                wrappedEditorRef={editor => {
+                  editorRef.current = editor;
+                }}
+                pauseRendering={!props.isActive}
+                tileMapTileSelection={props.tileMapTileSelection}
+                onSelectTileMapTile={props.onSelectTileMapTile}
+              />
+            ),
+          },
     'objects-list': {
       type: 'secondary',
       title: t`Objects`,

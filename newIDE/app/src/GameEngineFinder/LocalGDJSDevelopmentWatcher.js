@@ -6,8 +6,8 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type Props = {
-  onGDJSUpdated: () => void,
-}
+  onGDJSUpdated: () => Promise<void> | void,
+};
 
 /**
  * Set up some watchers for GDJS and Extensions sources.
@@ -50,13 +50,20 @@ export const LocalGDJSDevelopmentWatcher = ({ onGDJSUpdated }: Props) => {
         return;
       }
 
-      ipcRenderer.removeAllListeners('local-gdjs-development-watcher-runtime-updated');
-      ipcRenderer.on('local-gdjs-development-watcher-runtime-updated', (event, err) => {
-        onGDJSUpdated();
-      });
+      ipcRenderer.removeAllListeners(
+        'local-gdjs-development-watcher-runtime-updated'
+      );
+      ipcRenderer.on(
+        'local-gdjs-development-watcher-runtime-updated',
+        (event, err) => {
+          onGDJSUpdated();
+        }
+      );
 
       return () => {
-        ipcRenderer.removeAllListeners('local-gdjs-development-watcher-runtime-updated');
+        ipcRenderer.removeAllListeners(
+          'local-gdjs-development-watcher-runtime-updated'
+        );
       };
     },
     [shouldWatch, onGDJSUpdated]

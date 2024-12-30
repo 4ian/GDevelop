@@ -161,6 +161,12 @@ namespace gdjs {
   class RuntimeEditor {
     _game: RuntimeGame;
     _pointer = new THREE.Vector2();
+    // TODO: Use array
+    _selectedObjectData: {
+      intersect: THREE.Intersection;
+      camera: THREE.Camera;
+      scene: THREE.Scene;
+    } | null = null;
 
     constructor(game: RuntimeGame) {
       this._game = game;
@@ -174,22 +180,40 @@ namespace gdjs {
       this._pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
+    selectObject() {
+      const firstIntersectsByLayer = this.getFirstIntersectsOnEachLayer(false);
+      if (!firstIntersectsByLayer) return;
+      let closestIntersect;
+      for (const intersect of Object.values(firstIntersectsByLayer)) {
+        if (
+          !closestIntersect ||
+          intersect.intersect.distance < closestIntersect.intersect.distance
+        ) {
+          closestIntersect = intersect;
+        }
+      }
+      if (!closestIntersect) return;
+      this._selectedObjectData = closestIntersect;
+    }
+
     setupListeners() {
       const canvas = this._game.getRenderer().getCanvas();
 
       canvas?.addEventListener('pointermove', this.onPointerMove.bind(this));
+      canvas?.addEventListener('click', this.selectObject.bind(this));
     }
     cleanListeners() {
       const canvas = this._game.getRenderer().getCanvas();
 
       canvas?.removeEventListener('pointermove', this.onPointerMove.bind(this));
+      canvas?.removeEventListener('click', this.selectObject.bind(this));
     }
     activate(enable: boolean) {
       if (enable) this.setupListeners();
       else this.cleanListeners();
     }
 
-    render() {
+    getFirstIntersectsOnEachLayer(highlightObject: boolean) {
       const layerNames = new Array();
       const currentScene = this._game.getSceneStack().getCurrentScene();
       if (!currentScene) return;
@@ -201,21 +225,26 @@ namespace gdjs {
       );
 
       currentScene.getAllLayerNames(layerNames);
-      layerNames.forEach((layerName) => {
+      const firstIntersectsByLayer: {
+        [layerName: string]: {
+          intersect: THREE.Intersection;
+          camera: THREE.Camera;
+          scene: THREE.Scene;
+        };
+      } = layerNames.reduce((acc, layerName) => {
         const runtimeLayerRender = currentScene
           .getLayer(layerName)
           .getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeScene = runtimeLayerRender.getThreeScene();
-        const threeComposer = runtimeLayerRender.getThreeEffectComposer();
-        if (!threeCamera || !threeScene) return;
+        if (!threeCamera || !threeScene) return acc;
 
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(this._pointer, threeCamera);
         const intersects = raycaster.intersectObjects(threeScene.children);
 
         const firstIntersect = intersects[0];
-        if (firstIntersect) {
+        if (firstIntersect && highlightObject) {
           const outlinePass = new THREE_ADDONS.OutlinePass(
             resolution,
             threeScene,
@@ -230,7 +259,28 @@ namespace gdjs {
           outlinePass.selectedObjects = [firstIntersect.object];
           runtimeLayerRender.addPostProcessingPass(outlinePass);
         }
-      });
+        acc[layerName] = {
+          intersect: firstIntersect,
+          camera: threeCamera,
+          scene: threeScene,
+        };
+        return acc;
+      }, {});
+      return firstIntersectsByLayer;
+    }
+
+    render() {
+      this.getFirstIntersectsOnEachLayer(true);
+      if (this._selectedObjectData) {
+        const transformControls = new THREE_ADDONS.TransformControls(
+          this._selectedObjectData.camera,
+          this._game.getRenderer().getCanvas() || undefined
+        );
+        console.log('controls');
+        transformControls.attach(this._selectedObjectData.intersect.object);
+        transformControls.size = 100
+        this._selectedObjectData.scene.add(transformControls);
+      }
     }
   }
 

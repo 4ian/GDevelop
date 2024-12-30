@@ -193,6 +193,13 @@ namespace gdjs {
       const layerNames = new Array();
       const currentScene = this._game.getSceneStack().getCurrentScene();
       if (!currentScene) return;
+      const threeRenderer = this._game.getRenderer().getThreeRenderer();
+      if (!threeRenderer) return;
+      const resolution = new THREE.Vector2(
+        window.innerWidth,
+        window.innerHeight
+      );
+
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
         const runtimeLayerRender = currentScene
@@ -200,14 +207,28 @@ namespace gdjs {
           .getRenderer();
         const threeCamera = runtimeLayerRender.getThreeCamera();
         const threeScene = runtimeLayerRender.getThreeScene();
+        const threeComposer = runtimeLayerRender.getThreeEffectComposer();
         if (!threeCamera || !threeScene) return;
+
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(this._pointer, threeCamera);
         const intersects = raycaster.intersectObjects(threeScene.children);
 
         const firstIntersect = intersects[0];
         if (firstIntersect) {
-          console.log(firstIntersect.object);
+          const outlinePass = new THREE_ADDONS.OutlinePass(
+            resolution,
+            threeScene,
+            threeCamera
+          );
+
+          outlinePass.edgeStrength = 3.0;
+          outlinePass.edgeGlow = 2.0;
+          outlinePass.edgeThickness = 4.0;
+          outlinePass.pulsePeriod = 0;
+
+          outlinePass.selectedObjects = [firstIntersect.object];
+          runtimeLayerRender.addPostProcessingPass(outlinePass);
         }
       });
     }

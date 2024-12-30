@@ -66,13 +66,11 @@ export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
           <MeasurementUnitDocumentation
             label={property.getLabel()}
             description={property.getDescription()}
-            elementsWithWords={""}
+            elementsWithWords={''}
           />
         }
       >
-        <InputAdornment position="end">
-          {<CircledInfo/>}
-        </InputAdornment>
+        <InputAdornment position="end">{<CircledInfo />}</InputAdornment>
       </Tooltip>
     );
   }

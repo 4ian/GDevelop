@@ -15,7 +15,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import { NumericProperty, UnitAdornment } from '../Physics2Editor'
+import { NumericProperty, UnitAdornment } from '../Physics2Editor';
 
 type Props = BehaviorEditorProps;
 

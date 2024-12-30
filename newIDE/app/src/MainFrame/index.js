@@ -410,11 +410,10 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
-    previewDebuggerIds,
+    hasNonEditionPreviewsRunning,
     hotReloadLogs,
     clearHotReloadLogs,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
-  const hasPreviewsRunning = !!previewDebuggerIds.length;
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -1818,7 +1817,7 @@ const MainFrame = (props: Props) => {
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
-      hasPreviewsRunning,
+      hasPreviewsRunning: hasNonEditionPreviewsRunning,
       launchProjectWithLoadingScreenPreview: () =>
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
@@ -1826,7 +1825,7 @@ const MainFrame = (props: Props) => {
       launchProjectCodeAndDataPreview: () =>
         launchPreview({ hotReload: true, projectDataOnlyExport: false }),
     }),
-    [hasPreviewsRunning, launchPreview]
+    [hasNonEditionPreviewsRunning, launchPreview]
   );
 
   const getEditorsTabStateWithScene = React.useCallback(
@@ -3503,7 +3502,7 @@ const MainFrame = (props: Props) => {
     previewEnabled:
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
-    hasPreviewsRunning,
+    hasPreviewsRunning: hasNonEditionPreviewsRunning,
     allowNetworkPreview:
       !!_previewLauncher.current &&
       _previewLauncher.current.canDoNetworkPreview(),
@@ -3729,7 +3728,7 @@ const MainFrame = (props: Props) => {
           !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
         }
         onOpenDebugger={launchDebuggerAndPreview}
-        hasPreviewsRunning={hasPreviewsRunning}
+        hasPreviewsRunning={hasNonEditionPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}

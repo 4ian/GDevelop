@@ -1299,6 +1299,14 @@ namespace gdjs {
     }
 
     /**
+     * Check if the game loop is paused, for debugging/edition purposes.
+     * @returns true if the current game is paused
+     */
+    isPaused(): boolean {
+      return this._paused;
+    }
+
+    /**
      * Check if the game should call GDevelop development APIs or not.
      *
      * Unless you are contributing to GDevelop, avoid using this.

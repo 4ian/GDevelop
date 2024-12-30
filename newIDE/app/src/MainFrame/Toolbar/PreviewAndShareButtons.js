@@ -185,7 +185,9 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
           primary
-          onClick={onHotReloadPreview}
+          onClick={
+            hasPreviewsRunning ? onHotReloadPreview : onPreviewWithoutHotReload
+          }
           disabled={!isPreviewEnabled}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={

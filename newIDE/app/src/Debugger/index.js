@@ -219,6 +219,11 @@ export default class Debugger extends React.Component<Props, State> {
     this.setState({
       unregisterDebuggerServerCallbacks: unregisterCallbacks,
     });
+
+    // Fetch the status of each debugger client.
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, { command: 'getStatus' });
+    });
   };
 
   _handleMessage = (id: DebuggerId, data: any) => {
@@ -229,6 +234,13 @@ export default class Debugger extends React.Component<Props, State> {
           [id]: data.payload,
         },
       });
+    } else if (data.command === 'status') {
+      this.setState(
+        state => ({
+          gameIsPaused: { ...state.gameIsPaused, [id]: !!data.payload.isPaused },
+        }),
+        () => this.updateToolbar()
+      );
     } else if (data.command === 'profiler.output') {
       this.setState({
         profilerOutputs: {
@@ -276,26 +288,14 @@ export default class Debugger extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'play' });
 
-    // TODO: state should be set by the game (game.paused, game.resumed)
-    // this.setState(
-    //   state => ({
-    //     gameIsPaused: { ...state.gameIsPaused, [id]: false },
-    //   }),
-    //   () => this.updateToolbar()
-    // );
+    // Pause status is transmitted by the game (using `game.paused`, `game.resumed` or `status`).
   };
 
   _pause = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'pause' });
 
-    // TODO: state should be set by the game (game.paused, game.resumed)
-    // this.setState(
-    //   state => ({
-    //     gameIsPaused: { ...state.gameIsPaused, [id]: true },
-    //   }),
-    //   () => this.updateToolbar()
-    // );
+    // Pause status is transmitted by the game (using `game.paused`, `game.resumed` or `status`).
   };
 
   _refresh = (id: DebuggerId) => {

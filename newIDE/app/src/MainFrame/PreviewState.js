@@ -21,27 +21,34 @@ export type PreviewState = {|
   overridenPreviewExternalLayoutName: ?string,
 |};
 
+type DebuggerStatus = {|
+  isPaused: boolean,
+  isInGameEdition: boolean,
+|};
+
 type PreviewDebuggerServerWatcherResults = {|
-  previewDebuggerIds: Array<DebuggerId>,
+  hasNonEditionPreviewsRunning: boolean,
   hotReloadLogs: Array<HotReloaderLog>,
   clearHotReloadLogs: () => void,
 |};
 
 /**
- * Return the ids of the debuggers being run, watching for changes (new
+ * Return the status of the debuggers being run, watching for changes (new
  * debugger launched or existing one closed).
  */
 export const usePreviewDebuggerServerWatcher = (
   previewDebuggerServer: ?PreviewDebuggerServer
 ): PreviewDebuggerServerWatcherResults => {
-  const [debuggerIds, setDebuggerIds] = React.useState<Array<DebuggerId>>([]);
+  const [debuggerStatus, setDebuggerStatus] = React.useState<{
+    [DebuggerId]: DebuggerStatus,
+  }>({});
   const [hotReloadLogs, setHotReloadLogs] = React.useState<
     Array<HotReloaderLog>
   >([]);
   React.useEffect(
     () => {
       if (!previewDebuggerServer) {
-        setDebuggerIds([]);
+        setDebuggerStatus({});
         return;
       }
 
@@ -50,10 +57,24 @@ export const usePreviewDebuggerServerWatcher = (
           // Nothing to do.
         },
         onConnectionClosed: ({ id, debuggerIds }) => {
-          setDebuggerIds([...debuggerIds]);
+          // Remove the debugger status.
+          setDebuggerStatus(debuggerStatus => {
+            const {
+              [id]: closedDebuggerStatus,
+              ...otherDebuggerStatus
+            } = debuggerStatus;
+            console.info(
+              `Connection closed with preview #${id}. Last status was:`,
+              closedDebuggerStatus
+            );
+
+            return otherDebuggerStatus;
+          });
         },
         onConnectionOpened: ({ id, debuggerIds }) => {
-          setDebuggerIds([...debuggerIds]);
+          // Ask the new debugger client for its status (but don't assume anything
+          // at this stage).
+          previewDebuggerServer.sendMessage(id, { command: 'getStatus' });
         },
         onConnectionErrored: ({ id }) => {
           // Nothing to do (onConnectionClosed is called if necessary).
@@ -64,6 +85,14 @@ export const usePreviewDebuggerServerWatcher = (
         onHandleParsedMessage: ({ id, parsedMessage }) => {
           if (parsedMessage.command === 'hotReloader.logs') {
             setHotReloadLogs(parsedMessage.payload);
+          } else if (parsedMessage.command === 'status') {
+            setDebuggerStatus(debuggerStatus => ({
+              ...debuggerStatus,
+              [id]: {
+                isPaused: !!parsedMessage.payload.isPaused,
+                isInGameEdition: !!parsedMessage.payload.isInGameEdition,
+              },
+            }));
           }
         },
       });
@@ -77,5 +106,9 @@ export const usePreviewDebuggerServerWatcher = (
     setHotReloadLogs,
   ]);
 
-  return { previewDebuggerIds: debuggerIds, hotReloadLogs, clearHotReloadLogs };
+  const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
+    key => !debuggerStatus[+key].isInGameEdition
+  );
+
+  return { hasNonEditionPreviewsRunning, hotReloadLogs, clearHotReloadLogs };
 };

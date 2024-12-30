@@ -245,6 +245,8 @@ namespace gdjs {
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();
+      } else if (data.command === 'getStatus') {
+        that.sendRuntimeGameStatus();
       } else if (data.command === 'set') {
         that.set(data.path, data.newValue);
       } else if (data.command === 'call') {
@@ -267,6 +269,8 @@ namespace gdjs {
           // as it knows the current scene to show.
         });
       } else if (data.command === 'requestSceneReplace') {
+        if (!this._runtimegame.isInGameEdition()) return;
+
         const sceneName = data.sceneName || null;
         if (!sceneName) {
           logger.warn('No scene name specified, requestSceneReplace aborted');
@@ -451,6 +455,18 @@ namespace gdjs {
       logger.log('Calling', path, 'with', args);
       object[path[currentIndex]].apply(object, args);
       return true;
+    }
+
+    sendRuntimeGameStatus(): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'status',
+          payload: {
+            isPaused: this._runtimegame.isPaused(),
+            isInGameEdition: this._runtimegame.isInGameEdition(),
+          },
+        })
+      );
     }
 
     /**

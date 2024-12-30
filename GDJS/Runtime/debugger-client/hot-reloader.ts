@@ -144,8 +144,9 @@ namespace gdjs {
       });
     }
 
-    hotReload(): Promise<HotReloaderLog[]> {
+    async hotReload(): Promise<HotReloaderLog[]> {
       logger.info('Hot reload started');
+      const wasPaused = this._runtimeGame.isPaused();
       this._runtimeGame.pause(true);
       this._logs = [];
 
@@ -168,62 +169,59 @@ namespace gdjs {
       }
 
       // Reload projectData and runtimeGameOptions stored by convention in data.js:
-      return this._reloadScript('data.js').then(() => {
-        const newProjectData: ProjectData = gdjs.projectData;
+      await this._reloadScript('data.js');
 
-        const newRuntimeGameOptions: RuntimeGameOptions =
-          gdjs.runtimeGameOptions;
+      const newProjectData: ProjectData = gdjs.projectData;
 
-        const newScriptFiles = newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-        const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
+      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
 
-        // Reload the changed scripts, which will have the side effects of re-running
-        // the new scripts, potentially replacing the code of the free functions from
-        // extensions (which is fine) and registering updated behaviors (which will
-        // need to be re-instantiated in runtime objects).
-        return this.reloadScriptFiles(
+      const newScriptFiles = newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
+      const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
+
+      // Reload the changed scripts, which will have the side effects of re-running
+      // the new scripts, potentially replacing the code of the free functions from
+      // extensions (which is fine) and registering updated behaviors (which will
+      // need to be re-instantiated in runtime objects).
+      try {
+        await this.reloadScriptFiles(
           newProjectData,
           oldScriptFiles,
           newScriptFiles,
           projectDataOnlyExport
-        )
-          .then(() => {
-            const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
-              oldBehaviorConstructors,
-              gdjs.behaviorsTypes.items
-            );
-            return this._hotReloadRuntimeGame(
-              oldProjectData,
-              newProjectData,
-              changedRuntimeBehaviors,
-              this._runtimeGame
-            );
-          })
-          .catch((error) => {
-            const errorTarget = error.target;
-            if (errorTarget instanceof HTMLScriptElement) {
-              this._logs.push({
-                kind: 'fatal',
-                message: 'Unable to reload script: ' + errorTarget.src,
-              });
-            } else {
-              this._logs.push({
-                kind: 'fatal',
-                message:
-                  'Unexpected error happened while hot-reloading: ' +
-                  error.message,
-              });
-            }
-          })
-          .then(() => {
-            logger.info(
-              'Hot reload finished with logs:',
-              this._logs.map((log) => '\n' + log.kind + ': ' + log.message)
-            );
-            this._runtimeGame.pause(false);
-            return this._logs;
+        );
+
+        const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
+          oldBehaviorConstructors,
+          gdjs.behaviorsTypes.items
+        );
+        await this._hotReloadRuntimeGame(
+          oldProjectData,
+          newProjectData,
+          changedRuntimeBehaviors,
+          this._runtimeGame
+        );
+      } catch (error) {
+        const errorTarget = error.target;
+        if (errorTarget instanceof HTMLScriptElement) {
+          this._logs.push({
+            kind: 'fatal',
+            message: 'Unable to reload script: ' + errorTarget.src,
           });
-      });
+        } else {
+          this._logs.push({
+            kind: 'fatal',
+            message:
+              'Unexpected error happened while hot-reloading: ' + error.message,
+          });
+        }
+      }
+
+      logger.info(
+        'Hot reload finished with logs:',
+        this._logs.map((log) => '\n' + log.kind + ': ' + log.message)
+      );
+      this._runtimeGame.pause(wasPaused);
+      return this._logs;
     }
 
     _computeChangedRuntimeBehaviors(

@@ -168,6 +168,7 @@ namespace gdjs {
       scene: THREE.Scene;
     } | null = null;
     _clearCurrentPasses: (() => void)[] = [];
+    _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
 
     constructor(game: RuntimeGame) {
       this._game = game;
@@ -195,11 +196,34 @@ namespace gdjs {
       }
       if (!closestIntersect) return;
       this._selectedObjectData = closestIntersect;
+      if (this._selectedObjectData) {
+        if (
+          this._currentTransformControls &&
+          this._currentTransformControls.camera ===
+            this._selectedObjectData.camera
+        ) {
+          this._currentTransformControls.detach();
+          this._currentTransformControls.attach(
+            this._selectedObjectData.intersect.object
+          );
+        } else {
+          if (this._currentTransformControls) {
+            this._currentTransformControls.dispose();
+          }
+          this._currentTransformControls = new THREE_ADDONS.TransformControls(
+            this._selectedObjectData.camera,
+            this._game.getRenderer().getCanvas() || undefined
+          );
+          this._currentTransformControls.attach(
+            this._selectedObjectData.intersect.object
+          );
+          this._selectedObjectData.scene.add(this._currentTransformControls);
+        }
+      }
     }
 
     setupListeners() {
       const canvas = this._game.getRenderer().getCanvas();
-
       canvas?.addEventListener('pointermove', this.onPointerMove.bind(this));
       canvas?.addEventListener('click', this.selectObject.bind(this));
     }
@@ -279,15 +303,6 @@ namespace gdjs {
 
     render() {
       this.getFirstIntersectsOnEachLayer(true);
-      if (this._selectedObjectData) {
-        const transformControls = new THREE_ADDONS.TransformControls(
-          this._selectedObjectData.camera,
-          this._game.getRenderer().getCanvas() || undefined
-        );
-        transformControls.attach(this._selectedObjectData.intersect.object);
-        transformControls.size = 100;
-        this._selectedObjectData.scene.add(transformControls);
-      }
     }
   }
 

@@ -1814,7 +1814,8 @@ const MainFrame = (props: Props) => {
           hotReload: false,
           forceDiagnosticReport: false,
           isForInGameEdition: {
-            forcedSceneName: runningInGameEditionPreviewStatus.currentSceneName,
+            forcedSceneName:
+              runningInGameEditionPreviewStatus.currentSceneName || '',
           },
           numberOfWindows: 0,
         });

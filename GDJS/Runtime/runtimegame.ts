@@ -716,8 +716,7 @@ namespace gdjs {
 
       this._paused = enable;
       if (this._debuggerClient) {
-        if (this._paused) this._debuggerClient.sendGamePaused();
-        else this._debuggerClient.sendGameResumed();
+        this._debuggerClient.sendRuntimeGameStatus();
       }
     }
 

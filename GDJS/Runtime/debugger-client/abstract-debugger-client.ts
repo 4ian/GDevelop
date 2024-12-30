@@ -584,30 +584,6 @@ namespace gdjs {
       );
     }
 
-    /**
-     * Callback called when the game is paused.
-     */
-    sendGamePaused(): void {
-      this._sendMessage(
-        circularSafeStringify({
-          command: 'game.paused',
-          payload: null,
-        })
-      );
-    }
-
-    /**
-     * Callback called when the game is resumed.
-     */
-    sendGameResumed(): void {
-      this._sendMessage(
-        circularSafeStringify({
-          command: 'game.resumed',
-          payload: null,
-        })
-      );
-    }
-
     sendInstancesUpdated(runtimeObjects: gdjs.RuntimeObject[]): void {
       this._sendMessage(
         circularSafeStringify({

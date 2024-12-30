@@ -4,6 +4,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
   type HotReloaderLog,
+  type DebuggerStatus,
 } from '../ExportAndShare/PreviewLauncher.flow';
 
 /** Represents what should be run when a preview is launched */
@@ -19,12 +20,6 @@ export type PreviewState = {|
   overridenPreviewLayoutName: ?string,
   /** The external layout name to be used instead of the one set by the current editor. */
   overridenPreviewExternalLayoutName: ?string,
-|};
-
-type DebuggerStatus = {|
-  isPaused: boolean,
-  isInGameEdition: boolean,
-  currentSceneName: string,
 |};
 
 type PreviewDebuggerServerWatcherResults = {|

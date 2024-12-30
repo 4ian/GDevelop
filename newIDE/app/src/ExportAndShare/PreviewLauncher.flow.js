@@ -61,6 +61,13 @@ export type PreviewLauncherProps = {|
 /** Each game connected to the debugger server is identified by a unique number. */
 export type DebuggerId = number;
 
+/** Each game connected to the debugger server can communicate its status. */
+export type DebuggerStatus = {|
+  isPaused: boolean,
+  isInGameEdition: boolean,
+  currentSceneName: string | null,
+|};
+
 /** The callbacks for a debugger server used for previews. */
 export type PreviewDebuggerServerCallbacks = {|
   onErrorReceived: (err: Error) => void | Promise<void>,

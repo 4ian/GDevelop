@@ -2,6 +2,7 @@ import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { Pass } from 'three/examples/jsm/postprocessing/Pass';
@@ -22,6 +23,7 @@ declare global {
       GLTF,
       DRACOLoader,
       SkeletonUtils,
+      TransformControls,
       EffectComposer,
       OutlinePass,
       Pass,

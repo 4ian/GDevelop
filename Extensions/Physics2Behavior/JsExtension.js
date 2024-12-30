@@ -340,7 +340,8 @@ module.exports = {
           _(
             'The friction applied when touching other objects. The higher the value, the more friction.'
           )
-        );
+        )
+        .setGroup(_('Movement'));
       behaviorProperties
         .getOrCreate('restitution')
         .setValue(
@@ -352,7 +353,8 @@ module.exports = {
           _(
             'The "bounciness" of the object. The higher the value, the more other objects will bounce against it.'
           )
-        );
+        )
+        .setGroup(_('Movement'));
       behaviorProperties
         .getOrCreate('linearDamping')
         .setValue(

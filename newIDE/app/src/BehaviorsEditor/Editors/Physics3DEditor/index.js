@@ -8,8 +8,6 @@ import Checkbox from '../../../UI/Checkbox';
 import SelectField from '../../../UI/SelectField';
 import SelectOption from '../../../UI/SelectOption';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import { getMeasurementUnitShortLabel } from '../../../PropertiesEditor/PropertiesMapToSchema';
-import MeasurementUnitDocumentation from '../../../PropertiesEditor/MeasurementUnitDocumentation';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
@@ -17,55 +15,9 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Tooltip from '@material-ui/core/Tooltip';
+import { NumericProperty, UnitAdornment } from '../Physics2Editor'
 
 type Props = BehaviorEditorProps;
-
-const NumericProperty = (props: {|
-  id?: string,
-  properties: gdMapStringPropertyDescriptor,
-  propertyName: string,
-  step: number,
-  onUpdate: (newValue: string) => void,
-|}) => {
-  const { properties, propertyName, step, onUpdate, id } = props;
-  const property = properties.get(propertyName);
-
-  return (
-    <SemiControlledTextField
-      id={id}
-      fullWidth
-      value={property.getValue()}
-      key={propertyName}
-      floatingLabelText={property.getLabel()}
-      step={step}
-      onChange={onUpdate}
-      type="number"
-      endAdornment={<UnitAdornment property={property} />}
-    />
-  );
-};
-
-const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
-  const { property } = props;
-  const measurementUnit = property.getMeasurementUnit();
-  return (
-    <Tooltip
-      title={
-        <MeasurementUnitDocumentation
-          label={measurementUnit.getLabel()}
-          description={measurementUnit.getDescription()}
-          elementsWithWords={measurementUnit.getElementsWithWords()}
-        />
-      }
-    >
-      <InputAdornment position="end">
-        {getMeasurementUnitShortLabel(measurementUnit)}
-      </InputAdornment>
-    </Tooltip>
-  );
-};
 
 const BitGroupEditor = (props: {|
   bits: Array<boolean>,

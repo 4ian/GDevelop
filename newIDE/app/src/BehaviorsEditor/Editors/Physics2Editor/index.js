@@ -27,10 +27,11 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Tooltip from '@material-ui/core/Tooltip';
+import CircledInfo from '../../../UI/CustomSvgIcons/SmallCircledInfo';
 
 type Props = BehaviorEditorProps;
 
-const NumericProperty = (props: {|
+export const NumericProperty = (props: {|
   id?: string,
   properties: gdMapStringPropertyDescriptor,
   propertyName: string,
@@ -55,9 +56,26 @@ const NumericProperty = (props: {|
   );
 };
 
-const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
+  if (measurementUnit.isUndefined() && property.getDescription()) {
+    return (
+      <Tooltip
+        title={
+          <MeasurementUnitDocumentation
+            label={property.getLabel()}
+            description={property.getDescription()}
+            elementsWithWords={""}
+          />
+        }
+      >
+        <InputAdornment position="end">
+          {<CircledInfo/>}
+        </InputAdornment>
+      </Tooltip>
+    );
+  }
   return (
     <Tooltip
       title={

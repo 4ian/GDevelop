@@ -9,6 +9,7 @@ export * as SkeletonUtils from "./examples/jsm/utils/SkeletonUtils";
 
 export { EffectComposer } from "./examples/jsm/postprocessing/EffectComposer";
 export { RenderPass } from "./examples/jsm/postprocessing/RenderPass";
+export { OutlinePass } from "./examples/jsm/postprocessing/OutlinePass";
 export { ShaderPass } from "./examples/jsm/postprocessing/ShaderPass";
 export { SMAAPass } from "./examples/jsm/postprocessing/SMAAPass";
 export { OutputPass } from "./examples/jsm/postprocessing/OutputPass";

@@ -3,6 +3,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 import { Pass } from 'three/examples/jsm/postprocessing/Pass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
@@ -22,6 +23,7 @@ declare global {
       DRACOLoader,
       SkeletonUtils,
       EffectComposer,
+      OutlinePass,
       Pass,
       RenderPass,
       ShaderPass,

@@ -427,7 +427,6 @@ namespace gdjs {
       }
 
       this.render();
-
       this._isJustResumed = false;
       if (this._profiler) {
         this._profiler.end('render');
@@ -437,7 +436,6 @@ namespace gdjs {
       }
       return !!this.getRequestedChange();
     }
-
     /**
      * Render the scene (but do not execute the game logic).
      */

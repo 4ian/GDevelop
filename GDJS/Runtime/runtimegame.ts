@@ -349,7 +349,11 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
+<<<<<<< HEAD
     _isInGameEdition: boolean;
+=======
+    _isInGameEdition = true;
+>>>>>>> Import changes to render without step
 
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
@@ -1150,6 +1154,10 @@ namespace gdjs {
               // The game is paused for edition: the game loop continues to run,
               // but the game logic is not executed.
               this._sceneStack.renderWithoutStep();
+<<<<<<< HEAD
+=======
+              this._editor.render();
+>>>>>>> Import changes to render without step
               return true;
             } else {
               // Render and step the scene.

@@ -1807,6 +1807,11 @@ const MainFrame = (props: Props) => {
     async () => {
       const runningInGameEditionPreviewStatus = getInGameEditionPreviewStatus();
 
+      // Note: this is an "approximation", as all previews will be relaunched with
+      // the same configuration, which could not be the case if there was a mix of
+      // in-game edition and non-in-game edition previews.
+      // To fix this, preview configuration (scene name, etc...) should be persisted
+      // for each preview, for example in the URL, so it survives to a reload.
       if (runningInGameEditionPreviewStatus) {
         console.info('Relaunching preview for in-game edition...');
         await launchPreview({

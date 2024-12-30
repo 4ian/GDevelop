@@ -167,6 +167,7 @@ namespace gdjs {
       camera: THREE.Camera;
       scene: THREE.Scene;
     } | null = null;
+    _clearCurrentPasses: (() => void)[] = [];
 
     constructor(game: RuntimeGame) {
       this._game = game;
@@ -214,6 +215,10 @@ namespace gdjs {
     }
 
     getFirstIntersectsOnEachLayer(highlightObject: boolean) {
+      if (highlightObject) {
+        this._clearCurrentPasses.forEach((callback) => callback());
+        this._clearCurrentPasses.length = 0;
+      }
       const layerNames = new Array();
       const currentScene = this._game.getSceneStack().getCurrentScene();
       if (!currentScene) return;
@@ -251,13 +256,16 @@ namespace gdjs {
             threeCamera
           );
 
-          outlinePass.edgeStrength = 3.0;
-          outlinePass.edgeGlow = 2.0;
-          outlinePass.edgeThickness = 4.0;
+          outlinePass.edgeStrength = 6.0;
+          outlinePass.edgeGlow = 0;
+          outlinePass.edgeThickness = 1.0;
           outlinePass.pulsePeriod = 0;
 
           outlinePass.selectedObjects = [firstIntersect.object];
           runtimeLayerRender.addPostProcessingPass(outlinePass);
+          this._clearCurrentPasses.push(() => {
+            runtimeLayerRender.removePostProcessingPass(outlinePass);
+          });
         }
         acc[layerName] = {
           intersect: firstIntersect,
@@ -276,9 +284,8 @@ namespace gdjs {
           this._selectedObjectData.camera,
           this._game.getRenderer().getCanvas() || undefined
         );
-        console.log('controls');
         transformControls.attach(this._selectedObjectData.intersect.object);
-        transformControls.size = 100
+        transformControls.size = 100;
         this._selectedObjectData.scene.add(transformControls);
       }
     }

@@ -40,7 +40,7 @@ module.exports = {
           log.info(`Debugger connection #${id} opened.`);
 
           newWebSocket.on('message', message => {
-            log.info(`Debugger connection #${id} received message.`);
+            // log.info(`Debugger connection #${id} received message.`);
             options.onMessage({ id, message });
           });
 

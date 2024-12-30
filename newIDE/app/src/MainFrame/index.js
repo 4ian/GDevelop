@@ -306,7 +306,9 @@ export type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
   renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
-  renderGDJSDevelopmentWatcher?: ?() => React.Node,
+  renderGDJSDevelopmentWatcher?: ?({|
+    onGDJSUpdated: () => void,
+  |}) => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
@@ -410,9 +412,11 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
+    getInGameEditionPreviewStatus,
     hasNonEditionPreviewsRunning,
     hotReloadLogs,
     clearHotReloadLogs,
+    hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
   const {
     ensureInteractionHappened,
@@ -1797,6 +1801,41 @@ const MainFrame = (props: Props) => {
       });
     },
     [launchPreview]
+  );
+
+  const relaunchAndThenHardReloadAllPreviews = React.useCallback(
+    async () => {
+      const runningInGameEditionPreviewStatus = getInGameEditionPreviewStatus();
+
+      if (runningInGameEditionPreviewStatus) {
+        console.info("Relaunching preview for in-game edition...");
+        await launchPreview({
+          networkPreview: false,
+          hotReload: false,
+          forceDiagnosticReport: false,
+          isForInGameEdition: {
+            forcedSceneName: runningInGameEditionPreviewStatus.currentSceneName,
+          },
+          numberOfWindows: 0,
+        });
+      } else if (hasNonEditionPreviewsRunning) {
+        console.info("Relaunching preview...");
+        await launchPreview({
+          networkPreview: false,
+          hotReload: false,
+          forceDiagnosticReport: false,
+          numberOfWindows: 0,
+        });
+      }
+
+      hardReloadAllPreviews();
+    },
+    [
+      hardReloadAllPreviews,
+      launchPreview,
+      getInGameEditionPreviewStatus,
+      hasNonEditionPreviewsRunning,
+    ]
   );
 
   const launchQuickCustomizationPreview = React.useCallback(
@@ -4051,7 +4090,9 @@ const MainFrame = (props: Props) => {
       )}
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher()}
+        renderGDJSDevelopmentWatcher({
+          onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
+        })}
       {!!hotReloadLogs.length && (
         <HotReloadLogsDialog
           logs={hotReloadLogs}

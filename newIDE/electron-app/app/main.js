@@ -30,6 +30,7 @@ const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
@@ -324,6 +325,11 @@ app.on('ready', function() {
 
   ipcMain.on('close-local-gdjs-development-watcher', event => {
     closeLocalGDJSDevelopmentWatcher();
+  });
+
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated(() => {
+    log.info('Notifying the editor that the GDJS runtime has been updated.');
+    mainWindow.webContents.send('local-gdjs-development-watcher-runtime-updated', null);
   });
 
   // DebuggerServer events:

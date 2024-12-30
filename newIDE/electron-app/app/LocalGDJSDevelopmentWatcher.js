@@ -7,6 +7,8 @@ const process = require('process');
 const path = require('path');
 const log = require('electron-log');
 
+let onRuntimeUpdatedCallback = () => {};
+
 /**
  * Returns the folder corresponding to newIDE/app in **development**.
  * @returns {string}
@@ -69,7 +71,11 @@ const onWatchEvent = debounce(
     log.info(
       `GDJS/extensions watchers found a "${eventName}" in ${resolvedFilename}, updating GDJS Runtime...`
     );
-    importGDJSRuntime().catch(() => {});
+    importGDJSRuntime()
+      .then(() => {
+        onRuntimeUpdatedCallback();
+      })
+      .catch(() => {});
   },
   100 /* Avoid running the script too much in case multiple changes are fired at the same time. */
 );
@@ -101,7 +107,7 @@ const setupLocalGDJSDevelopmentWatcher = () => {
     path.join(findDevelopmentNewIdeAppPath(), watchPath)
   );
 
-  // Reload extensions when the component is first mounted
+  // Reload extensions when the watcher is first set.
   importGDJSRuntime().catch(() => {});
 
   watcher = chokidar
@@ -127,7 +133,12 @@ const closeLocalGDJSDevelopmentWatcher = () => {
   watcher = null;
 };
 
+const onLocalGDJSDevelopmentWatcherRuntimeUpdated = cb => {
+  onRuntimeUpdatedCallback = cb;
+};
+
 module.exports = {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
+  onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 };

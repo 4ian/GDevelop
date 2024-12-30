@@ -287,6 +287,10 @@ namespace gdjs {
         // as it knows the current scene to show.
       } else if (data.command === 'updateInstances') {
         // TODO: do an update/partial hot reload of the instances
+      } else if (data.command === 'hardReload') {
+        // This usually means that the preview was modified so much that an entire reload
+        // is needed, or that the runtime itself could have been modified.
+        location.reload();
       } else {
         logger.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -458,12 +462,14 @@ namespace gdjs {
     }
 
     sendRuntimeGameStatus(): void {
+      const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
           payload: {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
+            currentSceneName: currentScene ? currentScene.getName() : null,
           },
         })
       );

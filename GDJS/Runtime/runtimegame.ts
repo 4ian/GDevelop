@@ -926,10 +926,23 @@ namespace gdjs {
         this._setupGameVisibilityEvents();
 
         // The standard game loop
+        let lastFrameSceneName: string | null = null;
         let accumulatedElapsedTime = 0;
         this._hasJustResumed = false;
         this._renderer.startGameLoop((lastCallElapsedTime) => {
           try {
+            if (this._debuggerClient) {
+              // Watch the scene name to automatically update debugger when a scene is changed.
+              const currentScene = this.getSceneStack().getCurrentScene();
+              if (
+                currentScene &&
+                currentScene.getName() !== lastFrameSceneName
+              ) {
+                lastFrameSceneName = currentScene.getName();
+                this._debuggerClient.sendRuntimeGameStatus();
+              }
+            }
+
             if (this._paused && !this._isInGameEdition) {
               // The game is paused, but not being edited, so we entirely skip any logic.
               return true;

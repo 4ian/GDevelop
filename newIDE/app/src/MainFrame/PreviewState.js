@@ -24,12 +24,17 @@ export type PreviewState = {|
 type DebuggerStatus = {|
   isPaused: boolean,
   isInGameEdition: boolean,
+  currentSceneName: string,
 |};
 
 type PreviewDebuggerServerWatcherResults = {|
+  getInGameEditionPreviewStatus: () => DebuggerStatus | null,
   hasNonEditionPreviewsRunning: boolean,
+
   hotReloadLogs: Array<HotReloaderLog>,
   clearHotReloadLogs: () => void,
+
+  hardReloadAllPreviews: () => void,
 |};
 
 /**
@@ -91,6 +96,7 @@ export const usePreviewDebuggerServerWatcher = (
               [id]: {
                 isPaused: !!parsedMessage.payload.isPaused,
                 isInGameEdition: !!parsedMessage.payload.isInGameEdition,
+                currentSceneName: parsedMessage.payload.currentSceneName,
               },
             }));
           }
@@ -106,9 +112,45 @@ export const usePreviewDebuggerServerWatcher = (
     setHotReloadLogs,
   ]);
 
+  const hardReloadAllPreviews = React.useCallback(
+    () => {
+      if (!previewDebuggerServer) return;
+
+      console.info('Hard reloading all previews...');
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hardReload',
+        });
+      });
+    },
+    [previewDebuggerServer]
+  );
+
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
     key => !debuggerStatus[+key].isInGameEdition
   );
 
-  return { hasNonEditionPreviewsRunning, hotReloadLogs, clearHotReloadLogs };
+  const getInGameEditionPreviewStatus = React.useCallback(
+    () => {
+      const inGameEditionPreviewKey = Object.keys(debuggerStatus).find(key => {
+        if (debuggerStatus[+key].isInGameEdition) {
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!inGameEditionPreviewKey) return null;
+      return debuggerStatus[+inGameEditionPreviewKey];
+    },
+    [debuggerStatus]
+  );
+
+  return {
+    getInGameEditionPreviewStatus,
+    hasNonEditionPreviewsRunning,
+    hotReloadLogs,
+    clearHotReloadLogs,
+    hardReloadAllPreviews,
+  };
 };

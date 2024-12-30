@@ -358,7 +358,7 @@ namespace gdjs {
     }
 
     /**
-     * Step and render the scene.
+     * Step (execute the game logic) and render the scene.
      * @param elapsedTime In milliseconds
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
@@ -418,6 +418,23 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.end('callbacks and extensions (post-events)');
       }
+
+      this.render();
+
+      this._isJustResumed = false;
+      if (this._profiler) {
+        this._profiler.end('render');
+      }
+      if (this._profiler) {
+        this._profiler.endFrame();
+      }
+      return !!this.getRequestedChange();
+    }
+
+    /**
+     * Render the scene (but do not execute the game logic).
+     */
+    render() {
       if (this._profiler) {
         this._profiler.begin('objects (pre-render, effects update)');
       }
@@ -447,21 +464,6 @@ namespace gdjs {
         );
       }
 
-      this._isJustResumed = false;
-      this.render();
-      if (this._profiler) {
-        this._profiler.end('render');
-      }
-      if (this._profiler) {
-        this._profiler.endFrame();
-      }
-      return !!this.getRequestedChange();
-    }
-
-    /**
-     * Render the PIXI container associated to the runtimeScene.
-     */
-    render() {
       this._renderer.render();
     }
 

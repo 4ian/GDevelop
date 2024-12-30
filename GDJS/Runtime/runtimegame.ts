@@ -191,6 +191,7 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
+    _isInGameEdition: boolean;
 
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
@@ -265,6 +266,7 @@ namespace gdjs {
           )
         : null;
       this._isPreview = this._options.isPreview || false;
+      this._isInGameEdition = this._options.isInGameEdition || false;
       this._sessionId = null;
       this._playerId = null;
 
@@ -876,7 +878,10 @@ namespace gdjs {
       await loadAssets(onProgress);
 
       await loadingScreen.unload();
-      this.pause(false);
+
+      if (!this._isInGameEdition) {
+        this.pause(false);
+      }
     }
 
     private _getFirstSceneName(): string {
@@ -925,7 +930,8 @@ namespace gdjs {
         this._hasJustResumed = false;
         this._renderer.startGameLoop((lastCallElapsedTime) => {
           try {
-            if (this._paused) {
+            if (this._paused && !this._isInGameEdition) {
+              // The game is paused, but not being edited, so we entirely skip any logic.
               return true;
             }
 
@@ -950,13 +956,20 @@ namespace gdjs {
               this._notifyScenesForGameResolutionResize = false;
             }
 
-            // Render and step the scene.
-            if (this._sceneStack.step(elapsedTime)) {
-              this.getInputManager().onFrameEnded();
-              this._hasJustResumed = false;
+            if (this._paused && this._isInGameEdition) {
+              // The game is paused for edition: the game loop continues to run,
+              // but the game logic is not executed.
+              this._sceneStack.renderWithoutStep();
               return true;
+            } else {
+              // Render and step the scene.
+              if (this._sceneStack.step(elapsedTime)) {
+                this.getInputManager().onFrameEnded();
+                this._hasJustResumed = false;
+                return true;
+              }
+              return false;
             }
-            return false;
           } catch (e) {
             if (this._debuggerClient)
               this._debuggerClient.onUncaughtException(e);
@@ -1275,6 +1288,14 @@ namespace gdjs {
      */
     isPreview(): boolean {
       return this._isPreview;
+    }
+
+    /**
+     * Check if the game should display in-game edition tools or not.
+     * @returns true if the current game is being edited.
+     */
+    isInGameEdition(): boolean {
+      return this._isInGameEdition;
     }
 
     /**

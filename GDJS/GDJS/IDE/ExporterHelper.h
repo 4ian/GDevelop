@@ -45,6 +45,7 @@ struct PreviewExportOptions {
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
+        isInGameEdition(false),
         nonRuntimeScriptsCacheBurst(0),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""),

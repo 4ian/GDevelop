@@ -240,6 +240,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.isDevelopmentEnvironment) {
     runtimeGameOptions.AddChild("environment").SetStringValue("dev");
   }
+  if (options.isInGameEdition) {
+    runtimeGameOptions.AddChild("isInGameEdition").SetBoolValue(true);
+  }
   if (!options.gdevelopResourceToken.empty()) {
     runtimeGameOptions.AddChild("gdevelopResourceToken")
         .SetStringValue(options.gdevelopResourceToken);

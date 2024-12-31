@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -21,7 +21,8 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
-#if defined(_MSC_VER)
+
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(6334)
 #endif
@@ -174,7 +175,11 @@ template <typename T> struct RemoveSfinaeTag<SfinaeTag&(*)(T)> { typedef T Type;
 RAPIDJSON_NAMESPACE_END
 //@endcond
 
-#if defined(__GNUC__) || defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 

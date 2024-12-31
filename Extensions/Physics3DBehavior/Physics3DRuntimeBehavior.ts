@@ -1862,6 +1862,11 @@ namespace gdjs {
       hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean;
     }
 
+    /**
+     * The default collision checker uses the contacts found while
+     * stepping the physics simulation. For characters, another one is used
+     * as characters are simulated before the rest of the physics simulation.
+     */
     export class DefaultCollisionChecker implements CollisionChecker {
       behavior: gdjs.Physics3DRuntimeBehavior;
 

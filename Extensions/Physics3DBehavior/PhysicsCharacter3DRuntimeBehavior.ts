@@ -71,6 +71,7 @@ namespace gdjs {
     private _maxFallingSpeed: float;
     private _jumpSpeed: float;
     private _jumpSustainTime: float;
+    private _stairHeightMax: float;
 
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
@@ -140,6 +141,10 @@ namespace gdjs {
       this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
       this._shouldBindObjectAndForwardAngle =
         behaviorData.shouldBindObjectAndForwardAngle;
+      this._stairHeightMax =
+        behaviorData.stairHeightMax === undefined
+          ? 20
+          : behaviorData.stairHeightMax;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -159,7 +164,6 @@ namespace gdjs {
       const sharedData = behavior._sharedData;
       const jolt = sharedData.jolt;
       const extendedUpdateSettings = new Jolt.ExtendedUpdateSettings();
-      extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(0, 0, 0.4);
       const broadPhaseLayerFilter = new Jolt.DefaultBroadPhaseLayerFilter(
         jolt.GetObjectVsBroadPhaseLayerFilter(),
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
@@ -179,6 +183,7 @@ namespace gdjs {
         bodyFilter,
         shapeFilter,
       };
+      this.setStairHeightMax(this._stairHeightMax);
       sharedData.registerHook(this);
 
       behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
@@ -245,6 +250,9 @@ namespace gdjs {
         this.setShouldBindObjectAndForwardAngle(
           newBehaviorData.shouldBindObjectAndForwardAngle
         );
+      }
+      if (oldBehaviorData.stairHeightMax !== newBehaviorData.stairHeightMax) {
+        this.setStairHeightMax(newBehaviorData.stairHeightMax);
       }
       return true;
     }
@@ -781,6 +789,27 @@ namespace gdjs {
         Math.cos(gdjs.toRad(slopeMaxAngle)),
         1 - 1 / 1024
       );
+    }
+
+    getStairHeightMax(): float {
+      return this._stairHeightMax;
+    }
+
+    setStairHeightMax(stairHeightMax: float): void {
+      const { extendedUpdateSettings } = this.getPhysics3D();
+      this._stairHeightMax = stairHeightMax;
+      console.log(stairHeightMax);
+      const walkStairsStepUp = stairHeightMax * this._sharedData.worldInvScale;
+      extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(
+        0,
+        0,
+        walkStairsStepUp
+      );
+      // Use default values proportionally;
+      extendedUpdateSettings.mWalkStairsMinStepForward =
+        (0.02 / 0.4) * walkStairsStepUp;
+      extendedUpdateSettings.mWalkStairsStepForwardTest =
+        (0.15 / 0.4) * walkStairsStepUp;
     }
 
     /**

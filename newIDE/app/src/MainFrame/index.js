@@ -1633,7 +1633,7 @@ const MainFrame = (props: Props) => {
         ? previewState.overridenPreviewLayoutName
         : previewState.previewLayoutName;
       const externalLayoutName = isForInGameEdition
-        ? null
+        ? isForInGameEdition.forcedExternalLayoutName
         : previewState.isPreviewOverriden
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
@@ -1676,6 +1676,7 @@ const MainFrame = (props: Props) => {
         const startTime = Date.now();
         await previewLauncher.launchPreview({
           project: currentProject,
+          // TODO: replace by scene name and external layout name
           layout,
           externalLayout,
           networkPreview: !!networkPreview,
@@ -1789,13 +1790,20 @@ const MainFrame = (props: Props) => {
   );
 
   const onLaunchPreviewForInGameEdition = React.useCallback(
-    ({ sceneName }: {| sceneName: string |}) => {
+    ({
+      sceneName,
+      externalLayoutName,
+    }: {|
+      sceneName: string,
+      externalLayoutName: ?string,
+    |}) => {
       launchPreview({
         networkPreview: false,
         hotReload: false,
         forceDiagnosticReport: false,
         isForInGameEdition: {
           forcedSceneName: sceneName,
+          forcedExternalLayoutName: externalLayoutName,
         },
         numberOfWindows: 0,
       });
@@ -1821,6 +1829,8 @@ const MainFrame = (props: Props) => {
           isForInGameEdition: {
             forcedSceneName:
               runningInGameEditionPreviewStatus.currentSceneName || '',
+            // TODO: add support for forced external layout name.
+            forcedExternalLayoutName: null,
           },
           numberOfWindows: 0,
         });

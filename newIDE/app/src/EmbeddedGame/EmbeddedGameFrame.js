@@ -8,6 +8,7 @@ type AttachToPreviewOptions = {|
 
 type SwitchToSceneEditionOptions = {|
   sceneName: string,
+  externalLayoutName?: string,
 |};
 
 let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
@@ -22,15 +23,19 @@ export const attachToPreview = ({
 
 export const switchToSceneEdition = ({
   sceneName,
+  externalLayoutName,
 }: SwitchToSceneEditionOptions) => {
   if (!onSwitchToSceneEdition)
     throw new Error('No EmbeddedGameFrame registered.');
-  onSwitchToSceneEdition({ sceneName });
+  onSwitchToSceneEdition({ sceneName, externalLayoutName });
 };
 
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
-  onLaunchPreviewForInGameEdition: ({| sceneName: string |}) => void,
+  onLaunchPreviewForInGameEdition: ({|
+    sceneName: string,
+    externalLayoutName: ?string,
+  |}) => void,
 |};
 
 export const EmbeddedGameFrame = ({
@@ -55,12 +60,13 @@ export const EmbeddedGameFrame = ({
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
         if (!previewDebuggerServer) return;
 
-        const { sceneName } = options;
+        const { sceneName, externalLayoutName } = options;
 
         if (!previewIndexHtmlLocation) {
           console.info('Launching preview for embedded game.');
-          onLaunchPreviewForInGameEdition({ sceneName });
+          onLaunchPreviewForInGameEdition({ sceneName, externalLayoutName });
         } else {
+          // TODO: handle external layouts (and custom objects later).
           console.info(`Switching previews to scene "${sceneName}".`);
           previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
             previewDebuggerServer.sendMessage(debuggerId, {

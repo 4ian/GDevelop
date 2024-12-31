@@ -15,7 +15,10 @@ export type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
-  isForInGameEdition?: { forcedSceneName: string },
+  isForInGameEdition?: {|
+    forcedSceneName: string,
+    forcedExternalLayoutName: ?string,
+  |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
 export type CaptureOptions = {|

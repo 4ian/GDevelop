@@ -283,6 +283,8 @@ namespace gdjs {
         }
 
         runtimeGame.getSceneStack().replace(sceneName, true);
+        // TODO: handle external layouts.
+
         // TODO: if fatal error, should probably reload. The editor should handle this
         // as it knows the current scene to show.
       } else if (data.command === 'updateInstances') {

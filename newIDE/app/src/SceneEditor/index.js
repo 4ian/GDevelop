@@ -80,7 +80,6 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
-import { switchToSceneEdition } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -249,11 +248,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
-    if (this.props.isActive) {
-      if (this.props.layout && this.state.gameEditorMode === 'embedded-game') {
-        switchToSceneEdition({ sceneName: this.props.layout.getName() });
-      }
-    }
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -403,10 +397,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           selectedObjectFolderOrObjectsWithContext
         ),
       }));
-
-      if (this.props.layout && this.state.gameEditorMode === 'embedded-game') {
-        switchToSceneEdition({ sceneName: this.props.layout.getName() });
-      }
     }
   }
 

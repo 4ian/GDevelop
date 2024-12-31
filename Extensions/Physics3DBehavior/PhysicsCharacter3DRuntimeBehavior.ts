@@ -1435,6 +1435,14 @@ namespace gdjs {
       }
     }
 
+    /**
+     * A character is simulated by Jolt before the rest of the physics simulation
+     * (see `doBeforePhysicsStep`). 
+     * This means that contacts with the character would only rarely be recognized by
+     * the physics engine if using the default contact listeners. 
+     * Instead, this class allows to properly track contacts of the character
+     * using Jolt `CharacterVirtual::GetActiveContacts`.
+     */
     export class CharacterCollisionChecker
       implements gdjs.Physics3DRuntimeBehavior.CollisionChecker {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;

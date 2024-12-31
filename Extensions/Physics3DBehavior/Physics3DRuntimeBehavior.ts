@@ -540,7 +540,7 @@ namespace gdjs {
         if (this._body) {
           this._sharedData.bodyInterface.SetPosition(
             this._body.GetID(),
-            this.getVec3(
+            this.getRVec3(
               behaviorSpecificProps.px,
               behaviorSpecificProps.py,
               behaviorSpecificProps.pz

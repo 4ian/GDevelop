@@ -55,6 +55,26 @@ declare namespace Jolt {
     clear(): void;
     data(): Mat44MemRef;
   }
+  class ArrayBodyID {
+    empty(): boolean;
+    size(): number;
+    at(inIndex: number): BodyID;
+    push_back(inValue: BodyID): void;
+    reserve(inSize: number): void;
+    resize(inSize: number): void;
+    clear(): void;
+    data(): BodyIDMemRef;
+  }
+  class ArrayBodyPtr {
+    empty(): boolean;
+    size(): number;
+    at(inIndex: number): Body;
+    push_back(inValue: Body): void;
+    reserve(inSize: number): void;
+    resize(inSize: number): void;
+    clear(): void;
+    data(): BodyPtrMemRef;
+  }
   const EBodyType_RigidBody: number;
   const EBodyType_SoftBody: number;
   type EBodyType = typeof EBodyType_RigidBody | typeof EBodyType_SoftBody;
@@ -414,6 +434,8 @@ declare namespace Jolt {
   class Vec3MemRef {}
   class QuatMemRef {}
   class Mat44MemRef {}
+  class BodyIDMemRef {}
+  class BodyPtrMemRef {}
   class FloatMemRef {}
   class Uint8MemRef {}
   class UintMemRef {}
@@ -429,6 +451,10 @@ declare namespace Jolt {
     sMin(inLHS: Vec3, inRHS: Vec3): Vec3;
     sMax(inLHS: Vec3, inRHS: Vec3): Vec3;
     sClamp(inValue: Vec3, inMin: Vec3, inMax: Vec3): Vec3;
+    sFusedMultiplyAdd(inMul1: Vec3, inMul2: Vec3, inAdd: Vec3): Vec3;
+    sOr(inV1: Vec3, inV2: Vec3): Vec3;
+    sXor(inV1: Vec3, inV2: Vec3): Vec3;
+    sAnd(inV1: Vec3, inV2: Vec3): Vec3;
     sUnitSpherical(inTheta: number, inPhi: number): Vec3;
     GetComponent(inCoordinate: number): number;
     Equals(inV: Vec3): boolean;
@@ -455,10 +481,21 @@ declare namespace Jolt {
     Reciprocal(): Vec3;
     Cross(inRHS: Vec3): Vec3;
     Dot(inRHS: Vec3): number;
+    DotV(inRHS: Vec3): Vec3;
+    DotV4(inRHS: Vec3): Vec4;
     Add(inV: Vec3): Vec3;
     Sub(inV: Vec3): Vec3;
     Mul(inV: number): Vec3;
     Div(inV: number): Vec3;
+    MulVec3(inV: Vec3): Vec3;
+    MulFloat(inV: number): Vec3;
+    DivVec3(inV: Vec3): Vec3;
+    DivFloat(inV: number): Vec3;
+    AddVec3(inV: Vec3): Vec3;
+    SubVec3(inV: Vec3): Vec3;
+    SplatX(): Vec4;
+    SplatY(): Vec4;
+    SplatZ(): Vec4;
     ReduceMin(): number;
     ReduceMax(): number;
     Sqrt(): Vec3;
@@ -500,6 +537,12 @@ declare namespace Jolt {
     Sub(inV: Vec3): RVec3;
     Mul(inV: number): RVec3;
     Div(inV: number): RVec3;
+    MulRVec3(inV: RVec3): RVec3;
+    MulFloat(inV: number): RVec3;
+    DivRVec3(inV: RVec3): RVec3;
+    DivFloat(inV: number): RVec3;
+    AddRVec3(inV: RVec3): RVec3;
+    SubRVec3(inV: RVec3): RVec3;
     Sqrt(): RVec3;
     GetSign(): RVec3;
   }
@@ -508,6 +551,14 @@ declare namespace Jolt {
     constructor(inV: Vec4);
     constructor(inV: Vec3, inW: number);
     constructor(inX: number, inY: number, inZ: number, inW: number);
+    sZero(): Vec4;
+    sReplicate(inV: number): Vec4;
+    sMin(inLHS: Vec4, inRHS: Vec4): Vec4;
+    sMax(inLHS: Vec4, inRHS: Vec4): Vec4;
+    sFusedMultiplyAdd(inMul1: Vec4, inMul2: Vec4, inAdd: Vec4): Vec4;
+    sOr(inV1: Vec4, inV2: Vec4): Vec4;
+    sXor(inV1: Vec4, inV2: Vec4): Vec4;
+    sAnd(inV1: Vec4, inV2: Vec4): Vec4;
     GetX(): number;
     GetY(): number;
     GetZ(): number;
@@ -518,6 +569,18 @@ declare namespace Jolt {
     SetW(inW: number): void;
     Set(inX: number, inY: number, inZ: number, inW: number): void;
     GetComponent(inCoordinate: number): number;
+    IsClose(inV: Vec4, inMaxDistSq?: number): boolean;
+    IsNormalized(inTolerance?: number): boolean;
+    Add(inV: Vec4): Vec4;
+    Sub(inV: Vec4): Vec4;
+    Mul(inV: number): Vec4;
+    Div(inV: number): Vec4;
+    MulVec4(inV: Vec4): Vec4;
+    MulFloat(inV: number): Vec4;
+    DivVec4(inV: Vec4): Vec4;
+    DivFloat(inV: number): Vec4;
+    AddVec4(inV: Vec4): Vec4;
+    SubVec4(inV: Vec4): Vec4;
   }
   class Vector2 {
     constructor();
@@ -531,6 +594,10 @@ declare namespace Jolt {
     Sub(inV: Vector2): Vector2;
     Mul(inV: number): Vector2;
     Div(inV: number): Vector2;
+    MulFloat(inV: number): Vector2;
+    DivFloat(inV: number): Vector2;
+    AddVector2(inV: Vector2): Vector2;
+    SubVector2(inV: Vector2): Vector2;
     Dot(inRHS: Vector2): number;
   }
   class Quat {
@@ -599,10 +666,17 @@ declare namespace Jolt {
     sRotationY(inY: number): Mat44;
     sRotationZ(inZ: number): Mat44;
     sRotation(inQ: Quat): Mat44;
+    sRotationAxisAngle(inAxis: Vec3, inAngle: number): Mat44;
     sTranslation(inTranslation: Vec3): Mat44;
     sRotationTranslation(inRotation: Quat, inTranslation: Vec3): Mat44;
     sInverseRotationTranslation(inRotation: Quat, inTranslation: Vec3): Mat44;
     sScale(inScale: number): Mat44;
+    sScaleVec3(inScale: Vec3): Mat44;
+    sOuterProduct(inV1: Vec3, inV2: Vec3): Mat44;
+    sCrossProduct(inV: Vec3): Mat44;
+    sQuatLeftMultiply(inQ: Quat): Mat44;
+    sQuatRightMultiply(inQ: Quat): Mat44;
+    sLookAt(inPos: Vec3, inTarget: Vec3, inUp: Vec3): Mat44;
     sPerspective(
       inFovY: number,
       inAspect: number,
@@ -612,16 +686,32 @@ declare namespace Jolt {
     GetAxisX(): Vec3;
     GetAxisY(): Vec3;
     GetAxisZ(): Vec3;
+    GetDiagonal3(): Vec3;
+    GetDiagonal4(): Vec4;
     GetRotation(): Mat44;
+    GetRotationSafe(): Mat44;
     GetQuaternion(): Quat;
     GetTranslation(): Vec3;
+    Equals(inV: Mat44): boolean;
+    NotEquals(inV: Mat44): boolean;
     IsClose(inM: Mat44, inMaxDistSq?: number): boolean;
+    Add(inM: Mat44): Mat44;
+    MulFloat(inV: number): Mat44;
+    MulMat44(inM: Mat44): Mat44;
+    MulVec3(inV: Vec3): Vec3;
+    MulVec4(inV: Vec4): Vec4;
+    AddMat44(inM: Mat44): Mat44;
+    SubMat44(inM: Mat44): Mat44;
     Multiply3x3(inV: Vec3): Vec3;
     Multiply3x3Transposed(inV: Vec3): Vec3;
+    Multiply3x3LeftTransposed(inM: Mat44): Mat44;
+    Multiply3x3RightTransposed(inM: Mat44): Mat44;
     Transposed(): Mat44;
     Transposed3x3(): Mat44;
     Inversed(): Mat44;
     InversedRotationTranslation(): Mat44;
+    Adjointed3x3(): Mat44;
+    SetInversed3x3(inM: Mat44): boolean;
     GetDeterminant3x3(): number;
     Inversed3x3(): Mat44;
     GetDirectionPreservingMatrix(): Mat44;
@@ -629,12 +719,16 @@ declare namespace Jolt {
     PostTranslated(inTranslation: Vec3): Mat44;
     PreScaled(inScale: Vec3): Mat44;
     PostScaled(inScale: Vec3): Mat44;
+    Decompose(outScale: Vec3): Mat44;
     SetColumn3(inCol: number, inV: Vec3): void;
+    SetColumn4(inCol: number, inV: Vec4): void;
     SetAxisX(inV: Vec3): void;
     SetAxisY(inV: Vec3): void;
     SetAxisZ(inV: Vec3): void;
+    SetDiagonal3(inV: Vec3): void;
+    SetDiagonal4(inV: Vec4): void;
     SetTranslation(inV: Vec3): void;
-    SetColumn4(inCol: number, inV: Vec4): void;
+    GetColumn3(inCol: number): Vec3;
     GetColumn4(inCol: number): Vec4;
   }
   class RMat44 {
@@ -645,10 +739,18 @@ declare namespace Jolt {
     sTranslation(inTranslation: RVec3): RMat44;
     sRotationTranslation(inRotation: Quat, inTranslation: RVec3): RMat44;
     sInverseRotationTranslation(inRotation: Quat, inTranslation: RVec3): RMat44;
+    ToMat44(): Mat44;
+    Equals(inV: RMat44): boolean;
+    NotEquals(inV: RMat44): boolean;
+    MulVec3(inV: Vec3): RVec3;
+    MulRVec3(inV: RVec3): RVec3;
+    MulMat44(inM: Mat44): RMat44;
+    MulRMat44(inM: RMat44): RMat44;
     GetAxisX(): Vec3;
     GetAxisY(): Vec3;
     GetAxisZ(): Vec3;
     GetRotation(): Mat44;
+    SetRotation(inRotation: Mat44): void;
     GetQuaternion(): Quat;
     GetTranslation(): RVec3;
     IsClose(inM: RMat44, inMaxDistSq?: number): boolean;
@@ -661,25 +763,59 @@ declare namespace Jolt {
     PostTranslated(inTranslation: Vec3): RMat44;
     PreScaled(inScale: Vec3): RMat44;
     PostScaled(inScale: Vec3): RMat44;
+    GetDirectionPreservingMatrix(): Mat44;
     SetColumn3(inCol: number, inV: Vec3): void;
+    GetColumn3(inCol: number): Vec3;
     SetAxisX(inV: Vec3): void;
     SetAxisY(inV: Vec3): void;
     SetAxisZ(inV: Vec3): void;
     SetTranslation(inV: RVec3): void;
     SetColumn4(inCol: number, inV: Vec4): void;
     GetColumn4(inCol: number): Vec4;
+    Decompose(outScale: Vec3): RMat44;
   }
   class AABox {
     constructor();
     constructor(inMin: Vec3, inMax: Vec3);
     sBiggest(): AABox;
+    sFromTwoPoints(inP1: Vec3, inP2: Vec3): AABox;
+    sFromTriangle(inVertices: VertexList, inTriangle: IndexedTriangle): AABox;
+    Equals(inB: AABox): boolean;
+    NotEquals(inB: AABox): boolean;
+    SetEmpty(): void;
+    IsValid(): boolean;
+    EncapsulateVec3(inV: Vec3): void;
+    EncapsulateAABox(inBox: AABox): void;
+    EncapsulateTriangle(inTriangle: Triangle): void;
+    EncapsulateIndexedTriangle(
+      inVertices: VertexList,
+      inTriangle: IndexedTriangle
+    ): void;
+    Intersect(inOther: AABox): AABox;
+    EnsureMinimalEdgeLength(inMinEdgeLength: number): void;
+    ExpandBy(inV: Vec3): void;
+    GetCenter(): Vec3;
+    GetExtent(): Vec3;
+    GetSize(): Vec3;
+    GetSurfaceArea(): number;
+    GetVolume(): number;
+    ContainsVec3(inOther: Vec3): boolean;
+    ContainsRVec3(inOther: RVec3): boolean;
+    OverlapsAABox(inOther: AABox): boolean;
+    OverlapsPlane(inOther: AABox): boolean;
+    TranslateVec3(inOther: Vec3): void;
+    TranslateRVec3(inOther: RVec3): void;
+    TransformedMat44(inOther: Mat44): AABox;
+    TransformedRMat44(inOther: RMat44): AABox;
+    Scaled(inScale: Vec3): AABox;
+    GetClosestPoint(inV: Vec3): Vec3;
+    GetSqDistanceTo(inV: Vec3): number;
     get_mMin(): Vec3;
     set_mMin(mMin: Vec3): void;
     mMin: Vec3;
     get_mMax(): Vec3;
     set_mMax(mMax: Vec3): void;
     mMax: Vec3;
-    Overlaps(inOther: AABox): boolean;
   }
   class OrientedBox {
     constructor();
@@ -1019,6 +1155,7 @@ declare namespace Jolt {
     mDensity: number;
   }
   class ConvexShape extends Shape {
+    SetMaterial(inMaterial: PhysicsMaterial): void;
     GetDensity(): number;
     SetDensity(inDensity: number): void;
   }
@@ -1203,7 +1340,8 @@ declare namespace Jolt {
       inPosition: Vec3,
       inRotation: Quat,
       inShape: Shape,
-      inUserData: number
+      inUserData: number,
+      inIndex?: number
     ): number;
     RemoveShape(inIndex: number): void;
     ModifyShape(inIndex: number, inPosition: Vec3, inRotation: Quat): void;
@@ -1405,6 +1543,7 @@ declare namespace Jolt {
       inMaterial?: PhysicsMaterial,
       inHalfExtent?: number
     );
+    SetMaterial(inMaterial: PhysicsMaterial): void;
     GetPlane(): Plane;
     GetHalfExtent(): number;
   }
@@ -1449,6 +1588,8 @@ declare namespace Jolt {
     GetUserData(): number;
     SetUserData(inUserData: number): void;
     ResetWarmStart(): void;
+    SaveState(inStream: StateRecorder): void;
+    RestoreState(inStream: StateRecorder): void;
   }
   class TwoBodyConstraintSettings extends ConstraintSettings {
     Create(inBody1: Body, inBody2: Body): Constraint;
@@ -1936,6 +2077,9 @@ declare namespace Jolt {
     AddRef(): void;
     Release(): void;
   }
+  class PathConstraintPathHermite extends PathConstraintPath {
+    AddPoint(inPosition: Vec3, inTangent: Vec3, inNormal: Vec3): void;
+  }
   class PathConstraintPathEm extends PathConstraintPath {}
   class PathConstraintPathJS extends PathConstraintPathEm {
     constructor();
@@ -2088,6 +2232,7 @@ declare namespace Jolt {
     GetInverseInertiaDiagonal(): Vec3;
     GetInertiaRotation(): Quat;
     SetInverseInertia(inInvI: Vec3, inRotation: Quat): void;
+    ScaleToMass(inMass: number): void;
     GetLocalSpaceInverseInertia(): Mat44;
     GetInverseInertiaForRotation(inRotation: Mat44): Mat44;
     MultiplyWorldSpaceInverseInertiaByVector(inRotation: Quat, inV: Vec3): Vec3;
@@ -2211,22 +2356,31 @@ declare namespace Jolt {
     ): Vec3;
     GetUserData(): number;
     SetUserData(inUserData: number): void;
+    SaveState(inStream: StateRecorder): void;
+    RestoreState(inStream: StateRecorder): void;
   }
+  class BodyInterface_AddState {}
   class BodyInterface {
     CreateBody(inSettings: BodyCreationSettings): Body;
     CreateSoftBody(inSettings: SoftBodyCreationSettings): Body;
-    CreateBodyWithID(inBodyID: BodyID, inSettings: BodyCreationSettings): void;
+    CreateBodyWithID(inBodyID: BodyID, inSettings: BodyCreationSettings): Body;
     CreateSoftBodyWithID(
       inBodyID: BodyID,
       inSettings: SoftBodyCreationSettings
-    ): void;
+    ): Body;
     CreateBodyWithoutID(inSettings: BodyCreationSettings): Body;
     CreateSoftBodyWithoutID(inSettings: SoftBodyCreationSettings): Body;
     DestroyBodyWithoutID(inBody: Body): void;
     AssignBodyID(ioBody: Body): boolean;
     AssignBodyID(ioBody: Body, inBodyID: BodyID): boolean;
     UnassignBodyID(inBodyID: BodyID): Body;
+    UnassignBodyIDs(
+      inBodyIDs: BodyIDMemRef,
+      inNumber: number,
+      outBodies: BodyPtrMemRef
+    ): void;
     DestroyBody(inBodyID: BodyID): void;
+    DestroyBodies(inBodyIDs: BodyIDMemRef, inNumber: number): void;
     AddBody(inBodyID: BodyID, inActivationMode: EActivation): void;
     RemoveBody(inBodyID: BodyID): void;
     IsAdded(inBodyID: BodyID): boolean;
@@ -2238,6 +2392,22 @@ declare namespace Jolt {
       inSettings: SoftBodyCreationSettings,
       inActivationMode: EActivation
     ): BodyID;
+    AddBodiesPrepare(
+      ioBodies: BodyIDMemRef,
+      inNumber: number
+    ): BodyInterface_AddState;
+    AddBodiesFinalize(
+      ioBodies: BodyIDMemRef,
+      inNumber: number,
+      inAddState: BodyInterface_AddState,
+      inActivationMode: EActivation
+    ): void;
+    AddBodiesAbort(
+      ioBodies: BodyIDMemRef,
+      inNumber: number,
+      inAddState: BodyInterface_AddState
+    ): void;
+    RemoveBodies(ioBodies: BodyIDMemRef, inNumber: number): void;
     CreateConstraint(
       inSettings: TwoBodyConstraintSettings,
       inBodyID1: BodyID,
@@ -2290,6 +2460,16 @@ declare namespace Jolt {
     GetRotation(inBodyID: BodyID): Quat;
     GetWorldTransform(inBodyID: BodyID): RMat44;
     GetCenterOfMassTransform(inBodyID: BodyID): RMat44;
+    SetLinearAndAngularVelocity(
+      inBodyID: BodyID,
+      inLinearVelocity: Vec3,
+      inAngularVelocity: Vec3
+    ): void;
+    GetLinearAndAngularVelocity(
+      inBodyID: BodyID,
+      outLinearVelocity: Vec3,
+      outAngularVelocity: Vec3
+    ): void;
     SetLinearVelocity(inBodyID: BodyID, inLinearVelocity: Vec3): void;
     GetLinearVelocity(inBodyID: BodyID): Vec3;
     AddLinearVelocity(inBodyID: BodyID, inLinearVelocity: Vec3): void;
@@ -2315,12 +2495,14 @@ declare namespace Jolt {
       inDeltaTime: number
     ): void;
     ActivateBody(inBodyID: BodyID): void;
+    ActivateBodies(inBodyIDs: BodyIDMemRef, inNumber: number): void;
     ActivateBodiesInAABox(
       inBox: AABox,
       inBroadPhaseLayerFilter: BroadPhaseLayerFilter,
       inObjectLayerFilter: ObjectLayerFilter
     ): void;
     DeactivateBody(inBodyID: BodyID): void;
+    DeactivateBodies(inBodyIDs: BodyIDMemRef, inNumber: number): void;
     IsActive(inBodyID: BodyID): boolean;
     ResetSleepTimer(inBodyID: BodyID): void;
     GetBodyType(inBodyID: BodyID): EBodyType;
@@ -3083,6 +3265,18 @@ declare namespace Jolt {
       inBodyFilter: BodyFilter,
       inShapeFilter: ShapeFilter
     ): void;
+    CollideShapeWithInternalEdgeRemoval(
+      inShape: Shape,
+      inShapeScale: Vec3,
+      inCenterOfMassTransform: RMat44,
+      inCollideShapeSettings: CollideShapeSettings,
+      inBaseOffset: RVec3,
+      ioCollector: CollideShapeCollector,
+      inBroadPhaseLayerFilter: BroadPhaseLayerFilter,
+      inObjectLayerFilter: ObjectLayerFilter,
+      inBodyFilter: BodyFilter,
+      inShapeFilter: ShapeFilter
+    ): void;
     CastShape(
       inShapeCast: RShapeCast,
       inShapeCastSettings: ShapeCastSettings,
@@ -3176,6 +3370,8 @@ declare namespace Jolt {
     SetBodyActivationListener(inListener: BodyActivationListener): void;
     GetBodyActivationListener(): BodyActivationListener;
     WereBodiesInContact(inBodyID1: BodyID, inBodyID2: BodyID): boolean;
+    SetSimShapeFilter(inShapeFilter: SimShapeFilter): void;
+    GetSimShapeFilter(): SimShapeFilter;
   }
   class MassProperties {
     constructor();
@@ -3845,6 +4041,7 @@ declare namespace Jolt {
   }
   class CharacterVsCharacterCollision {}
   class CharacterVsCharacterCollisionSimple extends CharacterVsCharacterCollision {
+    constructor();
     Add(inCharacter: CharacterVirtual): void;
     Remove(inCharacter: CharacterVirtual): void;
   }
@@ -3870,6 +4067,62 @@ declare namespace Jolt {
     get_mWalkStairsStepDownExtra(): Vec3;
     set_mWalkStairsStepDownExtra(mWalkStairsStepDownExtra: Vec3): void;
     mWalkStairsStepDownExtra: Vec3;
+  }
+  class CharacterVirtualContact {
+    IsSameBody(inOther: CharacterVirtualContact): boolean;
+    get_mPosition(): RVec3;
+    set_mPosition(mPosition: RVec3): void;
+    mPosition: RVec3;
+    get_mLinearVelocity(): Vec3;
+    set_mLinearVelocity(mLinearVelocity: Vec3): void;
+    mLinearVelocity: Vec3;
+    get_mContactNormal(): Vec3;
+    set_mContactNormal(mContactNormal: Vec3): void;
+    mContactNormal: Vec3;
+    get_mSurfaceNormal(): Vec3;
+    set_mSurfaceNormal(mSurfaceNormal: Vec3): void;
+    mSurfaceNormal: Vec3;
+    get_mDistance(): number;
+    set_mDistance(mDistance: number): void;
+    mDistance: number;
+    get_mFraction(): number;
+    set_mFraction(mFraction: number): void;
+    mFraction: number;
+    get_mBodyB(): BodyID;
+    set_mBodyB(mBodyB: BodyID): void;
+    mBodyB: BodyID;
+    get_mCharacterB(): CharacterVirtual;
+    set_mCharacterB(mCharacterB: CharacterVirtual): void;
+    mCharacterB: CharacterVirtual;
+    get_mSubShapeIDB(): SubShapeID;
+    set_mSubShapeIDB(mSubShapeIDB: SubShapeID): void;
+    mSubShapeIDB: SubShapeID;
+    get_mMotionTypeB(): EMotionType;
+    set_mMotionTypeB(mMotionTypeB: EMotionType): void;
+    mMotionTypeB: EMotionType;
+    get_mIsSensorB(): boolean;
+    set_mIsSensorB(mIsSensorB: boolean): void;
+    mIsSensorB: boolean;
+    get_mUserData(): number;
+    set_mUserData(mUserData: number): void;
+    mUserData: number;
+    get_mMaterial(): PhysicsMaterial;
+    set_mMaterial(mMaterial: PhysicsMaterial): void;
+    mMaterial: PhysicsMaterial;
+    get_mHadCollision(): boolean;
+    set_mHadCollision(mHadCollision: boolean): void;
+    mHadCollision: boolean;
+    get_mWasDiscarded(): boolean;
+    set_mWasDiscarded(mWasDiscarded: boolean): void;
+    mWasDiscarded: boolean;
+    get_mCanPushCharacter(): boolean;
+    set_mCanPushCharacter(mCanPushCharacter: boolean): void;
+    mCanPushCharacter: boolean;
+  }
+  class ArrayCharacterVirtualContact {
+    empty(): boolean;
+    size(): number;
+    at(inIndex: number): CharacterVirtualContact;
   }
   class TempAllocator {}
   class BroadPhaseLayerFilter {
@@ -3940,6 +4193,20 @@ declare namespace Jolt {
       inSubShapeIDOfShape2: number
     ): boolean;
   }
+  class SimShapeFilter {
+    constructor();
+  }
+  class SimShapeFilterJS extends SimShapeFilter {
+    constructor();
+    ShouldCollide(
+      inBody1: number,
+      inShape1: number,
+      inSubShapeIDOfShape1: number,
+      inBody2: number,
+      inShape2: number,
+      inSubShapeIDOfShape2: number
+    ): boolean;
+  }
   class CharacterBase {
     GetRefCount(): number;
     AddRef(): void;
@@ -3957,6 +4224,8 @@ declare namespace Jolt {
     GetGroundVelocity(): Vec3;
     GetGroundMaterial(): PhysicsMaterial;
     GetGroundBodyID(): BodyID;
+    SaveState(inStream: StateRecorder): void;
+    RestoreState(inStream: StateRecorder): void;
   }
   class CharacterVirtual extends CharacterBase {
     constructor(
@@ -4056,6 +4325,9 @@ declare namespace Jolt {
     ): boolean;
     SetInnerBodyShape(inShape: Shape): void;
     GetTransformedShape(): TransformedShape;
+    HasCollidedWith(inBodyID: BodyID): boolean;
+    HasCollidedWithCharacter(inCharacter: CharacterVirtual): boolean;
+    GetActiveContacts(): ArrayCharacterVirtualContact;
   }
   class LinearCurve {
     constructor();
@@ -4550,6 +4822,7 @@ declare namespace Jolt {
     GetRefCount(): number;
     AddRef(): void;
     Release(): void;
+    GetConstraint(): VehicleConstraint;
   }
   class WheeledVehicleController extends VehicleController {
     constructor(
@@ -4665,6 +4938,8 @@ declare namespace Jolt {
   }
   class SkeletalAnimation {
     constructor();
+    SetIsLooping(inLooping: boolean): void;
+    IsLooping(): boolean;
     GetDuration(): number;
     ScaleJoints(inScale: number): void;
     Sample(inTime: number, ioPose: SkeletonPose): void;
@@ -4845,6 +5120,9 @@ declare namespace Jolt {
     get_mMaxContactConstraints(): number;
     set_mMaxContactConstraints(mMaxContactConstraints: number): void;
     mMaxContactConstraints: number;
+    get_mMaxWorkerThreads(): number;
+    set_mMaxWorkerThreads(mMaxWorkerThreads: number): void;
+    mMaxWorkerThreads: number;
     get_mBroadPhaseLayerInterface(): BroadPhaseLayerInterface;
     set_mBroadPhaseLayerInterface(
       mBroadPhaseLayerInterface: BroadPhaseLayerInterface

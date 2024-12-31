@@ -296,6 +296,7 @@ namespace gdjs {
 
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
+    collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
@@ -338,7 +339,7 @@ namespace gdjs {
      * each time the methods onContactBegin and onContactEnd are called by the contact
      * listener.
      */
-    private _currentContacts: Array<Physics3DRuntimeBehavior> = [];
+    _currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
     private _destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
@@ -379,6 +380,9 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
+      this.collisionChecker = new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(
         this
       );
       this.owner3D = owner;
@@ -540,7 +544,7 @@ namespace gdjs {
         if (this._body) {
           this._sharedData.bodyInterface.SetPosition(
             this._body.GetID(),
-            this.getVec3(
+            this.getRVec3(
               behaviorSpecificProps.px,
               behaviorSpecificProps.py,
               behaviorSpecificProps.pz
@@ -1696,27 +1700,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      if (
-        behavior1._currentContacts.some(
-          (behavior) => behavior.owner === object2
-        )
-      ) {
-        return true;
-      }
-      // If a contact has started at this frame and ended right away, it
-      // won't appear in current contacts but the condition should return
-      // true anyway.
-      if (
-        behavior1._contactsStartedThisFrame.some(
-          (behavior) => behavior.owner === object2
-        )
-      ) {
-        return true;
-      }
-
-      // No contact found
-      return false;
+      return behavior1.collisionChecker.isColliding(object2);
     }
 
     static hasCollisionStartedBetween(
@@ -1728,10 +1712,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      return behavior1._contactsStartedThisFrame.some(
-        (behavior) => behavior.owner === object2
-      );
+      return behavior1.collisionChecker.hasCollisionStartedWith(object2);
     }
 
     static hasCollisionStoppedBetween(
@@ -1743,10 +1724,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      return behavior1._contactsEndedThisFrame.some(
-        (behavior) => behavior.owner === object2
-      );
+      return behavior1.collisionChecker.hasCollisionStoppedWith(object2);
     }
   }
 
@@ -1874,6 +1852,50 @@ namespace gdjs {
           behavior.createShape(),
           true,
           Jolt.EActivation_Activate
+        );
+      }
+    }
+
+    export interface CollisionChecker {
+      isColliding(object: gdjs.RuntimeObject): boolean;
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean;
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean;
+    }
+
+    /**
+     * The default collision checker uses the contacts found while
+     * stepping the physics simulation. For characters, another one is used
+     * as characters are simulated before the rest of the physics simulation.
+     */
+    export class DefaultCollisionChecker implements CollisionChecker {
+      behavior: gdjs.Physics3DRuntimeBehavior;
+
+      constructor(behavior: gdjs.Physics3DRuntimeBehavior) {
+        this.behavior = behavior;
+      }
+
+      isColliding(object: gdjs.RuntimeObject): boolean {
+        if (
+          this.behavior._currentContacts.some(
+            (behavior) => behavior.owner === object
+          )
+        ) {
+          return true;
+        }
+        return this.behavior._contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean {
+        return this.behavior._contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean {
+        return this.behavior._contactsEndedThisFrame.some(
+          (behavior) => behavior.owner === object
         );
       }
     }

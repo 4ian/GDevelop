@@ -53,6 +53,7 @@ namespace gdjs {
      * before stepping the world.
      */
     _sharedData: gdjs.Physics3DSharedData;
+    collisionChecker: gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker;
 
     // TODO Should there be angle were the character can climb but will slip?
     _slopeMaxAngle: float;
@@ -121,6 +122,9 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
+      this.collisionChecker = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker(
+        this
+      );
 
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -180,6 +184,7 @@ namespace gdjs {
       behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
         this
       );
+      behavior.collisionChecker = this.collisionChecker;
       behavior.recreateBody();
 
       // Always begin in the direction of the object.
@@ -328,7 +333,9 @@ namespace gdjs {
       );
     }
 
-    onDeActivate() {}
+    onDeActivate() {
+      this.collisionChecker.clearContacts();
+    }
 
     onActivate() {}
 
@@ -498,6 +505,7 @@ namespace gdjs {
         shapeFilter,
         this._sharedData.jolt.GetTempAllocator()
       );
+      this.collisionChecker.updateContacts();
 
       if (this.isOnFloor()) {
         this._canJump = true;
@@ -1424,6 +1432,88 @@ namespace gdjs {
 
         // shapeHalfDepth may have changed, update the character position accordingly.
         this.updateCharacterPosition();
+      }
+    }
+
+    /**
+     * A character is simulated by Jolt before the rest of the physics simulation
+     * (see `doBeforePhysicsStep`).
+     * This means that contacts with the character would only rarely be recognized by
+     * the physics engine if using the default contact listeners.
+     * Instead, this class allows to properly track contacts of the character
+     * using Jolt `CharacterVirtual::GetActiveContacts`.
+     */
+    export class CharacterCollisionChecker
+      implements gdjs.Physics3DRuntimeBehavior.CollisionChecker {
+      characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
+
+      _currentContacts: Array<Physics3DRuntimeBehavior> = [];
+      _previousContacts: Array<Physics3DRuntimeBehavior> = [];
+
+      constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
+        this.characterBehavior = characterBehavior;
+      }
+
+      clearContacts(): void {
+        this._previousContacts.length = 0;
+        this._currentContacts.length = 0;
+      }
+
+      updateContacts(): void {
+        const swap = this._previousContacts;
+        this._previousContacts = this._currentContacts;
+        this._currentContacts = swap;
+        this._currentContacts.length = 0;
+
+        const { character, _sharedData } = this.characterBehavior;
+        if (!character) {
+          return;
+        }
+        const contacts = character.GetActiveContacts();
+        for (let index = 0; index < contacts.size(); index++) {
+          const contact = contacts.at(index);
+
+          const bodyLockInterface = _sharedData.physicsSystem.GetBodyLockInterface();
+          const body = bodyLockInterface.TryGetBody(contact.mBodyB);
+          const behavior = body.gdjsAssociatedBehavior;
+          if (behavior) {
+            this._currentContacts.push(behavior);
+          }
+        }
+      }
+
+      isColliding(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return this._currentContacts.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return (
+          this._currentContacts.some((behavior) => behavior.owner === object) &&
+          !this._previousContacts.some((behavior) => behavior.owner === object)
+        );
+      }
+
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return (
+          !this._currentContacts.some(
+            (behavior) => behavior.owner === object
+          ) &&
+          this._previousContacts.some((behavior) => behavior.owner === object)
+        );
       }
     }
   }

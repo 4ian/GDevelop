@@ -4,6 +4,15 @@ import optionalRequire from '../Utils/OptionalRequire';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+const excludedFiles = [
+  'global-three.d.ts',
+  'global-pixi.d.ts',
+  'pixi-particles-pixi-renderer.d.ts',
+  'pixi-tilemap.d.ts',
+  'pixi.js',
+  'three.js',
+];
+
 export const setupAutocompletions = (monaco: any) => {
   const importAllJsFilesFromFolder = (folderPath: string) =>
     fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
@@ -21,10 +30,46 @@ export const setupAutocompletions = (monaco: any) => {
           .isDirectory();
         if (
           (filename.endsWith('.ts') || filename.endsWith('.js')) &&
+          !excludedFiles.includes(filename) &&
           // Dialogue tree uses a folder called `bondage.js` that should not be read as a file.
           !isDirectory
         ) {
           const fullPath = path.join(folderPath, filename);
+          fs.readFile(fullPath, 'utf8', (fileError, content) => {
+            if (fileError) {
+              console.error(
+                `Unable to read ${fullPath} for setting up autocompletions:`,
+                fileError
+              );
+              return;
+            }
+
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+              content,
+              fullPath
+            );
+          });
+        }
+      });
+    });
+
+  const importAllJsFilesFromFolderRecursively = (folderPath: string) =>
+    fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
+      console.log('TEST');
+      if (error) {
+        console.error(
+          'Unable to read GDJS files for setting up autocompletions:',
+          error
+        );
+        return;
+      }
+
+      filenames.forEach(filename => {
+        const fullPath = path.join(folderPath, filename);
+        const isDirectory = fs.lstatSync(fullPath).isDirectory();
+        if (isDirectory) {
+          importAllJsFilesFromFolderRecursively(fullPath);
+        } else if (filename.endsWith('.ts') || filename.endsWith('.js')) {
           fs.readFile(fullPath, 'utf8', (fileError, content) => {
             if (fileError) {
               console.error(
@@ -66,6 +111,8 @@ export const setupAutocompletions = (monaco: any) => {
     );
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
+    const threeTypesPath = path.join(runtimePath, 'three');
+    const pixiTypesPath = path.join(runtimePath, 'pixi');
 
     importAllJsFilesFromFolder(runtimePath);
     importAllJsFilesFromFolder(runtimeTypesPath);
@@ -74,6 +121,54 @@ export const setupAutocompletions = (monaco: any) => {
     importAllJsFilesFromFolder(runtimeHowlerSoundManagerPath);
     importAllJsFilesFromFolder(runtimeFontfaceobserverFontManagerPath);
     importAllJsFilesFromFolder(eventToolsPath);
+    importAllJsFilesFromFolderRecursively(threeTypesPath);
+
+    importAllJsFilesFromFolderRecursively(pixiTypesPath);
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      `
+  import './mixin-cache-as-bitmap/lib';
+  import './mixin-get-child-by-name/lib';
+  import './mixin-get-global-position/lib';
+  export * from './accessibility/lib';
+  export * from './app/lib';
+  export * from './assets/lib';
+  export * from './color/lib';
+  export * from './compressed-textures/lib';
+  export * from './constant/lib';
+  export * from './core';
+  export * from './display/lib';
+  export * from './events/lib';
+  export * from './extensions/lib';
+  export * from './extract/lib';
+  export * from './filter-alpha/lib';
+  export * from './filter-blur/lib';
+  export * from './filter-color-matrix/lib';
+  export * from './filter-displacement/lib';
+  export * from './filter-fxaa/lib';
+  export * from './filter-noise/lib';
+  export * from './graphics/lib';
+  export * from './math/lib';
+  export * from './mesh/lib';
+  export * from './mesh-extras/lib';
+  export * from './particle-container/lib';
+  export * from './prepare/lib';
+  export * from './runner/lib';
+  export * from './settings/lib';
+  export * from './sprite/lib';
+  export * from './sprite-animated/lib';
+  export * from './sprite-tiling/lib';
+  export * from './spritesheet/lib';
+  export * from './text/lib';
+  export * from './text-bitmap/lib';
+  export * from './text-html/lib';
+  export * from './ticker/lib';
+  export * from './utils/lib';
+  
+  export as namespace PIXI;
+`,
+      path.join(pixiTypesPath, 'index.d.ts')
+    );
+
     fs.readdir(extensionsPath, (error: ?Error, folderNames: Array<string>) => {
       if (error) {
         console.error(

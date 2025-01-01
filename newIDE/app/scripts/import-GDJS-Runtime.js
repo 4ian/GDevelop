@@ -53,6 +53,7 @@ if (!args['skip-sources']) {
 
     const startTime = Date.now();
 
+    const pixiDestinationPath = path.join(destinationPath, 'Runtime-sources', 'pixi');
     // TODO: Investigate the use of a smart & faster sync
     // that only copy files with changed content.
     return Promise.all([
@@ -66,8 +67,31 @@ if (!args['skip-sources']) {
         path.join(destinationPath, 'Runtime-sources', 'Extensions'),
         { ...copyOptions, filter: ['**/*.js', '**/*.ts'] }
       ),
+      copy(
+        path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@types', 'three'),
+        path.join(destinationPath, 'Runtime-sources', 'three'),
+        { ...copyOptions, filter: ['*.d.ts'] }
+      ),
+      copy(
+        path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@types', 'three', 'src'),
+        path.join(destinationPath, 'Runtime-sources', 'three', 'src'),
+        { ...copyOptions, filter: ['**/*.d.ts'] }
+      ),
+      copy(
+        path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@pixi'),
+        pixiDestinationPath,
+        { ...copyOptions, filter: ['**/*.d.ts'] }
+      ),
     ])
       .then(function([unbundledResults, unbundledExtensionsResults]) {
+
+        shell.sed(
+          '-i',
+          'from \'@pixi((/\\w+)+)',
+          'from \'../..$1/lib',
+          pixiDestinationPath + '/*/lib/*.d.ts'
+        );
+
         const totalFilesCount =
           unbundledResults.length + unbundledExtensionsResults.length;
         const duration = Date.now() - startTime;

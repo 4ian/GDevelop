@@ -23,7 +23,6 @@ export type PreviewState = {|
 |};
 
 type PreviewDebuggerServerWatcherResults = {|
-  getInGameEditionPreviewStatus: () => DebuggerStatus | null,
   hasNonEditionPreviewsRunning: boolean,
 
   hotReloadLogs: Array<HotReloaderLog>,
@@ -91,7 +90,7 @@ export const usePreviewDebuggerServerWatcher = (
               [id]: {
                 isPaused: !!parsedMessage.payload.isPaused,
                 isInGameEdition: !!parsedMessage.payload.isInGameEdition,
-                currentSceneName: parsedMessage.payload.currentSceneName,
+                sceneName: parsedMessage.payload.sceneName,
               },
             }));
           }
@@ -125,24 +124,7 @@ export const usePreviewDebuggerServerWatcher = (
     key => !debuggerStatus[+key].isInGameEdition
   );
 
-  const getInGameEditionPreviewStatus = React.useCallback(
-    () => {
-      const inGameEditionPreviewKey = Object.keys(debuggerStatus).find(key => {
-        if (debuggerStatus[+key].isInGameEdition) {
-          return true;
-        }
-
-        return false;
-      });
-
-      if (!inGameEditionPreviewKey) return null;
-      return debuggerStatus[+inGameEditionPreviewKey];
-    },
-    [debuggerStatus]
-  );
-
   return {
-    getInGameEditionPreviewStatus,
     hasNonEditionPreviewsRunning,
     hotReloadLogs,
     clearHotReloadLogs,

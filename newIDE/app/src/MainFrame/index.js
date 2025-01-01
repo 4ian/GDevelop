@@ -412,7 +412,6 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
-    getInGameEditionPreviewStatus,
     hasNonEditionPreviewsRunning,
     hotReloadLogs,
     clearHotReloadLogs,
@@ -1813,44 +1812,20 @@ const MainFrame = (props: Props) => {
 
   const relaunchAndThenHardReloadAllPreviews = React.useCallback(
     async () => {
-      const runningInGameEditionPreviewStatus = getInGameEditionPreviewStatus();
-
-      // Note: this is an "approximation", as all previews will be relaunched with
-      // the same configuration, which could not be the case if there was a mix of
-      // in-game edition and non-in-game edition previews.
-      // To fix this, preview configuration (scene name, etc...) should be persisted
-      // for each preview, for example in the URL, so it survives to a reload.
-      if (runningInGameEditionPreviewStatus) {
-        console.info('Relaunching preview for in-game edition...');
-        await launchPreview({
-          networkPreview: false,
-          hotReload: false,
-          forceDiagnosticReport: false,
-          isForInGameEdition: {
-            forcedSceneName:
-              runningInGameEditionPreviewStatus.currentSceneName || '',
-            // TODO: add support for forced external layout name.
-            forcedExternalLayoutName: null,
-          },
-          numberOfWindows: 0,
-        });
-      } else if (hasNonEditionPreviewsRunning) {
-        console.info('Relaunching preview...');
-        await launchPreview({
-          networkPreview: false,
-          hotReload: false,
-          forceDiagnosticReport: false,
-          numberOfWindows: 0,
-        });
-      }
+      // Build a new preview (so that any changes in runtime files are picked up)
+      // and then ask all previews to "hard reload" themselves (i.e: refresh their page).
+      await launchPreview({
+        networkPreview: false,
+        hotReload: false,
+        forceDiagnosticReport: false,
+        numberOfWindows: 0,
+      });
 
       hardReloadAllPreviews();
     },
     [
       hardReloadAllPreviews,
       launchPreview,
-      getInGameEditionPreviewStatus,
-      hasNonEditionPreviewsRunning,
     ]
   );
 

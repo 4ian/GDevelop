@@ -63,15 +63,23 @@ export const EmbeddedGameFrame = ({
         const { sceneName, externalLayoutName } = options;
 
         if (!previewIndexHtmlLocation) {
-          console.info('Launching preview for embedded game.');
+          console.info(
+            externalLayoutName
+              ? `Launching in-game edition preview for external layout "${externalLayoutName}" (scene: "${sceneName}").`
+              : `Launching in-game edition preview for scene "${sceneName}".`
+          );
           onLaunchPreviewForInGameEdition({ sceneName, externalLayoutName });
         } else {
-          // TODO: handle external layouts (and custom objects later).
-          console.info(`Switching previews to scene "${sceneName}".`);
+          console.info(
+            externalLayoutName
+              ? `Switching in-game edition previews to external layout "${externalLayoutName}" (scene: "${sceneName}").`
+              : `Switching in-game edition previews to scene "${sceneName}".`
+          );
           previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
             previewDebuggerServer.sendMessage(debuggerId, {
-              command: 'requestSceneReplace',
+              command: 'switchForInGameEdition',
               sceneName,
+              externalLayoutName,
             });
           });
         }

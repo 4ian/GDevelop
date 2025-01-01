@@ -216,17 +216,30 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
   gd::ProjectStripper::StripProjectForExport(exportedProject);
-  exportedProject.SetFirstLayout(options.layoutName);
 
   previousTime = LogTimeSpent("Data stripping", previousTime);
 
   // Create the setup options passed to the gdjs.RuntimeGame
   gd::SerializerElement runtimeGameOptions;
   runtimeGameOptions.AddChild("isPreview").SetBoolValue(true);
-  if (!options.externalLayoutName.empty()) {
-    runtimeGameOptions.AddChild("injectExternalLayout")
-        .SetValue(options.externalLayoutName);
+
+  auto &initialRuntimeGameStatus =
+      runtimeGameOptions.AddChild("initialRuntimeGameStatus");
+  initialRuntimeGameStatus.AddChild("sceneName")
+      .SetStringValue(options.layoutName);
+  if (options.isInGameEdition) {
+    initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
   }
+  if (!options.externalLayoutName.empty()) {
+    initialRuntimeGameStatus.AddChild("injectedExternalLayoutName")
+        .SetValue(options.externalLayoutName);
+
+    if (options.isInGameEdition) {
+      initialRuntimeGameStatus.AddChild("skipCreatingInstancesFromScene")
+          .SetBoolValue(true);
+    }
+  }
+
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
   runtimeGameOptions.AddChild("nativeMobileApp")
@@ -239,9 +252,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.electronRemoteRequirePath);
   if (options.isDevelopmentEnvironment) {
     runtimeGameOptions.AddChild("environment").SetStringValue("dev");
-  }
-  if (options.isInGameEdition) {
-    runtimeGameOptions.AddChild("isInGameEdition").SetBoolValue(true);
   }
   if (!options.gdevelopResourceToken.empty()) {
     runtimeGameOptions.AddChild("gdevelopResourceToken")

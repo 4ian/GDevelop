@@ -121,10 +121,15 @@ namespace gdjs {
 
     /**
      * Load the runtime scene from the given scene.
-     * @param sceneData An object containing the scene data.
+     *
+     * @param sceneAndExtensionsData The data of the scene and extension variables to be loaded.
+     * @param options Options to change what is loaded.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+    loadFromScene(
+      sceneAndExtensionsData: SceneAndExtensionsData | null,
+      options?: { skipCreatingInstances?: boolean }
+    ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
@@ -184,14 +189,16 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      this.createObjectsFrom(
-        sceneData.instances,
-        0,
-        0,
-        0,
-        /*trackByPersistentUuid=*/
-        true
-      );
+      if (!options || !options.skipCreatingInstances) {
+        this.createObjectsFrom(
+          sceneData.instances,
+          0,
+          0,
+          0,
+          /*trackByPersistentUuid=*/
+          true
+        );
+      }
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();

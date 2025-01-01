@@ -68,7 +68,7 @@ export type DebuggerId = number;
 export type DebuggerStatus = {|
   isPaused: boolean,
   isInGameEdition: boolean,
-  currentSceneName: string | null,
+  sceneName: string | null,
 |};
 
 /** The callbacks for a debugger server used for previews. */

@@ -52,7 +52,11 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
-const electron = optionalRequire('electron');
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 
 export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
@@ -74,7 +78,7 @@ export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
   });
 
 const getNoProjectAlertMessage = () => {
-  if (!electron) {
+  if (!remote) {
     // Trying to open a local project from the web app of the mobile app.
     return t`Looks like your project isn't there!${'\n\n'}Your project must be stored on your computer.`;
   } else {
@@ -107,10 +111,8 @@ const styles = {
 };
 
 const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
-  if (!electron) return;
-  electron.shell.showItemInFolder(
-    path.resolve(file.fileMetadata.fileIdentifier)
-  );
+  if (!shell) return;
+  shell.showItemInFolder(path.resolve(file.fileMetadata.fileIdentifier));
 };
 
 const getFileNameWithoutExtensionFromPath = (path: string) => {

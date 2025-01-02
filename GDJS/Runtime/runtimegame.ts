@@ -371,11 +371,7 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
-<<<<<<< HEAD
     _isInGameEdition: boolean;
-=======
-    _isInGameEdition = true;
->>>>>>> Import changes to render without step
 
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
@@ -1146,8 +1142,12 @@ namespace gdjs {
               }
             }
 
-            if (this._paused && !this._isInGameEdition) {
-              // The game is paused, but not being edited, so we entirely skip any logic.
+            if (this._paused) {
+              this._editor.render();
+              // The game is paused for edition: the game loop continues to run,
+              // but the game logic is not executed.
+              this._sceneStack.renderWithoutStep();
+
               return true;
             }
 
@@ -1172,24 +1172,13 @@ namespace gdjs {
               this._notifyScenesForGameResolutionResize = false;
             }
 
-            if (this._paused && this._isInGameEdition) {
-              // The game is paused for edition: the game loop continues to run,
-              // but the game logic is not executed.
-              this._sceneStack.renderWithoutStep();
-<<<<<<< HEAD
-=======
-              this._editor.render();
->>>>>>> Import changes to render without step
+            // Render and step the scene.
+            if (this._sceneStack.step(elapsedTime)) {
+              this.getInputManager().onFrameEnded();
+              this._hasJustResumed = false;
               return true;
-            } else {
-              // Render and step the scene.
-              if (this._sceneStack.step(elapsedTime)) {
-                this.getInputManager().onFrameEnded();
-                this._hasJustResumed = false;
-                return true;
-              }
-              return false;
             }
+            return false;
           } catch (e) {
             if (this._debuggerClient)
               this._debuggerClient.onUncaughtException(e);

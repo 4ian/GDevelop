@@ -1535,6 +1535,15 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'stairHeightMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('stairHeightMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'shouldBindObjectAndForwardAngle') {
           behaviorContent
             .getChild('shouldBindObjectAndForwardAngle')
@@ -1703,6 +1712,24 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        if (!behaviorContent.hasChild('stairHeightMax')) {
+          behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
+        }
+        behaviorProperties
+          .getOrCreate('stairHeightMax')
+          .setLabel('Max. stair height')
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('stairHeightMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
           .setLabel('Keep object angle and forward direction the same')
@@ -1734,6 +1761,7 @@ module.exports = {
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
+        behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
         behaviorContent
           .addChild('shouldBindObjectAndForwardAngle')
           .setBoolValue(true);

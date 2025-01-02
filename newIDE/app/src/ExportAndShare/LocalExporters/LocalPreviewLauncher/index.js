@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import LocalFileSystem from '../LocalFileSystem';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { timeFunction } from '../../../Utils/TimeFunction';
 import { findGDJS } from '../../../GameEngineFinder/LocalGDJSFinder';
 import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';

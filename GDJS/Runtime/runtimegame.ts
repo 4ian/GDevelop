@@ -167,6 +167,7 @@ namespace gdjs {
       camera: THREE.Camera;
       scene: THREE.Scene;
     } | null = null;
+    _editionAbortController: AbortController = new AbortController();
     _clearCurrentPasses: (() => void)[] = [];
     _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
 
@@ -208,7 +209,8 @@ namespace gdjs {
           );
         } else {
           if (this._currentTransformControls) {
-            this._currentTransformControls.dispose();
+            this._currentTransformControls.detach();
+            this._currentTransformControls = null;
           }
           this._currentTransformControls = new THREE_ADDONS.TransformControls(
             this._selectedObjectData.camera,
@@ -224,18 +226,26 @@ namespace gdjs {
 
     setupListeners() {
       const canvas = this._game.getRenderer().getCanvas();
-      canvas?.addEventListener('pointermove', this.onPointerMove.bind(this));
-      canvas?.addEventListener('click', this.selectObject.bind(this));
+      this._editionAbortController = new AbortController();
+      canvas?.addEventListener('pointermove', this.onPointerMove.bind(this), {
+        signal: this._editionAbortController.signal,
+      });
+      canvas?.addEventListener('click', this.selectObject.bind(this), {
+        signal: this._editionAbortController.signal,
+      });
     }
     cleanListeners() {
-      const canvas = this._game.getRenderer().getCanvas();
-
-      canvas?.removeEventListener('pointermove', this.onPointerMove.bind(this));
-      canvas?.removeEventListener('click', this.selectObject.bind(this));
+      this._editionAbortController.abort();
     }
     activate(enable: boolean) {
       if (enable) this.setupListeners();
-      else this.cleanListeners();
+      else {
+        this.cleanListeners();
+        if (this._currentTransformControls) {
+          this._currentTransformControls.detach();
+          this._currentTransformControls = null;
+        }
+      }
     }
 
     getFirstIntersectsOnEachLayer(highlightObject: boolean) {

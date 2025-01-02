@@ -236,11 +236,13 @@ const Physics2Editor = (props: Props) => {
             value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
             floatingLabelText={
-              shape === 'Circle'
-                ? 'Radius'
-                : shape === 'Edge'
-                ? 'Length'
-                : 'Width'
+              shape === 'Circle' ? (
+                <Trans>Radius</Trans>
+              ) : shape === 'Edge' ? (
+                <Trans>Length</Trans>
+              ) : (
+                <Trans>Width</Trans>
+              )
             }
             min={0}
             onChange={newValue =>
@@ -257,7 +259,9 @@ const Physics2Editor = (props: Props) => {
             fullWidth
             value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
-            floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
+            floatingLabelText={
+              shape === 'Edge' ? <Trans>Angle</Trans> : <Trans>Height</Trans>
+            }
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionB', newValue)

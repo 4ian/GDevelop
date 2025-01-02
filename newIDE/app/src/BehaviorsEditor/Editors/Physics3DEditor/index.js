@@ -179,7 +179,9 @@ const Physics3DEditor = (props: Props) => {
           fullWidth
           value={properties.get('shapeDimensionA').getValue()}
           key={'shapeDimensionA'}
-          floatingLabelText={shape === 'Box' ? 'Width' : 'Radius'}
+          floatingLabelText={
+            shape === 'Box' ? <Trans>Width</Trans> : <Trans>Radius</Trans>
+          }
           min={0}
           onChange={newValue =>
             updateBehaviorProperty('shapeDimensionA', newValue)
@@ -194,7 +196,9 @@ const Physics3DEditor = (props: Props) => {
             fullWidth
             value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
-            floatingLabelText={shape === 'Box' ? 'Width' : 'Depth'}
+            floatingLabelText={
+              shape === 'Box' ? <Trans>Height</Trans> : <Trans>Depth</Trans>
+            }
             min={0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionB', newValue)
@@ -210,7 +214,7 @@ const Physics3DEditor = (props: Props) => {
             fullWidth
             value={properties.get('shapeDimensionC').getValue()}
             key={'shapeDimensionC'}
-            floatingLabelText={'Depth'}
+            floatingLabelText={<Trans>Depth</Trans>}
             min={0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionC', newValue)

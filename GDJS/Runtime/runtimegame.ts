@@ -196,31 +196,29 @@ namespace gdjs {
         }
       }
       if (!closestIntersect) return;
-      this._selectedObjectData = closestIntersect;
-      if (this._selectedObjectData) {
-        if (
-          this._currentTransformControls &&
-          this._currentTransformControls.camera ===
-            this._selectedObjectData.camera
-        ) {
+
+      if (
+        this._currentTransformControls &&
+        this._currentTransformControls.camera === closestIntersect.camera
+      ) {
+        this._currentTransformControls.detach();
+        this._currentTransformControls.attach(
+          closestIntersect.intersect.object
+        );
+      } else {
+        if (this._currentTransformControls) {
           this._currentTransformControls.detach();
-          this._currentTransformControls.attach(
-            this._selectedObjectData.intersect.object
-          );
-        } else {
-          if (this._currentTransformControls) {
-            this._currentTransformControls.detach();
-            this._currentTransformControls = null;
-          }
-          this._currentTransformControls = new THREE_ADDONS.TransformControls(
-            this._selectedObjectData.camera,
-            this._game.getRenderer().getCanvas() || undefined
-          );
-          this._currentTransformControls.attach(
-            this._selectedObjectData.intersect.object
-          );
-          this._selectedObjectData.scene.add(this._currentTransformControls);
+          this._currentTransformControls = null;
         }
+        this._currentTransformControls = new THREE_ADDONS.TransformControls(
+          closestIntersect.camera,
+          this._game.getRenderer().getCanvas() || undefined
+        );
+        this._currentTransformControls.scale.y = 1
+        this._currentTransformControls.attach(
+          closestIntersect.intersect.object
+        );
+        closestIntersect.scene.add(this._currentTransformControls);
       }
     }
 
@@ -282,7 +280,16 @@ namespace gdjs {
         raycaster.setFromCamera(this._pointer, threeCamera);
         const intersects = raycaster.intersectObjects(threeScene.children);
 
-        const firstIntersect = intersects[0];
+        const firstIntersect = intersects.filter((intersect) => {
+          let isObjectChildOfTransformControls = false;
+          intersect.object.traverseAncestors((ancestor) => {
+            if (ancestor === this._currentTransformControls) {
+              isObjectChildOfTransformControls = true;
+            }
+          });
+          return !isObjectChildOfTransformControls;
+        })[0];
+
         if (firstIntersect && highlightObject) {
           const outlinePass = new THREE_ADDONS.OutlinePass(
             resolution,

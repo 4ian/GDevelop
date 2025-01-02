@@ -23,10 +23,12 @@ import {
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
-const shell = electron ? electron.shell : null;
+const shell = remote ? remote.shell : null;
 
 const gd: libGDevelop = global.gd;
 

@@ -30,6 +30,7 @@ const gd: libGDevelop = global.gd;
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
 const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 const styles = {
   container: {
@@ -208,8 +209,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   openProjectFolder = () => {
-    if (remote)
-      remote.shell.openPath(path.dirname(this.props.project.getProjectFile()));
+    if (shell)
+      shell.openPath(path.dirname(this.props.project.getProjectFile()));
   };
 
   toggleProperties = () => {

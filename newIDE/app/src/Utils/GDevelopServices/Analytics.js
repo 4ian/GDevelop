@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { GDevelopAnalyticsApi } from './ApiConfigs';
 
-export type GameMetrics = {
+export type GameMetrics = {|
   date: string,
 
   sessions: ?{
@@ -43,7 +43,7 @@ export type GameMetrics = {
     /** Day 7 retained players (number of players who played this day, and were new players 7 days earlier). */
     d7RetainedPlayers: number,
   },
-};
+|};
 
 export const client = axios.create({
   baseURL: GDevelopAnalyticsApi.baseUrl,

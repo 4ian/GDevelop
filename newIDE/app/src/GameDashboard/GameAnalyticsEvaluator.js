@@ -7,13 +7,31 @@ import {
   addDays,
 } from 'date-fns';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
+import {
+  type GameAdEarning,
+  type Usage,
+} from '../Utils/GDevelopServices/Usage';
 
-export type MergedGameMetrics = GameMetrics & {
+export type MergedGameMetrics = {|
+  ...GameMetrics,
   /**
    * The start date is not defined when only one day is merged.
    */
   startDate: string | null,
-};
+|};
+
+export type MergedGameAdEarnings = {|
+  ...GameAdEarning,
+  /**
+   * The start date is not defined when only one day is merged.
+   */
+  startDate: string | null,
+|};
+
+export type CashOuts = {|
+  date: string,
+  amountInCredits: number,
+|};
 
 /**
  * It's divisible by 7.
@@ -46,6 +64,8 @@ export type ChartData = {|
       playersPercent: number,
       durationInMinutes: number,
     |},
+
+    totalEarningsInUSDs: number,
   |},
   /**
    * Metrics for each day of a month or each week of a year.
@@ -92,6 +112,14 @@ export type ChartData = {|
    * A funnel of the remaining players after a given played duration.
    */
   overPlayedDuration: {| duration: number, playersCount: number |}[],
+  /**
+   * Accumulated earnings from ads each day.
+   */
+  adsEarnings: {|
+    date: string,
+    accumulatedEarningsInCredits: number,
+    accumulatedEarningsInUSDs: number,
+  |}[],
 |};
 
 const emptyChartData: ChartData = {
@@ -110,9 +138,11 @@ const emptyChartData: ChartData = {
       playersPercent: 0,
       durationInMinutes: 0,
     },
+    totalEarningsInUSDs: 0,
   },
   overTime: [],
   overPlayedDuration: [],
+  adsEarnings: [],
 };
 
 const durationIndexes: { [string]: number } = {
@@ -124,9 +154,9 @@ const durationIndexes: { [string]: number } = {
 };
 export const durationValues = [1, 3, 5, 10, 15];
 
-const createZeroesMetric = (date: Date): GameMetrics => {
+const createZeroesGameMetric = (date: Date): GameMetrics => {
   return {
-    date: formatISO(date),
+    date: formatISO(date, { representation: 'date' }),
 
     sessions: {
       d0Sessions: 0,
@@ -150,10 +180,15 @@ const createZeroesMetric = (date: Date): GameMetrics => {
  * @param gameMetrics concise game metrics from the backend (today first)
  * @returns game metrics with a metric for each 364 past days (today first).
  */
-const fillMissingDays = (
+const fillMissingGameMetricsDays = ({
+  gameMetrics,
+  todayDate,
+  totalDays,
+}: {
   gameMetrics: Array<GameMetrics>,
-  todayDate: Date
-): Array<GameMetrics> => {
+  todayDate: Date,
+  totalDays: number,
+}): Array<GameMetrics> => {
   const filledGameMetrics = [];
   // TODO In some timezones, it might start the wrong day.
   let previousMetricDate = addDays(todayDate, 1);
@@ -164,19 +199,75 @@ const fillMissingDays = (
       differenceInCalendarDays(parseISO(metric.date), previousMetricDate) < -1
     ) {
       const addedMetricDate = subDays(previousMetricDate, 1);
-      filledGameMetrics.push(createZeroesMetric(addedMetricDate));
+      filledGameMetrics.push(createZeroesGameMetric(addedMetricDate));
       previousMetricDate = addedMetricDate;
     }
     filledGameMetrics.push(metric);
     previousMetricDate = metricDate;
   }
-  // Fill to one year
-  while (filledGameMetrics.length < daysShownForYear) {
+  // Fill to total days
+  while (filledGameMetrics.length < totalDays) {
     const addedMetricDate = subDays(previousMetricDate, 1);
-    filledGameMetrics.push(createZeroesMetric(addedMetricDate));
+    filledGameMetrics.push(createZeroesGameMetric(addedMetricDate));
     previousMetricDate = addedMetricDate;
   }
   return filledGameMetrics;
+};
+
+const createZeroesGameAdEarning = (
+  gameId: string,
+  date: Date
+): GameAdEarning => {
+  return {
+    gameId,
+    date: formatISO(date, { representation: 'date' }),
+    adEarningsInCredits: 0,
+    adEarningsInMilliUSDs: 0,
+    updatedAt: date.getTime(),
+  };
+};
+
+const fillMissingGameAdEarningsDays = ({
+  gameAdEarnings,
+  todayDate,
+  totalDays,
+  gameId,
+}: {
+  gameAdEarnings: Array<GameAdEarning>,
+  todayDate: Date,
+  totalDays: number,
+  gameId: string,
+}): Array<GameAdEarning> => {
+  const filledGameAdEarnings = [];
+  let previousEarningDate = addDays(todayDate, 1);
+  for (const earning of gameAdEarnings) {
+    const earningDate = parseISO(earning.date);
+    // Fill holes
+    while (
+      differenceInCalendarDays(parseISO(earning.date), previousEarningDate) < -1
+    ) {
+      const addedEarningDate = subDays(previousEarningDate, 1);
+      filledGameAdEarnings.push(
+        createZeroesGameAdEarning(gameId, addedEarningDate)
+      );
+      previousEarningDate = addedEarningDate;
+    }
+    filledGameAdEarnings.push(earning);
+    previousEarningDate = earningDate;
+  }
+
+  // Fill to total days
+  while (filledGameAdEarnings.length < totalDays) {
+    const addedEarningDate = subDays(previousEarningDate, 1);
+    filledGameAdEarnings.push(
+      createZeroesGameAdEarning(gameId, addedEarningDate)
+    );
+    previousEarningDate = addedEarningDate;
+  }
+
+  console.log('filledGameAdEarnings', filledGameAdEarnings);
+
+  return filledGameAdEarnings;
 };
 
 /**
@@ -192,8 +283,8 @@ const fillMissingDays = (
  * @returns the sum for each metric or `undefined` when one side is `undefined`
  */
 const mergeGameMetrics = (
-  a: GameMetrics,
-  b: GameMetrics
+  a: GameMetrics | MergedGameMetrics,
+  b: GameMetrics | MergedGameMetrics
 ): MergedGameMetrics => {
   return {
     date: a.date,
@@ -267,6 +358,44 @@ const mergeGameMetricsByWeek = (
     mergedGameMetrics.push(((mergedGameMetric: any): MergedGameMetrics));
   }
   return mergedGameMetrics;
+};
+
+const mergeGameAdEarnings = (
+  a: GameAdEarning | MergedGameAdEarnings,
+  b: GameAdEarning | MergedGameAdEarnings
+): MergedGameAdEarnings => {
+  return {
+    date: a.date,
+    startDate: b.date,
+
+    gameId: a.gameId,
+    adEarningsInCredits: a.adEarningsInCredits + b.adEarningsInCredits,
+    adEarningsInMilliUSDs: a.adEarningsInMilliUSDs + b.adEarningsInMilliUSDs,
+    updatedAt: a.updatedAt,
+  };
+};
+
+const mergeGameAdEarningsByWeek = (
+  gameAdEarnings: GameAdEarning[]
+): MergedGameAdEarnings[] => {
+  const mergedGameAdEarnings: Array<MergedGameAdEarnings> = [];
+  for (let weekIndex = 0; weekIndex < gameAdEarnings.length; weekIndex += 7) {
+    let mergedGameAdEarning = gameAdEarnings[weekIndex];
+    for (
+      let index = weekIndex + 1;
+      index < weekIndex + 7 && index < gameAdEarnings.length;
+      index++
+    ) {
+      mergedGameAdEarning = mergeGameAdEarnings(
+        mergedGameAdEarning,
+        gameAdEarnings[index]
+      );
+    }
+    mergedGameAdEarnings.push(
+      ((mergedGameAdEarning: any): MergedGameAdEarnings)
+    );
+  }
+  return mergedGameAdEarnings;
 };
 
 /**
@@ -350,13 +479,36 @@ const subtract = (a: ?number, b: ?number): number => {
  * @returns enriched game metrics that are ready to be used in a chart
  * (today first).
  */
-const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
+const evaluateChartData = ({
+  allMergedGameMetrics,
+  allMergedGameAdEarnings,
+  cashOuts,
+  period,
+}: {
+  allMergedGameMetrics: MergedGameMetrics[],
+  allMergedGameAdEarnings: MergedGameAdEarnings[],
+  cashOuts: CashOuts[],
+  period: 'week' | 'month' | 'year',
+}): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
   let onlyFullyDefinedPlayersSum = 0;
   let playedDurationSumInMinutes = 0;
 
-  metrics.forEach(metric => {
+  const numberOfItemsInPeriod =
+    period === 'week'
+      ? 7
+      : period === 'month'
+      ? 30
+      : // merged by week
+        52;
+
+  const gameMetricsForPeriod = allMergedGameMetrics.slice(
+    0,
+    numberOfItemsInPeriod
+  );
+
+  gameMetricsForPeriod.forEach(metric => {
     const d0SessionsDurationTotal =
       metric.sessions && metric.sessions.d0SessionsDurationTotal !== null
         ? metric.sessions.d0SessionsDurationTotal
@@ -412,9 +564,9 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   const dateFormatOptions = { month: 'short', day: 'numeric' };
   const noMonthDateFormatOptions = { day: 'numeric' };
 
-  const formatDate = (metric: MergedGameMetrics) => {
-    const startIsoDate = metric.startDate;
-    const endDate = parseISO(metric.date);
+  const formatDate = (chartItem: MergedGameMetrics | MergedGameAdEarnings) => {
+    const startIsoDate = chartItem.startDate;
+    const endDate = parseISO(chartItem.date);
     const formattedDate = endDate.toLocaleDateString(
       undefined,
       dateFormatOptions
@@ -434,6 +586,56 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
       formattedDate
     );
   };
+
+  const sortedGameAdEarnings = allMergedGameAdEarnings.sort(
+    (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
+  );
+  console.log('sortedGameAdEarnings', sortedGameAdEarnings);
+  let accumulatedEarningsInCredits = 0;
+  let accumulatedEarningsInMilliUSDs = 0;
+  const sortedAndAccumulatedGameAdEarnings = sortedGameAdEarnings
+    .map((earning, index) => {
+      let accumulatedEarningsInCreditsToThatDay =
+        earning.adEarningsInCredits + accumulatedEarningsInCredits;
+      let accumulatedEarningsInMilliUSDsToThatDay =
+        earning.adEarningsInMilliUSDs + accumulatedEarningsInMilliUSDs;
+
+      const cashOutsOnThatPeriod = cashOuts.filter(
+        cashOut =>
+          cashOut.date === earning.date ||
+          (!!earning.startDate &&
+            cashOut.date >= earning.startDate &&
+            cashOut.date <= earning.date)
+      );
+      if (cashOutsOnThatPeriod.length) {
+        cashOutsOnThatPeriod.forEach(cashOut => {
+          console.log(accumulatedEarningsInCreditsToThatDay);
+          const estimatedCreditToMilliUSDsRatio =
+            accumulatedEarningsInMilliUSDsToThatDay /
+            accumulatedEarningsInCreditsToThatDay;
+          const cashOutInMilliUSDs = Math.floor(
+            cashOut.amountInCredits * estimatedCreditToMilliUSDsRatio
+          );
+
+          accumulatedEarningsInCreditsToThatDay -= cashOut.amountInCredits;
+          accumulatedEarningsInMilliUSDsToThatDay -= cashOutInMilliUSDs;
+          console.log(
+            cashOut,
+            estimatedCreditToMilliUSDsRatio,
+            cashOutInMilliUSDs
+          );
+        });
+      }
+      accumulatedEarningsInCredits = accumulatedEarningsInCreditsToThatDay;
+      accumulatedEarningsInMilliUSDs = accumulatedEarningsInMilliUSDsToThatDay;
+      return {
+        date: formatDate(earning),
+        accumulatedEarningsInCredits: accumulatedEarningsInCreditsToThatDay,
+        accumulatedEarningsInUSDs:
+          Math.floor(accumulatedEarningsInMilliUSDsToThatDay / 10) / 100,
+      };
+    })
+    .slice(allMergedGameAdEarnings.length - numberOfItemsInPeriod);
 
   return {
     overview: {
@@ -470,8 +672,10 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
             : 0,
         durationInMinutes: durationValues[greaterDurationPlayerIndex],
       },
+      totalEarningsInUSDs:
+        Math.floor(accumulatedEarningsInMilliUSDs / 10) / 100,
     },
-    overTime: metrics
+    overTime: gameMetricsForPeriod
       .map(metric => {
         const d0SessionsDurationTotal =
           metric.sessions && metric.sessions.d0SessionsDurationTotal !== null
@@ -609,6 +813,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
         };
       })
     ),
+    adsEarnings: sortedAndAccumulatedGameAdEarnings,
   };
 };
 
@@ -617,55 +822,87 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
  * @returns enriched game metrics that are ready to be used in a chart
  * (today at last).
  */
-export const buildChartData = (
+export const buildChartData = ({
+  gameId,
+  gameMetrics,
+  gameAdEarnings,
+  usages,
+  todayDate = new Date(),
+}: {
+  gameId: string,
   gameMetrics: ?Array<GameMetrics>,
-  todayDate: Date = new Date()
-): { yearChartData: ChartData, monthChartData: ChartData } => {
-  if (!gameMetrics) {
+  gameAdEarnings: ?Array<GameAdEarning>,
+  usages: ?Array<Usage>,
+  todayDate?: Date,
+}): {|
+  yearChartData: ChartData,
+  monthChartData: ChartData,
+  weekChartData: ChartData,
+|} => {
+  if (!gameMetrics || !gameAdEarnings || !usages) {
     return {
       yearChartData: emptyChartData,
       monthChartData: emptyChartData,
+      weekChartData: emptyChartData,
     };
   }
-  const filledGameRollingMetrics = fillMissingDays(
-    gameMetrics.sort(
-      (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
-    ),
-    todayDate
-  );
-  return {
-    yearChartData: evaluateChartData(
-      mergeGameMetricsByWeek(filledGameRollingMetrics)
-    ),
-    monthChartData: evaluateChartData(
-      filledGameRollingMetrics
-        .slice(0, 30)
-        .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
-    ),
-  };
-};
 
-/**
- * @param gameMetrics concise game metrics from the backend (today first)
- * @returns enriched game metrics that are ready to be used in a chart
- * (today at last).
- */
-export const buildLastWeekChartData = (
-  gameMetrics: ?Array<GameMetrics>,
-  todayDate: Date = new Date()
-): ChartData => {
-  if (!gameMetrics) {
-    return emptyChartData;
-  }
-  const filledGameRollingMetrics = fillMissingDays(
-    gameMetrics.sort(
+  const filledGameMetrics = fillMissingGameMetricsDays({
+    gameMetrics: gameMetrics.sort(
       (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
     ),
-    todayDate
+    todayDate,
+    totalDays: daysShownForYear,
+  });
+  const filledGameAdEarnings = fillMissingGameAdEarningsDays({
+    gameAdEarnings: gameAdEarnings.sort(
+      (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
+    ),
+    todayDate,
+    totalDays: daysShownForYear,
+    gameId,
+  });
+  const gameMetricsMergedByWeek = mergeGameMetricsByWeek(filledGameMetrics);
+  const gameAdEarningsMergedByWeek = mergeGameAdEarningsByWeek(
+    filledGameAdEarnings
   );
-  return evaluateChartData(
-    filledGameRollingMetrics
-      .slice(0, 7)
-      .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
+
+  const gameMetricsMergedByDay: MergedGameMetrics[] = filledGameMetrics.map(
+    metric => ({ ...metric, startDate: null })
   );
+  const gameAdEarningsMergedByDay: MergedGameAdEarnings[] = filledGameAdEarnings.map(
+    earning => ({ ...earning, startDate: null })
+  );
+
+  const cashOuts = usages
+    .filter(
+      usage =>
+        usage.type === 'change-balance' &&
+        usage.description === 'Cash out of game earnings'
+    )
+    .map(usage => ({
+      date: formatISO(usage.createdAt, { representation: 'date' }),
+      amountInCredits: -(usage.creditsPaid || 0),
+    }));
+
+  return {
+    yearChartData: evaluateChartData({
+      allMergedGameMetrics: gameMetricsMergedByWeek,
+      allMergedGameAdEarnings: gameAdEarningsMergedByWeek,
+      cashOuts,
+      period: 'year',
+    }),
+    monthChartData: evaluateChartData({
+      allMergedGameMetrics: gameMetricsMergedByDay,
+      allMergedGameAdEarnings: gameAdEarningsMergedByDay,
+      cashOuts,
+      period: 'month',
+    }),
+    weekChartData: evaluateChartData({
+      allMergedGameMetrics: gameMetricsMergedByDay,
+      allMergedGameAdEarnings: gameAdEarningsMergedByDay,
+      cashOuts,
+      period: 'week',
+    }),
+  };
 };

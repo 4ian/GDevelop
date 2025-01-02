@@ -798,7 +798,6 @@ namespace gdjs {
     setStairHeightMax(stairHeightMax: float): void {
       const { extendedUpdateSettings } = this.getPhysics3D();
       this._stairHeightMax = stairHeightMax;
-      console.log(stairHeightMax);
       const walkStairsStepUp = stairHeightMax * this._sharedData.worldInvScale;
       extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(
         0,
@@ -806,6 +805,7 @@ namespace gdjs {
         walkStairsStepUp
       );
       // Use default values proportionally;
+      // "The factors are arbitrary but works well when tested in a game."
       extendedUpdateSettings.mWalkStairsMinStepForward =
         (0.02 / 0.4) * walkStairsStepUp;
       extendedUpdateSettings.mWalkStairsStepForwardTest =

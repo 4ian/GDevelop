@@ -435,7 +435,8 @@ const GameDashboardCard = ({
             { type: 'separator' },
             {
               label: i18n._(t`See all in the game dashboard`),
-              click: () => onOpenGameManager({ game }),
+              click: () =>
+                onOpenGameManager({ game, widgetToScrollTo: 'projects' }),
             },
           ]
         );

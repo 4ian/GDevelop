@@ -170,6 +170,7 @@ namespace gdjs {
     _editionAbortController: AbortController = new AbortController();
     _clearCurrentPasses: (() => void)[] = [];
     _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
+    _shouldIgnoreNextClick: boolean = false;
 
     constructor(game: RuntimeGame) {
       this._game = game;
@@ -184,6 +185,10 @@ namespace gdjs {
     }
 
     selectObject() {
+      if (this._shouldIgnoreNextClick) {
+        this._shouldIgnoreNextClick = false;
+        return;
+      }
       const firstIntersectsByLayer = this.getFirstIntersectsOnEachLayer(false);
       if (!firstIntersectsByLayer) return;
       let closestIntersect;
@@ -214,7 +219,10 @@ namespace gdjs {
           closestIntersect.camera,
           this._game.getRenderer().getCanvas() || undefined
         );
-        this._currentTransformControls.scale.y = 1
+        this._currentTransformControls.addEventListener('mouseDown', () => {
+          this._shouldIgnoreNextClick = true;
+        });
+        this._currentTransformControls.scale.y = -1;
         this._currentTransformControls.attach(
           closestIntersect.intersect.object
         );
@@ -290,7 +298,14 @@ namespace gdjs {
           return !isObjectChildOfTransformControls;
         })[0];
 
-        if (firstIntersect && highlightObject) {
+        if (
+          firstIntersect &&
+          highlightObject &&
+          (!this._currentTransformControls ||
+            !this._currentTransformControls.dragging)
+        ) {
+          // TODO: OutlinePass currently wrongly highlights the transform controls helper.
+          // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
           const outlinePass = new THREE_ADDONS.OutlinePass(
             resolution,
             threeScene,

@@ -142,7 +142,7 @@ export default function EventsBasedObjectEditor({
         />
       )}
       <Checkbox
-        label={<Trans>Private</Trans>}
+        label={<Trans>Private (can only be used inside the extension)</Trans>}
         checked={eventsBasedObject.isPrivate()}
         onCheck={(e, checked) => {
           eventsBasedObject.setPrivate(checked);

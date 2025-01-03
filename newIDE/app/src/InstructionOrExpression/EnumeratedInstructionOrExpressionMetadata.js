@@ -72,9 +72,14 @@ const isFunctionVisibleInGivenScope = (
 ): boolean => {
   const {
     behaviorMetadata,
+    objectMetadata,
     extension,
   } = enumeratedInstructionOrExpressionMetadata.scope;
-  const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
+  const {
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunctionsExtension,
+  } = scope;
 
   return !!(
     ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&
@@ -85,10 +90,11 @@ const isFunctionVisibleInGivenScope = (
         scope.eventsFunction &&
         scope.eventsFunction.isAsync()) ||
       (enumeratedInstructionOrExpressionMetadata.isRelevantForCustomObjectEvents &&
-        scope.eventsBasedObject)) &&
+        eventsBasedObject)) &&
     // Check visibility.
     ((!enumeratedInstructionOrExpressionMetadata.isPrivate &&
-      (!behaviorMetadata || !behaviorMetadata.isPrivate())) ||
+      (!behaviorMetadata || !behaviorMetadata.isPrivate()) &&
+      (!objectMetadata || !objectMetadata.isPrivate())) ||
       // The instruction or expression is marked as "private":
       // we now compare its scope (where it was declared) and the current scope
       // (where we are) to see if we should filter it or not.
@@ -101,12 +107,19 @@ const isFunctionVisibleInGivenScope = (
           eventsFunctionsExtension.getName(),
           eventsBasedBehavior.getName()
         ) === behaviorMetadata.getName()) ||
+      (objectMetadata &&
+        eventsBasedObject &&
+        eventsFunctionsExtension &&
+        gd.PlatformExtension.getObjectFullType(
+          eventsFunctionsExtension.getName(),
+          eventsBasedObject.getName()
+        ) === objectMetadata.getName()) ||
       // When editing the extension...
       (eventsFunctionsExtension &&
         eventsFunctionsExtension.getName() === extension.getName() &&
         // ...show public functions of a private behavior
         (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
           // ...show private non-behavior functions
-          !behaviorMetadata)))
+          (!behaviorMetadata && !objectMetadata))))
   );
 };

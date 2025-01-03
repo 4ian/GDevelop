@@ -1543,6 +1543,8 @@ export class ObjectMetadata extends EmscriptenObject {
   getDefaultBehaviors(): SetString;
   hasDefaultBehavior(behaviorType: string): boolean;
   addDefaultBehavior(behaviorType: string): ObjectMetadata;
+  isPrivate(): boolean;
+  setPrivate(): ObjectMetadata;
   setHidden(): ObjectMetadata;
   isHidden(): boolean;
   markAsRenderedIn3D(): ObjectMetadata;
@@ -2172,22 +2174,22 @@ export class EventsFunctionsContainer extends EmscriptenObject {
 export class AbstractEventsBasedEntity extends EmscriptenObject {
   getEventsFunctions(): EventsFunctionsContainer;
   getPropertyDescriptors(): PropertiesContainer;
+  getName(): string;
+  getFullName(): string;
+  getDescription(): string;
+  isPrivate(): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   constructor();
-  setDescription(description: string): EventsBasedBehavior;
-  getDescription(): string;
   setName(name: string): EventsBasedBehavior;
-  getName(): string;
   setFullName(fullName: string): EventsBasedBehavior;
-  getFullName(): string;
+  setDescription(description: string): EventsBasedBehavior;
+  setPrivate(isPrivate: boolean): EventsBasedBehavior;
   setObjectType(fullName: string): EventsBasedBehavior;
   getObjectType(): string;
-  setPrivate(isPrivate: boolean): EventsBasedBehavior;
-  isPrivate(): boolean;
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
@@ -2217,12 +2219,10 @@ export class EventsBasedBehaviorsList extends EmscriptenObject {
 
 export class EventsBasedObject extends AbstractEventsBasedEntity {
   constructor();
-  setDescription(description: string): EventsBasedObject;
-  getDescription(): string;
   setName(name: string): EventsBasedObject;
-  getName(): string;
   setFullName(fullName: string): EventsBasedObject;
-  getFullName(): string;
+  setDescription(description: string): EventsBasedObject;
+  setPrivate(isPrivate: boolean): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
   getDefaultName(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;

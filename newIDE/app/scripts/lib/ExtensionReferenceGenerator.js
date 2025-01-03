@@ -403,6 +403,9 @@ const generateExtensionReference = extension => {
   /** @type {Array<ObjectReference>} */
   let objectReferences = objectTypes.map(objectType => {
     const objectMetadata = extension.getObjectMetadata(objectType);
+    if (objectMetadata.isPrivate()) {
+      return null;
+    }
     const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
       areConditions: false,
       instructionsMetadata: extension.getAllActionsForObject(objectType),

@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EVENTSBASEDBEHAVIOR_H
-#define GDCORE_EVENTSBASEDBEHAVIOR_H
+#pragma once
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
@@ -75,17 +74,11 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   }
 
   /**
-   * \brief Check if the behavior is private - it can't be used outside of its
+   * \brief Set that the behavior or object is private - it can't be used outside of its
    * extension.
    */
-  bool IsPrivate() const { return isPrivate; }
-
-  /**
-   * \brief Set that the behavior is private - it can't be used outside of its
-   * extension.
-   */
-  EventsBasedBehavior& SetPrivate(bool _isPrivate) {
-    isPrivate = _isPrivate;
+  EventsBasedBehavior& SetPrivate(bool isPrivate) {
+    AbstractEventsBasedEntity::SetPrivate(isPrivate);
     return *this;
   }
 
@@ -149,11 +142,8 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
 
  private:
   gd::String objectType;
-  bool isPrivate = false;
   gd::PropertiesContainer sharedPropertyDescriptors;
   QuickCustomization::Visibility quickCustomizationVisibility;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENTSBASEDBEHAVIOR_H

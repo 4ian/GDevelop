@@ -636,11 +636,23 @@ namespace gdjs {
       );
     }
 
-    sendInstancesUpdated(runtimeObjects: gdjs.RuntimeObject[]): void {
+    sendInstancesUpdated(
+      objectUpdates: Array<{
+        object: RuntimeObject3D;
+        position: { x: number; y: number; z: number };
+      }>,
+      layoutName: string
+    ): void {
       this._sendMessage(
         circularSafeStringify({
           command: 'instances.updated',
-          payload: 'TODO',
+          payload: {
+            layoutName,
+            instances: objectUpdates.map((objectUpdate) => ({
+              persistentUuid: objectUpdate.object.persistentUuid,
+              position: objectUpdate.position,
+            })),
+          },
         })
       );
     }

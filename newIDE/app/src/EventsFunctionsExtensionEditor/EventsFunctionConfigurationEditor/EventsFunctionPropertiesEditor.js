@@ -532,11 +532,11 @@ export const EventsFunctionPropertiesEditor = ({
                     tooltipOrHelperText={
                       eventsBasedObject.isPrivate() ? (
                         <Trans>
-                          This function won't be visible in the events editors.
+                          This function won't be visible in the events editor.
                         </Trans>
                       ) : (
                         <Trans>
-                          This function will be visible in the events editors.
+                          This function will be visible in the events editor.
                         </Trans>
                       )
                     }

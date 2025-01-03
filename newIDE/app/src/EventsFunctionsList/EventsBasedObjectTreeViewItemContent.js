@@ -209,7 +209,7 @@ export class EventsBasedObjectTreeViewItemContent
     return this.eventsBasedObject.isPrivate() ? (
       <Tooltip
         title={
-          <Trans>This object won't be visible in the events editor.</Trans>
+          <Trans>This object won't be visible in the scene editor.</Trans>
         }
       >
         <VisibilityOff

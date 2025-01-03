@@ -1224,7 +1224,7 @@ namespace gdjs {
      * @returns Returns true if it is falling and false if not.
      */
     isFallingWithoutJumping(): boolean {
-      return !this.isOnFloor() && this._currentJumpSpeed === 0;
+      return !this.isOnFloor() && !this.isJumping();
     }
 
     /**
@@ -1241,7 +1241,8 @@ namespace gdjs {
      */
     isFalling(): boolean {
       return (
-        !this.isOnFloor() && this._currentJumpSpeed < this._currentFallSpeed
+        !this.isOnFloor() ||
+        (this.isJumping() && this._currentFallSpeed > this._currentJumpSpeed)
       );
     }
 

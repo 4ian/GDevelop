@@ -300,6 +300,22 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() override { return strExpressionsInfos; };
 
+
+  /**
+   * Check if the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  bool IsPrivate() const override { return isPrivate; }
+
+  /**
+   * Set that the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  ObjectMetadata &SetPrivate() {
+    isPrivate = true;
+    return *this;
+  }
+
   /**
    * \brief Set the object to be hidden in the IDE.
    *
@@ -356,6 +372,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String iconFilename;
   gd::String categoryFullName;
   std::set<gd::String> defaultBehaviorTypes;
+  bool isPrivate = false;
   bool hidden = false;
   bool isRenderedIn3D = false;
   gd::String openFullEditorLabel;

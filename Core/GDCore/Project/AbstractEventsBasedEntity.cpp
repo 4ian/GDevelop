@@ -23,6 +23,9 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
+  if (isPrivate) {
+    element.SetBoolAttribute("private", isPrivate);
+  }
 
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
@@ -36,6 +39,7 @@ void AbstractEventsBasedEntity::UnserializeFrom(
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
+  isPrivate = element.GetBoolAttribute("private");
 
   const gd::SerializerElement& eventsFunctionsElement =
       element.GetChild("eventsFunctions");

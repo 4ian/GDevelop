@@ -154,6 +154,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
         .AddDefaultBehavior("TextContainerCapability::TextContainerBehavior");
   }
 
+  if (eventsBasedObject.IsPrivate())
+    objectMetadata.SetPrivate();
+
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
   const gd::String &objectType = eventsBasedObject.GetName();

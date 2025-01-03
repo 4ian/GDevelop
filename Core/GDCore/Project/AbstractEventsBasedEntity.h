@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_ABSTRACTEVENTSBASEDENTITY_H
-#define GDCORE_ABSTRACTEVENTSBASEDENTITY_H
+#pragma once
 
 #include <vector>
 #include "GDCore/Project/NamedPropertyDescriptor.h"
@@ -39,6 +38,21 @@ class GD_CORE_API AbstractEventsBasedEntity {
    * this one.
    */
   AbstractEventsBasedEntity* Clone() const { return new AbstractEventsBasedEntity(*this); };
+
+  /**
+   * \brief Check if the behavior or object is private - it can't be used outside of its
+   * extension.
+   */
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * \brief Set that the behavior or object is private - it can't be used outside of its
+   * extension.
+   */
+  AbstractEventsBasedEntity& SetPrivate(bool isPrivate_) {
+    isPrivate = isPrivate_;
+    return *this;
+  }
 
   /**
    * \brief Get the description of the behavior or object, that is displayed in the
@@ -151,8 +165,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
   gd::EventsFunctionsContainer eventsFunctionsContainer;
   gd::PropertiesContainer propertyDescriptors;
   gd::String extensionName;
+  bool isPrivate = false;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_ABSTRACTEVENTSBASEDENTITY_H

@@ -272,7 +272,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
    * Check if the behavior is private - it can't be used outside of its
    * extension.
    */
-  bool IsPrivate() const { return isPrivate; }
+  bool IsPrivate() const override { return isPrivate; }
 
   /**
    * Set that the behavior is private - it can't be used outside of its

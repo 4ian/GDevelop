@@ -141,6 +141,15 @@ export default function EventsBasedObjectEditor({
           }}
         />
       )}
+      <Checkbox
+        label={<Trans>Private</Trans>}
+        checked={eventsBasedObject.isPrivate()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.setPrivate(checked);
+          onChange();
+          onEventsBasedObjectChildrenEdited();
+        }}
+      />
       <Line noMargin justifyContent="center">
         <RaisedButton
           label={<Trans>Open visual editor for the object</Trans>}

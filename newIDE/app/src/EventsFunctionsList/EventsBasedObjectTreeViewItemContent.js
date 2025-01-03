@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -15,9 +16,15 @@ import {
   type TreeItemProps,
   extensionObjectsRootFolderId,
 } from '.';
+import Tooltip from '@material-ui/core/Tooltip';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
+
+const styles = {
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
 
 export type EventsBasedObjectCreationParameters = {|
   isRenderedIn3D: boolean,
@@ -171,6 +178,12 @@ export class EventsBasedObjectTreeViewItemContent
         accelerator: 'Backspace',
       },
       {
+        label: this.eventsBasedObject.isPrivate()
+          ? i18n._(t`Make public`)
+          : i18n._(t`Make private`),
+        click: () => this._togglePrivate(),
+      },
+      {
         type: 'separator',
       },
       {
@@ -193,7 +206,21 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    return null;
+    return this.eventsBasedObject.isPrivate() ? (
+      <Tooltip
+        title={
+          <Trans>This object won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOff
+          fontSize="small"
+          style={{
+            ...styles.tooltip,
+            color: this.props.gdevelopTheme.text.color.disabled,
+          }}
+        />
+      </Tooltip>
+    ) : null;
   }
 
   delete(): void {
@@ -223,6 +250,11 @@ export class EventsBasedObjectTreeViewItemContent
       eventsBasedObjectsList.remove(this.eventsBasedObject.getName());
       this._onEventsBasedObjectModified();
     });
+  }
+
+  _togglePrivate(): void {
+    this.eventsBasedObject.setPrivate(!this.eventsBasedObject.isPrivate());
+    this.props.forceUpdateEditor();
   }
 
   getIndex(): number {

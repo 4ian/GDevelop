@@ -21,9 +21,6 @@ EventsBasedBehavior::EventsBasedBehavior()
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   element.SetAttribute("objectType", objectType);
-  if (isPrivate) {
-    element.SetBoolAttribute("private", isPrivate);
-  }
   sharedPropertyDescriptors.SerializeElementsTo(
       "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
   if (quickCustomizationVisibility != QuickCustomization::Visibility::Default) {
@@ -39,7 +36,6 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
-  isPrivate = element.GetBoolAttribute("private");
   sharedPropertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
   if (element.HasChild("quickCustomizationVisibility")) {

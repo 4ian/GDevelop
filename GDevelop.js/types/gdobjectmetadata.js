@@ -24,6 +24,8 @@ declare class gdObjectMetadata {
   getDefaultBehaviors(): gdSetString;
   hasDefaultBehavior(behaviorType: string): boolean;
   addDefaultBehavior(behaviorType: string): gdObjectMetadata;
+  isPrivate(): boolean;
+  setPrivate(): gdObjectMetadata;
   setHidden(): gdObjectMetadata;
   isHidden(): boolean;
   markAsRenderedIn3D(): gdObjectMetadata;

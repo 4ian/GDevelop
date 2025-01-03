@@ -4,6 +4,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+// Avoid conflicts in declaration of PIXI and THREE namespaces.
 const excludedFiles = [
   'global-three.d.ts',
   'global-pixi.d.ts',
@@ -55,7 +56,6 @@ export const setupAutocompletions = (monaco: any) => {
 
   const importAllJsFilesFromFolderRecursively = (folderPath: string) =>
     fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
-      console.log('TEST');
       if (error) {
         console.error(
           'Unable to read GDJS files for setting up autocompletions:',

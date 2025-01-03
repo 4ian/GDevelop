@@ -84,7 +84,7 @@ if (!args['skip-sources']) {
       ),
     ])
       .then(function([unbundledResults, unbundledExtensionsResults]) {
-
+        // Replace import of packages by import of relative folders.
         shell.sed(
           '-i',
           'from \'@pixi((/\\w+)+)',

@@ -31,6 +31,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
   type HistoryState,
@@ -54,7 +55,10 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
-import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import {
+  getInstanceInLayoutWithPersistentUuid,
+  getInstancesInLayoutForObject,
+} from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 import debounce from 'lodash/debounce';
 import { mapFor } from '../Utils/MapFor';
@@ -138,6 +142,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  previewDebuggerServer: ?PreviewDebuggerServer,
 |};
 
 type State = {|
@@ -191,6 +196,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
+  unregisterDebuggerCallback: (() => void) | null = null;
 
   constructor(props: Props) {
     super(props);
@@ -248,15 +254,68 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+
+    if (this.props.previewDebuggerServer) {
+      this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
+        {
+          onErrorReceived: () => {},
+          onConnectionClosed: () => {},
+          onConnectionOpened: () => {},
+          onConnectionErrored: () => {},
+          onServerStateChanged: () => {},
+          onHandleParsedMessage: this.onReceiveMessageFromEditor.bind(this),
+        }
+      );
+    }
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    if (this.unregisterDebuggerCallback) {
+      this.unregisterDebuggerCallback();
+    }
   }
 
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
+  }
+
+  onReceiveMessageFromEditor({
+    id,
+    parsedMessage,
+  }: {
+    id: number,
+    parsedMessage: {| command: string, payload: any |},
+  }) {
+    if (parsedMessage.command === 'instances.updated') {
+      if (
+        !this.props.layout ||
+        this.props.layout.getName() !== parsedMessage.payload.layoutName
+      ) {
+        return;
+      }
+      const modifiedInstances = [];
+      parsedMessage.payload.instances.forEach(instanceUpdateData => {
+        const { persistentUuid, position } = instanceUpdateData;
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        if (!instance) return;
+        instance.setX(position.x);
+        instance.setY(position.y);
+        instance.setZ(position.z);
+
+        modifiedInstances.push(instance);
+      });
+      this._onInstancesMoved(modifiedInstances);
+      if (this.props.previewDebuggerServer) {
+        this.props.previewDebuggerServer.sendMessage(id, {
+          command: 'hotReload',
+        });
+      }
+    }
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|

@@ -130,6 +130,10 @@ type Props = {|
     newName: string
   ) => void,
   children?: React.Node,
+  onFunctionParameterTypeChanged: (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => void,
 |};
 
 export const EventsFunctionParametersEditor = ({
@@ -148,6 +152,7 @@ export const EventsFunctionParametersEditor = ({
   onMoveObjectEventsParameter,
   onFunctionParameterWillBeRenamed,
   children,
+  onFunctionParameterTypeChanged,
 }: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -802,9 +807,13 @@ export const EventsFunctionParametersEditor = ({
                                       isTypeSelectorShown={isParameterTypeShown(
                                         i
                                       )}
-                                      onTypeUpdated={() =>
-                                        onParametersUpdated()
-                                      }
+                                      onTypeUpdated={() => {
+                                        onFunctionParameterTypeChanged(
+                                          eventsFunction,
+                                          parameter.getName()
+                                        );
+                                        onParametersUpdated();
+                                      }}
                                       getLastObjectParameterObjectType={() =>
                                         getLastObjectParameterObjectType(
                                           parameters,

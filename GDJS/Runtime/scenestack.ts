@@ -2,6 +2,16 @@ namespace gdjs {
   const logger = new gdjs.Logger('Scene stack');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
+  interface PushSceneOptions {
+    sceneName: string;
+    externalLayoutName?: string;
+    skipCreatingInstancesFromScene?: boolean;
+  };
+
+  interface ReplaceSceneOptions extends PushSceneOptions {
+    clear: boolean;
+  };
+
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
    */
@@ -113,15 +123,28 @@ namespace gdjs {
       }
     }
 
+
     /**
-     * Pause the scene currently being played and start the new scene that is specified.
-     * If `externalLayoutName` is set, also instantiate the objects from this external layout.
+     * Pause the scene currently being played and start the new scene that is specified in `options.sceneName`.
+     * If `options.externalLayoutName` is set, also instantiate the objects from this external layout.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedExternalLayoutName Deprecated, use `options.externalLayoutName` instead.
      */
     push(
-      newSceneName: string,
-      externalLayoutName?: string
+      options: PushSceneOptions | string,
+      deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+      console.log({options, deprecatedExternalLayoutName})
+
+      const sceneName =
+        typeof options === 'string' ? options : options.sceneName;
+      const skipCreatingInstancesFromScene =
+        typeof options === 'string' ? false : options.skipCreatingInstancesFromScene;
+      const externalLayoutName =
+        deprecatedExternalLayoutName ||
+        (typeof options === 'string' ? undefined : options.externalLayoutName);
 
       // Tell the scene it's being paused
       const currentScene = this._stack[this._stack.length - 1];
@@ -131,35 +154,43 @@ namespace gdjs {
 
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
-      if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(newSceneName, externalLayoutName);
+      if (this._runtimeGame.areSceneAssetsReady(sceneName)) {
+        return this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          skipCreatingInstancesFromScene,
+        });
       }
 
       this._isNextLayoutLoading = true;
-      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName);
+      this._runtimeGame.loadSceneAssets(sceneName).then(() => {
+        this._loadNewScene({
+          sceneName,
+          externalLayoutName,
+          skipCreatingInstancesFromScene,
+        });
         this._isNextLayoutLoading = false;
       });
       return null;
     }
 
-    private _loadNewScene(
-      newSceneName: string,
-      externalLayoutName?: string
-    ): gdjs.RuntimeScene {
+    private _loadNewScene(options: PushSceneOptions): gdjs.RuntimeScene {
       this._throwIfDisposed();
 
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
-        this._runtimeGame.getSceneAndExtensionsData(newSceneName)
+        this._runtimeGame.getSceneAndExtensionsData(options.sceneName),
+        {
+          skipCreatingInstances: options.skipCreatingInstancesFromScene,
+        }
       );
       this._wasFirstSceneLoaded = true;
 
       // Optionally create the objects from an external layout.
-      if (externalLayoutName) {
+      if (options.externalLayoutName) {
         const externalLayoutData = this._runtimeGame.getExternalLayoutData(
-          externalLayoutName
+          options.externalLayoutName
         );
         if (externalLayoutData) {
           newScene.createObjectsFrom(
@@ -177,10 +208,15 @@ namespace gdjs {
     }
 
     /**
-     * Start the specified scene, replacing the one currently being played.
-     * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+     * Start the scene in `options.sceneName`, replacing the one currently being played.
+     * If `options.clear` is set to true, all running scenes are also removed from the stack of scenes.
+     *
+     * @param options Contains the scene name and optional external layout name to instantiate.
+     * @param deprecatedClear Deprecated, use `options.clear` instead.
      */
-    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
+    replace(options: ReplaceSceneOptions | string, deprecatedClear?: boolean): gdjs.RuntimeScene | null {
+      const clear = deprecatedClear || typeof options === 'string' ? false : options.clear;
+
       this._throwIfDisposed();
       if (!!clear) {
         // Unload all the scenes
@@ -199,7 +235,7 @@ namespace gdjs {
           }
         }
       }
-      return this.push(newSceneName);
+      return this.push(options);
     }
 
     /**

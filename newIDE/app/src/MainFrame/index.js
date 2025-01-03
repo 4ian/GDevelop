@@ -200,6 +200,7 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
+import { EmbeddedGameFrame } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -305,7 +306,9 @@ export type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
   renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
-  renderGDJSDevelopmentWatcher?: ?() => React.Node,
+  renderGDJSDevelopmentWatcher?: ?({|
+    onGDJSUpdated: () => Promise<void> | void,
+  |}) => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   initialExampleSlugToOpen: ?string,
@@ -409,11 +412,11 @@ const MainFrame = (props: Props) => {
     _previewLauncher.current &&
     _previewLauncher.current.getPreviewDebuggerServer();
   const {
-    previewDebuggerIds,
+    hasNonEditionPreviewsRunning,
     hotReloadLogs,
     clearHotReloadLogs,
+    hardReloadAllPreviews,
   } = usePreviewDebuggerServerWatcher(previewDebuggerServer);
-  const hasPreviewsRunning = !!previewDebuggerIds.length;
   const {
     ensureInteractionHappened,
     renderOpenConfirmDialog,
@@ -620,6 +623,10 @@ const MainFrame = (props: Props) => {
           <ExtensionIcon />
         ) : null;
 
+      // Scene editors can have an embedded game, so they redefine manually
+      // which components can have clicks/touches.
+      const removePointerEvents = kind === 'layout';
+
       const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'start page'
@@ -637,6 +644,7 @@ const MainFrame = (props: Props) => {
             )
           : null,
         closable,
+        removePointerEvents,
         label,
         projectItemName: name,
         tabOptions,
@@ -1607,6 +1615,7 @@ const MainFrame = (props: Props) => {
       fullLoadingScreen,
       forceDiagnosticReport,
       launchCaptureOptions,
+      isForInGameEdition,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1617,10 +1626,14 @@ const MainFrame = (props: Props) => {
       setPreviewLoading(true);
       notifyPreviewOrExportWillStart(state.editorTabs);
 
-      const layoutName = previewState.isPreviewOverriden
+      const layoutName = isForInGameEdition
+        ? isForInGameEdition.forcedSceneName
+        : previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
         : previewState.previewLayoutName;
-      const externalLayoutName = previewState.isPreviewOverriden
+      const externalLayoutName = isForInGameEdition
+        ? isForInGameEdition.forcedExternalLayoutName
+        : previewState.isPreviewOverriden
         ? previewState.overridenPreviewExternalLayoutName
         : previewState.previewExternalLayoutName;
 
@@ -1662,6 +1675,7 @@ const MainFrame = (props: Props) => {
         const startTime = Date.now();
         await previewLauncher.launchPreview({
           project: currentProject,
+          // TODO: replace by scene name and external layout name
           layout,
           externalLayout,
           networkPreview: !!networkPreview,
@@ -1672,23 +1686,25 @@ const MainFrame = (props: Props) => {
           authenticatedPlayer,
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
-          numberOfWindows: numberOfWindows || 1,
+          numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
+          isForInGameEdition: !!isForInGameEdition,
           captureOptions,
           onCaptureFinished,
         });
         setPreviewLoading(false);
 
-        sendPreviewStarted({
-          quickCustomizationGameId:
-            quickCustomizationDialogOpenedFromGameId || null,
-          networkPreview: !!networkPreview,
-          hotReload: !!hotReload,
-          projectDataOnlyExport: !!projectDataOnlyExport,
-          fullLoadingScreen: !!fullLoadingScreen,
-          numberOfWindows: numberOfWindows || 1,
-          forceDiagnosticReport: !!forceDiagnosticReport,
-          previewLaunchDuration: Date.now() - startTime,
-        });
+        if (!isForInGameEdition)
+          sendPreviewStarted({
+            quickCustomizationGameId:
+              quickCustomizationDialogOpenedFromGameId || null,
+            networkPreview: !!networkPreview,
+            hotReload: !!hotReload,
+            projectDataOnlyExport: !!projectDataOnlyExport,
+            fullLoadingScreen: !!fullLoadingScreen,
+            numberOfWindows: numberOfWindows || 1,
+            forceDiagnosticReport: !!forceDiagnosticReport,
+            previewLaunchDuration: Date.now() - startTime,
+          });
 
         if (inAppTutorialOrchestratorRef.current) {
           inAppTutorialOrchestratorRef.current.onPreviewLaunch();
@@ -1772,6 +1788,47 @@ const MainFrame = (props: Props) => {
     [launchPreview]
   );
 
+  const onLaunchPreviewForInGameEdition = React.useCallback(
+    ({
+      sceneName,
+      externalLayoutName,
+    }: {|
+      sceneName: string,
+      externalLayoutName: ?string,
+    |}) => {
+      launchPreview({
+        networkPreview: false,
+        hotReload: false,
+        forceDiagnosticReport: false,
+        isForInGameEdition: {
+          forcedSceneName: sceneName,
+          forcedExternalLayoutName: externalLayoutName,
+        },
+        numberOfWindows: 0,
+      });
+    },
+    [launchPreview]
+  );
+
+  const relaunchAndThenHardReloadAllPreviews = React.useCallback(
+    async () => {
+      // Build a new preview (so that any changes in runtime files are picked up)
+      // and then ask all previews to "hard reload" themselves (i.e: refresh their page).
+      await launchPreview({
+        networkPreview: false,
+        hotReload: false,
+        forceDiagnosticReport: false,
+        numberOfWindows: 0,
+      });
+
+      hardReloadAllPreviews();
+    },
+    [
+      hardReloadAllPreviews,
+      launchPreview,
+    ]
+  );
+
   const launchQuickCustomizationPreview = React.useCallback(
     () =>
       launchPreview({
@@ -1790,7 +1847,7 @@ const MainFrame = (props: Props) => {
 
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
-      hasPreviewsRunning,
+      hasPreviewsRunning: hasNonEditionPreviewsRunning,
       launchProjectWithLoadingScreenPreview: () =>
         launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
@@ -1798,7 +1855,7 @@ const MainFrame = (props: Props) => {
       launchProjectCodeAndDataPreview: () =>
         launchPreview({ hotReload: true, projectDataOnlyExport: false }),
     }),
-    [hasPreviewsRunning, launchPreview]
+    [hasNonEditionPreviewsRunning, launchPreview]
   );
 
   const getEditorsTabStateWithScene = React.useCallback(
@@ -3475,7 +3532,7 @@ const MainFrame = (props: Props) => {
     previewEnabled:
       !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
     onOpenProjectManager: toggleProjectManager,
-    hasPreviewsRunning,
+    hasPreviewsRunning: hasNonEditionPreviewsRunning,
     allowNetworkPreview:
       !!_previewLauncher.current &&
       _previewLauncher.current.canDoNetworkPreview(),
@@ -3570,6 +3627,30 @@ const MainFrame = (props: Props) => {
         'main-frame' /* The root styling, done in CSS to read some CSS variables. */
       }
     >
+      {!!renderPreviewLauncher &&
+        renderPreviewLauncher(
+          {
+            crashReportUploadLevel:
+              preferences.values.previewCrashReportUploadLevel ||
+              'exclude-javascript-code-events',
+            previewContext: quickCustomizationDialogOpenedFromGameId
+              ? 'preview-quick-customization'
+              : 'preview',
+            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
+            getIncludeFileHashs:
+              eventsFunctionsExtensionsContext.getIncludeFileHashs,
+            onExport: () => openShareDialog('publish'),
+            onCaptureFinished,
+          },
+          (previewLauncher: ?PreviewLauncherInterface) => {
+            _previewLauncher.current = previewLauncher;
+          }
+        )}
+      <EmbeddedGameFrame
+        key={currentProject ? currentProject.ptr : 0}
+        previewDebuggerServer={previewDebuggerServer || null}
+        onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
+      />
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
@@ -3677,7 +3758,7 @@ const MainFrame = (props: Props) => {
           !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
         }
         onOpenDebugger={launchDebuggerAndPreview}
-        hasPreviewsRunning={hasPreviewsRunning}
+        hasPreviewsRunning={hasNonEditionPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
@@ -3706,7 +3787,11 @@ const MainFrame = (props: Props) => {
           const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+            <TabContentContainer
+              key={editorTab.key}
+              active={isCurrentTab}
+              removePointerEvents={editorTab.removePointerEvents}
+            >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
@@ -3837,7 +3922,11 @@ const MainFrame = (props: Props) => {
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
+        message={
+          loaderModalOpeningMessage ||
+          fileMetadataOpeningMessage ||
+          (previewLoading ? t`Loading preview...` : null)
+        }
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -3860,25 +3949,6 @@ const MainFrame = (props: Props) => {
           initialTab: shareDialogInitialTab,
           gamesList,
         })}
-      {!!renderPreviewLauncher &&
-        renderPreviewLauncher(
-          {
-            crashReportUploadLevel:
-              preferences.values.previewCrashReportUploadLevel ||
-              'exclude-javascript-code-events',
-            previewContext: quickCustomizationDialogOpenedFromGameId
-              ? 'preview-quick-customization'
-              : 'preview',
-            sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
-            getIncludeFileHashs:
-              eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openShareDialog('publish'),
-            onCaptureFinished,
-          },
-          (previewLauncher: ?PreviewLauncherInterface) => {
-            _previewLauncher.current = previewLauncher;
-          }
-        )}
       {chooseResourceOptions && onResourceChosen && !!currentProject && (
         <NewResourceDialog
           project={currentProject}
@@ -4011,7 +4081,9 @@ const MainFrame = (props: Props) => {
       )}
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher()}
+        renderGDJSDevelopmentWatcher({
+          onGDJSUpdated: relaunchAndThenHardReloadAllPreviews,
+        })}
       {!!hotReloadLogs.length && (
         <HotReloadLogsDialog
           logs={hotReloadLogs}

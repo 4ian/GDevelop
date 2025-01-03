@@ -320,7 +320,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 

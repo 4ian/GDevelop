@@ -252,7 +252,7 @@ export type EditorMosaicInterface = {|
 type Props = {|
   initialNodes: EditorMosaicNode,
   editors: {
-    [string]: Editor,
+    [string]: Editor | null,
   },
   limitToOneSecondaryEditor?: boolean,
   onOpenedEditorsChanged?: () => void,
@@ -300,7 +300,8 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
         if (limitToOneSecondaryEditor && editor.type === 'secondary') {
           // Replace the existing secondary editor, if any.
           const secondaryEditorName = openedEditorNames.find(
-            editorName => editors[editorName].type === 'secondary'
+            editorName =>
+              editors[editorName] && editors[editorName].type === 'secondary'
           );
           if (secondaryEditorName) {
             setMosaicNode(
@@ -408,12 +409,16 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
               // Move the entire mosaic up when the soft keyboard is open:
               'avoid-soft-keyboard': true,
             })}
+            style={{ position: 'relative', width: '100%', height: '100%' }}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
-              if (!editor) {
+              if (editor === undefined) {
                 console.error(
                   'Trying to render un unknown editor: ' + editorName
                 );
+                return null;
+              }
+              if (editor === null) {
                 return null;
               }
 

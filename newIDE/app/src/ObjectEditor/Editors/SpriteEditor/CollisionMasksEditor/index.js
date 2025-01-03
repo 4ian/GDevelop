@@ -307,7 +307,7 @@ const CollisionMasksEditor = ({
   if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
-  const editors: { [string]: Editor } = {
+  const editors: { [string]: Editor | null } = {
     preview: {
       type: 'primary',
       noTitleBar: true,

@@ -17,6 +17,7 @@ const styles = {
     overflowY: 'hidden',
     paddingLeft: 8,
     paddingRight: 8,
+    position: 'relative',
   },
 };
 

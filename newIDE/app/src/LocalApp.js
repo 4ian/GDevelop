@@ -97,7 +97,7 @@ export const create = (authentication: Authentication) => {
               )}
               quickPublishOnlineWebExporter={localOnlineWebExporter}
               renderGDJSDevelopmentWatcher={
-                isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
+                isDev ? ({ onGDJSUpdated }) => <LocalGDJSDevelopmentWatcher onGDJSUpdated={onGDJSUpdated} /> : null
               }
               storageProviders={storageProviders}
               resourceMover={LocalResourceMover}

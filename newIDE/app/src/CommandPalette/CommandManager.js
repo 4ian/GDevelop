@@ -51,18 +51,19 @@ export default class CommandManager implements CommandManagerInterface {
   }
 
   registerCommand = (commandName: CommandName, command: Command) => {
-    if (this._commands[commandName])
-      return console.warn(
-        `Tried to register command ${commandName}, but it is already registered.`
-      );
+    if (this._commands[commandName]) return;
+    // if (this._commands[commandName])
+    //   return console.warn(
+    //     `Tried to register command ${commandName}, but it is already registered.`
+    //   );
     this._commands[commandName] = command;
   };
 
   deregisterCommand = (commandName: CommandName) => {
-    if (!this._commands[commandName])
-      return console.warn(
-        `Tried to deregister command ${commandName}, but it is not registered.`
-      );
+    // if (!this._commands[commandName])
+    //   return console.warn(
+    //     `Tried to deregister command ${commandName}, but it is not registered.`
+    //   );
     delete this._commands[commandName];
   };
 

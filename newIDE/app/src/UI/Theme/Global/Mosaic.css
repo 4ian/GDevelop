@@ -1,6 +1,11 @@
 /* Mosaic layout */
 .mosaic-gd-theme.mosaic {
-  background-color: var(--mosaic-layout-background-color) !important;
+  /* background-color: var(--mosaic-layout-background-color) !important; */
+  background-color: transparent !important;
+}
+
+.mosaic-drop-target .drop-target-container {
+  pointer-events: all;
 }
 
 /* Mosaic window and tile */
@@ -25,6 +30,14 @@
 .mosaic-gd-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
 .mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
   background: var(--mosaic-toolbar-background-color) !important;
+}
+
+.mosaic-gd-theme .mosaic-window {
+  pointer-events: all;
+}
+
+.mosaic-gd-theme .mosaic-split {
+  pointer-events: all;
 }
 
 .mosaic-gd-theme .mosaic-split.-column {

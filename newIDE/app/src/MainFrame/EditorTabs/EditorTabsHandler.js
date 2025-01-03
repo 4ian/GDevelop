@@ -48,6 +48,8 @@ export type EditorTab = {|
   extraEditorProps: ?EditorContainerExtraProps,
   /** If set to false, the tab can't be closed. */
   closable: boolean,
+  /** If set to true, `pointer-events: none` is applied to the tab content. */
+  removePointerEvents: boolean,
 |};
 
 export type EditorTabsState = {|
@@ -91,6 +93,7 @@ export type EditorOpeningOptions = {|
   extraEditorProps?: EditorContainerExtraProps,
   dontFocusTab?: boolean,
   closable?: boolean,
+  removePointerEvents?: boolean,
 |};
 
 export const getEditorTabMetadata = (
@@ -138,6 +141,7 @@ export const openEditorTab = (
     key,
     extraEditorProps,
     dontFocusTab,
+    removePointerEvents,
     closable,
   }: EditorOpeningOptions
 ): EditorTabsState => {
@@ -163,6 +167,7 @@ export const openEditorTab = (
     extraEditorProps,
     editorRef: null,
     closable: typeof closable === 'undefined' ? true : !!closable,
+    removePointerEvents: !!removePointerEvents,
   };
 
   return {

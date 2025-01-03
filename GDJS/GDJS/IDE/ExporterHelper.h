@@ -45,6 +45,7 @@ struct PreviewExportOptions {
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
+        isInGameEdition(false),
         nonRuntimeScriptsCacheBurst(0),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""),
@@ -170,6 +171,14 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the export is made for being edited in the editor.
+   */
+  PreviewExportOptions &SetIsInGameEdition(bool enable) {
+    isInGameEdition = enable;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -291,6 +300,7 @@ struct PreviewExportOptions {
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
+  bool isInGameEdition;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;

@@ -12,6 +12,9 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -32,6 +35,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     if (this.props.isActive) {
       const { projectItemName } = this.props;
       this.props.setPreviewedLayout(projectItemName);
+
+      if (gameEditorMode === 'embedded-game' && projectItemName) {
+        switchToSceneEdition({ sceneName: projectItemName });
+      }
     }
   }
 
@@ -39,6 +46,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     if (!prevProps.isActive && this.props.isActive) {
       const { projectItemName } = this.props;
       this.props.setPreviewedLayout(projectItemName);
+
+      if (gameEditorMode === 'embedded-game' && projectItemName) {
+        switchToSceneEdition({ sceneName: projectItemName });
+      }
     }
   }
 

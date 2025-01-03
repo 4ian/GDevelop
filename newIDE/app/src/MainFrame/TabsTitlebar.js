@@ -19,7 +19,12 @@ type Props = {|
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 
 const styles = {
-  container: { display: 'flex', flexShrink: 0, alignItems: 'flex-end' },
+  container: {
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'flex-end',
+    position: 'relative',
+  },
   leftSideArea: { alignSelf: 'stretch', flexShrink: 0 },
   rightSideArea: { alignSelf: 'stretch', flex: 1 },
   menuIcon: { marginLeft: 4, marginRight: 4 },

@@ -2850,6 +2850,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
+  setIsInGameEdition(enable: boolean): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): PreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): PreviewExportOptions;

@@ -27,6 +27,9 @@ import {
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 const styles = {
   container: {
@@ -69,6 +72,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
         layout ? layout.getName() : null,
         projectItemName
       );
+
+      if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
+        switchToSceneEdition({
+          sceneName: layout.getName(),
+          externalLayoutName: projectItemName,
+        });
+      }
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -88,6 +98,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
         layout ? layout.getName() : null,
         projectItemName
       );
+
+      if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
+        switchToSceneEdition({
+          sceneName: layout.getName(),
+          externalLayoutName: projectItemName,
+        });
+      }
     }
   }
 

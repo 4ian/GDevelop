@@ -198,7 +198,9 @@ export class EventsBasedBehaviorTreeViewItemContent
     return this.eventsBasedBehavior.isPrivate() ? (
       <Tooltip
         title={
-          <Trans>This behavior won't be visible in the events editor.</Trans>
+          <Trans>
+            This behavior won't be visible in the scene and events editors.
+          </Trans>
         }
       >
         <VisibilityOff

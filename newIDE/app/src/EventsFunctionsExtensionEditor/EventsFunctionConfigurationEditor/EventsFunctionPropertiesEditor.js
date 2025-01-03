@@ -529,6 +529,17 @@ export const EventsFunctionPropertiesEditor = ({
                         onConfigurationUpdated('isPrivate');
                       forceUpdate();
                     }}
+                    tooltipOrHelperText={
+                      eventsBasedObject.isPrivate() ? (
+                        <Trans>
+                          This function won't be visible in the events editors.
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          This function will be visible in the events editors.
+                        </Trans>
+                      )
+                    }
                   />
                   <Checkbox
                     label={<Trans>Asynchronous</Trans>}

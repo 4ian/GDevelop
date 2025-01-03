@@ -14,6 +14,7 @@ import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const gd: libGDevelop = global.gd;
 
@@ -142,13 +143,24 @@ export default function EventsBasedObjectEditor({
         />
       )}
       <Checkbox
-        label={<Trans>Private (can only be used inside the extension)</Trans>}
+        label={<Trans>Private</Trans>}
         checked={eventsBasedObject.isPrivate()}
         onCheck={(e, checked) => {
           eventsBasedObject.setPrivate(checked);
           onChange();
           onEventsBasedObjectChildrenEdited();
         }}
+        tooltipOrHelperText={
+          eventsBasedObject.isPrivate() ? (
+            <Trans>
+              This object won't be visible in the scene and events editors.
+            </Trans>
+          ) : (
+            <Trans>
+              This object will be visible in the scene and events editors.
+            </Trans>
+          )
+        }
       />
       <Line noMargin justifyContent="center">
         <RaisedButton

@@ -436,7 +436,7 @@ const generateExtensionReference = extension => {
       conditionsReferenceTexts,
       expressionsReferenceTexts,
     };
-  });
+  }).filter(Boolean);
 
   // Behavior expressions
   /** @type {Array<BehaviorReference>} */

@@ -14,7 +14,6 @@ import { Line } from '../UI/Grid';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
-import Tooltip from '@material-ui/core/Tooltip';
 
 const gd: libGDevelop = global.gd;
 

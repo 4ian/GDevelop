@@ -215,6 +215,11 @@ gd::DependencyMetadata& PlatformExtension::AddDependency() {
   return extensionDependenciesMetadata.back();
 }
 
+gd::SourceFileMetadata& PlatformExtension::AddSourceFile() {
+  extensionSourceFilesMetadata.push_back(SourceFileMetadata());
+  return extensionSourceFilesMetadata.back();
+}
+
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
     const gd::String& fullname,
@@ -463,8 +468,20 @@ PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
 }
 
+const std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() const {
+  return extensionDependenciesMetadata;
+}
+
 std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
   return extensionDependenciesMetadata;
+}
+
+const std::vector<gd::SourceFileMetadata>& PlatformExtension::GetAllSourceFiles() const {
+  return extensionSourceFilesMetadata;
+}
+
+std::vector<gd::SourceFileMetadata>& PlatformExtension::GetAllSourceFiles() {
+  return extensionSourceFilesMetadata;
 }
 
 std::map<gd::String, gd::EventMetadata>& PlatformExtension::GetAllEvents() {

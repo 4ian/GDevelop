@@ -424,6 +424,7 @@ typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<gd::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
 typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
+typedef std::vector<gd::SourceFileMetadata> VectorSourceFileMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;

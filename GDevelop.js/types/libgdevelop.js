@@ -43,6 +43,7 @@ declare class libGDevelop {
   VectorString: Class<gdVectorString>;
   VectorPlatformExtension: Class<gdVectorPlatformExtension>;
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
+  VectorSourceFileMetadata: Class<gdVectorSourceFileMetadata>;
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
@@ -123,6 +124,7 @@ declare class libGDevelop {
   TilesetResource: Class<gdTilesetResource>;
   Model3DResource: Class<gdModel3DResource>;
   AtlasResource: Class<gdAtlasResource>;
+  JavaScriptResource: Class<gdJavaScriptResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;
@@ -146,6 +148,7 @@ declare class libGDevelop {
   ExpressionMetadata: Class<gdExpressionMetadata>;
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
   DependencyMetadata: Class<gdDependencyMetadata>;
+  SourceFileMetadata: Class<gdSourceFileMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
   ParameterMetadataContainer: Class<gdParameterMetadataContainer>;

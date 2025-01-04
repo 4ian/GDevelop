@@ -96,7 +96,7 @@ public:
    * \brief Expose a 3D model, which is always a reference to a "model3D" resource.
    */
   virtual void ExposeModel3D(gd::String &resourceName);
-  
+
   /**
    * \brief Expose an atlas, which is always a reference to a "atlas" resource.
    */
@@ -111,6 +111,11 @@ public:
    * \brief Expose a video, which is always a reference to a "video" resource.
    */
   virtual void ExposeVideo(gd::String &videoName);
+
+  /**
+   * \brief Expose a JavaScript file, which is always a reference to a "javascript" resource.
+   */
+  virtual void ExposeJavaScript(gd::String &javaScriptName);
 
   /**
    * \brief Expose a bitmap font, which is always a reference to a "bitmapFont" resource.

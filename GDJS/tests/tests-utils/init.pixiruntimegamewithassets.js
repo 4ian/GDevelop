@@ -24,7 +24,6 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
       sizeOnStartupMode: 'adaptWidth',
       antialiasingMode: 'MSAA',
       antialisingEnabledOnMobile: false,
-      useExternalSourceFiles: true,
       version: '1.0.0',
       name: 'Test game with real assets',
       author: '',

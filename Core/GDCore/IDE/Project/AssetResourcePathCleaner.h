@@ -46,6 +46,7 @@ public:
   void ExposeTileset(gd::String &tilesetName) override;
   void ExposeVideo(gd::String &videoName) override;
   void ExposeBitmapFont(gd::String &bitmapFontName) override;
+  void ExposeJavaScript(gd::String &javaScriptResourceName) override;
   void ExposeFile(gd::String &resource) override;
 
 protected:

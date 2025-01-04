@@ -71,14 +71,6 @@ class GD_CORE_API DependenciesAnalyzer {
     return externalEventsDependencies;
   };
 
-  /**
-   * \brief Return the source files being dependencies of the scene or external
-   * events passed in the constructor.
-   */
-  const std::set<gd::String>& GetSourceFilesDependencies() const {
-    return sourceFilesDependencies;
-  };
-
  private:
   /**
    * \brief Analyze the dependencies of the events.
@@ -92,7 +84,6 @@ class GD_CORE_API DependenciesAnalyzer {
 
   std::set<gd::String> scenesDependencies;
   std::set<gd::String> externalEventsDependencies;
-  std::set<gd::String> sourceFilesDependencies;
   std::vector<gd::String>
       parentScenes;  ///< Used to check for circular dependencies.
   std::vector<gd::String>

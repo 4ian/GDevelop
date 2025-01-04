@@ -1630,6 +1630,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         {editOptionsDialogOpen && (
           <OptionsEditorDialog
             project={project}
+            resourceManagementProps={this.props.resourceManagementProps}
             eventsFunctionsExtension={eventsFunctionsExtension}
             open
             onClose={() => this._editOptions(false)}

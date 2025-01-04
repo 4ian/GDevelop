@@ -87,6 +87,13 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   for (auto& dependency : dependencies)
     SerializeDependencyTo(dependency, dependenciesElement.AddChild(""));
 
+  if (!sourceFiles.empty()) {
+    auto& sourceFilesElement = element.AddChild("sourceFiles");
+    sourceFilesElement.ConsiderAsArray();
+    for (auto& sourceFile : sourceFiles)
+      sourceFile.SerializeTo(sourceFilesElement.AddChild(""));
+  }
+
   GetGlobalVariables().SerializeTo(element.AddChild("globalVariables"));
   GetSceneVariables().SerializeTo(element.AddChild("sceneVariables"));
 
@@ -158,6 +165,17 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
     dependencies.push_back(
         UnserializeDependencyFrom(dependenciesElement.GetChild(i)));
+
+  sourceFiles.clear();
+  if (element.HasChild("sourceFiles")) {
+    const auto& sourceFilesElement = element.GetChild("sourceFiles");
+    sourceFilesElement.ConsiderAsArray();
+    for (size_t i = 0; i < sourceFilesElement.GetChildrenCount(); ++i) {
+      SourceFileMetadata sourceFile;
+      sourceFile.UnserializeFrom(sourceFilesElement.GetChild(i));
+      sourceFiles.push_back(sourceFile);
+    }
+  }
 
   globalVariables.UnserializeFrom(element.GetChild("globalVariables"));
   sceneVariables.UnserializeFrom(element.GetChild("sceneVariables"));

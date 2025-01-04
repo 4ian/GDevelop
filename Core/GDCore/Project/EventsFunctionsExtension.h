@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
@@ -289,6 +290,42 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
       const gd::String& eventsFunctionName);
   ///@}
 
+  /** \name Source files
+   */
+  ///@{
+
+  /**
+   * \brief Adds a new source file.
+   */
+  gd::SourceFileMetadata& AddSourceFile() {
+    gd::SourceFileMetadata sourceFile;
+    sourceFiles.push_back(sourceFile);
+    return sourceFiles.back();
+  };
+
+  /**
+   * \brief Removes a source file.
+   */
+  void RemoveSourceFileAt(size_t index) {
+    sourceFiles.erase(sourceFiles.begin() + index);
+  };
+
+  /**
+   * \brief Returns the list of source files.
+   */
+  std::vector<gd::SourceFileMetadata>& GetAllSourceFiles() {
+    return sourceFiles;
+  };
+
+  /**
+   * \brief Returns the list of source files.
+   */
+  const std::vector<gd::SourceFileMetadata>& GetAllSourceFiles() const {
+    return sourceFiles;
+  };
+
+  ///@}
+
  private:
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
@@ -336,7 +373,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
   gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;
-  
+  std::vector<gd::SourceFileMetadata> sourceFiles;
+
   gd::VariablesContainer globalVariables;
   gd::VariablesContainer sceneVariables;
 };

@@ -125,6 +125,11 @@ export class VectorDependencyMetadata extends EmscriptenObject {
   at(index: number): DependencyMetadata;
 }
 
+export class VectorSourceFileMetadata extends EmscriptenObject {
+  size(): number;
+  at(index: number): SourceFileMetadata;
+}
+
 export class VectorInt extends EmscriptenObject {
   size(): number;
   at(index: number): number;
@@ -1100,6 +1105,10 @@ export class AtlasResource extends Resource {
   constructor();
 }
 
+export class JavaScriptResource extends Resource {
+  constructor();
+}
+
 export class InitialInstance extends EmscriptenObject {
   constructor();
   setObjectName(name: string): void;
@@ -1448,6 +1457,14 @@ export class DependencyMetadata extends EmscriptenObject {
   copyFrom(dependencyMetadata: DependencyMetadata): void;
 }
 
+export class SourceFileMetadata extends EmscriptenObject {
+  constructor();
+  getResourceName(): string;
+  setResourceName(resourceName_: string): SourceFileMetadata;
+  getIncludePosition(): string;
+  setIncludePosition(includePosition_: string): SourceFileMetadata;
+}
+
 export class ParameterMetadata extends EmscriptenObject {
   constructor();
   getType(): string;
@@ -1704,6 +1721,7 @@ export class PlatformExtension extends EmscriptenObject {
   getAllStrExpressionsForBehavior(autoType: string): MapStringExpressionMetadata;
   getAllProperties(): MapStringPropertyDescriptor;
   getAllDependencies(): VectorDependencyMetadata;
+  getAllSourceFiles(): VectorSourceFileMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;
@@ -2317,6 +2335,9 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   addDependency(): DependencyMetadata;
   removeDependencyAt(index: number): void;
   getAllDependencies(): VectorDependencyMetadata;
+  addSourceFile(): SourceFileMetadata;
+  removeSourceFileAt(index: number): void;
+  getAllSourceFiles(): VectorSourceFileMetadata;
   getGlobalVariables(): VariablesContainer;
   getSceneVariables(): VariablesContainer;
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;

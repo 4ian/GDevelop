@@ -22,7 +22,6 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -130,15 +129,6 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
     }
 
-    // Export source files
-    if (!helper.ExportExternalSourceFiles(
-            exportedProject, codeOutputDir, includesFiles)) {
-      gd::LogError(
-          _("Error during exporting! Unable to export source files:\n") +
-          lastError);
-      return false;
-    }
-
     auto projectUsedResources =
         gd::SceneResourcesFinder::FindProjectResources(exportedProject);
     std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
@@ -173,10 +163,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     else if (options.target == "facebookInstantGames")
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
-    if (!helper.ExportPixiIndexFile(exportedProject,
+    if (!helper.ExportIndexFile(exportedProject,
                                     source,
                                     exportDir,
                                     includesFiles,
+                                    usedExtensionsResult.GetUsedSourceFiles(),
                                     /*nonRuntimeScriptsCacheBurst=*/0,
                                     "")) {
       gd::LogError(_("Error during export:\n") + lastError);

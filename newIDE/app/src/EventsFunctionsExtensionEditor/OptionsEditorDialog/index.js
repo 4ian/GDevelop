@@ -11,6 +11,7 @@ import { ExtensionDependenciesEditor } from './ExtensionDependenciesEditor';
 import ExtensionExporterDialog from './ExtensionExporterDialog';
 import { Line } from '../../UI/Grid';
 import Upload from '../../UI/CustomSvgIcons/Upload';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 
 type TabName = 'options' | 'dependencies';
 
@@ -19,10 +20,14 @@ type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onClose: () => void,
   open: boolean,
+
+  // For source files:
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export default function OptionsEditorDialog({
   project,
+  resourceManagementProps,
   eventsFunctionsExtension,
   onClose,
   open,
@@ -95,6 +100,8 @@ export default function OptionsEditorDialog({
       {currentTab === 'dependencies' && (
         <Line>
           <ExtensionDependenciesEditor
+            project={project}
+            resourceManagementProps={resourceManagementProps}
             eventsFunctionsExtension={eventsFunctionsExtension}
           />
         </Line>

@@ -26,8 +26,8 @@ namespace gd {
 
 void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorker &worker) {
-  // See also gd::Project::ExposeResources for a method that traverses the whole
-  // project (this time for resources).
+  // See also gd::ResourceExposer::ExposeWholeProjectResources
+  // for a method that traverses the whole project (this time for resources).
 
   ExposeProjectEventsWithoutExtensions(project, worker);
 
@@ -106,16 +106,16 @@ void ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(
   }
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
     gd::Layout& dependencyLayout = project.GetLayout(sceneName);
-    
+
     worker.Launch(dependencyLayout.GetEvents());
   }
 }
 
 void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
-  // See also gd::Project::ExposeResources for a method that traverse the whole
-  // project (this time for resources) and ExposeProjectEffects (this time for
-  // effects).
+  // See also gd::ResourceExposer::ExposeWholeProjectResources
+  // for a method that traverses the whole project (this time for resources)
+  // and ExposeProjectEffects (this time for effects).
 
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {

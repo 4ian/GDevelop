@@ -10,7 +10,6 @@
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"

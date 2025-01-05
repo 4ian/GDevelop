@@ -337,21 +337,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             this._editorNavigator.openEditor('events-sheet');
           }
         }
-
-        const editor = this.editor;
-        if (!editor || !selectedEventsFunction) {
-          return;
-        }
-        const scrollPosition = this._editorScrollPositions.get(
-          selectedEventsFunction.ptr
-        );
-        if (scrollPosition) {
-          //editor.scrollToPosition(scrollPosition);
-          // (async () => {
-          //   await delay(1000);
-          //   editor.scrollToPosition(scrollPosition);
-          // })();
-        }
       }
     );
   };

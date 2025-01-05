@@ -296,9 +296,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           selectedEventsBasedBehavior,
           selectedEventsBasedObject,
         },
-        () => {
-          this.updateToolbar();
-        }
+        () => this.updateToolbar()
       );
       return;
     }

@@ -496,7 +496,6 @@ export default class ThemableEventsTree extends Component<
   }
 
   scrollToPosition(position: number) {
-    this._scrollPosition = position;
     const currentList = this._list;
     if (currentList) {
       const listWrapper = currentList.wrappedInstance.current;

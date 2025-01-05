@@ -43,7 +43,6 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { delay } from '../Utils/Delay';
 
 const gd: libGDevelop = global.gd;
 
@@ -347,10 +346,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           selectedEventsFunction.ptr
         );
         if (scrollPosition) {
-          (async () => {
-            await delay(1000);
-            editor.scrollToPosition(scrollPosition);
-          })();
+          //editor.scrollToPosition(scrollPosition);
+          // (async () => {
+          //   await delay(1000);
+          //   editor.scrollToPosition(scrollPosition);
+          // })();
         }
       }
     );
@@ -1453,6 +1453,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                scrollPosition={this._editorScrollPositions.get(
+                  selectedEventsFunction.ptr
+                )}
               />
             </Background>
           ) : selectedEventsBasedBehavior &&

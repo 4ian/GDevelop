@@ -151,6 +151,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  scrollPosition?: number,
 |};
 
 type ComponentProps = {|
@@ -1929,6 +1930,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     key={events.ptr}
                     indentScale={preferences.values.eventsSheetIndentScale}
                     onScroll={this._ensureFocused}
+                    scrollPosition={this.props.scrollPosition}
                     events={events}
                     project={project}
                     scope={scope}

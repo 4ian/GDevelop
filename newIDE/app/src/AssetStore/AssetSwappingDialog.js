@@ -6,7 +6,6 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { AssetStore, type AssetStoreInterface } from '.';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { AssetStoreContext } from './AssetStoreContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import LoaderModal from '../UI/LoaderModal';
 import { useInstallAsset } from './NewObjectDialog';
@@ -14,6 +13,7 @@ import { swapAsset } from './AssetSwapper';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RaisedButton from '../UI/RaisedButton';
+import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 type Props = {|
   project: gdProject,
@@ -37,7 +37,7 @@ function AssetSwappingDialog({
   onClose,
   minimalUI,
 }: Props) {
-  const { shopNavigationState } = React.useContext(AssetStoreContext);
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetShortHeader } = shopNavigationState.getCurrentPage();
 
   const [

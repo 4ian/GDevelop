@@ -26,6 +26,8 @@ export type AssetStorePageState = {|
 |};
 
 export type NavigationState = {|
+  searchText: string,
+  setSearchText: string => void,
   getCurrentPage: () => AssetStorePageState,
   isRootPage: boolean,
   backToPreviousPage: () => AssetStorePageState,
@@ -38,19 +40,23 @@ export type NavigationState = {|
   openShopCategoryPage: string => void,
   openPackPage: ({|
     assetPack: PublicAssetPack | PrivateAssetPack,
-    previousSearchText: string,
+    storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openPrivateAssetPackInformationPage: ({|
     privateAssetPackListingData: PrivateAssetPackListingData,
-    previousSearchText: string,
+    storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openPrivateGameTemplateInformationPage: ({|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
-    previousSearchText: string,
+    storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openAssetDetailPage: ({|
     assetShortHeader: AssetShortHeader,
-    previousSearchText: string,
+    storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   navigateInsideFolder: string => void,
   goBackToFolderIndex: number => void,
@@ -111,14 +117,44 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const useShopNavigation = (): NavigationState => {
+export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
+  searchText: '',
+  setSearchText: () => {},
+  getCurrentPage: () => assetStoreHomePageState,
+  isRootPage: true,
+  backToPreviousPage: () => assetStoreHomePageState,
+  openHome: () => assetStoreHomePageState,
+  openAssetSwapping: () => assetStoreHomePageState,
+  clearHistory: () => {},
+  clearPreviousPageFromHistory: () => {},
+  openSearchResultPage: () => {},
+  openTagPage: string => {},
+  openShopCategoryPage: string => {},
+  openPackPage: () => {},
+  openPrivateAssetPackInformationPage: () => {},
+  openPrivateGameTemplateInformationPage: () => {},
+  openAssetDetailPage: () => {},
+  navigateInsideFolder: string => {},
+  goBackToFolderIndex: number => {},
+});
+
+type AssetStoreNavigatorStateProviderProps = {|
+  children: React.Node,
+|};
+
+export const AssetStoreNavigatorStateProvider = (
+  props: AssetStoreNavigatorStateProviderProps
+) => {
+  const [searchText, setSearchText] = React.useState<string>('');
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });
   const previousPages = history.previousPages;
 
-  return React.useMemo(
+  const state = React.useMemo(
     () => ({
+      searchText,
+      setSearchText,
       getCurrentPage: () => previousPages[previousPages.length - 1],
       isRootPage: previousPages.length <= 1,
       backToPreviousPage: () => {
@@ -244,10 +280,12 @@ export const useShopNavigation = (): NavigationState => {
       },
       openPackPage: ({
         assetPack,
-        previousSearchText,
+        storeSearchText,
+        clearSearchText,
       }: {|
         assetPack: PublicAssetPack | PrivateAssetPack,
-        previousSearchText: string,
+        storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -256,7 +294,7 @@ export const useShopNavigation = (): NavigationState => {
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -297,13 +335,16 @@ export const useShopNavigation = (): NavigationState => {
             ],
           };
         });
+        if (clearSearchText) setSearchText('');
       },
       openPrivateAssetPackInformationPage: ({
         privateAssetPackListingData,
-        previousSearchText,
+        storeSearchText,
+        clearSearchText,
       }: {|
         privateAssetPackListingData: PrivateAssetPackListingData,
-        previousSearchText: string,
+        storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -312,7 +353,7 @@ export const useShopNavigation = (): NavigationState => {
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -339,13 +380,16 @@ export const useShopNavigation = (): NavigationState => {
             ],
           };
         });
+        if (clearSearchText) setSearchText('');
       },
       openAssetDetailPage: ({
         assetShortHeader,
-        previousSearchText,
+        storeSearchText,
+        clearSearchText,
       }: {|
         assetShortHeader: AssetShortHeader,
-        previousSearchText: string,
+        storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -354,7 +398,7 @@ export const useShopNavigation = (): NavigationState => {
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -381,13 +425,16 @@ export const useShopNavigation = (): NavigationState => {
             ],
           };
         });
+        if (clearSearchText) setSearchText('');
       },
       openPrivateGameTemplateInformationPage: ({
         privateGameTemplateListingData,
-        previousSearchText,
+        storeSearchText,
+        clearSearchText,
       }: {|
         privateGameTemplateListingData: PrivateGameTemplateListingData,
-        previousSearchText: string,
+        storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -396,7 +443,7 @@ export const useShopNavigation = (): NavigationState => {
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -423,6 +470,7 @@ export const useShopNavigation = (): NavigationState => {
             ],
           };
         });
+        if (clearSearchText) setSearchText('');
       },
       navigateInsideFolder: (folderTag: string) => {
         setHistory(previousHistory => {
@@ -476,6 +524,12 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
     }),
-    [previousPages]
+    [searchText, previousPages]
+  );
+
+  return (
+    <AssetStoreNavigatorContext.Provider value={state}>
+      {props.children}
+    </AssetStoreNavigatorContext.Provider>
   );
 };

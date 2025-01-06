@@ -10,7 +10,7 @@ import {
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
-import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
+import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
@@ -19,12 +19,11 @@ export default {
 };
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {
-  const navigationState = useShopNavigation();
   return (
     <PublicProfileProvider>
-      <AssetStoreStateProvider shopNavigationState={navigationState}>
-        {children}
-      </AssetStoreStateProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>{children}</AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
     </PublicProfileProvider>
   );
 };

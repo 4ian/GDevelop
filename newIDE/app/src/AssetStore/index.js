@@ -47,6 +47,7 @@ import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { LineStackLayout } from '../UI/Layout';
 import {
+  AssetStoreNavigatorContext,
   isHomePage,
   isSearchResultPage,
   type AssetStorePageState,
@@ -121,13 +122,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       privateAssetPackListingDatas,
       error: assetStoreError,
       fetchAssetsAndFilters,
-      shopNavigationState,
-      searchText,
-      setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
       assetFiltersState,
       getAssetShortHeaderFromId,
     } = React.useContext(AssetStoreContext);
+
+    const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+    const {
+      searchText,
+      setSearchText: setAssetStoreSearchText,
+    } = shopNavigationState;
 
     const assetSwappedObjectPtr = React.useRef<number | null>(null);
     React.useEffect(
@@ -169,10 +173,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       privateGameTemplateListingDatas,
       error: privateGameTemplateStoreError,
       fetchGameTemplates,
-      shop: {
-        privateGameTemplateListingDatasSearchResults,
-        setSearchText: setPrivateGameTemplateSearchText,
-      },
+      shop: { privateGameTemplateListingDatasSearchResults },
     } = React.useContext(PrivateGameTemplateStoreContext);
     const currentPage = shopNavigationState.getCurrentPage();
     const {
@@ -226,9 +227,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const setSearchText = React.useCallback(
       (newSearchText: string) => {
         setAssetStoreSearchText(newSearchText);
-        setPrivateGameTemplateSearchText(newSearchText);
       },
-      [setAssetStoreSearchText, setPrivateGameTemplateSearchText]
+      [setAssetStoreSearchText]
     );
 
     const fetchAssetsAndGameTemplates = React.useCallback(
@@ -344,12 +344,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           assetPackKind,
         });
         saveScrollPosition();
-        const previousSearchText = searchText;
-        // Don't reset search text when opening an asset as the search bar is not active.
-        // This helps speeding up the navigation when going back to the results page.
         shopNavigationState.openAssetDetailPage({
           assetShortHeader,
-          previousSearchText,
+          storeSearchText: true,
+          clearSearchText: false,
         });
       },
       [
@@ -358,7 +356,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         privateAssetPackListingDatas,
         saveScrollPosition,
         shopNavigationState,
-        searchText,
       ]
     );
 
@@ -378,19 +375,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           Window.openExternalURL(assetPack.externalWebLink);
         } else {
           saveScrollPosition();
-          const previousSearchText = searchText;
-          setSearchText(''); // Reset search text when opening a pack.
-          shopNavigationState.openPackPage({ assetPack, previousSearchText });
+          shopNavigationState.openPackPage({
+            assetPack,
+            storeSearchText: true,
+            clearSearchText: true,
+          });
           openFiltersPanelIfAppropriate();
         }
       },
-      [
-        shopNavigationState,
-        searchText,
-        saveScrollPosition,
-        setSearchText,
-        openFiltersPanelIfAppropriate,
-      ]
+      [shopNavigationState, saveScrollPosition, openFiltersPanelIfAppropriate]
     );
 
     // When a private pack is selected from the home page,
@@ -417,11 +410,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             assetPackKind: 'private',
           });
           saveScrollPosition();
-          const previousSearchText = searchText;
-          setSearchText(''); // Reset search text when opening a pack.
           shopNavigationState.openPrivateAssetPackInformationPage({
             privateAssetPackListingData,
-            previousSearchText,
+            storeSearchText: true,
+            clearSearchText: true,
           });
           return;
         }
@@ -435,11 +427,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           source: 'store-home',
         });
         saveScrollPosition();
-        const previousSearchText = searchText;
-        setSearchText(''); // Reset search text when opening a pack.
         shopNavigationState.openPackPage({
           assetPack: receivedAssetPack,
-          previousSearchText,
+          storeSearchText: true,
+          clearSearchText: true,
         });
         openFiltersPanelIfAppropriate();
       },
@@ -447,9 +438,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         receivedAssetPacks,
         saveScrollPosition,
         shopNavigationState,
-        setSearchText,
         openFiltersPanelIfAppropriate,
-        searchText,
       ]
     );
 
@@ -475,14 +464,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           source: 'store',
         });
         saveScrollPosition();
-        const previousSearchText = searchText;
-        setSearchText(''); // Reset search text when opening a template.
         shopNavigationState.openPrivateGameTemplateInformationPage({
           privateGameTemplateListingData,
-          previousSearchText,
+          storeSearchText: true,
+          clearSearchText: true,
         });
       },
-      [saveScrollPosition, setSearchText, searchText, shopNavigationState]
+      [saveScrollPosition, shopNavigationState]
     );
 
     const selectShopCategory = React.useCallback(
@@ -505,16 +493,17 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           publicAssetPacks &&
           publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
         saveScrollPosition();
-        setSearchText('');
         if (privateAssetPack) {
           shopNavigationState.openPackPage({
             assetPack: privateAssetPack,
-            previousSearchText: '', // We were on an asset page.
+            storeSearchText: false,
+            clearSearchText: true,
           });
         } else if (publicAssetPack) {
           shopNavigationState.openPackPage({
             assetPack: publicAssetPack,
-            previousSearchText: '', // We were on an asset page.
+            storeSearchText: false,
+            clearSearchText: true,
           });
         } else {
           shopNavigationState.openTagPage(tag);
@@ -523,7 +512,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         openFiltersPanelIfAppropriate();
       },
       [
-        setSearchText,
         receivedAssetPacks,
         publicAssetPacks,
         saveScrollPosition,

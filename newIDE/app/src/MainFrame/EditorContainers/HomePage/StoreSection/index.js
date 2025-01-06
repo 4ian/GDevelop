@@ -12,6 +12,7 @@ import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetSto
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
+import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
 
 type Props = {|
   project: ?gdProject,
@@ -32,10 +33,10 @@ const StoreSection = ({
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const {
-    assetShortHeadersSearchResults,
-    shopNavigationState,
-  } = React.useContext(AssetStoreContext);
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+  const { assetShortHeadersSearchResults } = React.useContext(
+    AssetStoreContext
+  );
   const {
     openedAssetPack,
     openedAssetShortHeader,

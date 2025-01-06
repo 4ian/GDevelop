@@ -17,8 +17,8 @@ import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import PrivateAssetsAuthorizationContext from '../../../../AssetStore/PrivateAssets/PrivateAssetsAuthorizationContext';
 import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import fakeResourceManagementProps from '../../../FakeResourceManagement';
-import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 import { fakeEventsFunctionsExtensionsState } from '../../../FakeEventsFunctionsExtensionsContext';
+import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
@@ -76,14 +76,13 @@ const mockFailedApiDataForPublicAsset1 = [
 ];
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {
-  const navigationState = useShopNavigation();
   return (
     <EventsFunctionsExtensionsContext.Provider
       value={fakeEventsFunctionsExtensionsState}
     >
-      <AssetStoreStateProvider shopNavigationState={navigationState}>
-        {children}
-      </AssetStoreStateProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>{children}</AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
     </EventsFunctionsExtensionsContext.Provider>
   );
 };
@@ -170,8 +169,6 @@ LayoutPublicAssetSomeAlreadyInstalled.parameters = {
 };
 
 export const LayoutPrivateAssetInstallSuccess = () => {
-  const navigationState = useShopNavigation();
-
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -186,28 +183,28 @@ export const LayoutPrivateAssetInstallSuccess = () => {
           'https://resources.gevelop.io/path/to/audio/archive',
       }}
     >
-      <AssetStoreStateProvider shopNavigationState={navigationState}>
-        <AssetPackInstallDialog
-          assetPack={fakeAssetPacks.starterPacks[0]}
-          assetShortHeaders={[fakePrivateAssetShortHeader1]}
-          addedAssetIds={new Set<string>()}
-          onClose={action('onClose')}
-          onAssetsAdded={action('onAssetsAdded')}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout.getObjects()}
-          resourceManagementProps={{
-            ...fakeResourceManagementProps,
-            canInstallPrivateAsset: () => true,
-          }}
-        />
-      </AssetStoreStateProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>
+          <AssetPackInstallDialog
+            assetPack={fakeAssetPacks.starterPacks[0]}
+            assetShortHeaders={[fakePrivateAssetShortHeader1]}
+            addedAssetIds={new Set<string>()}
+            onClose={action('onClose')}
+            onAssetsAdded={action('onAssetsAdded')}
+            project={testProject.project}
+            objectsContainer={testProject.testLayout.getObjects()}
+            resourceManagementProps={{
+              ...fakeResourceManagementProps,
+              canInstallPrivateAsset: () => true,
+            }}
+          />
+        </AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
     </PrivateAssetsAuthorizationContext.Provider>
   );
 };
 
 export const LayoutPrivateAssetInstallFailure = () => {
-  const navigationState = useShopNavigation();
-
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -222,21 +219,23 @@ export const LayoutPrivateAssetInstallFailure = () => {
           'https://resources.gevelop.io/path/to/audio/archive',
       }}
     >
-      <AssetStoreStateProvider shopNavigationState={navigationState}>
-        <AssetPackInstallDialog
-          assetPack={fakeAssetPacks.starterPacks[0]}
-          assetShortHeaders={[fakePrivateAssetShortHeader1]}
-          addedAssetIds={new Set<string>()}
-          onClose={action('onClose')}
-          onAssetsAdded={action('onAssetsAdded')}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout.getObjects()}
-          resourceManagementProps={{
-            ...fakeResourceManagementProps,
-            canInstallPrivateAsset: () => true,
-          }}
-        />
-      </AssetStoreStateProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>
+          <AssetPackInstallDialog
+            assetPack={fakeAssetPacks.starterPacks[0]}
+            assetShortHeaders={[fakePrivateAssetShortHeader1]}
+            addedAssetIds={new Set<string>()}
+            onClose={action('onClose')}
+            onAssetsAdded={action('onAssetsAdded')}
+            project={testProject.project}
+            objectsContainer={testProject.testLayout.getObjects()}
+            resourceManagementProps={{
+              ...fakeResourceManagementProps,
+              canInstallPrivateAsset: () => true,
+            }}
+          />
+        </AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
     </PrivateAssetsAuthorizationContext.Provider>
   );
 };

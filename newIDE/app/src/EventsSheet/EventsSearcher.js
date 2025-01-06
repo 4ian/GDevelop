@@ -50,6 +50,25 @@ type Props = {|
   |}) => React.Node,
 |};
 
+const deduplicateEventSearchResults = (
+  eventsSearchResults: gdVectorEventsSearchResult
+) => {
+  const resultEventsWithDuplicates = mapFor(
+    0,
+    eventsSearchResults.size(),
+    eventIndex => {
+      const eventsSearchResult = eventsSearchResults.at(eventIndex);
+      return eventsSearchResult.isEventValid()
+        ? eventsSearchResult.getEvent()
+        : null;
+    }
+  ).filter(Boolean);
+
+  // Store a list of unique events, because browsing for results in the events
+  // tree is made event by event.
+  return uniqBy<gdBaseEvent>(resultEventsWithDuplicates, event => event.ptr);
+};
+
 /**
  * Computes the positions of the first selected event and the search results
  * in the flatten event tree and looks for the search result just after the
@@ -116,25 +135,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
     });
   };
 
-  _deduplicateEventSearchResults = (
-    eventsSearchResults: gdVectorEventsSearchResult
-  ) => {
-    const resultEventsWithDuplicates = mapFor(
-      0,
-      eventsSearchResults.size(),
-      eventIndex => {
-        const eventsSearchResult = eventsSearchResults.at(eventIndex);
-        return eventsSearchResult.isEventValid()
-          ? eventsSearchResult.getEvent()
-          : null;
-      }
-    ).filter(Boolean);
-
-    // Store a list of unique events, because browsing for results in the events
-    // tree is made event by event.
-    return uniqBy<gdBaseEvent>(resultEventsWithDuplicates, event => event.ptr);
-  };
-
   _doReplaceInEvents = (
     {
       searchInSelection,
@@ -181,7 +181,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
         cb();
       }
     );
-    return this._deduplicateEventSearchResults(modifiedEvents);
+    return deduplicateEventSearchResults(modifiedEvents);
   };
 
   _doSearchInEvents = (
@@ -238,9 +238,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return;
     }
 
-    this._resultEvents = this._deduplicateEventSearchResults(
-      eventsSearchResults
-    );
+    this._resultEvents = deduplicateEventSearchResults(eventsSearchResults);
   };
 
   _goToSearchResults = (step: number): ?gdBaseEvent => {

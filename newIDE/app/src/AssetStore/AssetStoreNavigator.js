@@ -41,18 +41,22 @@ export type NavigationState = {|
   openPackPage: ({|
     assetPack: PublicAssetPack | PrivateAssetPack,
     storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openPrivateAssetPackInformationPage: ({|
     privateAssetPackListingData: PrivateAssetPackListingData,
     storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openPrivateGameTemplateInformationPage: ({|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   openAssetDetailPage: ({|
     assetShortHeader: AssetShortHeader,
     storeSearchText: boolean,
+    clearSearchText: boolean,
   |}) => void,
   navigateInsideFolder: string => void,
   goBackToFolderIndex: number => void,
@@ -277,9 +281,11 @@ export const AssetStoreNavigatorStateProvider = (
       openPackPage: ({
         assetPack,
         storeSearchText,
+        clearSearchText,
       }: {|
         assetPack: PublicAssetPack | PrivateAssetPack,
         storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -329,14 +335,16 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
-        if (storeSearchText) setSearchText('');
+        if (clearSearchText) setSearchText('');
       },
       openPrivateAssetPackInformationPage: ({
         privateAssetPackListingData,
         storeSearchText,
+        clearSearchText,
       }: {|
         privateAssetPackListingData: PrivateAssetPackListingData,
         storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -372,14 +380,16 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
-        if (storeSearchText) setSearchText('');
+        if (clearSearchText) setSearchText('');
       },
       openAssetDetailPage: ({
         assetShortHeader,
         storeSearchText,
+        clearSearchText,
       }: {|
         assetShortHeader: AssetShortHeader,
         storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -415,14 +425,16 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
-        if (storeSearchText) setSearchText('');
+        if (clearSearchText) setSearchText('');
       },
       openPrivateGameTemplateInformationPage: ({
         privateGameTemplateListingData,
         storeSearchText,
+        clearSearchText,
       }: {|
         privateGameTemplateListingData: PrivateGameTemplateListingData,
         storeSearchText: boolean,
+        clearSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -458,7 +470,7 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
-        if (storeSearchText) setSearchText('');
+        if (clearSearchText) setSearchText('');
       },
       navigateInsideFolder: (folderTag: string) => {
         setHistory(previousHistory => {

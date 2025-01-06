@@ -223,6 +223,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
           shopNavigationState.openPrivateGameTemplateInformationPage({
             privateGameTemplateListingData,
             storeSearchText: true,
+            clearSearchText: false,
           });
           initialGameTemplateOpened.current = false; // Allow to open the game template again if the effect run again.
           setInitialGameTemplateUserFriendlySlug(null);

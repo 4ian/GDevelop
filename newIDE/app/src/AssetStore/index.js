@@ -347,6 +347,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         shopNavigationState.openAssetDetailPage({
           assetShortHeader,
           storeSearchText: true,
+          clearSearchText: false,
         });
       },
       [
@@ -377,6 +378,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           shopNavigationState.openPackPage({
             assetPack,
             storeSearchText: true,
+            clearSearchText: true,
           });
           openFiltersPanelIfAppropriate();
         }
@@ -411,6 +413,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           shopNavigationState.openPrivateAssetPackInformationPage({
             privateAssetPackListingData,
             storeSearchText: true,
+            clearSearchText: true,
           });
           return;
         }
@@ -427,6 +430,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         shopNavigationState.openPackPage({
           assetPack: receivedAssetPack,
           storeSearchText: true,
+          clearSearchText: true,
         });
         openFiltersPanelIfAppropriate();
       },
@@ -463,6 +467,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         shopNavigationState.openPrivateGameTemplateInformationPage({
           privateGameTemplateListingData,
           storeSearchText: true,
+          clearSearchText: true,
         });
       },
       [saveScrollPosition, shopNavigationState]
@@ -492,11 +497,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           shopNavigationState.openPackPage({
             assetPack: privateAssetPack,
             storeSearchText: false,
+            clearSearchText: true,
           });
         } else if (publicAssetPack) {
           shopNavigationState.openPackPage({
             assetPack: publicAssetPack,
             storeSearchText: false,
+            clearSearchText: true,
           });
         } else {
           shopNavigationState.openTagPage(tag);

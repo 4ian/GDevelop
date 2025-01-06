@@ -372,6 +372,7 @@ export const AssetStoreStateProvider = ({
           shopNavigationState.openPackPage({
             assetPack,
             storeSearchText: true,
+            clearSearchText: false,
           });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
@@ -390,6 +391,7 @@ export const AssetStoreStateProvider = ({
           shopNavigationState.openPrivateAssetPackInformationPage({
             privateAssetPackListingData,
             storeSearchText: true,
+            clearSearchText: false,
           });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);

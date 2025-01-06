@@ -111,8 +111,8 @@ export const setupAutocompletions = (monaco: any) => {
     );
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
-    const threeTypesPath = path.join(runtimePath, 'three');
-    const pixiTypesPath = path.join(runtimePath, 'pixi');
+    const threeTypesPath = path.join(runtimeTypesPath, 'three');
+    const pixiTypesPath = path.join(runtimeTypesPath, 'pixi');
 
     importAllJsFilesFromFolder(runtimePath);
     importAllJsFilesFromFolder(runtimeTypesPath);

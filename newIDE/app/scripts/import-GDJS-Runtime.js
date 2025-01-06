@@ -54,7 +54,8 @@ if (!args['skip-sources']) {
 
     const startTime = Date.now();
 
-    const pixiDestinationPath = path.join(destinationPath, 'Runtime-sources', 'pixi');
+    const typesDestinationPath = path.join(destinationPath, 'Runtime-sources', 'types');
+    const pixiDestinationPath = path.join(typesDestinationPath, 'pixi');
     // TODO: Investigate the use of a smart & faster sync
     // that only copy files with changed content.
     return Promise.all([
@@ -70,12 +71,12 @@ if (!args['skip-sources']) {
       ),
       copy(
         path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@types', 'three'),
-        path.join(destinationPath, 'Runtime-sources', 'three'),
+        path.join(typesDestinationPath, 'three'),
         { ...copyOptions, filter: ['*.d.ts'] }
       ),
       copy(
         path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@types', 'three', 'src'),
-        path.join(destinationPath, 'Runtime-sources', 'three', 'src'),
+        path.join(typesDestinationPath, 'three', 'src'),
         { ...copyOptions, filter: ['**/*.d.ts'] }
       ),
       copy(

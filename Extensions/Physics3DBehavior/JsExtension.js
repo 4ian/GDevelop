@@ -1551,6 +1551,13 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'canBePushed') {
+          behaviorContent
+            .getChild('canBePushed')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -1745,6 +1752,22 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        if (!behaviorContent.hasChild('canBePushed')) {
+          behaviorContent.addChild('canBePushed').setBoolValue(true);
+        }
+        behaviorProperties
+          .getOrCreate('canBePushed')
+          .setLabel('Can be pushed by other characters')
+          .setGroup(_('Walk'))
+          .setType('Boolean')
+          .setValue(
+            behaviorContent.getChild('canBePushed').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return behaviorProperties;
       };
 
@@ -1765,6 +1788,7 @@ module.exports = {
         behaviorContent
           .addChild('shouldBindObjectAndForwardAngle')
           .setBoolValue(true);
+        behaviorContent.addChild('canBePushed').setBoolValue(true);
       };
 
       const aut = extension

@@ -151,7 +151,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  scrollPosition?: number,
+  initialScrollPosition?: number,
 |};
 
 type ComponentProps = {|
@@ -350,10 +350,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   onResourceExternallyChanged = resourceInfo => {
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-  };
-
-  scrollToPosition = (position: number) => {
-    if (this._eventsTree) this._eventsTree.scrollToPosition(position);
   };
 
   getScrollPosition = (): number => {
@@ -1930,7 +1926,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     key={events.ptr}
                     indentScale={preferences.values.eventsSheetIndentScale}
                     onScroll={this._ensureFocused}
-                    scrollPosition={this.props.scrollPosition}
+                    initialScrollPosition={this.props.initialScrollPosition}
                     events={events}
                     project={project}
                     scope={scope}
@@ -2194,7 +2190,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
-  scrollToPosition: (position: number) => void,
   getScrollPosition: () => number,
 |};
 
@@ -2204,7 +2199,6 @@ const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
     onResourceExternallyChanged,
-    scrollToPosition,
     getScrollPosition,
   }));
 
@@ -2215,9 +2209,6 @@ const EventsSheet = (props, ref) => {
   const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
-  };
-  const scrollToPosition = (position: number) => {
-    if (component.current) component.current.scrollToPosition(position);
   };
   const getScrollPosition = (): number => {
     return component.current ? component.current.getScrollPosition() : 0;

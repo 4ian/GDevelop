@@ -333,7 +333,7 @@ type EventsTreeProps = {|
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
   onScroll?: () => void,
-  scrollPosition?: number,
+  initialScrollPosition?: number,
 
   screenType: ScreenType,
   windowSize: WindowSizeType,
@@ -415,7 +415,7 @@ export default class ThemableEventsTree extends Component<
       isScrolledTop: true,
       isScrolledBottom: false,
     };
-    this._isForcedToInitialScroll = !!this.props.scrollPosition;
+    this._isForcedToInitialScroll = !!this.props.initialScrollPosition;
   }
 
   componentDidMount() {
@@ -458,7 +458,7 @@ export default class ThemableEventsTree extends Component<
           listWrapper.recomputeRowHeights();
           // For some reason the List scroll is reset to 0 twice when the component is mounted.
           if (this._isForcedToInitialScroll && !this.props.searchResults) {
-            listWrapper.scrollToPosition(this.props.scrollPosition);
+            listWrapper.scrollToPosition(this.props.initialScrollPosition);
           }
         }
       }
@@ -492,14 +492,6 @@ export default class ThemableEventsTree extends Component<
         const listWrapper = currentList.wrappedInstance.current;
         listWrapper && listWrapper.scrollToRow(row);
       }
-    }
-  }
-
-  scrollToPosition(position: number) {
-    const currentList = this._list;
-    if (currentList) {
-      const listWrapper = currentList.wrappedInstance.current;
-      listWrapper && listWrapper.scrollToPosition(position);
     }
   }
 
@@ -1083,7 +1075,7 @@ export default class ThemableEventsTree extends Component<
             onScroll: event => {
               if (
                 event.scrollTop !== 0 &&
-                event.scrollTop !== this.props.scrollPosition
+                event.scrollTop !== this.props.initialScrollPosition
               ) {
                 this._isForcedToInitialScroll = false;
               }

@@ -1436,7 +1436,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
-                scrollPosition={this._editorScrollPositions.get(
+                initialScrollPosition={this._editorScrollPositions.get(
                   selectedEventsFunction.ptr
                 )}
               />

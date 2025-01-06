@@ -456,10 +456,6 @@ export default class ThemableEventsTree extends Component<
         const listWrapper = currentList.wrappedInstance.current;
         if (listWrapper) {
           listWrapper.recomputeRowHeights();
-          // For some reason the List scroll is reset to 0 twice when the component is mounted.
-          if (this._isForcedToInitialScroll && !this.props.searchResults) {
-            listWrapper.scrollToPosition(this.props.initialScrollPosition);
-          }
         }
       }
       if (cb) cb();
@@ -1018,6 +1014,22 @@ export default class ThemableEventsTree extends Component<
     // (otherwise, no re-rendering would be done).
     const treeData = this.state.treeData ? [...this.state.treeData] : null;
     const zoomLevel = this.props.fontSize || 14;
+
+    if (this._isForcedToInitialScroll) {
+      if (this.props.searchResults) {
+        this._isForcedToInitialScroll = false;
+      }
+      else {
+        const currentList = this._list;
+        if (currentList) {
+          const listWrapper = currentList.wrappedInstance.current;
+          if (listWrapper && listWrapper.Grid.state.scrollTop !== this.props.initialScrollPosition) {
+            // For some reason the List scroll is reset to 0 twice when the component is mounted.
+            listWrapper.scrollToPosition(this.props.initialScrollPosition);
+          }
+        }
+      }
+    }
 
     return (
       <div

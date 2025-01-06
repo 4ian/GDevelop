@@ -294,7 +294,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: storeSearchText ? String(searchText) : '',
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -353,7 +353,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: storeSearchText ? String(searchText) : '',
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -398,7 +398,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: storeSearchText ? String(searchText) : '',
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -443,7 +443,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: storeSearchText ? String(searchText) : '',
+            searchText: storeSearchText ? searchText : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,

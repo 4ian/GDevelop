@@ -791,11 +791,13 @@ export default function SubscriptionDialog({
                   ❤️ <Trans>Support What You Love</Trans>
                 </Text>
                 <Text size="body" color="secondary">
-                  The GDevelop project is open-source, powered by passion and
-                  community. Your membership helps the GDevelop company maintain
-                  servers, build new features, develop commercial offerings and
-                  keep the open-source project thriving. Our goal: make game
-                  development fast, fun and accessible to all.
+                  <Trans>
+                    The GDevelop project is open-source, powered by passion and
+                    community. Your membership helps the GDevelop company
+                    maintain servers, build new features, develop commercial
+                    offerings and keep the open-source project thriving. Our
+                    goal: make game development fast, fun and accessible to all.
+                  </Trans>
                 </Text>
               </Column>
               {getPlanSpecificRequirements(

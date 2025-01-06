@@ -2380,7 +2380,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       platforms: false,
     },
     cloudProjects: {
-      maximumCount: 10,
+      maximumCount: 3,
       canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
     },
@@ -2491,7 +2491,7 @@ export const limitsForGoldUser: Limits = {
     },
     cloudProjects: {
       maximumCount: 100,
-      canMaximumCountBeIncreased: false,
+      canMaximumCountBeIncreased: true,
       maximumGuestCollaboratorsPerProject: 0,
     },
     leaderboards: {

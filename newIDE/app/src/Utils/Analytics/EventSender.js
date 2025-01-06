@@ -367,7 +367,6 @@ export type SubscriptionDialogDisplayReason =
   | 'Consult profile'
   | 'Build limit reached'
   | 'Leaderboard customization'
-  | 'Extend redeemed subscription'
   | 'Generate project from prompt'
   | 'Version history'
   | 'Add collaborators on project'

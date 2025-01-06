@@ -39,6 +39,9 @@ type Props = {|
     label: React.Node,
     onPayWithCredits: () => void,
   |},
+  onUpgrade?: () => void,
+  forceColumnLayout?: boolean,
+  filter?: 'individual' | 'team' | 'education',
 |};
 
 const GetSubscriptionCard = ({
@@ -47,21 +50,26 @@ const GetSubscriptionCard = ({
   label,
   hideButton,
   payWithCreditsOptions,
+  onUpgrade,
+  forceColumnLayout,
+  filter,
 }: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
   const { isMobile } = useResponsiveWindowSize();
+  const columnLayout = forceColumnLayout || isMobile;
   return (
     <div className={classes.premiumContainer}>
       <Paper style={styles.paper} background="medium">
-        <Line expand alignItems="center" noMargin={!isMobile}>
+        <Line expand alignItems="center" noMargin={!columnLayout}>
           <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
           <Column expand justifyContent="center">
             <ResponsiveLineStackLayout
               alignItems="center"
               noColumnMargin
               noMargin
+              forceMobileLayout={columnLayout}
             >
               <Column noMargin expand>
                 {children}
@@ -79,10 +87,14 @@ const GetSubscriptionCard = ({
                   label={label || <Trans>Upgrade</Trans>}
                   primary
                   onClick={() => {
+                    if (onUpgrade) {
+                      onUpgrade();
+                    }
                     openSubscriptionDialog({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
                       },
+                      filter,
                     });
                   }}
                   icon={<CrownShining fontSize="small" />}

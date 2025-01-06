@@ -13,7 +13,6 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
@@ -27,11 +26,8 @@ const SaveToStorageProviderDialog = ({
   onChooseProvider,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
 
-  const { profile, limits, cloudProjects } = authenticatedUser;
+  const { profile, cloudProjects } = authenticatedUser;
 
   const isLoadingCloudProjects = !!profile && !cloudProjects;
   const isCloudProjectsMaximumReached = checkIfHasTooManyCloudProjects(
@@ -67,19 +63,8 @@ const SaveToStorageProviderDialog = ({
                 }
               />
               {storageProvider.internalName === 'Cloud' &&
-                isCloudProjectsMaximumReached &&
-                limits && (
-                  <MaxProjectCountAlertMessage
-                    margin="dense"
-                    limits={limits}
-                    onUpgrade={() =>
-                      openSubscriptionDialog({
-                        analyticsMetadata: {
-                          reason: 'Cloud Project limit reached',
-                        },
-                      })
-                    }
-                  />
+                isCloudProjectsMaximumReached && (
+                  <MaxProjectCountAlertMessage margin="dense" />
                 )}
             </React.Fragment>
           ))}

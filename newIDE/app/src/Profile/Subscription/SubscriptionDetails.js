@@ -38,6 +38,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PlaceholderError from '../../UI/PlaceholderError';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
+import GetSubscriptionCard from './GetSubscriptionCard';
 
 const styles = {
   diamondIcon: {
@@ -82,7 +83,7 @@ const subscriptionOptions: {
     title: <Trans>For Education</Trans>,
     description: <Trans>Teachers, courses and universities</Trans>,
     icon: <EducationPlans style={{ width: 110, height: 100 }} />,
-    buttonColor: 'primary',
+    buttonColor: 'premium',
   },
 };
 
@@ -386,40 +387,16 @@ const SubscriptionDetails = ({
         )
       ) : !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
-          <Paper background="medium" variant="outlined" style={styles.paper}>
-            <ResponsiveLineStackLayout
-              alignItems="center"
-              expand
-              noMargin
-              noResponsiveLandscape
-            >
-              <Column expand noMargin>
-                <LineStackLayout alignItems="center">
-                  <img
-                    src="res/diamond.svg"
-                    style={styles.diamondIcon}
-                    alt="diamond"
-                  />
-                  <Text noMargin>
-                    <Trans>
-                      Unlock full access to GDevelop to create without limits!
-                    </Trans>
-                  </Text>
-                </LineStackLayout>
-              </Column>
-              <Column noMargin>
-                <RaisedButton
-                  label={<Trans>Choose a subscription</Trans>}
-                  primary
-                  onClick={() =>
-                    openSubscriptionDialog({
-                      analyticsMetadata: { reason: 'Consult profile' },
-                    })
-                  }
-                />
-              </Column>
-            </ResponsiveLineStackLayout>
-          </Paper>
+          <GetSubscriptionCard
+            label={<Trans>Choose a subscription</Trans>}
+            subscriptionDialogOpeningReason="Consult profile"
+          >
+            <Text noMargin>
+              <Trans>
+                Unlock full access to GDevelop to create without limits!
+              </Trans>
+            </Text>
+          </GetSubscriptionCard>
         ) : (
           <ResponsiveLineStackLayout noColumnMargin noResponsiveLandscape>
             {Object.keys(subscriptionOptions).map(key => {
@@ -477,42 +454,18 @@ const SubscriptionDetails = ({
           </ResponsiveLineStackLayout>
         )
       ) : (
-        <Paper background="medium" variant="outlined" style={styles.paper}>
-          <ResponsiveLineStackLayout
-            alignItems="center"
-            expand
-            noMargin
-            noResponsiveLandscape
-          >
-            <Column expand noMargin>
-              <LineStackLayout alignItems="center">
-                <img
-                  src="res/diamond.svg"
-                  style={styles.diamondIcon}
-                  alt="diamond"
-                />
-                <Text noMargin>
-                  <Trans>
-                    Oh no! Your subscription from the redemption code has
-                    expired. You can renew it by redeeming a new code or getting
-                    a new subscription.
-                  </Trans>
-                </Text>
-              </LineStackLayout>
-            </Column>
-            <Column noMargin>
-              <RaisedButton
-                label={<Trans>Choose a subscription</Trans>}
-                primary
-                onClick={() =>
-                  openSubscriptionDialog({
-                    analyticsMetadata: { reason: 'Consult profile' },
-                  })
-                }
-              />
-            </Column>
-          </ResponsiveLineStackLayout>
-        </Paper>
+        <GetSubscriptionCard
+          label={<Trans>Choose a subscription</Trans>}
+          subscriptionDialogOpeningReason="Consult profile"
+        >
+          <Text noMargin>
+            <Trans>
+              Oh no! Your subscription from the redemption code has expired. You
+              can renew it by redeeming a new code or getting a new
+              subscription.
+            </Trans>
+          </Text>
+        </GetSubscriptionCard>
       )}
     </Column>
   );

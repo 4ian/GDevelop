@@ -82,3 +82,20 @@ export const PayWithCreditsOptions = () => (
     </GetSubscriptionCard>
   </AuthenticatedUserContext.Provider>
 );
+
+export const ForceColumnLayout = () => (
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    <GetSubscriptionCard
+      subscriptionDialogOpeningReason="Build limit reached"
+      forceColumnLayout
+    >
+      <Line>
+        <Column noMargin>
+          <Text noMargin>
+            Upgrade your GDevelop subscription to unlock this packaging.
+          </Text>
+        </Column>
+      </Line>
+    </GetSubscriptionCard>
+  </AuthenticatedUserContext.Provider>
+);

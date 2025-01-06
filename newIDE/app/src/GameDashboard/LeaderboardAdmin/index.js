@@ -66,8 +66,9 @@ import LeaderboardOptionsDialog, {
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
-import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
+import MaxLeaderboardCountAlertMessage, {
+  checkIfHasTooManyLeaderboards,
+} from './MaxLeaderboardCountAlertMessage';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Paper from '../../UI/Paper';
 import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
@@ -234,9 +235,6 @@ export const LeaderboardAdmin = ({
     fetchLeaderboardEntries,
     browsing: { entries, goToNextPage, goToPreviousPage, goToFirstPage },
   } = React.useContext(LeaderboardContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
 
   const setIsLoading = React.useCallback(
     (yesOrNo: boolean) => {
@@ -332,13 +330,7 @@ export const LeaderboardAdmin = ({
     setApiError(null);
     try {
       if (limits && leaderboards) {
-        const leaderboardLimits = limits.capabilities.leaderboards;
-        if (
-          leaderboardLimits &&
-          leaderboardLimits.maximumCountPerGame > 0 &&
-          leaderboards.filter(leaderboard => !leaderboard.deletedAt).length >=
-            leaderboardLimits.maximumCountPerGame
-        ) {
+        if (checkIfHasTooManyLeaderboards(authenticatedUser, leaderboards)) {
           setDisplayMaxLeaderboardCountReachedWarning(true);
           return;
         }
@@ -907,20 +899,8 @@ export const LeaderboardAdmin = ({
       {({ i18n }) => (
         <>
           <Column noMargin expand>
-            {displayMaxLeaderboardCountReachedWarning && limits && (
-              <MaxLeaderboardCountAlertMessage
-                onUpgrade={() =>
-                  openSubscriptionDialog({
-                    analyticsMetadata: {
-                      reason: 'Leaderboard count per game limit reached',
-                    },
-                  })
-                }
-                onClose={() =>
-                  setDisplayMaxLeaderboardCountReachedWarning(false)
-                }
-                limits={limits}
-              />
+            {displayMaxLeaderboardCountReachedWarning && (
+              <MaxLeaderboardCountAlertMessage />
             )}
             <ResponsiveLineStackLayout
               noMargin

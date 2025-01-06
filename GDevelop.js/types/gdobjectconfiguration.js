@@ -12,6 +12,7 @@ declare class gdObjectConfiguration {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   getAnimationsCount(): number;
+  getAnimationName(index: number): string;
   delete(): void;
   ptr: number;
 };

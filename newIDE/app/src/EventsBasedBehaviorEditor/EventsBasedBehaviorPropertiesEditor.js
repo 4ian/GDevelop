@@ -730,6 +730,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           label={t`Boolean (checkbox)`}
                                         />
                                         <SelectOption
+                                          key="property-type-animationname"
+                                          value="AnimationName"
+                                          label={t`Animation name (text)`}
+                                        />
+                                        <SelectOption
                                           key="property-type-choice"
                                           value="Choice"
                                           label={t`String from a list of options (text)`}
@@ -802,7 +807,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         </SelectField>
                                       )}
                                       {(property.getType() === 'String' ||
-                                        property.getType() === 'Number') && (
+                                        property.getType() === 'Number' ||
+                                        property.getType() ===
+                                          'AnimationName') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={

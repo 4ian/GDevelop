@@ -153,6 +153,23 @@ class LocalFileSystem {
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
+      if (e.code === 'ENOENT') {
+        // If the file does not exist, it's possible it is meant to be downloaded.
+        // In this case, consider the file copied by getting it to be downloaded in the new destination.
+        const existingDestToDownload = Object.keys(this._filesToDownload).find(
+          filePath => filePath === source
+        );
+        if (existingDestToDownload) {
+          const existingSourceToDownload = this._filesToDownload[
+            existingDestToDownload
+          ];
+          this._filesToDownload[
+            pathPosix.normalize(dest)
+          ] = existingSourceToDownload;
+          return true;
+        }
+      }
+
       console.error('copyFile(' + source + ', ' + dest + ') failed: ' + e);
       return false;
     }

@@ -183,6 +183,21 @@ export default class BrowserFileSystem {
       return true;
     }
 
+    // If this is a file that we have to download,
+    // consider the file copied by getting it to be downloaded in the new destination
+    const existingDestToDownload = Object.keys(this._filesToDownload).find(
+      filePath => filePath === source
+    );
+    if (existingDestToDownload) {
+      const existingSourceToDownload = this._filesToDownload[
+        existingDestToDownload
+      ];
+      this._filesToDownload[
+        pathPosix.normalize(dest)
+      ] = existingSourceToDownload;
+      return true;
+    }
+
     console.error(`File not found in copyFile (from ${source} to ${dest}).`);
     return false;
   };

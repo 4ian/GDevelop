@@ -48,6 +48,7 @@ const resourceKindToInputAcceptedMimes = {
   ],
   atlas: [],
   spine: ['application/json'],
+  javascript: ['text/javascript'],
 };
 
 const getAcceptedExtensions = (

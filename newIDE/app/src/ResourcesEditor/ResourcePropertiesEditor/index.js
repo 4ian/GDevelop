@@ -20,6 +20,7 @@ import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
+import AlertMessage from '../../UI/AlertMessage';
 
 type Props = {|
   project: gdProject,
@@ -179,6 +180,18 @@ const ResourcePropertiesEditor = React.forwardRef<
             {!resources || !resources.length
               ? renderEmpty()
               : renderResourcesProperties()}
+            {resources.length > 0 &&
+              resources.some(
+                resource => resource.getKind() === 'javascript'
+              ) && (
+                <AlertMessage kind="info">
+                  <Trans>
+                    JavaScript files must be imported by an extension - by
+                    choosing it the extension properties. Otherwise, it won't be
+                    loaded by the game.
+                  </Trans>
+                </AlertMessage>
+              )}
             <EmbeddedResourcesMappingTable resources={resources} />
           </ColumnStackLayout>
         </ScrollView>

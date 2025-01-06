@@ -30,7 +30,8 @@ export type ResourceKind =
   | 'bitmapFont'
   | 'model3D'
   | 'atlas'
-  | 'spine';
+  | 'spine'
+  | 'javascript';
 
 export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
 
@@ -103,6 +104,14 @@ export const allResourceKindsAndMetadata = [
     fileExtensions: ['json'],
     createNewResource: () => {
       return new gd.SpineResource();
+    },
+  },
+  {
+    kind: 'javascript',
+    displayName: t`JavaScript file`,
+    fileExtensions: ['js'],
+    createNewResource: () => {
+      return new gd.JavaScriptResource();
     },
   },
 ];

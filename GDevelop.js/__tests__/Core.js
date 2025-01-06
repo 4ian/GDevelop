@@ -1368,6 +1368,24 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('gd.JavaScriptResource', function () {
+    it('should have name and file', function () {
+      const resource = new gd.JavaScriptResource();
+      resource.setName('MyJavaScriptResource');
+      resource.setFile('MyJavaScriptFile');
+      expect(resource.getName()).toBe('MyJavaScriptResource');
+      expect(resource.getFile()).toBe('MyJavaScriptFile');
+      resource.delete();
+    });
+    it('can have metadata', function () {
+      const resource = new gd.JavaScriptResource();
+      expect(resource.getMetadata()).toBe('');
+      resource.setMetadata(JSON.stringify({ hello: 'world' }));
+      expect(resource.getMetadata()).toBe('{"hello":"world"}');
+      resource.delete();
+    });
+  });
+
   describe('gd.JsonResource', function () {
     it('should have name and file', function () {
       const resource = new gd.JsonResource();

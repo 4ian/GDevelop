@@ -30,7 +30,6 @@
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
-#include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
@@ -67,7 +66,6 @@ Project::Project()
       isAntialisingEnabledOnMobile(false),
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
-      useExternalSourceFiles(false),
       isPlayableWithKeyboard(false),
       isPlayableWithGamepad(false),
       isPlayableWithMobile(false),
@@ -742,9 +740,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
   watermark.UnserializeFrom(propElement.GetChild("watermark"));
 
-  useExternalSourceFiles =
-      propElement.GetBoolAttribute("useExternalSourceFiles");
-
   authorIds.clear();
   auto& authorIdsElement = propElement.GetChild("authorIds");
   authorIdsElement.ConsiderAsArray();
@@ -916,19 +911,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::ExternalLayout& newExternalLayout =
         InsertNewExternalLayout("", GetExternalLayoutsCount());
     newExternalLayout.UnserializeFrom(externalLayoutElement);
-  }
-
-  externalSourceFiles.clear();
-  const SerializerElement& externalSourceFilesElement =
-      element.GetChild("externalSourceFiles", 0, "ExternalSourceFiles");
-  externalSourceFilesElement.ConsiderAsArrayOf("sourceFile", "SourceFile");
-  for (std::size_t i = 0; i < externalSourceFilesElement.GetChildrenCount();
-       ++i) {
-    const SerializerElement& sourceFileElement =
-        externalSourceFilesElement.GetChild(i);
-
-    gd::SourceFile& newSourceFile = InsertNewSourceFile("", "");
-    newSourceFile.UnserializeFrom(sourceFileElement);
   }
 }
 
@@ -1109,7 +1091,6 @@ void Project::SerializeTo(SerializerElement& element) const {
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
   watermark.SerializeTo(propElement.AddChild("watermark"));
-  propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
   auto& authorIdsElement = propElement.AddChild("authorIds");
   authorIdsElement.ConsiderAsArray();
@@ -1197,13 +1178,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < externalLayouts.size(); ++i)
     externalLayouts[i]->SerializeTo(
         externalLayoutsElement.AddChild("externalLayout"));
-
-  SerializerElement& externalSourceFilesElement =
-      element.AddChild("externalSourceFiles");
-  externalSourceFilesElement.ConsiderAsArrayOf("sourceFile");
-  for (std::size_t i = 0; i < externalSourceFiles.size(); ++i)
-    externalSourceFiles[i]->SerializeTo(
-        externalSourceFilesElement.AddChild("sourceFile"));
 }
 
 bool Project::IsNameSafe(const gd::String& name) {
@@ -1242,63 +1216,6 @@ gd::String Project::GetSafeName(const gd::String& name) {
   }
 
   return newName;
-}
-
-bool Project::HasSourceFile(gd::String name, gd::String language) const {
-  vector<std::unique_ptr<SourceFile> >::const_iterator sourceFile =
-      find_if(externalSourceFiles.begin(),
-              externalSourceFiles.end(),
-              [&name](const std::unique_ptr<SourceFile>& sourceFile) {
-                return sourceFile->GetFileName() == name;
-              });
-
-  if (sourceFile == externalSourceFiles.end()) return false;
-
-  return language.empty() || (*sourceFile)->GetLanguage() == language;
-}
-
-gd::SourceFile& Project::GetSourceFile(const gd::String& name) {
-  return *(*find_if(externalSourceFiles.begin(),
-                    externalSourceFiles.end(),
-                    [&name](const std::unique_ptr<SourceFile>& sourceFile) {
-                      return sourceFile->GetFileName() == name;
-                    }));
-}
-
-const gd::SourceFile& Project::GetSourceFile(const gd::String& name) const {
-  return *(*find_if(externalSourceFiles.begin(),
-                    externalSourceFiles.end(),
-                    [&name](const std::unique_ptr<SourceFile>& sourceFile) {
-                      return sourceFile->GetFileName() == name;
-                    }));
-}
-
-void Project::RemoveSourceFile(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::SourceFile> >::iterator sourceFile =
-      find_if(externalSourceFiles.begin(),
-              externalSourceFiles.end(),
-              [&name](const std::unique_ptr<SourceFile>& sourceFile) {
-                return sourceFile->GetFileName() == name;
-              });
-  if (sourceFile == externalSourceFiles.end()) return;
-
-  externalSourceFiles.erase(sourceFile);
-}
-
-gd::SourceFile& Project::InsertNewSourceFile(const gd::String& name,
-                                             const gd::String& language,
-                                             std::size_t position) {
-  if (HasSourceFile(name, language)) return GetSourceFile(name);
-
-  gd::SourceFile& newlyInsertedSourceFile = *(
-      *(externalSourceFiles.emplace(position < externalSourceFiles.size()
-                                        ? externalSourceFiles.begin() + position
-                                        : externalSourceFiles.end(),
-                                    new SourceFile())));
-  newlyInsertedSourceFile.SetLanguage(language);
-  newlyInsertedSourceFile.SetFileName(name);
-
-  return newlyInsertedSourceFile;
 }
 
 Project::Project(const Project &other)
@@ -1366,10 +1283,6 @@ void Project::Init(const gd::Project& game) {
 
   externalLayouts = gd::Clone(game.externalLayouts);
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
-
-  useExternalSourceFiles = game.useExternalSourceFiles;
-
-  externalSourceFiles = gd::Clone(game.externalSourceFiles);
 
   variables = game.GetVariables();
 

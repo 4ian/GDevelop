@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorSourceFileMetadata {
+    unsigned long size();
+    [Const, Ref] SourceFileMetadata at(unsigned long index);
+};
+
 interface VectorInt {
     unsigned long size();
     long at(unsigned long index);
@@ -1322,6 +1327,11 @@ interface AtlasResource {
 };
 AtlasResource implements Resource;
 
+interface JavaScriptResource {
+    void JavaScriptResource();
+};
+JavaScriptResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 
@@ -1757,6 +1767,15 @@ interface DependencyMetadata {
     [Ref] DependencyMetadata OnlyIfOtherDependencyIsExported([Const] DOMString otherDependency);
 
     void CopyFrom([Const, Ref] DependencyMetadata dependencyMetadata);
+};
+
+interface SourceFileMetadata {
+    void SourceFileMetadata();
+
+    [Const, Ref] DOMString GetResourceName();
+    [Ref] SourceFileMetadata SetResourceName([Const] DOMString resourceName_);
+    [Const, Ref] DOMString GetIncludePosition();
+    [Ref] SourceFileMetadata SetIncludePosition([Const] DOMString includePosition_);
 };
 
 interface ParameterMetadata {
@@ -2248,6 +2267,7 @@ interface PlatformExtension {
 
     [Ref] MapStringPropertyDescriptor GetAllProperties();
     [Ref] VectorDependencyMetadata GetAllDependencies();
+    [Ref] VectorSourceFileMetadata GetAllSourceFiles();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
     [Const, Value] DOMString STATIC_GetBehaviorFullType(
@@ -3170,6 +3190,10 @@ interface EventsFunctionsExtension {
     [Ref] DependencyMetadata AddDependency();
     void RemoveDependencyAt(unsigned long index);
     [Ref] VectorDependencyMetadata GetAllDependencies();
+
+    [Ref] SourceFileMetadata AddSourceFile();
+    void RemoveSourceFileAt(unsigned long index);
+    [Ref] VectorSourceFileMetadata GetAllSourceFiles();
 
     [Ref] VariablesContainer GetGlobalVariables();
     [Ref] VariablesContainer GetSceneVariables();

@@ -60,6 +60,7 @@ public:
     if (resourceType == "model3D") return allModel3Ds;
     if (resourceType == "atlas") return allAtlases;
     if (resourceType == "spine") return allSpines;
+    if (resourceType == "javascript") return allJavaScripts;
 
     return emptyResources;
   };
@@ -88,6 +89,9 @@ public:
   virtual void ExposeVideo(gd::String& resourceName) override {
     allVideos.insert(resourceName);
   };
+  virtual void ExposeJavaScript(gd::String& resourceName) override {
+    allJavaScripts.insert(resourceName);
+  };
   virtual void ExposeBitmapFont(gd::String& resourceName) override {
     allBitmapFonts.insert(resourceName);
   };
@@ -114,6 +118,7 @@ public:
   std::set<gd::String> allModel3Ds;
   std::set<gd::String> allAtlases;
   std::set<gd::String> allSpines;
+  std::set<gd::String> allJavaScripts;
   std::set<gd::String> emptyResources;
 
   static const std::vector<gd::String> resourceTypes;

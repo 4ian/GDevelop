@@ -53,6 +53,10 @@ void MetadataDeclarationHelper::DeclareExtension(
     extension.SetCategory(eventsFunctionsExtension.GetCategory());
 
   DeclareExtensionDependencies(extension, eventsFunctionsExtension);
+
+  for (const auto &sourceFile : eventsFunctionsExtension.GetAllSourceFiles()) {
+    extension.AddSourceFile() = sourceFile;
+  }
 }
 
 /**

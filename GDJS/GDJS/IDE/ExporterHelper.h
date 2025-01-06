@@ -20,11 +20,11 @@ class ExternalLayout;
 class SerializerElement;
 class AbstractFileSystem;
 class ResourcesManager;
+class SourceFileMetadata;
 class WholeProjectDiagnosticReport;
 class CaptureOptions;
 class Screenshot;
 }  // namespace gd
-class wxProgressDialog;
 
 namespace gdjs {
 
@@ -451,21 +451,6 @@ class ExporterHelper {
                             std::vector<gd::String> &includesFiles);
 
   /**
-   * \brief Copy the external source files used by the game into the export
-   * directory, and add them into files to be included.
-   *
-   * Files are named "ext-codeX.js", X being the index of the external source
-   * file in the project. \param project The project with resources to be
-   * exported. \param outputDir The directory where the events code must be
-   * generated. \param includesFiles A reference to a vector that will be filled
-   * with JS files to be exported along with the project. (including
-   * "ext-codeX.js" files).
-   */
-  bool ExportExternalSourceFiles(const gd::Project &project,
-                                 gd::String outputDir,
-                                 std::vector<gd::String> &includesFiles);
-
-  /**
    * \brief Generate the standard index file and save it to the export
    * directory.
    *
@@ -482,10 +467,11 @@ class ExporterHelper {
    * \param additionalSpec JSON string that will be passed to the
    * gdjs.RuntimeGame object.
    */
-  bool ExportPixiIndexFile(const gd::Project &project,
+  bool ExportIndexFile(const gd::Project &project,
                            gd::String source,
                            gd::String exportDir,
                            const std::vector<gd::String> &includesFiles,
+                           const std::vector<gd::SourceFileMetadata> &sourceFiles,
                            unsigned int nonRuntimeScriptsCacheBurst,
                            gd::String additionalSpec = "");
 

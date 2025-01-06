@@ -340,7 +340,6 @@ declare interface ProjectPropertiesData {
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: string;
-  useExternalSourceFiles: boolean;
   version: string;
   name: string;
   author: string;

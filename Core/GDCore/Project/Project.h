@@ -32,7 +32,6 @@ class Object;
 class ObjectConfiguration;
 class VariablesContainer;
 class ArbitraryResourceWorker;
-class SourceFile;
 class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
@@ -1019,56 +1018,6 @@ class GD_CORE_API Project {
   static gd::String GetSafeName(const gd::String& name);
   ///@}
 
-  /** \name External source files
-   * To manage external C++ or Javascript source files used by the game
-   */
-  ///@{
-  /**
-   * \brief Return true if the game activated the use of external source files.
-   */
-  bool UseExternalSourceFiles() const { return useExternalSourceFiles; }
-
-  /**
-   * \brief Return a const reference to the vector containing all the source
-   * files used by the game.
-   */
-  const std::vector<std::unique_ptr<gd::SourceFile> >& GetAllSourceFiles()
-      const {
-    return externalSourceFiles;
-  }
-
-  /**
-   * \brief Return true if the source file with the specified name is used by
-   * the game. \param name The filename of the source file. \param language
-   * Optional. If specified, check that the source file that exists is in this
-   * language.
-   */
-  bool HasSourceFile(gd::String name, gd::String language = "") const;
-
-  /**
-   * Return a reference to the external source file with the given name.
-   */
-  SourceFile& GetSourceFile(const gd::String& name);
-
-  /**
-   * Return a reference to the external source file with the given name.
-   */
-  const SourceFile& GetSourceFile(const gd::String& name) const;
-
-  /**
-   * Remove the specified source file.
-   */
-  void RemoveSourceFile(const gd::String& name);
-
-  /**
-   * Add a new source file the specified position in the external source files
-   * list.
-   */
-  gd::SourceFile& InsertNewSourceFile(const gd::String& name,
-                                      const gd::String& language,
-                                      std::size_t position = -1);
-  ///@}
-
   gd::WholeProjectDiagnosticReport& GetWholeProjectDiagnosticReport() {
     return wholeProjectDiagnosticReport;
   }
@@ -1141,10 +1090,6 @@ class GD_CORE_API Project {
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
-  bool useExternalSourceFiles =
-      false;  ///< True if game used external source files.
-  std::vector<std::unique_ptr<gd::SourceFile> >
-      externalSourceFiles;  ///< List of external source files used.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;  ///< Game author ids, from GDevelop users DB.

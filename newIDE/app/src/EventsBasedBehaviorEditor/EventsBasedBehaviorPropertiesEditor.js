@@ -41,6 +41,7 @@ import SearchBar from '../UI/SearchBar';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import CompactSelectField from '../UI/CompactSelectField';
 
 const gd: libGDevelop = global.gd;
 
@@ -730,6 +731,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           label={t`Boolean (checkbox)`}
                                         />
                                         <SelectOption
+                                          key="property-type-animationname"
+                                          value="AnimationName"
+                                          label={t`Animation Name (text)`}
+                                          />
+                                        <SelectOption
                                           key="property-type-choice"
                                           value="Choice"
                                           label={t`String from a list of options (text)`}
@@ -943,6 +949,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           property
                                         )}
                                       />
+                                    )}
+                                    {property.getType() === 'AnimationName' && (
+                                      <SelectField value = {'value'}
+                                      />
+                                      //<SelectOption />
                                     )}
                                     <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField

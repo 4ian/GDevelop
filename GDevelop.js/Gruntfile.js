@@ -183,6 +183,6 @@ module.exports = function (grunt) {
     'build:raw',
     'shell:copyToNewIDE',
     'shell:generateFlowTypes',
-    'shell:generateTSTypes',
+    //'shell:generateTSTypes',
   ]);
 };

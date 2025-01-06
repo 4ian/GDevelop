@@ -42,6 +42,7 @@ import { getAssetShortHeadersToDisplay } from './AssetsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import LoaderModal from '../UI/LoaderModal';
+import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 const isDev = Window.isDev();
 
@@ -130,7 +131,7 @@ export const useInstallAsset = ({
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
 |}) => {
-  const { shopNavigationState } = React.useContext(AssetStoreContext);
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -261,10 +262,10 @@ function NewObjectDialog({
 
   const {
     assetShortHeadersSearchResults,
-    shopNavigationState,
     environment,
     setEnvironment,
   } = React.useContext(AssetStoreContext);
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,

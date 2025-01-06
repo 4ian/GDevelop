@@ -26,6 +26,8 @@ export type AssetStorePageState = {|
 |};
 
 export type NavigationState = {|
+  searchText: string,
+  setSearchText: string => void,
   getCurrentPage: () => AssetStorePageState,
   isRootPage: boolean,
   backToPreviousPage: () => AssetStorePageState,
@@ -38,19 +40,19 @@ export type NavigationState = {|
   openShopCategoryPage: string => void,
   openPackPage: ({|
     assetPack: PublicAssetPack | PrivateAssetPack,
-    previousSearchText: string,
+    storeSearchText: boolean,
   |}) => void,
   openPrivateAssetPackInformationPage: ({|
     privateAssetPackListingData: PrivateAssetPackListingData,
-    previousSearchText: string,
+    storeSearchText: boolean,
   |}) => void,
   openPrivateGameTemplateInformationPage: ({|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
-    previousSearchText: string,
+    storeSearchText: boolean,
   |}) => void,
   openAssetDetailPage: ({|
     assetShortHeader: AssetShortHeader,
-    previousSearchText: string,
+    storeSearchText: boolean,
   |}) => void,
   navigateInsideFolder: string => void,
   goBackToFolderIndex: number => void,
@@ -112,6 +114,8 @@ type AssetStorePageHistory = {|
 |};
 
 export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
+  searchText: '',
+  setSearchText: () => {},
   getCurrentPage: () => assetStoreHomePageState,
   isRootPage: true,
   backToPreviousPage: () => assetStoreHomePageState,
@@ -137,6 +141,7 @@ type AssetStoreNavigatorStateProviderProps = {|
 export const AssetStoreNavigatorStateProvider = (
   props: AssetStoreNavigatorStateProviderProps
 ) => {
+  const [searchText, setSearchText] = React.useState<string>('');
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });
@@ -144,6 +149,8 @@ export const AssetStoreNavigatorStateProvider = (
 
   const state = React.useMemo(
     () => ({
+      searchText,
+      setSearchText,
       getCurrentPage: () => previousPages[previousPages.length - 1],
       isRootPage: previousPages.length <= 1,
       backToPreviousPage: () => {
@@ -269,10 +276,10 @@ export const AssetStoreNavigatorStateProvider = (
       },
       openPackPage: ({
         assetPack,
-        previousSearchText,
+        storeSearchText,
       }: {|
         assetPack: PublicAssetPack | PrivateAssetPack,
-        previousSearchText: string,
+        storeSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -281,7 +288,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? String(searchText) : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -322,13 +329,14 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
+        if (storeSearchText) setSearchText('');
       },
       openPrivateAssetPackInformationPage: ({
         privateAssetPackListingData,
-        previousSearchText,
+        storeSearchText,
       }: {|
         privateAssetPackListingData: PrivateAssetPackListingData,
-        previousSearchText: string,
+        storeSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -337,7 +345,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? String(searchText) : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -364,13 +372,14 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
+        if (storeSearchText) setSearchText('');
       },
       openAssetDetailPage: ({
         assetShortHeader,
-        previousSearchText,
+        storeSearchText,
       }: {|
         assetShortHeader: AssetShortHeader,
-        previousSearchText: string,
+        storeSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -379,7 +388,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? String(searchText) : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -406,13 +415,14 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
+        if (storeSearchText) setSearchText('');
       },
       openPrivateGameTemplateInformationPage: ({
         privateGameTemplateListingData,
-        previousSearchText,
+        storeSearchText,
       }: {|
         privateGameTemplateListingData: PrivateGameTemplateListingData,
-        previousSearchText: string,
+        storeSearchText: boolean,
       |}) => {
         setHistory(previousHistory => {
           const currentPage =
@@ -421,7 +431,7 @@ export const AssetStoreNavigatorStateProvider = (
             ];
           const currentPageWithSearchText = {
             ...currentPage,
-            searchText: previousSearchText,
+            searchText: storeSearchText ? String(searchText) : '',
           };
           const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
             0,
@@ -448,6 +458,7 @@ export const AssetStoreNavigatorStateProvider = (
             ],
           };
         });
+        if (storeSearchText) setSearchText('');
       },
       navigateInsideFolder: (folderTag: string) => {
         setHistory(previousHistory => {
@@ -501,7 +512,7 @@ export const AssetStoreNavigatorStateProvider = (
         });
       },
     }),
-    [previousPages]
+    [searchText, previousPages]
   );
 
   return (

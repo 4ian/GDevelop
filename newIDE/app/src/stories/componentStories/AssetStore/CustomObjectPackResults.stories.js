@@ -6,7 +6,7 @@ import paperDecorator from '../../PaperDecorator';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { CustomObjectPackResults } from '../../../AssetStore/NewObjectFromScratch';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
-import { useShopNavigation } from '../../../AssetStore/AssetStoreNavigator';
+import { AssetStoreNavigatorStateProvider } from '../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/CustomObjectPackResults',
@@ -15,12 +15,11 @@ export default {
 };
 
 const Wrapper = ({ children }: {| children: React.Node |}) => {
-  const navigationState = useShopNavigation();
   return (
     <FixedHeightFlexContainer height={500}>
-      <AssetStoreStateProvider shopNavigationState={navigationState}>
-        {children}
-      </AssetStoreStateProvider>
+      <AssetStoreNavigatorStateProvider>
+        <AssetStoreStateProvider>{children}</AssetStoreStateProvider>
+      </AssetStoreNavigatorStateProvider>
     </FixedHeightFlexContainer>
   );
 };

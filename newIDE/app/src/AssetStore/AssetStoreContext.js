@@ -29,7 +29,6 @@ import {
   AssetSwappingAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import {
-  type NavigationState,
   type AssetStorePageState,
   assetStoreHomePageState,
   AssetStoreNavigatorContext,
@@ -41,8 +40,6 @@ import {
   getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-
-const defaultSearchText = '';
 
 export type AssetFiltersState = {|
   animatedFilter: AnimatedAssetStoreSearchFilter,
@@ -79,12 +76,9 @@ type AssetStoreState = {|
   privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
-  searchText: string,
-  setSearchText: string => void,
   assetFiltersState: AssetFiltersState,
   assetPackFiltersState: AssetPackFiltersState,
   clearAllFilters: () => void,
-  shopNavigationState: NavigationState,
   currentPage: AssetStorePageState,
   useSearchItem: (
     searchText: string,
@@ -109,8 +103,6 @@ export const initialAssetStoreState: AssetStoreState = {
   privateAssetPackListingDatasSearchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
-  searchText: '',
-  setSearchText: () => {},
   assetFiltersState: {
     animatedFilter: new AnimatedAssetStoreSearchFilter(),
     setAnimatedFilter: filter => {},
@@ -132,30 +124,6 @@ export const initialAssetStoreState: AssetStoreState = {
     setTypeFilter: filter => {},
   },
   clearAllFilters: () => {},
-  shopNavigationState: {
-    getCurrentPage: () => assetStoreHomePageState,
-    isRootPage: true,
-    backToPreviousPage: () => assetStoreHomePageState,
-    openHome: () => assetStoreHomePageState,
-    openAssetSwapping: () => assetStoreHomePageState,
-    clearHistory: () => {},
-    clearPreviousPageFromHistory: () => {},
-    openSearchResultPage: () => {},
-    openTagPage: tag => {},
-    openShopCategoryPage: category => {},
-    openPackPage: ({ assetPack, previousSearchText }) => {},
-    openAssetDetailPage: ({ assetShortHeader, previousSearchText }) => {},
-    openPrivateAssetPackInformationPage: ({
-      privateAssetPackListingData,
-      previousSearchText,
-    }) => {},
-    openPrivateGameTemplateInformationPage: ({
-      privateGameTemplateListingData,
-      previousSearchText,
-    }) => {},
-    navigateInsideFolder: folder => {},
-    goBackToFolderIndex: index => {},
-  },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
@@ -192,6 +160,8 @@ export const AssetStoreStateProvider = ({
   children,
 }: AssetStoreStateProviderProps) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+  const { searchText } = shopNavigationState;
+
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
@@ -228,8 +198,6 @@ export const AssetStoreStateProvider = ({
   ] = React.useState<?string>(null);
   const initialPackOpened = React.useRef<boolean>(false);
   const { showAlert } = useAlertDialog();
-
-  const [searchText, setSearchText] = React.useState(defaultSearchText);
 
   const [
     animatedFilter,
@@ -403,7 +371,7 @@ export const AssetStoreStateProvider = ({
         if (assetPack) {
           shopNavigationState.openPackPage({
             assetPack,
-            previousSearchText: searchText,
+            storeSearchText: true,
           });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
@@ -421,7 +389,7 @@ export const AssetStoreStateProvider = ({
         if (privateAssetPackListingData) {
           shopNavigationState.openPrivateAssetPackInformationPage({
             privateAssetPackListingData,
-            previousSearchText: searchText,
+            storeSearchText: true,
           });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
@@ -441,7 +409,6 @@ export const AssetStoreStateProvider = ({
       shopNavigationState,
       showAlert,
       initialPackUserFriendlySlug,
-      searchText,
     ]
   );
 
@@ -606,10 +573,7 @@ export const AssetStoreStateProvider = ({
       environment,
       setEnvironment,
       error,
-      shopNavigationState,
       currentPage,
-      searchText,
-      setSearchText,
       assetFiltersState,
       assetPackFiltersState,
       clearAllFilters,
@@ -643,9 +607,7 @@ export const AssetStoreStateProvider = ({
       licenses,
       environment,
       error,
-      shopNavigationState,
       currentPage,
-      searchText,
       assetFiltersState,
       assetPackFiltersState,
       clearAllFilters,

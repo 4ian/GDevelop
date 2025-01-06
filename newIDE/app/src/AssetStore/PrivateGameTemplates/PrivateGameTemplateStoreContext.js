@@ -12,9 +12,7 @@ import {
   type PrivateGameTemplateListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import { capitalize } from 'lodash';
-import {
-  AssetStoreNavigatorContext,
-} from '../AssetStoreNavigator';
+import { AssetStoreNavigatorContext } from '../AssetStoreNavigator';
 import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetStoreUtils';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
@@ -42,8 +40,6 @@ type PrivateGameTemplateStoreState = {|
   error: ?Error,
   shop: {
     privateGameTemplateListingDatasSearchResults: ?Array<PrivateGameTemplateListingData>,
-    searchText: string,
-    setSearchText: string => void,
     filtersState: FiltersState,
     setInitialGameTemplateUserFriendlySlug: string => void,
   },
@@ -65,8 +61,6 @@ export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState
   error: null,
   shop: {
     privateGameTemplateListingDatasSearchResults: null,
-    searchText: '',
-    setSearchText: () => {},
     filtersState: {
       chosenFilters: new Set(),
       addFilter: () => {},
@@ -104,6 +98,10 @@ export const PrivateGameTemplateStoreStateProvider = ({
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+  const {
+    searchText: shopSearchText,
+    setSearchText: setShopSearchText,
+  } = shopNavigationState;
   const { limits } = React.useContext(AuthenticatedUserContext);
 
   const [
@@ -124,7 +122,6 @@ export const PrivateGameTemplateStoreStateProvider = ({
   const isLoading = React.useRef<boolean>(false);
   const { showAlert } = useAlertDialog();
 
-  const [shopSearchText, setShopSearchText] = React.useState(defaultSearchText);
   const [exampleStoreSearchText, setExampleStoreSearchText] = React.useState(
     defaultSearchText
   );
@@ -225,7 +222,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
           });
           shopNavigationState.openPrivateGameTemplateInformationPage({
             privateGameTemplateListingData,
-            previousSearchText: shopSearchText,
+            storeSearchText: true,
           });
           initialGameTemplateOpened.current = false; // Allow to open the game template again if the effect run again.
           setInitialGameTemplateUserFriendlySlug(null);
@@ -243,7 +240,6 @@ export const PrivateGameTemplateStoreStateProvider = ({
       shopNavigationState,
       showAlert,
       initialGameTemplateUserFriendlySlug,
-      shopSearchText,
     ]
   );
 
@@ -342,6 +338,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
       privateGameTemplateListingDatasSearchResultsForExampleStore,
       privateGameTemplateListingDatasSearchResultsForShop,
       shopSearchText,
+      setShopSearchText,
       exampleStoreSearchText,
       currentPage.filtersState,
       filtersStateForExampleStore,

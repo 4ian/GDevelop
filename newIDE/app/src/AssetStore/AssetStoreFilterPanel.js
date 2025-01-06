@@ -22,6 +22,7 @@ import { type RGBColor } from '../Utils/ColorTransformer';
 import { HexColorField } from './HexColorField';
 import Slider from '../UI/Slider';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 type Choice = {|
   label: React.Node,
@@ -229,8 +230,9 @@ export const AssetStoreFilterPanel = ({
     assetFiltersState,
     assetPackFiltersState,
     clearAllFilters,
-    shopNavigationState,
   } = React.useContext(AssetStoreContext);
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
+
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const onChoiceChange = React.useCallback(
     () => {

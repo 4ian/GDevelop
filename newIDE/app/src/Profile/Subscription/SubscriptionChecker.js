@@ -3,20 +3,19 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
-import Star from '@material-ui/icons/Star';
-import Favorite from '@material-ui/icons/Favorite';
+import Dialog from '../../UI/Dialog';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
-import { Column, LargeSpacer, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import {
   sendSubscriptionCheckDialogShown,
   sendSubscriptionCheckDismiss,
 } from '../../Utils/Analytics/EventSender';
-import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Text from '../../UI/Text';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import GetSubscriptionCard from './GetSubscriptionCard';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
@@ -35,11 +34,6 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-const styles = {
-  icon: { width: 40, height: 40, marginRight: 20 },
-  iconText: { flex: 1 },
-};
-
 const SubscriptionChecker = React.forwardRef<
   Props,
   SubscriptionCheckerInterface
@@ -50,9 +44,6 @@ const SubscriptionChecker = React.forwardRef<
   ) => {
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
-    const { openSubscriptionDialog } = React.useContext(
-      SubscriptionSuggestionContext
-    );
 
     const closeDialog = () => {
       sendSubscriptionCheckDismiss();
@@ -94,7 +85,7 @@ const SubscriptionChecker = React.forwardRef<
     return (
       <Dialog
         open={dialogOpen}
-        title={mode === 'try' ? <Trans>We need your support!</Trans> : title}
+        title={title}
         actions={[
           <FlatButton
             label={
@@ -108,67 +99,39 @@ const SubscriptionChecker = React.forwardRef<
             primary={false}
             onClick={closeDialog}
           />,
-          <DialogPrimaryButton
-            label={<Trans>Get a subscription or login</Trans>}
-            key="subscribe"
-            primary
-            onClick={() => {
-              if (onChangeSubscription) onChangeSubscription();
-              setDialogOpen(false);
-              openSubscriptionDialog({
-                analyticsMetadata: {
-                  reason: id,
-                  preStep: 'subscriptionChecker',
-                },
-              });
-            }}
-          />,
         ]}
         onRequestClose={closeDialog}
         maxWidth="sm"
       >
-        <Column noMargin>
-          <Line noMargin alignItems="center">
-            {mode === 'try' ? (
-              <Text>
-                <Trans>
-                  Please get a subscription to keep GDevelop running.
-                </Trans>
-              </Text>
-            ) : (
-              <Text>
-                <Trans>
-                  To use this feature, you need a GDevelop subscription.
-                </Trans>
-              </Text>
-            )}
-          </Line>
-          <Line noMargin alignItems="center">
-            <Star style={styles.icon} />
-            <Text style={styles.iconText}>
-              <Trans>
-                Get a subscription to gain more one-click exports, cloud
-                projects, leaderboards and remove the GDevelop splashscreen.
-              </Trans>
-            </Text>
-          </Line>
-          <Line noMargin alignItems="center">
-            <Favorite style={styles.icon} />
-            <Text style={styles.iconText}>
-              <Trans>
-                You're also supporting the development of GDevelop, an
-                open-source software! In the future, more online services will
-                be available for users with a subscription.
-              </Trans>
-            </Text>
-          </Line>
-          <LargeSpacer />
-          <Text align="right">
-            <b>
-              <Trans>Thanks!</Trans>
-            </b>
+        <ColumnStackLayout noMargin>
+          <Text size="sub-title">
+            ❤️ <Trans>Support What You Love</Trans>
           </Text>
-        </Column>
+          <Text color="secondary">
+            <Trans>
+              Your membership helps the GDevelop company maintain servers, build
+              new features and keep the open-source project thriving. Our goal:
+              make game development fast, fun and accessible to all.
+            </Trans>
+          </Text>
+          <GetSubscriptionCard
+            subscriptionDialogOpeningReason={id}
+            label={<Trans>Get Premium</Trans>}
+            onUpgrade={() => {
+              if (onChangeSubscription) onChangeSubscription();
+              setDialogOpen(false);
+            }}
+          >
+            <Column noMargin expand>
+              <Text>
+                <Trans>
+                  Upgrade to get more cloud projects, publishing, multiplayer,
+                  courses and credits every month with GDevelop Premium.
+                </Trans>
+              </Text>
+            </Column>
+          </GetSubscriptionCard>
+        </ColumnStackLayout>
       </Dialog>
     );
   }

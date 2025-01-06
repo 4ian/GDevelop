@@ -16,14 +16,13 @@ import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import AlertMessage from '../UI/AlertMessage';
-import { ColumnStackLayout } from '../UI/Layout';
-import RaisedButton from '../UI/RaisedButton';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
+import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import Text from '../UI/Text';
 
 const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
@@ -96,9 +95,6 @@ const useVersionHistory = ({
 }: Props) => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   const [
     versionsFetchingError,
     setVersionsFetchingError,
@@ -447,27 +443,19 @@ const useVersionHistory = ({
             </Column>
           </Line>
         ) : !isUserAllowedToSeeVersionHistory ? (
-          <Line expand>
-            <ColumnStackLayout>
-              <AlertMessage kind="info">
-                <Trans>
-                  Access project history, name saves, restore older versions.
-                  <br />
-                  Upgrade to a Pro plan to get started!
-                </Trans>
-              </AlertMessage>
-              <RaisedButton
-                primary
-                label={<Trans>Upgrade my subscription</Trans>}
-                onClick={() =>
-                  openSubscriptionDialog({
-                    analyticsMetadata: { reason: 'Version history' },
-                    filter: 'team',
-                  })
-                }
-              />
-            </ColumnStackLayout>
-          </Line>
+          <GetSubscriptionCard
+            subscriptionDialogOpeningReason="Version history"
+            forceColumnLayout
+            filter="team"
+          >
+            <Text>
+              <Trans>
+                Access project history, name saves, restore older versions.
+                <br />
+                Upgrade to a Pro plan to get started!
+              </Trans>
+            </Text>
+          </GetSubscriptionCard>
         ) : !state.versions && versionsFetchingError ? (
           <Line expand>
             <Column expand>

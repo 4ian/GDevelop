@@ -153,9 +153,9 @@ class LocalFileSystem {
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
-      // It's possible the file is not downloaded yet, in this case we add this path to the list of files to download.
       if (e.code === 'ENOENT') {
-        // Find if the file is in the list of files to download.
+        // If the file does not exist, it's possible it is meant to be downloaded.
+        // In this case, consider the file copied by getting it to be downloaded in the new destination.
         const existingDestToDownload = Object.keys(this._filesToDownload).find(
           filePath => filePath === source
         );

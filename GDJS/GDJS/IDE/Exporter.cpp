@@ -204,11 +204,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
             exportedProject, options.exportPath, usedExtensions))
       return false;
 
-    if (!helper.ExportBuildResourcesElectronFiles(
-            // It's important to use the original project here, as the exported
-            // project can have its resources modified.
-            options.project,
-            options.exportPath))
+    if (!helper.ExportBuildResourcesElectronFiles(exportedProject,
+                                                  options.exportPath))
       return false;
   } else if (options.target == "facebookInstantGames") {
     if (!exportProject(options.exportPath)) return false;

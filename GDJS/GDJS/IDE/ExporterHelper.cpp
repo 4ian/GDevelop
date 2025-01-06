@@ -730,9 +730,7 @@ bool ExporterHelper::ExportBuildResourcesElectronFiles(
           .GetResource(platformSpecificAssets.Get("desktop", "icon-512"))
           .GetFile();
 
-  auto projectDirectory = gd::AbstractFileSystem::NormalizeSeparator(
-      fs.DirNameFrom(project.GetProjectFile()));
-  fs.MakeAbsolute(iconFilename, projectDirectory);
+  fs.MakeAbsolute(iconFilename, exportDir + "/app");
   fs.MkDir(exportDir + "/buildResources");
   if (fs.FileExists(iconFilename)) {
     fs.CopyFile(iconFilename, exportDir + "/buildResources/icon.png");

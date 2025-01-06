@@ -153,6 +153,23 @@ class LocalFileSystem {
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
+      // It's possible the file is not downloaded yet, in this case we add this path to the list of files to download.
+      if (e.code === 'ENOENT') {
+        // Find if the file is in the list of files to download.
+        const existingDestToDownload = Object.keys(this._filesToDownload).find(
+          filePath => filePath === source
+        );
+        if (existingDestToDownload) {
+          const existingSourceToDownload = this._filesToDownload[
+            existingDestToDownload
+          ];
+          this._filesToDownload[
+            pathPosix.normalize(dest)
+          ] = existingSourceToDownload;
+          return true;
+        }
+      }
+
       console.error('copyFile(' + source + ', ' + dest + ') failed: ' + e);
       return false;
     }

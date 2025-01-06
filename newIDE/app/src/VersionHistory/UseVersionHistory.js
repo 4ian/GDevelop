@@ -443,19 +443,23 @@ const useVersionHistory = ({
             </Column>
           </Line>
         ) : !isUserAllowedToSeeVersionHistory ? (
-          <GetSubscriptionCard
-            subscriptionDialogOpeningReason="Version history"
-            forceColumnLayout
-            filter="team"
-          >
-            <Text>
-              <Trans>
-                Access project history, name saves, restore older versions.
-                <br />
-                Upgrade to a Pro plan to get started!
-              </Trans>
-            </Text>
-          </GetSubscriptionCard>
+          <Line expand>
+            <Column expand>
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Version history"
+                forceColumnLayout
+                filter="team"
+              >
+                <Text>
+                  <Trans>
+                    Access project history, name saves, restore older versions.
+                    <br />
+                    Upgrade to a Pro plan to get started!
+                  </Trans>
+                </Text>
+              </GetSubscriptionCard>
+            </Column>
+          </Line>
         ) : !state.versions && versionsFetchingError ? (
           <Line expand>
             <Column expand>

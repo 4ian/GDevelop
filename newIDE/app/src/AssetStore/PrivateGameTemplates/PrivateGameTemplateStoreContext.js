@@ -12,7 +12,9 @@ import {
   type PrivateGameTemplateListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import { capitalize } from 'lodash';
-import { type NavigationState } from '../AssetStoreNavigator';
+import {
+  AssetStoreNavigatorContext,
+} from '../AssetStoreNavigator';
 import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetStoreUtils';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
@@ -95,14 +97,13 @@ export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTe
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
-  shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
 export const PrivateGameTemplateStoreStateProvider = ({
-  shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
 
   const [

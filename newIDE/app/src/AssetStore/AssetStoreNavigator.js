@@ -111,13 +111,38 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const useShopNavigation = (): NavigationState => {
+export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
+  getCurrentPage: () => assetStoreHomePageState,
+  isRootPage: true,
+  backToPreviousPage: () => assetStoreHomePageState,
+  openHome: () => assetStoreHomePageState,
+  openAssetSwapping: () => assetStoreHomePageState,
+  clearHistory: () => {},
+  clearPreviousPageFromHistory: () => {},
+  openSearchResultPage: () => {},
+  openTagPage: string => {},
+  openShopCategoryPage: string => {},
+  openPackPage: () => {},
+  openPrivateAssetPackInformationPage: () => {},
+  openPrivateGameTemplateInformationPage: () => {},
+  openAssetDetailPage: () => {},
+  navigateInsideFolder: string => {},
+  goBackToFolderIndex: number => {},
+});
+
+type AssetStoreNavigatorStateProviderProps = {|
+  children: React.Node,
+|};
+
+export const AssetStoreNavigatorStateProvider = (
+  props: AssetStoreNavigatorStateProviderProps
+) => {
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });
   const previousPages = history.previousPages;
 
-  return React.useMemo(
+  const state = React.useMemo(
     () => ({
       getCurrentPage: () => previousPages[previousPages.length - 1],
       isRootPage: previousPages.length <= 1,
@@ -477,5 +502,11 @@ export const useShopNavigation = (): NavigationState => {
       },
     }),
     [previousPages]
+  );
+
+  return (
+    <AssetStoreNavigatorContext.Provider value={state}>
+      {props.children}
+    </AssetStoreNavigatorContext.Provider>
   );
 };

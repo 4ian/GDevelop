@@ -32,6 +32,7 @@ import {
   type NavigationState,
   type AssetStorePageState,
   assetStoreHomePageState,
+  AssetStoreNavigatorContext,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -167,7 +168,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>(
 );
 
 type AssetStoreStateProviderProps = {|
-  shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
@@ -189,9 +189,9 @@ const getPrivateAssetPackListingDataSearchTerms = (
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
 export const AssetStoreStateProvider = ({
-  shopNavigationState,
   children,
 }: AssetStoreStateProviderProps) => {
+  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);

@@ -279,6 +279,28 @@ namespace gdjs {
       }
     }
 
+    reloadInstances(
+      instances: Array<{
+        persistentUuid: string;
+        position: { x: number; y: number; z: number };
+      }>
+    ) {
+      const currentScene = this._game.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+      currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
+        const instance = instances.find(
+          (instance) => instance.persistentUuid === runtimeObject.persistentUuid
+        );
+        if (instance) {
+          runtimeObject.setX(instance.position.x);
+          runtimeObject.setY(instance.position.y);
+          if (runtimeObject instanceof gdjs.RuntimeObject3D) {
+            runtimeObject.setZ(instance.position.z);
+          }
+        }
+      });
+    }
+
     getFirstIntersectsOnEachLayer(highlightObject: boolean) {
       if (highlightObject) {
         this._clearCurrentPasses.forEach((callback) => callback());

@@ -96,6 +96,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     initialInstances,
     selectedLayer,
     onSelectInstances,
+    onInstancesModified,
   } = props;
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -145,6 +146,13 @@ const MosaicEditorsDisplay = React.forwardRef<
 
     return editorRef.current.getInstanceSize(instance);
   }, []);
+  const _onInstancesModified = React.useCallback(
+    instances => {
+      if (onInstancesModified) onInstancesModified(instances);
+      forceUpdateInstancesList();
+    },
+    [onInstancesModified, forceUpdateInstancesList]
+  );
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
@@ -276,7 +284,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               editInstanceVariables={props.editInstanceVariables}
               editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
               onEditObject={props.onEditObject}
-              onInstancesModified={forceUpdateInstancesList}
+              onInstancesModified={_onInstancesModified}
               onGetInstanceSize={getInstanceSize}
               ref={instanceOrObjectPropertiesEditorRef}
               unsavedChanges={props.unsavedChanges}

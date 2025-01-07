@@ -262,6 +262,8 @@ namespace gdjs {
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
+      } else if (data.command === 'instances.updated') {
+        runtimeGame._editor.reloadInstances(data.payload.instances);
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);

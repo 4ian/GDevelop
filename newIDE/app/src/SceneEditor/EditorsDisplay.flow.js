@@ -39,6 +39,7 @@ export type SceneEditorsDisplayProps = {|
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
   editObjectInPropertiesPanel: (objectName: string) => void,

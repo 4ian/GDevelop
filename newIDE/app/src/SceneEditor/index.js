@@ -263,7 +263,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onConnectionOpened: () => {},
           onConnectionErrored: () => {},
           onServerStateChanged: () => {},
-          onHandleParsedMessage: this.onReceiveMessageFromEditor.bind(this),
+          onHandleParsedMessage: this.onReceiveMessageFromGame.bind(this),
         }
       );
     }
@@ -281,7 +281,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.instancesEditorSettings;
   }
 
-  onReceiveMessageFromEditor({
+  onReceiveMessageFromGame({
     id,
     parsedMessage,
   }: {
@@ -293,9 +293,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         !this.props.layout ||
         this.props.layout.getName() !== parsedMessage.payload.layoutName
       ) {
+        // TODO: handle external layout as well.
         return;
       }
-      const modifiedInstances = [];
+      const modifiedInstances: gdInitialInstance[] = [];
       parsedMessage.payload.instances.forEach(instanceUpdateData => {
         const { persistentUuid, position } = instanceUpdateData;
         const instance = getInstanceInLayoutWithPersistentUuid(
@@ -310,11 +311,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         modifiedInstances.push(instance);
       });
       this._onInstancesMoved(modifiedInstances);
-      if (this.props.previewDebuggerServer) {
-        this.props.previewDebuggerServer.sendMessage(id, {
-          command: 'hotReload',
-        });
-      }
     }
   }
 
@@ -874,6 +870,25 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'instances.updated',
+          payload: {
+            instances: instances.map(instance => ({
+              persistentUuid: instance.getPersistentUuid(),
+              position: {
+                x: instance.getX(),
+                y: instance.getY(),
+                z: instance.getZ(),
+              }
+            })),
+          },
+        });
+      });
+    }
+
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
   };
@@ -2030,6 +2045,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
+                onInstancesModified={this._onInstancesModified}
                 onAddObjectInstance={this.addInstanceOnTheScene}
                 selectedLayer={this.state.selectedLayer}
                 editLayer={this.editLayer}

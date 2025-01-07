@@ -869,6 +869,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  _exportDataOnly = debounce(() => {
+    this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
+  }, 250);
+
+  /**
+   * TODO: Accept parameter that indicates which data has been modified
+   * (position, rotation, size, something else?)
+   */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     const { previewDebuggerServer, layout } = this.props;
     if (!layout) {
@@ -876,6 +884,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
     if (!previewDebuggerServer) return;
+
     previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
       previewDebuggerServer.sendMessage(debuggerId, {
         command: 'instances.updated',
@@ -892,7 +901,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
       });
     });
-
+    // TODO: Create a new export mode that will generate only the bare minimum
+    // so that the runtime game has up-to-date data without unnecessary reloading scripts.
+    // Once the mode exists, call it here.
+    // this._exportDataOnly();
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
   };

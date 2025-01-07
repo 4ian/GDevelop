@@ -228,20 +228,20 @@ namespace gdjs {
           'dragging-changed',
           (e) => {
             if (!this._selectedObjectData) return;
-            const rendererObject = this._selectedObjectData.intersect.object;
             if (e.value) {
               // Ignore if the user starts dragging
               return;
             }
-            const object = this._game.getObjectFromRenderer(
-              this._selectedObjectData.intersect.object
-            );
+            const rendererObject = this._selectedObjectData.intersect.object;
+            const object = this._game.getObjectFromRenderer(rendererObject);
             if (!object) return;
             if (object instanceof gdjs.RuntimeObject3D) {
               this._game.sendRuntimeObjectsUpdated([
                 {
                   object,
-                  position: rendererObject.position,
+                  position: object
+                    .getRenderer()
+                    .getObjectPositionFrom3DRendererObject(),
                 },
               ]);
             }
@@ -287,6 +287,8 @@ namespace gdjs {
     ) {
       const currentScene = this._game.getSceneStack().getCurrentScene();
       if (!currentScene) return;
+      // TODO: Might be worth indexing instances data and runtime objects by their
+      // persistentUuid (See HotReloader.indexByPersistentUuid).
       currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
         const instance = instances.find(
           (instance) => instance.persistentUuid === runtimeObject.persistentUuid

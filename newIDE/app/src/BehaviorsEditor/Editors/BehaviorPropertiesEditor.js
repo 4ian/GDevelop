@@ -12,6 +12,7 @@ import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { mapFor } from '../../Utils/MapFor';
+import { values } from 'lodash';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,7 +56,7 @@ const BehaviorPropertiesEditor = ({
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,
   ] = React.useState<boolean>(false);
-
+  console.log(behavior.getProperties().keys().toJSArray());
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
@@ -67,8 +68,9 @@ const BehaviorPropertiesEditor = ({
         object,
         'Basic'
       ),
-    [behavior, object]
-  );
+      [behavior, object]
+    );
+    console.log(basicPropertiesSchema);
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
     () => areAdvancedPropertiesModified(behavior),
@@ -102,14 +104,16 @@ const BehaviorPropertiesEditor = ({
       ),
     [behavior, object]
   );
-
+  
   return (
     <Column expand>
       {basicPropertiesSchema.length > 0 ||
       advancedPropertiesSchema.length > 0 ||
       deprecatedPropertiesSchema.length > 0 ? (
         <ColumnStackLayout expand noMargin>
+          TEST123
           <PropertiesEditor
+          
             project={project}
             schema={basicPropertiesSchema}
             instances={[behavior]}
@@ -118,47 +122,48 @@ const BehaviorPropertiesEditor = ({
           />
           {(advancedPropertiesSchema.length > 0 ||
             deprecatedPropertiesSchema.length > 0) && (
-            <Accordion
-              defaultExpanded={areAdvancedPropertiesExpandedByDefault}
-              noMargin
-            >
-              <AccordionHeader noMargin>
-                <Text size="sub-title">
-                  <Trans>Advanced properties</Trans>
-                </Text>
-              </AccordionHeader>
-              <AccordionBody disableGutters>
-                <Column expand noMargin>
-                  <PropertiesEditor
-                    project={project}
-                    schema={advancedPropertiesSchema}
-                    instances={[behavior]}
-                    onInstancesModified={onBehaviorUpdated}
-                    resourceManagementProps={resourceManagementProps}
-                  />
-                  {deprecatedPropertiesSchema.length > 0 &&
-                    (shouldShowDeprecatedProperties ? (
-                      <PropertiesEditor
-                        project={project}
-                        schema={deprecatedPropertiesSchema}
-                        instances={[behavior]}
-                        onInstancesModified={onBehaviorUpdated}
-                        resourceManagementProps={resourceManagementProps}
-                      />
-                    ) : (
-                      <Line justifyContent="center">
-                        <FlatButton
-                          key="show-deprecated"
-                          label={<Trans>Show deprecated options</Trans>}
-                          onClick={() =>
-                            setShouldShowDeprecatedProperties(true)
-                          }
-                        />
-                      </Line>
-                    ))}
-                </Column>
-              </AccordionBody>
-            </Accordion>
+              "ici étaient les options avancées"
+            // <Accordion
+            //   defaultExpanded={areAdvancedPropertiesExpandedByDefault}
+            //   noMargin
+            // >
+            //   <AccordionHeader noMargin>
+            //     <Text size="sub-title">
+            //       <Trans>Advanced properties</Trans>
+            //     </Text>
+            //   </AccordionHeader>
+            //   <AccordionBody disableGutters>
+            //     <Column expand noMargin>
+            //       <PropertiesEditor
+            //         project={project}
+            //         schema={advancedPropertiesSchema}
+            //         instances={[behavior]}
+            //         onInstancesModified={onBehaviorUpdated}
+            //         resourceManagementProps={resourceManagementProps}
+            //       />
+            //       {deprecatedPropertiesSchema.length > 0 &&
+            //         (shouldShowDeprecatedProperties ? (
+            //           <PropertiesEditor
+            //             project={project}
+            //             schema={deprecatedPropertiesSchema}
+            //             instances={[behavior]}
+            //             onInstancesModified={onBehaviorUpdated}
+            //             resourceManagementProps={resourceManagementProps}
+            //           />
+            //         ) : (
+            //           <Line justifyContent="center">
+            //             <FlatButton
+            //               key="show-deprecated"
+            //               label={<Trans>Show deprecated options</Trans>}
+            //               onClick={() =>
+            //                 setShouldShowDeprecatedProperties(true)
+            //               }
+            //             />
+            //           </Line>
+            //         ))}
+            //     </Column>
+            //   </AccordionBody>
+            // </Accordion>
           )}
         </ColumnStackLayout>
       ) : (

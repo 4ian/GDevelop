@@ -306,7 +306,19 @@ const PropertiesEditor = ({
             style={styles.field}
           />
         );
-      } else {
+      } else if(field.valueType === 'animationname')
+        {
+          //TODO: Populate with proper animation names
+          //TODO: When there is a change, save new values
+return(
+  <SelectField value ="test">
+    <SelectOption key={"option1"} value="choix 1" label="Premier choix" />
+    <SelectOption key={"option1"} value="test" label="Deuxième choix" />
+
+  </SelectField>
+  )
+        } 
+      else {
         const {
           onEditButtonBuildMenuTemplate,
           onEditButtonClick,

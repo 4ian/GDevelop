@@ -263,7 +263,7 @@ namespace gdjs {
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
       } else if (data.command === 'instances.updated') {
-        runtimeGame._editor.reloadInstances(data.payload.instances);
+        runtimeGame._editor.reloadInstances(data.payload);
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);

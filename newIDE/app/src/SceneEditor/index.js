@@ -870,24 +870,28 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
-    const { previewDebuggerServer } = this.props;
-    if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'instances.updated',
-          payload: {
-            instances: instances.map(instance => ({
-              persistentUuid: instance.getPersistentUuid(),
-              position: {
-                x: instance.getX(),
-                y: instance.getY(),
-                z: instance.getZ(),
-              }
-            })),
-          },
-        });
-      });
+    const { previewDebuggerServer, layout } = this.props;
+    if (!layout) {
+      // TODO: Handle external layout
+      return;
     }
+    if (!previewDebuggerServer) return;
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'instances.updated',
+        payload: {
+          layoutName: layout.getName(),
+          instances: instances.map(instance => ({
+            persistentUuid: instance.getPersistentUuid(),
+            position: {
+              x: instance.getX(),
+              y: instance.getY(),
+              z: instance.getZ(),
+            },
+          })),
+        },
+      });
+    });
 
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)

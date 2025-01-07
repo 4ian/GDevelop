@@ -279,18 +279,21 @@ namespace gdjs {
       }
     }
 
-    reloadInstances(
+    reloadInstances(payload: {
+      layoutName: string;
       instances: Array<{
         persistentUuid: string;
         position: { x: number; y: number; z: number };
-      }>
-    ) {
+      }>;
+    }) {
       const currentScene = this._game.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      if (!currentScene || currentScene.getName() !== payload.layoutName) {
+        return;
+      }
       // TODO: Might be worth indexing instances data and runtime objects by their
       // persistentUuid (See HotReloader.indexByPersistentUuid).
       currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
-        const instance = instances.find(
+        const instance = payload.instances.find(
           (instance) => instance.persistentUuid === runtimeObject.persistentUuid
         );
         if (instance) {

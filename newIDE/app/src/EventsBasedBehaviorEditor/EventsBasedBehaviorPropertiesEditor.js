@@ -41,7 +41,6 @@ import SearchBar from '../UI/SearchBar';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import ResourceTypeSelectField from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/ResourceTypeSelectField';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
-import CompactSelectField from '../UI/CompactSelectField';
 
 const gd: libGDevelop = global.gd;
 
@@ -734,7 +733,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           key="property-type-animationname"
                                           value="AnimationName"
                                           label={t`Animation Name (text)`}
-                                          />
+                                        />
                                         <SelectOption
                                           key="property-type-choice"
                                           value="Choice"
@@ -950,7 +949,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         )}
                                       />
                                     )}
-                                   
+
                                     <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField
                                         commitOnBlur

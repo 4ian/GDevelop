@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <string.h>
-#include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
 

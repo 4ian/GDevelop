@@ -12,7 +12,6 @@ import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { mapFor } from '../../Utils/MapFor';
-import { values } from 'lodash';
 
 const gd: libGDevelop = global.gd;
 
@@ -56,7 +55,6 @@ const BehaviorPropertiesEditor = ({
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,
   ] = React.useState<boolean>(false);
-  console.log(behavior.getProperties().keys().toJSArray());
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
@@ -68,9 +66,9 @@ const BehaviorPropertiesEditor = ({
         object,
         'Basic'
       ),
-      [behavior, object]
-    );
-    console.log(basicPropertiesSchema);
+    [behavior, object]
+  );
+  console.log(basicPropertiesSchema);
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
     () => areAdvancedPropertiesModified(behavior),
@@ -104,7 +102,7 @@ const BehaviorPropertiesEditor = ({
       ),
     [behavior, object]
   );
-  
+
   return (
     <Column expand>
       {basicPropertiesSchema.length > 0 ||
@@ -112,7 +110,6 @@ const BehaviorPropertiesEditor = ({
       deprecatedPropertiesSchema.length > 0 ? (
         <ColumnStackLayout expand noMargin>
           <PropertiesEditor
-          
             project={project}
             schema={basicPropertiesSchema}
             instances={[behavior]}

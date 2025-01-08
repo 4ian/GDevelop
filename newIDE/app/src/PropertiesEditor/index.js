@@ -306,9 +306,7 @@ const PropertiesEditor = ({
             style={styles.field}
           />
         );
-      } 
-        
-      else {
+      } else {
         const {
           onEditButtonBuildMenuTemplate,
           onEditButtonClick,
@@ -367,7 +365,6 @@ const PropertiesEditor = ({
 
   const renderSelectField = React.useCallback(
     (field: ValueField) => {
-      console.log(field);
       if (!field.getChoices || !field.getValue) return;
 
       const choices = field.getChoices();
@@ -405,11 +402,14 @@ const PropertiesEditor = ({
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
-        console.log("field value : ", getFieldValue({
-          instances,
-          field,
-          defaultValue: '(Multiple values)',
-        }));
+        console.log(
+          'field value : ',
+          getFieldValue({
+            instances,
+            field,
+            defaultValue: '(Multiple values)',
+          })
+        );
         return (
           <SelectField
             value={getFieldValue({
@@ -603,7 +603,6 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'leaderboardId') {
         return renderLeaderboardField(field);
       } else {
-        console.log(field);
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);
       }

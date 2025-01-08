@@ -152,7 +152,7 @@ type VariableRowProps = {|
   dropNode: (string, where: 'after' | 'before') => void,
   isSelected: boolean,
   onSelect: (shouldMultiselect: boolean, nodeId: string) => void,
-  topLevelVariableNameInputRefs: {|
+  variableNameInputRefs: {|
     current: { [number]: SimpleTextFieldInterface },
   |},
   topLevelVariableValueInputRefs: {|
@@ -166,7 +166,7 @@ type VariableRowProps = {|
   rowRightSideStyle: any,
 
   // Variable information:
-  onChangeName: (string, string) => void,
+  onChangeName: (string, string, reason: 'blur' | 'change') => void,
   overwritesInheritedVariable: boolean | void,
   name: string,
   index: number,
@@ -201,7 +201,7 @@ const VariableRow = React.memo<VariableRowProps>(
     isSelected,
     onSelect,
     gdevelopTheme,
-    topLevelVariableNameInputRefs,
+    variableNameInputRefs,
     topLevelVariableValueInputRefs,
     parentType,
     onChangeName,
@@ -347,8 +347,8 @@ const VariableRow = React.memo<VariableRowProps>(
                       <SimpleTextField
                         type="text"
                         ref={element => {
-                          if (depth === 0 && element) {
-                            topLevelVariableNameInputRefs.current[
+                          if (element) {
+                            variableNameInputRefs.current[
                               variablePointer
                             ] = element;
                           }
@@ -602,14 +602,22 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
       Array<string>
     >([]);
     const [containerWidth, setContainerWidth] = React.useState<?number>(null);
-    const topLevelVariableNameInputRefs = React.useRef<{|
+    const variableNameInputRefs = React.useRef<{|
+      // All the variable name inputs must be stored because the React key
+      // for the row contains the variable name (this could be changed) so
+      // if you change the name, you need the reference to the input
+      // in order to refocus the field when the name is changed.
       [number]: SimpleTextFieldInterface,
     |}>({});
     const topLevelVariableValueInputRefs = React.useRef<{|
+      // All the variable value inputs must be stored at the top level
+      // in the case the user wants to modify the value at the instance level
+      // of an object's variable: in that case, a new variable is created and
+      // the new variable value field needs to be focused.
       [number]: SimpleTextFieldInterface,
     |}>({});
     // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
-    const refocusNameField = useRefocusField(topLevelVariableNameInputRefs);
+    const refocusNameField = useRefocusField(variableNameInputRefs);
     // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
     const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -636,7 +644,6 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           variableContext = getParentVariableContext(variableContext);
         }
         if (variableContext.variable) {
-          // TODO Add ref to child-variables to allow to focus them.
           refocusNameField({ identifier: variableContext.variable.ptr });
         }
         const initialSelectedNodeId = variableContext.variable
@@ -1486,7 +1493,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           isSelected={isSelected}
           onSelect={onSelect}
           gdevelopTheme={gdevelopTheme}
-          topLevelVariableNameInputRefs={topLevelVariableNameInputRefs}
+          variableNameInputRefs={variableNameInputRefs}
           topLevelVariableValueInputRefs={topLevelVariableValueInputRefs}
           parentType={parentType}
           onChangeName={onChangeName}
@@ -1562,7 +1569,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     };
 
     const onChangeName = React.useCallback(
-      (newName: string, additionalContext: any) => {
+      (newName: string, additionalContext: any, reason: 'blur' | 'change') => {
+        if (!newName && reason === 'change') {
+          // Allows user to erase the whole field without the below logic
+          // filling the field with "Unnamed".
+          return;
+        }
         const parsedContext = JSON.parse(additionalContext);
         const nodeId: string = parsedContext.nodeId;
         const depth: number = parsedContext.depth;
@@ -1572,6 +1584,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           props.variablesContainer
         );
         if (name === null || !variable || newName === name) return;
+
+        const currentlyFocusedNameField =
+          variableNameInputRefs.current[variable.ptr];
+        const caretPosition = currentlyFocusedNameField
+          ? currentlyFocusedNameField.getCaretPosition()
+          : null;
 
         const parentVariable = getDirectParentVariable(lineage);
 
@@ -1612,7 +1630,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           nodeId,
           safeAndUniqueNewName
         );
-        refocusNameField({ identifier: variable.ptr });
+        refocusNameField({ identifier: variable.ptr, caretPosition });
       },
       [
         props.variablesContainer,

@@ -646,7 +646,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const lastObject = objects[objects.length - 1];
         let objectToScrollTo;
-        console.log(objects)
         if (
           newObjectDialogOpen &&
           newObjectDialogOpen.from &&
@@ -667,7 +666,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           } = getInsertionParentAndPositionFromSelection(selectedItem);
           const rootFolder = objectsContainer.getRootFolder();
           objects.forEach((object, index) => {
-            console.log(`moving object ${object.getName()}`)
             const objectFolderOrObject = rootFolder.getObjectChild(
               object.getName()
             );

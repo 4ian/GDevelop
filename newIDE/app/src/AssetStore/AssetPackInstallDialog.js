@@ -35,6 +35,7 @@ import {
   useFetchAssets,
 } from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
+import uniqBy from 'lodash/uniqBy';
 
 // We limit the number of assets that can be installed at once to avoid
 // timeouts especially with premium packs.
@@ -45,7 +46,7 @@ type Props = {|
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Set<string>,
   onClose: () => void,
-  onAssetsAdded: () => void,
+  onAssetsAdded: (createdObjects: gdObject[]) => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
@@ -168,7 +169,7 @@ const AssetPackInstallDialog = ({
         });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
-        const { errors } = await PromisePool.withConcurrency(6)
+        const { errors, results } = await PromisePool.withConcurrency(6)
           .for(assets)
           .process<InstallAssetOutput>(async asset => {
             const installOutput = isPrivateAsset(asset)
@@ -200,7 +201,11 @@ const AssetPackInstallDialog = ({
         await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
-        onAssetsAdded();
+        const createdObjects = uniqBy(
+          results.map(result => result.createdObjects).flat(),
+          'ptr'
+        );
+        onAssetsAdded(createdObjects);
       } catch (error) {
         setAreAssetsBeingInstalled(false);
         console.error('Error while installing the assets', error);

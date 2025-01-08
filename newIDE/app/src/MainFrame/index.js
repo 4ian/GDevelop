@@ -562,7 +562,7 @@ const MainFrame = (props: Props) => {
         kind === 'resources'
           ? i18n._(t`Resources`)
           : kind === 'start page'
-          ? i18n._(t`Home`)
+          ? undefined
           : kind === 'debugger'
           ? i18n._(t`Debugger`)
           : kind === 'layout events'

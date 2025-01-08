@@ -638,27 +638,64 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const onObjectsAddedFromAssets = React.useCallback(
       (objects: Array<gdObject>) => {
+        if (objects.length === 0) return;
+
         objects.forEach(object => {
           onObjectCreated(object);
         });
-        if (treeViewRef.current)
-          treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
         const lastObject = objects[objects.length - 1];
-        // A new object is always added to the scene (layout) by default.
-        const object = objectsContainer
-          .getRootFolder()
-          .getObjectChild(lastObject.getName());
-
+        let objectToScrollTo;
+        console.log(objects)
+        if (
+          newObjectDialogOpen &&
+          newObjectDialogOpen.from &&
+          // If a scene objectFolderOrObject is selected, move added assets next to or inside it.
+          !newObjectDialogOpen.from.global
+        ) {
+          const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems(
+              getFoldersAscendanceWithoutRootFolder(selectedItem).map(folder =>
+                getObjectFolderTreeViewItemId(folder)
+              )
+            );
+          }
+          const {
+            folder: parentFolder,
+            position,
+          } = getInsertionParentAndPositionFromSelection(selectedItem);
+          const rootFolder = objectsContainer.getRootFolder();
+          objects.forEach((object, index) => {
+            console.log(`moving object ${object.getName()}`)
+            const objectFolderOrObject = rootFolder.getObjectChild(
+              object.getName()
+            );
+            rootFolder.moveObjectFolderOrObjectToAnotherFolder(
+              objectFolderOrObject,
+              parentFolder,
+              position + index
+            );
+          });
+          objectToScrollTo = parentFolder.getObjectChild(lastObject.getName());
+        } else {
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems([sceneObjectsRootFolderId]);
+          }
+          // A new object is always added to the scene (layout) by default.
+          objectToScrollTo = objectsContainer
+            .getRootFolder()
+            .getObjectChild(lastObject.getName());
+        }
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(getObjectTreeViewItemId(object.getObject()));
+          scrollToItem(getObjectTreeViewItemId(objectToScrollTo.getObject()));
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [objectsContainer, onObjectCreated, scrollToItem]
+      [objectsContainer, onObjectCreated, scrollToItem, newObjectDialogOpen]
     );
 
     const swapObjectAsset = React.useCallback(

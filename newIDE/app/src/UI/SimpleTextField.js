@@ -88,6 +88,7 @@ export const SimpleTextField = React.memo<
       );
 
       const getCaretPosition = React.useCallback(() => {
+        // Returns null for inputs of type number (See https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionStart)
         if (inputRef.current) return inputRef.current.selectionStart;
         return 0;
       }, []);

@@ -166,7 +166,7 @@ type VariableRowProps = {|
   rowRightSideStyle: any,
 
   // Variable information:
-  onChangeName: (string, string) => void,
+  onChangeName: (string, string, reason: 'blur' | 'change') => void,
   overwritesInheritedVariable: boolean | void,
   name: string,
   index: number,
@@ -1561,7 +1561,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     };
 
     const onChangeName = React.useCallback(
-      (newName: string, additionalContext: any) => {
+      (newName: string, additionalContext: any, reason: 'blur' | 'change') => {
+        if (!newName && reason === 'change') {
+          // Allows user to erase the whole field without the below logic
+          // filling the field with "Unnamed".
+          return;
+        }
         const parsedContext = JSON.parse(additionalContext);
         const nodeId: string = parsedContext.nodeId;
         const depth: number = parsedContext.depth;

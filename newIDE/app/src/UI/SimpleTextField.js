@@ -7,7 +7,7 @@ import classNames from 'classnames';
 type SimpleTextFieldProps = {|
   disabled: boolean,
   type: 'number' | 'text',
-  onChange: (newValue: string, context: any) => void,
+  onChange: (newValue: string, context: any, reason: 'change' | 'blur') => void,
   value: string,
   hint?: string,
   id: string,
@@ -116,21 +116,30 @@ export const SimpleTextField = React.memo<
             onClick={stopPropagation}
             onDoubleClick={stopPropagation}
             onBlur={e => {
-              props.onChange(e.currentTarget.value, props.additionalContext);
+              props.onChange(
+                e.currentTarget.value,
+                props.additionalContext,
+                'blur'
+              );
             }}
             onChange={
               props.directlyStoreValueChangesWhileEditing
                 ? e => {
                     props.onChange(
                       e.currentTarget.value,
-                      props.additionalContext
+                      props.additionalContext,
+                      'change'
                     );
                   }
                 : undefined
             }
             onKeyUp={e => {
               if (shouldValidate(e)) {
-                props.onChange(e.currentTarget.value, props.additionalContext);
+                props.onChange(
+                  e.currentTarget.value,
+                  props.additionalContext,
+                  'blur'
+                );
               }
             }}
             style={props.italic ? styles.italic : undefined}

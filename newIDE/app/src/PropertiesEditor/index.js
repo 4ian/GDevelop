@@ -128,6 +128,7 @@ const getFieldValue = ({
   if (!getValue) return null;
 
   let value = getValue(instances[0]);
+  console.log("ccc", value);
   for (var i = 1; i < instances.length; ++i) {
     if (value !== getValue(instances[i])) {
       if (typeof defaultValue !== 'undefined') value = defaultValue;
@@ -306,18 +307,8 @@ const PropertiesEditor = ({
             style={styles.field}
           />
         );
-      } else if(field.valueType === 'animationname')
-        {
-          //TODO: Populate with proper animation names
-          //TODO: When there is a change, save new values
-return(
-  <SelectField value ="test">
-    <SelectOption key={"option1"} value="choix 1" label="Premier choix" />
-    <SelectOption key={"option1"} value="test" label="Deuxième choix" />
-
-  </SelectField>
-  )
-        } 
+      } 
+        
       else {
         const {
           onEditButtonBuildMenuTemplate,
@@ -377,6 +368,7 @@ return(
 
   const renderSelectField = React.useCallback(
     (field: ValueField) => {
+      console.log(field);
       if (!field.getChoices || !field.getValue) return;
 
       const choices = field.getChoices();
@@ -414,6 +406,11 @@ return(
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
+        console.log("field value : ", getFieldValue({
+          instances,
+          field,
+          defaultValue: '(Multiple values)',
+        }));
         return (
           <SelectField
             value={getFieldValue({
@@ -607,6 +604,7 @@ return(
       } else if (field.valueType === 'leaderboardId') {
         return renderLeaderboardField(field);
       } else {
+        console.log(field);
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);
       }

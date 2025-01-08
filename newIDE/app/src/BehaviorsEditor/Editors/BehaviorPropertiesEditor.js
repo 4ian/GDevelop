@@ -63,6 +63,7 @@ const BehaviorPropertiesEditor = ({
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
+          console.log("bbb ", name, value);
           behavior.updateProperty(name, value);
         },
         object,

@@ -833,6 +833,7 @@ interface ObjectConfiguration {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     unsigned long GetAnimationsCount();
+    [Const, Ref] DOMString GetAnimationName(unsigned long index);
 };
 
 interface UniquePtrObjectConfiguration {

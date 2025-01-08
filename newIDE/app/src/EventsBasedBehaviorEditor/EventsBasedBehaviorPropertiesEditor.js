@@ -950,11 +950,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         )}
                                       />
                                     )}
-                                    {property.getType() === 'AnimationName' && (
-                                      <SelectField value = {'value'}
-                                      />
-                                      //<SelectOption />
-                                    )}
+                                   
                                     <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField
                                         commitOnBlur

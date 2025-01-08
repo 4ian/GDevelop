@@ -1,4 +1,5 @@
 // @flow
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 
 /**

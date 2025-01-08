@@ -53,7 +53,8 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||
           propertyType == "Color" || propertyType == "Behavior" ||
-          propertyType == "Resource" || propertyType == "LeaderboardId") {
+          propertyType == "Resource" || propertyType == "LeaderboardId" ||
+          propertyType == "AnimationName") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
       } else if (propertyType == "Number") {
@@ -89,7 +90,8 @@ bool CustomConfigurationHelper::UpdateProperty(
 
   if (propertyType == "String" || propertyType == "Choice" ||
       propertyType == "Color" || propertyType == "Behavior" ||
-      propertyType == "Resource" || propertyType == "LeaderboardId") {
+      propertyType == "Resource" || propertyType == "LeaderboardId" 
+      || propertyType == "AnimationName") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

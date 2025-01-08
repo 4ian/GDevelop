@@ -603,9 +603,17 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     >([]);
     const [containerWidth, setContainerWidth] = React.useState<?number>(null);
     const variableNameInputRefs = React.useRef<{|
+      // All the variable name inputs must be stored because the React key
+      // for the row contains the variable name (this could be changed) so
+      // if you change the name, you need the reference to the input
+      // in order to refocus the field when the name is changed.
       [number]: SimpleTextFieldInterface,
     |}>({});
     const topLevelVariableValueInputRefs = React.useRef<{|
+      // All the variable value inputs must be stored at the top level
+      // in the case the user wants to modify the value at the instance level
+      // of an object's variable: in that case, a new variable is created and
+      // the new variable value field needs to be focused.
       [number]: SimpleTextFieldInterface,
     |}>({});
     // $FlowFixMe - Hard to fix issue regarding strict checking with interface.

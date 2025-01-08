@@ -90,8 +90,8 @@ bool CustomConfigurationHelper::UpdateProperty(
 
   if (propertyType == "String" || propertyType == "Choice" ||
       propertyType == "Color" || propertyType == "Behavior" ||
-      propertyType == "Resource" || propertyType == "LeaderboardId" 
-      || propertyType == "AnimationName") {
+      propertyType == "Resource" || propertyType == "LeaderboardId" || 
+      propertyType == "AnimationName") {
     element.SetStringValue(newValue);
   } else if (propertyType == "Number") {
     element.SetDoubleValue(newValue.To<double>());

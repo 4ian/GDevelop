@@ -128,7 +128,6 @@ const getFieldValue = ({
   if (!getValue) return null;
 
   let value = getValue(instances[0]);
-  console.log("ccc", value);
   for (var i = 1; i < instances.length; ++i) {
     if (value !== getValue(instances[i])) {
       if (typeof defaultValue !== 'undefined') value = defaultValue;

@@ -239,9 +239,6 @@ const createField = (
         name,
         valueType: 'string',
         getValue: (instance: Instance): string => {
-          console.log("aaa", getProperties(instance)
-          .get(name)
-          .getValue(), name);
           return getProperties(instance)
             .get(name)
             .getValue();

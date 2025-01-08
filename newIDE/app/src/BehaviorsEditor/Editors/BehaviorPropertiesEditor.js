@@ -63,7 +63,6 @@ const BehaviorPropertiesEditor = ({
         behavior.getProperties(),
         behavior => behavior.getProperties(),
         (behavior, name, value) => {
-          console.log("bbb ", name, value);
           behavior.updateProperty(name, value);
         },
         object,
@@ -112,7 +111,6 @@ const BehaviorPropertiesEditor = ({
       advancedPropertiesSchema.length > 0 ||
       deprecatedPropertiesSchema.length > 0 ? (
         <ColumnStackLayout expand noMargin>
-          TEST123
           <PropertiesEditor
           
             project={project}
@@ -123,48 +121,47 @@ const BehaviorPropertiesEditor = ({
           />
           {(advancedPropertiesSchema.length > 0 ||
             deprecatedPropertiesSchema.length > 0) && (
-              "ici étaient les options avancées"
-            // <Accordion
-            //   defaultExpanded={areAdvancedPropertiesExpandedByDefault}
-            //   noMargin
-            // >
-            //   <AccordionHeader noMargin>
-            //     <Text size="sub-title">
-            //       <Trans>Advanced properties</Trans>
-            //     </Text>
-            //   </AccordionHeader>
-            //   <AccordionBody disableGutters>
-            //     <Column expand noMargin>
-            //       <PropertiesEditor
-            //         project={project}
-            //         schema={advancedPropertiesSchema}
-            //         instances={[behavior]}
-            //         onInstancesModified={onBehaviorUpdated}
-            //         resourceManagementProps={resourceManagementProps}
-            //       />
-            //       {deprecatedPropertiesSchema.length > 0 &&
-            //         (shouldShowDeprecatedProperties ? (
-            //           <PropertiesEditor
-            //             project={project}
-            //             schema={deprecatedPropertiesSchema}
-            //             instances={[behavior]}
-            //             onInstancesModified={onBehaviorUpdated}
-            //             resourceManagementProps={resourceManagementProps}
-            //           />
-            //         ) : (
-            //           <Line justifyContent="center">
-            //             <FlatButton
-            //               key="show-deprecated"
-            //               label={<Trans>Show deprecated options</Trans>}
-            //               onClick={() =>
-            //                 setShouldShowDeprecatedProperties(true)
-            //               }
-            //             />
-            //           </Line>
-            //         ))}
-            //     </Column>
-            //   </AccordionBody>
-            // </Accordion>
+            <Accordion
+              defaultExpanded={areAdvancedPropertiesExpandedByDefault}
+              noMargin
+            >
+              <AccordionHeader noMargin>
+                <Text size="sub-title">
+                  <Trans>Advanced properties</Trans>
+                </Text>
+              </AccordionHeader>
+              <AccordionBody disableGutters>
+                <Column expand noMargin>
+                  <PropertiesEditor
+                    project={project}
+                    schema={advancedPropertiesSchema}
+                    instances={[behavior]}
+                    onInstancesModified={onBehaviorUpdated}
+                    resourceManagementProps={resourceManagementProps}
+                  />
+                  {deprecatedPropertiesSchema.length > 0 &&
+                    (shouldShowDeprecatedProperties ? (
+                      <PropertiesEditor
+                        project={project}
+                        schema={deprecatedPropertiesSchema}
+                        instances={[behavior]}
+                        onInstancesModified={onBehaviorUpdated}
+                        resourceManagementProps={resourceManagementProps}
+                      />
+                    ) : (
+                      <Line justifyContent="center">
+                        <FlatButton
+                          key="show-deprecated"
+                          label={<Trans>Show deprecated options</Trans>}
+                          onClick={() =>
+                            setShouldShowDeprecatedProperties(true)
+                          }
+                        />
+                      </Line>
+                    ))}
+                </Column>
+              </AccordionBody>
+            </Accordion>
           )}
         </ColumnStackLayout>
       ) : (

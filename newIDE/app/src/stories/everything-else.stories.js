@@ -34,7 +34,6 @@ import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalProp
 import paperDecorator, { getPaperDecorator } from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
-import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import {
   release,
@@ -2215,39 +2214,6 @@ storiesOf('SearchPanel', module)
       onCloseSearchPanel={() => {}}
       searchFocusOffset={1}
     />
-  ));
-
-storiesOf('InstructionSelector', module)
-  .addDecorator(paperDecorator)
-  .add('conditions (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <I18n>
-        {({ i18n }) => (
-          <InstructionSelector
-            i18n={i18n}
-            selectedType=""
-            onChoose={action('Instruction chosen')}
-            isCondition
-            scope={{ project: testProject.project }}
-          />
-        )}
-      </I18n>
-    </FixedHeightFlexContainer>
-  ))
-  .add('actions (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <I18n>
-        {({ i18n }) => (
-          <InstructionSelector
-            i18n={i18n}
-            selectedType=""
-            onChoose={action('Instruction chosen')}
-            isCondition={false}
-            scope={{ project: testProject.project }}
-          />
-        )}
-      </I18n>
-    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionOrObjectSelector', module)

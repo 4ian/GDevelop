@@ -732,7 +732,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         <SelectOption
                                           key="property-type-animationname"
                                           value="AnimationName"
-                                          label={t`Animation Name (text)`}
+                                          label={t`Animation name (text)`}
                                         />
                                         <SelectOption
                                           key="property-type-choice"

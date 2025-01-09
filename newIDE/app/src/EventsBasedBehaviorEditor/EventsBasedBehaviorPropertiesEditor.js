@@ -732,7 +732,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         <SelectOption
                                           key="property-type-animationname"
                                           value="AnimationName"
-                                          label={t`Animation Name (text)`}
+                                          label={t`Animation name (text)`}
                                         />
                                         <SelectOption
                                           key="property-type-choice"
@@ -808,8 +808,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                       )}
                                       {(property.getType() === 'String' ||
                                         property.getType() === 'Number' ||
-                                        property.getType() ===
-                                          'AnimationName') && (
+                                        property.getType() === 'AnimationName') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={
@@ -951,7 +950,6 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         )}
                                       />
                                     )}
-
                                     <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField
                                         commitOnBlur

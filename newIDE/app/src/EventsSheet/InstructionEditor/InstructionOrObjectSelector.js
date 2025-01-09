@@ -58,6 +58,18 @@ import {
 import { renderFolderListItem } from './SelectorListItems/FolderListItem';
 import Text from '../../UI/Text';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import ReadOnlyTreeView from '../../UI/TreeView/ReadOnlyTreeView';
+import { AutoSizer } from 'react-virtualized';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { mapFor } from '../../Utils/MapFor';
+import {
+  getObjectTreeViewItemId,
+  ObjectTreeViewItemContent,
+} from './ObjectTreeViewItemContent';
+import { ObjectFolderTreeViewItemContent } from './ObjectFolderTreeViewItemContent';
+import { type ObjectFolderTreeViewItemProps } from './ObjectFolderTreeViewItemContent';
+import { type ObjectTreeViewItemProps } from './ObjectTreeViewItemContent';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
 const gd: libGDevelop = global.gd;
 
@@ -79,6 +91,280 @@ const moveDeprecatedInstructionsDown = (
     result => !result.item.fullGroupName.includes('deprecated')
   );
   return [...notDeprecatedResults, ...deprecatedResults];
+};
+
+export interface TreeViewItemContent {
+  getName(): string | React.Node;
+  getId(): string;
+  getHtmlId(index: number): ?string;
+  getDataSet(): ?HTMLDataset;
+  getThumbnail(): ?string;
+}
+
+export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
+  group: gdObjectGroup;
+
+  constructor(group: gdObjectGroup) {
+    this.group = group;
+  }
+
+  getGroup(): gdObjectGroup | null {
+    return this.group;
+  }
+
+  getName(): string | React.Node {
+    return this.group.getName();
+  }
+
+  getId(): string {
+    return getObjectTreeViewItemId(this.group);
+  }
+
+  getHtmlId(index: number): ?string {
+    return `group-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      groupName: this.group.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return null;
+  }
+}
+export class ObjectGroupObjectTreeViewItemContent
+  implements TreeViewItemContent {
+  object: gdObject;
+  props: ObjectTreeViewItemProps;
+
+  constructor(object: gdObject, props: ObjectTreeViewItemProps) {
+    this.object = object;
+    this.props = props;
+  }
+
+  getObject(): gdObject | null {
+    return this.object;
+  }
+
+  getName(): string | React.Node {
+    return this.object.getName();
+  }
+
+  getId(): string {
+    return getObjectTreeViewItemId(this.object);
+  }
+
+  getHtmlId(index: number): ?string {
+    return `object-item-${index}`;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {
+      objectName: this.object.getName(),
+    };
+  }
+
+  getThumbnail(): ?string {
+    return this.props.getThumbnail(
+      this.props.project,
+      this.object.getConfiguration()
+    );
+  }
+}
+
+interface TreeViewItem {
+  isRoot?: boolean;
+  +content: TreeViewItemContent;
+  getChildren(searchText: string): ?Array<TreeViewItem>;
+}
+
+class LeafTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+
+  constructor(content: TreeViewItemContent) {
+    this.content = content;
+  }
+
+  getChildren(): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+class GroupTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+  group: gdObjectGroup;
+  globalObjectsContainer: gdObjectsContainer | null;
+  objectsContainer: gdObjectsContainer;
+  objectTreeViewItemProps: ObjectTreeViewItemProps;
+
+  constructor(
+    content: TreeViewItemContent,
+    group: gdObjectGroup,
+    globalObjectsContainer: gdObjectsContainer | null,
+    objectsContainer: gdObjectsContainer,
+    objectTreeViewItemProps: ObjectTreeViewItemProps
+  ) {
+    this.content = content;
+    this.group = group;
+    this.globalObjectsContainer = globalObjectsContainer;
+    this.objectsContainer = objectsContainer;
+    this.objectTreeViewItemProps = objectTreeViewItemProps;
+  }
+
+  getChildren(searchText: string): ?Array<TreeViewItem> {
+    if (!searchText) return null;
+    const allObjectNames = this.group.getAllObjectsNames();
+    return allObjectNames
+      .toJSArray()
+      .map(objectName => {
+        const object = getObjectByName(
+          this.globalObjectsContainer,
+          this.objectsContainer,
+          objectName
+        );
+        if (!object) {
+          return null;
+        }
+        return new LeafTreeViewItem(
+          new ObjectGroupObjectTreeViewItemContent(
+            object,
+            this.objectTreeViewItemProps
+          )
+        );
+      })
+      .filter(Boolean);
+  }
+}
+
+class RootTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+  children: TreeViewItem[];
+  isRoot = true;
+
+  constructor(content: TreeViewItemContent, children: TreeViewItem[]) {
+    this.content = content;
+    this.children = children;
+  }
+
+  getChildren(): ?Array<TreeViewItem> {
+    return this.children;
+  }
+}
+
+class LabelTreeViewItemContent implements TreeViewItemContent {
+  id: string;
+  label: string | React.Node;
+
+  constructor(id: string, label: string | React.Node) {
+    this.id = id;
+    this.label = label;
+  }
+
+  getName(): string | React.Node {
+    return this.label;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getHtmlId(index: number): ?string {
+    return this.id;
+  }
+
+  getDataSet(): ?HTMLDataset {
+    return {};
+  }
+
+  getThumbnail(): ?string {
+    return null;
+  }
+
+  getIndex(): number {
+    return 0;
+  }
+}
+
+class ObjectFolderTreeViewItem implements TreeViewItem {
+  isRoot: boolean;
+  global: boolean;
+  isPlaceholder = false;
+  content: TreeViewItemContent;
+  objectFolderOrObject: gdObjectFolderOrObject;
+  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps;
+  objectTreeViewItemProps: ObjectTreeViewItemProps;
+
+  constructor({
+    objectFolderOrObject,
+    global,
+    isRoot,
+    content,
+    objectFolderTreeViewItemProps,
+    objectTreeViewItemProps,
+  }: {|
+    objectFolderOrObject: gdObjectFolderOrObject,
+    global: boolean,
+    isRoot: boolean,
+    content: TreeViewItemContent,
+    objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
+    objectTreeViewItemProps: ObjectTreeViewItemProps,
+  |}) {
+    this.isRoot = isRoot;
+    this.global = global;
+    this.content = content;
+    this.objectFolderOrObject = objectFolderOrObject;
+    this.objectFolderTreeViewItemProps = objectFolderTreeViewItemProps;
+    this.objectTreeViewItemProps = objectTreeViewItemProps;
+  }
+
+  getChildren(): ?Array<TreeViewItem> {
+    if (this.objectFolderOrObject.getChildrenCount() === 0) {
+      return [];
+    }
+    return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
+      const child = this.objectFolderOrObject.getChildAt(i);
+      return createTreeViewItem({
+        objectFolderOrObject: child,
+        isGlobal: this.global,
+        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
+        objectTreeViewItemProps: this.objectTreeViewItemProps,
+      });
+    });
+  }
+}
+
+const createTreeViewItem = ({
+  objectFolderOrObject,
+  isGlobal,
+  objectFolderTreeViewItemProps,
+  objectTreeViewItemProps,
+}: {|
+  objectFolderOrObject: gdObjectFolderOrObject,
+  isGlobal: boolean,
+  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
+  objectTreeViewItemProps: ObjectTreeViewItemProps,
+|}): TreeViewItem => {
+  if (objectFolderOrObject.isFolder()) {
+    return new ObjectFolderTreeViewItem({
+      objectFolderOrObject: objectFolderOrObject,
+      global: isGlobal,
+      isRoot: false,
+      objectFolderTreeViewItemProps,
+      objectTreeViewItemProps,
+      content: new ObjectFolderTreeViewItemContent(
+        objectFolderOrObject,
+        objectFolderTreeViewItemProps
+      ),
+    });
+  } else {
+    return new LeafTreeViewItem(
+      new ObjectTreeViewItemContent(
+        objectFolderOrObject,
+        objectTreeViewItemProps
+      )
+    );
+  }
 };
 
 type State = {|
@@ -285,6 +571,17 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     });
   };
 
+  getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+  getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
+  getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
+    item.content.getHtmlId(index);
+
+  getTreeViewItemChildren = (item: TreeViewItem) =>
+    item.getChildren(this.state.searchText);
+  getTreeViewItemThumbnail = (item: TreeViewItem) =>
+    item.content.getThumbnail();
+  getTreeViewItemDataset = (item: TreeViewItem) => item.content.getDataSet();
+
   render() {
     const {
       style,
@@ -392,6 +689,87 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         );
       }
     };
+    const globalObjectsRootFolder = globalObjectsContainer
+      ? globalObjectsContainer.getRootFolder()
+      : null;
+    const objectsRootFolder = objectsContainer.getRootFolder();
+    const groups = objectsContainer.getObjectGroups();
+    const hasGroups = groups.count() > 0;
+    const globalGroups = globalObjectsContainer
+      ? globalObjectsContainer.getObjectGroups()
+      : null;
+    const hasGlobalGroups = globalGroups ? globalGroups.count() > 0 : false;
+
+    const objectTreeViewItemProps = {
+      project,
+      getThumbnail: ObjectsRenderingService.getThumbnail.bind(
+        ObjectsRenderingService
+      ),
+    };
+    const objectFolderTreeViewItemProps = {
+      project,
+    };
+
+    const getTreeViewItems = i18n =>
+      [
+        new ObjectFolderTreeViewItem({
+          objectFolderOrObject: objectsRootFolder,
+          global: false,
+          isRoot: true,
+          content: new LabelTreeViewItemContent(
+            'scene-objects',
+            i18n._(t`Scene Objects`)
+          ),
+          objectTreeViewItemProps,
+          objectFolderTreeViewItemProps,
+        }),
+        globalObjectsRootFolder
+          ? new ObjectFolderTreeViewItem({
+              objectFolderOrObject: globalObjectsRootFolder,
+              global: true,
+              isRoot: true,
+              content: new LabelTreeViewItemContent(
+                'global-objects',
+                i18n._(t`Global Objects`)
+              ),
+              objectTreeViewItemProps,
+              objectFolderTreeViewItemProps,
+            })
+          : null,
+        hasGroups
+          ? new RootTreeViewItem(
+              new LabelTreeViewItemContent('groups', i18n._(t`Groups`)),
+              mapFor(0, groups.count(), index => {
+                const group = groups.getAt(index);
+                return new GroupTreeViewItem(
+                  new ObjectGroupTreeViewItemContent(group),
+                  group,
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectTreeViewItemProps
+                );
+              })
+            )
+          : null,
+        hasGlobalGroups && globalGroups
+          ? new RootTreeViewItem(
+              new LabelTreeViewItemContent(
+                'global-groups',
+                i18n._(t`Global Groups`)
+              ),
+              mapFor(0, globalGroups.count(), index => {
+                const group = globalGroups.getAt(index);
+                return new GroupTreeViewItem(
+                  new ObjectGroupTreeViewItemContent(group),
+                  group,
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectTreeViewItemProps
+                );
+              })
+            )
+          : null,
+      ].filter(Boolean);
 
     return (
       <I18n>
@@ -458,264 +836,308 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
             )}
             <ScrollView ref={this._scrollView} autoHideScrollbar>
               {hasResults && (
-                <List>
-                  {(isSearching || currentTab === 'objects') && (
-                    <React.Fragment>
-                      {filteredObjectsList.map(
-                        ({ item: objectWithContext, matches }, index) =>
-                          renderObjectListItem({
-                            project: project,
-                            objectWithContext: objectWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(
-                                objectWithContext.object.getName()
-                              ),
-                            matchesCoordinates: matches.length
-                              ? matches[0].indices // Only field for objects is their name
-                              : [],
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                            id: 'object-item-' + index,
-                            data: {
-                              objectName: objectWithContext.object.getName(),
-                            },
-                          })
-                      )}
-
-                      {displayedObjectGroupsList.length > 0 && (
-                        <Subheader>
-                          <Trans>Object groups</Trans>
-                        </Subheader>
-                      )}
-                      {displayedObjectGroupsList.map(
-                        ({ item: groupWithContext, matches }, index) => {
-                          const results = [];
-
-                          results.push(
-                            renderGroupObjectsListItem({
-                              id: 'objectGroup-item-' + index,
-                              data: {
-                                objectName: groupWithContext.group.getName(),
-                              },
-                              groupWithContext,
-                              iconSize,
-                              onClick: () =>
-                                onChooseObject(
-                                  groupWithContext.group.getName()
-                                ),
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices // Only field for groups is their name
-                                : [],
-                              selectedValue: chosenObjectName
-                                ? getObjectOrObjectGroupListItemValue(
-                                    chosenObjectName
-                                  )
-                                : undefined,
-                            })
-                          );
-                          if (isSearching) {
-                            const { group, global } = groupWithContext;
-                            const groupName = group.getName();
-                            const objectsInGroup = group
-                              .getAllObjectsNames()
-                              .toJSArray()
-                              .map(objectName => {
-                                // A global object group can contain scene objects so we cannot use
-                                // the group context to get directly get the object knowing the
-                                // appropriate container.
-                                const object = getObjectByName(
-                                  globalObjectsContainer,
-                                  objectsContainer,
-                                  objectName
-                                );
-                                if (!object) return null;
-
-                                return renderObjectListItem({
-                                  project,
-                                  objectWithContext: {
-                                    object,
-                                    global,
-                                  },
-                                  keyPrefix: `group-${groupName}`,
-                                  withIndent: true,
-                                  iconSize,
-                                  onClick: () => onChooseObject(objectName),
-                                  matchesCoordinates: [],
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                });
-                              })
-                              .filter(Boolean);
-                            if (objectsInGroup.length === 0) {
-                              results.push(
-                                <ListItem
-                                  key={`${group.getName()}-empty`}
-                                  primaryText={
-                                    <Text style={styles.noObjectsText} noMargin>
-                                      <Trans>No objects in the group</Trans>
-                                    </Text>
-                                  }
-                                  style={styles.indentedListItem}
-                                />
-                              );
-                            } else {
-                              results.push(...objectsInGroup);
-                            }
+                <AutoSizer style={{ width: '100%' }} disableWidth>
+                  {({ height }) => (
+                    <ReadOnlyTreeView
+                      height={height}
+                      items={getTreeViewItems(i18n)}
+                      getItemName={this.getTreeViewItemName}
+                      getItemId={this.getTreeViewItemId}
+                      getItemHtmlId={this.getTreeViewItemHtmlId}
+                      getItemChildren={this.getTreeViewItemChildren}
+                      getItemThumbnail={this.getTreeViewItemThumbnail}
+                      getItemDataset={this.getTreeViewItemDataset}
+                      selectedItems={[]}
+                      // onClickItem?: Item => void
+                      onSelectItems={(items: TreeViewItem[]) => {
+                        if (!items) return;
+                        const item = items[0];
+                        if (!item || item.isRoot) return;
+                        const itemContentToSelect = items[0].content;
+                        if (itemContentToSelect.getObjectFolderOrObject) {
+                          const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                          if (
+                            !objectFolderOrObjectToSelect ||
+                            objectFolderOrObjectToSelect.isFolder()
+                          ) {
+                            return;
                           }
-                          return results;
-                        }
-                      )}
-                      {filteredFoldersList.length > 0 && (
-                        <Subheader>
-                          <Trans>Folders</Trans>
-                        </Subheader>
-                      )}
-                      {filteredFoldersList.map(
-                        ({ item: folderWithPath, matches }) => {
-                          const results = [];
-
-                          results.push(
-                            renderFolderListItem({
-                              folderWithPath,
-                              iconSize,
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices
-                                : [],
-                            })
+                          onChooseObject(
+                            objectFolderOrObjectToSelect.getObject().getName()
                           );
-                          const objectsInFolder = getObjectsInFolder(
-                            folderWithPath.folder
-                          );
-                          if (objectsInFolder.length === 0) {
-                            results.push(
-                              <ListItem
-                                key={`${folderWithPath.path}-empty`}
-                                primaryText={
-                                  <Text style={styles.noObjectsText} noMargin>
-                                    <Trans>No objects in the folder</Trans>
-                                  </Text>
-                                }
-                                style={styles.indentedListItem}
-                              />
-                            );
-                          } else {
-                            results.push(
-                              ...objectsInFolder.map(object =>
-                                renderObjectListItem({
-                                  project,
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                  keyPrefix: `folder-${folderWithPath.path}`,
-                                  iconSize,
-                                  matchesCoordinates: [],
-                                  objectWithContext: {
-                                    object,
-                                    global: folderWithPath.global,
-                                  },
-                                  withIndent: true,
-                                  onClick: () =>
-                                    onChooseObject(object.getName()),
-                                })
-                              )
-                            );
-                          }
-
-                          return results;
+                        } else if (itemContentToSelect.getGroup) {
+                          const group = itemContentToSelect.getGroup();
+                          if (!group) return;
+                          onChooseObject(group.getName());
                         }
-                      )}
-                    </React.Fragment>
-                  )}
-                  {isSearching && displayedInstructionsList.length > 0 && (
-                    <Subheader>
-                      {isCondition ? (
-                        <Trans>Conditions</Trans>
-                      ) : (
-                        <Trans>Actions</Trans>
-                      )}
-                    </Subheader>
-                  )}
-                  {isSearching &&
-                    displayedInstructionsList.map(
-                      ({ item: instructionMetadata, matches }) =>
-                        renderInstructionOrExpressionListItem({
-                          instructionOrExpressionMetadata: instructionMetadata,
-                          iconSize: iconSize,
-                          id: `instruction-item-${instructionMetadata.type.replace(
-                            /:/g,
-                            '-'
-                          )}`,
-                          onClick: () =>
-                            onChooseInstruction(
-                              instructionMetadata.type,
-                              instructionMetadata
-                            ),
-                          selectedValue: chosenInstructionType
-                            ? getInstructionListItemValue(chosenInstructionType)
-                            : undefined,
-                          matches,
-                        })
-                    )}
-                  {!isSearching && currentTab === 'free-instructions' && (
-                    <>
-                      {renderInstructionOrExpressionTree({
-                        instructionTreeNode: this.freeInstructionsInfoTree,
-                        onChoose: onChooseInstruction,
-                        iconSize,
-                        useSubheaders: true,
-                        selectedValue: chosenInstructionType
-                          ? getInstructionListItemValue(chosenInstructionType)
-                          : undefined,
-                        initiallyOpenedPath: this.initialInstructionTypePath,
-                        selectedItemRef: this._selectedItem,
-                        getGroupIconSrc,
-                      })}
-                      {onClickMore && (
-                        <ResponsiveLineStackLayout justifyContent="center">
-                          <RaisedButton
-                            primary
-                            icon={<Add />}
-                            onClick={onClickMore}
-                            label={
-                              isCondition ? (
-                                <Trans>
-                                  Search for new conditions in extensions
-                                </Trans>
-                              ) : (
-                                <Trans>
-                                  Search for new actions in extensions
-                                </Trans>
-                              )
-                            }
-                          />
-                        </ResponsiveLineStackLayout>
-                      )}
-                    </>
-                  )}
-                  {remainingResultsCount > 0 && (
-                    <ListItem
-                      primaryText={
-                        <Trans>And {remainingResultsCount} more results.</Trans>
-                      }
-                      disabled
-                      secondaryText={
-                        <Trans>
-                          Refine your search with more specific keyword to see
-                          them.
-                        </Trans>
-                      }
+                      }}
+                      searchText={searchText}
+                      multiSelect={false}
+                      //   arrowKeyNavigationProps?: {|
+                      //    onGetItemInside: (item: Item) => ?Item,
+                      //    onGetItemOutside: (item: Item) => ?Item,
+                      //  |},
                     />
                   )}
-                </List>
+                </AutoSizer>
+                // <List>
+                //   {(isSearching || currentTab === 'objects') && (
+                //     <React.Fragment>
+                //       {filteredObjectsList.map(
+                //         ({ item: objectWithContext, matches }, index) =>
+                //           renderObjectListItem({
+                //             project: project,
+                //             objectWithContext: objectWithContext,
+                //             iconSize: iconSize,
+                //             onClick: () =>
+                //               onChooseObject(
+                //                 objectWithContext.object.getName()
+                //               ),
+                //             matchesCoordinates: matches.length
+                //               ? matches[0].indices // Only field for objects is their name
+                //               : [],
+                //             selectedValue: chosenObjectName
+                //               ? getObjectOrObjectGroupListItemValue(
+                //                   chosenObjectName
+                //                 )
+                //               : undefined,
+                //             id: 'object-item-' + index,
+                //             data: {
+                //               objectName: objectWithContext.object.getName(),
+                //             },
+                //           })
+                //       )}
+
+                //       {displayedObjectGroupsList.length > 0 && (
+                //         <Subheader>
+                //           <Trans>Object groups</Trans>
+                //         </Subheader>
+                //       )}
+                //       {displayedObjectGroupsList.map(
+                //         ({ item: groupWithContext, matches }, index) => {
+                //           const results = [];
+
+                //           results.push(
+                //             renderGroupObjectsListItem({
+                //               id: 'objectGroup-item-' + index,
+                //               data: {
+                //                 objectName: groupWithContext.group.getName(),
+                //               },
+                //               groupWithContext,
+                //               iconSize,
+                //               onClick: () =>
+                //                 onChooseObject(
+                //                   groupWithContext.group.getName()
+                //                 ),
+                //               matchesCoordinates: matches.length
+                //                 ? matches[0].indices // Only field for groups is their name
+                //                 : [],
+                //               selectedValue: chosenObjectName
+                //                 ? getObjectOrObjectGroupListItemValue(
+                //                     chosenObjectName
+                //                   )
+                //                 : undefined,
+                //             })
+                //           );
+                //           if (isSearching) {
+                //             const { group, global } = groupWithContext;
+                //             const groupName = group.getName();
+                //             const objectsInGroup = group
+                //               .getAllObjectsNames()
+                //               .toJSArray()
+                //               .map(objectName => {
+                //                 // A global object group can contain scene objects so we cannot use
+                //                 // the group context to get directly get the object knowing the
+                //                 // appropriate container.
+                //                 const object = getObjectByName(
+                //                   globalObjectsContainer,
+                //                   objectsContainer,
+                //                   objectName
+                //                 );
+                //                 if (!object) return null;
+
+                //                 return renderObjectListItem({
+                //                   project,
+                //                   objectWithContext: {
+                //                     object,
+                //                     global,
+                //                   },
+                //                   keyPrefix: `group-${groupName}`,
+                //                   withIndent: true,
+                //                   iconSize,
+                //                   onClick: () => onChooseObject(objectName),
+                //                   matchesCoordinates: [],
+                //                   selectedValue: chosenObjectName
+                //                     ? getObjectOrObjectGroupListItemValue(
+                //                         chosenObjectName
+                //                       )
+                //                     : undefined,
+                //                 });
+                //               })
+                //               .filter(Boolean);
+                //             if (objectsInGroup.length === 0) {
+                //               results.push(
+                //                 <ListItem
+                //                   key={`${group.getName()}-empty`}
+                //                   primaryText={
+                //                     <Text style={styles.noObjectsText} noMargin>
+                //                       <Trans>No objects in the group</Trans>
+                //                     </Text>
+                //                   }
+                //                   style={styles.indentedListItem}
+                //                 />
+                //               );
+                //             } else {
+                //               results.push(...objectsInGroup);
+                //             }
+                //           }
+                //           return results;
+                //         }
+                //       )}
+                //       {filteredFoldersList.length > 0 && (
+                //         <Subheader>
+                //           <Trans>Folders</Trans>
+                //         </Subheader>
+                //       )}
+                //       {filteredFoldersList.map(
+                //         ({ item: folderWithPath, matches }) => {
+                //           const results = [];
+
+                //           results.push(
+                //             renderFolderListItem({
+                //               folderWithPath,
+                //               iconSize,
+                //               matchesCoordinates: matches.length
+                //                 ? matches[0].indices
+                //                 : [],
+                //             })
+                //           );
+                //           const objectsInFolder = getObjectsInFolder(
+                //             folderWithPath.folder
+                //           );
+                //           if (objectsInFolder.length === 0) {
+                //             results.push(
+                //               <ListItem
+                //                 key={`${folderWithPath.path}-empty`}
+                //                 primaryText={
+                //                   <Text style={styles.noObjectsText} noMargin>
+                //                     <Trans>No objects in the folder</Trans>
+                //                   </Text>
+                //                 }
+                //                 style={styles.indentedListItem}
+                //               />
+                //             );
+                //           } else {
+                //             results.push(
+                //               ...objectsInFolder.map(object =>
+                //                 renderObjectListItem({
+                //                   project,
+                //                   selectedValue: chosenObjectName
+                //                     ? getObjectOrObjectGroupListItemValue(
+                //                         chosenObjectName
+                //                       )
+                //                     : undefined,
+                //                   keyPrefix: `folder-${folderWithPath.path}`,
+                //                   iconSize,
+                //                   matchesCoordinates: [],
+                //                   objectWithContext: {
+                //                     object,
+                //                     global: folderWithPath.global,
+                //                   },
+                //                   withIndent: true,
+                //                   onClick: () =>
+                //                     onChooseObject(object.getName()),
+                //                 })
+                //               )
+                //             );
+                //           }
+
+                //           return results;
+                //         }
+                //       )}
+                //     </React.Fragment>
+                //   )}
+                //   {isSearching && displayedInstructionsList.length > 0 && (
+                //     <Subheader>
+                //       {isCondition ? (
+                //         <Trans>Conditions</Trans>
+                //       ) : (
+                //         <Trans>Actions</Trans>
+                //       )}
+                //     </Subheader>
+                //   )}
+                //   {isSearching &&
+                //     displayedInstructionsList.map(
+                //       ({ item: instructionMetadata, matches }) =>
+                //         renderInstructionOrExpressionListItem({
+                //           instructionOrExpressionMetadata: instructionMetadata,
+                //           iconSize: iconSize,
+                //           id: `instruction-item-${instructionMetadata.type.replace(
+                //             /:/g,
+                //             '-'
+                //           )}`,
+                //           onClick: () =>
+                //             onChooseInstruction(
+                //               instructionMetadata.type,
+                //               instructionMetadata
+                //             ),
+                //           selectedValue: chosenInstructionType
+                //             ? getInstructionListItemValue(chosenInstructionType)
+                //             : undefined,
+                //           matches,
+                //         })
+                //     )}
+                //   {!isSearching && currentTab === 'free-instructions' && (
+                //     <>
+                //       {renderInstructionOrExpressionTree({
+                //         instructionTreeNode: this.freeInstructionsInfoTree,
+                //         onChoose: onChooseInstruction,
+                //         iconSize,
+                //         useSubheaders: true,
+                //         selectedValue: chosenInstructionType
+                //           ? getInstructionListItemValue(chosenInstructionType)
+                //           : undefined,
+                //         initiallyOpenedPath: this.initialInstructionTypePath,
+                //         selectedItemRef: this._selectedItem,
+                //         getGroupIconSrc,
+                //       })}
+                //       {onClickMore && (
+                //         <ResponsiveLineStackLayout justifyContent="center">
+                //           <RaisedButton
+                //             primary
+                //             icon={<Add />}
+                //             onClick={onClickMore}
+                //             label={
+                //               isCondition ? (
+                //                 <Trans>
+                //                   Search for new conditions in extensions
+                //                 </Trans>
+                //               ) : (
+                //                 <Trans>
+                //                   Search for new actions in extensions
+                //                 </Trans>
+                //               )
+                //             }
+                //           />
+                //         </ResponsiveLineStackLayout>
+                //       )}
+                //     </>
+                //   )}
+                //   {remainingResultsCount > 0 && (
+                //     <ListItem
+                //       primaryText={
+                //         <Trans>And {remainingResultsCount} more results.</Trans>
+                //       }
+                //       disabled
+                //       secondaryText={
+                //         <Trans>
+                //           Refine your search with more specific keyword to see
+                //           them.
+                //         </Trans>
+                //       }
+                //     />
+                //   )}
+                // </List>
               )}
               {!isSearching &&
                 currentTab === 'objects' &&

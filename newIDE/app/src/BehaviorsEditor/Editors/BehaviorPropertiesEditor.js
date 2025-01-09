@@ -68,7 +68,6 @@ const BehaviorPropertiesEditor = ({
       ),
     [behavior, object]
   );
-  console.log(basicPropertiesSchema);
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
     () => areAdvancedPropertiesModified(behavior),

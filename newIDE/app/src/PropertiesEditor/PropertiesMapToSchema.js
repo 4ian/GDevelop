@@ -223,6 +223,9 @@ const createField = (
   } else if (valueType === 'animationname') {
     return {
       getChoices: () => {
+        if (!object) {
+          return [];
+        }
         const animationArray = mapFor(
           0,
           object.getConfiguration().getAnimationsCount(),

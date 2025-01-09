@@ -21,7 +21,7 @@ constexpr String::size_type String::npos;
 
 String::String() : m_string()
 {
-   
+
 }
 
 String::String(const char *characters) : m_string()

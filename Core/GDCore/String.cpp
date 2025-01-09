@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <string.h>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
 
@@ -20,6 +21,7 @@ constexpr String::size_type String::npos;
 
 String::String() : m_string()
 {
+
 }
 
 String::String(const char *characters) : m_string()

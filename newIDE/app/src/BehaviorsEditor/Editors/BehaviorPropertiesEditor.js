@@ -55,6 +55,7 @@ const BehaviorPropertiesEditor = ({
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,
   ] = React.useState<boolean>(false);
+
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
@@ -68,7 +69,6 @@ const BehaviorPropertiesEditor = ({
       ),
     [behavior, object]
   );
-  console.log(basicPropertiesSchema);
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
     () => areAdvancedPropertiesModified(behavior),

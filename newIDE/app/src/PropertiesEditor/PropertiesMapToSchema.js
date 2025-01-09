@@ -233,7 +233,7 @@ const createField = (
           };
         }
       );
-      animationArray.push({ value: '', label: '' });
+      animationArray.push({ value: '', label: '(no animation)' });
       return animationArray;
     }
     return {

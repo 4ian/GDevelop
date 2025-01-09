@@ -19,6 +19,7 @@ export const getObjectFolderTreeViewItemId = (
 export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   objectFolder: gdObjectFolderOrObject;
   props: ObjectFolderTreeViewItemProps;
+  applySearch = true;
 
   constructor(
     objectFolder: gdObjectFolderOrObject,

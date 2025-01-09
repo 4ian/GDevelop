@@ -21,6 +21,7 @@ export type ObjectTreeViewItemProps = {|
 export class ObjectTreeViewItemContent implements TreeViewItemContent {
   object: gdObjectFolderOrObject;
   props: ObjectTreeViewItemProps;
+  applySearch = true;
 
   constructor(
     object: gdObjectFolderOrObject,

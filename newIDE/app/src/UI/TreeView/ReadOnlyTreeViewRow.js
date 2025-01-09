@@ -45,7 +45,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
   const onDoubleClickItem = React.useCallback(
     e => {
-      if (!node || !node.hasChildren) return;
+      if (!node || !node.hasChildren || node.disableCollapse) return;
       onOpen(node);
     },
     [node, onOpen]

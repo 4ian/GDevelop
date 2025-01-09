@@ -82,6 +82,7 @@ type Props<Item> = {|
   width?: number,
   items: Item[],
   getItemHeight: () => number,
+  shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
   getItemDescription?: Item => string,
   getItemId: Item => string,
@@ -113,6 +114,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     items,
     searchText,
     getItemHeight,
+    shouldApplySearchToItem,
     getItemName,
     getItemDescription,
     getItemId,
@@ -180,10 +182,13 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
-      const description = getItemDescription ? getItemDescription(item) : undefined;
+      const description = getItemDescription
+        ? getItemDescription(item)
+        : undefined;
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? classes.animate : '';
+      const applySearch = shouldApplySearchToItem(item);
 
       /*
        * Append node to result if either:
@@ -197,7 +202,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         !searchText ||
         forceAllOpened ||
         forceOpen ||
-        (typeof name === 'string' && name.toLowerCase().includes(searchText)) ||
+        (!applySearch ||
+          (typeof name === 'string' &&
+            name.toLowerCase().includes(searchText))) ||
         flattenedChildren.length > 0
       ) {
         const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
@@ -241,6 +248,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [
       getItemId,
       getItemChildren,
+      shouldApplySearchToItem,
       forceAllOpened,
       openedNodeIds,
       openedDuringSearchNodeIds,

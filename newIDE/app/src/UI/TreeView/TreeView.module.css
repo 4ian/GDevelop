@@ -81,6 +81,7 @@
 
 .itemTextContainer {
   display: inline-grid;
+  gap: 2px;
 }
 
 .itemName {

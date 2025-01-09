@@ -94,6 +94,7 @@ const moveDeprecatedInstructionsDown = (
 };
 
 export interface TreeViewItemContent {
+  applySearch: boolean;
   getName(): string | React.Node;
   getDescription(): string | null;
   getId(): string;
@@ -103,6 +104,7 @@ export interface TreeViewItemContent {
 }
 
 export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
+  applySearch = true;
   group: gdObjectGroup;
 
   constructor(group: gdObjectGroup) {
@@ -135,17 +137,24 @@ export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
   }
 
   getThumbnail(): ?string {
-    return null;
+    return 'res/ribbon_default/objectsgroups64.png';
   }
 }
 export class ObjectGroupObjectTreeViewItemContent
   implements TreeViewItemContent {
+  applySearch = true;
   object: gdObject;
   props: ObjectTreeViewItemProps;
+  groupPrefix: string;
 
-  constructor(object: gdObject, props: ObjectTreeViewItemProps) {
+  constructor(
+    object: gdObject,
+    props: ObjectTreeViewItemProps,
+    groupPrefix: string
+  ) {
     this.object = object;
     this.props = props;
+    this.groupPrefix = groupPrefix;
   }
 
   getObject(): gdObject | null {
@@ -160,11 +169,11 @@ export class ObjectGroupObjectTreeViewItemContent
   }
 
   getId(): string {
-    return getObjectTreeViewItemId(this.object);
+    return `${this.groupPrefix}-${getObjectTreeViewItemId(this.object)}`;
   }
 
   getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
+    return `${this.groupPrefix}-object-item-${index}`;
   }
 
   getDataSet(): ?HTMLDataset {
@@ -236,7 +245,8 @@ class GroupTreeViewItem implements TreeViewItem {
         return new LeafTreeViewItem(
           new ObjectGroupObjectTreeViewItemContent(
             object,
-            this.objectTreeViewItemProps
+            this.objectTreeViewItemProps,
+            this.content.getId()
           )
         );
       })
@@ -261,6 +271,7 @@ class RootTreeViewItem implements TreeViewItem {
 
 class InstructionTreeViewItemContent implements TreeViewItemContent {
   instructionMetadata: EnumeratedInstructionMetadata;
+  applySearch = false;
   constructor(instructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
@@ -291,6 +302,7 @@ class InstructionTreeViewItemContent implements TreeViewItemContent {
 class LabelTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
+  applySearch = true;
 
   constructor(id: string, label: string | React.Node) {
     this.id = id;
@@ -605,6 +617,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   };
 
   getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+  shouldApplySearchToItem = (item: TreeViewItem) => item.content.applySearch;
   getTreeViewItemDescription = (item: TreeViewItem) =>
     item.content.getDescription();
   getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
@@ -804,7 +817,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               })
             )
           : null,
-        displayedInstructionsList
+        displayedInstructionsList.length > 0
           ? new RootTreeViewItem(
               new LabelTreeViewItemContent(
                 'instructions',
@@ -889,8 +902,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     <ReadOnlyTreeView
                       height={height}
                       items={getTreeViewItems(i18n)}
-                      getItemHeight={() => (isSearching ? 40 : 32)}
+                      getItemHeight={() => (isSearching ? 44 : 32)}
                       getItemName={this.getTreeViewItemName}
+                      shouldApplySearchToItem={this.shouldApplySearchToItem}
                       getItemDescription={this.getTreeViewItemDescription}
                       getItemId={this.getTreeViewItemId}
                       getItemHtmlId={this.getTreeViewItemHtmlId}

@@ -2,7 +2,9 @@
 
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
+import HistoryIcon from '../UI/CustomSvgIcons/History';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
@@ -416,76 +418,82 @@ const useVersionHistory = ({
 
   const renderVersionHistoryPanel = () => {
     return (
-      <Drawer
-        open={versionHistoryPanelOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={() => setVersionHistoryPanelOpen(false)}
-      >
-        <DrawerTopBar
-          title={<Trans>File history</Trans>}
-          onClose={() => setVersionHistoryPanelOpen(false)}
-          id="version-history-drawer"
-        />
-        {!cloudProjectId ? (
-          <Line expand>
-            <Column expand>
-              <AlertMessage kind="info">
-                <Trans>
-                  The version history is available for cloud projects only.
-                </Trans>
-              </AlertMessage>
-            </Column>
-          </Line>
-        ) : !isUserAllowedToSeeVersionHistory ? (
-          <Line expand>
-            <Column expand>
-              <GetSubscriptionCard
-                subscriptionDialogOpeningReason="Version history"
-                forceColumnLayout
-                filter="team"
-              >
-                <Text>
-                  <Trans>
-                    Access project history, name saves, restore older versions.
-                    <br />
-                    Upgrade to a Pro plan to get started!
-                  </Trans>
-                </Text>
-              </GetSubscriptionCard>
-            </Column>
-          </Line>
-        ) : !state.versions && versionsFetchingError ? (
-          <Line expand>
-            <Column expand>
-              <PlaceholderError onRetry={onLoadMoreVersions}>
-                {versionsFetchingError}
-              </PlaceholderError>
-            </Column>
-          </Line>
-        ) : state.versions ? (
-          <VersionHistory
-            authenticatedUserId={
-              authenticatedUser.profile ? authenticatedUser.profile.id : ''
-            }
-            isVisible={versionHistoryPanelOpen}
-            projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-            canLoadMore={!!state.nextPageUri}
-            onCheckoutVersion={onCheckoutVersion}
-            onLoadMore={onLoadMoreVersions}
-            onRenameVersion={onRenameVersion}
-            openedVersionStatus={checkedOutVersionStatus}
-            versions={state.versions}
-          />
-        ) : (
-          <PlaceholderLoader />
+      <I18n>
+        {({ i18n }) => (
+          <Drawer
+            open={versionHistoryPanelOpen}
+            PaperProps={{
+              style: styles.drawerContent,
+              className: 'safe-area-aware-left-container',
+            }}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            onClose={() => setVersionHistoryPanelOpen(false)}
+          >
+            <DrawerTopBar
+              icon={<HistoryIcon />}
+              title={i18n._(t`File history`)}
+              onClose={() => setVersionHistoryPanelOpen(false)}
+              id="version-history-drawer"
+            />
+            {!cloudProjectId ? (
+              <Line expand>
+                <Column expand>
+                  <AlertMessage kind="info">
+                    <Trans>
+                      The version history is available for cloud projects only.
+                    </Trans>
+                  </AlertMessage>
+                </Column>
+              </Line>
+            ) : !isUserAllowedToSeeVersionHistory ? (
+              <Line expand>
+                <Column expand>
+                  <GetSubscriptionCard
+                    subscriptionDialogOpeningReason="Version history"
+                    forceColumnLayout
+                    filter="team"
+                  >
+                    <Text>
+                      <Trans>
+                        Access project history, name saves, restore older
+                        versions.
+                        <br />
+                        Upgrade to a Pro plan to get started!
+                      </Trans>
+                    </Text>
+                  </GetSubscriptionCard>
+                </Column>
+              </Line>
+            ) : !state.versions && versionsFetchingError ? (
+              <Line expand>
+                <Column expand>
+                  <PlaceholderError onRetry={onLoadMoreVersions}>
+                    {versionsFetchingError}
+                  </PlaceholderError>
+                </Column>
+              </Line>
+            ) : state.versions ? (
+              <VersionHistory
+                authenticatedUserId={
+                  authenticatedUser.profile ? authenticatedUser.profile.id : ''
+                }
+                isVisible={versionHistoryPanelOpen}
+                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+                canLoadMore={!!state.nextPageUri}
+                onCheckoutVersion={onCheckoutVersion}
+                onLoadMore={onLoadMoreVersions}
+                onRenameVersion={onRenameVersion}
+                openedVersionStatus={checkedOutVersionStatus}
+                versions={state.versions}
+              />
+            ) : (
+              <PlaceholderLoader />
+            )}
+          </Drawer>
         )}
-      </Drawer>
+      </I18n>
     );
   };
 

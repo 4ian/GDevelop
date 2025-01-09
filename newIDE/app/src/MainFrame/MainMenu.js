@@ -179,36 +179,6 @@ export const buildMainMenuDeclarativeTemplate = ({
         onClickSendEvent: 'main-menu-close',
         enabled: !!project,
       },
-      ...(!isMacLike() || !isApplicationTopLevelMenu
-        ? [
-            { type: 'separator' },
-            {
-              label: i18n._(t`My Profile`),
-              onClickSendEvent: 'main-menu-open-profile',
-            },
-            {
-              label: i18n._(t`Preferences`),
-              onClickSendEvent: 'main-menu-open-preferences',
-            },
-            {
-              label: i18n._(t`Language`),
-              onClickSendEvent: 'main-menu-open-language',
-            },
-            // Leaving the app can only be done on the desktop app.
-            ...(!!electron
-              ? [
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Exit GDevelop`),
-                    accelerator: getElectronAccelerator(
-                      shortcutMap['QUIT_APP']
-                    ),
-                    onClickSendEvent: 'main-menu-close-app',
-                  },
-                ]
-              : []),
-          ]
-        : []),
     ],
   };
 
@@ -231,18 +201,22 @@ export const buildMainMenuDeclarativeTemplate = ({
   const viewTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`View`),
     submenu: [
-      {
-        label: i18n._(t`Show Project Manager`),
-        accelerator: getElectronAccelerator(
-          shortcutMap['OPEN_PROJECT_MANAGER']
-        ),
-        onClickSendEvent: 'main-menu-open-project-manager',
-        enabled: !!project,
-      },
-      {
-        label: i18n._(t`Show Home`),
-        onClickSendEvent: 'main-menu-open-home-page',
-      },
+      ...(isApplicationTopLevelMenu
+        ? [
+            {
+              label: i18n._(t`Show Project Manager`),
+              accelerator: getElectronAccelerator(
+                shortcutMap['OPEN_PROJECT_MANAGER']
+              ),
+              onClickSendEvent: 'main-menu-open-project-manager',
+              enabled: !!project,
+            },
+            {
+              label: i18n._(t`Show Home`),
+              onClickSendEvent: 'main-menu-open-home-page',
+            },
+          ]
+        : []),
       {
         label: i18n._(t`Open Debugger`),
         onClickSendEvent: 'main-menu-open-debugger',
@@ -360,9 +334,9 @@ export const buildMainMenuDeclarativeTemplate = ({
   // on the web-app, because they would not work and make sense at all.
   const template: Array<MenuDeclarativeItemTemplate> = [
     fileTemplate,
-    ...(!!electron ? [editTemplate] : []),
+    ...(!!electron && isApplicationTopLevelMenu ? [editTemplate] : []),
     viewTemplate,
-    ...(!!electron ? [windowTemplate] : []),
+    ...(!!electron && isApplicationTopLevelMenu ? [windowTemplate] : []),
     helpTemplate,
   ];
 

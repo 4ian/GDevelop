@@ -103,6 +103,7 @@ export type RenderEditorContainerProps = {|
   onSelectExampleShortHeader: ExampleShortHeader => void,
   onSelectPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   onOpenLanguageDialog: () => void,
+  onOpenVersionHistory: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,
   onOpenPreferences: () => void,

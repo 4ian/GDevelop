@@ -116,8 +116,6 @@ import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
   type MainMenuExtraCallbacks,
-  buildMainMenuDeclarativeTemplate,
-  adaptFromDeclarativeTemplate,
 } from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
@@ -3591,58 +3589,53 @@ const MainFrame = (props: Props) => {
         projectManagerOpen={projectManagerOpen}
         toggleProjectManager={toggleProjectManager}
         title={
-          state.currentProject ? state.currentProject.getName() : 'No project'
+          state.currentProject
+            ? state.currentProject.getName()
+            : i18n._(t`Menu`)
         }
       >
-        {currentProject ? (
-          <ProjectManager
-            project={currentProject}
-            onChangeProjectName={onChangeProjectName}
-            onSaveProjectProperties={onSaveProjectProperties}
-            onOpenExternalEvents={openExternalEvents}
-            onOpenLayout={name => {
-              openLayout(name);
-            }}
-            onOpenExternalLayout={openExternalLayout}
-            onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-            onInstallExtension={onInstallExtension}
-            onDeleteLayout={deleteLayout}
-            onDeleteExternalLayout={deleteExternalLayout}
-            onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
-            onDeleteExternalEvents={deleteExternalEvents}
-            onRenameLayout={renameLayout}
-            onRenameExternalLayout={renameExternalLayout}
-            onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
-            onRenameExternalEvents={renameExternalEvents}
-            onOpenResources={openResources}
-            eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
-            onReloadEventsFunctionsExtensions={() => {
-              if (isProjectClosedSoAvoidReloadingExtensions) {
-                return;
-              }
-              // Check if load is sufficient
-              eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-                currentProject
-              );
-            }}
-            onShareProject={() => openShareDialog()}
-            freezeUpdate={!projectManagerOpen}
-            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-            resourceManagementProps={resourceManagementProps}
-            gamesList={gamesList}
-            onOpenHomePage={openHomePage}
-            toggleProjectManager={toggleProjectManager}
-          />
-        ) : null}
+        <ProjectManager
+          project={currentProject}
+          onChangeProjectName={onChangeProjectName}
+          onSaveProjectProperties={onSaveProjectProperties}
+          onOpenExternalEvents={openExternalEvents}
+          onOpenLayout={name => {
+            openLayout(name);
+          }}
+          onOpenExternalLayout={openExternalLayout}
+          onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+          onInstallExtension={onInstallExtension}
+          onDeleteLayout={deleteLayout}
+          onDeleteExternalLayout={deleteExternalLayout}
+          onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
+          onDeleteExternalEvents={deleteExternalEvents}
+          onRenameLayout={renameLayout}
+          onRenameExternalLayout={renameExternalLayout}
+          onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
+          onRenameExternalEvents={renameExternalEvents}
+          onOpenResources={openResources}
+          eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
+          onReloadEventsFunctionsExtensions={() => {
+            if (isProjectClosedSoAvoidReloadingExtensions) {
+              return;
+            }
+            // Check if load is sufficient
+            eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+              currentProject
+            );
+          }}
+          onShareProject={() => openShareDialog()}
+          isOpen={projectManagerOpen}
+          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+          resourceManagementProps={resourceManagementProps}
+          gamesList={gamesList}
+          onOpenHomePage={openHomePage}
+          toggleProjectManager={toggleProjectManager}
+          mainMenuCallbacks={mainMenuCallbacks}
+          buildMainMenuProps={buildMainMenuProps}
+        />
       </ProjectManagerDrawer>
-      <TabsTitlebar
-        onBuildMenuTemplate={() =>
-          adaptFromDeclarativeTemplate(
-            buildMainMenuDeclarativeTemplate(buildMainMenuProps),
-            mainMenuCallbacks
-          )
-        }
-      >
+      <TabsTitlebar toggleProjectManager={toggleProjectManager}>
         <DraggableEditorTabs
           hideLabels={false}
           editorTabs={state.editorTabs}
@@ -3669,7 +3662,6 @@ const MainFrame = (props: Props) => {
         }
         canSave={canSave}
         onSave={saveProject}
-        toggleProjectManager={toggleProjectManager}
         openShareDialog={() =>
           openShareDialog(/* leave the dialog decide which tab to open */)
         }
@@ -3757,6 +3749,7 @@ const MainFrame = (props: Props) => {
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenNewProjectSetupDialog: openNewProjectDialog,
                     onOpenProjectManager: () => openProjectManager(true),
+                    onOpenVersionHistory: openVersionHistoryPanel,
                     askToCloseProject,
                     closeProject,
                     onSelectExampleShortHeader: exampleShortHeader => {

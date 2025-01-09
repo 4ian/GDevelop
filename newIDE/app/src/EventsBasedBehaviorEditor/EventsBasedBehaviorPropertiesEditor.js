@@ -951,7 +951,6 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         )}
                                       />
                                     )}
-
                                     <ResponsiveLineStackLayout noMargin>
                                       <SemiControlledTextField
                                         commitOnBlur

@@ -35,6 +35,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   getName(): string | React.Node {
     return this.objectFolder.getFolderName();
   }
+  getDescription(): string | null {
+    return null;
+  }
 
   getId(): string {
     return getObjectFolderTreeViewItemId(this.objectFolder);

@@ -13,7 +13,7 @@ import { type ItemData } from './ReadOnlyTreeView';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import classNames from 'classnames';
 
-export const TREE_VIEW_ROW_HEIGHT = 32;
+const iconSize = 24;
 
 type Props<Item> = {|
   index: number,
@@ -98,7 +98,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     </IconButton>
                     {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
                       <div className={classes.thumbnail}>
-                        <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                        <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
                       </div>
                     ) : (
                       !node.item.isRoot && (
@@ -108,21 +108,28 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   </>
                 ) : node.thumbnailSrc ? (
                   <div className={classes.thumbnail}>
-                    <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                    <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
                   </div>
                 ) : null}
-                <span
-                  className={classNames(
-                    classes.itemName,
-                    {
-                      [classes.rootFolder]: node.item.isRoot,
-                      [classes.placeholder]: node.item.isPlaceholder,
-                    },
-                    node.extraClass
+                <div className={classNames(classes.itemTextContainer)}>
+                  <span
+                    className={classNames(
+                      classes.itemName,
+                      {
+                        [classes.rootFolder]: node.item.isRoot,
+                        [classes.placeholder]: node.item.isPlaceholder,
+                      },
+                      node.extraClass
+                    )}
+                  >
+                    {node.name}
+                  </span>
+                  {node.description && (
+                    <span className={classNames(classes.itemDescription)}>
+                      {node.description}
+                    </span>
                   )}
-                >
-                  {node.name}
-                </span>
+                </div>
               </div>
             </div>
           </div>

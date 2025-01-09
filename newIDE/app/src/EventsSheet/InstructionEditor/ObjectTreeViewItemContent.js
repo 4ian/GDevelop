@@ -37,6 +37,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   getName(): string | React.Node {
     return this.object.getObject().getName();
   }
+  getDescription(): string | null {
+    return null;
+  }
 
   getId(): string {
     return getObjectTreeViewItemId(this.object.getObject());

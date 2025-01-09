@@ -5,9 +5,7 @@ import { FixedSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
 import classes from './TreeView.module.css';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
-import ReadOnlyTreeViewRow, {
-  TREE_VIEW_ROW_HEIGHT,
-} from './ReadOnlyTreeViewRow';
+import ReadOnlyTreeViewRow from './ReadOnlyTreeViewRow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
@@ -27,6 +25,7 @@ export type ItemBaseAttributes = {
 type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
+  description?: string,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -82,7 +81,9 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
+  getItemHeight: () => number,
   getItemName: Item => string | React.Node,
+  getItemDescription?: Item => string,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
@@ -111,7 +112,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     width,
     items,
     searchText,
+    getItemHeight,
     getItemName,
+    getItemDescription,
     getItemId,
     getItemHtmlId,
     getItemChildren,
@@ -177,6 +180,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
+      const description = getItemDescription ? getItemDescription(item) : undefined;
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
         animatedItemId && id === animatedItemId ? classes.animate : '';
@@ -202,6 +206,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
           {
             id,
             name,
+            description,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,
@@ -240,6 +245,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       openedNodeIds,
       openedDuringSearchNodeIds,
       getItemName,
+      getItemDescription,
       getItemDataset,
       animatedItemId,
       getItemThumbnail,
@@ -568,7 +574,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       <FixedSizeList
         height={height}
         itemCount={flattenedData.length}
-        itemSize={TREE_VIEW_ROW_HEIGHT}
+        itemSize={getItemHeight()}
         width={typeof width === 'number' ? width : '100%'}
         itemKey={index => flattenedData[index].id}
         // Flow does not seem to accept the generic used in FixedSizeList

@@ -808,8 +808,7 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                       )}
                                       {(property.getType() === 'String' ||
                                         property.getType() === 'Number' ||
-                                        property.getType() ===
-                                          'AnimationName') && (
+                                        property.getType() === 'AnimationName') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={

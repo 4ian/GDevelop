@@ -12,7 +12,6 @@
 
 using namespace gd;
 
-
 std::unique_ptr<gd::ObjectConfiguration> ObjectJsImplementation::Clone() const {
   ObjectJsImplementation* clone = new ObjectJsImplementation(*this);
 

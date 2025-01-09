@@ -55,6 +55,7 @@ const BehaviorPropertiesEditor = ({
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,
   ] = React.useState<boolean>(false);
+
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(

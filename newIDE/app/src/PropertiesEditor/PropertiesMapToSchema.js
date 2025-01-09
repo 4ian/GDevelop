@@ -221,22 +221,25 @@ const createField = (
       getDescription,
     };
   } else if (valueType === 'animationname') {
-    function getChoices() {
-      const animationArray = mapFor(
-        0,
-        object.getConfiguration().getAnimationsCount(),
-        i => {
-          const animationName = object.getConfiguration().getAnimationName(i);
-          return {
-            value: animationName,
-            label: animationName,
-          };
-        }
-      );
-      animationArray.push({ value: '', label: '(no animation)' });
-      return animationArray;
-    }
     return {
+      getChoices: () => {
+        const animationArray = mapFor(
+          0,
+          object.getConfiguration().getAnimationsCount(),
+          i => {
+            const animationName = object.getConfiguration().getAnimationName(i);
+            if (animationName === '') {
+              return null;
+            }
+            return {
+              value: animationName,
+              label: animationName,
+            };
+          }
+        ).filter(Boolean);
+        animationArray.push({ value: '', label: '(no animation)' });
+        return animationArray;
+      },
       name,
       valueType: 'string',
       getValue: (instance: Instance): string => {
@@ -248,8 +251,6 @@ const createField = (
         onUpdateProperty(instance, name, newValue);
       },
       getLabel,
-      getDescription,
-      getChoices,
     };
   } else {
     console.error(

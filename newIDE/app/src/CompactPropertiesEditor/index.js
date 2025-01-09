@@ -255,6 +255,7 @@ export const Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
+      Text1234
       style={{
         ...styles.separator,
         borderColor: gdevelopTheme.listItem.separatorColor,

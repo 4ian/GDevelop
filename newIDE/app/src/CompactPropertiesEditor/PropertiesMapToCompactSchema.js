@@ -234,6 +234,37 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
     };
+  } else if (valueType === 'animationname') {
+    function getChoices() {
+      const animationArray = mapFor(
+        0,
+        object.getConfiguration().getAnimationsCount(),
+        i => {
+          const animationName = object.getConfiguration().getAnimationName(i);
+          return {
+            value: animationName,
+            label: animationName,
+          };
+        }
+      );
+      animationArray.push({ value: '', label: '' });
+      return animationArray;
+    }
+    return {
+      name,
+      valueType: 'string',
+      getValue: (instance: Instance): string => {
+        return getProperties(instance)
+          .get(name)
+          .getValue();
+      },
+      setValue: (instance: Instance, newValue: string) => {
+        onUpdateProperty(instance, name, newValue);
+      },
+      getLabel,
+      getDescription,
+      getChoices,
+    };
   } else {
     console.error(
       `A property with type=${valueType} could not be mapped to a field. Ensure that this type is correct and understood by the IDE.`

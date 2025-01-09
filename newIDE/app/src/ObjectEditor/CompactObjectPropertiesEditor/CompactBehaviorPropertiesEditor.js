@@ -125,7 +125,6 @@ export const CompactBehaviorPropertiesEditor = ({
   const hasAdvancedProperties = advancedPropertiesSchema.length > 0;
   const hasSomeProperties =
     basicPropertiesSchema.length > 0 || hasAdvancedProperties;
-
   return (
     <ColumnStackLayout expand noMargin noOverflowParent>
       {!hasSomeProperties && (

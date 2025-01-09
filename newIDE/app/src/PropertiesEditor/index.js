@@ -402,14 +402,6 @@ const PropertiesEditor = ({
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
-        console.log(
-          'field value : ',
-          getFieldValue({
-            instances,
-            field,
-            defaultValue: '(Multiple values)',
-          })
-        );
         return (
           <SelectField
             value={getFieldValue({

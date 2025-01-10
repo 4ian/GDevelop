@@ -17,12 +17,13 @@ namespace gdjs {
 				return new (class implements gdjs.PixiFiltersTools.Filter {
 			shaderPass: THREE_ADDONS.ShaderPass;
 			_isEnabled: boolean;
-  
+			
 			constructor() {
-			  this.shaderPass = new THREE_ADDONS.ShaderPass(
-				THREE_ADDONS.BokehDepthShader
-			  );
-			  this._isEnabled = false;
+				this.shaderPass = new THREE_ADDONS.ShaderPass(
+					THREE_ADDONS.BokehDepthShader
+				);
+				console.log(THREE_ADDONS);
+				this._isEnabled = false;
 			}
   
 			isEnabled(target: EffectsTarget): boolean {

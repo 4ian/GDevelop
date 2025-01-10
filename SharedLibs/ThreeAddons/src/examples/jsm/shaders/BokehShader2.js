@@ -33,7 +33,7 @@ const BokehShader = {
 		'depthblur': { value: 0 },
 
 		'threshold': { value: 0.5 },
-		'gain': { value: 2.0 },
+		'gain': { value:  0.0 },
 		'bias': { value: 0.5 },
 		'fringe': { value: 0.7 },
 

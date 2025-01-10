@@ -1824,10 +1824,10 @@ const MainFrame = (props: Props) => {
   const openLayout = React.useCallback(
     (
       name: string,
-      {
-        openEventsEditor = true,
-        openSceneEditor = true,
-      }: {| openEventsEditor: boolean, openSceneEditor: boolean |} = {},
+      options?: {| openEventsEditor: boolean, openSceneEditor: boolean |} = {
+        openEventsEditor: true,
+        openSceneEditor: true,
+      },
       editorTabs?: EditorTabsState
     ): void => {
       setState(state => ({
@@ -1836,8 +1836,8 @@ const MainFrame = (props: Props) => {
           editorTabs || state.editorTabs,
           name,
           {
-            openEventsEditor,
-            openSceneEditor,
+            openEventsEditor: options.openEventsEditor,
+            openSceneEditor: options.openSceneEditor,
           }
         ),
       }));
@@ -3592,9 +3592,7 @@ const MainFrame = (props: Props) => {
           onChangeProjectName={onChangeProjectName}
           onSaveProjectProperties={onSaveProjectProperties}
           onOpenExternalEvents={openExternalEvents}
-          onOpenLayout={name => {
-            openLayout(name);
-          }}
+          onOpenLayout={(name, options) => openLayout(name, options)}
           onOpenExternalLayout={openExternalLayout}
           onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
           onInstallExtension={onInstallExtension}

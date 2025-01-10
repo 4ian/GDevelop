@@ -83,6 +83,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 const electron = optionalRequire('electron');
 
 export const getProjectManagerItemId = (identifier: string) =>
@@ -1506,6 +1507,19 @@ const ProjectManagerWithErrorBoundary = React.forwardRef<
   ProjectManagerInterface
 >((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
+  const shouldAutofocusInput = useShouldAutofocusInput();
+
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        if (props.isOpen && shouldAutofocusInput && projectManagerRef.current) {
+          projectManagerRef.current.focusSearchBar();
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    },
+    [props.isOpen, shouldAutofocusInput]
+  );
 
   return (
     <ErrorBoundary

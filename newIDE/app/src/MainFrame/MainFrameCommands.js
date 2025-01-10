@@ -70,11 +70,11 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onCloseApp,
   });
 
-  useCommand('OPEN_PROFILE', !!handlers.project, {
+  useCommand('OPEN_PROFILE', true, {
     handler: handlers.onOpenProfile,
   });
 
-  useCommand('OPEN_PROJECT_MANAGER', !!handlers.project, {
+  useCommand('OPEN_PROJECT_MANAGER', true, {
     handler: handlers.onOpenProjectManager,
   });
 

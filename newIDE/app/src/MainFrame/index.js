@@ -3609,7 +3609,6 @@ const MainFrame = (props: Props) => {
             if (isProjectClosedSoAvoidReloadingExtensions) {
               return;
             }
-            // Check if load is sufficient
             eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
               currentProject
             );

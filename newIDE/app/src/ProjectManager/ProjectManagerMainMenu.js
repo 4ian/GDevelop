@@ -52,6 +52,35 @@ const ProjectManagerMainMenu = ({
   const { isMobile } = useResponsiveWindowSize();
   const shouldUseNativeMenu = !isNativeMobileApp() && !isMobile;
 
+  const enhanceMenuItems = React.useCallback(
+    (menuItems: Array<MenuItemTemplate>): Array<MenuItemTemplate> =>
+      menuItems.map((menuItem, index) => {
+        if (menuItem.submenu) {
+          return {
+            ...menuItem,
+            submenu: enhanceMenuItems(menuItem.submenu),
+          };
+        }
+
+        if (menuItem.click) {
+          const originalClick = menuItem.click;
+          // $FlowFixMe - Flow is not able to make the difference between checkbox & classic item.
+          const newMenuItem: MenuItemTemplate = {
+            ...menuItem,
+            click: () => {
+              // Close the drawer when an item is clicked, as it's likely to be a navigation action.
+              originalClick();
+              closeDrawer();
+            },
+          };
+          return newMenuItem;
+        }
+
+        return menuItem;
+      }),
+    [closeDrawer]
+  );
+
   const visibleMenuItems = React.useMemo(
     () => {
       let displayedMenuItems = mainMenuItems;
@@ -64,9 +93,9 @@ const ProjectManagerMainMenu = ({
         displayedMenuItems = menuItem.submenu;
       }
 
-      return displayedMenuItems;
+      return enhanceMenuItems(displayedMenuItems);
     },
-    [mainMenuItems, selectedMainMenuItemIndices]
+    [mainMenuItems, selectedMainMenuItemIndices, enhanceMenuItems]
   );
 
   const isNavigatingInsideSubMenu = selectedMainMenuItemIndices.length > 0;
@@ -84,34 +113,6 @@ const ProjectManagerMainMenu = ({
       );
     },
     [selectedMainMenuItemIndices, setSelectedMainMenuItemIndices]
-  );
-
-  const enhanceMenuItems = React.useCallback(
-    (menuItems: Array<MenuItemTemplate>): Array<MenuItemTemplate> =>
-      menuItems.map((menuItem, index) => {
-        if (menuItem.submenu) {
-          return {
-            ...menuItem,
-            submenu: enhanceMenuItems(menuItem.submenu),
-          };
-        }
-
-        if (menuItem.click) {
-          const originalClick = menuItem.click;
-          // $FlowFixMe - TS is not able to make the difference between checkbox & classic item.
-          const newMenuItem: MenuItemTemplate = {
-            ...menuItem,
-            click: () => {
-              originalClick();
-              closeDrawer();
-            },
-          };
-          return newMenuItem;
-        }
-
-        return menuItem;
-      }),
-    [closeDrawer]
   );
 
   const onBuildSubMenuTemplate = React.useCallback(
@@ -202,9 +203,6 @@ const ProjectManagerMainMenu = ({
 
                     if (item.click) {
                       item.click();
-                      // Close the drawer after clicking on a menu item,
-                      // so the user can see the result of the action.
-                      closeDrawer();
                     } else if (item.submenu) {
                       setSelectedMainMenuItemIndices([
                         ...selectedMainMenuItemIndices,

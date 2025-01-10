@@ -500,214 +500,204 @@ const InstructionOrObjectSelector = React.forwardRef<
       ].filter(Boolean);
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <div
-            id="instruction-or-object-selector"
-            style={{
-              // Important for the component to not take the full height in a dialog,
-              // allowing to let the scrollview do its job.
-              minHeight: 0,
-              ...style,
-            }}
-          >
-            <SearchBar
-              id="search-bar"
-              value={searchText}
-              onChange={newSearchText => {
-                const oldSearchText = searchText;
-                if (!!newSearchText) search(newSearchText);
-                setSearchText(newSearchText);
-                // Notify if needed that we started or cleared a search
-                if (
-                  (!oldSearchText && newSearchText) ||
-                  (oldSearchText && !newSearchText)
-                ) {
-                  if (onSearchStartOrReset) onSearchStartOrReset();
-                }
-              }}
-              onRequestSearch={onSubmitSearch}
-              ref={searchBarRef}
-              autoFocus={focusOnMount ? 'desktop' : undefined}
-              placeholder={
-                isCondition
-                  ? t`Search objects or conditions`
-                  : t`Search objects or actions`
-              }
-            />
-            {!isSearching && (
-              <Line>
-                <Column expand noMargin>
-                  <Tabs
-                    value={currentTab}
-                    onChange={onChangeTab}
-                    options={[
-                      {
-                        label: <Trans>Objects</Trans>,
-                        value: 'objects',
-                      },
-                      {
-                        label: isCondition ? (
-                          <Trans>Other conditions</Trans>
-                        ) : (
-                          <Trans>Other actions</Trans>
-                        ),
-                        value: 'free-instructions',
-                      },
-                    ]}
-                  />
-                </Column>
-              </Line>
-            )}
-            {isSearching || currentTab === 'objects' ? (
-              !isSearching && !allObjectsList.length ? (
-                <EmptyMessage>
-                  {isOutsideLayout ? (
-                    <Trans>
-                      There are no objects. Objects will appear if you add some
-                      as parameters.
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      There is no object in your game or in this scene. Start by
-                      adding an new object in the scene editor, using the
-                      objects list.
-                    </Trans>
-                  )}
-                </EmptyMessage>
-              ) : isSearching && !hasResults ? (
-                <EmptyMessage>
-                  <Trans>
-                    Nothing corresponding to your search. Choose an object first
-                    or browse the list of actions/conditions.
-                  </Trans>
-                </EmptyMessage>
-              ) : (
-                <div style={{ flex: 1 }}>
-                  <AutoSizer style={{ width: '100%' }} disableWidth>
-                    {({ height }) => (
-                      <ReadOnlyTreeView
-                        ref={treeViewRef}
-                        height={height}
-                        estimatedItemSize={32}
-                        items={getTreeViewItems(i18n)}
-                        getItemHeight={getTreeViewItemHeight}
-                        getItemName={getTreeViewItemName}
-                        shouldApplySearchToItem={shouldApplySearchToItem}
-                        getItemDescription={getTreeViewItemDescription}
-                        getItemId={getTreeViewItemId}
-                        getItemHtmlId={getTreeViewItemHtmlId}
-                        getItemChildren={getTreeViewItemChildren}
-                        getItemThumbnail={getTreeViewItemThumbnail}
-                        getItemDataset={getTreeViewItemDataset}
-                        selectedItems={selectedItem ? [selectedItem] : []}
-                        initiallyOpenedNodeIds={[
-                          'scene-objects',
-                          'global-objects',
-                          'scene-groups',
-                          'global-groups',
-                          ...initiallyOpenedFolderIdsRef.current,
-                        ]}
-                        onSelectItems={(items: TreeViewItem[]) => {
-                          if (!items) return;
-                          const item = items[0];
-                          if (!item || item.isRoot) return;
-                          const itemContentToSelect = item.content;
-                          if (
-                            itemContentToSelect instanceof
-                            ObjectTreeViewItemContent
-                          ) {
-                            const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
-                            if (
-                              !objectFolderOrObjectToSelect ||
-                              objectFolderOrObjectToSelect.isFolder()
-                            ) {
-                              return;
-                            }
-                            onChooseObject(
-                              objectFolderOrObjectToSelect.getObject().getName()
-                            );
-                            setSelectedItem(item);
-                          } else if (
-                            itemContentToSelect instanceof
-                            ObjectGroupTreeViewItemContent
-                          ) {
-                            const group = itemContentToSelect.getGroup();
-                            if (!group) return;
-                            onChooseObject(group.getName());
-                            setSelectedItem(item);
-                          } else if (
-                            itemContentToSelect instanceof
-                            ObjectGroupObjectTreeViewItemContent
-                          ) {
-                            const object = itemContentToSelect.getObject();
-                            if (!object) return;
-                            onChooseObject(object.getName());
-                            setSelectedItem(item);
-                          } else if (
-                            itemContentToSelect instanceof
-                            InstructionTreeViewItemContent
-                          ) {
-                            const instructionMetadata = itemContentToSelect.getInstructionMetadata();
-                            if (!instructionMetadata) return;
-                            onChooseInstruction(
-                              instructionMetadata.type,
-                              instructionMetadata
-                            );
-                            setSelectedItem(item);
-                          }
-                        }}
-                        searchText={searchText}
-                        multiSelect={false}
-                      />
-                    )}
-                  </AutoSizer>
-                </div>
-              )
-            ) : (
-              <ScrollView ref={scrollViewRef} autoHideScrollbar>
-                <List>
-                  <>
-                    {renderInstructionOrExpressionTree({
-                      instructionTreeNode: freeInstructionsInfoTreeRef.current,
-                      onChoose: onChooseInstruction,
-                      iconSize: ICON_SIZE,
-                      useSubheaders: true,
-                      selectedValue: chosenInstructionType
-                        ? getInstructionListItemValue(chosenInstructionType)
-                        : undefined,
-                      initiallyOpenedPath:
-                        initialInstructionTypePathRef.current,
-                      selectedItemRef: selectedInstructionItemRef,
-                      getGroupIconSrc: getInstructionIconSrc,
-                    })}
-                    {onClickMore && (
-                      <ResponsiveLineStackLayout justifyContent="center">
-                        <RaisedButton
-                          primary
-                          icon={<Add />}
-                          onClick={onClickMore}
-                          label={
-                            isCondition ? (
-                              <Trans>
-                                Search for new conditions in extensions
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Search for new actions in extensions
-                              </Trans>
-                            )
-                          }
-                        />
-                      </ResponsiveLineStackLayout>
-                    )}
-                  </>
-                </List>
-              </ScrollView>
-            )}
-          </div>
+      <div
+        id="instruction-or-object-selector"
+        style={{
+          // Important for the component to not take the full height in a dialog,
+          // allowing to let the scrollview do its job.
+          minHeight: 0,
+          ...style,
+        }}
+      >
+        <SearchBar
+          id="search-bar"
+          value={searchText}
+          onChange={newSearchText => {
+            const oldSearchText = searchText;
+            if (!!newSearchText) search(newSearchText);
+            setSearchText(newSearchText);
+            // Notify if needed that we started or cleared a search
+            if (
+              (!oldSearchText && newSearchText) ||
+              (oldSearchText && !newSearchText)
+            ) {
+              if (onSearchStartOrReset) onSearchStartOrReset();
+            }
+          }}
+          onRequestSearch={onSubmitSearch}
+          ref={searchBarRef}
+          autoFocus={focusOnMount ? 'desktop' : undefined}
+          placeholder={
+            isCondition
+              ? t`Search objects or conditions`
+              : t`Search objects or actions`
+          }
+        />
+        {!isSearching && (
+          <Line>
+            <Column expand noMargin>
+              <Tabs
+                value={currentTab}
+                onChange={onChangeTab}
+                options={[
+                  {
+                    label: <Trans>Objects</Trans>,
+                    value: 'objects',
+                  },
+                  {
+                    label: isCondition ? (
+                      <Trans>Other conditions</Trans>
+                    ) : (
+                      <Trans>Other actions</Trans>
+                    ),
+                    value: 'free-instructions',
+                  },
+                ]}
+              />
+            </Column>
+          </Line>
         )}
-      </I18n>
+        {isSearching || currentTab === 'objects' ? (
+          !isSearching && !allObjectsList.length ? (
+            <EmptyMessage>
+              {isOutsideLayout ? (
+                <Trans>
+                  There are no objects. Objects will appear if you add some as
+                  parameters.
+                </Trans>
+              ) : (
+                <Trans>
+                  There is no object in your game or in this scene. Start by
+                  adding an new object in the scene editor, using the objects
+                  list.
+                </Trans>
+              )}
+            </EmptyMessage>
+          ) : isSearching && !hasResults ? (
+            <EmptyMessage>
+              <Trans>
+                Nothing corresponding to your search. Choose an object first or
+                browse the list of actions/conditions.
+              </Trans>
+            </EmptyMessage>
+          ) : (
+            <div style={{ flex: 1 }}>
+              <AutoSizer style={{ width: '100%' }} disableWidth>
+                {({ height }) => (
+                  <ReadOnlyTreeView
+                    ref={treeViewRef}
+                    height={height}
+                    estimatedItemSize={32}
+                    items={getTreeViewItems(i18n)}
+                    getItemHeight={getTreeViewItemHeight}
+                    getItemName={getTreeViewItemName}
+                    shouldApplySearchToItem={shouldApplySearchToItem}
+                    getItemDescription={getTreeViewItemDescription}
+                    getItemId={getTreeViewItemId}
+                    getItemHtmlId={getTreeViewItemHtmlId}
+                    getItemChildren={getTreeViewItemChildren}
+                    getItemThumbnail={getTreeViewItemThumbnail}
+                    getItemDataset={getTreeViewItemDataset}
+                    selectedItems={selectedItem ? [selectedItem] : []}
+                    initiallyOpenedNodeIds={[
+                      'scene-objects',
+                      'global-objects',
+                      'scene-groups',
+                      'global-groups',
+                      ...initiallyOpenedFolderIdsRef.current,
+                    ]}
+                    onSelectItems={(items: TreeViewItem[]) => {
+                      if (!items) return;
+                      const item = items[0];
+                      if (!item || item.isRoot) return;
+                      const itemContentToSelect = item.content;
+                      if (
+                        itemContentToSelect instanceof ObjectTreeViewItemContent
+                      ) {
+                        const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                        if (
+                          !objectFolderOrObjectToSelect ||
+                          objectFolderOrObjectToSelect.isFolder()
+                        ) {
+                          return;
+                        }
+                        onChooseObject(
+                          objectFolderOrObjectToSelect.getObject().getName()
+                        );
+                        setSelectedItem(item);
+                      } else if (
+                        itemContentToSelect instanceof
+                        ObjectGroupTreeViewItemContent
+                      ) {
+                        const group = itemContentToSelect.getGroup();
+                        if (!group) return;
+                        onChooseObject(group.getName());
+                        setSelectedItem(item);
+                      } else if (
+                        itemContentToSelect instanceof
+                        ObjectGroupObjectTreeViewItemContent
+                      ) {
+                        const object = itemContentToSelect.getObject();
+                        if (!object) return;
+                        onChooseObject(object.getName());
+                        setSelectedItem(item);
+                      } else if (
+                        itemContentToSelect instanceof
+                        InstructionTreeViewItemContent
+                      ) {
+                        const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                        if (!instructionMetadata) return;
+                        onChooseInstruction(
+                          instructionMetadata.type,
+                          instructionMetadata
+                        );
+                        setSelectedItem(item);
+                      }
+                    }}
+                    searchText={searchText}
+                    multiSelect={false}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+          )
+        ) : (
+          <ScrollView ref={scrollViewRef} autoHideScrollbar>
+            <List>
+              <>
+                {renderInstructionOrExpressionTree({
+                  instructionTreeNode: freeInstructionsInfoTreeRef.current,
+                  onChoose: onChooseInstruction,
+                  iconSize: ICON_SIZE,
+                  useSubheaders: true,
+                  selectedValue: chosenInstructionType
+                    ? getInstructionListItemValue(chosenInstructionType)
+                    : undefined,
+                  initiallyOpenedPath: initialInstructionTypePathRef.current,
+                  selectedItemRef: selectedInstructionItemRef,
+                  getGroupIconSrc: getInstructionIconSrc,
+                })}
+                {onClickMore && (
+                  <ResponsiveLineStackLayout justifyContent="center">
+                    <RaisedButton
+                      primary
+                      icon={<Add />}
+                      onClick={onClickMore}
+                      label={
+                        isCondition ? (
+                          <Trans>Search for new conditions in extensions</Trans>
+                        ) : (
+                          <Trans>Search for new actions in extensions</Trans>
+                        )
+                      }
+                    />
+                  </ResponsiveLineStackLayout>
+                )}
+              </>
+            </List>
+          </ScrollView>
+        )}
+      </div>
     );
   }
 );

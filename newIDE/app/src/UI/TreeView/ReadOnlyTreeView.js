@@ -82,6 +82,7 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
+  estimatedItemSize: number,
   getItemHeight: Item => number,
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
@@ -114,6 +115,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     width,
     items,
     searchText,
+    estimatedItemSize,
     getItemHeight,
     shouldApplySearchToItem,
     getItemName,
@@ -345,10 +347,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     (itemId: string, placement?: 'smart' | 'start' = 'smart') => {
       const list = listRef.current;
       if (list) {
-        // Browse flattenedData in reverse order since scrollToItem is mainly used
-        // to scroll to newly added object that is appended at the end of the list.
-        // $FlowFixMe - Method introduced in 2022.
-        const index = flattenedData.findLastIndex(node => node.id === itemId);
+        const index = flattenedData.findIndex(node => node.id === itemId);
         if (index >= 0) {
           list.scrollToItem(index, placement);
         }
@@ -588,6 +587,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       <VariableSizeList
         height={height}
         itemCount={flattenedData.length}
+        estimatedItemSize={estimatedItemSize}
         itemSize={index => getItemHeight(flattenedData[index].item)}
         width={typeof width === 'number' ? width : '100%'}
         itemKey={index => flattenedData[index].id}

@@ -61,17 +61,18 @@ import {
 } from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
-const iconSize = 24;
-const getGroupIconSrc = (key: string) => {
+const ICON_SIZE = 24;
+const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
+const getInstructionIconSrc = (key: string) => {
   return gd.JsPlatform.get()
     .getInstructionOrExpressionGroupMetadata(key)
     .getIcon();
 };
 
-const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
 export const styles = {
   noObjectsText: { opacity: 0.7 },
   indentedListItem: { paddingLeft: 45 },
@@ -91,14 +92,21 @@ const moveDeprecatedInstructionsDown = (
   return [...notDeprecatedResults, ...deprecatedResults];
 };
 
-type State = {|
-  searchText: string,
-  selectedItem: TreeViewItem | null,
-  searchResults: {
-    instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
-  },
-  initiallyOpenedFolderIds: string[],
-|};
+const shouldApplySearchToItem = (item: TreeViewItem) =>
+  item.content.applySearch;
+const getTreeViewItemHeight = (item: TreeViewItem) =>
+  item.content instanceof InstructionTreeViewItemContent ? 44 : 32;
+const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+const getTreeViewItemDescription = (item: TreeViewItem) =>
+  item.content.getDescription();
+const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
+const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
+  item.content.getHtmlId(index);
+
+const getTreeViewItemThumbnail = (item: TreeViewItem) =>
+  item.content.getThumbnail();
+const getTreeViewItemDataset = (item: TreeViewItem) =>
+  item.content.getDataSet();
 
 type Props = {|
   project: gdProject,
@@ -118,61 +126,83 @@ type Props = {|
   i18n: I18nType,
 |};
 
-export default class InstructionOrObjectSelector extends React.PureComponent<
+export type InstructionOrObjectSelectorInterface = {|
+  reEnumerateInstructions: (i18n: I18nType) => void,
+|};
+
+const InstructionOrObjectSelector = React.forwardRef<
   Props,
-  State
-> {
-  state = {
-    searchText: '',
-    searchResults: { instructions: [] },
-    selectedItem: null,
-    initiallyOpenedFolderIds: [],
-  };
-  _searchBar = React.createRef<SearchBarInterface>();
-  _scrollView = React.createRef<ScrollViewInterface>();
-  _treeView = React.createRef<ReadOnlyTreeViewInterface<TreeViewItem>>();
-  _selectedInstructionItem = React.createRef<ListItemRefType>();
-
-  // Free instructions, to be displayed in a tab next to the objects.
-  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
-  freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.freeInstructionsInfo
-  );
-  initialInstructionTypePath = findInTree(
-    this.freeInstructionsInfoTree,
-    this.props.chosenInstructionType
-  );
-
-  instructionSearchApi = null;
-
-  reEnumerateInstructions = (i18n: I18nType) => {
-    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructions(this.props.isCondition, i18n),
-      this.props.scope
+  InstructionOrObjectSelectorInterface
+>(
+  (
+    {
+      project,
+      projectScopedContainersAccessor,
+      scope,
+      currentTab,
+      onChangeTab,
+      isCondition,
+      focusOnMount,
+      chosenInstructionType,
+      onChooseInstruction,
+      chosenObjectName,
+      onChooseObject,
+      onSearchStartOrReset,
+      style,
+      onClickMore,
+      i18n,
+    },
+    ref
+  ) => {
+    const searchBarRef = React.useRef<?SearchBarInterface>(null);
+    const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+    const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
+      null
     );
-    this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
-    this.forceUpdate();
-  };
+    const selectedInstructionItemRef = React.useRef<?ListItemRefType>(null);
+    // Free instructions, to be displayed in a tab next to the objects.
+    const freeInstructionsInfoTreeRef = React.useRef<InstructionOrExpressionTreeNode>(
+      createTree(
+        filterEnumeratedInstructionOrExpressionMetadataByScope(
+          enumerateFreeInstructions(isCondition, i18n),
+          scope
+        )
+      )
+    );
+    const initialInstructionTypePathRef = React.useRef<?Array<string>>(
+      findInTree(freeInstructionsInfoTreeRef.current, chosenInstructionType)
+    );
+    // All the instructions, to be used when searching, so that the search is done
+    // across all the instructions (including object and behaviors instructions).
+    const allInstructionsInfoRef = React.useRef<
+      Array<EnumeratedInstructionMetadata>
+    >(
+      filterEnumeratedInstructionOrExpressionMetadataByScope(
+        enumerateAllInstructions(isCondition, i18n),
+        scope
+      )
+    );
+    const instructionSearchApiRef = React.useRef<Fuse>(
+      new Fuse(allInstructionsInfoRef.current, {
+        ...sharedFuseConfiguration,
+        keys: [
+          { name: 'displayedName', weight: 5 },
+          { name: 'fullGroupName', weight: 1 },
+          { name: 'description', weight: 3 },
+        ],
+      })
+    );
 
-  // All the instructions, to be used when searching, so that the search is done
-  // across all the instructions (including object and behaviors instructions).
-  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
-
-  componentDidMount() {
-    if (this._selectedInstructionItem.current && this._scrollView.current) {
-      this._scrollView.current.scrollTo(this._selectedInstructionItem.current);
-    }
+    const [searchText, setSearchText] = React.useState<string>('');
+    const [searchResults, setSearchResults] = React.useState<{
+      instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
+    }>({ instructions: [] });
+    const [selectedItem, setSelectedItem] = React.useState<?TreeViewItem>(null);
 
     // The objects must never be kept in a state as they may be temporary copies.
     // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
     // in the codebase.
-    const objectsContainersList = this.props.projectScopedContainersAccessor
+    const objectsContainersList = projectScopedContainersAccessor
       .get()
       .getObjectsContainersList();
 
@@ -195,35 +225,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       objectsContainersList.getObjectsContainersCount() - 1
     );
 
-    if (this.props.chosenObjectName) {
-      const objectOrGroupName = this.props.chosenObjectName;
-      const treeView = this._treeView.current;
-      const object = getObjectByName(
-        globalObjectsContainer,
-        objectsContainer,
-        objectOrGroupName
-      );
-      let itemId;
-      if (object) {
-        itemId = getObjectTreeViewItemId(object);
-      } else {
-        const group = getObjectGroupByName(
-          globalObjectsContainer,
-          objectsContainer,
-          objectOrGroupName
-        );
-        if (group) {
-          itemId = getObjectTreeViewItemId(group);
-        }
-      }
-
-      if (treeView && itemId) {
-        treeView.scrollToItemFromId(itemId);
-      }
-    }
-
-    this.setState({
-      initiallyOpenedFolderIds: [
+    const initiallyOpenedFolderIdsRef = React.useRef<string[]>(
+      [
         ...(globalObjectsContainer
           ? enumerateFoldersInContainer(globalObjectsContainer).map(
               folderWithPath => folderWithPath.folder
@@ -232,113 +235,109 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         ...enumerateFoldersInContainer(objectsContainer).map(
           folderWithPath => folderWithPath.folder
         ),
-      ].map(getObjectFolderTreeViewItemId),
-    });
-
-    this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
-      ...sharedFuseConfiguration,
-      keys: [
-        { name: 'displayedName', weight: 5 },
-        { name: 'fullGroupName', weight: 1 },
-        { name: 'description', weight: 3 },
-      ],
-    });
-  }
-
-  _search = (searchText: string) => {
-    if (searchText === '') return;
-
-    this.setState(
-      {
-        searchResults: {
-          instructions: this.instructionSearchApi
-            ? moveDeprecatedInstructionsDown(
-                this.instructionSearchApi
-                  .search(
-                    getFuseSearchQueryForMultipleKeys(searchText, [
-                      'displayedName',
-                      'fullGroupName',
-                      'description',
-                    ])
-                  )
-                  .map(result => ({
-                    item: result.item,
-                    matches: tuneMatches(result, searchText),
-                  }))
-              )
-            : [],
-        },
-      },
-      () => {
-        if (this._treeView.current) this._treeView.current.updateRowHeights();
-      }
+      ].map(getObjectFolderTreeViewItemId)
     );
-  };
 
-  getItemHeight = (item: TreeViewItem) =>
-    item.content instanceof InstructionTreeViewItemContent ? 44 : 32;
-  getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
-  shouldApplySearchToItem = (item: TreeViewItem) => item.content.applySearch;
-  getTreeViewItemDescription = (item: TreeViewItem) =>
-    item.content.getDescription();
-  getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
-  getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
-    item.content.getHtmlId(index);
+    const forceUpdate = useForceUpdate();
 
-  getTreeViewItemChildren = (item: TreeViewItem) =>
-    item.getChildren(this.state.searchText);
-  getTreeViewItemThumbnail = (item: TreeViewItem) =>
-    item.content.getThumbnail();
-  getTreeViewItemDataset = (item: TreeViewItem) => item.content.getDataSet();
+    const reEnumerateInstructions = React.useCallback(
+      (i18n: I18nType) => {
+        freeInstructionsInfoTreeRef.current = createTree(
+          filterEnumeratedInstructionOrExpressionMetadataByScope(
+            enumerateFreeInstructions(isCondition, i18n),
+            scope
+          )
+        );
+        forceUpdate();
+      },
+      [forceUpdate, isCondition, scope]
+    );
 
-  render() {
-    const {
-      style,
-      projectScopedContainersAccessor,
-      project,
-      chosenInstructionType,
-      onChooseInstruction,
-      chosenObjectName,
-      onChooseObject,
-      isCondition,
-      currentTab,
-      onChangeTab,
-      onSearchStartOrReset,
-      onClickMore,
-    } = this.props;
+    React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));
 
-    // The objects must never be kept in a state as they may be temporary copies.
-    // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
-    // in the codebase.
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
+    React.useLayoutEffect(
+      () => {
+        if (selectedInstructionItemRef.current && scrollViewRef.current) {
+          scrollViewRef.current.scrollTo(selectedInstructionItemRef.current);
+        }
+        if (chosenObjectName) {
+          const objectOrGroupName = chosenObjectName;
+          const treeView = treeViewRef.current;
+          if (!treeView) return;
+          const object = getObjectByName(
+            globalObjectsContainer,
+            objectsContainer,
+            objectOrGroupName
+          );
+          let itemId;
+          if (object) {
+            itemId = getObjectTreeViewItemId(object);
+          } else {
+            const group = getObjectGroupByName(
+              globalObjectsContainer,
+              objectsContainer,
+              objectOrGroupName
+            );
+            if (group) {
+              itemId = getObjectTreeViewItemId(group);
+            }
+          }
+          if (!!itemId) {
+            treeView.scrollToItemFromId(itemId, 'start');
+          }
+        }
+      },
+      [globalObjectsContainer, objectsContainer, chosenObjectName]
+    );
+
+    const getTreeViewItemChildren = (item: TreeViewItem) =>
+      item.getChildren(searchText);
+
+    const search = (searchText: string) => {
+      if (!searchText) return;
+
+      const matchingInstructions = moveDeprecatedInstructionsDown(
+        instructionSearchApiRef.current
+          .search(
+            getFuseSearchQueryForMultipleKeys(searchText, [
+              'displayedName',
+              'fullGroupName',
+              'description',
+            ])
+          )
+          .map(result => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          }))
+      );
+
+      setSearchResults({ instructions: matchingInstructions });
+    };
+
+    const onSubmitSearch = () => {
+      if (!searchText) return;
+      // TODO: Add possibility to chose first object/group when submitting search.
+      if (displayedInstructionsList.length > 0) {
+        onChooseInstruction(
+          displayedInstructionsList[0].item.type,
+          displayedInstructionsList[0].item
+        );
+      }
+    };
+
+    React.useEffect(
+      () => {
+        if (treeViewRef.current) treeViewRef.current.updateRowHeights();
+      },
+      [searchText]
+    );
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
       throw new Error(
         'Called InstructionOrObjectSelector without any object container.'
       );
     }
-    // TODO Use a loop instead of looking for 2 object containers.
-    if (objectsContainersList.getObjectsContainersCount() > 2) {
-      console.error(
-        'Called InstructionOrObjectSelector with more than 2 object containers.'
-      );
-    }
-    const globalObjectsContainer =
-      objectsContainersList.getObjectsContainersCount() > 1
-        ? objectsContainersList.getObjectsContainer(0)
-        : null;
-    const objectsContainer = objectsContainersList.getObjectsContainer(
-      objectsContainersList.getObjectsContainersCount() - 1
-    );
 
-    const {
-      searchText,
-      searchResults,
-      selectedItem,
-      initiallyOpenedFolderIds,
-    } = this.state;
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
     const isOutsideLayout = globalObjectsContainer !== project;
@@ -366,16 +365,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
     const hasResults = !isSearching || !!displayedInstructionsList.length;
 
-    const onSubmitSearch = () => {
-      if (!isSearching) return;
-      // TODO: Add possibility to chose first object/group when submitting search.
-      if (displayedInstructionsList.length > 0) {
-        onChooseInstruction(
-          displayedInstructionsList[0].item.type,
-          displayedInstructionsList[0].item
-        );
-      }
-    };
     const globalObjectsRootFolder = globalObjectsContainer
       ? globalObjectsContainer.getRootFolder()
       : null;
@@ -486,24 +475,21 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
             <SearchBar
               id="search-bar"
               value={searchText}
-              onChange={searchText => {
-                const oldSearchText = this.state.searchText;
-                if (!!searchText) this._search(searchText);
-                this.setState({
-                  searchText,
-                });
-
+              onChange={newSearchText => {
+                const oldSearchText = searchText;
+                if (!!newSearchText) search(newSearchText);
+                setSearchText(newSearchText);
                 // Notify if needed that we started or cleared a search
                 if (
-                  (!oldSearchText && searchText) ||
-                  (oldSearchText && !searchText)
+                  (!oldSearchText && newSearchText) ||
+                  (oldSearchText && !newSearchText)
                 ) {
                   if (onSearchStartOrReset) onSearchStartOrReset();
                 }
               }}
               onRequestSearch={onSubmitSearch}
-              ref={this._searchBar}
-              autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
+              ref={searchBarRef}
+              autoFocus={focusOnMount ? 'desktop' : undefined}
               placeholder={
                 isCondition
                   ? t`Search objects or conditions`
@@ -539,25 +525,26 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 <AutoSizer style={{ width: '100%' }} disableWidth>
                   {({ height }) => (
                     <ReadOnlyTreeView
-                      ref={this._treeView}
+                      ref={treeViewRef}
                       height={height}
+                      estimatedItemSize={32}
                       items={getTreeViewItems(i18n)}
-                      getItemHeight={this.getItemHeight}
-                      getItemName={this.getTreeViewItemName}
-                      shouldApplySearchToItem={this.shouldApplySearchToItem}
-                      getItemDescription={this.getTreeViewItemDescription}
-                      getItemId={this.getTreeViewItemId}
-                      getItemHtmlId={this.getTreeViewItemHtmlId}
-                      getItemChildren={this.getTreeViewItemChildren}
-                      getItemThumbnail={this.getTreeViewItemThumbnail}
-                      getItemDataset={this.getTreeViewItemDataset}
+                      getItemHeight={getTreeViewItemHeight}
+                      getItemName={getTreeViewItemName}
+                      shouldApplySearchToItem={shouldApplySearchToItem}
+                      getItemDescription={getTreeViewItemDescription}
+                      getItemId={getTreeViewItemId}
+                      getItemHtmlId={getTreeViewItemHtmlId}
+                      getItemChildren={getTreeViewItemChildren}
+                      getItemThumbnail={getTreeViewItemThumbnail}
+                      getItemDataset={getTreeViewItemDataset}
                       selectedItems={selectedItem ? [selectedItem] : []}
                       initiallyOpenedNodeIds={[
                         'scene-objects',
                         'global-objects',
                         'scene-groups',
                         'global-groups',
-                        ...initiallyOpenedFolderIds,
+                        ...initiallyOpenedFolderIdsRef.current,
                       ]}
                       onSelectItems={(items: TreeViewItem[]) => {
                         if (!items) return;
@@ -578,9 +565,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           onChooseObject(
                             objectFolderOrObjectToSelect.getObject().getName()
                           );
-                          this.setState({
-                            selectedItem: item,
-                          });
+                          setSelectedItem(item);
                         } else if (
                           itemContentToSelect instanceof
                           ObjectGroupTreeViewItemContent
@@ -588,9 +573,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           const group = itemContentToSelect.getGroup();
                           if (!group) return;
                           onChooseObject(group.getName());
-                          this.setState({
-                            selectedItem: item,
-                          });
+                          setSelectedItem(item);
                         } else if (
                           itemContentToSelect instanceof
                           ObjectGroupObjectTreeViewItemContent
@@ -598,9 +581,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           const object = itemContentToSelect.getObject();
                           if (!object) return;
                           onChooseObject(object.getName());
-                          this.setState({
-                            selectedItem: item,
-                          });
+                          setSelectedItem(item);
                         } else if (
                           itemContentToSelect instanceof
                           InstructionTreeViewItemContent
@@ -611,36 +592,31 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             instructionMetadata.type,
                             instructionMetadata
                           );
-                          this.setState({
-                            selectedItem: item,
-                          });
+                          setSelectedItem(item);
                         }
                       }}
                       searchText={searchText}
                       multiSelect={false}
-                      //   arrowKeyNavigationProps?: {|
-                      //    onGetItemInside: (item: Item) => ?Item,
-                      //    onGetItemOutside: (item: Item) => ?Item,
-                      //  |},
                     />
                   )}
                 </AutoSizer>
               </div>
             ) : (
-              <ScrollView ref={this._scrollView} autoHideScrollbar>
+              <ScrollView ref={scrollViewRef} autoHideScrollbar>
                 <List>
                   <>
                     {renderInstructionOrExpressionTree({
-                      instructionTreeNode: this.freeInstructionsInfoTree,
+                      instructionTreeNode: freeInstructionsInfoTreeRef.current,
                       onChoose: onChooseInstruction,
-                      iconSize,
+                      iconSize: ICON_SIZE,
                       useSubheaders: true,
                       selectedValue: chosenInstructionType
                         ? getInstructionListItemValue(chosenInstructionType)
                         : undefined,
-                      initiallyOpenedPath: this.initialInstructionTypePath,
-                      selectedItemRef: this._selectedInstructionItem,
-                      getGroupIconSrc,
+                      initiallyOpenedPath:
+                        initialInstructionTypePathRef.current,
+                      selectedItemRef: selectedInstructionItemRef,
+                      getGroupIconSrc: getInstructionIconSrc,
                     })}
                     {onClickMore && (
                       <ResponsiveLineStackLayout justifyContent="center">
@@ -883,7 +859,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           : undefined,
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
-                        getGroupIconSrc,
+                        getInstructionIcon,
                       })}
                       {onClickMore && (
                         <ResponsiveLineStackLayout justifyContent="center">
@@ -955,4 +931,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       </I18n>
     );
   }
-}
+);
+
+export default InstructionOrObjectSelector;

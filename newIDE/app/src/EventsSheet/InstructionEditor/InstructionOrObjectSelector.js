@@ -1,11 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import * as React from 'react';
+import Fuse from 'fuse.js';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { t } from '@lingui/macro';
-import Fuse from 'fuse.js';
+import { t, Trans } from '@lingui/macro';
 
-import * as React from 'react';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -19,61 +18,45 @@ import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { List, type ListItemRefType, ListItem } from '../../UI/List';
+import { List, type ListItemRefType } from '../../UI/List';
 import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs } from '../../UI/Tabs';
-import Subheader from '../../UI/Subheader';
-import {
-  enumerateObjectsAndGroups,
-  type ObjectWithContext,
-  type GroupWithContext,
-} from '../../ObjectsList/EnumerateObjects';
+import { enumerateObjectsAndGroups } from '../../ObjectsList/EnumerateObjects';
 import RaisedButton from '../../UI/RaisedButton';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
-import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
-import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
-import {
-  getObjectOrObjectGroupListItemValue,
-  getInstructionListItemValue,
-} from './SelectorListItems/Keys';
+import { getInstructionListItemValue } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
   tuneMatches,
   sharedFuseConfiguration,
-  getFuseSearchQueryForSimpleArray,
   getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 import Add from '../../UI/CustomSvgIcons/Add';
 import getObjectByName from '../../Utils/GetObjectByName';
-import {
-  enumerateFoldersInContainer,
-  getObjectsInFolder,
-} from '../../ObjectsList/EnumerateObjectFolderOrObject';
-import { renderFolderListItem } from './SelectorListItems/FolderListItem';
-import Text from '../../UI/Text';
+import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ReadOnlyTreeView, {
   type ReadOnlyTreeViewInterface,
 } from '../../UI/TreeView/ReadOnlyTreeView';
 import { AutoSizer } from 'react-virtualized';
-import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
 import {
   getObjectTreeViewItemId,
-  ObjectTreeViewItemContent,
-} from './ObjectTreeViewItemContent';
-import {
   getObjectFolderTreeViewItemId,
-  ObjectFolderTreeViewItemContent,
-} from './ObjectFolderTreeViewItemContent';
-import { type ObjectFolderTreeViewItemProps } from './ObjectFolderTreeViewItemContent';
-import { type ObjectTreeViewItemProps } from './ObjectTreeViewItemContent';
+  InstructionTreeViewItemContent,
+  ObjectFolderTreeViewItem,
+  GroupTreeViewItem,
+  ObjectGroupTreeViewItemContent,
+  RootTreeViewItem,
+  LabelTreeViewItemContent,
+  LeafTreeViewItem,
+  type TreeViewItem,
+} from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 
@@ -104,335 +87,6 @@ const moveDeprecatedInstructionsDown = (
     result => !result.item.fullGroupName.includes('deprecated')
   );
   return [...notDeprecatedResults, ...deprecatedResults];
-};
-
-export interface TreeViewItemContent {
-  applySearch: boolean;
-  getName(): string | React.Node;
-  getDescription(): string | null;
-  getId(): string;
-  getHtmlId(index: number): ?string;
-  getDataSet(): ?HTMLDataset;
-  getThumbnail(): ?string;
-}
-
-export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
-  applySearch = true;
-  group: gdObjectGroup;
-
-  constructor(group: gdObjectGroup) {
-    this.group = group;
-  }
-
-  getGroup(): gdObjectGroup | null {
-    return this.group;
-  }
-
-  getName(): string | React.Node {
-    return this.group.getName();
-  }
-  getDescription(): string | null {
-    return null;
-  }
-
-  getId(): string {
-    return getObjectTreeViewItemId(this.group);
-  }
-
-  getHtmlId(index: number): ?string {
-    return `group-item-${index}`;
-  }
-
-  getDataSet(): ?HTMLDataset {
-    return {
-      groupName: this.group.getName(),
-    };
-  }
-
-  getThumbnail(): ?string {
-    return 'res/ribbon_default/objectsgroups64.png';
-  }
-}
-export class ObjectGroupObjectTreeViewItemContent
-  implements TreeViewItemContent {
-  applySearch = true;
-  object: gdObject;
-  props: ObjectTreeViewItemProps;
-  groupPrefix: string;
-
-  constructor(
-    object: gdObject,
-    props: ObjectTreeViewItemProps,
-    groupPrefix: string
-  ) {
-    this.object = object;
-    this.props = props;
-    this.groupPrefix = groupPrefix;
-  }
-
-  getObject(): gdObject | null {
-    return this.object;
-  }
-
-  getName(): string | React.Node {
-    return this.object.getName();
-  }
-  getDescription(): string | null {
-    return null;
-  }
-
-  getId(): string {
-    return `${this.groupPrefix}-${getObjectTreeViewItemId(this.object)}`;
-  }
-
-  getHtmlId(index: number): ?string {
-    return `${this.groupPrefix}-object-item-${index}`;
-  }
-
-  getDataSet(): ?HTMLDataset {
-    return {
-      objectName: this.object.getName(),
-    };
-  }
-
-  getThumbnail(): ?string {
-    return this.props.getThumbnail(
-      this.props.project,
-      this.object.getConfiguration()
-    );
-  }
-}
-
-interface TreeViewItem {
-  isRoot?: boolean;
-  +content: TreeViewItemContent;
-  getChildren(searchText: string): ?Array<TreeViewItem>;
-}
-
-class LeafTreeViewItem implements TreeViewItem {
-  content: TreeViewItemContent;
-
-  constructor(content: TreeViewItemContent) {
-    this.content = content;
-  }
-
-  getChildren(): ?Array<TreeViewItem> {
-    return null;
-  }
-}
-class GroupTreeViewItem implements TreeViewItem {
-  content: TreeViewItemContent;
-  group: gdObjectGroup;
-  globalObjectsContainer: gdObjectsContainer | null;
-  objectsContainer: gdObjectsContainer;
-  objectTreeViewItemProps: ObjectTreeViewItemProps;
-
-  constructor(
-    content: TreeViewItemContent,
-    group: gdObjectGroup,
-    globalObjectsContainer: gdObjectsContainer | null,
-    objectsContainer: gdObjectsContainer,
-    objectTreeViewItemProps: ObjectTreeViewItemProps
-  ) {
-    this.content = content;
-    this.group = group;
-    this.globalObjectsContainer = globalObjectsContainer;
-    this.objectsContainer = objectsContainer;
-    this.objectTreeViewItemProps = objectTreeViewItemProps;
-  }
-
-  getChildren(searchText: string): ?Array<TreeViewItem> {
-    if (!searchText) return null;
-    const allObjectNames = this.group.getAllObjectsNames();
-    return allObjectNames
-      .toJSArray()
-      .map(objectName => {
-        const object = getObjectByName(
-          this.globalObjectsContainer,
-          this.objectsContainer,
-          objectName
-        );
-        if (!object) {
-          return null;
-        }
-        return new LeafTreeViewItem(
-          new ObjectGroupObjectTreeViewItemContent(
-            object,
-            this.objectTreeViewItemProps,
-            this.content.getId()
-          )
-        );
-      })
-      .filter(Boolean);
-  }
-}
-
-class RootTreeViewItem implements TreeViewItem {
-  content: TreeViewItemContent;
-  children: TreeViewItem[];
-  isRoot = true;
-
-  constructor(content: TreeViewItemContent, children: TreeViewItem[]) {
-    this.content = content;
-    this.children = children;
-  }
-
-  getChildren(): ?Array<TreeViewItem> {
-    return this.children;
-  }
-}
-
-class InstructionTreeViewItemContent implements TreeViewItemContent {
-  instructionMetadata: EnumeratedInstructionMetadata;
-  applySearch = false;
-  constructor(instructionMetadata) {
-    this.instructionMetadata = instructionMetadata;
-  }
-  getInstructionMetadata() {
-    return this.instructionMetadata;
-  }
-  getName() {
-    return this.instructionMetadata.displayedName;
-  }
-  getDescription(): string | null {
-    return this.instructionMetadata.fullGroupName;
-  }
-
-  getId() {
-    return `instruction-item-${this.instructionMetadata.type.replace(
-      /:/g,
-      '-'
-    )}`;
-  }
-  getHtmlId() {
-    return this.getId();
-  }
-  getDataSet() {
-    return {};
-  }
-  getThumbnail() {
-    return this.instructionMetadata.iconFilename;
-  }
-}
-
-class LabelTreeViewItemContent implements TreeViewItemContent {
-  id: string;
-  label: string | React.Node;
-  applySearch = true;
-
-  constructor(id: string, label: string | React.Node) {
-    this.id = id;
-    this.label = label;
-  }
-
-  getName(): string | React.Node {
-    return this.label;
-  }
-
-  getDescription(): string | null {
-    return null;
-  }
-
-  getId(): string {
-    return this.id;
-  }
-
-  getHtmlId(index: number): ?string {
-    return this.id;
-  }
-
-  getDataSet(): ?HTMLDataset {
-    return {};
-  }
-
-  getThumbnail(): ?string {
-    return null;
-  }
-
-  getIndex(): number {
-    return 0;
-  }
-}
-
-class ObjectFolderTreeViewItem implements TreeViewItem {
-  isRoot: boolean;
-  global: boolean;
-  isPlaceholder = false;
-  content: TreeViewItemContent;
-  objectFolderOrObject: gdObjectFolderOrObject;
-  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps;
-  objectTreeViewItemProps: ObjectTreeViewItemProps;
-
-  constructor({
-    objectFolderOrObject,
-    global,
-    isRoot,
-    content,
-    objectFolderTreeViewItemProps,
-    objectTreeViewItemProps,
-  }: {|
-    objectFolderOrObject: gdObjectFolderOrObject,
-    global: boolean,
-    isRoot: boolean,
-    content: TreeViewItemContent,
-    objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
-    objectTreeViewItemProps: ObjectTreeViewItemProps,
-  |}) {
-    this.isRoot = isRoot;
-    this.global = global;
-    this.content = content;
-    this.objectFolderOrObject = objectFolderOrObject;
-    this.objectFolderTreeViewItemProps = objectFolderTreeViewItemProps;
-    this.objectTreeViewItemProps = objectTreeViewItemProps;
-  }
-
-  getChildren(): ?Array<TreeViewItem> {
-    if (this.objectFolderOrObject.getChildrenCount() === 0) {
-      return [];
-    }
-    return mapFor(0, this.objectFolderOrObject.getChildrenCount(), i => {
-      const child = this.objectFolderOrObject.getChildAt(i);
-      return createTreeViewItem({
-        objectFolderOrObject: child,
-        isGlobal: this.global,
-        objectFolderTreeViewItemProps: this.objectFolderTreeViewItemProps,
-        objectTreeViewItemProps: this.objectTreeViewItemProps,
-      });
-    });
-  }
-}
-
-const createTreeViewItem = ({
-  objectFolderOrObject,
-  isGlobal,
-  objectFolderTreeViewItemProps,
-  objectTreeViewItemProps,
-}: {|
-  objectFolderOrObject: gdObjectFolderOrObject,
-  isGlobal: boolean,
-  objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps,
-  objectTreeViewItemProps: ObjectTreeViewItemProps,
-|}): TreeViewItem => {
-  if (objectFolderOrObject.isFolder()) {
-    return new ObjectFolderTreeViewItem({
-      objectFolderOrObject: objectFolderOrObject,
-      global: isGlobal,
-      isRoot: false,
-      objectFolderTreeViewItemProps,
-      objectTreeViewItemProps,
-      content: new ObjectFolderTreeViewItemContent(
-        objectFolderOrObject,
-        objectFolderTreeViewItemProps
-      ),
-    });
-  } else {
-    return new LeafTreeViewItem(
-      new ObjectTreeViewItemContent(
-        objectFolderOrObject,
-        objectTreeViewItemProps
-      )
-    );
-  }
 };
 
 type State = {|

@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { FixedSizeList } from 'react-window';
+import { VariableSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
 import classes from './TreeView.module.css';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
@@ -81,7 +81,7 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  getItemHeight: () => number,
+  getItemHeight: (Item) => number,
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
   getItemDescription?: Item => string,
@@ -138,7 +138,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds || []
   );
   const containerRef = React.useRef<?HTMLDivElement>(null);
-  const listRef = React.useRef<?FixedSizeList>(null);
+  const listRef = React.useRef<?VariableSizeList>(null);
   const [
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
@@ -579,13 +579,13 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       onKeyDown={onKeyDown}
       ref={containerRef}
     >
-      <FixedSizeList
+      <VariableSizeList
         height={height}
         itemCount={flattenedData.length}
-        itemSize={getItemHeight()}
+        itemSize={index => getItemHeight(flattenedData[index].item)}
         width={typeof width === 'number' ? width : '100%'}
         itemKey={index => flattenedData[index].id}
-        // Flow does not seem to accept the generic used in FixedSizeList
+        // Flow does not seem to accept the generic used in VariableSizeList
         // can itself use a generic.
         // $FlowFixMe
         itemData={itemData}
@@ -596,7 +596,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         overscanCount={20}
       >
         {ReadOnlyTreeViewRow}
-      </FixedSizeList>
+      </VariableSizeList>
     </div>
   );
 };

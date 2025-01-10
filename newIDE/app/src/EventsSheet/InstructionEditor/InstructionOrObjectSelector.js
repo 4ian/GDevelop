@@ -468,7 +468,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = {
     searchText: '',
-    searchResults: {  instructions: [] },
+    searchResults: { instructions: [] },
     selectedItem: null,
     initiallyOpenedFolderIds: [],
   };
@@ -614,6 +614,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     });
   };
 
+  getItemHeight = (item: TreeViewItem) =>
+    item.content instanceof InstructionTreeViewItemContent ? 44 : 32;
   getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
   shouldApplySearchToItem = (item: TreeViewItem) => item.content.applySearch;
   getTreeViewItemDescription = (item: TreeViewItem) =>
@@ -680,9 +682,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     // not in the events of a layout or an external events sheet - but in an extension.
     const isOutsideLayout = globalObjectsContainer !== project;
 
-    const { allObjectsList } = enumerateObjectsAndGroups(
-      objectsContainersList
-    );
+    const { allObjectsList } = enumerateObjectsAndGroups(objectsContainersList);
 
     const isSearching = !!searchText;
 
@@ -703,9 +703,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         )
       : 0;
 
-    const hasResults =
-      !isSearching ||
-      !!displayedInstructionsList.length;
+    const hasResults = !isSearching || !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
@@ -883,7 +881,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       ref={this._treeView}
                       height={height}
                       items={getTreeViewItems(i18n)}
-                      getItemHeight={() => (isSearching ? 44 : 32)}
+                      getItemHeight={this.getItemHeight}
                       getItemName={this.getTreeViewItemName}
                       shouldApplySearchToItem={this.shouldApplySearchToItem}
                       getItemDescription={this.getTreeViewItemDescription}

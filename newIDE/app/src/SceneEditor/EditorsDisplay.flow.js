@@ -21,6 +21,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 
 export type SceneEditorsDisplayProps = {|
+  gameEditorMode: 'embedded-game' | 'instances-editor',
   project: gdProject,
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,

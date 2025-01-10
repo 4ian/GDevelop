@@ -15,6 +15,10 @@ export type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
+  isForInGameEdition?: {|
+    forcedSceneName: string,
+    forcedExternalLayoutName: ?string,
+  |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
 export type CaptureOptions = {|
@@ -40,6 +44,7 @@ export type PreviewOptions = {|
     playerToken: string,
   },
   numberOfWindows: number,
+  isForInGameEdition: boolean,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,
@@ -58,6 +63,13 @@ export type PreviewLauncherProps = {|
 
 /** Each game connected to the debugger server is identified by a unique number. */
 export type DebuggerId = number;
+
+/** Each game connected to the debugger server can communicate its status. */
+export type DebuggerStatus = {|
+  isPaused: boolean,
+  isInGameEdition: boolean,
+  sceneName: string | null,
+|};
 
 /** The callbacks for a debugger server used for previews. */
 export type PreviewDebuggerServerCallbacks = {|

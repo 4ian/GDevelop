@@ -245,6 +245,8 @@ namespace gdjs {
         that.sendRuntimeGameDump();
       } else if (data.command === 'refresh') {
         that.sendRuntimeGameDump();
+      } else if (data.command === 'getStatus') {
+        that.sendRuntimeGameStatus();
       } else if (data.command === 'set') {
         that.set(data.path, data.newValue);
       } else if (data.command === 'call') {
@@ -263,7 +265,84 @@ namespace gdjs {
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
+          // TODO: if fatal error, should probably reload. The editor should handle this
+          // as it knows the current scene to show.
         });
+      } else if (data.command === 'switchForInGameEdition') {
+        if (!this._runtimegame.isInGameEdition()) return;
+
+        const sceneName = data.sceneName || null;
+        const externalLayoutName = data.externalLayoutName || null;
+        if (!sceneName) {
+          logger.warn('No scene name specified, switchForInGameEdition aborted');
+          return;
+        }
+
+        const runtimeGameOptions = this._runtimegame.getAdditionalOptions();
+        if (runtimeGameOptions.initialRuntimeGameStatus) {
+          // Skip changing the scene if we're already on the state that is being requested.
+          if (
+            runtimeGameOptions.initialRuntimeGameStatus.sceneName ===
+              sceneName &&
+            runtimeGameOptions.initialRuntimeGameStatus
+              .injectedExternalLayoutName === externalLayoutName
+          ) {
+            return;
+          }
+        }
+
+        runtimeGame
+          .getSceneStack()
+          .replace({
+            sceneName,
+            externalLayoutName,
+            skipCreatingInstancesFromScene: !!externalLayoutName,
+            clear: true,
+          });
+
+        // Update initialRuntimeGameStatus so that a hard reload
+        // will come back to the same state, and so that we can check later
+        // if the game is already on the state that is being requested.
+        runtimeGameOptions.initialRuntimeGameStatus = {
+          isPaused: runtimeGame.isPaused(),
+          isInGameEdition: runtimeGame.isInGameEdition(),
+          sceneName: sceneName,
+          injectedExternalLayoutName: externalLayoutName,
+          skipCreatingInstancesFromScene: !!externalLayoutName,
+        };
+      } else if (data.command === 'updateInstances') {
+        // TODO: do an update/partial hot reload of the instances
+      } else if (data.command === 'hardReload') {
+        // This usually means that the preview was modified so much that an entire reload
+        // is needed, or that the runtime itself could have been modified.
+        try {
+          const reloadUrl = new URL(location.href);
+
+          // Construct the initial status to be restored.
+          const initialRuntimeGameStatus = this._runtimegame.getAdditionalOptions()
+            .initialRuntimeGameStatus;
+          const runtimeGameStatus: RuntimeGameStatus = {
+            isPaused: this._runtimegame.isPaused(),
+            isInGameEdition: this._runtimegame.isInGameEdition(),
+            sceneName: initialRuntimeGameStatus?.sceneName || null,
+            injectedExternalLayoutName:
+              initialRuntimeGameStatus?.injectedExternalLayoutName || null,
+            skipCreatingInstancesFromScene:
+              initialRuntimeGameStatus?.skipCreatingInstancesFromScene || false,
+          };
+
+          reloadUrl.searchParams.set(
+            'runtimeGameStatus',
+            JSON.stringify(runtimeGameStatus)
+          );
+          location.replace(reloadUrl);
+        } catch (error) {
+          logger.error(
+            'Could not reload the game with the new initial status',
+            error
+          );
+          location.reload();
+        }
       } else {
         logger.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -434,6 +513,20 @@ namespace gdjs {
       return true;
     }
 
+    sendRuntimeGameStatus(): void {
+      const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'status',
+          payload: {
+            isPaused: this._runtimegame.isPaused(),
+            isInGameEdition: this._runtimegame.isInGameEdition(),
+            sceneName: currentScene ? currentScene.getName() : null,
+          },
+        })
+      );
+    }
+
     /**
      * Dump all the relevant data from the {@link RuntimeGame} instance and send it to the server.
      */
@@ -543,26 +636,11 @@ namespace gdjs {
       );
     }
 
-    /**
-     * Callback called when the game is paused.
-     */
-    sendGamePaused(): void {
+    sendInstancesUpdated(runtimeObjects: gdjs.RuntimeObject[]): void {
       this._sendMessage(
         circularSafeStringify({
-          command: 'game.paused',
-          payload: null,
-        })
-      );
-    }
-
-    /**
-     * Callback called when the game is resumed.
-     */
-    sendGameResumed(): void {
-      this._sendMessage(
-        circularSafeStringify({
-          command: 'game.resumed',
-          payload: null,
+          command: 'instances.updated',
+          payload: 'TODO',
         })
       );
     }

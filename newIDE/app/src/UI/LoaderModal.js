@@ -28,14 +28,15 @@ type Props = {|
   progress?: ?number,
 |};
 
-const transitionDuration = { enter: 0, exit: 150 };
+const transitionDuration = { enter: 400 };
 
 const LoaderModal = ({ progress, message, show }: Props) => {
   const isInfinite = progress === null || progress === undefined;
+  if (!show) return null;
   return (
     <I18n>
       {({ i18n }) => (
-        <Dialog open={show} transitionDuration={transitionDuration}>
+        <Dialog open transitionDuration={transitionDuration}>
           <DialogContent style={styles.dialogContent}>
             <div
               style={{

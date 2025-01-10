@@ -121,10 +121,15 @@ namespace gdjs {
 
     /**
      * Load the runtime scene from the given scene.
-     * @param sceneData An object containing the scene data.
+     *
+     * @param sceneAndExtensionsData The data of the scene and extension variables to be loaded.
+     * @param options Options to change what is loaded.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+    loadFromScene(
+      sceneAndExtensionsData: SceneAndExtensionsData | null,
+      options?: { skipCreatingInstances?: boolean }
+    ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
@@ -184,14 +189,16 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      this.createObjectsFrom(
-        sceneData.instances,
-        0,
-        0,
-        0,
-        /*trackByPersistentUuid=*/
-        true
-      );
+      if (!options || !options.skipCreatingInstances) {
+        this.createObjectsFrom(
+          sceneData.instances,
+          0,
+          0,
+          0,
+          /*trackByPersistentUuid=*/
+          true
+        );
+      }
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
@@ -358,7 +365,7 @@ namespace gdjs {
     }
 
     /**
-     * Step and render the scene.
+     * Step (execute the game logic) and render the scene.
      * @param elapsedTime In milliseconds
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
@@ -418,6 +425,23 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.end('callbacks and extensions (post-events)');
       }
+
+      this.render();
+
+      this._isJustResumed = false;
+      if (this._profiler) {
+        this._profiler.end('render');
+      }
+      if (this._profiler) {
+        this._profiler.endFrame();
+      }
+      return !!this.getRequestedChange();
+    }
+
+    /**
+     * Render the scene (but do not execute the game logic).
+     */
+    render() {
       if (this._profiler) {
         this._profiler.begin('objects (pre-render, effects update)');
       }
@@ -447,21 +471,6 @@ namespace gdjs {
         );
       }
 
-      this._isJustResumed = false;
-      this.render();
-      if (this._profiler) {
-        this._profiler.end('render');
-      }
-      if (this._profiler) {
-        this._profiler.endFrame();
-      }
-      return !!this.getRequestedChange();
-    }
-
-    /**
-     * Render the PIXI container associated to the runtimeScene.
-     */
-    render() {
       this._renderer.render();
     }
 

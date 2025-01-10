@@ -1992,10 +1992,6 @@ module.exports = {
       .markAsOnlyWorkingFor3D()
       .addIncludeFile('Extensions/3D/BokehShader2.js');
       const properties = effect.getProperties();
-      properties.getOrCreate('focalDepth')
-      .setValue('1')
-      .setLabel(_('Depth of the focal  lens'))
-      .setType('number');
     }
     {
       const effect = extension

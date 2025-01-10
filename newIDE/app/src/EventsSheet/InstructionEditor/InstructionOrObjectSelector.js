@@ -49,9 +49,11 @@ import {
   getObjectTreeViewItemId,
   getObjectFolderTreeViewItemId,
   InstructionTreeViewItemContent,
+  ObjectTreeViewItemContent,
   ObjectFolderTreeViewItem,
   GroupTreeViewItem,
   ObjectGroupTreeViewItemContent,
+  ObjectGroupObjectTreeViewItemContent,
   RootTreeViewItem,
   LabelTreeViewItemContent,
   LeafTreeViewItem,
@@ -562,7 +564,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         const item = items[0];
                         if (!item || item.isRoot) return;
                         const itemContentToSelect = item.content;
-                        if (itemContentToSelect.getObjectFolderOrObject) {
+                        if (
+                          itemContentToSelect instanceof
+                          ObjectTreeViewItemContent
+                        ) {
                           const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
                           if (
                             !objectFolderOrObjectToSelect ||
@@ -576,21 +581,30 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           this.setState({
                             selectedItem: item,
                           });
-                        } else if (itemContentToSelect.getGroup) {
+                        } else if (
+                          itemContentToSelect instanceof
+                          ObjectGroupTreeViewItemContent
+                        ) {
                           const group = itemContentToSelect.getGroup();
                           if (!group) return;
                           onChooseObject(group.getName());
                           this.setState({
                             selectedItem: item,
                           });
-                        } else if (itemContentToSelect.getObject) {
+                        } else if (
+                          itemContentToSelect instanceof
+                          ObjectGroupObjectTreeViewItemContent
+                        ) {
                           const object = itemContentToSelect.getObject();
                           if (!object) return;
                           onChooseObject(object.getName());
                           this.setState({
                             selectedItem: item,
                           });
-                        } else if (itemContentToSelect.getInstructionMetadata) {
+                        } else if (
+                          itemContentToSelect instanceof
+                          InstructionTreeViewItemContent
+                        ) {
                           const instructionMetadata = itemContentToSelect.getInstructionMetadata();
                           if (!instructionMetadata) return;
                           onChooseInstruction(

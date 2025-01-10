@@ -1817,8 +1817,6 @@ namespace gdjs {
         }
         const body = behavior._body!;
 
-        // TODO the `if` is probably unnecessary because `SetPositionAndRotationWhenChanged` already check this.
-        // The object object transform has changed, update body transform:
         if (
           this.behavior._objectOldX !== owner3D.getX() ||
           this.behavior._objectOldY !== owner3D.getY() ||

@@ -812,9 +812,7 @@ namespace gdjs {
           ? this.layers & gdjs.Physics3DSharedData.staticLayersMask
           : this.layers & gdjs.Physics3DSharedData.dynamicLayersMask,
         // Static objects accept all collisions as it's the mask of dynamic objects that matters.
-        this.isStatic()
-          ? gdjs.Physics3DSharedData.allLayersMask
-          : this.masks
+        this.isStatic() ? gdjs.Physics3DSharedData.allLayersMask : this.masks
       );
     }
 

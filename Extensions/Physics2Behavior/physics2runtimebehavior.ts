@@ -964,7 +964,7 @@ namespace gdjs {
       // It would be useless to try to recreate it as updateBodyFromObject already does it.
       // If the body is null, we just don't do anything
       // (but still run the physics simulation - this is independent).
-      if (this._body !== null) {
+      if (this._body !== null && !this.isStatic() && this._body.IsAwake()) {
         this.owner.setX(
           this._body.GetPosition().get_x() * this._sharedData.worldScale -
             this.owner.getWidth() / 2 +

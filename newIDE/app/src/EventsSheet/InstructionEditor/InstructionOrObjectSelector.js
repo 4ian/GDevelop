@@ -246,26 +246,31 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _search = (searchText: string) => {
     if (searchText === '') return;
 
-    this.setState({
-      searchResults: {
-        instructions: this.instructionSearchApi
-          ? moveDeprecatedInstructionsDown(
-              this.instructionSearchApi
-                .search(
-                  getFuseSearchQueryForMultipleKeys(searchText, [
-                    'displayedName',
-                    'fullGroupName',
-                    'description',
-                  ])
-                )
-                .map(result => ({
-                  item: result.item,
-                  matches: tuneMatches(result, searchText),
-                }))
-            )
-          : [],
+    this.setState(
+      {
+        searchResults: {
+          instructions: this.instructionSearchApi
+            ? moveDeprecatedInstructionsDown(
+                this.instructionSearchApi
+                  .search(
+                    getFuseSearchQueryForMultipleKeys(searchText, [
+                      'displayedName',
+                      'fullGroupName',
+                      'description',
+                    ])
+                  )
+                  .map(result => ({
+                    item: result.item,
+                    matches: tuneMatches(result, searchText),
+                  }))
+              )
+            : [],
+        },
       },
-    });
+      () => {
+        if (this._treeView.current) this._treeView.current.updateRowHeights();
+      }
+    );
   };
 
   getItemHeight = (item: TreeViewItem) =>

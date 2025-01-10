@@ -75,13 +75,14 @@ export type ReadOnlyTreeViewInterface<Item> = {|
   animateItemFromId: (itemId: string) => void,
   areItemsOpen: (Array<Item>) => boolean[],
   areItemsOpenFromId: (Array<string>) => boolean[],
+  updateRowHeights: () => void,
 |};
 
 type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  getItemHeight: (Item) => number,
+  getItemHeight: Item => number,
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
   getItemDescription?: Item => string,
@@ -335,7 +336,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [onClickItem]
   );
 
-  let flattenedData = React.useMemo(
+  const flattenedData = React.useMemo(
     () => flattenOpened(items, searchText ? searchText.toLowerCase() : null),
     [flattenOpened, items, searchText]
   );
@@ -382,6 +383,10 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     },
     [openedNodeIds]
   );
+
+  const updateRowHeights = React.useCallback(() => {
+    if (listRef.current) listRef.current.resetAfterIndex(0);
+  }, []);
 
   const animateItem = React.useCallback(
     (item: Item) => {
@@ -441,6 +446,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       animateItemFromId,
       areItemsOpen,
       areItemsOpenFromId,
+      updateRowHeights,
     })
   );
 

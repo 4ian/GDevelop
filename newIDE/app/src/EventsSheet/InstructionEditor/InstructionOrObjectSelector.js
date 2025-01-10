@@ -58,7 +58,9 @@ import {
 import { renderFolderListItem } from './SelectorListItems/FolderListItem';
 import Text from '../../UI/Text';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
-import ReadOnlyTreeView from '../../UI/TreeView/ReadOnlyTreeView';
+import ReadOnlyTreeView, {
+  type ReadOnlyTreeViewInterface,
+} from '../../UI/TreeView/ReadOnlyTreeView';
 import { AutoSizer } from 'react-virtualized';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { mapFor } from '../../Utils/MapFor';
@@ -66,10 +68,14 @@ import {
   getObjectTreeViewItemId,
   ObjectTreeViewItemContent,
 } from './ObjectTreeViewItemContent';
-import { ObjectFolderTreeViewItemContent } from './ObjectFolderTreeViewItemContent';
+import {
+  getObjectFolderTreeViewItemId,
+  ObjectFolderTreeViewItemContent,
+} from './ObjectFolderTreeViewItemContent';
 import { type ObjectFolderTreeViewItemProps } from './ObjectFolderTreeViewItemContent';
 import { type ObjectTreeViewItemProps } from './ObjectTreeViewItemContent';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 
 const gd: libGDevelop = global.gd;
 
@@ -436,14 +442,8 @@ type State = {|
     objects: Array<SearchResult<ObjectWithContext>>,
     groups: Array<SearchResult<GroupWithContext>>,
     instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
-    folders: Array<
-      SearchResult<{|
-        path: string,
-        folder: gdObjectFolderOrObject,
-        global: boolean,
-      |}>
-    >,
   },
+  initiallyOpenedFolderIds: string[],
 |};
 
 type Props = {|
@@ -470,12 +470,14 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = {
     searchText: '',
-    searchResults: { objects: [], groups: [], instructions: [], folders: [] },
+    searchResults: { objects: [], groups: [], instructions: [] },
     selectedItem: null,
+    initiallyOpenedFolderIds: [],
   };
   _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItemRefType>();
+  _treeView = React.createRef<ReadOnlyTreeViewInterface<TreeViewItem>>();
+  _selectedInstructionItem = React.createRef<ListItemRefType>();
 
   // Free instructions, to be displayed in a tab next to the objects.
   freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -493,7 +495,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   instructionSearchApi = null;
   objectSearchApi = null;
   groupSearchApi = null;
-  folderSearchApi = null;
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -512,8 +513,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   );
 
   componentDidMount() {
-    if (this._selectedItem.current && this._scrollView.current) {
-      this._scrollView.current.scrollTo(this._selectedItem.current);
+    if (this._selectedInstructionItem.current && this._scrollView.current) {
+      this._scrollView.current.scrollTo(this._selectedInstructionItem.current);
     }
 
     // The objects must never be kept in a state as they may be temporary copies.
@@ -546,17 +547,46 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       objectsContainersList.getObjectsContainersCount() - 1
     );
 
-    const allFolders = [
-      ...(globalObjectsContainer
-        ? enumerateFoldersInContainer(globalObjectsContainer).map(
-            folderWithPath => ({ ...folderWithPath, global: true })
-          )
-        : []),
-      ...enumerateFoldersInContainer(objectsContainer).map(folderWithPath => ({
-        ...folderWithPath,
-        global: false,
-      })),
-    ];
+    if (this.props.chosenObjectName) {
+      const objectOrGroupName = this.props.chosenObjectName;
+      const treeView = this._treeView.current;
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        objectOrGroupName
+      );
+      let itemId;
+      if (object) {
+        itemId = getObjectTreeViewItemId(object);
+      } else {
+        const group = getObjectGroupByName(
+          // TODO: to fix.
+          globalObjectsContainer,
+          objectsContainer,
+          objectOrGroupName
+        );
+        if (group) {
+          itemId = getObjectTreeViewItemId(group);
+        }
+      }
+
+      if (treeView && itemId) {
+        treeView.scrollToItemFromId(itemId);
+      }
+    }
+
+    this.setState({
+      initiallyOpenedFolderIds: [
+        ...(globalObjectsContainer
+          ? enumerateFoldersInContainer(globalObjectsContainer).map(
+              folderWithPath => folderWithPath.folder
+            )
+          : []),
+        ...enumerateFoldersInContainer(objectsContainer).map(
+          folderWithPath => folderWithPath.folder
+        ),
+      ].map(getObjectFolderTreeViewItemId),
+    });
 
     this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
       ...sharedFuseConfiguration,
@@ -576,11 +606,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       getFn: (item, property) => item.group.getName(),
       keys: ['name'], // Not used as we only use the name of the group
     });
-    this.folderSearchApi = new Fuse(allFolders, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.path,
-      keys: ['name'], // Not used as we only use the path to the folder
-    });
   }
 
   _search = (searchText: string) => {
@@ -598,12 +623,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
           : [],
         groups: this.groupSearchApi
           ? this.groupSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-        folders: this.folderSearchApi
-          ? this.folderSearchApi.search(extendedSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
@@ -684,8 +703,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       objectsContainersList.getObjectsContainersCount() - 1
     );
 
-    const { searchText, searchResults, selectedItem } = this.state;
-
+    const {
+      searchText,
+      searchResults,
+      selectedItem,
+      initiallyOpenedFolderIds,
+    } = this.state;
+    console.log(initiallyOpenedFolderIds);
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
     const isOutsideLayout = globalObjectsContainer !== project;
@@ -705,7 +729,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       filteredObjectsList = searchResults.objects;
       displayedObjectGroupsList = searchResults.groups;
       filteredInstructionsList = searchResults.instructions;
-      filteredFoldersList = searchResults.folders;
     } else {
       filteredObjectsList = allObjectsList.map(object => ({
         item: object,
@@ -798,7 +821,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
           : null,
         hasGroups
           ? new RootTreeViewItem(
-              new LabelTreeViewItemContent('groups', i18n._(t`Groups`)),
+              new LabelTreeViewItemContent('scene-groups', i18n._(t`Groups`)),
               mapFor(0, groups.count(), index => {
                 const group = groups.getAt(index);
                 return new GroupTreeViewItem(
@@ -912,6 +935,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 <AutoSizer style={{ width: '100%' }} disableWidth>
                   {({ height }) => (
                     <ReadOnlyTreeView
+                      ref={this._treeView}
                       height={height}
                       items={getTreeViewItems(i18n)}
                       getItemHeight={() => (isSearching ? 44 : 32)}
@@ -924,6 +948,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       getItemThumbnail={this.getTreeViewItemThumbnail}
                       getItemDataset={this.getTreeViewItemDataset}
                       selectedItems={selectedItem ? [selectedItem] : []}
+                      initiallyOpenedNodeIds={[
+                        'scene-objects',
+                        'global-objects',
+                        'scene-groups',
+                        'global-groups',
+                        ...initiallyOpenedFolderIds,
+                      ]}
                       onSelectItems={(items: TreeViewItem[]) => {
                         if (!items) return;
                         const item = items[0];
@@ -992,7 +1023,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         ? getInstructionListItemValue(chosenInstructionType)
                         : undefined,
                       initiallyOpenedPath: this.initialInstructionTypePath,
-                      selectedItemRef: this._selectedItem,
+                      selectedItemRef: this._selectedInstructionItem,
                       getGroupIconSrc,
                     })}
                     {onClickMore && (

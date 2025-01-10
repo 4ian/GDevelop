@@ -80,7 +80,8 @@ VariablesContainersList VariablesContainersList::
   variablesContainersList.Push(propertyVariablesContainer);
 
   gd::EventsFunctionTools::ParametersToVariablesContainer(
-      eventsFunction.GetParametersForEvents(extension),
+      eventsFunction.GetParametersForEvents(
+          eventsBasedBehavior.GetEventsFunctions()),
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 
@@ -104,7 +105,8 @@ VariablesContainersList::MakeNewVariablesContainersListForObjectEventsFunction(
   variablesContainersList.Push(propertyVariablesContainer);
 
   gd::EventsFunctionTools::ParametersToVariablesContainer(
-      eventsFunction.GetParametersForEvents(extension),
+      eventsFunction.GetParametersForEvents(
+          eventsBasedObject.GetEventsFunctions()),
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 

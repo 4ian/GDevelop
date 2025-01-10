@@ -275,6 +275,9 @@ class InstructionTreeViewItemContent implements TreeViewItemContent {
   constructor(instructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
+  getInstructionMetadata() {
+    return this.instructionMetadata;
+  }
   getName() {
     return this.instructionMetadata.displayedName;
   }
@@ -421,6 +424,7 @@ const createTreeViewItem = ({
 
 type State = {|
   searchText: string,
+  selectedItem: TreeViewItem | null,
   searchResults: {
     objects: Array<SearchResult<ObjectWithContext>>,
     groups: Array<SearchResult<GroupWithContext>>,
@@ -460,6 +464,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   state = {
     searchText: '',
     searchResults: { objects: [], groups: [], instructions: [], folders: [] },
+    selectedItem: null,
   };
   _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
@@ -672,7 +677,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       objectsContainersList.getObjectsContainersCount() - 1
     );
 
-    const { searchText, searchResults } = this.state;
+    const { searchText, searchResults, selectedItem } = this.state;
 
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
@@ -911,13 +916,12 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       getItemChildren={this.getTreeViewItemChildren}
                       getItemThumbnail={this.getTreeViewItemThumbnail}
                       getItemDataset={this.getTreeViewItemDataset}
-                      selectedItems={[]}
-                      // onClickItem?: Item => void
+                      selectedItems={selectedItem ? [selectedItem] : []}
                       onSelectItems={(items: TreeViewItem[]) => {
                         if (!items) return;
                         const item = items[0];
                         if (!item || item.isRoot) return;
-                        const itemContentToSelect = items[0].content;
+                        const itemContentToSelect = item.content;
                         if (itemContentToSelect.getObjectFolderOrObject) {
                           const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
                           if (
@@ -929,10 +933,33 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           onChooseObject(
                             objectFolderOrObjectToSelect.getObject().getName()
                           );
+                          this.setState({
+                            selectedItem: item,
+                          });
                         } else if (itemContentToSelect.getGroup) {
                           const group = itemContentToSelect.getGroup();
                           if (!group) return;
                           onChooseObject(group.getName());
+                          this.setState({
+                            selectedItem: item,
+                          });
+                        } else if (itemContentToSelect.getObject) {
+                          const object = itemContentToSelect.getObject();
+                          if (!object) return;
+                          onChooseObject(object.getName());
+                          this.setState({
+                            selectedItem: item,
+                          });
+                        } else if (itemContentToSelect.getInstructionMetadata) {
+                          const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                          if (!instructionMetadata) return;
+                          onChooseInstruction(
+                            instructionMetadata.type,
+                            instructionMetadata
+                          );
+                          this.setState({
+                            selectedItem: item,
+                          });
                         }
                       }}
                       searchText={searchText}

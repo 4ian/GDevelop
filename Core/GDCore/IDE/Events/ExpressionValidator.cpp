@@ -460,12 +460,12 @@ const gd::String& ExpressionValidator::TypeToString(Type type) {
     case Type::NumberOrString:
       return numberOrStringTypeString;
     case Type::Variable:
+      // This function is only used to display errors.
+      // Users don't care if it's legacy or not or
+      // if it allows properties and parameters.
     case Type::VariableOrProperty:
     case Type::VariableOrPropertyOrParameter:
-      return variableTypeString;
     case Type::LegacyVariable:
-      // This function is only used to display error.
-      // Users don't care if it's legacy or not.
       return variableTypeString;
     case Type::Object:
       return objectTypeString;

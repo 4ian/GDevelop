@@ -206,9 +206,10 @@ const InstructionOrObjectSelector = React.forwardRef<
     // The objects must never be kept in a state as they may be temporary copies.
     // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
     // in the codebase.
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
+    const objectsContainersList = React.useMemo(
+      () => projectScopedContainersAccessor.get().getObjectsContainersList(),
+      [projectScopedContainersAccessor]
+    );
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
       throw new Error(
@@ -221,6 +222,11 @@ const InstructionOrObjectSelector = React.forwardRef<
         'Used InstructionOrObjectSelector with more than 2 object containers.'
       );
     }
+    const { allObjectsList } = React.useMemo(
+      () => enumerateObjectsAndGroups(objectsContainersList),
+      [objectsContainersList]
+    );
+
     const globalObjectsContainer =
       objectsContainersList.getObjectsContainersCount() > 1
         ? objectsContainersList.getObjectsContainer(0)
@@ -333,20 +339,13 @@ const InstructionOrObjectSelector = React.forwardRef<
       () => {
         if (treeViewRef.current) treeViewRef.current.updateRowHeights();
       },
+      // Recompute row heights when search changes.
       [searchText]
     );
 
-    if (objectsContainersList.getObjectsContainersCount() === 0) {
-      throw new Error(
-        'Called InstructionOrObjectSelector without any object container.'
-      );
-    }
-
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
-    const isOutsideLayout = globalObjectsContainer !== project;
-
-    const { allObjectsList } = enumerateObjectsAndGroups(objectsContainersList);
+    const isOutsideLayout = globalObjectsContainer !== project.getObjects();
 
     const isSearching = !!searchText;
 
@@ -367,7 +366,7 @@ const InstructionOrObjectSelector = React.forwardRef<
         )
       : 0;
 
-    const hasResults = !isSearching || !!displayedInstructionsList.length;
+    const hasResults = !isSearching || displayedInstructionsList.length > 0;
 
     const globalObjectsRootFolder = globalObjectsContainer
       ? globalObjectsContainer.getRootFolder()
@@ -536,87 +535,111 @@ const InstructionOrObjectSelector = React.forwardRef<
                 </Column>
               </Line>
             )}
-            {currentTab === 'objects' ? (
-              <div style={{ flex: 1 }}>
-                <AutoSizer style={{ width: '100%' }} disableWidth>
-                  {({ height }) => (
-                    <ReadOnlyTreeView
-                      ref={treeViewRef}
-                      height={height}
-                      estimatedItemSize={32}
-                      items={getTreeViewItems(i18n)}
-                      getItemHeight={getTreeViewItemHeight}
-                      getItemName={getTreeViewItemName}
-                      shouldApplySearchToItem={shouldApplySearchToItem}
-                      getItemDescription={getTreeViewItemDescription}
-                      getItemId={getTreeViewItemId}
-                      getItemHtmlId={getTreeViewItemHtmlId}
-                      getItemChildren={getTreeViewItemChildren}
-                      getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemDataset={getTreeViewItemDataset}
-                      selectedItems={selectedItem ? [selectedItem] : []}
-                      initiallyOpenedNodeIds={[
-                        'scene-objects',
-                        'global-objects',
-                        'scene-groups',
-                        'global-groups',
-                        ...initiallyOpenedFolderIdsRef.current,
-                      ]}
-                      onSelectItems={(items: TreeViewItem[]) => {
-                        if (!items) return;
-                        const item = items[0];
-                        if (!item || item.isRoot) return;
-                        const itemContentToSelect = item.content;
-                        if (
-                          itemContentToSelect instanceof
-                          ObjectTreeViewItemContent
-                        ) {
-                          const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
-                          if (
-                            !objectFolderOrObjectToSelect ||
-                            objectFolderOrObjectToSelect.isFolder()
-                          ) {
-                            return;
-                          }
-                          onChooseObject(
-                            objectFolderOrObjectToSelect.getObject().getName()
-                          );
-                          setSelectedItem(item);
-                        } else if (
-                          itemContentToSelect instanceof
-                          ObjectGroupTreeViewItemContent
-                        ) {
-                          const group = itemContentToSelect.getGroup();
-                          if (!group) return;
-                          onChooseObject(group.getName());
-                          setSelectedItem(item);
-                        } else if (
-                          itemContentToSelect instanceof
-                          ObjectGroupObjectTreeViewItemContent
-                        ) {
-                          const object = itemContentToSelect.getObject();
-                          if (!object) return;
-                          onChooseObject(object.getName());
-                          setSelectedItem(item);
-                        } else if (
-                          itemContentToSelect instanceof
-                          InstructionTreeViewItemContent
-                        ) {
-                          const instructionMetadata = itemContentToSelect.getInstructionMetadata();
-                          if (!instructionMetadata) return;
-                          onChooseInstruction(
-                            instructionMetadata.type,
-                            instructionMetadata
-                          );
-                          setSelectedItem(item);
-                        }
-                      }}
-                      searchText={searchText}
-                      multiSelect={false}
-                    />
+            {isSearching || currentTab === 'objects' ? (
+              !isSearching && !allObjectsList.length ? (
+                <EmptyMessage>
+                  {isOutsideLayout ? (
+                    <Trans>
+                      There are no objects. Objects will appear if you add some
+                      as parameters.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      There is no object in your game or in this scene. Start by
+                      adding an new object in the scene editor, using the
+                      objects list.
+                    </Trans>
                   )}
-                </AutoSizer>
-              </div>
+                </EmptyMessage>
+              ) : isSearching && !hasResults ? (
+                <EmptyMessage>
+                  <Trans>
+                    Nothing corresponding to your search. Choose an object first
+                    or browse the list of actions/conditions.
+                  </Trans>
+                </EmptyMessage>
+              ) : (
+                <div style={{ flex: 1 }}>
+                  <AutoSizer style={{ width: '100%' }} disableWidth>
+                    {({ height }) => (
+                      <ReadOnlyTreeView
+                        ref={treeViewRef}
+                        height={height}
+                        estimatedItemSize={32}
+                        items={getTreeViewItems(i18n)}
+                        getItemHeight={getTreeViewItemHeight}
+                        getItemName={getTreeViewItemName}
+                        shouldApplySearchToItem={shouldApplySearchToItem}
+                        getItemDescription={getTreeViewItemDescription}
+                        getItemId={getTreeViewItemId}
+                        getItemHtmlId={getTreeViewItemHtmlId}
+                        getItemChildren={getTreeViewItemChildren}
+                        getItemThumbnail={getTreeViewItemThumbnail}
+                        getItemDataset={getTreeViewItemDataset}
+                        selectedItems={selectedItem ? [selectedItem] : []}
+                        initiallyOpenedNodeIds={[
+                          'scene-objects',
+                          'global-objects',
+                          'scene-groups',
+                          'global-groups',
+                          ...initiallyOpenedFolderIdsRef.current,
+                        ]}
+                        onSelectItems={(items: TreeViewItem[]) => {
+                          if (!items) return;
+                          const item = items[0];
+                          if (!item || item.isRoot) return;
+                          const itemContentToSelect = item.content;
+                          if (
+                            itemContentToSelect instanceof
+                            ObjectTreeViewItemContent
+                          ) {
+                            const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                            if (
+                              !objectFolderOrObjectToSelect ||
+                              objectFolderOrObjectToSelect.isFolder()
+                            ) {
+                              return;
+                            }
+                            onChooseObject(
+                              objectFolderOrObjectToSelect.getObject().getName()
+                            );
+                            setSelectedItem(item);
+                          } else if (
+                            itemContentToSelect instanceof
+                            ObjectGroupTreeViewItemContent
+                          ) {
+                            const group = itemContentToSelect.getGroup();
+                            if (!group) return;
+                            onChooseObject(group.getName());
+                            setSelectedItem(item);
+                          } else if (
+                            itemContentToSelect instanceof
+                            ObjectGroupObjectTreeViewItemContent
+                          ) {
+                            const object = itemContentToSelect.getObject();
+                            if (!object) return;
+                            onChooseObject(object.getName());
+                            setSelectedItem(item);
+                          } else if (
+                            itemContentToSelect instanceof
+                            InstructionTreeViewItemContent
+                          ) {
+                            const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                            if (!instructionMetadata) return;
+                            onChooseInstruction(
+                              instructionMetadata.type,
+                              instructionMetadata
+                            );
+                            setSelectedItem(item);
+                          }
+                        }}
+                        searchText={searchText}
+                        multiSelect={false}
+                      />
+                    )}
+                  </AutoSizer>
+                </div>
+              )
             ) : (
               <ScrollView ref={scrollViewRef} autoHideScrollbar>
                 <List>
@@ -656,290 +679,6 @@ const InstructionOrObjectSelector = React.forwardRef<
                     )}
                   </>
                 </List>
-                {/* <List>
-                {(isSearching || currentTab === 'objects') && (
-                    <React.Fragment>
-                      {filteredObjectsList.map(
-                        ({ item: objectWithContext, matches }, index) =>
-                          renderObjectListItem({
-                            project: project,
-                            objectWithContext: objectWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(
-                                objectWithContext.object.getName()
-                              ),
-                            matchesCoordinates: matches.length
-                              ? matches[0].indices // Only field for objects is their name
-                              : [],
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                            id: 'object-item-' + index,
-                            data: {
-                              objectName: objectWithContext.object.getName(),
-                            },
-                          })
-                      )}
-
-                      {displayedObjectGroupsList.length > 0 && (
-                        <Subheader>
-                          <Trans>Object groups</Trans>
-                        </Subheader>
-                      )}
-                      {displayedObjectGroupsList.map(
-                        ({ item: groupWithContext, matches }, index) => {
-                          const results = [];
-
-                          results.push(
-                            renderGroupObjectsListItem({
-                              id: 'objectGroup-item-' + index,
-                              data: {
-                                objectName: groupWithContext.group.getName(),
-                              },
-                              groupWithContext,
-                              iconSize,
-                              onClick: () =>
-                                onChooseObject(
-                                  groupWithContext.group.getName()
-                                ),
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices // Only field for groups is their name
-                                : [],
-                              selectedValue: chosenObjectName
-                                ? getObjectOrObjectGroupListItemValue(
-                                    chosenObjectName
-                                  )
-                                : undefined,
-                            })
-                          );
-                          if (isSearching) {
-                            const { group, global } = groupWithContext;
-                            const groupName = group.getName();
-                            const objectsInGroup = group
-                              .getAllObjectsNames()
-                              .toJSArray()
-                              .map(objectName => {
-                                // A global object group can contain scene objects so we cannot use
-                                // the group context to get directly get the object knowing the
-                                // appropriate container.
-                                const object = getObjectByName(
-                                  globalObjectsContainer,
-                                  objectsContainer,
-                                  objectName
-                                );
-                                if (!object) return null;
-
-                                return renderObjectListItem({
-                                  project,
-                                  objectWithContext: {
-                                    object,
-                                    global,
-                                  },
-                                  keyPrefix: `group-${groupName}`,
-                                  withIndent: true,
-                                  iconSize,
-                                  onClick: () => onChooseObject(objectName),
-                                  matchesCoordinates: [],
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                });
-                              })
-                              .filter(Boolean);
-                            if (objectsInGroup.length === 0) {
-                              results.push(
-                                <ListItem
-                                  key={`${group.getName()}-empty`}
-                                  primaryText={
-                                    <Text style={styles.noObjectsText} noMargin>
-                                      <Trans>No objects in the group</Trans>
-                                    </Text>
-                                  }
-                                  style={styles.indentedListItem}
-                                />
-                              );
-                            } else {
-                              results.push(...objectsInGroup);
-                            }
-                          }
-                          return results;
-                        }
-                      )}
-                      {filteredFoldersList.length > 0 && (
-                        <Subheader>
-                          <Trans>Folders</Trans>
-                        </Subheader>
-                      )}
-                      {filteredFoldersList.map(
-                        ({ item: folderWithPath, matches }) => {
-                          const results = [];
-
-                          results.push(
-                            renderFolderListItem({
-                              folderWithPath,
-                              iconSize,
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices
-                                : [],
-                            })
-                          );
-                          const objectsInFolder = getObjectsInFolder(
-                            folderWithPath.folder
-                          );
-                          if (objectsInFolder.length === 0) {
-                            results.push(
-                              <ListItem
-                                key={`${folderWithPath.path}-empty`}
-                                primaryText={
-                                  <Text style={styles.noObjectsText} noMargin>
-                                    <Trans>No objects in the folder</Trans>
-                                  </Text>
-                                }
-                                style={styles.indentedListItem}
-                              />
-                            );
-                          } else {
-                            results.push(
-                              ...objectsInFolder.map(object =>
-                                renderObjectListItem({
-                                  project,
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                  keyPrefix: `folder-${folderWithPath.path}`,
-                                  iconSize,
-                                  matchesCoordinates: [],
-                                  objectWithContext: {
-                                    object,
-                                    global: folderWithPath.global,
-                                  },
-                                  withIndent: true,
-                                  onClick: () =>
-                                    onChooseObject(object.getName()),
-                                })
-                              )
-                            );
-                          }
-
-                          return results;
-                        }
-                      )}
-                    </React.Fragment>
-                  )}
-                  {isSearching && displayedInstructionsList.length > 0 && (
-                    <Subheader>
-                      {isCondition ? (
-                        <Trans>Conditions</Trans>
-                      ) : (
-                        <Trans>Actions</Trans>
-                      )}
-                    </Subheader>
-                  )}
-                  {isSearching &&
-                    displayedInstructionsList.map(
-                      ({ item: instructionMetadata, matches }) =>
-                        renderInstructionOrExpressionListItem({
-                          instructionOrExpressionMetadata: instructionMetadata,
-                          iconSize: iconSize,
-                          id: `instruction-item-${instructionMetadata.type.replace(
-                            /:/g,
-                            '-'
-                          )}`,
-                          onClick: () =>
-                            onChooseInstruction(
-                              instructionMetadata.type,
-                              instructionMetadata
-                            ),
-                          selectedValue: chosenInstructionType
-                            ? getInstructionListItemValue(chosenInstructionType)
-                            : undefined,
-                          matches,
-                        })
-                    )}
-                  {!isSearching && currentTab === 'free-instructions' && (
-                    <>
-                      {renderInstructionOrExpressionTree({
-                        instructionTreeNode: this.freeInstructionsInfoTree,
-                        onChoose: onChooseInstruction,
-                        iconSize,
-                        useSubheaders: true,
-                        selectedValue: chosenInstructionType
-                          ? getInstructionListItemValue(chosenInstructionType)
-                          : undefined,
-                        initiallyOpenedPath: this.initialInstructionTypePath,
-                        selectedItemRef: this._selectedItem,
-                        getInstructionIcon,
-                      })}
-                      {onClickMore && (
-                        <ResponsiveLineStackLayout justifyContent="center">
-                          <RaisedButton
-                            primary
-                            icon={<Add />}
-                            onClick={onClickMore}
-                            label={
-                              isCondition ? (
-                                <Trans>
-                                  Search for new conditions in extensions
-                                </Trans>
-                              ) : (
-                                <Trans>
-                                  Search for new actions in extensions
-                                </Trans>
-                              )
-                            }
-                          />
-                        </ResponsiveLineStackLayout>
-                      )}
-                    </>
-                  )}
-                  {remainingResultsCount > 0 && (
-                    <ListItem
-                      primaryText={
-                        <Trans>And {remainingResultsCount} more results.</Trans>
-                      }
-                      disabled
-                      secondaryText={
-                        <Trans>
-                          Refine your search with more specific keyword to see
-                          them.
-                        </Trans>
-                      }
-                    />
-                  )}
-                </List> */}
-                {!isSearching &&
-                  currentTab === 'objects' &&
-                  !allObjectsList.length && (
-                    <EmptyMessage>
-                      {isOutsideLayout ? (
-                        <Trans>
-                          There are no objects. Objects will appear if you add
-                          some as parameters.
-                        </Trans>
-                      ) : (
-                        <Trans>
-                          There is no object in your game or in this scene.
-                          Start by adding an new object in the scene editor,
-                          using the objects list.
-                        </Trans>
-                      )}
-                    </EmptyMessage>
-                  )}
-                {!hasResults && (
-                  <EmptyMessage>
-                    <Trans>
-                      Nothing corresponding to your search. Choose an object
-                      first or browse the list of actions/conditions.
-                    </Trans>
-                  </EmptyMessage>
-                )}
               </ScrollView>
             )}
           </div>

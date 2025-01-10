@@ -808,13 +808,11 @@ namespace gdjs {
     getBodyLayer(): number {
       return Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
         // Make sure objects don't register in the wrong layer group.
-        this.bodyType === 'Static'
+        this.isStatic()
           ? this.layers & gdjs.Physics3DSharedData.staticLayersMask
           : this.layers & gdjs.Physics3DSharedData.dynamicLayersMask,
         // Static objects accept all collisions as it's the mask of dynamic objects that matters.
-        this.bodyType === 'Static'
-          ? gdjs.Physics3DSharedData.allLayersMask
-          : this.masks
+        this.isStatic() ? gdjs.Physics3DSharedData.allLayersMask : this.masks
       );
     }
 
@@ -1805,7 +1803,7 @@ namespace gdjs {
         // It would be useless to try to recreate it as updateBodyFromObject already does it.
         // If the body is null, we just don't do anything
         // (but still run the physics simulation - this is independent).
-        if (_body !== null) {
+        if (_body !== null && _body.IsActive()) {
           behavior.moveObjectToPhysicsPosition(_body.GetPosition());
           behavior.moveObjectToPhysicsRotation(_body.GetRotation());
         }
@@ -1819,8 +1817,6 @@ namespace gdjs {
         }
         const body = behavior._body!;
 
-        // TODO the `if` is probably unnecessary because `SetPositionAndRotationWhenChanged` already check this.
-        // The object object transform has changed, update body transform:
         if (
           this.behavior._objectOldX !== owner3D.getX() ||
           this.behavior._objectOldY !== owner3D.getY() ||

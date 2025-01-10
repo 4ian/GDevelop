@@ -34,21 +34,21 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
-        onOpen(node);
+        onOpen(node, index);
         return;
       }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
       onClick(node);
     },
-    [onClick, onSelect, node, onOpen]
+    [onClick, onSelect, node, onOpen, index]
   );
 
   const onDoubleClickItem = React.useCallback(
     e => {
       if (!node || !node.hasChildren || node.disableCollapse) return;
-      onOpen(node);
+      onOpen(node, index);
     },
-    [node, onOpen]
+    [node, onOpen, index]
   );
 
   const displayAsFolder = node.canHaveChildren;
@@ -86,7 +86,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       size="small"
                       onClick={e => {
                         e.stopPropagation();
-                        onOpen(node);
+                        onOpen(node, index);
                       }}
                       disabled={node.disableCollapse}
                     >

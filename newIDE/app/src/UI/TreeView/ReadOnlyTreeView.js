@@ -39,7 +39,7 @@ type FlattenedNode<Item> = {|
 |};
 
 export type ItemData<Item> = {|
-  onOpen: (FlattenedNode<Item>) => void,
+  onOpen: (FlattenedNode<Item>, index: number) => void,
   onClick: (FlattenedNode<Item>) => void,
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   flattenedData: FlattenedNode<Item>[],
@@ -50,7 +50,7 @@ export type ItemData<Item> = {|
 const getItemProps = memoizeOne(
   <Item>(
     flattenedData: FlattenedNode<Item>[],
-    onOpen: (FlattenedNode<Item>) => void,
+    onOpen: (FlattenedNode<Item>, index: number) => void,
     onClick: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     isMobile: boolean,
@@ -273,7 +273,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 
   const onOpen = React.useCallback(
-    (node: FlattenedNode<Item>) => {
+    (node: FlattenedNode<Item>, index: number) => {
       if (isSearching) {
         if (node.collapsed) {
           setOpenedDuringSearchNodeIds([...openedDuringSearchNodeIds, node.id]);
@@ -293,6 +293,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
           }
         }
       }
+      if (listRef.current) listRef.current.resetAfterIndex(index);
     },
     [
       openedDuringSearchNodeIds,

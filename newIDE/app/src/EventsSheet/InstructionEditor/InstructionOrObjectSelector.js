@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Fuse from 'fuse.js';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 

@@ -76,6 +76,7 @@ export type ReadOnlyTreeViewInterface<Item> = {|
   areItemsOpen: (Array<Item>) => boolean[],
   areItemsOpenFromId: (Array<string>) => boolean[],
   updateRowHeights: () => void,
+  getDisplayedItemsIterator: () => Iterable<Item>,
 |};
 
 type Props<Item> = {|
@@ -432,6 +433,15 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [animatedItemId]
   );
 
+  const getDisplayedItemsIterator = React.useCallback(
+    function*() {
+      for (let i = 0; i < flattenedData.length; i++) {
+        yield flattenedData[i].item;
+      }
+    },
+    [flattenedData]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe
     ref,
@@ -446,6 +456,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       areItemsOpen,
       areItemsOpenFromId,
       updateRowHeights,
+      getDisplayedItemsIterator,
     })
   );
 

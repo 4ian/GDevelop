@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { AutoSizer } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -43,7 +44,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import ReadOnlyTreeView, {
   type ReadOnlyTreeViewInterface,
 } from '../../UI/TreeView/ReadOnlyTreeView';
-import { AutoSizer } from 'react-virtualized';
 import { mapFor } from '../../Utils/MapFor';
 import {
   getObjectTreeViewItemId,
@@ -186,6 +186,10 @@ const InstructionOrObjectSelector = React.forwardRef<
         scope
       )
     );
+    // Instructions search results are handled by Fuse because the text is searched
+    // in different attributes of the object. Objects, groups and folders search is
+    // directly handled by the tree view since they only have one field and their name
+    // are straightforward.
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
@@ -237,14 +241,14 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const initiallyOpenedFolderIdsRef = React.useRef<string[]>(
       [
+        ...enumerateFoldersInContainer(objectsContainer).map(
+          folderWithPath => folderWithPath.folder
+        ),
         ...(globalObjectsContainer
           ? enumerateFoldersInContainer(globalObjectsContainer).map(
               folderWithPath => folderWithPath.folder
             )
           : []),
-        ...enumerateFoldersInContainer(objectsContainer).map(
-          folderWithPath => folderWithPath.folder
-        ),
       ].map(getObjectFolderTreeViewItemId)
     );
 
@@ -303,7 +307,7 @@ const InstructionOrObjectSelector = React.forwardRef<
     const getTreeViewItemChildren = (item: TreeViewItem) =>
       item.getChildren(searchText);
 
-    const search = (searchText: string) => {
+    const search = React.useCallback((searchText: string) => {
       if (!searchText) return;
 
       const matchingInstructions = moveDeprecatedInstructionsDown(
@@ -322,16 +326,36 @@ const InstructionOrObjectSelector = React.forwardRef<
       );
 
       setSearchResults({ instructions: matchingInstructions });
-    };
+    }, []);
 
     const onSubmitSearch = () => {
-      if (!searchText) return;
-      // TODO: Add possibility to chose first object/group when submitting search.
-      if (displayedInstructionsList.length > 0) {
-        onChooseInstruction(
-          displayedInstructionsList[0].item.type,
-          displayedInstructionsList[0].item
-        );
+      if (!searchText || !treeViewRef.current) return;
+
+      for (const item of treeViewRef.current.getDisplayedItemsIterator()) {
+        if (item.content instanceof ObjectGroupTreeViewItemContent) {
+          const group = item.content.getGroup();
+          if (!group) return;
+          onChooseObject(group.getName());
+          break;
+        }
+        if (item.content instanceof ObjectTreeViewItemContent) {
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return;
+          onChooseObject(objectFolderOrObject.getObject().getName());
+          break;
+        }
+        if (item.content instanceof ObjectGroupObjectTreeViewItemContent) {
+          const object = item.content.getObject();
+          if (!object) return;
+          onChooseObject(object.getName());
+          break;
+        }
+        if (item.content instanceof InstructionTreeViewItemContent) {
+          const instructionMetadata = item.content.getInstructionMetadata();
+          if (!instructionMetadata) return;
+          onChooseInstruction(instructionMetadata.type, instructionMetadata);
+          break;
+        }
       }
     };
 

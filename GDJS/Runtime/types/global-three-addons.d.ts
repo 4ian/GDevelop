@@ -13,6 +13,7 @@ import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessC
 import { ColorCorrectionShader } from 'three/examples/jsm/shaders/ColorCorrectionShader';
 import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationShader';
 import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
+import { BokehShader } from 'three/examples/jsm/shaders/BokehShader2';
 
 declare global {
   namespace THREE_ADDONS {
@@ -32,6 +33,7 @@ declare global {
       ColorCorrectionShader,
       HueSaturationShader,
       ExposureShader,
+      BokehShader,
     };
   }
 }

@@ -16,3 +16,4 @@ export { UnrealBloomPass } from "./examples/jsm/postprocessing/UnrealBloomPass";
 export { BrightnessContrastShader } from "./examples/jsm/shaders/BrightnessContrastShader";
 export { HueSaturationShader } from "./examples/jsm/shaders/HueSaturationShader";
 export { ExposureShader } from "./examples/jsm/shaders/ExposureShader";
+export { BokehShader } from "./examples/jsm/shaders/BokehShader2";

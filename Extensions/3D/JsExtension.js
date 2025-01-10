@@ -1985,6 +1985,20 @@ module.exports = {
     }
     {
       const effect = extension
+      .addEffect('DepthOfField')
+      .setFullName(_('DepthOfField'))
+      .setDescription(_('Apply a depth-of-field effect.'))
+      .markAsNotWorkingForObjects()
+      .markAsOnlyWorkingFor3D()
+      .addIncludeFile('Extensions/3D/BokehShader2.js');
+      const properties = effect.getProperties();
+      properties.getOrCreate('focalDepth')
+      .setValue('1')
+      .setLabel(_('Depth of the focal  lens'))
+      .setType('number');
+    }
+    {
+      const effect = extension
         .addEffect('BrightnessAndContrast')
         .setFullName(_('Brightness and contrast.'))
         .setDescription(_('Adjust brightness and contrast.'))

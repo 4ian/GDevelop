@@ -713,6 +713,7 @@ export class ObjectConfiguration extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAnimationsCount(): number;
+  getAnimationName(index: number): string;
 }
 
 export class UniquePtrObjectConfiguration extends EmscriptenObject {

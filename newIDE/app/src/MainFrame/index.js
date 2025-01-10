@@ -268,7 +268,6 @@ export type State = {|
   updateStatus: ElectronUpdateStatus,
   openFromStorageProviderDialogOpen: boolean,
   saveToStorageProviderDialogOpen: boolean,
-  eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
 |};
 
@@ -326,7 +325,6 @@ const MainFrame = (props: Props) => {
       updateStatus: { message: '', status: 'unknown' },
       openFromStorageProviderDialogOpen: false,
       saveToStorageProviderDialogOpen: false,
-      eventsFunctionsExtensionsError: null,
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
@@ -480,12 +478,7 @@ const MainFrame = (props: Props) => {
   //   console.log(state);
   // });
 
-  const {
-    currentProject,
-    currentFileMetadata,
-    updateStatus,
-    eventsFunctionsExtensionsError,
-  } = state;
+  const { currentProject, currentFileMetadata, updateStatus } = state;
   const {
     renderShareDialog,
     resourceSources,
@@ -3614,7 +3607,6 @@ const MainFrame = (props: Props) => {
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
           onOpenResources={openResources}
-          eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
           onReloadEventsFunctionsExtensions={() => {
             if (isProjectClosedSoAvoidReloadingExtensions) {
               return;

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import {
   adaptFromDeclarativeTemplate,
   buildMainMenuDeclarativeTemplate,
@@ -146,7 +146,13 @@ const ProjectManagerMainMenu = ({
               // Use a "native" or "simulated native" menu on desktop & web, or handle navigation on mobile
               return (
                 <React.Fragment key={index}>
-                  {index !== 0 && <div className={classes.verticalSeparator} />}
+                  {index !== 0 && (
+                    <>
+                      <Spacer />
+                      <div className={classes.verticalSeparator} />
+                      <Spacer />
+                    </>
+                  )}
                   {shouldUseNativeMenu ? (
                     <ElementWithMenu
                       element={

@@ -42,7 +42,7 @@ const mainMenuCallbacks = {
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 
-export const Default = () => {
+export const NoProjectOpen = () => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -52,7 +52,7 @@ export const Default = () => {
             <FixedHeightFlexContainer height={1000}>
               <FixedWidthFlexContainer width={320}>
                 <ProjectManager
-                  project={testProject.project}
+                  project={null}
                   onSaveProjectProperties={async () => true}
                   onChangeProjectName={action('onChangeProjectName')}
                   onOpenExternalEvents={action('onOpenExternalEvents')}
@@ -75,7 +75,6 @@ export const Default = () => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
-                  eventsFunctionsExtensionsError={null}
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
@@ -111,7 +110,7 @@ export const Default = () => {
   );
 };
 
-export const ErrorsInFunctions = () => {
+export const ProjectOpen = () => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -144,9 +143,6 @@ export const ErrorsInFunctions = () => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
-                  eventsFunctionsExtensionsError={
-                    new Error('Fake error during code generation')
-                  }
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}

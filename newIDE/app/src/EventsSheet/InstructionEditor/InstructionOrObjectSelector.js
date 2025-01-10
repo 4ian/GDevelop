@@ -439,8 +439,6 @@ type State = {|
   searchText: string,
   selectedItem: TreeViewItem | null,
   searchResults: {
-    objects: Array<SearchResult<ObjectWithContext>>,
-    groups: Array<SearchResult<GroupWithContext>>,
     instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
   },
   initiallyOpenedFolderIds: string[],
@@ -470,7 +468,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 > {
   state = {
     searchText: '',
-    searchResults: { objects: [], groups: [], instructions: [] },
+    searchResults: {  instructions: [] },
     selectedItem: null,
     initiallyOpenedFolderIds: [],
   };
@@ -493,8 +491,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   );
 
   instructionSearchApi = null;
-  objectSearchApi = null;
-  groupSearchApi = null;
 
   reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -523,10 +519,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const objectsContainersList = this.props.projectScopedContainersAccessor
       .get()
       .getObjectsContainersList();
-
-    const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      objectsContainersList
-    );
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
       throw new Error(
@@ -560,7 +552,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         itemId = getObjectTreeViewItemId(object);
       } else {
         const group = getObjectGroupByName(
-          // TODO: to fix.
           globalObjectsContainer,
           objectsContainer,
           objectOrGroupName
@@ -596,37 +587,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         { name: 'description', weight: 3 },
       ],
     });
-    this.objectSearchApi = new Fuse(allObjectsList, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.object.getName(),
-      keys: ['name'], // Not used as we only use the name of the object
-    });
-    this.groupSearchApi = new Fuse(allGroupsList, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.group.getName(),
-      keys: ['name'], // Not used as we only use the name of the group
-    });
   }
 
   _search = (searchText: string) => {
     if (searchText === '') return;
 
-    const extendedSearchText = getFuseSearchQueryForSimpleArray(searchText);
-
     this.setState({
       searchResults: {
-        objects: this.objectSearchApi
-          ? this.objectSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-        groups: this.groupSearchApi
-          ? this.groupSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
         instructions: this.instructionSearchApi
           ? moveDeprecatedInstructionsDown(
               this.instructionSearchApi
@@ -709,35 +676,20 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       selectedItem,
       initiallyOpenedFolderIds,
     } = this.state;
-    console.log(initiallyOpenedFolderIds);
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
     const isOutsideLayout = globalObjectsContainer !== project;
 
-    const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+    const { allObjectsList } = enumerateObjectsAndGroups(
       objectsContainersList
     );
 
     const isSearching = !!searchText;
 
-    let filteredObjectsList = [];
-    let displayedObjectGroupsList = [];
     let filteredInstructionsList = [];
-    let filteredFoldersList = [];
 
     if (isSearching) {
-      filteredObjectsList = searchResults.objects;
-      displayedObjectGroupsList = searchResults.groups;
       filteredInstructionsList = searchResults.instructions;
-    } else {
-      filteredObjectsList = allObjectsList.map(object => ({
-        item: object,
-        matches: [],
-      }));
-      displayedObjectGroupsList = allGroupsList.map(object => ({
-        item: object,
-        matches: [],
-      }));
     }
     const displayedInstructionsList = filteredInstructionsList.slice(
       0,
@@ -753,19 +705,12 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
     const hasResults =
       !isSearching ||
-      !!filteredObjectsList.length ||
-      !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length ||
-      !!filteredFoldersList;
+      !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
-
-      if (filteredObjectsList.length > 0) {
-        onChooseObject(filteredObjectsList[0].item.object.getName());
-      } else if (displayedObjectGroupsList.length > 0) {
-        onChooseObject(displayedObjectGroupsList[0].item.group.getName());
-      } else if (displayedInstructionsList.length > 0) {
+      // TODO: Add possibility to chose first object/group when submitting search.
+      if (displayedInstructionsList.length > 0) {
         onChooseInstruction(
           displayedInstructionsList[0].item.type,
           displayedInstructionsList[0].item

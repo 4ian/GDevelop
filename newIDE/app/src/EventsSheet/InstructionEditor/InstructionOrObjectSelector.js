@@ -58,6 +58,7 @@ import {
   LabelTreeViewItemContent,
   LeafTreeViewItem,
   type TreeViewItem,
+  MoreResultsTreeViewItemContent,
 } from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
@@ -95,7 +96,10 @@ const moveDeprecatedInstructionsDown = (
 const shouldApplySearchToItem = (item: TreeViewItem) =>
   item.content.applySearch;
 const getTreeViewItemHeight = (item: TreeViewItem) =>
-  item.content instanceof InstructionTreeViewItemContent ? 44 : 32;
+  item.content instanceof InstructionTreeViewItemContent ||
+  item.content instanceof MoreResultsTreeViewItemContent
+    ? 44
+    : 32;
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemDescription = (item: TreeViewItem) =>
   item.content.getDescription();
@@ -451,11 +455,23 @@ const InstructionOrObjectSelector = React.forwardRef<
                 'instructions',
                 i18n._(isCondition ? t`Conditions` : t`Actions`)
               ),
-              displayedInstructionsList.map(searchResult => {
-                return new LeafTreeViewItem(
-                  new InstructionTreeViewItemContent(searchResult.item)
-                );
-              })
+              [
+                ...displayedInstructionsList.map(searchResult => {
+                  return new LeafTreeViewItem(
+                    new InstructionTreeViewItemContent(searchResult.item)
+                  );
+                }),
+                remainingResultsCount
+                  ? new LeafTreeViewItem(
+                      new MoreResultsTreeViewItemContent(
+                        i18n._(t`And ${remainingResultsCount} more results.`),
+                        i18n._(
+                          t`Refine your search with more specific keywords.`
+                        )
+                      )
+                    )
+                  : null,
+              ].filter(Boolean)
             )
           : null,
       ].filter(Boolean);

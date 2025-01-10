@@ -246,6 +246,35 @@ export class RootTreeViewItem implements TreeViewItem {
   }
 }
 
+export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
+  applySearch = false;
+  name: string;
+  description: string;
+  constructor(name: string, description: string) {
+    this.name = name;
+    this.description = description;
+  }
+  getName() {
+    return this.name;
+  }
+  getDescription(): string | null {
+    return this.description;
+  }
+
+  getId() {
+    return `more-results`;
+  }
+  getHtmlId() {
+    return null;
+  }
+  getDataSet() {
+    return {};
+  }
+  getThumbnail() {
+    return null;
+  }
+}
+
 export class InstructionTreeViewItemContent implements TreeViewItemContent {
   instructionMetadata: EnumeratedInstructionMetadata;
   applySearch = false;

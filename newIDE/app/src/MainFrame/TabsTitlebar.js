@@ -77,7 +77,8 @@ export default function TabsTitlebar({
       />
       <IconButton
         size="small"
-        id="gdevelop-main-menu"
+        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+        id="main-toolbar-project-manager-button"
         style={styles.menuIcon}
         color="default"
         onClick={toggleProjectManager}

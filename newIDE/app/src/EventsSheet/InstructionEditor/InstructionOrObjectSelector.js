@@ -360,9 +360,13 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     React.useEffect(
       () => {
-        if (treeViewRef.current) treeViewRef.current.updateRowHeights();
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          treeView.updateRowHeights();
+          treeView.scrollTo(0);
+        }
       },
-      // Recompute row heights when search changes.
+      // Recompute row heights when search changes and reset scroll.
       [searchText]
     );
 

@@ -67,6 +67,7 @@ const getItemProps = memoizeOne(
 
 export type ReadOnlyTreeViewInterface<Item> = {|
   forceUpdateList: () => void,
+  scrollTo: (offset: number) => void,
   scrollToItem: (Item, placement?: 'smart' | 'start') => void,
   scrollToItemFromId: (itemId: string, placement?: 'smart' | 'start') => void,
   openItems: (string[]) => void,
@@ -364,6 +365,13 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [getItemId, scrollToItemFromId]
   );
 
+  const scrollTo = React.useCallback((offset: number) => {
+    const list = listRef.current;
+    if (list) {
+      list.scrollTo(offset);
+    }
+  }, []);
+
   const openItems = React.useCallback(
     (itemIds: string[]) => {
       const notAlreadyOpenedNodeIds = itemIds.filter(
@@ -448,6 +456,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     ref,
     () => ({
       forceUpdateList: forceUpdate,
+      scrollTo,
       scrollToItem,
       scrollToItemFromId,
       openItems,

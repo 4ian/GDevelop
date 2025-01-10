@@ -277,30 +277,47 @@ const InstructionOrObjectSelector = React.forwardRef<
           const objectOrGroupName = chosenObjectName;
           const treeView = treeViewRef.current;
           if (!treeView) return;
-          const object = getObjectByName(
-            globalObjectsContainer,
-            objectsContainer,
-            objectOrGroupName
-          );
-          let itemId;
-          if (object) {
-            itemId = getObjectTreeViewItemId(object);
-          } else {
-            const group = getObjectGroupByName(
-              globalObjectsContainer,
-              objectsContainer,
-              objectOrGroupName
-            );
-            if (group) {
-              itemId = getObjectTreeViewItemId(group);
+
+          let timeoutId;
+          for (const item of treeView.getDisplayedItemsIterator()) {
+            if (item.content instanceof ObjectGroupTreeViewItemContent) {
+              const group = item.content.getGroup();
+              if (!group) return;
+              if (group.getName() === objectOrGroupName) {
+                setSelectedItem(item);
+                timeoutId = setTimeout(
+                  () => treeView.scrollToItem(item, 'start'),
+                  // We have to wait for a first render otherwise the tree view
+                  // considers it has a size of 0 and its computations are wrong.
+                  50
+                );
+                break;
+              }
+            }
+            if (item.content instanceof ObjectTreeViewItemContent) {
+              const objectFolderOrObject = item.content.getObjectFolderOrObject();
+              if (!objectFolderOrObject) return;
+              if (
+                objectFolderOrObject.getObject().getName() === objectOrGroupName
+              ) {
+                setSelectedItem(item);
+                timeoutId = setTimeout(
+                  () => treeView.scrollToItem(item, 'start'),
+                  // We have to wait for a first render otherwise the tree view
+                  // considers it has a size of 0 and its computations are wrong.
+                  50
+                );
+                break;
+              }
             }
           }
-          if (!!itemId) {
-            treeView.scrollToItemFromId(itemId, 'start');
+          if (timeoutId) {
+            return () => clearTimeout(timeoutId);
           }
         }
       },
-      [globalObjectsContainer, objectsContainer, chosenObjectName]
+      // Scroll to and select the already chosen object/instruction at opening.
+      [chosenObjectName]
     );
 
     const getTreeViewItemChildren = (item: TreeViewItem) =>

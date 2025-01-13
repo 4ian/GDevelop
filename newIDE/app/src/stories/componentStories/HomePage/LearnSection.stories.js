@@ -46,7 +46,6 @@ export const Default = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
@@ -81,7 +80,6 @@ export const NotAuthenticated = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
@@ -118,7 +116,6 @@ export const EducationSubscriber = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
@@ -155,7 +152,6 @@ export const EducationTeacher = () => (
           courseChapters={null}
           course={null}
           isCourseTaskCompleted={() => false}
-          isLoadingChapters={false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
           getCourseCompletion={() => null}
@@ -189,7 +185,6 @@ export const Loading = () => (
         courseChapters={null}
         course={null}
         isCourseTaskCompleted={() => false}
-        isLoadingChapters={false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}
         getCourseCompletion={() => null}

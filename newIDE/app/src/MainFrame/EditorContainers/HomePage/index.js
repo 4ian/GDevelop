@@ -238,7 +238,7 @@ export const HomePage = React.memo<Props>(
       const {
         selectedCourse,
         courseChapters,
-        isLoadingChapters,
+        areChaptersReady,
         onCompleteTask,
         isTaskCompleted,
         getChapterCompletion,
@@ -316,6 +316,10 @@ export const HomePage = React.memo<Props>(
             }
           } else if (requestedTab === 'learn') {
             const courseId = routeArguments['course-id'];
+            if (!areChaptersReady) {
+              // Do not process requested tab before courses are ready.
+              return;
+            }
 
             if (courseId && selectedCourse && selectedCourse.id === courseId) {
               setLearnCategory('course');
@@ -332,6 +336,7 @@ export const HomePage = React.memo<Props>(
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
           games,
+          areChaptersReady,
         ]
       );
 
@@ -531,7 +536,6 @@ export const HomePage = React.memo<Props>(
                       onSelectCategory={setLearnCategory}
                       course={selectedCourse}
                       courseChapters={courseChapters}
-                      isLoadingChapters={isLoadingChapters}
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}

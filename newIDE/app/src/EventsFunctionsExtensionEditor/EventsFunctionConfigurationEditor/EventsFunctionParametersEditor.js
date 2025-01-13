@@ -596,6 +596,8 @@ export const EventsFunctionParametersEditor = ({
             game.
           </Trans>
         </DismissableAlertMessage>
+        {/* TODO: Should the "Only global objects..." mention should be kept since
+        we don't show the global objects? */}
         <EmptyMessage>
           <Trans>
             This is a "lifecycle function". It will be called automatically by

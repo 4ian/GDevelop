@@ -59,15 +59,84 @@ import {
 } from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 const gd: libGDevelop = global.gd;
 
 const ICON_SIZE = 24;
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
-const SCENE_OBJECTS_ROOT_ITEM_ID = 'scene-objects';
-const GLOBAL_OBJECTS_ROOT_ITEM_ID = 'global-objects';
-const SCENE_GROUPS_ROOT_ITEM_ID = 'scene-groups';
-const GLOBAL_GROUPS_ROOT_ITEM_ID = 'global-groups';
+const LOCAL_OBJECTS_ROOT_ITEM_ID = 'local-objects';
+const HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID = 'higher-scope-objects';
+const LOCAL_GROUPS_ROOT_ITEM_ID = 'local-groups';
+const HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID = 'higher-scope-groups';
+
+const getLabelsForContainers = (
+  scope: EventsScope
+): {|
+  localScopeObjectsTitle: MessageDescriptor,
+  higherScopeObjectsTitle: MessageDescriptor | null,
+  localScopeGroupsTitle: MessageDescriptor | null,
+  higherScopeGroupsTitle: MessageDescriptor | null,
+|} => {
+  if (scope.layout || scope.externalEvents) {
+    return {
+      localScopeObjectsTitle: t`Scene objects`,
+      higherScopeObjectsTitle: t`Global objects`,
+      localScopeGroupsTitle: t`Scene groups`,
+      higherScopeGroupsTitle: t`Global groups`,
+    };
+  } else if (scope.eventsBasedObject) {
+    return {
+      localScopeObjectsTitle: t`Parameters`,
+      higherScopeObjectsTitle: t`Object's children object`,
+      localScopeGroupsTitle: null, // Parameters cannot be put into groups.
+      higherScopeGroupsTitle: t`Object's children groups`,
+    };
+  } else if (scope.eventsBasedBehavior) {
+    return {
+      localScopeObjectsTitle: t`Attached object`,
+      higherScopeObjectsTitle: null,
+      localScopeGroupsTitle: null,
+      higherScopeGroupsTitle: null,
+    };
+  } else if (scope.eventsFunction) {
+    return {
+      localScopeObjectsTitle: t`Parameters`,
+      higherScopeObjectsTitle: null,
+      localScopeGroupsTitle: null, // Parameters cannot be put into groups.
+      higherScopeGroupsTitle: null,
+    };
+  }
+  throw new Error('Scope not recognized.');
+};
+
+const getEmptyMessage = (scope: EventsScope): React.Node => {
+  if (scope.layout || scope.externalEvents) {
+    return (
+      <Trans>
+        There is no object in your game or in this scene. Start by adding an new
+        object in the scene editor, using the objects list.
+      </Trans>
+    );
+  } else if (scope.eventsBasedObject) {
+    return (
+      <Trans>
+        There are no objects. Objects will appear if you add some as parameter
+        or add children to the object.
+      </Trans>
+    );
+  } else if (scope.eventsBasedBehavior) {
+    // Should not happened, a behavior has an object as parameter by default.
+    return null;
+  } else if (scope.eventsFunction) {
+    return (
+      <Trans>
+        There are no objects. Objects will appear if you add some as parameters.
+      </Trans>
+    );
+  }
+  throw new Error('Scope not recognized.');
+};
 
 const getInstructionIconSrc = (key: string) => {
   return gd.JsPlatform.get()
@@ -397,10 +466,6 @@ const InstructionOrObjectSelector = React.forwardRef<
       [searchText]
     );
 
-    // If the global objects container is not the project, consider that we're
-    // not in the events of a layout or an external events sheet - but in an extension.
-    const isOutsideLayout = globalObjectsContainer !== project.getObjects();
-
     const isSearching = !!searchText;
 
     let filteredInstructionsList = [];
@@ -443,6 +508,8 @@ const InstructionOrObjectSelector = React.forwardRef<
       project,
     };
 
+    const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
+
     const getTreeViewItems = i18n =>
       [
         new ObjectFolderTreeViewItem({
@@ -450,9 +517,8 @@ const InstructionOrObjectSelector = React.forwardRef<
           global: false,
           isRoot: true,
           content: new LabelTreeViewItemContent(
-            SCENE_OBJECTS_ROOT_ITEM_ID,
-            // TODO: Use props, for extensions, the first container is the function objects list, the second one is the custom objects' children list.
-            i18n._(t`Scene Objects`)
+            LOCAL_OBJECTS_ROOT_ITEM_ID,
+            i18n._(labels.localScopeObjectsTitle)
           ),
           objectTreeViewItemProps,
           objectFolderTreeViewItemProps,
@@ -463,8 +529,10 @@ const InstructionOrObjectSelector = React.forwardRef<
               global: true,
               isRoot: true,
               content: new LabelTreeViewItemContent(
-                GLOBAL_OBJECTS_ROOT_ITEM_ID,
-                i18n._(t`Global Objects`)
+                HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
+                labels.higherScopeGroupsTitle
+                  ? i18n._(labels.higherScopeGroupsTitle)
+                  : ''
               ),
               objectTreeViewItemProps,
               objectFolderTreeViewItemProps,
@@ -473,8 +541,10 @@ const InstructionOrObjectSelector = React.forwardRef<
         hasGroups
           ? new RootTreeViewItem(
               new LabelTreeViewItemContent(
-                SCENE_GROUPS_ROOT_ITEM_ID,
-                i18n._(t`Groups`)
+                LOCAL_GROUPS_ROOT_ITEM_ID,
+                labels.localScopeGroupsTitle
+                  ? i18n._(labels.localScopeGroupsTitle)
+                  : ''
               ),
               mapFor(0, groups.count(), index => {
                 const group = groups.getAt(index);
@@ -491,8 +561,10 @@ const InstructionOrObjectSelector = React.forwardRef<
         hasGlobalGroups && globalGroups
           ? new RootTreeViewItem(
               new LabelTreeViewItemContent(
-                GLOBAL_GROUPS_ROOT_ITEM_ID,
-                i18n._(t`Global Groups`)
+                HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
+                labels.higherScopeGroupsTitle
+                  ? i18n._(labels.higherScopeGroupsTitle)
+                  : ''
               ),
               mapFor(0, globalGroups.count(), index => {
                 const group = globalGroups.getAt(index);
@@ -593,20 +665,7 @@ const InstructionOrObjectSelector = React.forwardRef<
         )}
         {isSearching || currentTab === 'objects' ? (
           !isSearching && !allObjectsList.length ? (
-            <EmptyMessage>
-              {isOutsideLayout ? (
-                <Trans>
-                  There are no objects. Objects will appear if you add some as
-                  parameters.
-                </Trans>
-              ) : (
-                <Trans>
-                  There is no object in your game or in this scene. Start by
-                  adding an new object in the scene editor, using the objects
-                  list.
-                </Trans>
-              )}
-            </EmptyMessage>
+            <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
           ) : isSearching && !hasResults ? (
             <EmptyMessage>
               <Trans>
@@ -634,10 +693,10 @@ const InstructionOrObjectSelector = React.forwardRef<
                     getItemDataset={getTreeViewItemDataset}
                     selectedItems={selectedItem ? [selectedItem] : []}
                     initiallyOpenedNodeIds={[
-                      SCENE_OBJECTS_ROOT_ITEM_ID,
-                      GLOBAL_OBJECTS_ROOT_ITEM_ID,
-                      SCENE_GROUPS_ROOT_ITEM_ID,
-                      GLOBAL_GROUPS_ROOT_ITEM_ID,
+                      LOCAL_OBJECTS_ROOT_ITEM_ID,
+                      HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
+                      LOCAL_GROUPS_ROOT_ITEM_ID,
+                      HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
                       ...initiallyOpenedFolderIdsRef.current,
                     ]}
                     onSelectItems={(items: TreeViewItem[]) => {

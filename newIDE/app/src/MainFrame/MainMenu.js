@@ -201,22 +201,18 @@ export const buildMainMenuDeclarativeTemplate = ({
   const viewTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`View`),
     submenu: [
-      ...(isApplicationTopLevelMenu
-        ? [
-            {
-              label: i18n._(t`Show Project Manager`),
-              accelerator: getElectronAccelerator(
-                shortcutMap['OPEN_PROJECT_MANAGER']
-              ),
-              onClickSendEvent: 'main-menu-open-project-manager',
-              enabled: !!project,
-            },
-            {
-              label: i18n._(t`Show Home`),
-              onClickSendEvent: 'main-menu-open-home-page',
-            },
-          ]
-        : []),
+      {
+        label: i18n._(t`Show Project Manager`),
+        accelerator: getElectronAccelerator(
+          shortcutMap['OPEN_PROJECT_MANAGER']
+        ),
+        onClickSendEvent: 'main-menu-open-project-manager',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Show Home`),
+        onClickSendEvent: 'main-menu-open-home-page',
+      },
       {
         label: i18n._(t`Open Debugger`),
         onClickSendEvent: 'main-menu-open-debugger',
@@ -335,7 +331,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   const template: Array<MenuDeclarativeItemTemplate> = [
     fileTemplate,
     ...(!!electron && isApplicationTopLevelMenu ? [editTemplate] : []),
-    viewTemplate,
+    ...(!!electron && isApplicationTopLevelMenu ? [viewTemplate] : []),
     ...(!!electron && isApplicationTopLevelMenu ? [windowTemplate] : []),
     helpTemplate,
   ];

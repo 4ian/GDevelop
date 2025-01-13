@@ -67,9 +67,10 @@ const useCourses = () => {
     updateUserCourseProgress
   );
 
-  const [isLoadingChapters, setIsLoadingChapters] = React.useState<boolean>(
+  const [areChaptersReady, setAreChaptersReady] = React.useState<boolean>(
     false
   );
+
   const [
     courseChapters,
     setCourseChapters,
@@ -85,7 +86,6 @@ const useCourses = () => {
 
   const fetchCourseChapters = React.useCallback(
     async (courseId: string) => {
-      setIsLoadingChapters(true);
       try {
         const [fetchedChapters, userProgress] = await Promise.all([
           listCourseChapters(getAuthorizationHeader, {
@@ -108,8 +108,9 @@ const useCourses = () => {
         ]);
         setUserCourseProgressImmediately(userProgress);
         setCourseChapters(fetchedChapters);
-      } finally {
-        setIsLoadingChapters(false);
+        setAreChaptersReady(true);
+      } catch (error) {
+        console.error('An error occurred while fetching courses:', error);
       }
     },
     // A subscription change will change the displayed chapters sent by the backend.
@@ -347,7 +348,7 @@ const useCourses = () => {
     courses,
     courseChapters,
     selectedCourse,
-    isLoadingChapters,
+    areChaptersReady,
     onCompleteTask,
     isTaskCompleted,
     getChapterCompletion,

@@ -108,7 +108,7 @@ export class ObjectGroupTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return `group-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {
@@ -155,7 +155,7 @@ export class ObjectGroupObjectTreeViewItemContent
   }
 
   getHtmlId(index: number): ?string {
-    return `${this.groupPrefix}-object-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {
@@ -301,7 +301,14 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
     return this.getId();
   }
   getDataSet() {
-    return {};
+    return {
+      instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
+      object: this.instructionMetadata.scope.objectMetadata
+        ? this.instructionMetadata.scope.objectMetadata
+            .getName()
+            .replace(/:/g, '-') + '-'
+        : undefined,
+    };
   }
   getThumbnail() {
     return this.instructionMetadata.iconFilename;
@@ -421,7 +428,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {
@@ -467,8 +474,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    // TODO: Make sure it keeps the in-app-tutorial work.
-    return `object-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {

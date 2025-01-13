@@ -115,7 +115,7 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
+    return null;
   }
 
   getThumbnail(): ?string {
@@ -125,7 +125,7 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   getDataset(): ?HTMLDataset {
-    return null;
+    return { objectName: this.eventsBasedObject.getName() };
   }
 
   onSelect(): void {

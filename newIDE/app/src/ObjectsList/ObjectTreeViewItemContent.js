@@ -204,7 +204,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {

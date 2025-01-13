@@ -42,7 +42,6 @@ const selectorInterpolationProjectDataAccessors = {
   objectInObjectOrResourceSelector: 'objectInObjectOrResourceSelector:',
   editorTab: 'editorTab:',
 };
-const legacyItemInObjectListDomSelectorPattern = /#object-item-[0-9]{1,2}$/;
 
 const getPhasesStartIndices = (endIndices: Array<number>): Array<number> =>
   endIndices.map((_, i) => {
@@ -279,16 +278,6 @@ const isDomBasedTriggerComplete = (
 ): boolean => {
   if (!trigger) return false;
   if (
-    trigger.presenceOfElement &&
-    !trigger.presenceOfElement.match(
-      legacyItemInObjectListDomSelectorPattern
-    ) &&
-    document.querySelector(
-      interpolateElementId(trigger.presenceOfElement, data)
-    )
-  ) {
-    return true;
-  } else if (
     trigger.absenceOfElement &&
     !document.querySelector(
       interpolateElementId(trigger.absenceOfElement, data)
@@ -715,11 +704,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
             if (
               isDomBasedTriggerComplete(shortcutStep.trigger, data) ||
               (shortcutStep.trigger &&
-                (shortcutStep.trigger.objectAddedInLayout ||
-                  (shortcutStep.trigger.presenceOfElement &&
-                    shortcutStep.trigger.presenceOfElement.match(
-                      legacyItemInObjectListDomSelectorPattern
-                    ))) &&
+                shortcutStep.trigger.objectAddedInLayout &&
                 hasCurrentSceneObjectsCountIncreased())
             ) {
               shouldGoToStepAtIndex = flow.findIndex(
@@ -887,14 +872,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
             sceneName,
             count: nextStepTrigger.instancesCount,
           });
-        } else if (
-          nextStepTrigger &&
-          (nextStepTrigger.objectAddedInLayout ||
-            (nextStepTrigger.presenceOfElement &&
-              nextStepTrigger.presenceOfElement.match(
-                legacyItemInObjectListDomSelectorPattern
-              )))
-        ) {
+        } else if (nextStepTrigger && nextStepTrigger.objectAddedInLayout) {
           setSceneObjectCountToWatch(true);
         }
       },

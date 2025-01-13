@@ -37,7 +37,6 @@ import {
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 import Add from '../../UI/CustomSvgIcons/Add';
-import getObjectByName from '../../Utils/GetObjectByName';
 import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ReadOnlyTreeView, {
@@ -45,7 +44,6 @@ import ReadOnlyTreeView, {
 } from '../../UI/TreeView/ReadOnlyTreeView';
 import { mapFor } from '../../Utils/MapFor';
 import {
-  getObjectTreeViewItemId,
   getObjectFolderTreeViewItemId,
   InstructionTreeViewItemContent,
   ObjectTreeViewItemContent,
@@ -60,13 +58,17 @@ import {
   MoreResultsTreeViewItemContent,
 } from './TreeViewItems';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
 const ICON_SIZE = 24;
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
+const SCENE_OBJECTS_ROOT_ITEM_ID = 'scene-objects';
+const GLOBAL_OBJECTS_ROOT_ITEM_ID = 'global-objects';
+const SCENE_GROUPS_ROOT_ITEM_ID = 'scene-groups';
+const GLOBAL_GROUPS_ROOT_ITEM_ID = 'global-groups';
+
 const getInstructionIconSrc = (key: string) => {
   return gd.JsPlatform.get()
     .getInstructionOrExpressionGroupMetadata(key)
@@ -76,6 +78,8 @@ const getInstructionIconSrc = (key: string) => {
 export const styles = {
   noObjectsText: { opacity: 0.7 },
   indentedListItem: { paddingLeft: 45 },
+  treeViewContainer: { flex: 1 },
+  treeViewAutoSizer: { width: '100%' },
 };
 
 export type TabName = 'objects' | 'free-instructions';
@@ -239,6 +243,11 @@ const InstructionOrObjectSelector = React.forwardRef<
     );
 
     const initiallyOpenedFolderIdsRef = React.useRef<string[]>(
+      // TODO: Once it is possible to store the opened state of folders,
+      // Reuse it here to have the same state between the scene editor
+      // and the event sheets + Open the folder ascendance until the chosen object
+      // if there is one, to make sure it is displayed if the user is opening
+      // an already set up instruction.
       [
         ...enumerateFoldersInContainer(objectsContainer).map(
           folderWithPath => folderWithPath.folder
@@ -440,7 +449,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           global: false,
           isRoot: true,
           content: new LabelTreeViewItemContent(
-            'scene-objects',
+            SCENE_OBJECTS_ROOT_ITEM_ID,
             i18n._(t`Scene Objects`)
           ),
           objectTreeViewItemProps,
@@ -452,7 +461,7 @@ const InstructionOrObjectSelector = React.forwardRef<
               global: true,
               isRoot: true,
               content: new LabelTreeViewItemContent(
-                'global-objects',
+                GLOBAL_OBJECTS_ROOT_ITEM_ID,
                 i18n._(t`Global Objects`)
               ),
               objectTreeViewItemProps,
@@ -461,7 +470,10 @@ const InstructionOrObjectSelector = React.forwardRef<
           : null,
         hasGroups
           ? new RootTreeViewItem(
-              new LabelTreeViewItemContent('scene-groups', i18n._(t`Groups`)),
+              new LabelTreeViewItemContent(
+                SCENE_GROUPS_ROOT_ITEM_ID,
+                i18n._(t`Groups`)
+              ),
               mapFor(0, groups.count(), index => {
                 const group = groups.getAt(index);
                 return new GroupTreeViewItem(
@@ -477,7 +489,7 @@ const InstructionOrObjectSelector = React.forwardRef<
         hasGlobalGroups && globalGroups
           ? new RootTreeViewItem(
               new LabelTreeViewItemContent(
-                'global-groups',
+                GLOBAL_GROUPS_ROOT_ITEM_ID,
                 i18n._(t`Global Groups`)
               ),
               mapFor(0, globalGroups.count(), index => {
@@ -601,8 +613,8 @@ const InstructionOrObjectSelector = React.forwardRef<
               </Trans>
             </EmptyMessage>
           ) : (
-            <div style={{ flex: 1 }}>
-              <AutoSizer style={{ width: '100%' }} disableWidth>
+            <div style={styles.treeViewContainer}>
+              <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
                 {({ height }) => (
                   <ReadOnlyTreeView
                     ref={treeViewRef}
@@ -620,10 +632,10 @@ const InstructionOrObjectSelector = React.forwardRef<
                     getItemDataset={getTreeViewItemDataset}
                     selectedItems={selectedItem ? [selectedItem] : []}
                     initiallyOpenedNodeIds={[
-                      'scene-objects',
-                      'global-objects',
-                      'scene-groups',
-                      'global-groups',
+                      SCENE_OBJECTS_ROOT_ITEM_ID,
+                      GLOBAL_OBJECTS_ROOT_ITEM_ID,
+                      SCENE_GROUPS_ROOT_ITEM_ID,
+                      GLOBAL_GROUPS_ROOT_ITEM_ID,
                       ...initiallyOpenedFolderIdsRef.current,
                     ]}
                     onSelectItems={(items: TreeViewItem[]) => {

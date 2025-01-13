@@ -19,10 +19,10 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import ExternalEventsAutoComplete from '../EventsSheet/EventsTree/Renderers/LinkEvent/ExternalEventsAutoComplete';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
-import MouseField from '../EventsSheet/ParameterFields/MouseField';
+import MouseButtonField from '../EventsSheet/ParameterFields/MouseButtonField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
-import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import KeyboardKeyField from '../EventsSheet/ParameterFields/KeyboardKeyField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -1544,11 +1544,11 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
-  .add('KeyField', () => (
+  .add('KeyboardKeyField', () => (
     <ValueStateHolder
       initialValue={'Space'}
       render={(value, onChange) => (
-        <KeyField
+        <KeyboardKeyField
           project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}
@@ -1562,11 +1562,11 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
-  .add('MouseField', () => (
+  .add('MouseButtonField', () => (
     <ValueStateHolder
       initialValue={'Left'}
       render={(value, onChange) => (
-        <MouseField
+        <MouseButtonField
           project={testProject.project}
           scope={{ project: testProject.project }}
           value={value}

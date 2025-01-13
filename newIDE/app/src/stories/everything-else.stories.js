@@ -1546,7 +1546,7 @@ storiesOf('ParameterFields', module)
   ))
   .add('KeyboardKeyField', () => (
     <ValueStateHolder
-      initialValue={'Space'}
+      initialValue={'"Space"'}
       render={(value, onChange) => (
         <KeyboardKeyField
           project={testProject.project}
@@ -1564,7 +1564,7 @@ storiesOf('ParameterFields', module)
   ))
   .add('MouseButtonField', () => (
     <ValueStateHolder
-      initialValue={'Left'}
+      initialValue={'"Left"'}
       render={(value, onChange) => (
         <MouseButtonField
           project={testProject.project}

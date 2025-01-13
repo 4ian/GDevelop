@@ -9,6 +9,7 @@ import {
   fakeStartupAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import FixedWidthFlexContainer from '../../../FixedWidthFlexContainer';
 
 export default {
   title: 'HomePage/CreateSection/MaxProjectCountAlertMessage',
@@ -45,5 +46,13 @@ export const ForProUser = () => (
 export const DenseMargins = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <MaxProjectCountAlertMessage margin="dense" />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const DenseMarginsOnSmallDialog = () => (
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+    <FixedWidthFlexContainer width={500}>
+      <MaxProjectCountAlertMessage margin="dense" />
+    </FixedWidthFlexContainer>
   </AuthenticatedUserContext.Provider>
 );

@@ -62,6 +62,8 @@ export default function ValueTypeEditor({
 }: Props) {
   const forceUpdate = useForceUpdate();
 
+  const type = convertTypeToSelectorValue(valueTypeMetadata.getName());
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -70,7 +72,7 @@ export default function ValueTypeEditor({
             {isTypeSelectorShown && (
               <SelectField
                 floatingLabelText={<Trans>Type</Trans>}
-                value={convertTypeToSelectorValue(valueTypeMetadata.getName())}
+                value={type}
                 onChange={(e, i, value: string) => {
                   valueTypeMetadata.setName(value);
                   valueTypeMetadata.setOptional(false);
@@ -96,8 +98,26 @@ export default function ValueTypeEditor({
                   value="stringWithSelector"
                   label={t`String from a list of options (text)`}
                 />
-                <SelectOption value="key" label={t`Keyboard Key (text)`} />
-                <SelectOption value="mouse" label={t`Mouse button (text)`} />
+                <SelectOption
+                  value="keyboardKey"
+                  label={t`Keyboard Key (text)`}
+                />
+                <SelectOption
+                  value="mouseButton"
+                  label={t`Mouse button (text)`}
+                />
+                {type === 'key' && (
+                  <SelectOption
+                    value="key"
+                    label={t`Keyboard Key (deprecated)`}
+                  />
+                )}
+                {type === 'mouse' && (
+                  <SelectOption
+                    value="mouse"
+                    label={t`Mouse button (deprecated)`}
+                  />
+                )}
                 <SelectOption value="color" label={t`Color (text)`} />
                 <SelectOption value="layer" label={t`Layer (text)`} />
                 <SelectOption value="sceneName" label={t`Scene name (text)`} />

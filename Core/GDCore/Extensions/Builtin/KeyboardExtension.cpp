@@ -35,7 +35,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("key", _("Key"));
+      .AddParameter("key", _("Key to check"))
+      .SetHidden();
 
   extension
       .AddCondition("KeyReleased",
@@ -46,33 +47,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("key", _("Key"));
+      .AddParameter("key", _("Key to check"))
+      .SetHidden();
 
   extension
       .AddCondition("KeyFromTextPressed",
-                    _("Key pressed (text expression)"),
-                    _("Check if a key, retrieved from the result of the "
-                      "expression, is pressed"),
+                    _("Key pressed"),
+                    _("Check if a key is pressed"),
                     _("_PARAM1_ key is pressed"),
                     "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Expression generating the key to check"))
-      .MarkAsAdvanced();
+      .AddParameter("keyboardKey", _("Key to check"))
+      .MarkAsSimple();
 
   extension
       .AddCondition("KeyFromTextReleased",
-                    _("Key released (text expression)"),
-                    _("Check if a key, retrieved from the result of the "
-                      "expression, was just released"),
+                    _("Key released"),
+                    _("Check if a key was just released"),
                     _("_PARAM1_ key is released"),
                     "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Expression generating the key to check"))
-      .MarkAsAdvanced();
+      .AddParameter("keyboardKey", _("Key to check"))
+      .MarkAsSimple();
 
   extension
       .AddCondition("AnyKeyPressed",

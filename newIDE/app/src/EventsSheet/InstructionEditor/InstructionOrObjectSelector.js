@@ -248,6 +248,7 @@ const InstructionOrObjectSelector = React.forwardRef<
       // and the event sheets + Open the folder ascendance until the chosen object
       // if there is one, to make sure it is displayed if the user is opening
       // an already set up instruction.
+      // Also: if an in-app tutorial is running, open all folders.
       [
         ...enumerateFoldersInContainer(objectsContainer).map(
           folderWithPath => folderWithPath.folder
@@ -450,6 +451,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           isRoot: true,
           content: new LabelTreeViewItemContent(
             SCENE_OBJECTS_ROOT_ITEM_ID,
+            // TODO: Use props, for extensions, the first container is the function objects list, the second one is the custom objects' children list.
             i18n._(t`Scene Objects`)
           ),
           objectTreeViewItemProps,

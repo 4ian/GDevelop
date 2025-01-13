@@ -2,18 +2,16 @@
 import * as React from 'react';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isMacLike } from '../Utils/Platform';
 import Window, { useWindowControlsOverlayWatcher } from '../Utils/Window';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useForceUpdate from '../Utils/UseForceUpdate';
 const electron = optionalRequire('electron');
 
 type Props = {|
-  onBuildMenuTemplate: () => Array<MenuItemTemplate>,
   children: React.Node,
+  toggleProjectManager: () => void,
 |};
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -28,7 +26,10 @@ const styles = {
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
-export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
+export default function TabsTitlebar({
+  children,
+  toggleProjectManager,
+}: Props) {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
@@ -74,19 +75,16 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
         }}
         className={DRAGGABLE_PART_CLASS_NAME}
       />
-      <ElementWithMenu
-        element={
-          <IconButton
-            size="small"
-            id="gdevelop-main-menu"
-            style={styles.menuIcon}
-            color="default"
-          >
-            <MenuIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={onBuildMenuTemplate}
-      />
+      <IconButton
+        size="small"
+        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+        id="main-toolbar-project-manager-button"
+        style={styles.menuIcon}
+        color="default"
+        onClick={toggleProjectManager}
+      >
+        <MenuIcon />
+      </IconButton>
       {children}
       <div
         style={{

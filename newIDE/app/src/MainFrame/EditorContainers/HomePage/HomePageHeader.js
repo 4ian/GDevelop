@@ -7,7 +7,6 @@ import FlatButton from '../../../UI/FlatButton';
 import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
-import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import TextButton from '../../../UI/TextButton';
@@ -18,12 +17,13 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import SaveProjectIcon from '../../SaveProjectIcon';
 import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
+import HistoryIcon from '../../../UI/CustomSvgIcons/History';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 const electron = optionalRequire('electron');
 
 type Props = {|
   hasProject: boolean,
-  onOpenProjectManager: () => void,
+  onOpenVersionHistory: () => void,
   onOpenProfile: () => void,
   onOpenLanguageDialog: () => void,
   onSave: () => Promise<void>,
@@ -32,7 +32,7 @@ type Props = {|
 
 export const HomePageHeader = ({
   hasProject,
-  onOpenProjectManager,
+  onOpenVersionHistory,
   onOpenProfile,
   onOpenLanguageDialog,
   onSave,
@@ -52,22 +52,23 @@ export const HomePageHeader = ({
         >
           <Column noMargin>
             <Line noMargin>
-              <IconButton
-                size="small"
-                id="main-toolbar-project-manager-button"
-                onClick={onOpenProjectManager}
-                tooltip={t`Project Manager`}
-                color="default"
-                disabled={!hasProject}
-              >
-                <ProjectManagerIcon />
-              </IconButton>
               {!!hasProject && (
-                <SaveProjectIcon
-                  id="main-toolbar-save-button"
-                  onSave={onSave}
-                  canSave={canSave}
-                />
+                <>
+                  <IconButton
+                    size="small"
+                    id="main-toolbar-history-button"
+                    onClick={onOpenVersionHistory}
+                    tooltip={t`Open version history`}
+                    color="default"
+                  >
+                    <HistoryIcon />
+                  </IconButton>
+                  <SaveProjectIcon
+                    id="main-toolbar-save-button"
+                    onSave={onSave}
+                    canSave={canSave}
+                  />
+                </>
               )}
             </Line>
           </Column>

@@ -8,14 +8,9 @@ import Cross from './CustomSvgIcons/Cross';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
 import { DialogTitleBar } from '../UI/Dialog';
+import { LineStackLayout } from './Layout';
 
 const appBarHeight = 32;
-
-type Props = {|
-  title: React.Node,
-  onClose: () => void,
-  id: string,
-|};
 
 const styles = {
   appBar: {
@@ -37,6 +32,13 @@ const styles = {
   },
 };
 
+type Props = {|
+  icon?: React.Node,
+  title: string,
+  onClose: () => void,
+  id: string,
+|};
+
 const DrawerTopBar = (props: Props) => {
   return (
     <>
@@ -49,15 +51,34 @@ const DrawerTopBar = (props: Props) => {
         elevation={0}
       >
         <Toolbar style={styles.toolbar}>
-          <Tooltip
-            title={props.title}
-            placement="bottom"
-            enterDelay={tooltipEnterDelay}
-          >
-            <Typography variant="h6" style={styles.title}>
-              {props.title}
-            </Typography>
-          </Tooltip>
+          <LineStackLayout noMargin expand alignItems="center">
+            {props.icon && (
+              <IconButton
+                onClick={props.onClose}
+                edge="start"
+                color="inherit"
+                size="small"
+                id={`${props.id}-icon`}
+              >
+                {props.icon}
+              </IconButton>
+            )}
+            {props.title.length > 30 ? (
+              <Tooltip
+                title={props.title}
+                placement="bottom"
+                enterDelay={tooltipEnterDelay}
+              >
+                <Typography variant="h6" style={styles.title}>
+                  {props.title}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Typography variant="h6" style={styles.title}>
+                {props.title}
+              </Typography>
+            )}
+          </LineStackLayout>
           <IconButton
             onClick={props.onClose}
             edge="end"

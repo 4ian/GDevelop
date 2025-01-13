@@ -22,7 +22,6 @@ import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type GamesList } from '../GameDashboard/UseGamesList';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
-import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -37,11 +36,10 @@ import TreeView, {
 import PreferencesContext, {
   type Preferences,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
-import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
@@ -76,15 +74,24 @@ import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import RouterContext from '../MainFrame/RouterContext';
+import {
+  type MainMenuCallbacks,
+  type BuildMainMenuProps,
+} from '../MainFrame/MainMenu';
+import ProjectManagerMainMenu from './ProjectManagerMainMenu';
+import EmptyMessage from '../UI/EmptyMessage';
+import { ColumnStackLayout } from '../UI/Layout';
+import { isMacLike } from '../Utils/Platform';
+import optionalRequire from '../Utils/OptionalRequire';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
+const electron = optionalRequire('electron');
 
 export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
-const gameIconsItemId = getProjectManagerItemId('game-icons');
 const gameDashboardItemId = 'manage';
-const projectSettingsRootFolderId = getProjectManagerItemId('project-settings');
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId = getProjectManagerItemId('scenes');
@@ -401,7 +408,7 @@ export type ProjectManagerInterface = {|
 |};
 
 type Props = {|
-  project: gdProject,
+  project: ?gdProject,
   onChangeProjectName: string => Promise<void>,
   onSaveProjectProperties: (options: { newName?: string }) => Promise<boolean>,
   ...SceneTreeViewItemCallbacks,
@@ -409,14 +416,17 @@ type Props = {|
   ...ExternalEventsTreeViewItemCallbacks,
   ...ExternalLayoutTreeViewItemCallbacks,
   onOpenResources: () => void,
-  eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
-  freezeUpdate: boolean,
+  isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
+
+  // Main menu
+  mainMenuCallbacks: MainMenuCallbacks,
+  buildMainMenuProps: BuildMainMenuProps,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -444,9 +454,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenExternalLayout,
       onOpenEventsFunctionsExtension,
       onOpenResources,
-      eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
-      freezeUpdate,
+      isOpen,
       hotReloadPreviewButtonProps,
       onInstallExtension,
       onShareProject,
@@ -454,6 +463,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       gamesList,
       onOpenHomePage,
       toggleProjectManager,
+      mainMenuCallbacks,
+      buildMainMenuProps,
     },
     ref
   ) => {
@@ -532,6 +543,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     );
     const onOpenGamesDashboardDialog = React.useCallback(
       () => {
+        if (!project) return;
+
         navigateToRoute('games-dashboard', {
           'game-id': project.getProjectUuid(),
           'games-dashboard-tab': 'details',
@@ -622,6 +635,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const addNewScene = React.useCallback(
       (index: number, i18n: I18nType) => {
+        if (!project) return;
+
         const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
           project.hasLayoutNamed(name)
         );
@@ -717,6 +732,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const addExternalEvents = React.useCallback(
       (index: number, i18n: I18nType) => {
+        if (!project) return;
+
         const newName = newNameGenerator(
           i18n._(t`Untitled external events`),
           name => project.hasExternalEventsNamed(name)
@@ -752,6 +769,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const addExternalLayout = React.useCallback(
       (index: number, i18n: I18nType) => {
+        if (!project) return;
+
         const newName = newNameGenerator(
           i18n._(t`Untitled external layout`),
           name => project.hasExternalLayoutNamed(name)
@@ -837,23 +856,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [editName, selectedItems]
     );
 
-    const sceneTreeViewItemProps = React.useMemo<SceneTreeViewItemProps>(
-      () => ({
-        project,
-        unsavedChanges,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        onDeleteLayout,
-        onRenameLayout,
-        onOpenLayout,
-        onOpenLayoutProperties,
-        onOpenLayoutVariables,
-      }),
+    const sceneTreeViewItemProps = React.useMemo<?SceneTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onDeleteLayout,
+              onRenameLayout,
+              onOpenLayout,
+              onOpenLayoutProperties,
+              onOpenLayoutVariables,
+            }
+          : null,
       [
         project,
         unsavedChanges,
@@ -872,23 +894,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    const extensionTreeViewItemProps = React.useMemo<ExtensionTreeViewItemProps>(
-      () => ({
-        project,
-        unsavedChanges,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        onDeleteEventsFunctionsExtension,
-        onRenameEventsFunctionsExtension,
-        onOpenEventsFunctionsExtension,
-        onReloadEventsFunctionsExtensions,
-        onEditEventsFunctionExtensionOrSeeDetails,
-      }),
+    const extensionTreeViewItemProps = React.useMemo<?ExtensionTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onDeleteEventsFunctionsExtension,
+              onRenameEventsFunctionsExtension,
+              onOpenEventsFunctionsExtension,
+              onReloadEventsFunctionsExtensions,
+              onEditEventsFunctionExtensionOrSeeDetails,
+            }
+          : null,
       [
         project,
         unsavedChanges,
@@ -907,21 +932,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    const externalEventsTreeViewItemProps = React.useMemo<ExternalEventsTreeViewItemProps>(
-      () => ({
-        project,
-        unsavedChanges,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        onDeleteExternalEvents,
-        onRenameExternalEvents,
-        onOpenExternalEvents,
-      }),
+    const externalEventsTreeViewItemProps = React.useMemo<?ExternalEventsTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onDeleteExternalEvents,
+              onRenameExternalEvents,
+              onOpenExternalEvents,
+            }
+          : null,
       [
         project,
         unsavedChanges,
@@ -938,21 +966,24 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    const externalLayoutTreeViewItemProps = React.useMemo<ExternalLayoutTreeViewItemProps>(
-      () => ({
-        project,
-        unsavedChanges,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
-        onDeleteExternalLayout,
-        onRenameExternalLayout,
-        onOpenExternalLayout,
-      }),
+    const externalLayoutTreeViewItemProps = React.useMemo<?ExternalLayoutTreeViewItemProps>(
+      () =>
+        project
+          ? {
+              project,
+              unsavedChanges,
+              preferences,
+              gdevelopTheme,
+              forceUpdate,
+              forceUpdateList,
+              showDeleteConfirmation,
+              editName,
+              scrollToItem,
+              onDeleteExternalLayout,
+              onRenameExternalLayout,
+              onOpenExternalLayout,
+            }
+          : null,
       [
         project,
         unsavedChanges,
@@ -971,218 +1002,205 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
-        return [
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              gameSettingsRootFolderId,
-              i18n._(t`Game settings`)
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              return [
-                new LeafTreeViewItem(
-                  new ActionTreeViewItemContent(
-                    gamePropertiesItemId,
-                    i18n._(t`Properties`),
-                    openProjectProperties,
-                    'res/icons_default/properties_black.svg'
-                  )
-                ),
-                new LeafTreeViewItem(
-                  new ActionTreeViewItemContent(
-                    gameIconsItemId,
-                    i18n._(t`Icons`),
-                    openProjectIcons,
-                    'res/icons_default/picture_black.svg'
-                  )
-                ),
-                new LeafTreeViewItem(
-                  new ActionTreeViewItemContent(
-                    gameDashboardItemId,
-                    i18n._(t`Game Dashboard`),
-                    onOpenGamesDashboardDialog,
-                    'res/icons_default/graphs_black.svg'
-                  )
-                ),
-              ];
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              projectSettingsRootFolderId,
-              i18n._(t`Project settings`)
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              return [
-                new LeafTreeViewItem(
-                  new ActionTreeViewItemContent(
-                    globalVariablesItemId,
-                    i18n._(t`Global variables`),
-                    openProjectVariables,
-                    'res/icons_default/global_variable24_black.svg'
-                  )
-                ),
-                new LeafTreeViewItem(
-                  new ActionTreeViewItemContent(
-                    gameResourcesItemId,
-                    i18n._(t`Resources`),
-                    onOpenResources,
-                    'res/icons_default/project_resources_black.svg'
-                  )
-                ),
-              ];
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              scenesRootFolderId,
-              i18n._(t`Scenes`),
+        return !project ||
+          !sceneTreeViewItemProps ||
+          !extensionTreeViewItemProps ||
+          !externalEventsTreeViewItemProps ||
+          !externalLayoutTreeViewItemProps
+          ? []
+          : [
               {
-                icon: <Add />,
-                label: i18n._(t`Add a scene`),
-                click: () => {
-                  // TODO Add after selected scene?
-                  const index = project.getLayoutsCount() - 1;
-                  addNewScene(index, i18n);
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  gameSettingsRootFolderId,
+                  i18n._(t`Game settings`)
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  return [
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        gamePropertiesItemId,
+                        i18n._(t`Properties & Icons`),
+                        openProjectProperties,
+                        'res/icons_default/properties_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        globalVariablesItemId,
+                        i18n._(t`Global variables`),
+                        openProjectVariables,
+                        'res/icons_default/global_variable24_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        gameResourcesItemId,
+                        i18n._(t`Resources`),
+                        onOpenResources,
+                        'res/icons_default/project_resources_black.svg'
+                      )
+                    ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        gameDashboardItemId,
+                        i18n._(t`Game Dashboard`),
+                        onOpenGamesDashboardDialog,
+                        'res/icons_default/graphs_black.svg'
+                      )
+                    ),
+                  ];
                 },
-                id: 'add-new-scene-button',
-              }
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              if (project.getLayoutsCount() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    scenesEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new scene.`)
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                project.getLayoutsCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new SceneTreeViewItemContent(
-                      project.getLayoutAt(i),
-                      sceneTreeViewItemProps
-                    )
-                  )
-              );
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              extensionsRootFolderId,
-              i18n._(t`Extensions`),
+              },
               {
-                icon: <Add />,
-                label: i18n._(t`Create or search for new extensions`),
-                click: openSearchExtensionDialog,
-                id: 'project-manager-extension-search-or-create',
-              }
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              if (project.getEventsFunctionsExtensionsCount() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    extensionsEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new function.`)
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                project.getEventsFunctionsExtensionsCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new ExtensionTreeViewItemContent(
-                      project.getEventsFunctionsExtensionAt(i),
-                      extensionTreeViewItemProps
-                    )
-                  )
-              );
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              externalEventsRootFolderId,
-              i18n._(t`External events`),
-              {
-                icon: <Add />,
-                label: i18n._(t`Add external events`),
-                click: () => {
-                  // TODO Add after selected scene?
-                  const index = project.getExternalEventsCount() - 1;
-                  addExternalEvents(index, i18n);
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  scenesRootFolderId,
+                  i18n._(t`Scenes`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add a scene`),
+                    click: () => {
+                      // TODO Add after selected scene?
+                      const index = project.getLayoutsCount() - 1;
+                      addNewScene(index, i18n);
+                    },
+                    id: 'add-new-scene-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getLayoutsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        scenesEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new scene.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getLayoutsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new SceneTreeViewItemContent(
+                          project.getLayoutAt(i),
+                          sceneTreeViewItemProps
+                        )
+                      )
+                  );
                 },
-                id: 'add-new-external-events-button',
-              }
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              if (project.getExternalEventsCount() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    externalEventsEmptyPlaceholderId,
-                    i18n._(t`Start by adding new external events.`)
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                project.getExternalEventsCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new ExternalEventsTreeViewItemContent(
-                      project.getExternalEventsAt(i),
-                      externalEventsTreeViewItemProps
-                    )
-                  )
-              );
-            },
-          },
-          {
-            isRoot: true,
-            content: new LabelTreeViewItemContent(
-              externalLayoutsRootFolderId,
-              i18n._(t`External layouts`),
+              },
               {
-                icon: <Add />,
-                label: i18n._(t`Add an external layout`),
-                click: () => {
-                  // TODO Add after selected scene?
-                  const index = project.getExternalLayoutsCount() - 1;
-                  addExternalLayout(index, i18n);
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  extensionsRootFolderId,
+                  i18n._(t`Extensions`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create or search for new extensions`),
+                    click: openSearchExtensionDialog,
+                    id: 'project-manager-extension-search-or-create',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getEventsFunctionsExtensionsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        extensionsEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new function.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getEventsFunctionsExtensionsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new ExtensionTreeViewItemContent(
+                          project.getEventsFunctionsExtensionAt(i),
+                          extensionTreeViewItemProps
+                        )
+                      )
+                  );
                 },
-                id: 'add-new-external-layout-button',
-              }
-            ),
-            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-              if (project.getExternalLayoutsCount() === 0) {
-                return [
-                  new PlaceHolderTreeViewItem(
-                    externalLayoutEmptyPlaceholderId,
-                    i18n._(t`Start by adding a new external layout.`)
-                  ),
-                ];
-              }
-              return mapFor(
-                0,
-                project.getExternalLayoutsCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new ExternalLayoutTreeViewItemContent(
-                      project.getExternalLayoutAt(i),
-                      externalLayoutTreeViewItemProps
-                    )
-                  )
-              );
-            },
-          },
-        ];
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  externalEventsRootFolderId,
+                  i18n._(t`External events`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add external events`),
+                    click: () => {
+                      // TODO Add after selected scene?
+                      const index = project.getExternalEventsCount() - 1;
+                      addExternalEvents(index, i18n);
+                    },
+                    id: 'add-new-external-events-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getExternalEventsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        externalEventsEmptyPlaceholderId,
+                        i18n._(t`Start by adding new external events.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getExternalEventsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new ExternalEventsTreeViewItemContent(
+                          project.getExternalEventsAt(i),
+                          externalEventsTreeViewItemProps
+                        )
+                      )
+                  );
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
+                  externalLayoutsRootFolderId,
+                  i18n._(t`External layouts`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Add an external layout`),
+                    click: () => {
+                      // TODO Add after selected scene?
+                      const index = project.getExternalLayoutsCount() - 1;
+                      addExternalLayout(index, i18n);
+                    },
+                    id: 'add-new-external-layout-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  if (project.getExternalLayoutsCount() === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        externalLayoutEmptyPlaceholderId,
+                        i18n._(t`Start by adding a new external layout.`)
+                      ),
+                    ];
+                  }
+                  return mapFor(
+                    0,
+                    project.getExternalLayoutsCount(),
+                    i =>
+                      new LeafTreeViewItem(
+                        new ExternalLayoutTreeViewItemContent(
+                          project.getExternalLayoutAt(i),
+                          externalLayoutTreeViewItemProps
+                        )
+                      )
+                  );
+                },
+              },
+            ];
       },
       [
         addExternalEvents,
@@ -1192,7 +1210,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         onOpenGamesDashboardDialog,
-        openProjectIcons,
         onOpenResources,
         openProjectProperties,
         openProjectVariables,
@@ -1251,15 +1268,31 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = project.ptr;
+    const listKey = project ? project.ptr : 'no-project';
     const initiallyOpenedNodeIds = [
       gameSettingsRootFolderId,
-      projectSettingsRootFolderId,
       scenesRootFolderId,
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,
     ];
+
+    const [
+      selectedMainMenuItemIndices,
+      setSelectedMainMenuItemIndices,
+    ] = React.useState([]);
+    const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
+    const shouldHideMainMenu = isMacLike() && !!electron;
+
+    // Unselect items when the project manager is closed.
+    React.useEffect(
+      () => {
+        if (!isOpen) {
+          setSelectedMainMenuItemIndices([]);
+        }
+      },
+      [isOpen]
+    );
 
     return (
       <Background maxWidth>
@@ -1272,158 +1305,184 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onOpenPlatformSpecificAssetsDialog={openProjectIcons}
           onOpenSearchExtensionDialog={openSearchExtensionDialog}
         />
-        <Column>
-          <LineStackLayout>
-            <Column expand noMargin>
-              <SearchBar
-                ref={searchBarRef}
-                value={searchText}
-                onRequestSearch={() => {}}
-                onChange={setSearchText}
-                placeholder={t`Search in project`}
+        <Line expand>
+          <ColumnStackLayout noMargin expand>
+            {!shouldHideMainMenu && (
+              <ProjectManagerMainMenu
+                project={project}
+                mainMenuCallbacks={mainMenuCallbacks}
+                buildMainMenuProps={buildMainMenuProps}
+                selectedMainMenuItemIndices={selectedMainMenuItemIndices}
+                setSelectedMainMenuItemIndices={setSelectedMainMenuItemIndices}
+                closeDrawer={toggleProjectManager}
               />
-            </Column>
-          </LineStackLayout>
-        </Column>
-        <I18n>
-          {({ i18n }) => (
-            <>
-              <div
-                id="project-manager"
-                style={{
-                  ...styles.listContainer,
-                  ...styles.autoSizerContainer,
-                }}
-                onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-                onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-              >
-                <AutoSizer style={styles.autoSizer} disableWidth>
-                  {({ height }) => (
-                    <TreeView
-                      key={listKey}
-                      ref={treeViewRef}
-                      items={getTreeViewData(i18n)}
-                      height={height}
-                      forceAllOpened={!!currentlyRunningInAppTutorial}
-                      searchText={searchText}
-                      getItemName={getTreeViewItemName}
-                      getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemChildren={getTreeViewItemChildren(i18n)}
-                      multiSelect={false}
-                      getItemId={getTreeViewItemId}
-                      getItemHtmlId={getTreeViewItemHtmlId}
-                      getItemDataset={getTreeViewItemDataSet}
-                      onEditItem={editItem}
-                      onCollapseItem={onCollapseItem}
-                      selectedItems={selectedItems}
-                      onSelectItems={items => {
-                        const itemToSelect = items[0];
-                        if (!itemToSelect) return;
-                        if (itemToSelect.isRoot) return;
-                        setSelectedItems(items);
+            )}
+            {!isNavigatingInMainMenuItem && project && (
+              <Line noMargin>
+                <Column expand>
+                  <SearchBar
+                    ref={searchBarRef}
+                    value={searchText}
+                    onRequestSearch={() => {}}
+                    onChange={setSearchText}
+                    placeholder={t`Search in project`}
+                  />
+                </Column>
+              </Line>
+            )}
+            <I18n>
+              {({ i18n }) => (
+                <>
+                  {isNavigatingInMainMenuItem ? null : project ? (
+                    <div
+                      id="project-manager"
+                      style={{
+                        ...styles.listContainer,
+                        ...styles.autoSizerContainer,
                       }}
-                      onClickItem={onClickItem}
-                      onRenameItem={renameItem}
-                      buildMenuTemplate={buildMenuTemplate(i18n)}
-                      getItemRightButton={getTreeViewItemRightButton(i18n)}
-                      renderRightComponent={renderTreeViewItemRightComponent(
-                        i18n
-                      )}
-                      onMoveSelectionToItem={(destinationItem, where) =>
-                        moveSelectionTo(i18n, destinationItem, where)
-                      }
-                      canMoveSelectionToItem={canMoveSelectionTo}
-                      reactDndType={extensionItemReactDndType}
-                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      forceDefaultDraggingPreview
-                      shouldHideMenuIcon={item => !item.content.getRootId()}
+                      onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+                      onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+                    >
+                      <AutoSizer style={styles.autoSizer} disableWidth>
+                        {({ height }) => (
+                          <TreeView
+                            key={listKey}
+                            ref={treeViewRef}
+                            items={getTreeViewData(i18n)}
+                            height={height}
+                            forceAllOpened={!!currentlyRunningInAppTutorial}
+                            searchText={searchText}
+                            getItemName={getTreeViewItemName}
+                            getItemThumbnail={getTreeViewItemThumbnail}
+                            getItemChildren={getTreeViewItemChildren(i18n)}
+                            multiSelect={false}
+                            getItemId={getTreeViewItemId}
+                            getItemHtmlId={getTreeViewItemHtmlId}
+                            getItemDataset={getTreeViewItemDataSet}
+                            onEditItem={editItem}
+                            onCollapseItem={onCollapseItem}
+                            selectedItems={selectedItems}
+                            onSelectItems={items => {
+                              const itemToSelect = items[0];
+                              if (!itemToSelect) return;
+                              if (itemToSelect.isRoot) return;
+                              setSelectedItems(items);
+                            }}
+                            onClickItem={onClickItem}
+                            onRenameItem={renameItem}
+                            buildMenuTemplate={buildMenuTemplate(i18n)}
+                            getItemRightButton={getTreeViewItemRightButton(
+                              i18n
+                            )}
+                            renderRightComponent={renderTreeViewItemRightComponent(
+                              i18n
+                            )}
+                            onMoveSelectionToItem={(destinationItem, where) =>
+                              moveSelectionTo(i18n, destinationItem, where)
+                            }
+                            canMoveSelectionToItem={canMoveSelectionTo}
+                            reactDndType={extensionItemReactDndType}
+                            initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+                            forceDefaultDraggingPreview
+                            shouldHideMenuIcon={item =>
+                              !item.content.getRootId()
+                            }
+                          />
+                        )}
+                      </AutoSizer>
+                    </div>
+                  ) : (
+                    <EmptyMessage>
+                      <Trans>To begin, open or create a new project.</Trans>
+                    </EmptyMessage>
+                  )}
+                  {project && projectPropertiesDialogOpen && (
+                    <ProjectPropertiesDialog
+                      open
+                      initialTab={projectPropertiesDialogInitialTab}
+                      project={project}
+                      onClose={() => setProjectPropertiesDialogOpen(false)}
+                      onApply={onSaveProjectProperties}
+                      onPropertiesApplied={onProjectPropertiesApplied}
+                      resourceManagementProps={resourceManagementProps}
+                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                      i18n={i18n}
                     />
                   )}
-                </AutoSizer>
-              </div>
-              {projectPropertiesDialogOpen && (
-                <ProjectPropertiesDialog
-                  open
-                  initialTab={projectPropertiesDialogInitialTab}
-                  project={project}
-                  onClose={() => setProjectPropertiesDialogOpen(false)}
-                  onApply={onSaveProjectProperties}
-                  onPropertiesApplied={onProjectPropertiesApplied}
-                  resourceManagementProps={resourceManagementProps}
-                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  i18n={i18n}
-                />
+                  {project && projectVariablesEditorOpen && (
+                    <GlobalVariablesDialog
+                      project={project}
+                      open
+                      onCancel={() => setProjectVariablesEditorOpen(false)}
+                      onApply={() => {
+                        triggerUnsavedChanges();
+                        setProjectVariablesEditorOpen(false);
+                      }}
+                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                    />
+                  )}
+                  {project && !!editedPropertiesLayout && (
+                    <ScenePropertiesDialog
+                      open
+                      layout={editedPropertiesLayout}
+                      project={project}
+                      onApply={() => {
+                        triggerUnsavedChanges();
+                        onOpenLayoutProperties(null);
+                      }}
+                      onClose={() => onOpenLayoutProperties(null)}
+                      onEditVariables={() => {
+                        onOpenLayoutVariables(editedPropertiesLayout);
+                        onOpenLayoutProperties(null);
+                      }}
+                      resourceManagementProps={resourceManagementProps}
+                    />
+                  )}
+                  {project && !!editedVariablesLayout && (
+                    <SceneVariablesDialog
+                      open
+                      project={project}
+                      layout={editedVariablesLayout}
+                      onCancel={() => onOpenLayoutVariables(null)}
+                      onApply={() => {
+                        triggerUnsavedChanges();
+                        onOpenLayoutVariables(null);
+                      }}
+                      hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                    />
+                  )}
+                  {project && extensionsSearchDialogOpen && (
+                    <ExtensionsSearchDialog
+                      project={project}
+                      onClose={() => setExtensionsSearchDialogOpen(false)}
+                      onInstallExtension={onInstallExtension}
+                      onCreateNew={() => {
+                        onCreateNewExtension(project, i18n);
+                      }}
+                    />
+                  )}
+                  {project &&
+                    openedExtensionShortHeader &&
+                    openedExtensionName && (
+                      <InstalledExtensionDetails
+                        project={project}
+                        onClose={() => {
+                          setOpenedExtensionShortHeader(null);
+                          setOpenedExtensionName(null);
+                        }}
+                        onOpenEventsFunctionsExtension={
+                          onOpenEventsFunctionsExtension
+                        }
+                        extensionShortHeader={openedExtensionShortHeader}
+                        extensionName={openedExtensionName}
+                        onInstallExtension={onInstallExtension}
+                      />
+                    )}
+                </>
               )}
-              {projectVariablesEditorOpen && (
-                <GlobalVariablesDialog
-                  project={project}
-                  open
-                  onCancel={() => setProjectVariablesEditorOpen(false)}
-                  onApply={() => {
-                    triggerUnsavedChanges();
-                    setProjectVariablesEditorOpen(false);
-                  }}
-                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                />
-              )}
-              {!!editedPropertiesLayout && (
-                <ScenePropertiesDialog
-                  open
-                  layout={editedPropertiesLayout}
-                  project={project}
-                  onApply={() => {
-                    triggerUnsavedChanges();
-                    onOpenLayoutProperties(null);
-                  }}
-                  onClose={() => onOpenLayoutProperties(null)}
-                  onEditVariables={() => {
-                    onOpenLayoutVariables(editedPropertiesLayout);
-                    onOpenLayoutProperties(null);
-                  }}
-                  resourceManagementProps={resourceManagementProps}
-                />
-              )}
-              {!!editedVariablesLayout && (
-                <SceneVariablesDialog
-                  open
-                  project={project}
-                  layout={editedVariablesLayout}
-                  onCancel={() => onOpenLayoutVariables(null)}
-                  onApply={() => {
-                    triggerUnsavedChanges();
-                    onOpenLayoutVariables(null);
-                  }}
-                  hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                />
-              )}
-              {extensionsSearchDialogOpen && (
-                <ExtensionsSearchDialog
-                  project={project}
-                  onClose={() => setExtensionsSearchDialogOpen(false)}
-                  onInstallExtension={onInstallExtension}
-                  onCreateNew={() => {
-                    onCreateNewExtension(project, i18n);
-                  }}
-                />
-              )}
-              {openedExtensionShortHeader && openedExtensionName && (
-                <InstalledExtensionDetails
-                  project={project}
-                  onClose={() => {
-                    setOpenedExtensionShortHeader(null);
-                    setOpenedExtensionName(null);
-                  }}
-                  onOpenEventsFunctionsExtension={
-                    onOpenEventsFunctionsExtension
-                  }
-                  extensionShortHeader={openedExtensionShortHeader}
-                  extensionName={openedExtensionName}
-                  onInstallExtension={onInstallExtension}
-                />
-              )}
-            </>
-          )}
-        </I18n>
+            </I18n>
+          </ColumnStackLayout>
+        </Line>
       </Background>
     );
   }
@@ -1436,7 +1495,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  nextProps.freezeUpdate;
+  !nextProps.isOpen;
 
 const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   ProjectManager,
@@ -1453,17 +1512,13 @@ const ProjectManagerWithErrorBoundary = React.forwardRef<
   React.useEffect(
     () => {
       const timeoutId = setTimeout(() => {
-        if (
-          !props.freezeUpdate &&
-          shouldAutofocusInput &&
-          projectManagerRef.current
-        ) {
+        if (props.isOpen && shouldAutofocusInput && projectManagerRef.current) {
           projectManagerRef.current.focusSearchBar();
         }
       }, 100);
       return () => clearTimeout(timeoutId);
     },
-    [props.freezeUpdate, shouldAutofocusInput]
+    [props.isOpen, shouldAutofocusInput]
   );
 
   return (

@@ -55,7 +55,7 @@ export const MaxProjectCountAlertMessage = ({ margin }: Props) => {
       }
       hideButton={!canMaximumCountBeIncreased}
     >
-      <Line noMargin={margin === 'dense'}>
+      <Line>
         <Column noMargin expand>
           <Text
             size={margin === 'dense' ? 'sub-title' : 'block-title'}

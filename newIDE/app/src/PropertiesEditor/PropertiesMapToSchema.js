@@ -265,6 +265,8 @@ const createField = (
         choices.push({ value: '', label: '(no key)' });
         return choices;
       },
+      isAutocompleted: true,
+      isAllowingAnyValue: false,
       name,
       valueType: 'string',
       getValue: (instance: Instance): string => {

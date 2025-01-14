@@ -438,10 +438,9 @@ const InstructionOrObjectSelector = React.forwardRef<
       // Scroll to and select the already chosen object/instruction at opening.
       // chosenObjectName and chosenInstructionType are not dependencies to avoid
       // the tree views to scroll at each item selection. This effect will be run
-      // when the components mounts only, and that's what we want. And also when
-      // the user switches tab to go back to the selected item.
+      // when the components mounts only, and that's what we want.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [currentTab]
+      []
     );
 
     const getTreeViewItemChildren = (item: TreeViewItem) =>
@@ -644,6 +643,9 @@ const InstructionOrObjectSelector = React.forwardRef<
           : null,
       ].filter(Boolean);
 
+    const hasNoObjects = !isSearching && !allObjectsList.length;
+    const searchHasNoResults = isSearching && !hasResults;
+
     return (
       <div
         id="instruction-or-object-selector"
@@ -702,181 +704,161 @@ const InstructionOrObjectSelector = React.forwardRef<
             </Column>
           </Line>
         )}
-        {isSearching || currentTab === 'objects' ? (
-          !isSearching && !allObjectsList.length ? (
-            <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
-          ) : isSearching && !hasResults ? (
-            <EmptyMessage>
-              <Trans>
-                Nothing corresponding to your search. Choose an object first or
-                browse the list of actions/conditions.
-              </Trans>
-            </EmptyMessage>
-          ) : (
-            <div style={styles.treeViewContainer}>
-              <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
-                {({ height }) => (
-                  <ReadOnlyTreeView
-                    key="objects-and-search-results"
-                    ref={treeViewRef}
-                    height={height}
-                    estimatedItemSize={singleLineTreeViewItemHeight}
-                    items={getTreeViewItems(i18n)}
-                    getItemHeight={getTreeViewItemHeight}
-                    getItemName={getTreeViewItemName}
-                    shouldApplySearchToItem={shouldApplySearchToItem}
-                    getItemDescription={getTreeViewItemDescription}
-                    getItemId={getTreeViewItemId}
-                    getItemHtmlId={getTreeViewItemHtmlId}
-                    getItemChildren={getTreeViewItemChildren}
-                    getItemThumbnail={getTreeViewItemThumbnail}
-                    getItemDataset={getTreeViewItemDataset}
-                    selectedItems={selectedItem ? [selectedItem] : []}
-                    initiallyOpenedNodeIds={[
-                      LOCAL_OBJECTS_ROOT_ITEM_ID,
-                      HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
-                      LOCAL_GROUPS_ROOT_ITEM_ID,
-                      HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
-                      ...initiallyOpenedFolderIdsRef.current,
-                    ]}
-                    onSelectItems={(items: TreeViewItem[]) => {
-                      if (!items) return;
-                      const item = items[0];
-                      if (!item || item.isRoot) return;
-                      const itemContentToSelect = item.content;
-                      if (
-                        itemContentToSelect instanceof ObjectTreeViewItemContent
-                      ) {
-                        const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
-                        if (
-                          !objectFolderOrObjectToSelect ||
-                          objectFolderOrObjectToSelect.isFolder()
-                        ) {
-                          return;
-                        }
-                        onChooseObject(
-                          objectFolderOrObjectToSelect.getObject().getName()
-                        );
-                        setSelectedItem(item);
-                      } else if (
-                        itemContentToSelect instanceof
-                        ObjectGroupTreeViewItemContent
-                      ) {
-                        const group = itemContentToSelect.getGroup();
-                        if (!group) return;
-                        onChooseObject(group.getName());
-                        setSelectedItem(item);
-                      } else if (
-                        itemContentToSelect instanceof
-                        ObjectGroupObjectTreeViewItemContent
-                      ) {
-                        const object = itemContentToSelect.getObject();
-                        if (!object) return;
-                        onChooseObject(object.getName());
-                        setSelectedItem(item);
-                      } else if (
-                        itemContentToSelect instanceof
-                        InstructionTreeViewItemContent
-                      ) {
-                        const instructionMetadata = itemContentToSelect.getInstructionMetadata();
-                        if (!instructionMetadata) return;
-                        onChooseInstruction(
-                          instructionMetadata.type,
-                          instructionMetadata
-                        );
-                        setSelectedItem(item);
-                      }
-                    }}
-                    searchText={searchText}
-                    multiSelect={false}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          )
-        ) : (
-          <div style={styles.treeViewContainer}>
-            <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
-              {({ height }) => (
-                <ReadOnlyTreeView
-                  key="free-instructions"
-                  ref={freeInstructionTreeViewRef}
-                  height={height}
-                  items={getFreeInstructionsTreeViewItems(i18n)}
-                  getItemHeight={() => singleLineTreeViewItemHeight}
-                  getItemName={getTreeViewItemName}
-                  shouldApplySearchToItem={() => false}
-                  getItemDescription={getTreeViewItemDescription}
-                  getItemId={getTreeViewItemId}
-                  getItemHtmlId={getTreeViewItemHtmlId}
-                  getItemChildren={getTreeViewItemChildren}
-                  getItemThumbnail={getTreeViewItemThumbnail}
-                  getItemDataset={getTreeViewItemDataset}
-                  selectedItems={selectedItem ? [selectedItem] : []}
-                  initiallyOpenedNodeIds={Array.from(
-                    new Set([
-                      ...initiallyOpenedInstructionsGroupIdsRef.current,
-                      ...initialInstructionAscendanceRef.current,
-                    ])
-                  )}
-                  onSelectItems={(items: TreeViewItem[]) => {
-                    if (!items) return;
-                    const item = items[0];
-                    if (!item || item.isRoot) return;
-                    const itemContentToSelect = item.content;
+        {hasNoObjects ? (
+          <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
+        ) : searchHasNoResults ? (
+          <EmptyMessage>
+            <Trans>
+              Nothing corresponding to your search. Choose an object first or
+              browse the list of actions/conditions.
+            </Trans>
+          </EmptyMessage>
+        ) : null}
+        <div
+          style={{
+            ...styles.treeViewContainer,
+            display:
+              (currentTab === 'objects' || isSearching) &&
+              !searchHasNoResults &&
+              !hasNoObjects
+                ? 'unset'
+                : 'none',
+          }}
+        >
+          <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
+            {({ height }) => (
+              <ReadOnlyTreeView
+                key="objects-and-search-results"
+                ref={treeViewRef}
+                height={height}
+                estimatedItemSize={singleLineTreeViewItemHeight}
+                items={getTreeViewItems(i18n)}
+                getItemHeight={getTreeViewItemHeight}
+                getItemName={getTreeViewItemName}
+                shouldApplySearchToItem={shouldApplySearchToItem}
+                getItemDescription={getTreeViewItemDescription}
+                getItemId={getTreeViewItemId}
+                getItemHtmlId={getTreeViewItemHtmlId}
+                getItemChildren={getTreeViewItemChildren}
+                getItemThumbnail={getTreeViewItemThumbnail}
+                getItemDataset={getTreeViewItemDataset}
+                selectedItems={selectedItem ? [selectedItem] : []}
+                initiallyOpenedNodeIds={[
+                  LOCAL_OBJECTS_ROOT_ITEM_ID,
+                  HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
+                  LOCAL_GROUPS_ROOT_ITEM_ID,
+                  HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
+                  ...initiallyOpenedFolderIdsRef.current,
+                ]}
+                onSelectItems={(items: TreeViewItem[]) => {
+                  if (!items) return;
+                  const item = items[0];
+                  if (!item || item.isRoot) return;
+                  const itemContentToSelect = item.content;
+                  if (
+                    itemContentToSelect instanceof ObjectTreeViewItemContent
+                  ) {
+                    const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
                     if (
-                      itemContentToSelect instanceof
-                      FreeInstructionTreeViewItemContent
+                      !objectFolderOrObjectToSelect ||
+                      objectFolderOrObjectToSelect.isFolder()
                     ) {
-                      const instructionMetadata = itemContentToSelect.getInstructionMetadata();
-                      if (!instructionMetadata) return;
-                      onChooseInstruction(
-                        instructionMetadata.type,
-                        instructionMetadata
-                      );
-                      setSelectedItem(item);
+                      return;
                     }
-                  }}
-                  multiSelect={false}
-                />
-              )}
-            </AutoSizer>
-          </div>
-          // <ScrollView ref={scrollViewRef} autoHideScrollbar>
-          //   <List>
-          //     <>
-          //       {renderInstructionOrExpressionTree({
-          //         instructionTreeNode: freeInstructionsInfoTreeRef.current,
-          //         onChoose: onChooseInstruction,
-          //         iconSize: ICON_SIZE,
-          //         useSubheaders: true,
-          //         selectedValue: chosenInstructionType
-          //           ? getInstructionListItemValue(chosenInstructionType)
-          //           : undefined,
-          //         initiallyOpenedPath: initialInstructionTypePathRef.current,
-          //         selectedItemRef: selectedInstructionItemRef,
-          //         getGroupIconSrc: getInstructionIconSrc,
-          //       })}
-          //       {onClickMore && (
-          //         <ResponsiveLineStackLayout justifyContent="center">
-          //           <RaisedButton
-          //             primary
-          //             icon={<Add />}
-          //             onClick={onClickMore}
-          //             label={
-          //               isCondition ? (
-          //                 <Trans>Search for new conditions in extensions</Trans>
-          //               ) : (
-          //                 <Trans>Search for new actions in extensions</Trans>
-          //               )
-          //             }
-          //           />
-          //         </ResponsiveLineStackLayout>
-          //       )}
-          //     </>
-          //   </List>
-          // </ScrollView>
-        )}
+                    onChooseObject(
+                      objectFolderOrObjectToSelect.getObject().getName()
+                    );
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    ObjectGroupTreeViewItemContent
+                  ) {
+                    const group = itemContentToSelect.getGroup();
+                    if (!group) return;
+                    onChooseObject(group.getName());
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    ObjectGroupObjectTreeViewItemContent
+                  ) {
+                    const object = itemContentToSelect.getObject();
+                    if (!object) return;
+                    onChooseObject(object.getName());
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    InstructionTreeViewItemContent
+                  ) {
+                    const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                    if (!instructionMetadata) return;
+                    onChooseInstruction(
+                      instructionMetadata.type,
+                      instructionMetadata
+                    );
+                    setSelectedItem(item);
+                  }
+                }}
+                searchText={searchText}
+                multiSelect={false}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <div
+          style={{
+            ...styles.treeViewContainer,
+            display:
+              currentTab === 'free-instructions' && !isSearching
+                ? 'unset'
+                : 'none',
+          }}
+        >
+          <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
+            {({ height }) => (
+              <ReadOnlyTreeView
+                key="free-instructions"
+                ref={freeInstructionTreeViewRef}
+                height={height}
+                items={getFreeInstructionsTreeViewItems(i18n)}
+                getItemHeight={() => singleLineTreeViewItemHeight}
+                getItemName={getTreeViewItemName}
+                shouldApplySearchToItem={() => false}
+                getItemDescription={getTreeViewItemDescription}
+                getItemId={getTreeViewItemId}
+                getItemHtmlId={getTreeViewItemHtmlId}
+                getItemChildren={getTreeViewItemChildren}
+                getItemThumbnail={getTreeViewItemThumbnail}
+                getItemDataset={getTreeViewItemDataset}
+                selectedItems={selectedItem ? [selectedItem] : []}
+                initiallyOpenedNodeIds={Array.from(
+                  new Set([
+                    ...initiallyOpenedInstructionsGroupIdsRef.current,
+                    ...initialInstructionAscendanceRef.current,
+                  ])
+                )}
+                onSelectItems={(items: TreeViewItem[]) => {
+                  if (!items) return;
+                  const item = items[0];
+                  if (!item || item.isRoot) return;
+                  const itemContentToSelect = item.content;
+                  if (
+                    itemContentToSelect instanceof
+                    FreeInstructionTreeViewItemContent
+                  ) {
+                    const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                    if (!instructionMetadata) return;
+                    onChooseInstruction(
+                      instructionMetadata.type,
+                      instructionMetadata
+                    );
+                    setSelectedItem(item);
+                  }
+                }}
+                multiSelect={false}
+              />
+            )}
+          </AutoSizer>
+        </div>
       </div>
     );
   }

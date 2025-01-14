@@ -139,6 +139,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   ref: ReadOnlyTreeViewInterface<Item>
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
+  const [isRendered, setIsRendered] = React.useState<boolean>(false);
+  const bufferedScrollingCommandRef = React.useRef<?() => void>(null);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
     initiallyOpenedNodeIds || []
   );
@@ -352,11 +354,17 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       if (list) {
         const index = flattenedData.findIndex(node => node.id === itemId);
         if (index >= 0) {
-          list.scrollToItem(index, placement);
+          if (isRendered) {
+            list.scrollToItem(index, placement);
+          } else {
+            bufferedScrollingCommandRef.current = () => {
+              list.scrollToItem(index, placement);
+            };
+          }
         }
       }
     },
-    [flattenedData]
+    [flattenedData, isRendered]
   );
 
   const scrollToItem = React.useCallback(
@@ -365,12 +373,31 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     [getItemId, scrollToItemFromId]
   );
 
-  const scrollTo = React.useCallback((offset: number) => {
-    const list = listRef.current;
-    if (list) {
-      list.scrollTo(offset);
-    }
-  }, []);
+  const scrollTo = React.useCallback(
+    (offset: number) => {
+      const list = listRef.current;
+      if (list) {
+        if (isRendered) {
+          list.scrollTo(offset);
+        } else {
+          bufferedScrollingCommandRef.current = () => {
+            list.scrollTo(offset);
+          };
+        }
+      }
+    },
+    [isRendered]
+  );
+
+  React.useEffect(
+    () => {
+      if (isRendered && bufferedScrollingCommandRef.current) {
+        bufferedScrollingCommandRef.current();
+        bufferedScrollingCommandRef.current = null;
+      }
+    },
+    [isRendered]
+  );
 
   const openItems = React.useCallback(
     (itemIds: string[]) => {
@@ -621,6 +648,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         // - during in-app tutorials we make sure the tooltip displayer finds
         //   the elements to highlight
         overscanCount={20}
+        onItemsRendered={() => setIsRendered(true)}
       >
         {ReadOnlyTreeViewRow}
       </VariableSizeList>

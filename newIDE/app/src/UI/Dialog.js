@@ -21,48 +21,16 @@ import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
 import { Line } from './Grid';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
-import optionalRequire from '../Utils/OptionalRequire';
-import useForceUpdate from '../Utils/UseForceUpdate';
-import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+
 import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
 import {
   getAvoidSoftKeyboardStyle,
   useSoftKeyboardBottomOffset,
 } from './MobileSoftKeyboard';
-
-const electron = optionalRequire('electron');
-
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
-
-export const DialogTitleBar = ({
-  backgroundColor,
-}: {|
-  backgroundColor: string,
-|}) => {
-  // An installed PWA can have window controls displayed as overlay. If supported,
-  // we set up a listener to detect any change and force a refresh that will read
-  // the latest size of the controls.
-  const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
-
-  // $FlowFixMe - this API is not handled by Flow.
-  const { windowControlsOverlay } = navigator;
-
-  if (!!electron || (windowControlsOverlay && windowControlsOverlay.visible)) {
-    // We're on the desktop app, or in an installed PWA with window controls displayed
-    // as overlay: we need to display a spacing at the top of the dialog.
-    return (
-      <div
-        className={DRAGGABLE_PART_CLASS_NAME}
-        style={{ height: 38, backgroundColor, flexShrink: 0 }}
-      />
-    );
-  }
-
-  // Not on the desktop app, and not in an installed PWA with window controls displayed
-  // as overlay: no need to display a spacing.
-  return null;
-};
+import {
+  TitleBarLeftSafeMargins,
+  TitleBarRightSafeMargins,
+} from './TitleBarSafeMargins';
 
 // Default.
 const dialogPaddingX = 24;
@@ -109,6 +77,11 @@ const styles = {
     textAlign: 'left',
     // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
     overflowWrap: 'anywhere',
+  },
+  closeDialogContainer: {
+    // Ensure this part can be interacted with on macOS, when the dialog is fullscreen and used as PWA.
+    // Otherwise, the close button is not clickable.
+    WebkitAppRegion: 'no-drag',
   },
   fixedContentContainer: {
     paddingBottom: 8,
@@ -402,11 +375,6 @@ const Dialog = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
-      {isFullScreen && (
-        <DialogTitleBar
-          backgroundColor={gdevelopTheme.titlebar.backgroundColor}
-        />
-      )}
       <div style={dialogContainerStyle}>
         <div
           style={{
@@ -415,18 +383,34 @@ const Dialog = ({
           }}
         >
           <Line noMargin justifyContent="space-between" alignItems="flex-start">
-            <Text noMargin size="section-title">
-              {title}
-            </Text>
-            {onRequestClose && !cannotBeDismissed && (
-              <IconButton
-                onClick={onRequestClose}
-                size="small"
-                disabled={cannotBeDismissed}
-              >
-                <Cross />
-              </IconButton>
-            )}
+            <Line noMargin alignItems="center">
+              {isFullScreen && (
+                <TitleBarLeftSafeMargins
+                  backgroundColor={gdevelopTheme.dialog.backgroundColor}
+                />
+              )}
+              <Text noMargin size="section-title">
+                {title}
+              </Text>
+            </Line>
+            <Line noMargin alignItems="center">
+              {onRequestClose && !cannotBeDismissed && (
+                <div style={styles.closeDialogContainer}>
+                  <IconButton
+                    onClick={onRequestClose}
+                    size="small"
+                    disabled={cannotBeDismissed}
+                  >
+                    <Cross />
+                  </IconButton>
+                </div>
+              )}
+              {isFullScreen && (
+                <TitleBarRightSafeMargins
+                  backgroundColor={gdevelopTheme.dialog.backgroundColor}
+                />
+              )}
+            </Line>
           </Line>
         </div>
         {fixedContent && (

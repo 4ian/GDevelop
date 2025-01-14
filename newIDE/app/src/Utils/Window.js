@@ -22,6 +22,31 @@ export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 let currentTitleBarColor: ?string = null;
 
+const onChangeCallbacks = new Set<() => void>();
+let debouncedGeometryChange = null;
+
+const setupWindowControlsOverlayWatcher = () => {
+  if (debouncedGeometryChange) {
+    // Already set up.
+    return;
+  }
+
+  // $FlowFixMe - this API is not handled by Flow.
+  const { windowControlsOverlay } = navigator;
+
+  if (windowControlsOverlay) {
+    debouncedGeometryChange = debounce(() => {
+      for (const callback of onChangeCallbacks) {
+        callback();
+      }
+    }, 20);
+    windowControlsOverlay.addEventListener(
+      'geometrychange',
+      debouncedGeometryChange
+    );
+  }
+};
+
 /**
  * Listen to the changes to the window controls provided by the operating system:
  *
@@ -34,31 +59,16 @@ export const useWindowControlsOverlayWatcher = ({
 }: {|
   onChanged: () => void,
 |}) => {
-  // $FlowFixMe - this API is not handled by Flow.
-  const { windowControlsOverlay } = navigator;
+  setupWindowControlsOverlayWatcher();
 
   React.useEffect(
     () => {
-      let listenerCallback = null;
-      if (windowControlsOverlay) {
-        listenerCallback = debounce(() => {
-          onChanged();
-        }, 50);
-        windowControlsOverlay.addEventListener(
-          'geometrychange',
-          listenerCallback
-        );
-      }
+      onChangeCallbacks.add(onChanged);
       return () => {
-        if (listenerCallback) {
-          windowControlsOverlay.removeEventListener(
-            'geometrychange',
-            listenerCallback
-          );
-        }
+        onChangeCallbacks.delete(onChanged);
       };
     },
-    [onChanged, windowControlsOverlay]
+    [onChanged]
   );
 };
 
@@ -371,5 +381,12 @@ export default class Window {
       );
       return false; // Assume we're not in development mode. Might be incorrect but better not consider production as development.
     }
+  }
+
+  static isFullScreen(): boolean {
+    if (!remote) return false;
+
+    const browserWindow = remote.getCurrentWindow();
+    return browserWindow.isFullScreen();
   }
 }

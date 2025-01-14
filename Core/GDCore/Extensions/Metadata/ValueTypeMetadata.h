@@ -212,6 +212,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "functionParameterName" ||
              parameterType == "externalLayoutName" ||
              parameterType == "leaderboardId" ||
+             parameterType == "keyboardKey" ||
+             parameterType == "mouseButton" ||
              parameterType == "identifier";
     } else if (type == "boolean") {
       return parameterType == "yesorno" || parameterType == "trueorfalse";

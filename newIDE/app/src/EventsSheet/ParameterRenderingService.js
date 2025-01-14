@@ -15,7 +15,13 @@ import OperatorField, {
   renderInlineOperator,
 } from './ParameterFields/OperatorField';
 import MouseField, { renderInlineMouse } from './ParameterFields/MouseField';
+import MouseButtonField, {
+  renderInlineMouseButton,
+} from './ParameterFields/MouseButtonField';
 import KeyField, { renderInlineKey } from './ParameterFields/KeyField';
+import KeyboardKeyField, {
+  renderInlineKeyboardKey,
+} from './ParameterFields/KeyboardKeyField';
 import ObjectField, {
   renderInlineObjectWithThumbnail,
 } from './ParameterFields/ObjectField';
@@ -75,6 +81,7 @@ const gd: libGDevelop = global.gd;
 const components = {
   default: DefaultField,
   mouse: MouseField,
+  mouseButton: MouseButtonField,
   object: ObjectField,
   relationalOperator: RelationalOperatorField,
   operator: OperatorField,
@@ -91,6 +98,7 @@ const components = {
   objectvar: ObjectVariableField,
   layer: LayerField,
   key: KeyField,
+  keyboardKey: KeyboardKeyField,
   file: DefaultField, //TODO
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
@@ -127,7 +135,9 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   scenevar: renderInlineSceneVariable,
   objectvar: renderInlineObjectVariable,
   key: renderInlineKey,
+  keyboardKey: renderInlineKeyboardKey,
   mouse: renderInlineMouse,
+  mouseButton: renderInlineMouseButton,
   object: renderInlineObjectWithThumbnail,
   yesorno: renderInlineYesNo,
   trueorfalse: renderInlineTrueFalse,
@@ -137,6 +147,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,
+  mouseButton: t`Mouse button`,
   object: t`Object`,
   relationalOperator: t`Relational operator`,
   operator: t`Operator`,
@@ -153,6 +164,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectvar: t`Object variable`,
   layer: t`Layer`,
   key: t`Keyboard key`,
+  keyboardKey: t`Keyboard key`,
   musicfile: t`Audio resource`,
   soundfile: t`Audio resource`,
   audioResource: t`Audio resource`,

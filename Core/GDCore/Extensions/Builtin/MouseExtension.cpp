@@ -252,7 +252,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("mouse", _("Button to check"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetHidden();
 
   // Support for deprecated names:
   extension.AddDuplicatedCondition("SourisBouton", "MouseButtonPressed")
@@ -262,49 +263,41 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition("MouseButtonReleased",
                     _("Mouse button released"),
                     _("Check if the specified mouse button was released."),
-                    _("_PARAM1_ mouse button was released"),
+                    _("Touch or _PARAM1_ mouse button is released"),
                     "",
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("mouse", _("Button to check"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetHidden();
 
   extension
       .AddCondition(
           "MouseButtonFromTextPressed",
-          _("Mouse button pressed or touch held (text expression)"),
-          _("Check if a mouse button, retrieved from the result of the "
-            "expression, is pressed."),
-          _("_PARAM1_ mouse button is pressed"),
+          _("Mouse button pressed or touch held"),
+          _("Check if the specified mouse button is pressed or "
+              "if a touch is in contact with the screen."),
+          _("Touch or _PARAM1_ mouse button is down"),
           "",
           "res/conditions/mouse24.png",
           "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("stringWithSelector",
-                    _("Expression generating the mouse button to check"),
-                    "[\"Left\", \"Right\", \"Middle\"]")
-      .SetParameterLongDescription(
-          _("Possible values are Left, Right and Middle."))
-      .MarkAsAdvanced();
+      .AddParameter("mouseButton", _("Button to check"))
+      .MarkAsSimple();
 
   extension
       .AddCondition(
           "MouseButtonFromTextReleased",
-          _("Mouse button released (text expression)"),
-          _("Check if a mouse button, retrieved from the result of the "
-            "expression, was just released."),
-          _("_PARAM1_ mouse button is released"),
+          _("Mouse button released"),
+          _("Check if the specified mouse button was released."),
+          _("Touch or _PARAM1_ mouse button is released"),
           "",
           "res/conditions/mouse24.png",
           "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("stringWithSelector",
-                    _("Expression generating the mouse button to check"),
-                    "[\"Left\", \"Right\", \"Middle\"]")
-      .SetParameterLongDescription(
-          _("Possible values are Left, Right and Middle."))
-      .MarkAsAdvanced();
+      .AddParameter("mouseButton", _("Button to check"))
+      .MarkAsSimple();
 
   extension
       .AddExpressionAndCondition("number",

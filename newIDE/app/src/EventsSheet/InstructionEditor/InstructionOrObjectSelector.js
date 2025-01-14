@@ -367,12 +367,13 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     React.useLayoutEffect(
       () => {
+        let timeoutId;
+
         if (chosenObjectName) {
           const objectOrGroupName = chosenObjectName;
           const treeView = treeViewRef.current;
           if (!treeView) return;
 
-          let timeoutId;
           for (const item of treeView.getDisplayedItemsIterator()) {
             if (item.content instanceof ObjectGroupTreeViewItemContent) {
               const group = item.content.getGroup();
@@ -405,14 +406,10 @@ const InstructionOrObjectSelector = React.forwardRef<
               }
             }
           }
-          if (timeoutId) {
-            return () => clearTimeout(timeoutId);
-          }
         } else if (chosenInstructionType) {
           const treeView = freeInstructionTreeViewRef.current;
           if (!treeView) return;
 
-          let timeoutId;
           for (const item of treeView.getDisplayedItemsIterator()) {
             if (item.content instanceof FreeInstructionTreeViewItemContent) {
               const instructionMetadata = item.content.getInstructionMetadata();
@@ -429,13 +426,17 @@ const InstructionOrObjectSelector = React.forwardRef<
               }
             }
           }
-          if (timeoutId) {
-            return () => clearTimeout(timeoutId);
-          }
+        }
+        if (timeoutId) {
+          return () => clearTimeout(timeoutId);
         }
       },
       // Scroll to and select the already chosen object/instruction at opening.
-      [chosenObjectName, chosenInstructionType]
+      // chosenObjectName and chosenInstructionType are not dependencies to avoid
+      // the tree views to scroll at each item selection. This effect will be run
+      // when the components mounts only, and that's what we want.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
     );
 
     const getTreeViewItemChildren = (item: TreeViewItem) =>

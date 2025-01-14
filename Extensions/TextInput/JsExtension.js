@@ -79,6 +79,18 @@ module.exports = {
         objectContent.disabled = newValue === '1';
         return true;
       }
+      else if(propertyName === 'maxLength')
+      {
+        objectContent.maxLength = newValue;
+      }
+      else if (propertyName === 'padding')
+      {
+        objectContent.padding = newValue;
+      }
+      else if(propertyName === 'textAlignement')
+      {
+        objectContent.textAlignement = newValue;
+      }
 
       return false;
     };
@@ -200,6 +212,30 @@ module.exports = {
         .setLabel(_('Width'))
         .setGroup(_('Border appearance'));
 
+        objectProperties
+        .getOrCreate('padding')
+        .setValue((objectContent.padding || 0).toString())
+        .setType('number')
+        .setLabel(_('Padding'))
+        .setGroup(_('Border appearance'));
+
+        objectProperties
+        .getOrCreate('maxLength')
+        .setValue(objectContent.maxLength || 20)
+        .setType('number')
+        .setLabel(_('Max length'))
+        .setGroup(_('Border appearance'));
+
+        objectProperties
+        .getOrCreate('textAlignement')
+        .setValue(objectContent.textAlignement || 'left')
+        .setType('choice')
+        .addExtraInfo('left')
+        .addExtraInfo('right')
+        .addExtraInfo('center')
+        .setLabel(_('text Alignement'))
+        .setGroup(_('Border appearance'));
+
       return objectProperties;
     };
     textInputObject.content = {
@@ -216,6 +252,9 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
+      padding: 0,
+      textAlignement: 'left',
+      maxLength: '20',
     };
 
     textInputObject.updateInitialInstanceProperty = function (

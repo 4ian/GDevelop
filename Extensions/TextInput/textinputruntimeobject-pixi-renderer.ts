@@ -9,6 +9,13 @@ namespace gdjs {
     search: 'search',
   };
 
+  const userFriendlyToHtmlAlignement = 
+  {
+    left: 'left',
+    center: 'center',
+    right: 'right',
+  }
+
   const formatRgbAndOpacityToCssRgba = (
     rgbColor: [float, float, float],
     opacity: float
@@ -59,6 +66,11 @@ namespace gdjs {
       this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._input.style.display = 'none'; // Hide while object is being set up.
       this._input.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
+      this._input.maxLength = this._object.getMaxLength();
+      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.textAlign = this._object.getTextAlignement();
+  
+      
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -83,6 +95,9 @@ namespace gdjs {
       this.updateBorderWidth();
       this.updateDisabled();
       this.updateReadOnly();
+      this.updateTextlignement();
+      this.updateMaxLength();
+      this.updatePadding();
 
       this._runtimeGame
         .getRenderer()
@@ -216,6 +231,9 @@ namespace gdjs {
       this._input.style.height = heightInContainer + 'px';
       this._input.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
+        this._input.style.display = 'initial';
+        this._input.style.padding = this._object.getPadding() + 'px';
+        this._input.style.textAlign = this._object.getTextAlignement();
 
       // Automatically adjust the font size to follow the game scale.
       this._input.style.fontSize =
@@ -224,7 +242,6 @@ namespace gdjs {
         'px';
 
       // Display after the object is positioned.
-      this._input.style.display = 'initial';
     }
 
     updateString() {
@@ -305,6 +322,25 @@ namespace gdjs {
       if (!this._input) return;
 
       this._input.readOnly = this._object.isReadOnly();
+    }
+
+    updateMaxLength() {
+      if(!this._input) return;
+
+      this._input.maxLength = this._object.getMaxLength();
+    }
+
+    updatePadding() {
+      if(!this._input) return;
+
+      this._input.style.padding = this._object.getPadding() + 'px';
+    }
+
+    updateTextlignement() {
+      if (!this._input) return;
+
+      const newTextAlignement = userFriendlyToHtmlAlignement[this._object.getTextAlignement()] || 'right';
+      this._input.style.textAlign = newTextAlignement;
     }
 
     isFocused() {

@@ -9,9 +9,15 @@ namespace gdjs {
     'search',
     'text area',
   ] as const;
+  const supportedtextAlignement = [
+    'left',
+    'center',
+    'right',
+  ] as const;
 
-  type SupportedInputType = typeof supportedInputTypes[number];
 
+  type SupportedInputType = typeof supportedInputTypes[number]; 
+  type SupportedtextAlignement = typeof supportedtextAlignement[number]; 
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
 
@@ -20,6 +26,16 @@ namespace gdjs {
       return potentialInputType as SupportedInputType;
 
     return 'text';
+  };
+
+  const parseTextAlignement = (potentialTextAlignement: string): SupportedtextAlignement => {
+    const lowercasedNewTextAlignement = potentialTextAlignement.toLowerCase();
+
+    // @ts-ignore - we're actually checking that this value is correct.
+    if (supportedtextAlignement.includes(lowercasedNewTextAlignement))
+      return potentialTextAlignement as SupportedtextAlignement;
+
+    return 'left';
   };
 
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
@@ -34,6 +50,9 @@ namespace gdjs {
       textColor: string;
       fillColor: string;
       fillOpacity: float;
+      padding : integer; 
+      textAlign : SupportedtextAlignement;
+      maxLength : integer;
       borderColor: string;
       borderOpacity: float;
       borderWidth: float;
@@ -84,6 +103,9 @@ namespace gdjs {
     private _textColor: [float, float, float];
     private _fillColor: [float, float, float];
     private _fillOpacity: float;
+    private _padding : integer; 
+    private _textAlign : SupportedtextAlignement;
+    private _maxLength : integer;
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
     private _borderWidth: float;
@@ -107,12 +129,15 @@ namespace gdjs {
       this._fillColor = gdjs.rgbOrHexToRGBColor(objectData.content.fillColor);
       this._fillOpacity = objectData.content.fillOpacity;
       this._borderColor = gdjs.rgbOrHexToRGBColor(
-        objectData.content.borderColor
+  objectData.content.borderColor
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
+      this._padding = objectData.content.padding;
+      this._textAlign = objectData.content.textAlign;
+      this._maxLength = objectData.content.maxLength;
 
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
@@ -189,6 +214,19 @@ namespace gdjs {
       if (oldObjectData.content.readOnly !== newObjectData.content.readOnly) {
         this.setReadOnly(newObjectData.content.readOnly);
       }
+      if(oldObjectData.content.maxLength !== newObjectData.content.maxLength)
+      {
+        this.SetMaxLength(newObjectData.content.maxLength);
+      }
+      if(oldObjectData.content.textAlign !== newObjectData.content.textAlign)
+        {
+          this._textAlign = newObjectData.content.textAlign;
+          //this.setTextAlignement(newObjectData.content.textAlign);
+        }
+      if(oldObjectData.content.padding !== newObjectData.content.padding)
+        {
+            this.SetPadding(newObjectData.content.padding);
+        }
       return true;
     }
 
@@ -499,6 +537,35 @@ namespace gdjs {
 
     isFocused(): boolean {
       return this._renderer.isFocused();
+    }
+
+    getMaxLength() : integer {
+      return this._maxLength;
+    }
+    SetMaxLength(value: integer)
+    {
+      this._maxLength = value;
+      this._renderer.updateMaxLength();
+    }
+    getPadding() : integer {
+      return this._padding;
+    }
+    SetPadding(value: integer)
+    {
+      this._padding = value;
+    }
+
+    getTextAlignement() : SupportedtextAlignement
+    {
+      return this._textAlign;
+    } 
+
+    setTextAlignement(newTextAlignement: string) {
+      const lowercasedNewTextAlignement = newTextAlignement.toLowerCase();
+      if (lowercasedNewTextAlignement === this._textAlign) return;
+
+      this._textAlign = parseTextAlignement(lowercasedNewTextAlignement);
+      this._renderer.updateTextlignement();
     }
 
     focus(): void {

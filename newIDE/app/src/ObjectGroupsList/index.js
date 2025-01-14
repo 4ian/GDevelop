@@ -483,12 +483,14 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 label: i18n._(t`Rename`),
                 click: () => onEditName(item),
               },
-              {
-                label: i18n._(t`Set as global group`),
-                enabled: !isGroupWithContextGlobal(item),
-                click: () => setAsGlobalGroup(item),
-                visible: canSetAsGlobalGroup !== false,
-              },
+              globalObjectGroups
+                ? {
+                    label: i18n._(t`Set as global group`),
+                    enabled: !isGroupWithContextGlobal(item),
+                    click: () => setAsGlobalGroup(item),
+                    visible: canSetAsGlobalGroup !== false,
+                  }
+                : null,
               {
                 label: i18n._(t`Delete`),
                 click: () => onDelete(item),
@@ -498,7 +500,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 label: i18n._(t`Add a new group...`),
                 click: onCreateGroup,
               },
-            ],
+            ].filter(Boolean),
       [
         onCreateGroup,
         onEditName,
@@ -507,6 +509,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         onDuplicate,
         canSetAsGlobalGroup,
         setAsGlobalGroup,
+        globalObjectGroups,
       ]
     );
 

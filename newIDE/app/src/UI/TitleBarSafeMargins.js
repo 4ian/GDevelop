@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { isMacLike } from '../Utils/Platform';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+import Window, { useWindowControlsOverlayWatcher } from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const electron = optionalRequire('electron');
@@ -28,18 +28,24 @@ export const TitleBarLeftSafeMargins = ({
   const forceUpdate = useForceUpdate();
   useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
 
+  let leftSideOffset = 0;
   // macOS displays the "traffic lights" on the left.
-  const isDesktopMacos = !!electron && isMacLike();
-  let leftSideOffset = isDesktopMacos ? 76 : 0;
+  const isDesktopMacosFullScreen =
+    !!electron && isMacLike() && Window.isFullScreen();
 
-  // An installed PWA can have window controls displayed as overlay,
-  // which we measure here to set the offsets.
-  // $FlowFixMe - this API is not handled by Flow.
-  const { windowControlsOverlay } = navigator;
-  if (windowControlsOverlay) {
-    if (windowControlsOverlay.visible) {
-      const { x } = windowControlsOverlay.getTitlebarAreaRect();
-      leftSideOffset = x;
+  if (isDesktopMacosFullScreen) {
+    // When in full screen on macOS, the "traffic lights" are not in the overlay.
+    leftSideOffset = 0;
+  } else {
+    // Otherwise, the windowControlsOverlay tells us how much space is needed.
+    // This can happen for mac apps, or installed PWA.
+    // $FlowFixMe - this API is not handled by Flow.
+    const { windowControlsOverlay } = navigator;
+    if (windowControlsOverlay) {
+      if (windowControlsOverlay.visible) {
+        const { x } = windowControlsOverlay.getTitlebarAreaRect();
+        leftSideOffset = x;
+      }
     }
   }
 

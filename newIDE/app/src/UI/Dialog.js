@@ -19,7 +19,7 @@ import RaisedButton from './RaisedButton';
 import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
-import { Line } from './Grid';
+import { Column, Line } from './Grid';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
@@ -393,24 +393,26 @@ const Dialog = ({
                 {title}
               </Text>
             </Line>
-            <Line noMargin alignItems="center">
-              {onRequestClose && !cannotBeDismissed && (
-                <div style={styles.closeDialogContainer}>
-                  <IconButton
-                    onClick={onRequestClose}
-                    size="small"
-                    disabled={cannotBeDismissed}
-                  >
-                    <Cross />
-                  </IconButton>
-                </div>
-              )}
-              {isFullScreen && (
-                <TitleBarRightSafeMargins
-                  backgroundColor={gdevelopTheme.dialog.backgroundColor}
-                />
-              )}
-            </Line>
+            <Column noMargin>
+              <Line noMargin alignItems="center">
+                {onRequestClose && !cannotBeDismissed && (
+                  <div style={styles.closeDialogContainer}>
+                    <IconButton
+                      onClick={onRequestClose}
+                      size="small"
+                      disabled={cannotBeDismissed}
+                    >
+                      <Cross />
+                    </IconButton>
+                  </div>
+                )}
+                {isFullScreen && (
+                  <TitleBarRightSafeMargins
+                    backgroundColor={gdevelopTheme.dialog.backgroundColor}
+                  />
+                )}
+              </Line>
+            </Column>
           </Line>
         </div>
         {fixedContent && (

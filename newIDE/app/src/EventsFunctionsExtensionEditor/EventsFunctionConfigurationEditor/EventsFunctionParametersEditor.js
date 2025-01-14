@@ -583,29 +583,31 @@ export const EventsFunctionParametersEditor = ({
     );
   if (isAnExtensionLifecycleEventsFunction) {
     return (
-      <Column noMargin>
-        <DismissableAlertMessage
-          kind="info"
-          identifier="lifecycle-events-function-included-only-if-extension-used"
-        >
-          <Trans>
-            For the lifecycle functions to be executed, you need the extension
-            to be used in the game, either by having at least one action,
-            condition or expression used, or a behavior of the extension added
-            to an object. Otherwise, the extension won't be included in the
-            game.
-          </Trans>
-        </DismissableAlertMessage>
-        {/* TODO: Should the "Only global objects..." mention should be kept since
+      <Line>
+        <Column noMargin>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          {/* TODO: Should the "Only global objects..." mention should be kept since
         we don't show the global objects? */}
-        <EmptyMessage>
-          <Trans>
-            This is a "lifecycle function". It will be called automatically by
-            the game engine. It has no parameters. Only global objects can be
-            used as the events will be run for all scenes in your game.
-          </Trans>
-        </EmptyMessage>
-      </Column>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters. Only global objects can be
+              used as the events will be run for all scenes in your game.
+            </Trans>
+          </EmptyMessage>
+        </Column>
+      </Line>
     );
   }
 

@@ -365,11 +365,25 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));
 
-    React.useLayoutEffect(
+    React.useEffect(
       () => {
-        let timeoutId;
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          treeView.updateRowHeights();
+          treeView.scrollTo(0);
+        }
+      },
+      // Recompute row heights when search changes and reset scroll.
+      // Keep this effect before the effect that scrolls to the selected item
+      // at opening to avoid this effect take priority over this other, more
+      // important one.
+      [searchText]
+    );
 
+    React.useEffect(
+      () => {
         if (chosenObjectName) {
+          let itemToSelect;
           const objectOrGroupName = chosenObjectName;
           const treeView = treeViewRef.current;
           if (!treeView) return;
@@ -379,13 +393,7 @@ const InstructionOrObjectSelector = React.forwardRef<
               const group = item.content.getGroup();
               if (!group) return;
               if (group.getName() === objectOrGroupName) {
-                setSelectedItem(item);
-                timeoutId = setTimeout(
-                  () => treeView.scrollToItem(item, 'start'),
-                  // We have to wait for a first render otherwise the tree view
-                  // considers it has a size of 0 and its computations are wrong.
-                  50
-                );
+                itemToSelect = item;
                 break;
               }
             }
@@ -395,18 +403,18 @@ const InstructionOrObjectSelector = React.forwardRef<
               if (
                 objectFolderOrObject.getObject().getName() === objectOrGroupName
               ) {
-                setSelectedItem(item);
-                timeoutId = setTimeout(
-                  () => treeView.scrollToItem(item, 'start'),
-                  // We have to wait for a first render otherwise the tree view
-                  // considers it has a size of 0 and its computations are wrong.
-                  50
-                );
+                itemToSelect = item;
                 break;
               }
             }
           }
+          if (itemToSelect) {
+            setSelectedItem(itemToSelect);
+            treeView.scrollToItem(itemToSelect, 'start');
+          }
         } else if (chosenInstructionType) {
+          let itemToSelect;
+
           const treeView = freeInstructionTreeViewRef.current;
           if (!treeView) return;
 
@@ -416,27 +424,24 @@ const InstructionOrObjectSelector = React.forwardRef<
               if (!instructionMetadata) return;
               if (instructionMetadata.type === chosenInstructionType) {
                 setSelectedItem(item);
-                timeoutId = setTimeout(
-                  () => treeView.scrollToItem(item, 'start'),
-                  // We have to wait for a first render otherwise the tree view
-                  // considers it has a size of 0 and its computations are wrong.
-                  50
-                );
+                treeView.scrollToItem(item, 'start');
                 break;
               }
             }
           }
-        }
-        if (timeoutId) {
-          return () => clearTimeout(timeoutId);
+          if (itemToSelect) {
+            setSelectedItem(itemToSelect);
+            treeView.scrollToItem(itemToSelect, 'start');
+          }
         }
       },
       // Scroll to and select the already chosen object/instruction at opening.
       // chosenObjectName and chosenInstructionType are not dependencies to avoid
       // the tree views to scroll at each item selection. This effect will be run
-      // when the components mounts only, and that's what we want.
+      // when the components mounts only, and that's what we want. And also when
+      // the user switches tab to go back to the selected item.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [currentTab]
     );
 
     const getTreeViewItemChildren = (item: TreeViewItem) =>
@@ -493,18 +498,6 @@ const InstructionOrObjectSelector = React.forwardRef<
         }
       }
     };
-
-    React.useEffect(
-      () => {
-        const treeView = treeViewRef.current;
-        if (treeView) {
-          treeView.updateRowHeights();
-          treeView.scrollTo(0);
-        }
-      },
-      // Recompute row heights when search changes and reset scroll.
-      [searchText]
-    );
 
     const isSearching = !!searchText;
 
@@ -724,6 +717,7 @@ const InstructionOrObjectSelector = React.forwardRef<
               <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
                 {({ height }) => (
                   <ReadOnlyTreeView
+                    key="objects-and-search-results"
                     ref={treeViewRef}
                     height={height}
                     estimatedItemSize={singleLineTreeViewItemHeight}
@@ -805,6 +799,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
               {({ height }) => (
                 <ReadOnlyTreeView
+                  key="free-instructions"
                   ref={freeInstructionTreeViewRef}
                   height={height}
                   items={getFreeInstructionsTreeViewItems(i18n)}

@@ -5,6 +5,7 @@ import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
+import { keyNames } from '../EventsSheet/ParameterFields/KeyboardKeyField';
 
 const createField = (
   name: string,
@@ -226,7 +227,7 @@ const createField = (
         if (!object) {
           return [];
         }
-        const animationArray = mapFor(
+        const choices = mapFor(
           0,
           object.getConfiguration().getAnimationsCount(),
           i => {
@@ -239,8 +240,30 @@ const createField = (
                 };
           }
         ).filter(Boolean);
-        animationArray.push({ value: '', label: '(no animation)' });
-        return animationArray;
+        choices.push({ value: '', label: '(no animation)' });
+        return choices;
+      },
+      name,
+      valueType: 'string',
+      getValue: (instance: Instance): string => {
+        return getProperties(instance)
+          .get(name)
+          .getValue();
+      },
+      setValue: (instance: Instance, newValue: string) => {
+        onUpdateProperty(instance, name, newValue);
+      },
+      getLabel,
+    };
+  } else if (valueType === 'keyboardkey') {
+    return {
+      getChoices: () => {
+        const choices = keyNames.map(keyName => ({
+          value: keyName,
+          label: keyName,
+        }));
+        choices.push({ value: '', label: '(no key)' });
+        return choices;
       },
       name,
       valueType: 'string',

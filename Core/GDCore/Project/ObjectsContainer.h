@@ -169,10 +169,7 @@ class GD_CORE_API ObjectsContainer {
   /**
    * \brief Clear all groups of the container.
    */
-  void Clear() {
-    rootFolder->Clear();
-    initialObjects.clear();
-  }
+  void Clear();
 
   /**
    * Provide a raw access to the vector containing the objects

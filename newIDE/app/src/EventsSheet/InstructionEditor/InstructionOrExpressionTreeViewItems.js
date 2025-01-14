@@ -55,7 +55,6 @@ export const createFreeInstructionTreeViewItem = ({
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
       // $FlowFixMe
-
       if (typeof subInstructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
         const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;

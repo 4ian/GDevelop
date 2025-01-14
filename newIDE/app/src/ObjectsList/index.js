@@ -54,6 +54,8 @@ import {
 } from './ObjectFolderTreeViewItemContent';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -73,6 +75,33 @@ const styles = {
   },
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
+};
+
+export const getLabelsForObjectsAndGroupsLists = (
+  scope: EventsScope
+): {|
+  localScopeObjectsTitle: MessageDescriptor,
+  higherScopeObjectsTitle: MessageDescriptor | null,
+  localScopeGroupsTitle: MessageDescriptor | null,
+  higherScopeGroupsTitle: MessageDescriptor | null,
+|} => {
+  if (scope.layout) {
+    return {
+      localScopeObjectsTitle: t`Scene Objects`,
+      higherScopeObjectsTitle: t`Global Objects`,
+      localScopeGroupsTitle: t`Scene Groups`,
+      higherScopeGroupsTitle: t`Global Groups`,
+    };
+  } else if (scope.eventsBasedObject) {
+    return {
+      localScopeObjectsTitle: t`Object's children`,
+      higherScopeObjectsTitle: null, // Global objects not accessible from custom object.
+      localScopeGroupsTitle: t`Object's groups`,
+      higherScopeGroupsTitle: null,
+    };
+  }
+
+  throw new Error('Scope not recognized.');
 };
 
 export const getTreeViewItemIdFromObjectFolderOrObject = (
@@ -1022,6 +1051,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ? globalObjectsContainer.getRootFolder()
       : null;
     const objectsRootFolder = objectsContainer.getRootFolder();
+    const labels = React.useMemo(
+      () =>
+        getLabelsForObjectsAndGroupsLists(
+          projectScopedContainersAccessor.getScope()
+        ),
+      [projectScopedContainersAccessor]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -1032,7 +1069,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               isRoot: true,
               content: new LabelTreeViewItemContent(
                 globalObjectsRootFolderId,
-                i18n._(t`Global Objects`),
+                i18n._(labels.higherScopeObjectsTitle),
                 null,
                 () => [
                   {
@@ -1083,7 +1120,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             isRoot: true,
             content: new LabelTreeViewItemContent(
               sceneObjectsRootFolderId,
-              i18n._(t`Scene Objects`),
+              i18n._(labels.localScopeObjectsTitle),
               {
                 icon: <Add />,
                 label: t`Add an object`,
@@ -1141,6 +1178,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onAddNewObject,
         onExportAssets,
         selectedObjectFolderOrObjectsWithContext,
+        labels,
       ]
     );
 

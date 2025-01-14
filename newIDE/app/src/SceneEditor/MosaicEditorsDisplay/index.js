@@ -430,6 +430,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 globalObjectsContainer &&
                 globalObjectsContainer.getObjectGroups()
               }
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               objectGroups={objectsContainer.getObjectGroups()}
               onCreateGroup={props.onCreateObjectGroup}
               onEditGroup={props.onEditObjectGroup}

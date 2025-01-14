@@ -26,6 +26,9 @@ export const Default = () => (
           globalObjectGroups={testProject.project
             .getObjects()
             .getObjectGroups()}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
           onCreateGroup={action('onCreateGroup')}
           onEditGroup={action('onEditGroup')}

@@ -26,6 +26,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { getLabelsForObjectsAndGroupsLists } from '../ObjectsList';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -92,6 +94,7 @@ export type ObjectGroupsListInterface = {|
 type Props = {|
   globalObjectGroups: gdObjectGroupsContainer | null,
   objectGroups: gdObjectGroupsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
   onCreateGroup: () => void,
@@ -112,6 +115,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
   (props, ref) => {
     const {
       globalObjectGroups,
+      projectScopedContainersAccessor,
       objectGroups,
       onCreateGroup,
       onDeleteGroup,
@@ -519,6 +523,14 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       [onCreateGroup]
     );
 
+    const labels = React.useMemo(
+      () =>
+        getLabelsForObjectsAndGroupsLists(
+          projectScopedContainersAccessor.getScope()
+        ),
+      [projectScopedContainersAccessor]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const objectGroupsList: GroupWithContextList = enumerateGroups(
@@ -533,7 +545,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const treeViewItems = [
           globalObjectGroups && {
-            label: i18n._(t`Global Groups`),
+            label: i18n._(labels.higherScopeGroupsTitle),
             children:
               globalObjectGroupsList.length > 0
                 ? globalObjectGroupsList
@@ -543,7 +555,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             id: globalGroupsRootFolderId,
           },
           {
-            label: i18n._(t`Scene Groups`),
+            label: i18n._(labels.localScopeGroupsTitle),
             children:
               objectGroupsList.length > 0
                 ? objectGroupsList
@@ -556,7 +568,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         return treeViewItems;
       },
-      [globalObjectGroups, objectGroups]
+      [globalObjectGroups, objectGroups, labels]
     );
 
     React.useEffect(

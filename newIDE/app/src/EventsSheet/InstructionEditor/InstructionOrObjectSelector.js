@@ -18,16 +18,10 @@ import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { List, type ListItemRefType } from '../../UI/List';
 import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
-import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs } from '../../UI/Tabs';
 import { enumerateObjectsAndGroups } from '../../ObjectsList/EnumerateObjects';
-import RaisedButton from '../../UI/RaisedButton';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { getInstructionListItemValue } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
@@ -36,7 +30,6 @@ import {
   getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
-import Add from '../../UI/CustomSvgIcons/Add';
 import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ReadOnlyTreeView, {
@@ -60,10 +53,17 @@ import {
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import {
+  createFreeInstructionTreeViewItem,
+  InstructionTreeViewItemContent as FreeInstructionTreeViewItemContent,
+  getInstructionGroupId,
+} from './InstructionOrExpressionTreeViewItems';
 
 const gd: libGDevelop = global.gd;
 
-const ICON_SIZE = 24;
+const singleLineTreeViewItemHeight = 32;
+const twoLinesTreeViewItemHeight = 44;
+
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
 const LOCAL_OBJECTS_ROOT_ITEM_ID = 'local-objects';
 const HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID = 'higher-scope-objects';
@@ -170,8 +170,8 @@ const shouldApplySearchToItem = (item: TreeViewItem) =>
 const getTreeViewItemHeight = (item: TreeViewItem) =>
   item.content instanceof InstructionTreeViewItemContent ||
   item.content instanceof MoreResultsTreeViewItemContent
-    ? 44
-    : 32;
+    ? twoLinesTreeViewItemHeight
+    : singleLineTreeViewItemHeight;
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemDescription = (item: TreeViewItem) =>
   item.content.getDescription();
@@ -231,12 +231,12 @@ const InstructionOrObjectSelector = React.forwardRef<
     ref
   ) => {
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
-    const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
     const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
       null
     );
-    const selectedInstructionItemRef = React.useRef<?ListItemRefType>(null);
-    // Free instructions, to be displayed in a tab next to the objects.
+    const freeInstructionTreeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
+      null
+    );
     const freeInstructionsInfoTreeRef = React.useRef<InstructionOrExpressionTreeNode>(
       createTree(
         filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -247,6 +247,19 @@ const InstructionOrObjectSelector = React.forwardRef<
     );
     const initialInstructionTypePathRef = React.useRef<?Array<string>>(
       findInTree(freeInstructionsInfoTreeRef.current, chosenInstructionType)
+    );
+    const initialInstructionAscendanceRef = React.useRef<Array<string>>(
+      initialInstructionTypePathRef.current
+        ? initialInstructionTypePathRef.current.reduce(
+            (nodeIds, categoryName) => {
+              const parentId =
+                nodeIds.length > 0 ? nodeIds[nodeIds.length - 1] : null;
+              nodeIds.push(getInstructionGroupId(categoryName, parentId));
+              return nodeIds;
+            },
+            []
+          )
+        : []
     );
     // All the instructions, to be used when searching, so that the search is done
     // across all the instructions (including object and behaviors instructions).
@@ -329,6 +342,11 @@ const InstructionOrObjectSelector = React.forwardRef<
           : []),
       ].map(getObjectFolderTreeViewItemId)
     );
+    const initiallyOpenedInstructionsGroupIdsRef = React.useRef<string[]>([
+      ...Object.keys(freeInstructionsInfoTreeRef.current).map(categoryName =>
+        getInstructionGroupId(categoryName)
+      ),
+    ]);
 
     const forceUpdate = useForceUpdate();
 
@@ -349,9 +367,6 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     React.useLayoutEffect(
       () => {
-        if (selectedInstructionItemRef.current && scrollViewRef.current) {
-          scrollViewRef.current.scrollTo(selectedInstructionItemRef.current);
-        }
         if (chosenObjectName) {
           const objectOrGroupName = chosenObjectName;
           const treeView = treeViewRef.current;
@@ -393,10 +408,34 @@ const InstructionOrObjectSelector = React.forwardRef<
           if (timeoutId) {
             return () => clearTimeout(timeoutId);
           }
+        } else if (chosenInstructionType) {
+          const treeView = freeInstructionTreeViewRef.current;
+          if (!treeView) return;
+
+          let timeoutId;
+          for (const item of treeView.getDisplayedItemsIterator()) {
+            if (item.content instanceof FreeInstructionTreeViewItemContent) {
+              const instructionMetadata = item.content.getInstructionMetadata();
+              if (!instructionMetadata) return;
+              if (instructionMetadata.type === chosenInstructionType) {
+                setSelectedItem(item);
+                timeoutId = setTimeout(
+                  () => treeView.scrollToItem(item, 'start'),
+                  // We have to wait for a first render otherwise the tree view
+                  // considers it has a size of 0 and its computations are wrong.
+                  50
+                );
+                break;
+              }
+            }
+          }
+          if (timeoutId) {
+            return () => clearTimeout(timeoutId);
+          }
         }
       },
       // Scroll to and select the already chosen object/instruction at opening.
-      [chosenObjectName]
+      [chosenObjectName, chosenInstructionType]
     );
 
     const getTreeViewItemChildren = (item: TreeViewItem) =>
@@ -509,6 +548,12 @@ const InstructionOrObjectSelector = React.forwardRef<
     };
 
     const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
+
+    const getFreeInstructionsTreeViewItems = i18n =>
+      createFreeInstructionTreeViewItem({
+        instructionOrGroup: freeInstructionsInfoTreeRef.current,
+        freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
+      });
 
     const getTreeViewItems = i18n =>
       [
@@ -680,7 +725,7 @@ const InstructionOrObjectSelector = React.forwardRef<
                   <ReadOnlyTreeView
                     ref={treeViewRef}
                     height={height}
-                    estimatedItemSize={32}
+                    estimatedItemSize={singleLineTreeViewItemHeight}
                     items={getTreeViewItems(i18n)}
                     getItemHeight={getTreeViewItemHeight}
                     getItemName={getTreeViewItemName}
@@ -755,40 +800,86 @@ const InstructionOrObjectSelector = React.forwardRef<
             </div>
           )
         ) : (
-          <ScrollView ref={scrollViewRef} autoHideScrollbar>
-            <List>
-              <>
-                {renderInstructionOrExpressionTree({
-                  instructionTreeNode: freeInstructionsInfoTreeRef.current,
-                  onChoose: onChooseInstruction,
-                  iconSize: ICON_SIZE,
-                  useSubheaders: true,
-                  selectedValue: chosenInstructionType
-                    ? getInstructionListItemValue(chosenInstructionType)
-                    : undefined,
-                  initiallyOpenedPath: initialInstructionTypePathRef.current,
-                  selectedItemRef: selectedInstructionItemRef,
-                  getGroupIconSrc: getInstructionIconSrc,
-                })}
-                {onClickMore && (
-                  <ResponsiveLineStackLayout justifyContent="center">
-                    <RaisedButton
-                      primary
-                      icon={<Add />}
-                      onClick={onClickMore}
-                      label={
-                        isCondition ? (
-                          <Trans>Search for new conditions in extensions</Trans>
-                        ) : (
-                          <Trans>Search for new actions in extensions</Trans>
-                        )
-                      }
-                    />
-                  </ResponsiveLineStackLayout>
-                )}
-              </>
-            </List>
-          </ScrollView>
+          <div style={styles.treeViewContainer}>
+            <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
+              {({ height }) => (
+                <ReadOnlyTreeView
+                  ref={freeInstructionTreeViewRef}
+                  height={height}
+                  items={getFreeInstructionsTreeViewItems(i18n)}
+                  getItemHeight={() => singleLineTreeViewItemHeight}
+                  getItemName={getTreeViewItemName}
+                  shouldApplySearchToItem={() => false}
+                  getItemDescription={getTreeViewItemDescription}
+                  getItemId={getTreeViewItemId}
+                  getItemHtmlId={getTreeViewItemHtmlId}
+                  getItemChildren={getTreeViewItemChildren}
+                  getItemThumbnail={getTreeViewItemThumbnail}
+                  getItemDataset={getTreeViewItemDataset}
+                  selectedItems={selectedItem ? [selectedItem] : []}
+                  initiallyOpenedNodeIds={Array.from(
+                    new Set([
+                      ...initiallyOpenedInstructionsGroupIdsRef.current,
+                      ...initialInstructionAscendanceRef.current,
+                    ])
+                  )}
+                  onSelectItems={(items: TreeViewItem[]) => {
+                    if (!items) return;
+                    const item = items[0];
+                    if (!item || item.isRoot) return;
+                    const itemContentToSelect = item.content;
+                    if (
+                      itemContentToSelect instanceof
+                      FreeInstructionTreeViewItemContent
+                    ) {
+                      const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                      if (!instructionMetadata) return;
+                      onChooseInstruction(
+                        instructionMetadata.type,
+                        instructionMetadata
+                      );
+                      setSelectedItem(item);
+                    }
+                  }}
+                  multiSelect={false}
+                />
+              )}
+            </AutoSizer>
+          </div>
+          // <ScrollView ref={scrollViewRef} autoHideScrollbar>
+          //   <List>
+          //     <>
+          //       {renderInstructionOrExpressionTree({
+          //         instructionTreeNode: freeInstructionsInfoTreeRef.current,
+          //         onChoose: onChooseInstruction,
+          //         iconSize: ICON_SIZE,
+          //         useSubheaders: true,
+          //         selectedValue: chosenInstructionType
+          //           ? getInstructionListItemValue(chosenInstructionType)
+          //           : undefined,
+          //         initiallyOpenedPath: initialInstructionTypePathRef.current,
+          //         selectedItemRef: selectedInstructionItemRef,
+          //         getGroupIconSrc: getInstructionIconSrc,
+          //       })}
+          //       {onClickMore && (
+          //         <ResponsiveLineStackLayout justifyContent="center">
+          //           <RaisedButton
+          //             primary
+          //             icon={<Add />}
+          //             onClick={onClickMore}
+          //             label={
+          //               isCondition ? (
+          //                 <Trans>Search for new conditions in extensions</Trans>
+          //               ) : (
+          //                 <Trans>Search for new actions in extensions</Trans>
+          //               )
+          //             }
+          //           />
+          //         </ResponsiveLineStackLayout>
+          //       )}
+          //     </>
+          //   </List>
+          // </ScrollView>
         )}
       </div>
     );

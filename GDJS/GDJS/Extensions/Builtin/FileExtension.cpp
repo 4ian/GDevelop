@@ -36,7 +36,6 @@ FileExtension::FileExtension() {
   GetAllActions()["DeleteGroupFichier"].SetFunctionName(
       "gdjs.evtTools.storage.deleteElementFromJSONFile");
   GetAllActions()["DeleteFichier"]
-      .SetGroup(_("Storage"))
       .SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are

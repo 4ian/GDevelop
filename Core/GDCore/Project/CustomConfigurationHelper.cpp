@@ -24,13 +24,13 @@ void CustomConfigurationHelper::InitializeContent(
     auto &element = configurationContent.AddChild(property->GetName());
     auto propertyType = property->GetType();
 
-    if (propertyType == "String" || propertyType == "Choice" ||
-        propertyType == "Color" || propertyType == "Behavior" ||
-        propertyType == "Resource" || propertyType == "LeaderboardId") {
+    const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+        gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType));
+    if (primitiveType == "string") {
       element.SetStringValue(property->GetValue());
-    } else if (propertyType == "Number") {
+    } else if (primitiveType == "number") {
       element.SetDoubleValue(property->GetValue().To<double>());
-    } else if (propertyType == "Boolean") {
+    } else if (primitiveType == "boolean") {
       element.SetBoolValue(property->GetValue() == "true");
     }
   }

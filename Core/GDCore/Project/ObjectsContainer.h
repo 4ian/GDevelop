@@ -167,6 +167,14 @@ class GD_CORE_API ObjectsContainer {
       std::size_t newPosition);
 
   /**
+   * \brief Clear all groups of the container.
+   */
+  void Clear() {
+    rootFolder->Clear();
+    initialObjects.clear();
+  }
+
+  /**
    * Provide a raw access to the vector containing the objects
    */
   std::vector<std::unique_ptr<gd::Object> >& GetObjects() {

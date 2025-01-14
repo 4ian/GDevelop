@@ -8,10 +8,11 @@ import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import classes from './TreeView.module.css';
-import { type ItemBaseAttributes } from '.';
+import { type ItemBaseAttributes } from './ReadOnlyTreeView';
 import { type ItemData } from './ReadOnlyTreeView';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import classNames from 'classnames';
+import RaisedButton from '../RaisedButton';
 
 const iconSize = 24;
 
@@ -50,6 +51,23 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     },
     [node, onOpen, index]
   );
+
+  if (node.item.displayAsPrimaryButton) {
+    return (
+      <div style={style} ref={containerRef}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+          }}
+        >
+          <RaisedButton primary onClick={onClickItem} label={node.name} />
+        </div>
+      </div>
+    );
+  }
 
   const displayAsFolder = node.canHaveChildren;
 

@@ -56,6 +56,8 @@ import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import {
   createFreeInstructionTreeViewItem,
   InstructionTreeViewItemContent as FreeInstructionTreeViewItemContent,
+  MoreResultsTreeViewItemContent as MoreInstructionsTreeViewItemContent,
+  LeafTreeViewItem as InstructionLeafTreeViewItem,
   getInstructionGroupId,
 } from './InstructionOrExpressionTreeViewItems';
 
@@ -169,7 +171,8 @@ const shouldApplySearchToItem = (item: TreeViewItem) =>
   item.content.applySearch;
 const getTreeViewItemHeight = (item: TreeViewItem) =>
   item.content instanceof InstructionTreeViewItemContent ||
-  item.content instanceof MoreResultsTreeViewItemContent
+  item.content instanceof MoreResultsTreeViewItemContent ||
+  item.content instanceof MoreInstructionsTreeViewItemContent
     ? twoLinesTreeViewItemHeight
     : singleLineTreeViewItemHeight;
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -543,10 +546,25 @@ const InstructionOrObjectSelector = React.forwardRef<
     const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
 
     const getFreeInstructionsTreeViewItems = i18n =>
-      createFreeInstructionTreeViewItem({
-        instructionOrGroup: freeInstructionsInfoTreeRef.current,
-        freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
-      });
+      [
+        ...createFreeInstructionTreeViewItem({
+          instructionOrGroup: freeInstructionsInfoTreeRef.current,
+          freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
+        }),
+        onClickMore
+          ? new InstructionLeafTreeViewItem(
+              new MoreInstructionsTreeViewItemContent(
+                isCondition ? (
+                  <Trans>Search for new conditions in extensions</Trans>
+                ) : (
+                  <Trans>Search for new actions in extensions</Trans>
+                ),
+                onClickMore
+              ),
+              true
+            )
+          : null,
+      ].filter(Boolean);
 
     const getTreeViewItems = i18n =>
       [
@@ -820,7 +838,7 @@ const InstructionOrObjectSelector = React.forwardRef<
                 ref={freeInstructionTreeViewRef}
                 height={height}
                 items={getFreeInstructionsTreeViewItems(i18n)}
-                getItemHeight={() => singleLineTreeViewItemHeight}
+                getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={() => false}
                 getItemDescription={getTreeViewItemDescription}
@@ -852,6 +870,11 @@ const InstructionOrObjectSelector = React.forwardRef<
                       instructionMetadata
                     );
                     setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    MoreInstructionsTreeViewItemContent
+                  ) {
+                    itemContentToSelect.onClick();
                   }
                 }}
                 multiSelect={false}

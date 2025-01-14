@@ -20,6 +20,7 @@ export const navigationKeys = [
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
+  +displayAsPrimaryButton?: boolean,
 };
 
 type FlattenedNode<Item> = {|

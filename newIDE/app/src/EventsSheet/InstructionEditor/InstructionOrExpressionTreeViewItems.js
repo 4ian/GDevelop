@@ -19,15 +19,18 @@ export interface TreeViewItemContent {
 
 export interface TreeViewItem {
   isRoot?: boolean;
+  displayAsPrimaryButton?: boolean;
   +content: TreeViewItemContent;
   getChildren(): ?Array<TreeViewItem>;
 }
 
 export class LeafTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
+  displayAsPrimaryButton: boolean;
 
-  constructor(content: TreeViewItemContent) {
+  constructor(content: TreeViewItemContent, displayAsPrimaryButton?: boolean) {
     this.content = content;
+    this.displayAsPrimaryButton = !!displayAsPrimaryButton;
   }
 
   getChildren(): ?Array<TreeViewItem> {
@@ -195,5 +198,36 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
   }
   getThumbnail() {
     return this.instructionMetadata.iconFilename;
+  }
+}
+
+export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
+  applySearch = false;
+  name: React.Node;
+  onClick: () => void;
+
+  constructor(name: React.Node, onClick: () => void) {
+    this.name = name;
+    this.onClick = onClick;
+  }
+
+  getName() {
+    return this.name;
+  }
+  getDescription(): string | null {
+    return null;
+  }
+
+  getId() {
+    return `more-instructions`;
+  }
+  getHtmlId() {
+    return null;
+  }
+  getDataSet() {
+    return {};
+  }
+  getThumbnail() {
+    return null;
   }
 }

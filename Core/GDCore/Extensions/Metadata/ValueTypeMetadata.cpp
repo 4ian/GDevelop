@@ -98,7 +98,7 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
   } else if (propertyType == "ObjectAnimationName") {
     return objectAnimationNameValueType;
   }
-  // For "String" or default
+  // For "String", "Resource" or default
   return stringValueType;
 };
 

@@ -316,6 +316,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String choiceValueType;
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
+  static const gd::String objectAnimationNameValueType;
 };
 
 }  // namespace gd

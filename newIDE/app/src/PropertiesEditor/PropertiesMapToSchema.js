@@ -220,7 +220,7 @@ const createField = (
       getLabel,
       getDescription,
     };
-  } else if (valueType === 'animationname') {
+  } else if (valueType === 'objectanimationname') {
     return {
       getChoices: () => {
         if (!object) {
@@ -231,13 +231,12 @@ const createField = (
           object.getConfiguration().getAnimationsCount(),
           i => {
             const animationName = object.getConfiguration().getAnimationName(i);
-            if (animationName === '') {
-              return null;
-            }
-            return {
-              value: animationName,
-              label: animationName,
-            };
+            return animationName === ''
+              ? null
+              : {
+                  value: animationName,
+                  label: animationName,
+                };
           }
         ).filter(Boolean);
         animationArray.push({ value: '', label: '(no animation)' });

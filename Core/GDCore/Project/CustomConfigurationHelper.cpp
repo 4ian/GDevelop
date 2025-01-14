@@ -50,17 +50,16 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
 
     auto &newProperty = objectProperties[propertyName];
 
+    const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+        gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType));
     if (configurationContent.HasChild(propertyName)) {
-      if (propertyType == "String" || propertyType == "Choice" ||
-          propertyType == "Color" || propertyType == "Behavior" ||
-          propertyType == "Resource" || propertyType == "LeaderboardId" ||
-          propertyType == "AnimationName") {
+      if (primitiveType == "string") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetStringValue());
-      } else if (propertyType == "Number") {
+      } else if (primitiveType == "number") {
         newProperty.SetValue(gd::String::From(
             configurationContent.GetChild(propertyName).GetDoubleValue()));
-      } else if (propertyType == "Boolean") {
+      } else if (primitiveType == "boolean") {
         newProperty.SetValue(
             configurationContent.GetChild(propertyName).GetBoolValue()
                 ? "true"
@@ -88,14 +87,13 @@ bool CustomConfigurationHelper::UpdateProperty(
   auto &element = configurationContent.AddChild(propertyName);
   const gd::String &propertyType = property.GetType();
 
-  if (propertyType == "String" || propertyType == "Choice" ||
-      propertyType == "Color" || propertyType == "Behavior" ||
-      propertyType == "Resource" || propertyType == "LeaderboardId" || 
-      propertyType == "AnimationName") {
+  const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType));
+  if (primitiveType == "string") {
     element.SetStringValue(newValue);
-  } else if (propertyType == "Number") {
+  } else if (primitiveType == "number") {
     element.SetDoubleValue(newValue.To<double>());
-  } else if (propertyType == "Boolean") {
+  } else if (primitiveType == "boolean") {
     element.SetBoolValue(newValue == "1");
   }
 

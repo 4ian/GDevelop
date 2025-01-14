@@ -155,9 +155,9 @@ export class InstructionGroupTreeViewItemContent
     };
   }
   getThumbnail() {
-    return (
-      this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc
-    );
+    return !this.props.parentId
+      ? 'NONE'
+      : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
   }
 }
 

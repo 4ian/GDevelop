@@ -114,7 +114,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                         <ArrowHeadBottom fontSize="small" />
                       )}
                     </IconButton>
-                    {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
+                    {!node.thumbnailSrc ||
+                    node.thumbnailSrc === 'NONE' ? null : node.thumbnailSrc !==
+                      'FOLDER' ? (
                       <div className={classes.thumbnail}>
                         <ListIcon iconSize={iconSize} src={node.thumbnailSrc} />
                       </div>

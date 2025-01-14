@@ -82,14 +82,17 @@ module.exports = {
       else if(propertyName === 'maxLength')
       {
         objectContent.maxLength = newValue;
+        return true;
       }
       else if (propertyName === 'padding')
       {
         objectContent.padding = newValue;
+        return true;
       }
       else if(propertyName === 'textAlignement')
       {
         objectContent.textAlignement = newValue;
+        return true;
       }
 
       return false;

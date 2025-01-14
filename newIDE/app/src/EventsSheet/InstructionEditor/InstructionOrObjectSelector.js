@@ -88,7 +88,7 @@ const getLabelsForContainers = (
   } else if (scope.eventsBasedObject) {
     return {
       localScopeObjectsTitle: t`Parameters`,
-      higherScopeObjectsTitle: t`Object's children object`,
+      higherScopeObjectsTitle: t`Object's children`,
       localScopeGroupsTitle: null, // Parameters cannot be put into groups.
       higherScopeGroupsTitle: t`Object's children groups`,
     };
@@ -530,8 +530,8 @@ const InstructionOrObjectSelector = React.forwardRef<
               isRoot: true,
               content: new LabelTreeViewItemContent(
                 HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
-                labels.higherScopeGroupsTitle
-                  ? i18n._(labels.higherScopeGroupsTitle)
+                labels.higherScopeObjectsTitle
+                  ? i18n._(labels.higherScopeObjectsTitle)
                   : ''
               ),
               objectTreeViewItemProps,

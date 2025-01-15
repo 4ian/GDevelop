@@ -141,7 +141,7 @@ class GD_CORE_API ExpressionParameterReplacer
           parameterMetadata->GetValueTypeMetadata();
       if (gd::EventsParameterReplacer::CanContainParameter(
               parameterTypeMetadata)) {
-        isParentTypeAVariable = parameterTypeMetadata.IsVariable();
+        isParentTypeAVariable = parameterTypeMetadata.IsVariableOnly();
         parameter->Visit(*this);
       }
     }
@@ -197,7 +197,7 @@ bool EventsParameterReplacer::DoVisitInstruction(gd::Instruction& instruction,
         if (node) {
           ExpressionParameterReplacer renamer(
               platform, GetProjectScopedContainers(),
-              parameterMetadata.GetValueTypeMetadata().IsVariable(),
+              parameterMetadata.GetValueTypeMetadata().IsVariableOnly(),
               oldToNewPropertyNames);
           node->Visit(renamer);
 
@@ -221,7 +221,7 @@ bool EventsParameterReplacer::DoVisitEventExpression(
   if (node) {
     ExpressionParameterReplacer renamer(
         platform, GetProjectScopedContainers(),
-        metadata.GetValueTypeMetadata().IsVariable(), oldToNewPropertyNames);
+        metadata.GetValueTypeMetadata().IsVariableOnly(), oldToNewPropertyNames);
     node->Visit(renamer);
 
     if (renamer.HasDoneRenaming()) {

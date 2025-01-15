@@ -13,10 +13,8 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariablesOfContainersList } from './EnumerateVariables';
+import { enumerateVariablesOrPropertiesOrParametersOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
-
-const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
@@ -45,7 +43,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
-        enumerateVariablesOfContainersList(
+        enumerateVariablesOrPropertiesOrParametersOfContainersList(
           projectScopedContainersAccessor.get().getVariablesContainersList()
         ),
       [projectScopedContainersAccessor]
@@ -62,12 +60,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           i => {
             return variablesContainersList.getVariablesContainer(i);
           }
-        ).filter(
-          variableContainer =>
-            variableContainer.getSourceType() !==
-              gd.VariablesContainer.Parameters &&
-            variableContainer.getSourceType() !==
-              gd.VariablesContainer.Properties
         );
       },
       [projectScopedContainersAccessor]
@@ -139,5 +131,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
-  renderVariableWithIcon(props, 'variable');
+export const renderInlineAnyVariableOrPropertyOrParameter = (
+  props: ParameterInlineRendererProps
+) => renderVariableWithIcon(props, 'variable');

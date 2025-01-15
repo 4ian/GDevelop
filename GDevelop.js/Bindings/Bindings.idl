@@ -307,11 +307,12 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::Object",
   "VariablesContainer::Local",
   "VariablesContainer::ExtensionGlobal",
-  "VariablesContainer::ExtensionScene"
+  "VariablesContainer::ExtensionScene",
+  "VariablesContainer::Parameters",
+  "VariablesContainer::Properties",
 };
 
 interface VariablesContainer {
-    void VariablesContainer();
     void VariablesContainer(VariablesContainer_SourceType sourceType);
 
     VariablesContainer_SourceType GetSourceType();
@@ -712,21 +713,26 @@ interface ProjectScopedContainers {
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] VariablesContainer propertyVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
         [Const, Ref] Project project,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Const, Ref] EventsFunction eventsFunction,
-        [Ref] ObjectsContainer parameterObjectsContainer);
+        [Ref] ObjectsContainer parameterObjectsContainer,
+        [Ref] VariablesContainer parameterVariablesContainer,
+        [Ref] VariablesContainer propertyVariablesContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForEventsBasedObject(
         [Const, Ref] Project project,
@@ -2555,6 +2561,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] ObjectsContainer parameterObjectsContainer,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_ChangeParameterType(
+      [Ref] Project project,
+      [Ref] ProjectScopedContainers projectScopedContainers,
+      [Ref] EventsFunction eventsFunction,
+      [Const, Ref] ObjectsContainer parameterObjectsContainer,
+      [Const] DOMString parameterName);
     void STATIC_MoveEventsFunctionParameter(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2587,12 +2599,22 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_ChangeEventsBasedBehaviorPropertyType(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString propertyName);
     void STATIC_RenameEventsBasedObjectProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const, Ref] EventsBasedObject eventsBasedObject,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_ChangeEventsBasedObjectPropertyType(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString propertyName);
     void STATIC_RenameEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

@@ -6,6 +6,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/IDE/EventsFunctionTools.h"
 
 namespace gd {
 
@@ -38,6 +39,78 @@ VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtensi
   variablesContainersList.Push(extension.GetGlobalVariables());
   variablesContainersList.Push(extension.GetSceneVariables());
   variablesContainersList.firstLocalVariableContainerIndex = 2;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForFreeEventsFunction(
+    const gd::EventsFunctionsExtension &extension,
+    const gd::EventsFunction &eventsFunction,
+    gd::VariablesContainer &parameterVariablesContainer) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+
+  gd::EventsFunctionTools::ParametersToVariablesContainer(
+      eventsFunction.GetParametersForEvents(extension),
+      parameterVariablesContainer);
+  variablesContainersList.Push(parameterVariablesContainer);
+
+  variablesContainersList.firstLocalVariableContainerIndex = 3;
+  return variablesContainersList;
+}
+
+VariablesContainersList VariablesContainersList::
+    MakeNewVariablesContainersListForBehaviorEventsFunction(
+        const gd::EventsFunctionsExtension &extension,
+        const gd::EventsBasedBehavior &eventsBasedBehavior,
+        const gd::EventsFunction &eventsFunction,
+        gd::VariablesContainer &parameterVariablesContainer,
+        gd::VariablesContainer &propertyVariablesContainer) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+
+  gd::EventsFunctionTools::PropertiesToVariablesContainer(
+      eventsBasedBehavior.GetSharedPropertyDescriptors(), propertyVariablesContainer);
+  variablesContainersList.Push(propertyVariablesContainer);
+
+  gd::EventsFunctionTools::PropertiesToVariablesContainer(
+      eventsBasedBehavior.GetPropertyDescriptors(), propertyVariablesContainer);
+  variablesContainersList.Push(propertyVariablesContainer);
+
+  gd::EventsFunctionTools::ParametersToVariablesContainer(
+      eventsFunction.GetParametersForEvents(
+          eventsBasedBehavior.GetEventsFunctions()),
+      parameterVariablesContainer);
+  variablesContainersList.Push(parameterVariablesContainer);
+
+  variablesContainersList.firstLocalVariableContainerIndex = 5;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForObjectEventsFunction(
+    const gd::EventsFunctionsExtension &extension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    const gd::EventsFunction &eventsFunction,
+    gd::VariablesContainer &parameterVariablesContainer,
+    gd::VariablesContainer &propertyVariablesContainer) {
+  VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+
+  gd::EventsFunctionTools::PropertiesToVariablesContainer(
+      eventsBasedObject.GetPropertyDescriptors(), propertyVariablesContainer);
+  variablesContainersList.Push(propertyVariablesContainer);
+
+  gd::EventsFunctionTools::ParametersToVariablesContainer(
+      eventsFunction.GetParametersForEvents(
+          eventsBasedObject.GetEventsFunctions()),
+      parameterVariablesContainer);
+  variablesContainersList.Push(parameterVariablesContainer);
+
+  variablesContainersList.firstLocalVariableContainerIndex = 4;
   return variablesContainersList;
 }
 

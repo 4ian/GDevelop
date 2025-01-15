@@ -37,6 +37,8 @@ export enum VariablesContainer_SourceType {
   Local = 4,
   ExtensionGlobal = 5,
   ExtensionScene = 6,
+  Parameters = 7,
+  Properties = 8,
 }
 
 export enum ObjectsContainer_SourceType {
@@ -334,7 +336,6 @@ export class Variable extends EmscriptenObject {
 }
 
 export class VariablesContainer extends EmscriptenObject {
-  constructor();
   constructor(sourceType: VariablesContainer_SourceType);
   getSourceType(): VariablesContainer_SourceType;
   has(name: string): boolean;
@@ -638,9 +639,9 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
   static makeNewProjectScopedContainersForProject(project: Project): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterVariablesContainer: VariablesContainer, propertyVariablesContainer: VariablesContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersForEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, outputObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
@@ -1928,12 +1929,15 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static renameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
   static renameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
   static renameParameter(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
+  static changeParameterType(project: Project, projectScopedContainers: ProjectScopedContainers, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer, parameterName: string): void;
   static moveEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
   static moveObjectEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;
   static renameEventsBasedBehaviorProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
   static renameEventsBasedBehaviorSharedProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
+  static changeEventsBasedBehaviorPropertyType(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, propertyName: string): void;
   static renameEventsBasedObjectProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
+  static changeEventsBasedObjectPropertyType(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, propertyName: string): void;
   static renameEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateBehaviorNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceBehaviorName: string): void;
   static renameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;

@@ -70,18 +70,23 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsFunctionsExtensi
 
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
-    const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &parameterObjectsContainer) {
+    gd::ObjectsContainer &parameterObjectsContainer,
+    gd::VariablesContainer &parameterVariablesContainer) {
 
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, eventsFunctionsExtension, eventsFunction, parameterObjectsContainer);
+      project, eventsFunctionsExtension, eventsFunction,
+      parameterObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(
           parameterObjectsContainer),
       VariablesContainersList::
-          MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
+          MakeNewVariablesContainersListForFreeEventsFunction(
+              eventsFunctionsExtension, eventsFunction,
+              parameterVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
@@ -97,7 +102,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
     const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &parameterObjectsContainer) {
+    gd::ObjectsContainer &parameterObjectsContainer,
+    gd::VariablesContainer &parameterVariablesContainer,
+    gd::VariablesContainer &propertyVariablesContainer) {
 
   gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
       project,
@@ -109,7 +116,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(
           parameterObjectsContainer),
       VariablesContainersList::
-          MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
+          MakeNewVariablesContainersListForBehaviorEventsFunction(
+              eventsFunctionsExtension, eventsBasedBehavior, eventsFunction,
+              parameterVariablesContainer, propertyVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
@@ -130,7 +139,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedObject &eventsBasedObject,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &parameterObjectsContainer) {
+    gd::ObjectsContainer &parameterObjectsContainer,
+    gd::VariablesContainer &parameterVariablesContainer,
+    gd::VariablesContainer &propertyVariablesContainer) {
 
   gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
       project, eventsBasedObject, eventsFunction, parameterObjectsContainer);
@@ -140,8 +151,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
           eventsBasedObject.GetObjects(),
           parameterObjectsContainer),
       VariablesContainersList::
-          MakeNewVariablesContainersListForEventsFunctionsExtension(
-              eventsFunctionsExtension),
+          MakeNewVariablesContainersListForObjectEventsFunction(
+              eventsFunctionsExtension, eventsBasedObject, eventsFunction,
+              parameterVariablesContainer, propertyVariablesContainer),
       &eventsFunctionsExtension.GetGlobalVariables(),
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());

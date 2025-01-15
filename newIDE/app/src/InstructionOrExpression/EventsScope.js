@@ -17,15 +17,21 @@ export type EventsScope = {|
 export class ProjectScopedContainersAccessor {
   _scope: EventsScope;
   _parameterObjectsContainer: gdObjectsContainer | null;
+  _parameterVariablesContainer: gdVariablesContainer | null;
+  _propertyVariablesContainer: gdVariablesContainer | null;
   _eventPath: Array<gdBaseEvent>;
 
   constructor(
     scope: EventsScope,
     parameterObjectsContainer: gdObjectsContainer | null = null,
+    parameterVariablesContainer: gdVariablesContainer | null = null,
+    propertyVariablesContainer: gdVariablesContainer | null = null,
     eventPath: Array<gdBaseEvent> = []
   ) {
     this._scope = scope;
     this._parameterObjectsContainer = parameterObjectsContainer;
+    this._parameterVariablesContainer = parameterVariablesContainer;
+    this._propertyVariablesContainer = propertyVariablesContainer;
     this._eventPath = eventPath;
     // Trigger parameterObjectsContainer update.
     this.get();
@@ -57,28 +63,48 @@ export class ProjectScopedContainersAccessor {
         if (!this._parameterObjectsContainer) {
           throw new Error('Extension scope used without any ObjectsContainer');
         }
+        if (!this._parameterVariablesContainer) {
+          throw new Error(
+            'Extension scope used without a VariablesContainer for parameters'
+          );
+        }
         if (eventsBasedBehavior) {
+          if (!this._propertyVariablesContainer) {
+            throw new Error(
+              'Extension scope used without a VariablesContainer for properties'
+            );
+          }
           projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsBasedBehavior,
             eventsFunction,
-            this._parameterObjectsContainer
+            this._parameterObjectsContainer,
+            this._parameterVariablesContainer,
+            this._propertyVariablesContainer
           );
         } else if (eventsBasedObject) {
+          if (!this._propertyVariablesContainer) {
+            throw new Error(
+              'Extension scope used without a VariablesContainer for properties'
+            );
+          }
           projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsBasedObject,
             eventsFunction,
-            this._parameterObjectsContainer
+            this._parameterObjectsContainer,
+            this._parameterVariablesContainer,
+            this._propertyVariablesContainer
           );
         } else {
           projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
             project,
             eventsFunctionsExtension,
             eventsFunction,
-            this._parameterObjectsContainer
+            this._parameterObjectsContainer,
+            this._parameterVariablesContainer
           );
         }
       } else if (eventsBasedObject) {
@@ -116,6 +142,8 @@ export class ProjectScopedContainersAccessor {
     return new ProjectScopedContainersAccessor(
       this._scope,
       this._parameterObjectsContainer,
+      this._parameterVariablesContainer,
+      this._propertyVariablesContainer,
       [...this._eventPath, event]
     );
   }

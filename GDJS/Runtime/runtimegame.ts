@@ -167,6 +167,8 @@ namespace gdjs {
       camera: THREE.Camera;
       scene: THREE.Scene;
     } | null = null;
+    _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
+    _raycaster = new THREE.Raycaster()
     _editionAbortController: AbortController = new AbortController();
     _clearCurrentPasses: (() => void)[] = [];
     _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
@@ -316,10 +318,6 @@ namespace gdjs {
       if (!currentScene) return;
       const threeRenderer = this._game.getRenderer().getThreeRenderer();
       if (!threeRenderer) return;
-      const resolution = new THREE.Vector2(
-        window.innerWidth,
-        window.innerHeight
-      );
 
       currentScene.getAllLayerNames(layerNames);
       const firstIntersectsByLayer: {
@@ -336,9 +334,22 @@ namespace gdjs {
         const threeScene = runtimeLayerRender.getThreeScene();
         if (!threeCamera || !threeScene) return acc;
 
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(this._pointer, threeCamera);
-        const intersects = raycaster.intersectObjects(threeScene.children);
+        if (!this._outlinePasses[layerName]) {
+          this._outlinePasses[layerName] = new THREE_ADDONS.OutlinePass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            threeScene,
+            threeCamera
+          );
+
+          runtimeLayerRender.addPostProcessingPass(this._outlinePasses[layerName]);
+        }
+        const outlinePass = this._outlinePasses[layerName];
+
+        // Note that raycasting is done by Three.js, which means it could slow down
+        // if lots of 3D objects are shown. We consider that if this needs improvements,
+        // this must be handled by the game engine culling
+        this._raycaster.setFromCamera(this._pointer, threeCamera);
+        const intersects = this._raycaster.intersectObjects(threeScene.children);
 
         const firstIntersect = intersects.filter((intersect) => {
           let isObjectChildOfTransformControls = false;
@@ -358,22 +369,12 @@ namespace gdjs {
         ) {
           // TODO: OutlinePass currently wrongly highlights the transform controls helper.
           // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
-          const outlinePass = new THREE_ADDONS.OutlinePass(
-            resolution,
-            threeScene,
-            threeCamera
-          );
 
           outlinePass.edgeStrength = 6.0;
           outlinePass.edgeGlow = 0;
           outlinePass.edgeThickness = 1.0;
           outlinePass.pulsePeriod = 0;
-
           outlinePass.selectedObjects = [firstIntersect.object];
-          runtimeLayerRender.addPostProcessingPass(outlinePass);
-          this._clearCurrentPasses.push(() => {
-            runtimeLayerRender.removePostProcessingPass(outlinePass);
-          });
         }
         acc[layerName] = {
           intersect: firstIntersect,

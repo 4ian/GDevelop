@@ -88,6 +88,12 @@ type Props<Item> = {|
   items: Item[],
   estimatedItemSize: number,
   getItemHeight: Item => number,
+  /**
+   * Return false if the item should be displayed even if a search text is given
+   * and the item name does not match it. This allows for more complex search
+   * in the parent.
+   * TODO: Port this logic to the TreeView component.
+   */
   shouldApplySearchToItem: Item => boolean,
   getItemName: Item => string | React.Node,
   getItemDescription?: Item => string,
@@ -398,6 +404,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         bufferedScrollingCommandRef.current = null;
       }
     },
+    // Scroll commands do not work before the tree is rendered so the last scroll
+    // command is buffered and run when the tree view rendered for the first time.
+    // TODO: Port this logic to the TreeView component.
     [isRendered]
   );
 
@@ -508,14 +517,14 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     getItemHtmlId
   );
 
-  // Reset opened nodes during search when user stops searching
-  // or when the search text changes.
   React.useEffect(
     () => {
       if (!searchText || searchText.length > 0) {
         setOpenedDuringSearchNodeIds([]);
       }
     },
+    // Reset opened nodes during search when user stops searching
+    // or when the search text changes.
     [searchText]
   );
 

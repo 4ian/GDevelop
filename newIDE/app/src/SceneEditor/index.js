@@ -31,6 +31,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
   type HistoryState,
@@ -54,7 +55,10 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
-import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import {
+  getInstanceInLayoutWithPersistentUuid,
+  getInstancesInLayoutForObject,
+} from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 import debounce from 'lodash/debounce';
 import { mapFor } from '../Utils/MapFor';
@@ -138,6 +142,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  previewDebuggerServer: ?PreviewDebuggerServer,
 |};
 
 type State = {|
@@ -191,6 +196,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
+  unregisterDebuggerCallback: (() => void) | null = null;
 
   constructor(props: Props) {
     super(props);
@@ -248,15 +254,64 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+
+    if (this.props.previewDebuggerServer) {
+      this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
+        {
+          onErrorReceived: () => {},
+          onConnectionClosed: () => {},
+          onConnectionOpened: () => {},
+          onConnectionErrored: () => {},
+          onServerStateChanged: () => {},
+          onHandleParsedMessage: this.onReceiveMessageFromGame.bind(this),
+        }
+      );
+    }
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    if (this.unregisterDebuggerCallback) {
+      this.unregisterDebuggerCallback();
+    }
   }
 
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
+  }
+
+  onReceiveMessageFromGame({
+    id,
+    parsedMessage,
+  }: {
+    id: number,
+    parsedMessage: {| command: string, payload: any |},
+  }) {
+    if (parsedMessage.command === 'instances.updated') {
+      if (
+        !this.props.layout ||
+        this.props.layout.getName() !== parsedMessage.payload.layoutName
+      ) {
+        // TODO: handle external layout as well.
+        return;
+      }
+      const modifiedInstances: gdInitialInstance[] = [];
+      parsedMessage.payload.instances.forEach(instanceUpdateData => {
+        const { persistentUuid, position } = instanceUpdateData;
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        if (!instance) return;
+        instance.setX(position.x);
+        instance.setY(position.y);
+        instance.setZ(position.z);
+
+        modifiedInstances.push(instance);
+      });
+      this._onInstancesMoved(modifiedInstances);
+    }
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|
@@ -814,7 +869,42 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  _exportDataOnly = debounce(() => {
+    this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
+  }, 250);
+
+  /**
+   * TODO: Accept parameter that indicates which data has been modified
+   * (position, rotation, size, something else?)
+   */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
+    const { previewDebuggerServer, layout } = this.props;
+    if (!layout) {
+      // TODO: Handle external layout
+      return;
+    }
+    if (!previewDebuggerServer) return;
+
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'instances.updated',
+        payload: {
+          layoutName: layout.getName(),
+          instances: instances.map(instance => ({
+            persistentUuid: instance.getPersistentUuid(),
+            position: {
+              x: instance.getX(),
+              y: instance.getY(),
+              z: instance.getZ(),
+            },
+          })),
+        },
+      });
+    });
+    // TODO: Create a new export mode that will generate only the bare minimum
+    // so that the runtime game has up-to-date data without unnecessary reloading scripts.
+    // Once the mode exists, call it here.
+    // this._exportDataOnly();
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
   };
@@ -1971,6 +2061,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
+                onInstancesModified={this._onInstancesModified}
                 onAddObjectInstance={this.addInstanceOnTheScene}
                 selectedLayer={this.state.selectedLayer}
                 editLayer={this.editLayer}

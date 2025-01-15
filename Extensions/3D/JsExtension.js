@@ -2332,9 +2332,9 @@ module.exports = {
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
 
-        this._faceResourceNames = ['', '', '', '', '', ''];
-        this._faceVisibilities = [true, true, true, true, true, true];
-        this._shouldRepeatTextureOnFace = [true, true, true, true, true, true];
+        this._faceResourceNames = new Array(6).fill(null);
+        this._faceVisibilities = new Array(6).fill(null);
+        this._shouldRepeatTextureOnFace = new Array(6).fill(null);
         this._facesOrientation = 'Y';
         this._backFaceUpThroughWhichAxisRotation = 'X';
         this._shouldUseTransparentTexture = false;

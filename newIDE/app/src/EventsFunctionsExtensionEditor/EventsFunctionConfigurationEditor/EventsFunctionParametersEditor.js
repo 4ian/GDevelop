@@ -597,13 +597,10 @@ export const EventsFunctionParametersEditor = ({
               game.
             </Trans>
           </DismissableAlertMessage>
-          {/* TODO: Should the "Only global objects..." mention should be kept since
-        we don't show the global objects? */}
           <EmptyMessage>
             <Trans>
               This is a "lifecycle function". It will be called automatically by
-              the game engine. It has no parameters. Only global objects can be
-              used as the events will be run for all scenes in your game.
+              the game engine. It has no parameters.
             </Trans>
           </EmptyMessage>
         </Column>

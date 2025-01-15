@@ -745,6 +745,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           label={t`Object animation (text)`}
                                         />
                                         <SelectOption
+                                          key="property-type-keyboard-key"
+                                          value="KeyboardKey"
+                                          label={t`Keyboard key (text)`}
+                                        />
+                                        <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
                                           label={t`Resource (JavaScript only)`}
@@ -809,7 +814,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                       {(property.getType() === 'String' ||
                                         property.getType() === 'Number' ||
                                         property.getType() ===
-                                          'ObjectAnimationName') && (
+                                          'ObjectAnimationName' ||
+                                        property.getType() ===
+                                          'KeyboardKey') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={

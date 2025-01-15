@@ -128,12 +128,18 @@ export const keyNames = [
   'F12',
   'Pause',
 ];
-
-const isKeyValid = (keyName: string): boolean =>
-  keyNames.some(value => `"${value}"` === keyName);
+const keyNamesSet = new Set(keyNames);
 
 const stringRegex = /^"(\w*)"$/;
 const valueRegex = /^\w*$/;
+
+const isKeyValid = (expression: string): boolean => {
+  const matches = expression.match(stringRegex);
+  // Return true by default as it could be an expression.
+  return matches && matches[1] !== undefined
+    ? keyNamesSet.has(matches[1])
+    : true;
+};
 
 const getStringContent = (expression: string): string => {
   const matches = expression.match(stringRegex);

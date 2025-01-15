@@ -37,6 +37,7 @@ import {
   type LeaderboardIdField,
 } from '../CompactPropertiesEditor';
 import LeaderboardIdPropertyField from './LeaderboardIdPropertyField';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 
 // Re-export the types.
 export type {
@@ -428,6 +429,54 @@ const PropertiesEditor = ({
     [instances, _onInstancesModified, getFieldDescription]
   );
 
+  const renderAutocompletionField = React.useCallback(
+    (field: ValueField) => {
+      if (!field.getChoices || !field.getValue || field.valueType !== 'string')
+        return;
+
+      const choices = field.getChoices();
+      const { setValue } = field;
+      const value = getFieldValue({
+        instances,
+        field,
+        defaultValue: '(Multiple values)',
+      });
+
+      return (
+        <SemiControlledAutoComplete
+          value={value}
+          key={field.name}
+          id={field.name}
+          floatingLabelText={getFieldLabel({ instances, field })}
+          helperMarkdownText={getFieldDescription(field)}
+          onChange={(newValue: string) => {
+            instances.forEach(i => setValue(i, newValue || ''));
+            _onInstancesModified(instances);
+          }}
+          dataSource={choices.map(({ value }) => ({
+            value: value,
+            text: value,
+          }))}
+          fullWidth
+          errorText={
+            field.isAllowingAnyValue ||
+            value === '(Multiple values)' ||
+            choices.some(data => data.value === value) ? (
+              undefined
+            ) : !value ? (
+              <Trans>You must select a value.</Trans>
+            ) : (
+              <Trans>
+                You must select a valid value. "{value}" is not valid.
+              </Trans>
+            )
+          }
+        />
+      );
+    },
+    [instances, _onInstancesModified, getFieldDescription]
+  );
+
   const renderButton = React.useCallback(
     (field: ActionButton) => {
       let disabled = false;
@@ -595,7 +644,13 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'leaderboardId') {
         return renderLeaderboardField(field);
       } else {
-        if (field.getChoices && field.getValue) return renderSelectField(field);
+        if (field.getChoices && field.getValue) {
+          if (field.isAutocompleted) {
+            return renderAutocompletionField(field);
+          } else {
+            return renderSelectField(field);
+          }
+        }
         if (field.getValue) return renderInputField(field);
       }
       return null;

@@ -319,6 +319,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
   static const gd::String objectAnimationNameValueType;
+  static const gd::String keyboardKeyValueType;
 };
 
 }  // namespace gd

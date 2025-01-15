@@ -80,6 +80,7 @@ const gd::String ValueTypeMetadata::choiceValueType = "stringWithSelector";
 const gd::String ValueTypeMetadata::behaviorValueType = "behavior";
 const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimationName";
+const gd::String ValueTypeMetadata::keyboardKeyValueType = "keyboardKey";
 
 const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     const gd::String &propertyType) {
@@ -97,6 +98,8 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
     return leaderboardIdValueType;
   } else if (propertyType == "ObjectAnimationName") {
     return objectAnimationNameValueType;
+  } else if (propertyType == "KeyboardKey") {
+    return keyboardKeyValueType;
   }
   // For "String", "Resource" or default
   return stringValueType;

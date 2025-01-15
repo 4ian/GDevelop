@@ -72,6 +72,7 @@ namespace gdjs {
     private _jumpSpeed: float;
     private _jumpSustainTime: float;
     private _stairHeightMax: float;
+    _canBePushed: boolean;
 
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
@@ -145,6 +146,10 @@ namespace gdjs {
         behaviorData.stairHeightMax === undefined
           ? 20
           : behaviorData.stairHeightMax;
+      this._canBePushed =
+        behaviorData.canBePushed === undefined
+          ? true
+          : behaviorData.canBePushed;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -1324,6 +1329,8 @@ namespace gdjs {
   export namespace PhysicsCharacter3DRuntimeBehavior {
     export class CharacterBodyUpdater {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
+      /** Handle collisions between characters that can push each other. */
+      static characterVsCharacterCollision: Jolt.CharacterVsCharacterCollisionSimple | null = null;
 
       constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
         this.characterBehavior = characterBehavior;
@@ -1336,7 +1343,13 @@ namespace gdjs {
         const shape = behavior.createShape();
 
         const settings = new Jolt.CharacterVirtualSettings();
-        settings.mInnerBodyLayer = behavior.getBodyLayer();
+        // Characters innerBody are Kinematic body, they don't allow other
+        // characters to push them.
+        // The layer 0 doesn't allow any collision as masking them always result to 0.
+        // This allows CharacterVsCharacterCollisionSimple to handle the collisions.
+        settings.mInnerBodyLayer = this.characterBehavior._canBePushed
+          ? 0
+          : behavior.getBodyLayer();
         settings.mInnerBodyShape = shape;
         settings.mMass = shape.GetMassProperties().get_mMass();
         settings.mMaxSlopeAngle = gdjs.toRad(_slopeMaxAngle);
@@ -1376,6 +1389,106 @@ namespace gdjs {
           .GetBodyLockInterface()
           .TryGetBody(character.GetInnerBodyID());
         this.characterBehavior.character = character;
+
+        if (this.characterBehavior._canBePushed) {
+          // CharacterVsCharacterCollisionSimple handle characters pushing each other.
+          let characterVsCharacterCollision =
+            CharacterBodyUpdater.characterVsCharacterCollision;
+          if (!characterVsCharacterCollision) {
+            characterVsCharacterCollision = new Jolt.CharacterVsCharacterCollisionSimple();
+            CharacterBodyUpdater.characterVsCharacterCollision = characterVsCharacterCollision;
+          }
+          characterVsCharacterCollision.Add(character);
+          character.SetCharacterVsCharacterCollision(
+            characterVsCharacterCollision
+          );
+
+          const characterContactListener = new Jolt.CharacterContactListenerJS();
+          characterContactListener.OnAdjustBodyVelocity = (
+            character,
+            body2Ptr,
+            linearVelocityPtr,
+            angularVelocity
+          ) => {};
+          characterContactListener.OnContactValidate = (
+            character,
+            bodyID2,
+            subShapeID2
+          ) => {
+            return true;
+          };
+          characterContactListener.OnCharacterContactValidate = (
+            characterPtr,
+            otherCharacterPtr,
+            subShapeID2
+          ) => {
+            // CharacterVsCharacterCollisionSimple doesn't handle collision layers.
+            // We have to filter characters ourself.
+            const character = Jolt.wrapPointer(
+              characterPtr,
+              Jolt.CharacterVirtual
+            );
+            const otherCharacter = Jolt.wrapPointer(
+              otherCharacterPtr,
+              Jolt.CharacterVirtual
+            );
+
+            const body = _sharedData.physicsSystem
+              .GetBodyLockInterface()
+              .TryGetBody(character.GetInnerBodyID());
+            const otherBody = _sharedData.physicsSystem
+              .GetBodyLockInterface()
+              .TryGetBody(otherCharacter.GetInnerBodyID());
+
+            const physicsBehavior = body.gdjsAssociatedBehavior;
+            const otherPhysicsBehavior = otherBody.gdjsAssociatedBehavior;
+
+            if (!physicsBehavior || !otherPhysicsBehavior) {
+              return true;
+            }
+            return physicsBehavior.canCollideAgainst(otherPhysicsBehavior);
+          };
+          characterContactListener.OnContactAdded = (
+            character,
+            bodyID2,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            settings
+          ) => {};
+          characterContactListener.OnCharacterContactAdded = (
+            character,
+            otherCharacter,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            settings
+          ) => {};
+          characterContactListener.OnContactSolve = (
+            character,
+            bodyID2,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            contactVelocity,
+            contactMaterial,
+            characterVelocity,
+            newCharacterVelocity
+          ) => {};
+          characterContactListener.OnCharacterContactSolve = (
+            character,
+            otherCharacter,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            contactVelocity,
+            contactMaterial,
+            characterVelocityPtr,
+            newCharacterVelocityPtr
+          ) => {};
+          character.SetListener(characterContactListener);
+        }
+
         // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
         //body.SetCollideKinematicVsNonDynamic(true);
         return body;

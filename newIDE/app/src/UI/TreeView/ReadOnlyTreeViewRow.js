@@ -34,7 +34,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const onClickItem = React.useCallback(
     event => {
       if (!node || node.item.isPlaceholder) return;
-      if (node.item.isRoot || node.item.openWithSingleClick) {
+      if (
+        (node.item.isRoot || node.item.openWithSingleClick) &&
+        !node.disableCollapse
+      ) {
         onOpen(node, index);
         return;
       }

@@ -17,10 +17,28 @@ export const navigationKeys = [
   'Enter',
 ];
 
+const doesMatchSearch = (name: string | React.Node, searchText: string) =>
+  typeof name === 'string' && name.toLowerCase().includes(searchText);
+
+const browseTree = <Item>(
+  items: Item[],
+  getItemChildren: Item => ?(Item[]),
+  callback: Item => void
+) => {
+  items.forEach(item => {
+    callback(item);
+    const children = getItemChildren(item);
+    if (children) {
+      browseTree(children, getItemChildren, callback);
+    }
+  });
+};
+
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
   +displayAsPrimaryButton?: boolean,
+  +openIfSearchMatches?: boolean,
   +openWithSingleClick?: boolean,
 };
 
@@ -79,7 +97,10 @@ export type ReadOnlyTreeViewInterface<Item> = {|
   areItemsOpen: (Array<Item>) => boolean[],
   areItemsOpenFromId: (Array<string>) => boolean[],
   updateRowHeights: () => void,
+  // TODO: Port this logic to the TreeView component.
   getDisplayedItemsIterator: () => Iterable<Item>,
+  // TODO: Port this logic to the TreeView component.
+  getDisplayedItemsCount: () => number,
 |};
 
 type Props<Item> = {|
@@ -217,9 +238,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         !searchText ||
         forceAllOpened ||
         forceOpen ||
-        (!applySearch ||
-          (typeof name === 'string' &&
-            name.toLowerCase().includes(searchText))) ||
+        (!applySearch || doesMatchSearch(name, searchText)) ||
         flattenedChildren.length > 0
       ) {
         const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
@@ -488,6 +507,12 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     },
     [flattenedData]
   );
+  const getDisplayedItemsCount = React.useCallback(
+    () => {
+      return flattenedData.length;
+    },
+    [flattenedData]
+  );
 
   React.useImperativeHandle(
     // $FlowFixMe
@@ -505,6 +530,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       areItemsOpenFromId,
       updateRowHeights,
       getDisplayedItemsIterator,
+      getDisplayedItemsCount,
     })
   );
 
@@ -519,13 +545,25 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
   React.useEffect(
     () => {
-      if (!searchText || searchText.length > 0) {
+      if (!searchText) {
         setOpenedDuringSearchNodeIds([]);
+      } else {
+        const openedNodes = [];
+        browseTree(items, getItemChildren, item => {
+          const itemName = getItemName(item);
+          if (
+            doesMatchSearch(itemName, searchText) &&
+            item.openIfSearchMatches
+          ) {
+            openedNodes.push(getItemId(item));
+          }
+        });
+        setOpenedDuringSearchNodeIds(openedNodes);
       }
     },
-    // Reset opened nodes during search when user stops searching
-    // or when the search text changes.
-    [searchText]
+    // When the search changes, recompute the nodes that should be opened
+    // by default.
+    [searchText, items, getItemName, getItemId, getItemChildren]
   );
 
   const onKeyDown = React.useCallback(

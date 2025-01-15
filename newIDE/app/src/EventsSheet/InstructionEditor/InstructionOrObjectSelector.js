@@ -520,8 +520,6 @@ const InstructionOrObjectSelector = React.forwardRef<
         )
       : 0;
 
-    const hasResults = !isSearching || displayedInstructionsList.length > 0;
-
     const globalObjectsRootFolder = globalObjectsContainer
       ? globalObjectsContainer.getRootFolder()
       : null;
@@ -660,6 +658,17 @@ const InstructionOrObjectSelector = React.forwardRef<
             )
           : null,
       ].filter(Boolean);
+
+    const hasResults = React.useMemo(
+      () => {
+        if (!isSearching) return true;
+        if (displayedInstructionsList.length > 0) return true;
+        const treeView = treeViewRef.current;
+        if (!treeView) return true;
+        return treeView.getDisplayedItemsCount() > 0;
+      },
+      [displayedInstructionsList, isSearching]
+    );
 
     const hasNoObjects = !isSearching && !allObjectsList.length;
     const searchHasNoResults = isSearching && !hasResults;

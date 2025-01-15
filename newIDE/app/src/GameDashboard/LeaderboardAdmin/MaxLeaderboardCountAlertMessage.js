@@ -55,6 +55,7 @@ const MaxLeaderboardCountAlertMessage = () => {
             )
           }
           hideButton={!leaderboardLimits.canMaximumCountPerGameBeIncreased}
+          recommendedPlanIdIfNoSubscription="gdevelop_silver"
         >
           <Line>
             <Column noMargin expand>

@@ -635,6 +635,7 @@ const PrivateAssetPackInformationPage = ({
                                         openSubscriptionDialog({
                                           analyticsMetadata: {
                                             reason: 'Claim asset pack',
+                                            recommendedPlanId: 'gdevelop_gold',
                                           },
                                           filter: 'individual',
                                         })

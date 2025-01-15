@@ -22,7 +22,8 @@ type RouteKey =
   | 'game-template'
   | 'tutorial-id'
   | 'course-id'
-  | 'create-from-example';
+  | 'create-from-example'
+  | 'recommended-plan-id';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

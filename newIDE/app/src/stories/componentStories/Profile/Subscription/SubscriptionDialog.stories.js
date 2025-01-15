@@ -172,7 +172,6 @@ export const Default = ({
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionDialog
-          open
           subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
             subscriptionPlansWithPricingSystems
           )}
@@ -180,8 +179,8 @@ export const Default = ({
             userLegacySubscriptionPlanWithPricingSystem
           }
           onClose={() => action('on close')()}
-          analyticsMetadata={{ reason: 'Debugger' }}
           filter={filter === 'none' ? undefined : filter}
+          onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>

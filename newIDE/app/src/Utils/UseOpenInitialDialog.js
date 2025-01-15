@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import RouterContext from '../MainFrame/RouterContext';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import {
+  SubscriptionSuggestionContext,
+  type PurchasablePlanId,
+} from '../Profile/Subscription/SubscriptionSuggestionContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from './GDevelopServices/InAppTutorial';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
@@ -34,10 +37,27 @@ const useOpenInitialDialog = ({
     () => {
       switch (routeArguments['initial-dialog']) {
         case 'subscription':
+          let recommendedPlanId = routeArguments['recommended-plan-id'];
+          if (
+            ![
+              'gdevelop_silver',
+              'gdevelop_gold',
+              'gdevelop_education',
+              'gdevelop_startup',
+            ].includes(recommendedPlanId)
+          ) {
+            recommendedPlanId = 'gdevelop_silver';
+          }
+          // $FlowFixMe - we know that recommendedPlanId is a valid PurchasablePlanId
+          const verifiedPlanId: PurchasablePlanId = recommendedPlanId;
+
           openSubscriptionDialog({
-            analyticsMetadata: { reason: 'Landing dialog at opening' },
+            analyticsMetadata: {
+              reason: 'Landing dialog at opening',
+              recommendedPlanId: verifiedPlanId,
+            },
           });
-          removeRouteArguments(['initial-dialog']);
+          removeRouteArguments(['initial-dialog', 'recommended-plan-id']);
           break;
         case 'signup':
           // Add timeout to give time to the app to sign in with Firebase

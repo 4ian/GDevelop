@@ -177,7 +177,10 @@ const AIPromptField = ({
           )}
         />
         {authenticated && !hasUsagesAvailable && (
-          <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
+          <GetSubscriptionCard
+            subscriptionDialogOpeningReason="Generate project from prompt"
+            recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          >
             <Line>
               <Column noMargin>
                 <Text noMargin>

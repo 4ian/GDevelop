@@ -19,13 +19,15 @@ import LeftLoader from '../../UI/LeftLoader';
 import { canBenefitFromDiscordRole } from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
-  onClose: Function,
+  onClose: () => void,
   authenticatedUser: AuthenticatedUser,
+  onSuccess: () => void,
 |};
 
 export default function SubscriptionPendingDialog({
   onClose,
   authenticatedUser,
+  onSuccess,
 }: Props) {
   const userPlanIdAtOpening = React.useRef<?string>(
     !!authenticatedUser.subscription
@@ -88,6 +90,15 @@ export default function SubscriptionPendingDialog({
       onClose();
     },
     [onClose, onEdit, discordUsername]
+  );
+
+  React.useEffect(
+    () => {
+      if (hasUserPlanChanged) {
+        onSuccess();
+      }
+    },
+    [hasUserPlanChanged, onSuccess]
   );
 
   return (

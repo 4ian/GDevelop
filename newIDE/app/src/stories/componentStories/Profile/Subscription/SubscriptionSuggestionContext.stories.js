@@ -31,6 +31,7 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
       openSubscriptionDialog({
         analyticsMetadata: {
           reason: 'Cloud Project limit reached',
+          recommendedPlanId: 'gdevelop_silver',
         },
       });
     },

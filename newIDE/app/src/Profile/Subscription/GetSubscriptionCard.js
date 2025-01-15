@@ -12,6 +12,8 @@ import classes from './GetSubscriptionCard.module.css';
 import Paper from '../../UI/Paper';
 import CrownShining from '../../UI/CustomSvgIcons/CrownShining';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import AuthenticatedUserContext from '../AuthenticatedUserContext';
+import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 
 const styles = {
   paper: {
@@ -42,6 +44,11 @@ type Props = {|
   onUpgrade?: () => void,
   forceColumnLayout?: boolean,
   filter?: 'individual' | 'team' | 'education',
+  recommendedPlanIdIfNoSubscription?:
+    | 'gdevelop_silver'
+    | 'gdevelop_gold'
+    | 'gdevelop_startup'
+    | 'gdevelop_education',
 |};
 
 const GetSubscriptionCard = ({
@@ -53,7 +60,13 @@ const GetSubscriptionCard = ({
   onUpgrade,
   forceColumnLayout,
   filter,
+  recommendedPlanIdIfNoSubscription,
 }: Props) => {
+  const { subscription } = React.useContext(AuthenticatedUserContext);
+  const actualPlanIdToRecommend = hasValidSubscriptionPlan(subscription)
+    ? // If the user already has a subscription, show the original subscription dialog.
+      undefined
+    : recommendedPlanIdIfNoSubscription;
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -93,6 +106,7 @@ const GetSubscriptionCard = ({
                     openSubscriptionDialog({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
+                        recommendedPlanId: actualPlanIdToRecommend,
                       },
                       filter,
                     });

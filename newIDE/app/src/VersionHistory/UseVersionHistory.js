@@ -454,6 +454,7 @@ const useVersionHistory = ({
                     subscriptionDialogOpeningReason="Version history"
                     forceColumnLayout
                     filter="team"
+                    recommendedPlanIdIfNoSubscription="gdevelop_startup"
                   >
                     <Text>
                       <Trans>

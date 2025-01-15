@@ -35,7 +35,7 @@ import {
   useFetchAssets,
 } from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
-import uniqBy from 'lodash/uniqBy';
+import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 
 // We limit the number of assets that can be installed at once to avoid
 // timeouts especially with premium packs.
@@ -50,6 +50,7 @@ type Props = {|
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
+  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
 const AssetPackInstallDialog = ({
@@ -61,6 +62,7 @@ const AssetPackInstallDialog = ({
   project,
   objectsContainer,
   resourceManagementProps,
+  targetObjectFolderOrObjectWithContext,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
@@ -172,17 +174,19 @@ const AssetPackInstallDialog = ({
         const { errors, results } = await PromisePool.withConcurrency(6)
           .for(assets)
           .process<InstallAssetOutput>(async asset => {
-            const installOutput = isPrivateAsset(asset)
-              ? await installPrivateAsset({
-                  asset,
-                  project,
-                  objectsContainer: targetObjectsContainer,
-                })
-              : await installPublicAsset({
-                  asset,
-                  project,
-                  objectsContainer: targetObjectsContainer,
-                });
+            const doInstall = isPrivateAsset(asset)
+              ? installPrivateAsset
+              : installPublicAsset;
+            const installOutput = await doInstall({
+              asset,
+              project,
+              objectsContainer: targetObjectsContainer,
+              targetObjectFolderOrObject:
+                targetObjectFolderOrObjectWithContext &&
+                !targetObjectFolderOrObjectWithContext.global
+                  ? targetObjectFolderOrObjectWithContext.objectFolderOrObject
+                  : null,
+            });
 
             if (!installOutput) {
               throw new Error('Unable to install the asset.');
@@ -201,10 +205,9 @@ const AssetPackInstallDialog = ({
         await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
-        const createdObjects = uniqBy(
-          results.map(result => result.createdObjects).flat(),
-          'ptr'
-        );
+        const createdObjects = results
+          .map(result => result.createdObjects)
+          .flat();
         onAssetsAdded(createdObjects);
       } catch (error) {
         setAreAssetsBeingInstalled(false);
@@ -226,6 +229,7 @@ const AssetPackInstallDialog = ({
       onAssetsAdded,
       installPrivateAsset,
       targetObjectsContainer,
+      targetObjectFolderOrObjectWithContext,
     ]
   );
 

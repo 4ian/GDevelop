@@ -644,56 +644,36 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           onObjectCreated(object);
         });
 
+        // Here, the last object in the array might not be the last object
+        // in the tree view, given the fact that assets are added in parallel
+        // See (AssetPackInstallDialog.onInstallAssets).
         const lastObject = objects[objects.length - 1];
-        let objectToScrollTo;
-        if (
-          newObjectDialogOpen &&
-          newObjectDialogOpen.from &&
-          // If a scene objectFolderOrObject is selected, move added assets next to or inside it.
-          !newObjectDialogOpen.from.global
-        ) {
-          const selectedItem = newObjectDialogOpen.from.objectFolderOrObject;
+
+        if (newObjectDialogOpen && newObjectDialogOpen.from) {
+          const {
+            objectFolderOrObject: selectedObjectFolderOrObject,
+          } = newObjectDialogOpen.from;
           if (treeViewRef.current) {
             treeViewRef.current.openItems(
-              getFoldersAscendanceWithoutRootFolder(selectedItem).map(folder =>
-                getObjectFolderTreeViewItemId(folder)
-              )
+              getFoldersAscendanceWithoutRootFolder(
+                selectedObjectFolderOrObject
+              ).map(folder => getObjectFolderTreeViewItemId(folder))
             );
           }
-          const {
-            folder: parentFolder,
-            position,
-          } = getInsertionParentAndPositionFromSelection(selectedItem);
-          const rootFolder = objectsContainer.getRootFolder();
-          objects.forEach((object, index) => {
-            const objectFolderOrObject = rootFolder.getObjectChild(
-              object.getName()
-            );
-            rootFolder.moveObjectFolderOrObjectToAnotherFolder(
-              objectFolderOrObject,
-              parentFolder,
-              position + index
-            );
-          });
-          objectToScrollTo = parentFolder.getObjectChild(lastObject.getName());
         } else {
           if (treeViewRef.current) {
             treeViewRef.current.openItems([sceneObjectsRootFolderId]);
           }
-          // A new object is always added to the scene (layout) by default.
-          objectToScrollTo = objectsContainer
-            .getRootFolder()
-            .getObjectChild(lastObject.getName());
         }
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(getObjectTreeViewItemId(objectToScrollTo.getObject()));
+          scrollToItem(getObjectTreeViewItemId(lastObject));
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [objectsContainer, onObjectCreated, scrollToItem, newObjectDialogOpen]
+      [onObjectCreated, scrollToItem, newObjectDialogOpen]
     );
 
     const swapObjectAsset = React.useCallback(

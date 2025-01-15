@@ -302,6 +302,7 @@ function NewObjectDialog({
     project,
     objectsContainer,
     resourceManagementProps,
+    targetObjectFolderOrObjectWithContext,
   });
 
   const onInstallAsset = React.useCallback(
@@ -573,6 +574,9 @@ function NewObjectDialog({
                 project={project}
                 objectsContainer={objectsContainer}
                 resourceManagementProps={resourceManagementProps}
+                targetObjectFolderOrObjectWithContext={
+                  targetObjectFolderOrObjectWithContext
+                }
               />
             )}
         </>

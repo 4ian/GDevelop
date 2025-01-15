@@ -69,8 +69,10 @@ export const TitleBarLeftSafeMargins = ({
 
 export const TitleBarRightSafeMargins = ({
   backgroundColor,
+  rightSideAdditionalOffsetToGiveSpaceToDrag,
 }: {|
   backgroundColor?: string,
+  rightSideAdditionalOffsetToGiveSpaceToDrag?: boolean,
 |}) => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
@@ -93,8 +95,6 @@ export const TitleBarRightSafeMargins = ({
     }
   }
 
-  const rightSideAdditionalOffsetToGiveSpaceToDrag = 30;
-
   if (rightSideOffset) {
     return (
       <div
@@ -102,7 +102,8 @@ export const TitleBarRightSafeMargins = ({
         style={{
           ...titleBarStyles.rightSideArea,
           minWidth:
-            rightSideOffset + rightSideAdditionalOffsetToGiveSpaceToDrag,
+            rightSideOffset +
+            (rightSideAdditionalOffsetToGiveSpaceToDrag ? 30 : 0),
           backgroundColor: backgroundColor || 'transparent',
         }}
       />

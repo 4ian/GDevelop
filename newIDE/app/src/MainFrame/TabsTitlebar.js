@@ -56,7 +56,7 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {children}
-      <TitleBarRightSafeMargins />
+      <TitleBarRightSafeMargins rightSideAdditionalOffsetToGiveSpaceToDrag />
     </div>
   );
 }

@@ -302,6 +302,7 @@ function NewObjectDialog({
     project,
     objectsContainer,
     resourceManagementProps,
+    targetObjectFolderOrObjectWithContext,
   });
 
   const onInstallAsset = React.useCallback(
@@ -566,12 +567,16 @@ function NewObjectDialog({
                 assetShortHeaders={displayedAssetShortHeaders}
                 addedAssetIds={existingAssetStoreIds}
                 onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={() => {
+                onAssetsAdded={createdObjects => {
                   setIsAssetPackDialogInstallOpen(false);
+                  onObjectsAddedFromAssets(createdObjects);
                 }}
                 project={project}
                 objectsContainer={objectsContainer}
                 resourceManagementProps={resourceManagementProps}
+                targetObjectFolderOrObjectWithContext={
+                  targetObjectFolderOrObjectWithContext
+                }
               />
             )}
         </>

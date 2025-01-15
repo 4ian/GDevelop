@@ -638,27 +638,42 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const onObjectsAddedFromAssets = React.useCallback(
       (objects: Array<gdObject>) => {
+        if (objects.length === 0) return;
+
         objects.forEach(object => {
           onObjectCreated(object);
         });
-        if (treeViewRef.current)
-          treeViewRef.current.openItems([sceneObjectsRootFolderId]);
 
+        // Here, the last object in the array might not be the last object
+        // in the tree view, given the fact that assets are added in parallel
+        // See (AssetPackInstallDialog.onInstallAssets).
         const lastObject = objects[objects.length - 1];
-        // A new object is always added to the scene (layout) by default.
-        const object = objectsContainer
-          .getRootFolder()
-          .getObjectChild(lastObject.getName());
 
+        if (newObjectDialogOpen && newObjectDialogOpen.from) {
+          const {
+            objectFolderOrObject: selectedObjectFolderOrObject,
+          } = newObjectDialogOpen.from;
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems(
+              getFoldersAscendanceWithoutRootFolder(
+                selectedObjectFolderOrObject
+              ).map(folder => getObjectFolderTreeViewItemId(folder))
+            );
+          }
+        } else {
+          if (treeViewRef.current) {
+            treeViewRef.current.openItems([sceneObjectsRootFolderId]);
+          }
+        }
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          scrollToItem(getObjectTreeViewItemId(object.getObject()));
+          scrollToItem(getObjectTreeViewItemId(lastObject));
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [objectsContainer, onObjectCreated, scrollToItem]
+      [onObjectCreated, scrollToItem, newObjectDialogOpen]
     );
 
     const swapObjectAsset = React.useCallback(

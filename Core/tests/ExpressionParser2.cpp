@@ -2289,7 +2289,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid property (property with child in variableOrProperty parameter)") {
+  SECTION("Invalid parameter (parameter with child in variableOrPropertyOrParameter parameter)") {
     {
       gd::ParameterMetadataContainer parameters;
       parameters.InsertNewParameter("MyParameter", 0).SetType("number");

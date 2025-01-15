@@ -18,6 +18,7 @@ export interface TreeViewItemContent {
 export interface TreeViewItem {
   isRoot?: boolean;
   +content: TreeViewItemContent;
+  openWithSingleClick?: boolean;
   getChildren(searchText: string): ?Array<TreeViewItem>;
 }
 
@@ -358,6 +359,7 @@ export class ObjectFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   global: boolean;
   isPlaceholder = false;
+  openWithSingleClick = true;
   content: TreeViewItemContent;
   objectFolderOrObject: gdObjectFolderOrObject;
   objectFolderTreeViewItemProps: ObjectFolderTreeViewItemProps;

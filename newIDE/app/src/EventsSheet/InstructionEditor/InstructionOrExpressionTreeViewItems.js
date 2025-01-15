@@ -20,6 +20,7 @@ export interface TreeViewItemContent {
 export interface TreeViewItem {
   isRoot?: boolean;
   displayAsPrimaryButton?: boolean;
+  openWithSingleClick?: boolean;
   +content: TreeViewItemContent;
   getChildren(): ?Array<TreeViewItem>;
 }
@@ -113,6 +114,7 @@ export class InstructionGroupTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];
   isRoot = false;
+  openWithSingleClick = true;
 
   constructor(content: TreeViewItemContent, children: TreeViewItem[]) {
     this.content = content;

@@ -21,6 +21,7 @@ export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
   +displayAsPrimaryButton?: boolean,
+  +openWithSingleClick?: boolean,
 };
 
 type FlattenedNode<Item> = {|

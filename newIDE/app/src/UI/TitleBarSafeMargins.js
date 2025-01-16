@@ -103,7 +103,7 @@ export const TitleBarRightSafeMargins = ({
       className={DRAGGABLE_PART_CLASS_NAME}
       style={{
         ...titleBarStyles.rightSideArea,
-        draggableMinWidth,
+        minWidth: draggableMinWidth,
         backgroundColor: backgroundColor || 'transparent',
       }}
     />

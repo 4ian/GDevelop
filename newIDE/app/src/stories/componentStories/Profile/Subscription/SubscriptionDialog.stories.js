@@ -14,11 +14,13 @@ import {
   fakeAuthenticatedUserWithLegacyProSubscription,
   fakeAuthenticatedUserWithEducationPlan,
   fakeStartupAuthenticatedUser,
-  subscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
-import { getAvailableSubscriptionPlansWithPrices } from '../../../../Utils/UseSubscriptionPlans';
+import useSubscriptionPlans, {
+  getAvailableSubscriptionPlansWithPrices,
+} from '../../../../Utils/UseSubscriptionPlans';
+import LoaderModal from '../../../../UI/LoaderModal';
 
 export default {
   title: 'Subscription/SubscriptionDialog',
@@ -159,16 +161,22 @@ export const Default = ({
     }
   }
 
-  const { subscription: userSubscription } = authenticatedUser;
-  const userLegacySubscriptionPlanWithPricingSystem = userSubscription
-    ? subscriptionPlansWithPricingSystems.find(
-        planWithPricingSystem =>
-          planWithPricingSystem.id === userSubscription.planId &&
-          planWithPricingSystem.isLegacy
-      )
-    : null;
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser,
+  });
 
-  return (
+  const { subscription: userSubscription } = authenticatedUser;
+  const userLegacySubscriptionPlanWithPricingSystem =
+    userSubscription && subscriptionPlansWithPricingSystems
+      ? subscriptionPlansWithPricingSystems.find(
+          planWithPricingSystem =>
+            planWithPricingSystem.id === userSubscription.planId &&
+            planWithPricingSystem.isLegacy
+        )
+      : null;
+
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionDialog
@@ -184,5 +192,7 @@ export const Default = ({
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };

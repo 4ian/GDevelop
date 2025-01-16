@@ -7,11 +7,13 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import {
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
-  subscriptionPlansWithPricingSystems,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import PromotionSubscriptionDialog from '../../../../Profile/Subscription/PromotionSubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
-import { getAvailableSubscriptionPlansWithPrices } from '../../../../Utils/UseSubscriptionPlans';
+import useSubscriptionPlans, {
+  getAvailableSubscriptionPlansWithPrices,
+} from '../../../../Utils/UseSubscriptionPlans';
+import LoaderModal from '../../../../UI/LoaderModal';
 
 export default {
   title: 'Subscription/PromotionSubscriptionDialog',
@@ -19,122 +21,155 @@ export default {
   decorators: [paperDecorator],
 };
 
-const availableSubscriptionPlansWithPrices = getAvailableSubscriptionPlansWithPrices(
-  subscriptionPlansWithPricingSystems
-);
-
 export const NotAuthenticatedSilverRecommended = () => {
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeNotAuthenticatedUser,
+  });
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_silver"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };
 
 export const AuthenticatedSilverRecommended = () => {
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
+  });
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_silver"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };
 
 export const GoldRecommended = () => {
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
+  });
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_gold"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };
 
 export const ProRecommended = () => {
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
+  });
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_startup"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };
 
 export const EducationRecommended = () => {
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
+  });
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_education"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };
 
 export const WithoutSilverButRecommended = () => {
-  const availableSubscriptionPlansWithPrices = getAvailableSubscriptionPlansWithPrices(
-    subscriptionPlansWithPricingSystems
-  );
-  const subscritionPlansWithoutSilver = availableSubscriptionPlansWithPrices.filter(
-    plan => plan.id !== 'gdevelop_silver'
-  );
-  return (
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
+  });
+  const subscritionPlansWithoutSilver = subscriptionPlansWithPricingSystems
+    ? subscriptionPlansWithPricingSystems.filter(
+        plan => plan.id !== 'gdevelop_silver'
+      )
+    : null;
+  return subscritionPlansWithoutSilver ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
-          subscriptionPlansWithPricingSystems={subscritionPlansWithoutSilver}
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscritionPlansWithoutSilver
+          )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_silver"
           onOpenPendingDialog={() => action('on open pending dialog')()}
         />
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };

@@ -1,4 +1,6 @@
 // @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import update from 'lodash/update';
 import compact from 'lodash/compact';
 import {
@@ -9,21 +11,21 @@ import {
 import { getInstructionType } from '../EventsSheet/InstructionEditor/SelectorListItems/Keys';
 
 const GROUP_DELIMITER = '/';
-const SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS = [
-  'General',
-  'Input',
-  'Audio',
-  'Text', // Expression only
-  'Camera',
-  'User interface',
-  'Game mechanic',
-  'Movement', // Expression only
-  'Players',
-  'Visual effect',
-  'Ads',
-  'Network',
-  'Third-party',
-  'Advanced',
+const getSortedFreeInstructionsTopLevelGroups = (i18n: I18nType) => [
+  i18n._(t`General`),
+  i18n._(t`Input`),
+  i18n._(t`Audio`),
+  i18n._(t`Text`),
+  i18n._(t`Camera`),
+  i18n._(t`User interface`),
+  i18n._(t`Game mechanic`),
+  i18n._(t`Movement`),
+  i18n._(t`Players`),
+  i18n._(t`Visual effect`),
+  i18n._(t`Ads`),
+  i18n._(t`Network`),
+  i18n._(t`Third-party`),
+  i18n._(t`Advanced`),
 ];
 
 export type TreeNode<T> =
@@ -39,9 +41,13 @@ export type InstructionOrExpressionTreeNode =
   | EnumeratedExpressionMetadata;
 
 export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
-  allExpressions: Array<T>
+  allExpressions: Array<T>,
+  i18n: I18nType
 ): TreeNode<T> => {
   const tree = {};
+  const sortedFreeInstructionsTopLevelGroups = getSortedFreeInstructionsTopLevelGroups(
+    i18n
+  );
   allExpressions.forEach((expressionInfo: T) => {
     let pathInTree = compact(
       expressionInfo.fullGroupName.split(GROUP_DELIMITER)
@@ -62,8 +68,25 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
 
   const sortedTree = Object.keys(tree)
     .sort((a, b) => {
-      const aIndex = SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS.indexOf(a);
-      const bIndex = SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS.indexOf(b);
+      const aIndex = sortedFreeInstructionsTopLevelGroups.indexOf(a);
+      const bIndex = sortedFreeInstructionsTopLevelGroups.indexOf(b);
+      // Extensions can have instructions/expressions in categories that are not in
+      // sortedFreeInstructionsTopLevelGroups. In that case, they are displayed
+      // at the end of the list, but before the Advanced category, and in alphabetical
+      // order.
+      if (aIndex === -1 && bIndex === -1) {
+        return a.localeCompare(b);
+      }
+      if (aIndex === -1) {
+        if (bIndex === sortedFreeInstructionsTopLevelGroups.length - 1)
+          return -1;
+        return +1;
+      }
+      if (bIndex === -1) {
+        if (aIndex === sortedFreeInstructionsTopLevelGroups.length - 1)
+          return +1;
+        return -1;
+      }
       return aIndex - bIndex;
     })
     .reduce((acc, groupName) => {

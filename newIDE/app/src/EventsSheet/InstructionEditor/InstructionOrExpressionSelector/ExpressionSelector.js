@@ -33,7 +33,10 @@ export default class ExpressionSelector extends Component<Props, {||}> {
     enumerateAllExpressions(this.props.expressionType, this.props.i18n),
     this.props.scope
   );
-  instructionsInfoTree: ExpressionTreeNode = createTree(this.instructionsInfo);
+  instructionsInfoTree: ExpressionTreeNode = createTree(
+    this.instructionsInfo,
+    this.props.i18n
+  );
 
   render() {
     const { expressionType, scope, i18n, ...otherProps } = this.props;

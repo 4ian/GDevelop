@@ -245,7 +245,8 @@ const InstructionOrObjectSelector = React.forwardRef<
         filterEnumeratedInstructionOrExpressionMetadataByScope(
           enumerateFreeInstructions(isCondition, i18n),
           scope
-        )
+        ),
+        i18n
       )
     );
     const initialInstructionTypePathRef = React.useRef<?Array<string>>(
@@ -359,7 +360,8 @@ const InstructionOrObjectSelector = React.forwardRef<
           filterEnumeratedInstructionOrExpressionMetadataByScope(
             enumerateFreeInstructions(isCondition, i18n),
             scope
-          )
+          ),
+          i18n
         );
         forceUpdate();
       },

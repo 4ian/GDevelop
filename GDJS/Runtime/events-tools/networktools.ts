@@ -45,8 +45,7 @@ namespace gdjs {
           request.ontimeout = onError;
           request.onabort = onError;
           request.onreadystatechange = () => {
-            /* "DONE" */
-            if (request.readyState === 4) {
+            if (request.readyState === XMLHttpRequest.DONE) {
               if (request.status >= 400) {
                 onError('' + request.status);
               }

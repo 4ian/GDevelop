@@ -174,6 +174,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onClick, onSelect, node, onOpen]
   );
 
+  const onDoubleClickItem = React.useCallback(
+    e => {
+      if (!node || !node.hasChildren || node.disableCollapse) return;
+      onOpen(node);
+    },
+    [node, onOpen]
+  );
+
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
       if (!node.item.isRoot) onClickItem(event);
@@ -491,6 +499,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             <div
               id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
               onClick={onClickItem}
+              onDoubleClick={onDoubleClickItem}
               className={classNames(
                 classes.rowContainer,
                 dropIndicatorClassName,

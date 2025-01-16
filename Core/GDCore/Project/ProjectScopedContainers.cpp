@@ -178,7 +178,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForEventsBasedObject(
   // created below.
   // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
   // in the codebase.
-  outputObjectsContainer.GetObjects().clear();
+  outputObjectsContainer.Clear();
   outputObjectsContainer.GetObjectGroups().Clear();
 
   // This object named "Object" represents the parent and is used by events.

@@ -134,6 +134,10 @@ class GD_CORE_API ObjectFolderOrObject {
    * the instance children and recursively does it for every folder children.
    */
   void RemoveRecursivelyObjectNamed(const gd::String& name);
+  /**
+   * \brief Clears all children
+   */
+  void Clear();
 
   /**
    * \brief Inserts an instance representing the given object at the given

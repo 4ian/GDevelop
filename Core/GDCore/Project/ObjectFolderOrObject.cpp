@@ -137,6 +137,15 @@ void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
   }
 };
 
+void ObjectFolderOrObject::Clear() {
+  if (IsFolder()) {
+    for (auto& it : children) {
+      it->Clear();
+    }
+    children.clear();
+  }
+};
+
 bool ObjectFolderOrObject::IsADescendantOf(
     const ObjectFolderOrObject& otherObjectFolderOrObject) {
   if (parent == nullptr) return false;

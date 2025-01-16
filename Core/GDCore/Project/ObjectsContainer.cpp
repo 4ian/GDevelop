@@ -7,12 +7,12 @@
 
 #include <algorithm>
 
-#include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectFolderOrObject.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/PolymorphicClone.h"
 
 namespace gd {
 
@@ -28,8 +28,7 @@ ObjectsContainer::ObjectsContainer(const ObjectsContainer& other) {
   Init(other);
 }
 
-ObjectsContainer& ObjectsContainer::operator=(
-    const ObjectsContainer& other) {
+ObjectsContainer& ObjectsContainer::operator=(const ObjectsContainer& other) {
   if (this != &other) Init(other);
 
   return *this;
@@ -69,7 +68,7 @@ void ObjectsContainer::AddMissingObjectsInRootFolder() {
 
 void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {
-  initialObjects.clear();
+  Clear();
   element.ConsiderAsArrayOf("object", "Objet");
   for (std::size_t i = 0; i < element.GetChildrenCount(); ++i) {
     const SerializerElement& objectElement = element.GetChild(i);
@@ -182,6 +181,11 @@ void ObjectsContainer::RemoveObject(const gd::String& name) {
   rootFolder->RemoveRecursivelyObjectNamed(name);
 
   initialObjects.erase(objectIt);
+}
+
+void ObjectsContainer::Clear() {
+  rootFolder->Clear();
+  initialObjects.clear();
 }
 
 void ObjectsContainer::MoveObjectFolderOrObjectToAnotherContainerInFolder(

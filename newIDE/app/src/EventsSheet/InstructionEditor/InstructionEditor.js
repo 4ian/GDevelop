@@ -123,7 +123,8 @@ export const useInstructionEditor = ({
       chosenObjectName: objectName,
       chosenObjectInstructionsInfo,
       chosenObjectInstructionsInfoTree: createTree(
-        chosenObjectInstructionsInfo
+        chosenObjectInstructionsInfo,
+        i18n
       ),
     };
   };

@@ -60,6 +60,7 @@ import {
   LeafTreeViewItem as InstructionLeafTreeViewItem,
   getInstructionGroupId,
 } from './InstructionOrExpressionTreeViewItems';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -288,6 +289,9 @@ const InstructionOrObjectSelector = React.forwardRef<
           { name: 'description', weight: 3 },
         ],
       })
+    );
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
     );
 
     const [searchText, setSearchText] = React.useState<string>('');
@@ -766,6 +770,7 @@ const InstructionOrObjectSelector = React.forwardRef<
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={shouldApplySearchToItem}
                 getItemDescription={getTreeViewItemDescription}
+                forceAllOpened={!!currentlyRunningInAppTutorial}
                 getItemId={getTreeViewItemId}
                 getItemHtmlId={getTreeViewItemHtmlId}
                 getItemChildren={getTreeViewItemChildren}

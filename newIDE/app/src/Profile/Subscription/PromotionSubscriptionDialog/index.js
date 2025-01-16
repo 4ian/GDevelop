@@ -147,7 +147,8 @@ export default function PromotionSubscriptionDialog({
             topBackgroundSrc={'res/premium/premium_dialog_background.png'}
           >
             <ColumnStackLayout noMargin justifyContent="space-between" expand>
-              {!purchasablePlansWithPricingSystems ? (
+              {!purchasablePlansWithPricingSystems ||
+              authenticatedUser.loginState === 'loggingIn' ? (
                 <PlaceholderLoader />
               ) : (
                 <ColumnStackLayout expand noMargin>

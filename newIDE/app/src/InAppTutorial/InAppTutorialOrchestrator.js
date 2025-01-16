@@ -278,6 +278,13 @@ const isDomBasedTriggerComplete = (
 ): boolean => {
   if (!trigger) return false;
   if (
+    trigger.presenceOfElement &&
+    document.querySelector(
+      interpolateElementId(trigger.presenceOfElement, data)
+    )
+  ) {
+    return true;
+  } else if (
     trigger.absenceOfElement &&
     !document.querySelector(
       interpolateElementId(trigger.absenceOfElement, data)

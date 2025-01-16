@@ -2,12 +2,13 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import Text from '../../../UI/Text';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../../UI/Grid';
 import {
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
   EDUCATION_PLAN_MAX_SEATS,
   EDUCATION_PLAN_MIN_SEATS,
+  getSummarizedSubscriptionPlanFeatures,
 } from '../../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import { getPlanIcon } from '../PlanCard';
@@ -47,6 +48,10 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  summarizeFeatureRow: {
+    paddingTop: 4,
+    paddingBottom: 4,
+  },
   tableRightItemContainer: {
     width: 120,
     display: 'flex',
@@ -72,6 +77,13 @@ const styles = {
     cursor: 'default',
   },
   discountedPrice: { textDecoration: 'line-through' },
+  unlimitedContainer: {
+    padding: '4px 8px',
+    borderRadius: 4,
+    display: 'flex',
+    alignItems: 'center',
+    color: 'black',
+  },
 };
 
 const formatPriceWithCurrency = (amountInCents: number, currency: string) => {
@@ -163,7 +175,7 @@ const PromotionSubscriptionPlan = ({
                 : styles.simpleSizeContainer
             }
           >
-            <ColumnStackLayout justifyContent="center" noMargin>
+            <Column justifyContent="center" noMargin>
               <div
                 style={{
                   backgroundColor: gdevelopTheme.paper.backgroundColor.light,
@@ -180,38 +192,55 @@ const PromotionSubscriptionPlan = ({
                   </div>
                 </Line>
               </div>
-              {subscriptionPlanWithPricingSystems.bulletPointsByLocale.map(
-                (bulletPointByLocale, index) => (
-                  <Column key={index} noMargin>
-                    <div
-                      style={{
-                        borderTop:
-                          index !== 0 &&
-                          `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-                      }}
+              {getSummarizedSubscriptionPlanFeatures(
+                i18n,
+                subscriptionPlanWithPricingSystems
+              ).map((summarizedFeature, index) => (
+                <Column key={index} noMargin>
+                  <div
+                    style={{
+                      ...styles.summarizeFeatureRow,
+                      borderTop:
+                        index !== 0 &&
+                        `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+                    }}
+                  >
+                    <Line
+                      noMargin
+                      alignItems="center"
+                      justifyContent="space-between"
                     >
-                      <Line
-                        noMargin
-                        alignItems="center"
-                        justifyContent="space-between"
-                      >
-                        <Text style={styles.bulletText}>
-                          {selectMessageByLocale(i18n, bulletPointByLocale)}
-                        </Text>
-                        <div style={styles.tableRightItemContainer}>
+                      <Text style={styles.bulletText}>
+                        {summarizedFeature.displayedFeatureName}
+                      </Text>
+                      <div style={styles.tableRightItemContainer}>
+                        {summarizedFeature.enabled ? (
                           <CheckCircleFilled
                             style={{
                               ...styles.bulletIcon,
                               color: gdevelopTheme.message.valid,
                             }}
                           />
-                        </div>
-                      </Line>
-                    </div>
-                  </Column>
-                )
-              )}
-              <Spacer />
+                        ) : summarizedFeature.unlimited ? (
+                          <div
+                            style={{
+                              ...styles.unlimitedContainer,
+                              backgroundColor: gdevelopTheme.message.valid,
+                            }}
+                          >
+                            <Text noMargin color="inherit">
+                              ∞ <Trans>Unlimited</Trans>
+                            </Text>
+                          </div>
+                        ) : (
+                          <Text>{summarizedFeature.description}</Text>
+                        )}
+                      </div>
+                    </Line>
+                  </div>
+                </Column>
+              ))}
+              <LargeSpacer />
               <Line noMargin justifyContent="center">
                 <Text size="body" color="secondary">
                   <Trans>
@@ -230,7 +259,7 @@ const PromotionSubscriptionPlan = ({
                   </Trans>
                 </Text>
               </Line>
-            </ColumnStackLayout>
+            </Column>
           </div>
           <div style={styles.simpleSizeContainer}>
             <ColumnStackLayout expand noMargin>
@@ -239,7 +268,7 @@ const PromotionSubscriptionPlan = ({
                   <ColumnStackLayout>
                     <Line alignItems="center" justifyContent="center">
                       {planIcon}
-                      <Text size="sub-title">
+                      <Text size="block-title">
                         <span style={{ textTransform: 'uppercase' }}>
                           <b>
                             {selectMessageByLocale(

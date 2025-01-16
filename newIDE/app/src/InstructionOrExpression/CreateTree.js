@@ -9,6 +9,22 @@ import {
 import { getInstructionType } from '../EventsSheet/InstructionEditor/SelectorListItems/Keys';
 
 const GROUP_DELIMITER = '/';
+const SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS = [
+  'General',
+  'Input',
+  'Audio',
+  'Text', // Expression only
+  'Camera',
+  'User interface',
+  'Game mechanic',
+  'Movement', // Expression only
+  'Players',
+  'Visual effect',
+  'Ads',
+  'Network',
+  'Third-party',
+  'Advanced',
+];
 
 export type TreeNode<T> =
   | T
@@ -44,7 +60,18 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
     });
   });
 
-  return tree;
+  const sortedTree = Object.keys(tree)
+    .sort((a, b) => {
+      const aIndex = SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS.indexOf(a);
+      const bIndex = SORTED_FREE_INSTRUCTIONS_TOP_LEVEL_GROUPS.indexOf(b);
+      return aIndex - bIndex;
+    })
+    .reduce((acc, groupName) => {
+      acc[groupName] = tree[groupName];
+      return acc;
+    }, {});
+
+  return sortedTree;
 };
 
 const doFindInTree = <T: Object>(

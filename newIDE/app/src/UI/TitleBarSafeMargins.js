@@ -98,6 +98,8 @@ export const TitleBarRightSafeMargins = ({
   const draggableMinWidth =
     rightSideOffset + (rightSideAdditionalOffsetToGiveSpaceToDrag ? 30 : 0);
 
+  // Always display this draggable area, as it will take the whole available space
+  // in the title bar.
   return (
     <div
       className={DRAGGABLE_PART_CLASS_NAME}

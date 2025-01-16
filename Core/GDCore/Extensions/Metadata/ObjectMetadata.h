@@ -39,6 +39,8 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   /**
    * \brief Construct an object metadata, using a "blueprint" object that will
    * be copied when a new object is requested.
+   *
+   * \note This is used for objects declared in JavaScript extensions.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
@@ -47,9 +49,9 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
                  const gd::String& icon24x24_,
                  std::shared_ptr<gd::ObjectConfiguration> blueprintObject_);
   /**
-   * \brief Construct an object metadata, without "blueprint" object
+   * \brief Construct an object metadata.
    *
-   * \note This is used by events based objects.
+   * \note This is used by events based objects ("custom objects").
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
@@ -60,14 +62,17 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   /**
    * \brief Construct an object metadata, with a function that will be called
    * to instantiate a new object.
+   *
+   * \note This is used for objects declared in C++ extensions.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
                  const gd::String& fullname_,
                  const gd::String& description_,
                  const gd::String& icon24x24_,
-                 CreateFunPtr createFunPtrP);
-  ObjectMetadata() : createFunPtr(NULL) {}
+                 CreateFunPtr createFunPtr_);
+
+  ObjectMetadata() {}
   virtual ~ObjectMetadata(){};
 
   /**
@@ -360,7 +365,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-  CreateFunPtr createFunPtr;
+  CreateFunPtr createFunPtr = nullptr;
 
  private:
   gd::String extensionNamespace;

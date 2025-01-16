@@ -4068,7 +4068,7 @@ const MainFrame = (props: Props) => {
             }
 
             setQuickCustomizationDialogOpenedFromGameId(null);
-            closeProject();
+            await closeProject();
             openHomePage();
             if (!hasUnsavedChanges) {
               navigateToRoute('build');

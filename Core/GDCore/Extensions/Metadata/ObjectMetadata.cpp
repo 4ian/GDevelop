@@ -46,30 +46,25 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& fullname_,
                                const gd::String& description_,
                                const gd::String& icon24x24)
-    : ObjectMetadata(extensionNamespace_,
-                     name_,
-                     fullname_,
-                     description_,
-                     icon24x24,
-                     []() -> std::unique_ptr<gd::ObjectConfiguration> {
-      gd::LogFatalError(
-          "Error: Event-based objects don't have blueprint. "
-          "This method should never be called.");
-      return nullptr;
-    }) {}
+    : name(name_),
+      iconFilename(icon24x24),
+      extensionNamespace(extensionNamespace_) {
+  SetFullName(gd::String(fullname_));
+  SetDescription(gd::String(description_));
+}
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
                                const gd::String& fullname_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
-                               CreateFunPtr createFunPtrP)
-    : name(name_),
-      iconFilename(icon24x24),
-      createFunPtr(createFunPtrP),
-      extensionNamespace(extensionNamespace_) {
-  SetFullName(gd::String(fullname_));
-  SetDescription(gd::String(description_));
+                               CreateFunPtr createFunPtr_)
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24) {
+  createFunPtr = createFunPtr_;
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddCondition(

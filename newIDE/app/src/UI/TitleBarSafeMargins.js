@@ -95,22 +95,19 @@ export const TitleBarRightSafeMargins = ({
     }
   }
 
-  if (rightSideOffset) {
-    return (
-      <div
-        className={DRAGGABLE_PART_CLASS_NAME}
-        style={{
-          ...titleBarStyles.rightSideArea,
-          minWidth:
-            rightSideOffset +
-            (rightSideAdditionalOffsetToGiveSpaceToDrag ? 30 : 0),
-          backgroundColor: backgroundColor || 'transparent',
-        }}
-      />
-    );
-  }
+  const draggableMinWidth =
+    rightSideOffset + (rightSideAdditionalOffsetToGiveSpaceToDrag ? 30 : 0);
 
-  // Not on the desktop app, and not in an installed PWA with window controls displayed
-  // as overlay: no need to display a spacing.
-  return null;
+  // Always display this draggable area, as it will take the whole available space
+  // in the title bar.
+  return (
+    <div
+      className={DRAGGABLE_PART_CLASS_NAME}
+      style={{
+        ...titleBarStyles.rightSideArea,
+        minWidth: draggableMinWidth,
+        backgroundColor: backgroundColor || 'transparent',
+      }}
+    />
+  );
 };

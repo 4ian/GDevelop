@@ -11,7 +11,6 @@ import {
   type SubscriptionPlanPricingSystem,
 } from '../../../Utils/GDevelopServices/Usage';
 import { sendChoosePlanClicked } from '../../../Utils/Analytics/EventSender';
-import { type PurchasablePlanId } from '../SubscriptionSuggestionContext';
 import Window from '../../../Utils/Window';
 import Text from '../../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
@@ -26,7 +25,7 @@ import AlertMessage from '../../../UI/AlertMessage';
 type Props = {|
   onClose: Function,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
-  recommendedPlanId: PurchasablePlanId,
+  recommendedPlanId: string,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 

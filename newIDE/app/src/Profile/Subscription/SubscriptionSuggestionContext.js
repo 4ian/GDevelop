@@ -18,17 +18,13 @@ import useSubscriptionPlans, {
 } from '../../Utils/UseSubscriptionPlans';
 import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
+import LoaderModal from '../../UI/LoaderModal';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
-export type PurchasablePlanId =
-  | 'gdevelop_silver'
-  | 'gdevelop_gold'
-  | 'gdevelop_startup'
-  | 'gdevelop_education';
 
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
-  recommendedPlanId?: PurchasablePlanId,
+  recommendedPlanId?: string,
   preStep?: 'subscriptionChecker',
 |};
 
@@ -171,8 +167,10 @@ export const SubscriptionSuggestionProvider = ({
         />
       )}
       {analyticsMetadata ? (
-        !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
-        analyticsMetadata.recommendedPlanId ? (
+        authenticatedUser.loginState === 'loggingIn' ? (
+          <LoaderModal show />
+        ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
+          analyticsMetadata.recommendedPlanId ? (
           <PromotionSubscriptionDialog
             subscriptionPlansWithPricingSystems={
               availableSubscriptionPlansWithPrices

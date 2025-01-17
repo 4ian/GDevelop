@@ -9,8 +9,8 @@ import { ClickAwayListener } from '@material-ui/core';
 import Add from '../UI/CustomSvgIcons/Add';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Undo from '../UI/CustomSvgIcons/Undo';
-import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
-import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -316,7 +316,7 @@ const VariableRow = React.memo<VariableRowProps>(
                       focusRipple
                       style={variableRowStyles.chevron}
                     >
-                      {isExpanded ? <ChevronBottom /> : <ChevronRight />}
+                      {isExpanded ? <ChevronArrowBottom /> : <ChevronArrowRight />}
                     </ButtonBase>
                   ) : (
                     <div style={variableRowStyles.chevron} />

@@ -137,8 +137,8 @@ const isValidLiteralKeyboardKey = (expression: string): boolean => {
   const matches = expression.match(stringRegex);
   return matches && matches[1] !== undefined
     ? keyNamesSet.has(matches[1])
-    // the expression is not a literal value
-    : false;
+    : // the expression is not a literal value
+      false;
 };
 
 // This is not the negation of the function above as both return false for
@@ -148,8 +148,8 @@ const isInvalidLiteralKeyboardKey = (expression: string): boolean => {
   // Return true by default as it could be an expression.
   return matches && matches[1] !== undefined
     ? !keyNamesSet.has(matches[1])
-    // the expression is not a literal value
-    : false;
+    : // the expression is not a literal value
+      false;
 };
 
 const getStringContent = (expression: string): string => {

@@ -149,19 +149,19 @@ export const WithoutSilverButRecommended = () => {
     includeLegacy: true,
     authenticatedUser: fakeAuthenticatedUserWithNoSubscription,
   });
-  const subscritionPlansWithoutSilver = subscriptionPlansWithPricingSystems
+  const subscriptionPlansWithoutSilver = subscriptionPlansWithPricingSystems
     ? subscriptionPlansWithPricingSystems.filter(
         plan => plan.id !== 'gdevelop_silver'
       )
     : null;
-  return subscritionPlansWithoutSilver ? (
+  return subscriptionPlansWithoutSilver ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
         value={fakeAuthenticatedUserWithNoSubscription}
       >
         <PromotionSubscriptionDialog
           subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
-            subscritionPlansWithoutSilver
+            subscriptionPlansWithoutSilver
           )}
           onClose={() => action('on close')()}
           recommendedPlanId="gdevelop_silver"

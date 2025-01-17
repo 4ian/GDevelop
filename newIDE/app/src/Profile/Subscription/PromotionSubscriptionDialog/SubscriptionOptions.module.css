@@ -1,6 +1,8 @@
 .optionAndBadgeContainer {
     position: relative;
     height: 100%;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .optionContainer {
@@ -35,11 +37,14 @@
 
 .recommendedBadge {
     position: absolute;
-    top: -12px;
+    top: -8px;
     right: 10px;
     background: var(--theme-message-hot-background-color);
     color: var(--theme-message-hot-color);
     padding: 2px 8px;
     border-radius: 16px;
     z-index: 2;
+}
+.recommendedBadge.mobile {
+    top: -5px;
 }

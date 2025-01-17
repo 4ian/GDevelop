@@ -8,7 +8,7 @@ import { Column } from '../../../UI/Grid';
 import { type SubscriptionPlanWithPricingSystems } from '../../../Utils/GDevelopServices/Usage';
 import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
 import { getPlanIcon } from '../PlanCard';
-import { LineStackLayout } from '../../../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import classes from './SubscriptionOptions.module.css';
 import classNames from 'classnames';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -16,12 +16,6 @@ import { Trans } from '@lingui/macro';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
-  optionsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))',
-    gridGap: '0.5rem',
-    margin: 2,
-  },
   buttonBase: {
     height: '100%',
     width: '100%',
@@ -49,14 +43,18 @@ const SubscriptionOptionButton = ({
   recommended,
   disabled,
 }: Props) => {
-  const { windowSize } = useResponsiveWindowSize();
-  const isMobileOrMediumScreen =
-    windowSize === 'small' || windowSize === 'medium';
+  const { windowSize, isMobile } = useResponsiveWindowSize();
+  const isMobileOrMediumScreen = isMobile || windowSize === 'medium';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div className={classes.optionAndBadgeContainer}>
       {recommended && (
-        <div className={classes.recommendedBadge}>
+        <div
+          className={classNames({
+            [classes.recommendedBadge]: true,
+            [classes.mobile]: isMobile,
+          })}
+        >
           <Text color="inherit" noMargin>
             {isMobileOrMediumScreen ? (
               <Trans>Recommended</Trans>
@@ -113,7 +111,7 @@ const SubscriptionOptions = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <div style={styles.optionsContainer}>
+        <ResponsiveLineStackLayout noMargin>
           {subscriptionPlansWithPricingSystems.map(
             (subscriptionPlanWithPricingSystems, index) => {
               const isSelected =
@@ -169,7 +167,7 @@ const SubscriptionOptions = ({
               );
             }
           )}
-        </div>
+        </ResponsiveLineStackLayout>
       )}
     </I18n>
   );

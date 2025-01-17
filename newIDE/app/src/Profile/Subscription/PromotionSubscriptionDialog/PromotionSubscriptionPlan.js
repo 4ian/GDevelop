@@ -34,6 +34,7 @@ import DiscountFlame from '../../../UI/HotMessage/DiscountFlame';
 import ThumbsUp from '../../../UI/CustomSvgIcons/ThumbsUp';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import CircledClose from '../../../UI/CustomSvgIcons/CircledClose';
 
 const styles = {
   simpleSizeContainer: {
@@ -214,13 +215,15 @@ const PromotionSubscriptionPlan = ({
                         {summarizedFeature.displayedFeatureName}
                       </Text>
                       <div style={styles.tableRightItemContainer}>
-                        {summarizedFeature.enabled ? (
+                        {summarizedFeature.enabled === 'yes' ? (
                           <CheckCircleFilled
                             style={{
                               ...styles.bulletIcon,
                               color: gdevelopTheme.message.valid,
                             }}
                           />
+                        ) : summarizedFeature.enabled === 'no' ? (
+                          <CircledClose style={styles.bulletIcon} />
                         ) : summarizedFeature.unlimited ? (
                           <div
                             style={{

@@ -30,8 +30,8 @@ import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
 import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-import SquaredDoubleChevronArrowDown from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowDown';
-import SquaredDoubleChevronArrowUp from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowUp';
+import SquaredChevronArrowDown from '../../UI/CustomSvgIcons/SquaredChevronArrowDown';
+import SquaredChevronArrowUp from '../../UI/CustomSvgIcons/SquaredChevronArrowUp';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
@@ -166,9 +166,9 @@ const TopLevelCollapsibleSection = ({
         <LineStackLayout noMargin alignItems="center">
           <IconButton size="small" onClick={toggleFolded}>
             {isFolded ? (
-              <SquaredDoubleChevronArrowUp style={styles.icon} />
+              <SquaredChevronArrowUp style={styles.icon} />
             ) : (
-              <SquaredDoubleChevronArrowDown style={styles.icon} />
+              <SquaredChevronArrowDown style={styles.icon} />
             )}
           </IconButton>
           <Text size="sub-title" noMargin style={textEllipsisStyle}>

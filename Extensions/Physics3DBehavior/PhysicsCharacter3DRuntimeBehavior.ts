@@ -332,6 +332,21 @@ namespace gdjs {
       return result;
     }
 
+    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+      // Characters body should not rotate around X and Y.
+      const rotation = result.sEulerAngles(
+        this.getVec3(0, 0, gdjs.toRad(this.owner3D.getAngle()))
+      );
+      result.Set(
+        rotation.GetX(),
+        rotation.GetY(),
+        rotation.GetZ(),
+        rotation.GetW()
+      );
+      Jolt.destroy(rotation);
+      return result;
+    }
+
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       const { behavior } = this.getPhysics3D();
       this.owner3D.setCenterXInScene(
@@ -344,6 +359,19 @@ namespace gdjs {
         (physicsPosition.GetZ() - behavior._shapeHalfDepth) *
           this._sharedData.worldScale
       );
+    }
+
+    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+      const threeObject = this.owner3D.get3DRendererObject();
+      threeObject.quaternion.x = physicsRotation.GetX();
+      threeObject.quaternion.y = physicsRotation.GetY();
+      threeObject.quaternion.z = physicsRotation.GetZ();
+      threeObject.quaternion.w = physicsRotation.GetW();
+      // TODO Avoid this instantiation
+      const euler = new THREE.Euler(0, 0, 0, 'ZYX');
+      euler.setFromQuaternion(threeObject.quaternion);
+      // No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
+      this.owner3D.setAngle(gdjs.toDegrees(euler.z));
     }
 
     onDeActivate() {
@@ -1495,7 +1523,6 @@ namespace gdjs {
       }
 
       updateObjectFromBody() {
-        const { behavior } = this.characterBehavior.getPhysics3D();
         const { character } = this.characterBehavior;
         if (!character) {
           return;
@@ -1504,8 +1531,9 @@ namespace gdjs {
         this.characterBehavior.moveObjectToPhysicsPosition(
           character.GetPosition()
         );
-        // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
-        behavior.moveObjectToPhysicsRotation(character.GetRotation());
+        this.characterBehavior.moveObjectToPhysicsRotation(
+          character.GetRotation()
+        );
       }
 
       updateBodyFromObject() {
@@ -1526,9 +1554,10 @@ namespace gdjs {
           behavior._objectOldRotationY !== owner3D.getRotationY() ||
           behavior._objectOldRotationZ !== owner3D.getAngle()
         ) {
-          // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
           character.SetRotation(
-            behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1))
+            this.characterBehavior.getPhysicsRotation(
+              _sharedData.getQuat(0, 0, 0, 1)
+            )
           );
         }
       }

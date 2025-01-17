@@ -133,12 +133,23 @@ const keyNamesSet = new Set(keyNames);
 const stringRegex = /^"(\w*)"$/;
 const valueRegex = /^\w*$/;
 
-const isKeyValid = (expression: string): boolean => {
+const isValidLiteralKeyboardKey = (expression: string): boolean => {
+  const matches = expression.match(stringRegex);
+  return matches && matches[1] !== undefined
+    ? keyNamesSet.has(matches[1])
+    // the expression is not a literal value
+    : false;
+};
+
+// This is not the negation of the function above as both return false for
+// non-literal expressions.
+const isInvalidLiteralKeyboardKey = (expression: string): boolean => {
   const matches = expression.match(stringRegex);
   // Return true by default as it could be an expression.
   return matches && matches[1] !== undefined
-    ? keyNamesSet.has(matches[1])
-    : true;
+    ? !keyNamesSet.has(matches[1])
+    // the expression is not a literal value
+    : false;
 };
 
 const getStringContent = (expression: string): string => {
@@ -162,7 +173,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isKeyValid(props.value)
+      !!props.value && !isValidLiteralKeyboardKey(props.value)
     );
 
     const switchFieldType = () => {
@@ -170,10 +181,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     };
 
     const onChangeSelectValue = (value: string) => {
-      const oldValue = getStringContent(props.value);
-      if (oldValue !== value) {
-        props.onChange(valueRegex.test(value) ? `"${value}"` : value);
-      }
+      props.onChange(valueRegex.test(value) ? `"${value}"` : value);
     };
 
     const onChangeTextValue = (value: string) => {
@@ -215,7 +223,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               errorText={
                 !props.value ? (
                   <Trans>You must select a key.</Trans>
-                ) : !isKeyValid(props.value) ? (
+                ) : !isValidLiteralKeyboardKey(props.value) ? (
                   <Trans>
                     You must select a valid key. "{props.value}" is not valid.
                   </Trans>
@@ -266,6 +274,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineKeyboardKey = ({
   value,
+  expressionIsValid,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
   if (!value) {
@@ -276,7 +285,7 @@ export const renderInlineKeyboardKey = ({
     );
   }
 
-  return isKeyValid(value) ? (
+  return expressionIsValid && !isInvalidLiteralKeyboardKey(value) ? (
     value
   ) : (
     <InvalidParameterValue>{value}</InvalidParameterValue>

@@ -1,0 +1,21 @@
+.choosePlanContainer {
+    position: relative;
+    overflow: hidden;
+    padding: 3px;
+    border-radius: 10px;
+    display: flex;
+    flex: 1;
+}
+
+.choosePlanContainer::before {
+    content: '';
+    display: block;
+    background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
+    width: 100%;
+    height: 100%;
+    padding-bottom: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

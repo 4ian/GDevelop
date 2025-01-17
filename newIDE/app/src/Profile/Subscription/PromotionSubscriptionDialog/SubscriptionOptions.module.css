@@ -1,0 +1,50 @@
+.optionAndBadgeContainer {
+    position: relative;
+    height: 100%;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.optionContainer {
+    position: relative;
+    overflow: hidden;
+    padding: 2px;
+    border-radius: 10px;
+    display: flex;
+    height: 100%;
+}
+
+.optionContainer::before {
+    content: '';
+    display: block;
+    background: var(--theme-text-disabled-color);
+    width: 100%;
+    height: 100%;
+    padding-bottom: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.optionContainer:hover::before {
+    background: var(--theme-text-default-color);
+}
+
+.optionContainer.selected::before {
+    background: linear-gradient(90deg, var(--theme-premium-teal) 0%, var(--theme-premium-orange) 100%);
+}
+
+.recommendedBadge {
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: var(--theme-message-hot-background-color);
+    color: var(--theme-message-hot-color);
+    padding: 2px 8px;
+    border-radius: 16px;
+    z-index: 2;
+}
+.recommendedBadge.mobile {
+    top: -5px;
+}

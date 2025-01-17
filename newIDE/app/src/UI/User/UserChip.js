@@ -31,6 +31,7 @@ const GetPremiumButton = () => {
         openSubscriptionDialog({
           analyticsMetadata: {
             reason: 'Account get premium',
+            recommendedPlanId: 'gdevelop_silver',
           },
         });
       }}

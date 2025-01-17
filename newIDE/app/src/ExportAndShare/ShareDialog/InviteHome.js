@@ -323,7 +323,10 @@ const InviteHome = ({ cloudProjectId }: Props) => {
         {!hasSufficientPermissionsWithSubscription &&
           !!projectUserAcls &&
           fetchError !== 'project-not-owned' && (
-            <GetSubscriptionCard subscriptionDialogOpeningReason="Add collaborators on project">
+            <GetSubscriptionCard
+              subscriptionDialogOpeningReason="Add collaborators on project"
+              recommendedPlanIdIfNoSubscription="gdevelop_startup"
+            >
               <Text>
                 <Trans>
                   Get a startup subscription to invite collaborators into your

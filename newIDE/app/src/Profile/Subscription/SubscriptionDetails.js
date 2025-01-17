@@ -457,6 +457,7 @@ const SubscriptionDetails = ({
         <GetSubscriptionCard
           label={<Trans>Choose a subscription</Trans>}
           subscriptionDialogOpeningReason="Consult profile"
+          recommendedPlanIdIfNoSubscription="gdevelop_silver"
         >
           <Text noMargin>
             <Trans>

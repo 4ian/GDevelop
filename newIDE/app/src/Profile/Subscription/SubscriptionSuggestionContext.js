@@ -2,7 +2,10 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import SubscriptionDialog from './SubscriptionDialog';
-import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
+import {
+  sendSubscriptionDialogShown,
+  type SubscriptionDialogDisplayReason,
+} from '../../Utils/Analytics/EventSender';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import {
   hasMobileAppStoreSubscriptionPlan,
@@ -13,13 +16,17 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import useSubscriptionPlans, {
   getAvailableSubscriptionPlansWithPrices,
 } from '../../Utils/UseSubscriptionPlans';
+import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
+import SubscriptionPendingDialog from './SubscriptionPendingDialog';
+import LoaderModal from '../../UI/LoaderModal';
+
+export type SubscriptionType = 'individual' | 'team' | 'education';
 
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
+  recommendedPlanId?: string,
   preStep?: 'subscriptionChecker',
 |};
-
-export type SubscriptionType = 'individual' | 'team' | 'education';
 
 type SubscriptionSuggestionState = {|
   /**
@@ -46,10 +53,10 @@ export const SubscriptionSuggestionProvider = ({
   children,
   simulateMobileApp,
 }: SubscriptionSuggestionProviderProps) => {
-  const [analyticsMetadata, setAnalyticsMetadata] = React.useState<?{|
-    reason: SubscriptionDialogDisplayReason,
-    preStep?: 'subscriptionChecker',
-  |}>(null);
+  const [
+    analyticsMetadata,
+    setAnalyticsMetadata,
+  ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
   const [filter, setFilter] = React.useState<
     'individual' | 'team' | 'education' | null
   >(null);
@@ -59,6 +66,10 @@ export const SubscriptionSuggestionProvider = ({
     includeLegacy: true,
     authenticatedUser,
   });
+  const [
+    subscriptionPendingDialogOpen,
+    setSubscriptionPendingDialogOpen,
+  ] = React.useState(false);
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
@@ -132,23 +143,60 @@ export const SubscriptionSuggestionProvider = ({
     [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]
   );
 
+  // When the analyticsMetadata is set, a dialog is shown so we can send an event.
+  React.useEffect(
+    () => {
+      if (analyticsMetadata) {
+        sendSubscriptionDialogShown(analyticsMetadata);
+      }
+    },
+    [analyticsMetadata]
+  );
+
   return (
     <SubscriptionSuggestionContext.Provider value={value}>
       {children}
-      {analyticsMetadata && (
-        <SubscriptionDialog
-          open
-          subscriptionPlansWithPricingSystems={
-            availableSubscriptionPlansWithPrices
-          }
-          userLegacySubscriptionPlanWithPricingSystem={
-            userLegacySubscriptionPlanWithPricingSystem
-          }
-          onClose={closeSubscriptionDialog}
-          analyticsMetadata={analyticsMetadata}
-          filter={filter}
+      {subscriptionPendingDialogOpen && (
+        <SubscriptionPendingDialog
+          authenticatedUser={authenticatedUser}
+          onClose={() => {
+            setSubscriptionPendingDialogOpen(false);
+            authenticatedUser.onRefreshSubscription();
+          }}
+          onSuccess={closeSubscriptionDialog}
         />
       )}
+      {analyticsMetadata ? (
+        authenticatedUser.loginState === 'loggingIn' ? (
+          <LoaderModal show />
+        ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
+          analyticsMetadata.recommendedPlanId ? (
+          <PromotionSubscriptionDialog
+            subscriptionPlansWithPricingSystems={
+              availableSubscriptionPlansWithPrices
+            }
+            onClose={closeSubscriptionDialog}
+            recommendedPlanId={analyticsMetadata.recommendedPlanId}
+            onOpenPendingDialog={(open: boolean) =>
+              setSubscriptionPendingDialogOpen(open)
+            }
+          />
+        ) : (
+          <SubscriptionDialog
+            subscriptionPlansWithPricingSystems={
+              availableSubscriptionPlansWithPrices
+            }
+            userLegacySubscriptionPlanWithPricingSystem={
+              userLegacySubscriptionPlanWithPricingSystem
+            }
+            onClose={closeSubscriptionDialog}
+            filter={filter}
+            onOpenPendingDialog={(open: boolean) =>
+              setSubscriptionPendingDialogOpen(open)
+            }
+          />
+        )
+      ) : null}
     </SubscriptionSuggestionContext.Provider>
   );
 };

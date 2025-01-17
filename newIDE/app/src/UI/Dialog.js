@@ -14,7 +14,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
-import { LineStackLayout } from './Layout';
+import { ColumnStackLayout, LineStackLayout } from './Layout';
 import RaisedButton from './RaisedButton';
 import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
@@ -99,6 +99,16 @@ const styles = {
   minHeightForFullHeightModal: 'calc(100% - 64px)',
   minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
   minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
+  topBackground: {
+    position: 'absolute',
+    top: 0,
+    zIndex: -1,
+    left: dialogPaddingX,
+    right: dialogPaddingX,
+    height: '100%',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+  },
 };
 
 const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
@@ -149,10 +159,13 @@ const useStylesForDialogContent = ({
 type DialogProps = {|
   open?: boolean,
   title: React.Node,
+  subtitle?: React.Node,
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
   dangerLevel?: 'warning' | 'danger',
+
+  topBackgroundSrc?: string,
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -220,6 +233,7 @@ const Dialog = ({
   maxWidth,
   minHeight,
   title,
+  subtitle,
   fixedContent,
   children,
   flexColumnBody,
@@ -231,6 +245,7 @@ const Dialog = ({
   fullscreen,
   actionsFullWidthOnMobile,
   forceScrollVisible,
+  topBackgroundSrc,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -342,6 +357,14 @@ const Dialog = ({
 
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
+  const paperMinHeight = fullHeight
+    ? styles.minHeightForFullHeightModal
+    : minHeight === 'lg'
+    ? styles.minHeightForLargeHeightModal
+    : minHeight === 'sm'
+    ? styles.minHeightForSmallHeightModal
+    : undefined;
+
   return (
     <MuiDialog
       classes={classesForDangerousDialog}
@@ -357,13 +380,7 @@ const Dialog = ({
         id,
         style: {
           backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          minHeight: fullHeight
-            ? styles.minHeightForFullHeightModal
-            : minHeight === 'lg'
-            ? styles.minHeightForLargeHeightModal
-            : minHeight === 'sm'
-            ? styles.minHeightForSmallHeightModal
-            : undefined,
+          minHeight: paperMinHeight,
           ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
         },
       }}
@@ -375,6 +392,14 @@ const Dialog = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
+      {topBackgroundSrc && (
+        <div
+          style={{
+            ...styles.topBackground,
+            backgroundImage: `url(${topBackgroundSrc})`,
+          }}
+        />
+      )}
       <div style={dialogContainerStyle}>
         <div
           style={{
@@ -389,9 +414,12 @@ const Dialog = ({
                   backgroundColor={gdevelopTheme.dialog.backgroundColor}
                 />
               )}
-              <Text noMargin size="section-title">
-                {title}
-              </Text>
+              <ColumnStackLayout noMargin>
+                <Text noMargin size="section-title">
+                  {title}
+                </Text>
+                {subtitle && <Text noMargin>{subtitle}</Text>}
+              </ColumnStackLayout>
             </Line>
             <Column noMargin>
               <Line noMargin alignItems="center">

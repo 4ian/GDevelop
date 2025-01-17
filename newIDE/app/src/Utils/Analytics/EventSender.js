@@ -10,6 +10,7 @@ import {
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
+import { type SubscriptionAnalyticsMetadata } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 const electron = optionalRequire('electron');
@@ -377,10 +378,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock course chapter'
   | 'Account get premium';
 
-export const sendSubscriptionDialogShown = (metadata: {|
-  reason: SubscriptionDialogDisplayReason,
-  preStep?: 'subscriptionChecker',
-|}) => {
+export const sendSubscriptionDialogShown = (
+  metadata: SubscriptionAnalyticsMetadata
+) => {
   recordEvent('subscription-dialog-shown', metadata);
 };
 

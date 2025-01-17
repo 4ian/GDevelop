@@ -133,6 +133,7 @@ export default function RedeemCodeDialog({
                 floatingLabelFixed
                 errorText={getRedeemCodeErrorText(error)}
                 autoFocus="desktop"
+                disabled={isLoading}
               />
               {!subscription ||
               !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.

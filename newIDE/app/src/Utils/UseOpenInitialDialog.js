@@ -34,10 +34,16 @@ const useOpenInitialDialog = ({
     () => {
       switch (routeArguments['initial-dialog']) {
         case 'subscription':
+          let recommendedPlanId =
+            routeArguments['recommended-plan-id'] || 'gdevelop_silver';
+
           openSubscriptionDialog({
-            analyticsMetadata: { reason: 'Landing dialog at opening' },
+            analyticsMetadata: {
+              reason: 'Landing dialog at opening',
+              recommendedPlanId,
+            },
           });
-          removeRouteArguments(['initial-dialog']);
+          removeRouteArguments(['initial-dialog', 'recommended-plan-id']);
           break;
         case 'signup':
           // Add timeout to give time to the app to sign in with Firebase

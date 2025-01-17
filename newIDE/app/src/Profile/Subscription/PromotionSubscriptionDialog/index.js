@@ -181,23 +181,25 @@ export default function PromotionSubscriptionDialog({
                 </ColumnStackLayout>
               )}
               <Line>
-                <Column noMargin>
-                  <LineStackLayout noMargin>
-                    <Text size="sub-title">❤️</Text>
-                    <Text size="sub-title">
-                      <Trans>Support What You Love</Trans>
+                <ColumnStackLayout noMargin>
+                  <Column noMargin>
+                    <LineStackLayout noMargin>
+                      <Text size="sub-title">❤️</Text>
+                      <Text size="sub-title">
+                        <Trans>Support What You Love</Trans>
+                      </Text>
+                    </LineStackLayout>
+                    <Text size="body" color="secondary">
+                      <Trans>
+                        The GDevelop project is open-source, powered by passion
+                        and community. Your membership helps the GDevelop
+                        company maintain servers, build new features, develop
+                        commercial offerings and keep the open-source project
+                        thriving. Our goal: make game development fast, fun and
+                        accessible to all.
+                      </Trans>
                     </Text>
-                  </LineStackLayout>
-                  <Text size="body" color="secondary">
-                    <Trans>
-                      The GDevelop project is open-source, powered by passion
-                      and community. Your membership helps the GDevelop company
-                      maintain servers, build new features, develop commercial
-                      offerings and keep the open-source project thriving. Our
-                      goal: make game development fast, fun and accessible to
-                      all.
-                    </Trans>
-                  </Text>
+                  </Column>
                   {getPlanSpecificRequirements(
                     i18n,
                     subscriptionPlansWithPricingSystems
@@ -209,7 +211,7 @@ export default function PromotionSubscriptionDialog({
                       {planSpecificRequirements}
                     </AlertMessage>
                   ))}
-                </Column>
+                </ColumnStackLayout>
               </Line>
             </ColumnStackLayout>
           </Dialog>

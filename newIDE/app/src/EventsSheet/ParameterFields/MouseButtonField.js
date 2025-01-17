@@ -33,6 +33,28 @@ const mouseButtons = [
     label: t`Forward (Additional button, typically the Browser Forward button)`,
   },
 ];
+const mouseButtonsSet = new Set(mouseButtons.map(button => button.value));
+
+const stringRegex = /^"(\w*)"$/;
+
+const isValidLiteralMouseButton = (expression: string): boolean => {
+  const matches = expression.match(stringRegex);
+  return matches && matches[1] !== undefined
+    ? mouseButtonsSet.has(matches[1])
+    : // the expression is not a literal value
+      false;
+};
+
+// This is not the negation of the function above as both return false for
+// non-literal expressions.
+const isInvalidLiteralMouseButton = (expression: string): boolean => {
+  const matches = expression.match(stringRegex);
+  // Return true by default as it could be an expression.
+  return matches && matches[1] !== undefined
+    ? !mouseButtonsSet.has(matches[1])
+    : // the expression is not a literal value
+      false;
+};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseButtonField(props, ref) {
@@ -48,13 +70,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const isCurrentValueInList = mouseButtons.some(
-      mouseButton => `"${mouseButton.value}"` === props.value
-    );
-
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInList
+      !!props.value && !isValidLiteralMouseButton(props.value)
     );
 
     const switchFieldType = () => {
@@ -144,13 +162,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineMouseButton = ({
   value,
+  expressionIsValid,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
-  return value ? (
+  if (!value) {
+    return (
+      <InvalidParameterValue isEmpty>
+        <Trans>Choose a mouse button</Trans>
+      </InvalidParameterValue>
+    );
+  }
+
+  return expressionIsValid && !isInvalidLiteralMouseButton(value) ? (
     value
   ) : (
-    <InvalidParameterValue isEmpty>
-      <Trans>Choose a mouse button</Trans>
-    </InvalidParameterValue>
+    <InvalidParameterValue>{value}</InvalidParameterValue>
   );
 };

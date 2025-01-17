@@ -214,7 +214,11 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               eventsFunctionsContainer={eventsFunctionsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}
               helpPagePath={helpPagePath}
-              onConfigurationUpdated={onConfigurationUpdated}
+              onConfigurationUpdated={() => {
+                onConfigurationUpdated();
+                // A function configuration change may impact the parameters.
+                this.forceUpdate();
+              }}
               renderConfigurationHeader={renderConfigurationHeader}
               freezeEventsFunctionType={freezeEventsFunctionType}
               getFunctionGroupNames={getFunctionGroupNames}

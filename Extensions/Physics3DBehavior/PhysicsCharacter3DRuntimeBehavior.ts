@@ -1274,7 +1274,7 @@ namespace gdjs {
      */
     isFalling(): boolean {
       return (
-        !this.isOnFloor() ||
+        this.isFallingWithoutJumping() ||
         (this.isJumping() && this._currentFallSpeed > this._currentJumpSpeed)
       );
     }

@@ -421,10 +421,11 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
 
-  const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
-      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
-          property.GetType()));
-  if (primitiveType == "string") {
+  const auto &valueType =
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
+  const auto &primitiveType =
+      gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+  if (primitiveType == "string" || valueType == "behavior") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (primitiveType == "number") {
     return "Number(" +

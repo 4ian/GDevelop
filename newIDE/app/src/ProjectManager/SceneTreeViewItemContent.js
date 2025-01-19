@@ -23,7 +23,13 @@ const styles = {
 export type SceneTreeViewItemCallbacks = {|
   onDeleteLayout: gdLayout => void,
   onRenameLayout: (string, string) => void,
-  onOpenLayout: string => void,
+  onOpenLayout: (
+    name: string,
+    options?: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+    |}
+  ) => void,
 |};
 
 export type SceneTreeViewItemCommonProps = {|
@@ -101,6 +107,27 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
   buildMenuTemplate(i18n: I18nType, index: number) {
     return [
+      {
+        label: i18n._(t`Open scene editor`),
+        enabled: true,
+        click: () =>
+          this.props.onOpenLayout(this.scene.getName(), {
+            openSceneEditor: true,
+            openEventsEditor: false,
+          }),
+      },
+      {
+        label: i18n._(t`Open events sheet`),
+        enabled: true,
+        click: () =>
+          this.props.onOpenLayout(this.scene.getName(), {
+            openSceneEditor: false,
+            openEventsEditor: true,
+          }),
+      },
+      {
+        type: 'separator',
+      },
       {
         label: i18n._(t`Edit scene properties`),
         enabled: true,

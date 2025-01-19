@@ -19,6 +19,7 @@ const path = optionalRequire('path');
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
 const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 
 export const locateResourceFile = ({
   project,
@@ -32,7 +33,7 @@ export const locateResourceFile = ({
     resource.getName()
   );
 
-  remote.shell.showItemInFolder(path.resolve(resourceFilePath));
+  if (shell) shell.showItemInFolder(path.resolve(resourceFilePath));
 };
 
 export const openResourceFile = ({
@@ -46,7 +47,7 @@ export const openResourceFile = ({
     project,
     resource.getName()
   );
-  remote.shell.openPath(path.resolve(resourceFilePath));
+  if (shell) shell.openPath(path.resolve(resourceFilePath));
 };
 
 export const copyResourceFilePath = ({

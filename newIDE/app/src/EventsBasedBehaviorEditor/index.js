@@ -178,6 +178,18 @@ export default function EventsBasedBehaviorEditor({
               if (onConfigurationUpdated) onConfigurationUpdated('isPrivate');
               onChange();
             }}
+            tooltipOrHelperText={
+              eventsBasedBehavior.isPrivate() ? (
+                <Trans>
+                  This behavior won't be visible in the scene and events
+                  editors.
+                </Trans>
+              ) : (
+                <Trans>
+                  This behavior will be visible in the scene and events editors.
+                </Trans>
+              )
+            }
           />
           {eventsBasedBehavior
             .getEventsFunctions()

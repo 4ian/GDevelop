@@ -22,18 +22,13 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
-  sendSubscriptionDialogShown,
   sendChoosePlanClicked,
   sendCancelSubscriptionToChange,
 } from '../../Utils/Analytics/EventSender';
-import {
-  type SubscriptionAnalyticsMetadata,
-  type SubscriptionType,
-} from './SubscriptionSuggestionContext';
-import SubscriptionPendingDialog from './SubscriptionPendingDialog';
+import { type SubscriptionType } from './SubscriptionSuggestionContext';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
@@ -184,7 +179,7 @@ const getMaximumYearlyDiscountOverPlans = ({
   return maximumDiscount;
 };
 
-const getPlanSpecificRequirements = (
+export const getPlanSpecificRequirements = (
   i18n: I18nType,
   subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
 ): Array<string> => {
@@ -207,21 +202,19 @@ const getPlanSpecificRequirements = (
 };
 
 type Props = {|
-  open: boolean,
   onClose: Function,
-  analyticsMetadata: SubscriptionAnalyticsMetadata,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   userLegacySubscriptionPlanWithPricingSystem: ?SubscriptionPlanWithPricingSystems,
   filter: ?SubscriptionType,
+  onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function SubscriptionDialog({
-  open,
   onClose,
-  analyticsMetadata,
   subscriptionPlansWithPricingSystems,
   userLegacySubscriptionPlanWithPricingSystem,
   filter,
+  onOpenPendingDialog,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
@@ -230,10 +223,6 @@ export default function SubscriptionDialog({
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
-  const [
-    subscriptionPendingDialogOpen,
-    setSubscriptionPendingDialogOpen,
-  ] = React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [period, setPeriod] = React.useState<'year' | 'month'>(
@@ -246,15 +235,6 @@ export default function SubscriptionDialog({
   const { showConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
-  );
-
-  React.useEffect(
-    () => {
-      if (open) {
-        sendSubscriptionDialogShown(analyticsMetadata);
-      }
-    },
-    [open, analyticsMetadata]
   );
 
   const buyUpdateOrCancelPlan = async (
@@ -271,7 +251,7 @@ export default function SubscriptionDialog({
     }
     // Subscribing from an account without a subscription
     if (!subscription.planId && subscriptionPlanPricingSystem) {
-      setSubscriptionPendingDialogOpen(true);
+      onOpenPendingDialog(true);
       const isEducationPlan =
         subscriptionPlanPricingSystem &&
         subscriptionPlanPricingSystem.planId === 'gdevelop_education';
@@ -360,7 +340,7 @@ export default function SubscriptionDialog({
       }
 
       // Then redirect as if a new subscription is being chosen.
-      setSubscriptionPendingDialogOpen(true);
+      onOpenPendingDialog(true);
       Window.openExternalURL(
         getRedirectToCheckoutUrl({
           pricingSystemId: subscriptionPlanPricingSystem.id,
@@ -467,7 +447,7 @@ export default function SubscriptionDialog({
                 onClick={() => setRedeemCodeDialogOpen(true)}
               />,
             ]}
-            open={open}
+            open
           >
             {isPlanValid && userSubscriptionPlanWithPricingSystems && (
               <Column noMargin>
@@ -787,15 +767,20 @@ export default function SubscriptionDialog({
                 </Text>
               </Line>
               <Column noMargin>
-                <Text size="sub-title">
-                  ❤️ <Trans>Support What You Love</Trans>
-                </Text>
+                <LineStackLayout noMargin>
+                  <Text size="sub-title">❤️</Text>
+                  <Text size="sub-title">
+                    <Trans>Support What You Love</Trans>
+                  </Text>
+                </LineStackLayout>
                 <Text size="body" color="secondary">
-                  The GDevelop project is open-source, powered by passion and
-                  community. Your membership helps the GDevelop company maintain
-                  servers, build new features, develop commercial offerings and
-                  keep the open-source project thriving. Our goal: make game
-                  development fast, fun and accessible to all.
+                  <Trans>
+                    The GDevelop project is open-source, powered by passion and
+                    community. Your membership helps the GDevelop company
+                    maintain servers, build new features, develop commercial
+                    offerings and keep the open-source project thriving. Our
+                    goal: make game development fast, fun and accessible to all.
+                  </Trans>
                 </Text>
               </Column>
               {getPlanSpecificRequirements(
@@ -881,15 +866,6 @@ export default function SubscriptionDialog({
                 </Text>
               </Dialog>
             )}
-          {subscriptionPendingDialogOpen && (
-            <SubscriptionPendingDialog
-              authenticatedUser={authenticatedUser}
-              onClose={() => {
-                setSubscriptionPendingDialogOpen(false);
-                authenticatedUser.onRefreshSubscription();
-              }}
-            />
-          )}
           {redeemCodeDialogOpen && (
             <RedeemCodeDialog
               authenticatedUser={authenticatedUser}
@@ -902,7 +878,7 @@ export default function SubscriptionDialog({
                     await authenticatedUser.onRefreshSubscription();
                   } finally {
                     setIsChangingSubscription(false);
-                    setSubscriptionPendingDialogOpen(true);
+                    onOpenPendingDialog(true);
                   }
                 }
               }}

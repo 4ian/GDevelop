@@ -33,9 +33,6 @@ const styles = {
   tabLabelAndIcon: {
     display: 'flex',
     alignItems: 'center',
-    marginLeft: 10,
-    // 12 instead of 10 to even the perceived margin of the home tab (the only not-closable tab).
-    marginRight: 12,
   },
   closeButton: {
     marginRight: 5,
@@ -242,14 +239,6 @@ export function ClosableTab({
               height: gdevelopTheme.closableTabs.height,
               color: textColor,
               fontFamily: gdevelopTheme.closableTabs.fontFamily,
-              marginLeft:
-                icon || renderCustomIcon
-                  ? closable
-                    ? 0
-                    : styles.tabLabelAndIcon.marginLeft -
-                      styles.tabIcon.marginRight
-                  : styles.tabLabelAndIcon.marginLeft,
-              marginRight: closable ? 0 : styles.tabLabelAndIcon.marginRight,
             }}
           >
             {icon || renderCustomIcon ? (

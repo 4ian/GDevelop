@@ -21,6 +21,7 @@ export const DefaultNoSubscription = () => (
   <SubscriptionPendingDialog
     authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
     onClose={action('on close')}
+    onSuccess={action('on success')}
   />
 );
 
@@ -28,6 +29,7 @@ export const AuthenticatedUserWithSubscriptionAndDiscordUsernameAlreadyFilled = 
   <SubscriptionPendingDialog
     authenticatedUser={fakeSilverAuthenticatedUser}
     onClose={action('on close')}
+    onSuccess={action('on success')}
   />
 );
 
@@ -43,6 +45,7 @@ export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = 
       profile: fakeProfileWithoutDiscordUsername,
     }}
     onClose={action('on close')}
+    onSuccess={action('on success')}
   />
 );
 
@@ -53,5 +56,6 @@ export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername =
       profile: fakeProfileWithoutDiscordUsername,
     }}
     onClose={action('on close')}
+    onSuccess={action('on success')}
   />
 );

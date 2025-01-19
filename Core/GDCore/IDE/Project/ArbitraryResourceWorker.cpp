@@ -62,6 +62,11 @@ void ArbitraryResourceWorker::ExposeSpine(gd::String& resourceName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeJavaScript(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -193,6 +198,10 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "spine") {
     ExposeSpine(resourceName);
+    return;
+  }
+  if (resourceType == "javascript") {
+    ExposeJavaScript(resourceName);
     return;
   }
   gd::LogError("Unexpected resource type: " + resourceType + " for: " + resourceName);

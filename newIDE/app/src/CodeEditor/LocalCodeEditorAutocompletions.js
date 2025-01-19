@@ -4,6 +4,16 @@ import optionalRequire from '../Utils/OptionalRequire';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+// Avoid conflicts in declaration of PIXI and THREE namespaces.
+const excludedFiles = [
+  'global-three.d.ts',
+  'global-pixi.d.ts',
+  'pixi-particles-pixi-renderer.d.ts',
+  'pixi-tilemap.d.ts',
+  'pixi.js',
+  'three.js',
+];
+
 export const setupAutocompletions = (monaco: any) => {
   const importAllJsFilesFromFolder = (folderPath: string) =>
     fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
@@ -21,10 +31,45 @@ export const setupAutocompletions = (monaco: any) => {
           .isDirectory();
         if (
           (filename.endsWith('.ts') || filename.endsWith('.js')) &&
+          !excludedFiles.includes(filename) &&
           // Dialogue tree uses a folder called `bondage.js` that should not be read as a file.
           !isDirectory
         ) {
           const fullPath = path.join(folderPath, filename);
+          fs.readFile(fullPath, 'utf8', (fileError, content) => {
+            if (fileError) {
+              console.error(
+                `Unable to read ${fullPath} for setting up autocompletions:`,
+                fileError
+              );
+              return;
+            }
+
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+              content,
+              fullPath
+            );
+          });
+        }
+      });
+    });
+
+  const importAllJsFilesFromFolderRecursively = (folderPath: string) =>
+    fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
+      if (error) {
+        console.error(
+          'Unable to read GDJS files for setting up autocompletions:',
+          error
+        );
+        return;
+      }
+
+      filenames.forEach(filename => {
+        const fullPath = path.join(folderPath, filename);
+        const isDirectory = fs.lstatSync(fullPath).isDirectory();
+        if (isDirectory) {
+          importAllJsFilesFromFolderRecursively(fullPath);
+        } else if (filename.endsWith('.ts') || filename.endsWith('.js')) {
           fs.readFile(fullPath, 'utf8', (fileError, content) => {
             if (fileError) {
               console.error(
@@ -66,6 +111,8 @@ export const setupAutocompletions = (monaco: any) => {
     );
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
+    const threeTypesPath = path.join(runtimeTypesPath, 'three');
+    const pixiTypesPath = path.join(runtimeTypesPath, 'pixi');
 
     importAllJsFilesFromFolder(runtimePath);
     importAllJsFilesFromFolder(runtimeTypesPath);
@@ -74,6 +121,9 @@ export const setupAutocompletions = (monaco: any) => {
     importAllJsFilesFromFolder(runtimeHowlerSoundManagerPath);
     importAllJsFilesFromFolder(runtimeFontfaceobserverFontManagerPath);
     importAllJsFilesFromFolder(eventToolsPath);
+    importAllJsFilesFromFolderRecursively(threeTypesPath);
+    importAllJsFilesFromFolderRecursively(pixiTypesPath);
+
     fs.readdir(extensionsPath, (error: ?Error, folderNames: Array<string>) => {
       if (error) {
         console.error(

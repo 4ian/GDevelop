@@ -74,6 +74,9 @@ private:
   void ExposeVideo(gd::String &videoResourceName) override {
     AddUsedResource(videoResourceName);
   };
+  void ExposeJavaScript(gd::String &javaScriptResourceName) override {
+    AddUsedResource(javaScriptResourceName);
+  };
   void ExposeBitmapFont(gd::String &bitmapFontName) override {
     AddUsedResource(bitmapFontName);
   };

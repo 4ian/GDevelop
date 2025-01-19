@@ -27,10 +27,11 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Tooltip from '@material-ui/core/Tooltip';
+import CircledInfo from '../../../UI/CustomSvgIcons/SmallCircledInfo';
 
 type Props = BehaviorEditorProps;
 
-const NumericProperty = (props: {|
+export const NumericProperty = (props: {|
   id?: string,
   properties: gdMapStringPropertyDescriptor,
   propertyName: string,
@@ -55,9 +56,24 @@ const NumericProperty = (props: {|
   );
 };
 
-const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
+  if (measurementUnit.isUndefined() && property.getDescription()) {
+    return (
+      <Tooltip
+        title={
+          <MeasurementUnitDocumentation
+            label={property.getLabel()}
+            description={property.getDescription()}
+            elementsWithWords={''}
+          />
+        }
+      >
+        <InputAdornment position="end">{<CircledInfo />}</InputAdornment>
+      </Tooltip>
+    );
+  }
   return (
     <Tooltip
       title={
@@ -220,11 +236,13 @@ const Physics2Editor = (props: Props) => {
             value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
             floatingLabelText={
-              shape === 'Circle'
-                ? 'Radius'
-                : shape === 'Edge'
-                ? 'Length'
-                : 'Width'
+              shape === 'Circle' ? (
+                <Trans>Radius</Trans>
+              ) : shape === 'Edge' ? (
+                <Trans>Length</Trans>
+              ) : (
+                <Trans>Width</Trans>
+              )
             }
             min={0}
             onChange={newValue =>
@@ -241,7 +259,9 @@ const Physics2Editor = (props: Props) => {
             fullWidth
             value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
-            floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
+            floatingLabelText={
+              shape === 'Edge' ? <Trans>Angle</Trans> : <Trans>Height</Trans>
+            }
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue =>
               updateBehaviorProperty('shapeDimensionB', newValue)

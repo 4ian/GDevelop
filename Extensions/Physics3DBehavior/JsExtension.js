@@ -300,7 +300,8 @@ module.exports = {
             _(
               'The friction applied when touching other objects. The higher the value, the more friction.'
             )
-          );
+          )
+          .setGroup(_('Movement'));
         behaviorProperties
           .getOrCreate('restitution')
           .setValue(
@@ -315,7 +316,8 @@ module.exports = {
             _(
               'The "bounciness" of the object. The higher the value, the more other objects will bounce against it.'
             )
-          );
+          )
+          .setGroup(_('Movement'));
         behaviorProperties
           .getOrCreate('linearDamping')
           .setValue(
@@ -1533,9 +1535,25 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'stairHeightMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('stairHeightMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'shouldBindObjectAndForwardAngle') {
           behaviorContent
             .getChild('shouldBindObjectAndForwardAngle')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'canBePushed') {
+          behaviorContent
+            .getChild('canBePushed')
             .setBoolValue(newValue === '1');
           return true;
         }
@@ -1701,6 +1719,24 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        if (!behaviorContent.hasChild('stairHeightMax')) {
+          behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
+        }
+        behaviorProperties
+          .getOrCreate('stairHeightMax')
+          .setLabel('Max. stair height')
+          .setGroup(_('Walk'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('stairHeightMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         behaviorProperties
           .getOrCreate('shouldBindObjectAndForwardAngle')
           .setLabel('Keep object angle and forward direction the same')
@@ -1710,6 +1746,22 @@ module.exports = {
             behaviorContent
               .getChild('shouldBindObjectAndForwardAngle')
               .getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        if (!behaviorContent.hasChild('canBePushed')) {
+          behaviorContent.addChild('canBePushed').setBoolValue(true);
+        }
+        behaviorProperties
+          .getOrCreate('canBePushed')
+          .setLabel('Can be pushed by other characters')
+          .setGroup(_('Walk'))
+          .setType('Boolean')
+          .setValue(
+            behaviorContent.getChild('canBePushed').getBoolValue()
               ? 'true'
               : 'false'
           )
@@ -1732,9 +1784,11 @@ module.exports = {
         behaviorContent.addChild('sidewaysDeceleration').setDoubleValue(800);
         behaviorContent.addChild('sidewaysSpeedMax').setDoubleValue(400);
         behaviorContent.addChild('slopeMaxAngle').setDoubleValue(50);
+        behaviorContent.addChild('stairHeightMax').setDoubleValue(20);
         behaviorContent
           .addChild('shouldBindObjectAndForwardAngle')
           .setBoolValue(true);
+        behaviorContent.addChild('canBePushed').setBoolValue(true);
       };
 
       const aut = extension

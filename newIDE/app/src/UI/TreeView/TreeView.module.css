@@ -73,15 +73,30 @@
 }
 
 .itemName,
+.itemDescription,
 .itemNameInput {
   font-family: var(--gdevelop-modern-font-family) !important;
   font-size: 14px;
 }
+
+.itemTextContainer {
+  display: inline-grid;
+  gap: 2px;
+}
+
 .itemName {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: none;
+}
+
+.itemDescription {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: none;
+  color: var(--theme-text-secondary-color)
 }
 
 .itemName.placeholder {

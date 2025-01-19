@@ -53,6 +53,10 @@ void MetadataDeclarationHelper::DeclareExtension(
     extension.SetCategory(eventsFunctionsExtension.GetCategory());
 
   DeclareExtensionDependencies(extension, eventsFunctionsExtension);
+
+  for (const auto &sourceFile : eventsFunctionsExtension.GetAllSourceFiles()) {
+    extension.AddSourceFile() = sourceFile;
+  }
 }
 
 /**
@@ -153,6 +157,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
     objectMetadata
         .AddDefaultBehavior("TextContainerCapability::TextContainerBehavior");
   }
+
+  if (eventsBasedObject.IsPrivate())
+    objectMetadata.SetPrivate();
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.

@@ -347,7 +347,10 @@ function LeaderboardAppearanceDialog({
               />
             </ResponsiveLineStackLayout>
             {!canUseTheme ? (
-              <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Leaderboard customization"
+                recommendedPlanIdIfNoSubscription="gdevelop_silver"
+              >
                 <Line>
                   <Column noMargin>
                     <Text noMargin>
@@ -400,7 +403,10 @@ function LeaderboardAppearanceDialog({
               disabled={!useCustomCss || isLoading}
             />
             {!canUseCustomCss ? (
-              <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Leaderboard customization"
+                recommendedPlanIdIfNoSubscription="gdevelop_startup"
+              >
                 <Line>
                   <Column noMargin>
                     <Text noMargin>

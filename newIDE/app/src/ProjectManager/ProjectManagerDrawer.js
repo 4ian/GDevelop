@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-import EmptyMessage from '../UI/EmptyMessage';
-import { Trans } from '@lingui/macro';
+import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import {
   getAvoidSoftKeyboardStyle,
   useSoftKeyboardBottomOffset,
@@ -53,16 +52,12 @@ export const ProjectManagerDrawer = ({
       })}
     >
       <DrawerTopBar
+        icon={<MenuIcon />}
         title={title}
         onClose={toggleProjectManager}
         id="project-manager-drawer"
       />
       {children}
-      {!children && (
-        <EmptyMessage>
-          <Trans>To begin, open or create a new project.</Trans>
-        </EmptyMessage>
-      )}
     </Drawer>
   );
 };

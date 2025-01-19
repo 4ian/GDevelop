@@ -141,6 +141,26 @@ export default function EventsBasedObjectEditor({
           }}
         />
       )}
+      <Checkbox
+        label={<Trans>Private</Trans>}
+        checked={eventsBasedObject.isPrivate()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.setPrivate(checked);
+          onChange();
+          onEventsBasedObjectChildrenEdited();
+        }}
+        tooltipOrHelperText={
+          eventsBasedObject.isPrivate() ? (
+            <Trans>
+              This object won't be visible in the scene and events editors.
+            </Trans>
+          ) : (
+            <Trans>
+              This object will be visible in the scene and events editors.
+            </Trans>
+          )
+        }
+      />
       <Line noMargin justifyContent="center">
         <RaisedButton
           label={<Trans>Open visual editor for the object</Trans>}

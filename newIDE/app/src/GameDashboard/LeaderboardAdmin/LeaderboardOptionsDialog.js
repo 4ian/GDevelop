@@ -253,7 +253,10 @@ function LeaderboardOptionsDialog({
               }
             />
             {!canDisableLoginInLeaderboard && (
-              <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Leaderboard customization"
+                recommendedPlanIdIfNoSubscription="gdevelop_startup"
+              >
                 <Line>
                   <Column noMargin>
                     <Text noMargin>

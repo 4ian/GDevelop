@@ -10,8 +10,11 @@ import Window from '../../Utils/Window';
 import ResourcesLoader from '../../ResourcesLoader';
 
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
 const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 const app = remote ? remote.app : null;
 
 export const generateGetResourceActions = ({
@@ -40,7 +43,7 @@ export const generateGetResourceActions = ({
       resource.getName(),
       {}
     );
-    if (app && path && electron) {
+    if (app && path && shell) {
       const defaultPath = path.join(
         app.getPath('downloads'),
         resource.getName()
@@ -68,8 +71,7 @@ export const generateGetResourceActions = ({
       informUser({
         actionLabel: <Trans>Open folder</Trans>,
         message: <Trans>The resource has been downloaded</Trans>,
-        onActionClick: () =>
-          electron.shell.showItemInFolder(path.resolve(targetPath)),
+        onActionClick: () => shell.showItemInFolder(path.resolve(targetPath)),
       });
     } else {
       Window.openExternalURL(resourceUrl);

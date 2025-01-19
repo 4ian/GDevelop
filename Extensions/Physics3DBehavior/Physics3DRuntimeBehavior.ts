@@ -296,6 +296,7 @@ namespace gdjs {
 
   export class Physics3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     bodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
+    collisionChecker: gdjs.Physics3DRuntimeBehavior.CollisionChecker;
     owner3D: gdjs.RuntimeObject3D;
 
     bodyType: string;
@@ -338,7 +339,7 @@ namespace gdjs {
      * each time the methods onContactBegin and onContactEnd are called by the contact
      * listener.
      */
-    private _currentContacts: Array<Physics3DRuntimeBehavior> = [];
+    _currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
     private _destroyedDuringFrameLogic: boolean;
     _body: Jolt.Body | null = null;
@@ -379,6 +380,9 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
+      this.collisionChecker = new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(
         this
       );
       this.owner3D = owner;
@@ -540,7 +544,7 @@ namespace gdjs {
         if (this._body) {
           this._sharedData.bodyInterface.SetPosition(
             this._body.GetID(),
-            this.getVec3(
+            this.getRVec3(
               behaviorSpecificProps.px,
               behaviorSpecificProps.py,
               behaviorSpecificProps.pz
@@ -803,15 +807,23 @@ namespace gdjs {
      */
     getBodyLayer(): number {
       return Jolt.ObjectLayerPairFilterMask.prototype.sGetObjectLayer(
-        // Make sure objects don't register in the wrong layer group.
-        this.bodyType === 'Static'
-          ? this.layers & gdjs.Physics3DSharedData.staticLayersMask
-          : this.layers & gdjs.Physics3DSharedData.dynamicLayersMask,
-        // Static objects accept all collisions as it's the mask of dynamic objects that matters.
-        this.bodyType === 'Static'
-          ? gdjs.Physics3DSharedData.allLayersMask
-          : this.masks
+        this.getLayersAccordingToBodyType(),
+        this.getMasksAccordingToBodyType()
       );
+    }
+
+    private getLayersAccordingToBodyType(): integer {
+      // Make sure objects don't register in the wrong layer group.
+      return this.isStatic()
+        ? this.layers & gdjs.Physics3DSharedData.staticLayersMask
+        : this.layers & gdjs.Physics3DSharedData.dynamicLayersMask;
+    }
+
+    private getMasksAccordingToBodyType(): integer {
+      // Static objects accept all collisions as it's the mask of dynamic objects that matters.
+      return this.isStatic()
+        ? gdjs.Physics3DSharedData.allLayersMask
+        : this.masks;
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -1687,6 +1699,14 @@ namespace gdjs {
       }
     }
 
+    canCollideAgainst(otherBehavior: gdjs.Physics3DRuntimeBehavior): boolean {
+      return (
+        (this.getMasksAccordingToBodyType() &
+          otherBehavior.getLayersAccordingToBodyType()) !==
+        0
+      );
+    }
+
     static areObjectsColliding(
       object1: gdjs.RuntimeObject,
       object2: gdjs.RuntimeObject,
@@ -1696,27 +1716,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      if (
-        behavior1._currentContacts.some(
-          (behavior) => behavior.owner === object2
-        )
-      ) {
-        return true;
-      }
-      // If a contact has started at this frame and ended right away, it
-      // won't appear in current contacts but the condition should return
-      // true anyway.
-      if (
-        behavior1._contactsStartedThisFrame.some(
-          (behavior) => behavior.owner === object2
-        )
-      ) {
-        return true;
-      }
-
-      // No contact found
-      return false;
+      return behavior1.collisionChecker.isColliding(object2);
     }
 
     static hasCollisionStartedBetween(
@@ -1728,10 +1728,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      return behavior1._contactsStartedThisFrame.some(
-        (behavior) => behavior.owner === object2
-      );
+      return behavior1.collisionChecker.hasCollisionStartedWith(object2);
     }
 
     static hasCollisionStoppedBetween(
@@ -1743,10 +1740,7 @@ namespace gdjs {
         behaviorName
       ) as Physics3DRuntimeBehavior | null;
       if (!behavior1) return false;
-
-      return behavior1._contactsEndedThisFrame.some(
-        (behavior) => behavior.owner === object2
-      );
+      return behavior1.collisionChecker.hasCollisionStoppedWith(object2);
     }
   }
 
@@ -1827,7 +1821,7 @@ namespace gdjs {
         // It would be useless to try to recreate it as updateBodyFromObject already does it.
         // If the body is null, we just don't do anything
         // (but still run the physics simulation - this is independent).
-        if (_body !== null) {
+        if (_body !== null && _body.IsActive()) {
           behavior.moveObjectToPhysicsPosition(_body.GetPosition());
           behavior.moveObjectToPhysicsRotation(_body.GetRotation());
         }
@@ -1841,8 +1835,6 @@ namespace gdjs {
         }
         const body = behavior._body!;
 
-        // TODO the `if` is probably unnecessary because `SetPositionAndRotationWhenChanged` already check this.
-        // The object object transform has changed, update body transform:
         if (
           this.behavior._objectOldX !== owner3D.getX() ||
           this.behavior._objectOldY !== owner3D.getY() ||
@@ -1874,6 +1866,50 @@ namespace gdjs {
           behavior.createShape(),
           true,
           Jolt.EActivation_Activate
+        );
+      }
+    }
+
+    export interface CollisionChecker {
+      isColliding(object: gdjs.RuntimeObject): boolean;
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean;
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean;
+    }
+
+    /**
+     * The default collision checker uses the contacts found while
+     * stepping the physics simulation. For characters, another one is used
+     * as characters are simulated before the rest of the physics simulation.
+     */
+    export class DefaultCollisionChecker implements CollisionChecker {
+      behavior: gdjs.Physics3DRuntimeBehavior;
+
+      constructor(behavior: gdjs.Physics3DRuntimeBehavior) {
+        this.behavior = behavior;
+      }
+
+      isColliding(object: gdjs.RuntimeObject): boolean {
+        if (
+          this.behavior._currentContacts.some(
+            (behavior) => behavior.owner === object
+          )
+        ) {
+          return true;
+        }
+        return this.behavior._contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean {
+        return this.behavior._contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean {
+        return this.behavior._contactsEndedThisFrame.some(
+          (behavior) => behavior.owner === object
         );
       }
     }

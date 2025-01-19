@@ -130,6 +130,10 @@ type Props = {|
     newName: string
   ) => void,
   children?: React.Node,
+  onFunctionParameterTypeChanged: (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => void,
 |};
 
 export const EventsFunctionParametersEditor = ({
@@ -148,6 +152,7 @@ export const EventsFunctionParametersEditor = ({
   onMoveObjectEventsParameter,
   onFunctionParameterWillBeRenamed,
   children,
+  onFunctionParameterTypeChanged,
 }: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -583,27 +588,28 @@ export const EventsFunctionParametersEditor = ({
     );
   if (isAnExtensionLifecycleEventsFunction) {
     return (
-      <Column noMargin>
-        <DismissableAlertMessage
-          kind="info"
-          identifier="lifecycle-events-function-included-only-if-extension-used"
-        >
-          <Trans>
-            For the lifecycle functions to be executed, you need the extension
-            to be used in the game, either by having at least one action,
-            condition or expression used, or a behavior of the extension added
-            to an object. Otherwise, the extension won't be included in the
-            game.
-          </Trans>
-        </DismissableAlertMessage>
-        <EmptyMessage>
-          <Trans>
-            This is a "lifecycle function". It will be called automatically by
-            the game engine. It has no parameters. Only global objects can be
-            used as the events will be run for all scenes in your game.
-          </Trans>
-        </EmptyMessage>
-      </Column>
+      <Line>
+        <Column noMargin>
+          <DismissableAlertMessage
+            kind="info"
+            identifier="lifecycle-events-function-included-only-if-extension-used"
+          >
+            <Trans>
+              For the lifecycle functions to be executed, you need the extension
+              to be used in the game, either by having at least one action,
+              condition or expression used, or a behavior of the extension added
+              to an object. Otherwise, the extension won't be included in the
+              game.
+            </Trans>
+          </DismissableAlertMessage>
+          <EmptyMessage>
+            <Trans>
+              This is a "lifecycle function". It will be called automatically by
+              the game engine. It has no parameters.
+            </Trans>
+          </EmptyMessage>
+        </Column>
+      </Line>
     );
   }
 
@@ -802,9 +808,13 @@ export const EventsFunctionParametersEditor = ({
                                       isTypeSelectorShown={isParameterTypeShown(
                                         i
                                       )}
-                                      onTypeUpdated={() =>
-                                        onParametersUpdated()
-                                      }
+                                      onTypeUpdated={() => {
+                                        onFunctionParameterTypeChanged(
+                                          eventsFunction,
+                                          parameter.getName()
+                                        );
+                                        onParametersUpdated();
+                                      }}
                                       getLastObjectParameterObjectType={() =>
                                         getLastObjectParameterObjectType(
                                           parameters,

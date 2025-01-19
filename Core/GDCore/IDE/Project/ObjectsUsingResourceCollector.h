@@ -73,6 +73,9 @@ public:
   virtual void ExposeVideo(gd::String& otherResourceName) override {
     MatchResourceName(otherResourceName);
   };
+  virtual void ExposeJavaScript(gd::String& otherResourceName) override {
+    MatchResourceName(otherResourceName);
+  };
   virtual void ExposeBitmapFont(gd::String& otherResourceName) override {
     MatchResourceName(otherResourceName);
   };

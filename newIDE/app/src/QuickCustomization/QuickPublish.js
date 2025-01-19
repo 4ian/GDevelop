@@ -9,7 +9,6 @@ import RaisedButton from '../UI/RaisedButton';
 import { I18n } from '@lingui/react';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import Text from '../UI/Text';
-import { type Limits } from '../Utils/GDevelopServices/Usage';
 import {
   getBuildArtifactUrl,
   type Build,
@@ -33,7 +32,6 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 
 type Props = {|
@@ -66,13 +64,9 @@ export const QuickPublish = ({
   onLaunchPreview,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   const {
     profile,
     onOpenCreateAccountDialog,
-    limits,
     cloudProjects,
     getAuthorizationHeader,
   } = authenticatedUser;
@@ -93,19 +87,6 @@ export const QuickPublish = ({
       payWithCredits: false,
     });
   }, []);
-
-  const renderCallout = (limits: Limits) => (
-    <MaxProjectCountAlertMessage
-      limits={limits}
-      onUpgrade={() =>
-        openSubscriptionDialog({
-          analyticsMetadata: {
-            reason: 'Cloud Project limit reached',
-          },
-        })
-      }
-    />
-  );
 
   const isLoadingCloudProjects = !!profile && !cloudProjects;
   const isCloudProjectsMaximumReached = checkIfHasTooManyCloudProjects(
@@ -203,8 +184,8 @@ export const QuickPublish = ({
         {profile ? (
           isLoadingCloudProjects ? (
             <PlaceholderLoader />
-          ) : cantContinueBecauseCloudProjectsMaximumReached && limits ? (
-            renderCallout(limits)
+          ) : cantContinueBecauseCloudProjectsMaximumReached ? (
+            <MaxProjectCountAlertMessage />
           ) : (
             <I18n>
               {({ i18n }) => (

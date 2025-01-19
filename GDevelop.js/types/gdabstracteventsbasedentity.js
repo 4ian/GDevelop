@@ -2,6 +2,10 @@
 declare class gdAbstractEventsBasedEntity {
   getEventsFunctions(): gdEventsFunctionsContainer;
   getPropertyDescriptors(): gdPropertiesContainer;
+  getName(): string;
+  getFullName(): string;
+  getDescription(): string;
+  isPrivate(): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

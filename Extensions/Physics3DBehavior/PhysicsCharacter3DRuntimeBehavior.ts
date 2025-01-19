@@ -53,6 +53,7 @@ namespace gdjs {
      * before stepping the world.
      */
     _sharedData: gdjs.Physics3DSharedData;
+    collisionChecker: gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker;
 
     // TODO Should there be angle were the character can climb but will slip?
     _slopeMaxAngle: float;
@@ -70,6 +71,8 @@ namespace gdjs {
     private _maxFallingSpeed: float;
     private _jumpSpeed: float;
     private _jumpSustainTime: float;
+    private _stairHeightMax: float;
+    _canBePushed: boolean;
 
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
@@ -121,6 +124,9 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
+      this.collisionChecker = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker(
+        this
+      );
 
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -136,6 +142,14 @@ namespace gdjs {
       this._jumpSpeed = this.getJumpSpeedToReach(behaviorData.jumpHeight);
       this._shouldBindObjectAndForwardAngle =
         behaviorData.shouldBindObjectAndForwardAngle;
+      this._stairHeightMax =
+        behaviorData.stairHeightMax === undefined
+          ? 20
+          : behaviorData.stairHeightMax;
+      this._canBePushed =
+        behaviorData.canBePushed === undefined
+          ? true
+          : behaviorData.canBePushed;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -155,7 +169,6 @@ namespace gdjs {
       const sharedData = behavior._sharedData;
       const jolt = sharedData.jolt;
       const extendedUpdateSettings = new Jolt.ExtendedUpdateSettings();
-      extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(0, 0, 0.4);
       const broadPhaseLayerFilter = new Jolt.DefaultBroadPhaseLayerFilter(
         jolt.GetObjectVsBroadPhaseLayerFilter(),
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
@@ -175,11 +188,13 @@ namespace gdjs {
         bodyFilter,
         shapeFilter,
       };
+      this.setStairHeightMax(this._stairHeightMax);
       sharedData.registerHook(this);
 
       behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
         this
       );
+      behavior.collisionChecker = this.collisionChecker;
       behavior.recreateBody();
 
       // Always begin in the direction of the object.
@@ -240,6 +255,9 @@ namespace gdjs {
         this.setShouldBindObjectAndForwardAngle(
           newBehaviorData.shouldBindObjectAndForwardAngle
         );
+      }
+      if (oldBehaviorData.stairHeightMax !== newBehaviorData.stairHeightMax) {
+        this.setStairHeightMax(newBehaviorData.stairHeightMax);
       }
       return true;
     }
@@ -314,6 +332,21 @@ namespace gdjs {
       return result;
     }
 
+    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+      // Characters body should not rotate around X and Y.
+      const rotation = result.sEulerAngles(
+        this.getVec3(0, 0, gdjs.toRad(this.owner3D.getAngle()))
+      );
+      result.Set(
+        rotation.GetX(),
+        rotation.GetY(),
+        rotation.GetZ(),
+        rotation.GetW()
+      );
+      Jolt.destroy(rotation);
+      return result;
+    }
+
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       const { behavior } = this.getPhysics3D();
       this.owner3D.setCenterXInScene(
@@ -328,7 +361,22 @@ namespace gdjs {
       );
     }
 
-    onDeActivate() {}
+    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+      const threeObject = this.owner3D.get3DRendererObject();
+      threeObject.quaternion.x = physicsRotation.GetX();
+      threeObject.quaternion.y = physicsRotation.GetY();
+      threeObject.quaternion.z = physicsRotation.GetZ();
+      threeObject.quaternion.w = physicsRotation.GetW();
+      // TODO Avoid this instantiation
+      const euler = new THREE.Euler(0, 0, 0, 'ZYX');
+      euler.setFromQuaternion(threeObject.quaternion);
+      // No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
+      this.owner3D.setAngle(gdjs.toDegrees(euler.z));
+    }
+
+    onDeActivate() {
+      this.collisionChecker.clearContacts();
+    }
 
     onActivate() {}
 
@@ -498,6 +546,7 @@ namespace gdjs {
         shapeFilter,
         this._sharedData.jolt.GetTempAllocator()
       );
+      this.collisionChecker.updateContacts();
 
       if (this.isOnFloor()) {
         this._canJump = true;
@@ -773,6 +822,27 @@ namespace gdjs {
         Math.cos(gdjs.toRad(slopeMaxAngle)),
         1 - 1 / 1024
       );
+    }
+
+    getStairHeightMax(): float {
+      return this._stairHeightMax;
+    }
+
+    setStairHeightMax(stairHeightMax: float): void {
+      const { extendedUpdateSettings } = this.getPhysics3D();
+      this._stairHeightMax = stairHeightMax;
+      const walkStairsStepUp = stairHeightMax * this._sharedData.worldInvScale;
+      extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(
+        0,
+        0,
+        walkStairsStepUp
+      );
+      // Use default values proportionally;
+      // "The factors are arbitrary but works well when tested in a game."
+      extendedUpdateSettings.mWalkStairsMinStepForward =
+        (0.02 / 0.4) * walkStairsStepUp;
+      extendedUpdateSettings.mWalkStairsStepForwardTest =
+        (0.15 / 0.4) * walkStairsStepUp;
     }
 
     /**
@@ -1187,7 +1257,7 @@ namespace gdjs {
      * @returns Returns true if it is falling and false if not.
      */
     isFallingWithoutJumping(): boolean {
-      return !this.isOnFloor() && this._currentJumpSpeed === 0;
+      return !this.isOnFloor() && !this.isJumping();
     }
 
     /**
@@ -1204,7 +1274,8 @@ namespace gdjs {
      */
     isFalling(): boolean {
       return (
-        !this.isOnFloor() && this._currentJumpSpeed < this._currentFallSpeed
+        this.isFallingWithoutJumping() ||
+        (this.isJumping() && this._currentFallSpeed > this._currentJumpSpeed)
       );
     }
 
@@ -1286,6 +1357,8 @@ namespace gdjs {
   export namespace PhysicsCharacter3DRuntimeBehavior {
     export class CharacterBodyUpdater {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
+      /** Handle collisions between characters that can push each other. */
+      static characterVsCharacterCollision: Jolt.CharacterVsCharacterCollisionSimple | null = null;
 
       constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
         this.characterBehavior = characterBehavior;
@@ -1298,7 +1371,13 @@ namespace gdjs {
         const shape = behavior.createShape();
 
         const settings = new Jolt.CharacterVirtualSettings();
-        settings.mInnerBodyLayer = behavior.getBodyLayer();
+        // Characters innerBody are Kinematic body, they don't allow other
+        // characters to push them.
+        // The layer 0 doesn't allow any collision as masking them always result to 0.
+        // This allows CharacterVsCharacterCollisionSimple to handle the collisions.
+        settings.mInnerBodyLayer = this.characterBehavior._canBePushed
+          ? 0
+          : behavior.getBodyLayer();
         settings.mInnerBodyShape = shape;
         settings.mMass = shape.GetMassProperties().get_mMass();
         settings.mMaxSlopeAngle = gdjs.toRad(_slopeMaxAngle);
@@ -1338,13 +1417,112 @@ namespace gdjs {
           .GetBodyLockInterface()
           .TryGetBody(character.GetInnerBodyID());
         this.characterBehavior.character = character;
+
+        if (this.characterBehavior._canBePushed) {
+          // CharacterVsCharacterCollisionSimple handle characters pushing each other.
+          let characterVsCharacterCollision =
+            CharacterBodyUpdater.characterVsCharacterCollision;
+          if (!characterVsCharacterCollision) {
+            characterVsCharacterCollision = new Jolt.CharacterVsCharacterCollisionSimple();
+            CharacterBodyUpdater.characterVsCharacterCollision = characterVsCharacterCollision;
+          }
+          characterVsCharacterCollision.Add(character);
+          character.SetCharacterVsCharacterCollision(
+            characterVsCharacterCollision
+          );
+
+          const characterContactListener = new Jolt.CharacterContactListenerJS();
+          characterContactListener.OnAdjustBodyVelocity = (
+            character,
+            body2Ptr,
+            linearVelocityPtr,
+            angularVelocity
+          ) => {};
+          characterContactListener.OnContactValidate = (
+            character,
+            bodyID2,
+            subShapeID2
+          ) => {
+            return true;
+          };
+          characterContactListener.OnCharacterContactValidate = (
+            characterPtr,
+            otherCharacterPtr,
+            subShapeID2
+          ) => {
+            // CharacterVsCharacterCollisionSimple doesn't handle collision layers.
+            // We have to filter characters ourself.
+            const character = Jolt.wrapPointer(
+              characterPtr,
+              Jolt.CharacterVirtual
+            );
+            const otherCharacter = Jolt.wrapPointer(
+              otherCharacterPtr,
+              Jolt.CharacterVirtual
+            );
+
+            const body = _sharedData.physicsSystem
+              .GetBodyLockInterface()
+              .TryGetBody(character.GetInnerBodyID());
+            const otherBody = _sharedData.physicsSystem
+              .GetBodyLockInterface()
+              .TryGetBody(otherCharacter.GetInnerBodyID());
+
+            const physicsBehavior = body.gdjsAssociatedBehavior;
+            const otherPhysicsBehavior = otherBody.gdjsAssociatedBehavior;
+
+            if (!physicsBehavior || !otherPhysicsBehavior) {
+              return true;
+            }
+            return physicsBehavior.canCollideAgainst(otherPhysicsBehavior);
+          };
+          characterContactListener.OnContactAdded = (
+            character,
+            bodyID2,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            settings
+          ) => {};
+          characterContactListener.OnCharacterContactAdded = (
+            character,
+            otherCharacter,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            settings
+          ) => {};
+          characterContactListener.OnContactSolve = (
+            character,
+            bodyID2,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            contactVelocity,
+            contactMaterial,
+            characterVelocity,
+            newCharacterVelocity
+          ) => {};
+          characterContactListener.OnCharacterContactSolve = (
+            character,
+            otherCharacter,
+            subShapeID2,
+            contactPosition,
+            contactNormal,
+            contactVelocity,
+            contactMaterial,
+            characterVelocityPtr,
+            newCharacterVelocityPtr
+          ) => {};
+          character.SetListener(characterContactListener);
+        }
+
         // TODO This is not really reliable. We could choose to disable it and force user to use the "is on platform" condition.
         //body.SetCollideKinematicVsNonDynamic(true);
         return body;
       }
 
       updateObjectFromBody() {
-        const { behavior } = this.characterBehavior.getPhysics3D();
         const { character } = this.characterBehavior;
         if (!character) {
           return;
@@ -1353,8 +1531,9 @@ namespace gdjs {
         this.characterBehavior.moveObjectToPhysicsPosition(
           character.GetPosition()
         );
-        // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
-        behavior.moveObjectToPhysicsRotation(character.GetRotation());
+        this.characterBehavior.moveObjectToPhysicsRotation(
+          character.GetRotation()
+        );
       }
 
       updateBodyFromObject() {
@@ -1375,9 +1554,10 @@ namespace gdjs {
           behavior._objectOldRotationY !== owner3D.getRotationY() ||
           behavior._objectOldRotationZ !== owner3D.getAngle()
         ) {
-          // TODO No need to update the rotation for X and Y as CharacterVirtual doesn't change it.
           character.SetRotation(
-            behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1))
+            this.characterBehavior.getPhysicsRotation(
+              _sharedData.getQuat(0, 0, 0, 1)
+            )
           );
         }
       }
@@ -1424,6 +1604,88 @@ namespace gdjs {
 
         // shapeHalfDepth may have changed, update the character position accordingly.
         this.updateCharacterPosition();
+      }
+    }
+
+    /**
+     * A character is simulated by Jolt before the rest of the physics simulation
+     * (see `doBeforePhysicsStep`).
+     * This means that contacts with the character would only rarely be recognized by
+     * the physics engine if using the default contact listeners.
+     * Instead, this class allows to properly track contacts of the character
+     * using Jolt `CharacterVirtual::GetActiveContacts`.
+     */
+    export class CharacterCollisionChecker
+      implements gdjs.Physics3DRuntimeBehavior.CollisionChecker {
+      characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
+
+      _currentContacts: Array<Physics3DRuntimeBehavior> = [];
+      _previousContacts: Array<Physics3DRuntimeBehavior> = [];
+
+      constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
+        this.characterBehavior = characterBehavior;
+      }
+
+      clearContacts(): void {
+        this._previousContacts.length = 0;
+        this._currentContacts.length = 0;
+      }
+
+      updateContacts(): void {
+        const swap = this._previousContacts;
+        this._previousContacts = this._currentContacts;
+        this._currentContacts = swap;
+        this._currentContacts.length = 0;
+
+        const { character, _sharedData } = this.characterBehavior;
+        if (!character) {
+          return;
+        }
+        const contacts = character.GetActiveContacts();
+        for (let index = 0; index < contacts.size(); index++) {
+          const contact = contacts.at(index);
+
+          const bodyLockInterface = _sharedData.physicsSystem.GetBodyLockInterface();
+          const body = bodyLockInterface.TryGetBody(contact.mBodyB);
+          const behavior = body.gdjsAssociatedBehavior;
+          if (behavior) {
+            this._currentContacts.push(behavior);
+          }
+        }
+      }
+
+      isColliding(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return this._currentContacts.some(
+          (behavior) => behavior.owner === object
+        );
+      }
+
+      hasCollisionStartedWith(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return (
+          this._currentContacts.some((behavior) => behavior.owner === object) &&
+          !this._previousContacts.some((behavior) => behavior.owner === object)
+        );
+      }
+
+      hasCollisionStoppedWith(object: gdjs.RuntimeObject): boolean {
+        const { character } = this.characterBehavior;
+        if (!character) {
+          return false;
+        }
+        return (
+          !this._currentContacts.some(
+            (behavior) => behavior.owner === object
+          ) &&
+          this._previousContacts.some((behavior) => behavior.owner === object)
+        );
       }
     }
   }

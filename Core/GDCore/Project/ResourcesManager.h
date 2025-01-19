@@ -548,6 +548,32 @@ class GD_CORE_API AtlasResource : public Resource {
 };
 
 /**
+ * \brief Describe a video file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API JavaScriptResource : public Resource {
+ public:
+  JavaScriptResource() : Resource() { SetKind("javascript"); };
+  virtual ~JavaScriptResource(){};
+  virtual JavaScriptResource* Clone() const override {
+    return new JavaScriptResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+  virtual bool UseFile() const override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource

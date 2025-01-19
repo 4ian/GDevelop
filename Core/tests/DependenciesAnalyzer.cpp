@@ -32,7 +32,6 @@ TEST_CASE("DependenciesAnalyzer", "[common]") {
     REQUIRE(analyzer.GetScenesDependencies().find("Layout2") !=
             analyzer.GetScenesDependencies().end());
     REQUIRE(analyzer.GetExternalEventsDependencies().size() == 0);
-    REQUIRE(analyzer.GetSourceFilesDependencies().size() == 0);
   }
 
   SECTION("Can detect a simple external events dependency") {
@@ -55,7 +54,6 @@ TEST_CASE("DependenciesAnalyzer", "[common]") {
     REQUIRE(analyzer.GetExternalEventsDependencies().size() == 1);
     REQUIRE(analyzer.GetExternalEventsDependencies().find("ExternalEvents1") !=
             analyzer.GetExternalEventsDependencies().end());
-    REQUIRE(analyzer.GetSourceFilesDependencies().size() == 0);
   }
 
   SECTION("Can detect a transitive scene and external events dependency") {
@@ -87,7 +85,6 @@ TEST_CASE("DependenciesAnalyzer", "[common]") {
     REQUIRE(analyzer.GetExternalEventsDependencies().size() == 1);
     REQUIRE(analyzer.GetExternalEventsDependencies().find("ExternalEvents1") !=
             analyzer.GetExternalEventsDependencies().end());
-    REQUIRE(analyzer.GetSourceFilesDependencies().size() == 0);
   }
 
   SECTION("Can detect a (nested) circular dependency with scenes") {

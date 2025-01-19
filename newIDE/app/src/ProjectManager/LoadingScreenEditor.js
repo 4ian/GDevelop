@@ -68,7 +68,7 @@ export const LoadingScreenEditor = ({
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();
-  const shouldDisplayGetSubscriptionCard = !hasValidSubscriptionPlan(
+  const hasValidSubscription = hasValidSubscriptionPlan(
     authenticatedUser.subscription
   );
 
@@ -234,8 +234,11 @@ export const LoadingScreenEditor = ({
                 </SelectField>
               </Column>
             </ResponsiveLineStackLayout>
-            {shouldDisplayGetSubscriptionCard && (
-              <GetSubscriptionCard subscriptionDialogOpeningReason="Disable GDevelop splash at startup">
+            {!hasValidSubscription && (
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Disable GDevelop splash at startup"
+                recommendedPlanIdIfNoSubscription="gdevelop_silver"
+              >
                 <Text>
                   <Trans>
                     Get a silver or gold subscription to disable GDevelop

@@ -12,7 +12,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
   label?: React.Node,
   primary?: boolean,
   color?: 'primary' | 'success' | 'danger' | 'premium',
-  size?: 'medium',
+  size?: 'medium' | 'large',
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
@@ -30,7 +30,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
 
 export type RaisedButtonProps = {|
   ...RaisedButtonPropsWithoutOnClick,
-  onClick: ?() => void | Promise<void>,
+  onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
 /**

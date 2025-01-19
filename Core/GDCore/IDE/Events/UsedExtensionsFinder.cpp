@@ -13,6 +13,18 @@
 
 namespace gd {
 
+void UsedExtensionsResult::AddUsedExtension(const gd::PlatformExtension& extension) {
+  usedExtensions.insert(extension.GetName());
+
+  usedSourceFiles.insert(usedSourceFiles.end(),
+                         extension.GetAllSourceFiles().begin(),
+                         extension.GetAllSourceFiles().end());
+}
+
+void UsedExtensionsResult::AddUsedBuiltinExtension(const gd::String& extensionName) {
+  usedExtensions.insert(extensionName);
+}
+
 const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& project) {
   UsedExtensionsFinder worker(project);
   gd::ProjectBrowserHelper::ExposeProjectObjects(project, worker);
@@ -28,9 +40,9 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {
   if (metadata.GetMetadata().IsRenderedIn3D()) {
     result.MarkAsHaving3DObjects();
   }
-  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  result.AddUsedExtension(metadata.GetExtension());
   for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-    result.GetUsedIncludeFiles().insert(includeFile);
+    result.AddUsedIncludeFiles(includeFile);
   }
 };
 
@@ -39,12 +51,12 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {
 void UsedExtensionsFinder::DoVisitBehavior(gd::Behavior &behavior) {
   auto metadata = gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
       project.GetCurrentPlatform(), behavior.GetTypeName());
-  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  result.AddUsedExtension(metadata.GetExtension());
   for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-    result.GetUsedIncludeFiles().insert(includeFile);
+    result.AddUsedIncludeFiles(includeFile);
   }
   for (auto &&includeFile : metadata.GetMetadata().requiredFiles) {
-    result.GetUsedRequiredFiles().insert(includeFile);
+    result.AddUsedRequiredFiles(includeFile);
   }
 };
 
@@ -57,9 +69,9 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
                         project.GetCurrentPlatform(), instruction.GetType())
                   : gd::MetadataProvider::GetExtensionAndActionMetadata(
                         project.GetCurrentPlatform(), instruction.GetType());
-  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  result.AddUsedExtension(metadata.GetExtension());
   for (auto&& includeFile : metadata.GetMetadata().GetIncludeFiles()) {
-    result.GetUsedIncludeFiles().insert(includeFile);
+    result.AddUsedIncludeFiles(includeFile);
   }
 
   gd::ParameterMetadataTools::IterateOverParameters(
@@ -77,7 +89,7 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
       rootType = "number";
       parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
-      result.GetUsedExtensions().insert("BuiltinVariables");
+      result.AddUsedBuiltinExtension("BuiltinVariables");
   });
 
   return false;
@@ -110,7 +122,7 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
 
 // Add variable extension and visit sub-expressions on variable nodes
 void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
-  result.GetUsedExtensions().insert("BuiltinVariables");
+  result.AddUsedBuiltinExtension("BuiltinVariables");
 
   auto type = gd::ExpressionTypeFinder::GetType(
       project.GetCurrentPlatform(), GetProjectScopedContainers(), rootType, node);
@@ -123,9 +135,9 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
         // This represents an object.
         auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
           project.GetCurrentPlatform(), node.name);
-        result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+        result.AddUsedExtension(metadata.GetExtension());
         for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-          result.GetUsedIncludeFiles().insert(includeFile);
+          result.AddUsedIncludeFiles(includeFile);
         }
       }, [&]() {
         // This is a variable.
@@ -143,13 +155,13 @@ void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
 
 void UsedExtensionsFinder::OnVisitVariableAccessorNode(
     VariableAccessorNode& node) {
-  result.GetUsedExtensions().insert("BuiltinVariables");
+  result.AddUsedBuiltinExtension("BuiltinVariables");
   if (node.child) node.child->Visit(*this);
 };
 
 void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
-  result.GetUsedExtensions().insert("BuiltinVariables");
+  result.AddUsedBuiltinExtension("BuiltinVariables");
   node.expression->Visit(*this);
   if (node.child) node.child->Visit(*this);
 };
@@ -163,9 +175,9 @@ void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode &node) {
     // An object or object variable is used.
     auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
         project.GetCurrentPlatform(), node.identifierName);
-    result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+    result.AddUsedExtension(metadata.GetExtension());
     for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
-      result.GetUsedIncludeFiles().insert(includeFile);
+      result.AddUsedIncludeFiles(includeFile);
     }
   }
 };
@@ -187,9 +199,9 @@ void UsedExtensionsFinder::OnVisitFunctionCallNode(FunctionCallNode& node) {
       return;
   }
 
-  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  result.AddUsedExtension(metadata.GetExtension());
   for (auto&& includeFile : metadata.GetMetadata().GetIncludeFiles()) {
-    result.GetUsedIncludeFiles().insert(includeFile);
+    result.AddUsedIncludeFiles(includeFile);
   }
 };
 

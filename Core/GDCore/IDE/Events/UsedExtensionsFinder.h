@@ -9,6 +9,8 @@
 #include <set>
 
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
+#include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 #include "GDCore/String.h"
@@ -44,6 +46,10 @@ public:
     return usedRequiredFiles;
   }
 
+  const std::vector<gd::SourceFileMetadata>& GetUsedSourceFiles() const {
+    return usedSourceFiles;
+  }
+
   /**
    * \brief Return true when at least 1 object uses the 3D renderer.
    */
@@ -51,20 +57,10 @@ public:
     return has3DObjects;
   }
 
-  /**
-   * The extensions used by the project (or part of it).
-   */
-  std::set<gd::String> &GetUsedExtensions() { return usedExtensions; }
-
-  /**
-   * The include files used at runtime by the project (or part of it).
-   */
-  std::set<gd::String> &GetUsedIncludeFiles() { return usedIncludeFiles; }
-
-  /**
-   * The additional files required at runtime by the project (or part of it).
-   */
-  std::set<gd::String> &GetUsedRequiredFiles() { return usedRequiredFiles; }
+  void AddUsedExtension(const gd::PlatformExtension& extension);
+  void AddUsedBuiltinExtension(const gd::String& extensionName);
+  void AddUsedIncludeFiles(const gd::String& includeFile) { usedIncludeFiles.insert(includeFile); }
+  void AddUsedRequiredFiles(const gd::String& requiredFile) { usedRequiredFiles.insert(requiredFile); }
 
   void MarkAsHaving3DObjects() {
     has3DObjects = true;
@@ -74,6 +70,7 @@ private:
   std::set<gd::String> usedExtensions;
   std::set<gd::String> usedIncludeFiles;
   std::set<gd::String> usedRequiredFiles;
+  std::vector<gd::SourceFileMetadata> usedSourceFiles;
   bool has3DObjects = false;
 };
 

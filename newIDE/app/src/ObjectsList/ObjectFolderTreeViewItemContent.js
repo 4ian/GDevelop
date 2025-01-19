@@ -135,11 +135,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return `object-item-${index}`;
+    return null;
   }
 
   getDataSet(): ?HTMLDataset {
-    return null;
+    return {
+      folderName: this.objectFolder.getFolderName(),
+      global: this._isGlobal.toString(),
+    };
   }
 
   getThumbnail(): ?string {

@@ -35,7 +35,11 @@ import ContextMenu, {
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-const electron = optionalRequire('electron');
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 
 const styles = {
@@ -72,10 +76,8 @@ type Props = {|
 |};
 
 const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
-  if (!electron) return;
-  electron.shell.showItemInFolder(
-    path.resolve(file.fileMetadata.fileIdentifier)
-  );
+  if (!shell) return;
+  shell.showItemInFolder(path.resolve(file.fileMetadata.fileIdentifier));
 };
 
 const ProjectFileList = ({

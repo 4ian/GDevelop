@@ -175,7 +175,8 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
       .AddExtraInfo("center")
       .AddExtraInfo("bottom")
       .SetLabel(_("Vertical alignment"))
-      .SetGroup(_("Font"));
+      .SetGroup(_("Font"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   objectProperties["isOutlineEnabled"]
       .SetValue(isOutlineEnabled ? "true" : "false")

@@ -73,6 +73,15 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   }
 
   /**
+   * \brief Set that the object is private - it can't be used outside of its
+   * extension.
+   */
+  EventsBasedObject& SetPrivate(bool isPrivate) {
+    AbstractEventsBasedEntity::SetPrivate(isPrivate);
+    return *this;
+  }
+
+  /**
    * \brief Declare a usage of the 3D renderer.
    */
   EventsBasedObject& MarkAsRenderedIn3D(bool isRenderedIn3D_) {

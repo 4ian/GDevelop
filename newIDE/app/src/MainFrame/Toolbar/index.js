@@ -5,7 +5,6 @@ import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
 import PreviewAndShareButtons, {
   type PreviewAndShareButtonsProps,
 } from './PreviewAndShareButtons';
-import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import IconButton from '../../UI/IconButton';
 import { Spacer } from '../../UI/Grid';
 import HistoryIcon from '../../UI/CustomSvgIcons/History';
@@ -17,7 +16,6 @@ import SaveProjectIcon from '../SaveProjectIcon';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
-  toggleProjectManager: () => void,
   openShareDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
@@ -34,7 +32,6 @@ export type ToolbarInterface = {|
 |};
 
 type LeftButtonsToolbarGroupProps = {|
-  toggleProjectManager: () => void,
   onSave: () => Promise<void>,
   onOpenVersionHistory: () => void,
   checkedOutVersionStatus?: ?OpenedVersionStatus,
@@ -49,20 +46,10 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
       <ToolbarGroup firstChild>
         <IconButton
           size="small"
-          id="main-toolbar-project-manager-button"
-          onClick={props.toggleProjectManager}
-          tooltip={t`Project Manager`}
-          color="default"
-        >
-          <ProjectManagerIcon />
-        </IconButton>
-        <IconButton
-          size="small"
           id="toolbar-history-button"
           onClick={props.onOpenVersionHistory}
           tooltip={t`Open version history`}
           color="default"
-          disabled={false}
         >
           <HistoryIcon />
         </IconButton>
@@ -116,7 +103,6 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
         {props.showProjectButtons ? (
           <>
             <LeftButtonsToolbarGroup
-              toggleProjectManager={props.toggleProjectManager}
               onSave={props.onSave}
               canSave={props.canSave}
               onOpenVersionHistory={props.onOpenVersionHistory}

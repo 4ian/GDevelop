@@ -100,7 +100,7 @@ const CurrentUsageDisplayer = ({
   if (!quota || !subscription || !usagePrice) return <PlaceholderLoader />;
 
   const isFeatureLocked = quota.max === 0;
-  const hasSubscription = hasValidSubscriptionPlan(subscription);
+  const hasValidSubscription = hasValidSubscriptionPlan(subscription);
   const remainingBuilds = Math.max(quota.max - quota.current, 0);
   const usageRatio = `${quota.current}/${quota.max}`;
   const remainingMultipleMessage =
@@ -132,7 +132,7 @@ const CurrentUsageDisplayer = ({
 
   return (
     <ColumnStackLayout noMargin>
-      {hasSubscription ? (
+      {hasValidSubscription ? (
         !quota.limitReached ? (
           <div
             style={{
@@ -172,6 +172,7 @@ const CurrentUsageDisplayer = ({
                   }
             }
             hideButton={cannotUpgradeSubscription}
+            recommendedPlanIdIfNoSubscription="gdevelop_silver"
           >
             <Line>
               {!isFeatureLocked ? (
@@ -217,6 +218,7 @@ const CurrentUsageDisplayer = ({
                   onPayWithCredits: onPurchaseBuildWithCredits,
                 }
           }
+          recommendedPlanIdIfNoSubscription="gdevelop_silver"
         >
           <Line>
             {!isFeatureLocked ? (

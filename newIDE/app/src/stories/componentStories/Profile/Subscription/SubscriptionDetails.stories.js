@@ -4,7 +4,6 @@ import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
 import {
-  subscriptionPlansWithPricingSystems,
   fakeNotAuthenticatedUser,
   fakeAuthenticatedUserLoggingIn,
   fakeAuthenticatedUserWithNoSubscription,
@@ -21,6 +20,10 @@ import {
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
+import useSubscriptionPlans, {
+  getAvailableSubscriptionPlansWithPrices,
+} from '../../../../Utils/UseSubscriptionPlans';
+import LoaderModal from '../../../../UI/LoaderModal';
 
 export default {
   title: 'Subscription/SubscriptionDetails',
@@ -181,18 +184,24 @@ export const Default = ({
   }
 
   const { subscription: userSubscription } = authenticatedUser;
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+    authenticatedUser,
+  });
 
-  return (
+  return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <SubscriptionDetails
-        subscriptionPlansWithPricingSystems={
+        subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
           subscriptionPlansWithPricingSystems
-        }
+        )}
         subscription={userSubscription}
         onManageSubscription={action('manage subscription')}
         isManageSubscriptionLoading={!!loading}
         simulateNativeMobileApp={!!simulateNativeMobileApp}
       />
     </AlertProvider>
+  ) : (
+    <LoaderModal show />
   );
 };

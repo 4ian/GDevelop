@@ -129,7 +129,7 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is a number.
+   * \brief Return true if the type of the parameter is a variable.
    * \note If you had a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
@@ -146,6 +146,19 @@ class GD_CORE_API ValueTypeMetadata {
    */
   static bool IsVariable(const gd::String &type) {
     return gd::ValueTypeMetadata::GetPrimitiveValueType(type) == "variable";
+  }
+
+  /**
+   * \brief Return true if the type of the parameter is a variable and not a
+   * property or a parameter.
+   */
+  bool IsVariableOnly() const {
+      return
+          // Any variable.
+          name == "variable" ||
+          // Old, "pre-scoped" variables:
+          name == "objectvar" || name == "globalvar" ||
+          name == "scenevar";
   }
 
   /**
@@ -212,15 +225,20 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "functionParameterName" ||
              parameterType == "externalLayoutName" ||
              parameterType == "leaderboardId" ||
+             parameterType == "keyboardKey" ||
+             parameterType == "mouseButton" ||
              parameterType == "identifier";
     } else if (type == "boolean") {
       return parameterType == "yesorno" || parameterType == "trueorfalse";
     } else if (type == "variable") {
       return
-             parameterType == "variable" || // Any variable.
-             // Old, "pre-scoped" variables:
-             parameterType == "objectvar" || parameterType == "globalvar" ||
-             parameterType == "scenevar";
+          // Any variable.
+          parameterType == "variable" ||
+          parameterType == "variableOrProperty" ||
+          parameterType == "variableOrPropertyOrParameter" ||
+          // Old, "pre-scoped" variables:
+          parameterType == "objectvar" || parameterType == "globalvar" ||
+          parameterType == "scenevar";
     } else if (type == "resource") {
       return parameterType == "fontResource" ||
              parameterType == "audioResource" ||
@@ -316,6 +334,8 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String choiceValueType;
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
+  static const gd::String objectAnimationNameValueType;
+  static const gd::String keyboardKeyValueType;
 };
 
 }  // namespace gd

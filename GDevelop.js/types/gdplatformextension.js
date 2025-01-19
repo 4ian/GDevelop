@@ -55,6 +55,7 @@ declare class gdPlatformExtension {
   getAllStrExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
   getAllProperties(): gdMapStringPropertyDescriptor;
   getAllDependencies(): gdVectorDependencyMetadata;
+  getAllSourceFiles(): gdVectorSourceFileMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;

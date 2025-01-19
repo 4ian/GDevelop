@@ -38,7 +38,6 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -69,6 +68,11 @@ namespace gdjs {
 static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
   if (std::find(container.begin(), container.end(), str) == container.end())
     container.push_back(str);
+}
+
+static void InsertUniqueFirst(std::vector<gd::String> &container, gd::String str) {
+  if (std::find(container.begin(), container.end(), str) == container.end())
+    container.insert(container.begin(), str);
 }
 
 static gd::String CleanProjectName(gd::String projectName) {
@@ -187,15 +191,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                           includesFiles,
                           wholeProjectDiagnosticReport,
                           true)) {
-      return false;
-    }
-
-    // Export source files
-    if (!ExportExternalSourceFiles(
-            immutableProject, codeOutputDir, includesFiles)) {
-      gd::LogError(
-          _("Error during exporting! Unable to export source files:\n") +
-          lastError);
       return false;
     }
 
@@ -331,10 +326,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
 
   // Create the index file
-  if (!ExportPixiIndexFile(exportedProject,
+  if (!ExportIndexFile(exportedProject,
                            gdjsRoot + "/Runtime/index.html",
                            options.exportPath,
                            includesFiles,
+                           usedExtensionsResult.GetUsedSourceFiles(),
                            options.nonRuntimeScriptsCacheBurst,
                            "gdjs.runtimeGameOptions"))
     return false;
@@ -396,19 +392,40 @@ void ExporterHelper::SerializeUsedResources(
   }
 }
 
-bool ExporterHelper::ExportPixiIndexFile(
+bool ExporterHelper::ExportIndexFile(
     const gd::Project &project,
     gd::String source,
     gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
+    const std::vector<gd::SourceFileMetadata> &sourceFiles,
     unsigned int nonRuntimeScriptsCacheBurst,
     gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
+  // Add a reference to all files to include, as weel as the source files
+  // required by the project.
+  std::vector<gd::String> finalIncludesFiles = includesFiles;
+  auto addSourceFileToIncludeFiles = [&](const gd::SourceFileMetadata& sourceFile) {
+    const auto& resourcesManager = project.GetResourcesManager();
+    if (!resourcesManager.HasResource(sourceFile.GetResourceName()))
+      return;
+
+    const gd::String& sourceFileFilename = resourcesManager.GetResource(sourceFile.GetResourceName()).GetFile();
+
+    if (sourceFile.GetIncludePosition() == "first") {
+      InsertUniqueFirst(finalIncludesFiles, sourceFileFilename);
+    } else if (sourceFile.GetIncludePosition() == "last") {
+      InsertUnique(finalIncludesFiles, sourceFileFilename);
+    }
+  };
+  for (const auto& sourceFile : sourceFiles) {
+    addSourceFileToIncludeFiles(sourceFile);
+  }
+
   // Generate the file
   if (!CompleteIndexFile(str,
                          exportDir,
-                         includesFiles,
+                         finalIncludesFiles,
                          nonRuntimeScriptsCacheBurst,
                          additionalSpec))
     return false;
@@ -743,9 +760,7 @@ bool ExporterHelper::ExportBuildResourcesElectronFiles(
           .GetResource(platformSpecificAssets.Get("desktop", "icon-512"))
           .GetFile();
 
-  auto projectDirectory = gd::AbstractFileSystem::NormalizeSeparator(
-      fs.DirNameFrom(project.GetProjectFile()));
-  fs.MakeAbsolute(iconFilename, projectDirectory);
+  fs.MakeAbsolute(iconFilename, exportDir + "/app");
   fs.MkDir(exportDir + "/buildResources");
   if (fs.FileExists(iconFilename)) {
     fs.CopyFile(iconFilename, exportDir + "/buildResources/icon.png");
@@ -972,29 +987,6 @@ bool ExporterHelper::ExportEventsCode(
       lastError = _("Unable to write ") + filename;
       return false;
     }
-  }
-
-  return true;
-}
-
-bool ExporterHelper::ExportExternalSourceFiles(
-    const gd::Project &project,
-    gd::String outputDir,
-    std::vector<gd::String> &includesFiles) {
-  const auto &allFiles = project.GetAllSourceFiles();
-  for (std::size_t i = 0; i < allFiles.size(); ++i) {
-    if (!allFiles[i]) continue;
-    if (allFiles[i]->GetLanguage() != "Javascript") continue;
-
-    gd::SourceFile &file = *allFiles[i];
-
-    gd::String filename = file.GetFileName();
-    fs.MakeAbsolute(filename, fs.DirNameFrom(project.GetProjectFile()));
-    gd::String outFilename = "ext-code" + gd::String::From(i) + ".js";
-    if (!fs.CopyFile(filename, outputDir + outFilename))
-      gd::LogWarning(_("Could not copy external file") + filename);
-
-    InsertUnique(includesFiles, outputDir + outFilename);
   }
 
   return true;

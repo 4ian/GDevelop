@@ -20,7 +20,6 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
@@ -132,7 +131,6 @@ const NewProjectSetupDialog = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const {
-    limits,
     authenticated,
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
@@ -156,9 +154,6 @@ const NewProjectSetupDialog = ({
   );
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
-  );
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
   );
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
@@ -674,17 +669,8 @@ const NewProjectSetupDialog = ({
                     </Paper>
                   </Line>
                 )}
-                {limits && hasTooManyCloudProjects ? (
-                  <MaxProjectCountAlertMessage
-                    limits={limits}
-                    onUpgrade={() =>
-                      openSubscriptionDialog({
-                        analyticsMetadata: {
-                          reason: 'Cloud Project limit reached',
-                        },
-                      })
-                    }
-                  />
+                {hasTooManyCloudProjects ? (
+                  <MaxProjectCountAlertMessage />
                 ) : null}
               </ColumnStackLayout>
             )}

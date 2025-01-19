@@ -420,15 +420,18 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
-  if (property.GetType() == "String" || property.GetType() == "Choice" ||
-      property.GetType() == "Color" || property.GetType() == "Behavior" ||
-      property.GetType() == "Resource") {
+
+  const auto &valueType =
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
+  const auto &primitiveType =
+      gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+  if (primitiveType == "string" || valueType == "behavior") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
-  } else if (property.GetType() == "Number") {
+  } else if (primitiveType == "number") {
     return "Number(" +
            EventsCodeGenerator::ConvertToStringExplicit(property.GetValue()) +
            ") || 0";
-  } else if (property.GetType() == "Boolean") {  // TODO: Check if working
+  } else if (primitiveType == "boolean") {  // TODO: Check if working
     return property.GetValue() == "true" ? "true" : "false";
   }
 

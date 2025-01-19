@@ -13,6 +13,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
+#include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionOrExpressionGroupMetadata.h"
@@ -214,6 +215,7 @@ class GD_CORE_API PlatformExtension {
       const gd::String& icon);
 
   gd::DependencyMetadata& AddDependency();
+  gd::SourceFileMetadata& AddSourceFile();
 
   /**
    * \brief Declare a new object as being part of the extension.
@@ -553,6 +555,24 @@ class GD_CORE_API PlatformExtension {
   std::vector<gd::DependencyMetadata>& GetAllDependencies();
 
   /**
+   * \brief Return a reference to a vector containing the metadata of all the
+   * dependencies of the extension.
+   */
+  const std::vector<gd::DependencyMetadata>& GetAllDependencies() const;
+
+  /**
+   * \brief Return a reference to a vector containing the metadata of all the
+   * dependencies of the extension.
+   */
+  std::vector<gd::SourceFileMetadata>& GetAllSourceFiles();
+
+  /**
+   * \brief Return a reference to a vector containing the metadata of all the
+   * dependencies of the extension.
+   */
+  const std::vector<gd::SourceFileMetadata>& GetAllSourceFiles() const;
+
+  /**
    * \brief Return a reference to a map containing the names of the actions,
    * related to the object type, and the metadata associated with.
    */
@@ -687,6 +707,7 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
+  std::vector<gd::SourceFileMetadata> extensionSourceFilesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
   std::map<gd::String, InstructionOrExpressionGroupMetadata>

@@ -38,12 +38,14 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
 
   extensionsLoaded.push_back(extension);
 
-  // Load all creation/destruction functions for objects provided by the
-  // extension
+  // Load all creation functions for objects provided by the
+  // extension.
   vector<gd::String> objectsTypes = extension->GetExtensionObjectsTypes();
   for (std::size_t i = 0; i < objectsTypes.size(); ++i) {
-    creationFunctionTable[objectsTypes[i]] =
-        extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
+    CreateFunPtr createFunPtr = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
+    if (createFunPtr != nullptr) {
+      creationFunctionTable[objectsTypes[i]] = createFunPtr;
+    }
   }
 
   for (const auto& it :
@@ -62,7 +64,9 @@ void Platform::RemoveExtension(const gd::String& name) {
     if (extension->GetName() == name) {
       vector<gd::String> objectsTypes = extension->GetExtensionObjectsTypes();
       for (std::size_t i = 0; i < objectsTypes.size(); ++i) {
-        creationFunctionTable.erase(objectsTypes[i]);
+        if (creationFunctionTable.find(objectsTypes[i]) != creationFunctionTable.end()) {
+          creationFunctionTable.erase(objectsTypes[i]);
+        }
       }
     }
   }

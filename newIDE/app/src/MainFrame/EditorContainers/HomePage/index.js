@@ -123,7 +123,7 @@ type Props = {|
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
-  onOpenProjectManager: () => void,
+  onOpenVersionHistory: () => void,
   askToCloseProject: () => Promise<boolean>,
   closeProject: () => Promise<void>,
 
@@ -177,7 +177,7 @@ export const HomePage = React.memo<Props>(
         onSelectExampleShortHeader,
         onSelectPrivateGameTemplateListingData,
         onOpenPrivateGameTemplateListingData,
-        onOpenProjectManager,
+        onOpenVersionHistory,
         onOpenLanguageDialog,
         onOpenProfile,
         onCreateProjectFromExample,
@@ -238,7 +238,7 @@ export const HomePage = React.memo<Props>(
       const {
         selectedCourse,
         courseChapters,
-        isLoadingChapters,
+        areChaptersReady,
         onCompleteTask,
         isTaskCompleted,
         getChapterCompletion,
@@ -316,6 +316,10 @@ export const HomePage = React.memo<Props>(
             }
           } else if (requestedTab === 'learn') {
             const courseId = routeArguments['course-id'];
+            if (!areChaptersReady) {
+              // Do not process requested tab before courses are ready.
+              return;
+            }
 
             if (courseId && selectedCourse && selectedCourse.id === courseId) {
               setLearnCategory('course');
@@ -332,6 +336,7 @@ export const HomePage = React.memo<Props>(
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
           games,
+          areChaptersReady,
         ]
       );
 
@@ -399,7 +404,7 @@ export const HomePage = React.memo<Props>(
                 hasProject={!!project}
                 onOpenLanguageDialog={onOpenLanguageDialog}
                 onOpenProfile={onOpenProfile}
-                onOpenProjectManager={onOpenProjectManager}
+                onOpenVersionHistory={onOpenVersionHistory}
                 onSave={onSave}
                 canSave={canSave}
               />
@@ -410,7 +415,7 @@ export const HomePage = React.memo<Props>(
           setToolbar,
           onOpenLanguageDialog,
           onOpenProfile,
-          onOpenProjectManager,
+          onOpenVersionHistory,
           project,
           onSave,
           canSave,
@@ -531,7 +536,6 @@ export const HomePage = React.memo<Props>(
                       onSelectCategory={setLearnCategory}
                       course={selectedCourse}
                       courseChapters={courseChapters}
-                      isLoadingChapters={isLoadingChapters}
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}
@@ -615,7 +619,7 @@ export const renderHomePageContainer = (
       props.onOpenPrivateGameTemplateListingData
     }
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
-    onOpenProjectManager={props.onOpenProjectManager}
+    onOpenVersionHistory={props.onOpenVersionHistory}
     onOpenTemplateFromTutorial={props.onOpenTemplateFromTutorial}
     onOpenTemplateFromCourseChapter={props.onOpenTemplateFromCourseChapter}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

@@ -93,7 +93,7 @@ describe('EnumerateInstructions', () => {
 
   it('can create the tree of instructions', () => {
     const instructions = enumerateAllInstructions(true, makeFakeI18n());
-    const tree = createTree(instructions);
+    const tree = createTree(instructions, makeFakeI18n());
     expect(tree).toHaveProperty('Advanced');
     expect(tree).toHaveProperty('Audio');
     expect(tree).toMatchObject({

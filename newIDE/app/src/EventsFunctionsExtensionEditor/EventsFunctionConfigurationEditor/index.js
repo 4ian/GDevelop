@@ -56,6 +56,10 @@ type Props = {|
     oldName: string,
     newName: string
   ) => void,
+  onFunctionParameterTypeChanged: (
+    eventsFunction: gdEventsFunction,
+    parameterName: string
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
   getFunctionGroupNames?: () => string[],
 |};
@@ -155,6 +159,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       eventsFunctionsContainer,
       eventsFunctionsExtension,
       onFunctionParameterWillBeRenamed,
+      onFunctionParameterTypeChanged,
     } = this.props;
 
     const hasLegacyFunctionObjectGroups =
@@ -198,6 +203,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
             onMoveObjectEventsParameter={onMoveObjectEventsParameter}
             onFunctionParameterWillBeRenamed={onFunctionParameterWillBeRenamed}
+            onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
             key={eventsFunction ? eventsFunction.ptr : null}
           >
             <EventsFunctionPropertiesEditor
@@ -208,7 +214,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               eventsFunctionsContainer={eventsFunctionsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}
               helpPagePath={helpPagePath}
-              onConfigurationUpdated={onConfigurationUpdated}
+              onConfigurationUpdated={extensionItemConfigurationAttribute => {
+                onConfigurationUpdated &&
+                  onConfigurationUpdated(extensionItemConfigurationAttribute);
+                // A function configuration change may impact the parameters.
+                this.forceUpdate();
+              }}
               renderConfigurationHeader={renderConfigurationHeader}
               freezeEventsFunctionType={freezeEventsFunctionType}
               getFunctionGroupNames={getFunctionGroupNames}

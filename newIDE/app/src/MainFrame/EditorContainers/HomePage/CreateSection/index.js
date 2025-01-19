@@ -47,7 +47,6 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
-import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { useProjectsListFor } from './utils';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
@@ -148,9 +147,6 @@ const CreateSection = ({
   );
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
-  );
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
   );
   // $FlowIgnore
   const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = React.useMemo(
@@ -450,20 +446,11 @@ const CreateSection = ({
         <SectionContainer
           flexBody
           renderFooter={
-            !isMobile && limits && hasTooManyCloudProjects
+            !isMobile && hasTooManyCloudProjects
               ? () => (
                   <Line>
                     <Column expand>
-                      <MaxProjectCountAlertMessage
-                        limits={limits}
-                        onUpgrade={() =>
-                          openSubscriptionDialog({
-                            analyticsMetadata: {
-                              reason: 'Cloud Project limit reached',
-                            },
-                          })
-                        }
-                      />
+                      <MaxProjectCountAlertMessage />
                     </Column>
                   </Line>
                 )
@@ -538,18 +525,8 @@ const CreateSection = ({
                   searchText={searchText}
                   setSearchText={setSearchText}
                 />
-                {isMobile && limits && hasTooManyCloudProjects && (
-                  <MaxProjectCountAlertMessage
-                    margin="dense"
-                    limits={limits}
-                    onUpgrade={() =>
-                      openSubscriptionDialog({
-                        analyticsMetadata: {
-                          reason: 'Cloud Project limit reached',
-                        },
-                      })
-                    }
-                  />
+                {isMobile && hasTooManyCloudProjects && (
+                  <MaxProjectCountAlertMessage margin="dense" />
                 )}
                 {quickCustomizationRecommendation && (
                   <ColumnStackLayout noMargin>

@@ -424,6 +424,7 @@ typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<gd::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
 typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;
+typedef std::vector<gd::SourceFileMetadata> VectorSourceFileMetadata;
 typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
@@ -728,6 +729,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction
 #define STATIC_RenameParameter RenameParameter
+#define STATIC_ChangeParameterType ChangeParameterType
 #define STATIC_MoveEventsFunctionParameter MoveEventsFunctionParameter
 #define STATIC_MoveBehaviorEventsFunctionParameter \
   MoveBehaviorEventsFunctionParameter
@@ -738,6 +740,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsBasedBehaviorSharedProperty \
   RenameEventsBasedBehaviorSharedProperty
 #define STATIC_RenameEventsBasedObjectProperty RenameEventsBasedObjectProperty
+#define STATIC_ChangeEventsBasedBehaviorPropertyType ChangeEventsBasedBehaviorPropertyType
+#define STATIC_ChangeEventsBasedObjectPropertyType ChangeEventsBasedObjectPropertyType
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 #define STATIC_UpdateBehaviorNameInEventsBasedBehavior UpdateBehaviorNameInEventsBasedBehavior
 #define STATIC_RenameEventsBasedObject RenameEventsBasedObject

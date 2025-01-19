@@ -38,6 +38,10 @@ void AssetResourcePathCleaner::ExposeVideo(gd::String &videoName) {
   ExposeResourceAsFile(videoName);
 }
 
+void AssetResourcePathCleaner::ExposeJavaScript(gd::String &javaScriptResourceName) {
+  ExposeResourceAsFile(javaScriptResourceName);
+}
+
 void AssetResourcePathCleaner::ExposeBitmapFont(gd::String &bitmapFontName) {
   ExposeResourceAsFile(bitmapFontName);
 }

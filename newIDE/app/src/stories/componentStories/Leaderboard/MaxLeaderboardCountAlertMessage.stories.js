@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
-import { limitsReached } from '../../../fixtures/GDevelopServicesTestData';
+import { defaultAuthenticatedUserWithNoSubscription } from '../../../fixtures/GDevelopServicesTestData';
 import MaxLeaderboardCountAlertMessage from '../../../GameDashboard/LeaderboardAdmin/MaxLeaderboardCountAlertMessage';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'Leaderboard/MaxLeaderboardCountAlertMessage',
@@ -12,9 +12,9 @@ export default {
 };
 
 export const Default = () => (
-  <MaxLeaderboardCountAlertMessage
-    limits={limitsReached}
-    onUpgrade={() => action('onUpgrade')()}
-    onClose={() => action('onClose')()}
-  />
+  <AuthenticatedUserContext.Provider
+    value={defaultAuthenticatedUserWithNoSubscription}
+  >
+    <MaxLeaderboardCountAlertMessage />
+  </AuthenticatedUserContext.Provider>
 );

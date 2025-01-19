@@ -174,6 +174,7 @@ public:
   virtual const gd::String &GetFullName() const = 0;
   virtual const gd::String &GetDescription() const = 0;
   virtual const gd::String &GetIconFilename() const = 0;
+  virtual bool IsPrivate() const = 0;
 
   /**
    * \brief Return a reference to a map containing the names of the actions

@@ -22,8 +22,11 @@ import {
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
-const electron = optionalRequire('electron');
-const shell = electron ? electron.shell : null;
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
+const shell = remote ? remote.shell : null;
 
 const gd: libGDevelop = global.gd;
 

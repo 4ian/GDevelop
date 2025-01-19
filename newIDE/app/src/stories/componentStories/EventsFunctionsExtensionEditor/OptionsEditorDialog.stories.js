@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -26,6 +27,7 @@ export const Default = () => (
       >
         <OptionsEditorDialog
           project={testProject.project}
+          resourceManagementProps={fakeResourceManagementProps}
           eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
           open
           onClose={action('close')}

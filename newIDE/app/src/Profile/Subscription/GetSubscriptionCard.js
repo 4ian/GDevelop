@@ -12,6 +12,8 @@ import classes from './GetSubscriptionCard.module.css';
 import Paper from '../../UI/Paper';
 import CrownShining from '../../UI/CustomSvgIcons/CrownShining';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import AuthenticatedUserContext from '../AuthenticatedUserContext';
+import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 
 const styles = {
   paper: {
@@ -39,6 +41,14 @@ type Props = {|
     label: React.Node,
     onPayWithCredits: () => void,
   |},
+  onUpgrade?: () => void,
+  forceColumnLayout?: boolean,
+  filter?: 'individual' | 'team' | 'education',
+  recommendedPlanIdIfNoSubscription?:
+    | 'gdevelop_silver'
+    | 'gdevelop_gold'
+    | 'gdevelop_startup'
+    | 'gdevelop_education',
 |};
 
 const GetSubscriptionCard = ({
@@ -47,21 +57,32 @@ const GetSubscriptionCard = ({
   label,
   hideButton,
   payWithCreditsOptions,
+  onUpgrade,
+  forceColumnLayout,
+  filter,
+  recommendedPlanIdIfNoSubscription,
 }: Props) => {
+  const { subscription } = React.useContext(AuthenticatedUserContext);
+  const actualPlanIdToRecommend = hasValidSubscriptionPlan(subscription)
+    ? // If the user already has a subscription, show the original subscription dialog.
+      undefined
+    : recommendedPlanIdIfNoSubscription;
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
   const { isMobile } = useResponsiveWindowSize();
+  const columnLayout = forceColumnLayout || isMobile;
   return (
     <div className={classes.premiumContainer}>
       <Paper style={styles.paper} background="medium">
-        <Line expand alignItems="center" noMargin={!isMobile}>
+        <Line expand alignItems="center" noMargin={!columnLayout}>
           <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
           <Column expand justifyContent="center">
             <ResponsiveLineStackLayout
               alignItems="center"
               noColumnMargin
               noMargin
+              forceMobileLayout={columnLayout}
             >
               <Column noMargin expand>
                 {children}
@@ -79,10 +100,15 @@ const GetSubscriptionCard = ({
                   label={label || <Trans>Upgrade</Trans>}
                   primary
                   onClick={() => {
+                    if (onUpgrade) {
+                      onUpgrade();
+                    }
                     openSubscriptionDialog({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
+                        recommendedPlanId: actualPlanIdToRecommend,
                       },
+                      filter,
                     });
                   }}
                   icon={<CrownShining fontSize="small" />}

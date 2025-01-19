@@ -2,7 +2,9 @@
 
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import Drawer from '@material-ui/core/Drawer';
+import HistoryIcon from '../UI/CustomSvgIcons/History';
 import DrawerTopBar from '../UI/DrawerTopBar';
 import {
   listVersionsOfProject,
@@ -16,14 +18,13 @@ import { Column, Line } from '../UI/Grid';
 import VersionHistory, { type OpenedVersionStatus } from '.';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import AlertMessage from '../UI/AlertMessage';
-import { ColumnStackLayout } from '../UI/Layout';
-import RaisedButton from '../UI/RaisedButton';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import PlaceholderError from '../UI/PlaceholderError';
 import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
+import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import Text from '../UI/Text';
 
 const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
@@ -96,9 +97,6 @@ const useVersionHistory = ({
 }: Props) => {
   const { hasUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const { showAlert } = useAlertDialog();
-  const { openSubscriptionDialog } = React.useContext(
-    SubscriptionSuggestionContext
-  );
   const [
     versionsFetchingError,
     setVersionsFetchingError,
@@ -420,80 +418,83 @@ const useVersionHistory = ({
 
   const renderVersionHistoryPanel = () => {
     return (
-      <Drawer
-        open={versionHistoryPanelOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={() => setVersionHistoryPanelOpen(false)}
-      >
-        <DrawerTopBar
-          title={<Trans>File history</Trans>}
-          onClose={() => setVersionHistoryPanelOpen(false)}
-          id="version-history-drawer"
-        />
-        {!cloudProjectId ? (
-          <Line expand>
-            <Column expand>
-              <AlertMessage kind="info">
-                <Trans>
-                  The version history is available for cloud projects only.
-                </Trans>
-              </AlertMessage>
-            </Column>
-          </Line>
-        ) : !isUserAllowedToSeeVersionHistory ? (
-          <Line expand>
-            <ColumnStackLayout>
-              <AlertMessage kind="info">
-                <Trans>
-                  Access project history, name saves, restore older versions.
-                  <br />
-                  Upgrade to a Pro plan to get started!
-                </Trans>
-              </AlertMessage>
-              <RaisedButton
-                primary
-                label={<Trans>Upgrade my subscription</Trans>}
-                onClick={() =>
-                  openSubscriptionDialog({
-                    analyticsMetadata: { reason: 'Version history' },
-                    filter: 'team',
-                  })
+      <I18n>
+        {({ i18n }) => (
+          <Drawer
+            open={versionHistoryPanelOpen}
+            PaperProps={{
+              style: styles.drawerContent,
+              className: 'safe-area-aware-left-container',
+            }}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            onClose={() => setVersionHistoryPanelOpen(false)}
+          >
+            <DrawerTopBar
+              icon={<HistoryIcon />}
+              title={i18n._(t`File history`)}
+              onClose={() => setVersionHistoryPanelOpen(false)}
+              id="version-history-drawer"
+            />
+            {!cloudProjectId ? (
+              <Line expand>
+                <Column expand>
+                  <AlertMessage kind="info">
+                    <Trans>
+                      The version history is available for cloud projects only.
+                    </Trans>
+                  </AlertMessage>
+                </Column>
+              </Line>
+            ) : !isUserAllowedToSeeVersionHistory ? (
+              <Line expand>
+                <Column expand>
+                  <GetSubscriptionCard
+                    subscriptionDialogOpeningReason="Version history"
+                    forceColumnLayout
+                    filter="team"
+                    recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                  >
+                    <Text>
+                      <Trans>
+                        Access project history, name saves, restore older
+                        versions.
+                        <br />
+                        Upgrade to a Pro plan to get started!
+                      </Trans>
+                    </Text>
+                  </GetSubscriptionCard>
+                </Column>
+              </Line>
+            ) : !state.versions && versionsFetchingError ? (
+              <Line expand>
+                <Column expand>
+                  <PlaceholderError onRetry={onLoadMoreVersions}>
+                    {versionsFetchingError}
+                  </PlaceholderError>
+                </Column>
+              </Line>
+            ) : state.versions ? (
+              <VersionHistory
+                authenticatedUserId={
+                  authenticatedUser.profile ? authenticatedUser.profile.id : ''
                 }
+                isVisible={versionHistoryPanelOpen}
+                projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
+                canLoadMore={!!state.nextPageUri}
+                onCheckoutVersion={onCheckoutVersion}
+                onLoadMore={onLoadMoreVersions}
+                onRenameVersion={onRenameVersion}
+                openedVersionStatus={checkedOutVersionStatus}
+                versions={state.versions}
               />
-            </ColumnStackLayout>
-          </Line>
-        ) : !state.versions && versionsFetchingError ? (
-          <Line expand>
-            <Column expand>
-              <PlaceholderError onRetry={onLoadMoreVersions}>
-                {versionsFetchingError}
-              </PlaceholderError>
-            </Column>
-          </Line>
-        ) : state.versions ? (
-          <VersionHistory
-            authenticatedUserId={
-              authenticatedUser.profile ? authenticatedUser.profile.id : ''
-            }
-            isVisible={versionHistoryPanelOpen}
-            projectId={fileMetadata ? fileMetadata.fileIdentifier : ''}
-            canLoadMore={!!state.nextPageUri}
-            onCheckoutVersion={onCheckoutVersion}
-            onLoadMore={onLoadMoreVersions}
-            onRenameVersion={onRenameVersion}
-            openedVersionStatus={checkedOutVersionStatus}
-            versions={state.versions}
-          />
-        ) : (
-          <PlaceholderLoader />
+            ) : (
+              <PlaceholderLoader />
+            )}
+          </Drawer>
         )}
-      </Drawer>
+      </I18n>
     );
   };
 

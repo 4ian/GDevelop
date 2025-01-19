@@ -69,8 +69,9 @@ class ProjectScopedContainers {
   MakeNewProjectScopedContainersForFreeEventsFunction(
       const gd::Project &project,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
-      const gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& parameterObjectsContainer);
+      const gd::EventsFunction &eventsFunction,
+      gd::ObjectsContainer &parameterObjectsContainer,
+      gd::VariablesContainer &parameterVariablesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForBehaviorEventsFunction(
@@ -78,7 +79,9 @@ class ProjectScopedContainers {
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       const gd::EventsFunction &eventsFunction,
-      gd::ObjectsContainer &parameterObjectsContainer);
+      gd::ObjectsContainer &parameterObjectsContainer,
+      gd::VariablesContainer &parameterVariablesContainer,
+      gd::VariablesContainer &propertyVariablesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForObjectEventsFunction(
@@ -86,7 +89,9 @@ class ProjectScopedContainers {
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedObject &eventsBasedObject,
       const gd::EventsFunction &eventsFunction,
-      gd::ObjectsContainer &parameterObjectsContainer);
+      gd::ObjectsContainer &parameterObjectsContainer,
+      gd::VariablesContainer &parameterVariablesContainer,
+    gd::VariablesContainer &propertyVariablesContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForEventsBasedObject(
@@ -124,9 +129,17 @@ class ProjectScopedContainers {
       std::function<ReturnType()> notFoundCallback) const {
     if (objectsContainersList.HasObjectOrGroupNamed(name))
       return objectCallback();
-    else if (variablesContainersList.Has(name))
+    else if (variablesContainersList.Has(name)) {
+      const auto &variablesContainer =
+          variablesContainersList.GetVariablesContainerFromVariableName(name);
+      const auto sourceType = variablesContainer.GetSourceType();
+      if (sourceType == gd::VariablesContainer::SourceType::Properties) {
+        return propertyCallback();
+      } else if (sourceType == gd::VariablesContainer::SourceType::Parameters) {
+        return parameterCallback();
+      }
       return variableCallback();
-    else if (ParameterMetadataTools::Has(parametersVectorsList, name))
+    } else if (ParameterMetadataTools::Has(parametersVectorsList, name))
       return parameterCallback();
     else if (propertiesContainersList.Has(name))
       return propertyCallback();

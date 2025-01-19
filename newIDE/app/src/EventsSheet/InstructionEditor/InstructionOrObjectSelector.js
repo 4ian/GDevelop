@@ -1,11 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-import { t } from '@lingui/macro';
-import Fuse from 'fuse.js';
-
 import * as React from 'react';
+import { AutoSizer } from 'react-virtualized';
+import Fuse from 'fuse.js';
+import { type I18n as I18nType } from '@lingui/core';
+import { t, Trans } from '@lingui/macro';
+
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -19,52 +18,140 @@ import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
-import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs } from '../../UI/Tabs';
-import Subheader from '../../UI/Subheader';
-import {
-  enumerateObjectsAndGroups,
-  type ObjectWithContext,
-  type GroupWithContext,
-} from '../../ObjectsList/EnumerateObjects';
-import RaisedButton from '../../UI/RaisedButton';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
-import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
-import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
-import { renderInstructionOrExpressionTree } from './SelectorListItems/SelectorInstructionsTreeListItem';
+import { enumerateObjectsAndGroups } from '../../ObjectsList/EnumerateObjects';
 import EmptyMessage from '../../UI/EmptyMessage';
-import {
-  getObjectOrObjectGroupListItemValue,
-  getInstructionListItemValue,
-} from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
   tuneMatches,
   sharedFuseConfiguration,
-  getFuseSearchQueryForSimpleArray,
   getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
-import Add from '../../UI/CustomSvgIcons/Add';
-import getObjectByName from '../../Utils/GetObjectByName';
-import {
-  enumerateFoldersInContainer,
-  getObjectsInFolder,
-} from '../../ObjectsList/EnumerateObjectFolderOrObject';
-import { renderFolderListItem } from './SelectorListItems/FolderListItem';
-import Text from '../../UI/Text';
+import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import ReadOnlyTreeView, {
+  type ReadOnlyTreeViewInterface,
+} from '../../UI/TreeView/ReadOnlyTreeView';
+import { mapFor } from '../../Utils/MapFor';
+import {
+  getObjectFolderTreeViewItemId,
+  InstructionTreeViewItemContent,
+  ObjectTreeViewItemContent,
+  ObjectFolderTreeViewItem,
+  GroupTreeViewItem,
+  ObjectGroupTreeViewItemContent,
+  ObjectGroupObjectTreeViewItemContent,
+  RootTreeViewItem,
+  LabelTreeViewItemContent,
+  LeafTreeViewItem,
+  type TreeViewItem,
+  MoreResultsTreeViewItemContent,
+} from './TreeViewItems';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import {
+  createFreeInstructionTreeViewItem,
+  InstructionTreeViewItemContent as FreeInstructionTreeViewItemContent,
+  MoreResultsTreeViewItemContent as MoreInstructionsTreeViewItemContent,
+  LeafTreeViewItem as InstructionLeafTreeViewItem,
+  getInstructionGroupId,
+} from './InstructionOrExpressionTreeViewItems';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 
+const singleLineTreeViewItemHeight = 32;
+const twoLinesTreeViewItemHeight = 44;
+
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
+const LOCAL_OBJECTS_ROOT_ITEM_ID = 'local-objects';
+const HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID = 'higher-scope-objects';
+const LOCAL_GROUPS_ROOT_ITEM_ID = 'local-groups';
+const HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID = 'higher-scope-groups';
+
+const getLabelsForContainers = (
+  scope: EventsScope
+): {|
+  localScopeObjectsTitle: MessageDescriptor,
+  higherScopeObjectsTitle: MessageDescriptor | null,
+  localScopeGroupsTitle: MessageDescriptor | null,
+  higherScopeGroupsTitle: MessageDescriptor | null,
+|} => {
+  if (scope.layout || scope.externalEvents) {
+    return {
+      localScopeObjectsTitle: t`Scene objects`,
+      higherScopeObjectsTitle: t`Global objects`,
+      localScopeGroupsTitle: t`Scene groups`,
+      higherScopeGroupsTitle: t`Global groups`,
+    };
+  } else if (scope.eventsBasedObject) {
+    return {
+      localScopeObjectsTitle: t`Parameters`,
+      higherScopeObjectsTitle: t`Object's children`,
+      localScopeGroupsTitle: null, // Parameters cannot be put into groups.
+      higherScopeGroupsTitle: t`Object's children groups`,
+    };
+  } else if (scope.eventsBasedBehavior) {
+    return {
+      localScopeObjectsTitle: t`Attached object`,
+      higherScopeObjectsTitle: null,
+      localScopeGroupsTitle: null,
+      higherScopeGroupsTitle: null,
+    };
+  } else if (scope.eventsFunction) {
+    return {
+      localScopeObjectsTitle: t`Parameters`,
+      higherScopeObjectsTitle: null,
+      localScopeGroupsTitle: null, // Parameters cannot be put into groups.
+      higherScopeGroupsTitle: null,
+    };
+  }
+  throw new Error('Scope not recognized.');
+};
+
+const getEmptyMessage = (scope: EventsScope): React.Node => {
+  if (scope.layout || scope.externalEvents) {
+    return (
+      <Trans>
+        There is no object in your game or in this scene. Start by adding an new
+        object in the scene editor, using the objects list.
+      </Trans>
+    );
+  } else if (scope.eventsBasedObject) {
+    return (
+      <Trans>
+        There are no objects. Objects will appear if you add some as parameter
+        or add children to the object.
+      </Trans>
+    );
+  } else if (scope.eventsBasedBehavior) {
+    // Should not happened, a behavior has an object as parameter by default.
+    return null;
+  } else if (scope.eventsFunction) {
+    return (
+      <Trans>
+        There are no objects. Objects will appear if you add some as parameters.
+      </Trans>
+    );
+  }
+  throw new Error('Scope not recognized.');
+};
+
+const getInstructionIconSrc = (key: string) => {
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
+};
+
 export const styles = {
   noObjectsText: { opacity: 0.7 },
   indentedListItem: { paddingLeft: 45 },
+  treeViewContainer: { flex: 1 },
+  treeViewAutoSizer: { width: '100%' },
 };
 
 export type TabName = 'objects' | 'free-instructions';
@@ -81,21 +168,25 @@ const moveDeprecatedInstructionsDown = (
   return [...notDeprecatedResults, ...deprecatedResults];
 };
 
-type State = {|
-  searchText: string,
-  searchResults: {
-    objects: Array<SearchResult<ObjectWithContext>>,
-    groups: Array<SearchResult<GroupWithContext>>,
-    instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
-    folders: Array<
-      SearchResult<{|
-        path: string,
-        folder: gdObjectFolderOrObject,
-        global: boolean,
-      |}>
-    >,
-  },
-|};
+const shouldApplySearchToItem = (item: TreeViewItem) =>
+  item.content.applySearch;
+const getTreeViewItemHeight = (item: TreeViewItem) =>
+  item.content instanceof InstructionTreeViewItemContent ||
+  item.content instanceof MoreResultsTreeViewItemContent ||
+  item.content instanceof MoreInstructionsTreeViewItemContent
+    ? twoLinesTreeViewItemHeight
+    : singleLineTreeViewItemHeight;
+const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
+const getTreeViewItemDescription = (item: TreeViewItem) =>
+  item.content.getDescription();
+const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
+const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
+  item.content.getHtmlId(index);
+
+const getTreeViewItemThumbnail = (item: TreeViewItem) =>
+  item.content.getThumbnail();
+const getTreeViewItemDataset = (item: TreeViewItem) =>
+  item.content.getDataSet();
 
 type Props = {|
   project: gdProject,
@@ -115,73 +206,106 @@ type Props = {|
   i18n: I18nType,
 |};
 
-const iconSize = 24;
-const getGroupIconSrc = (key: string) => {
-  return gd.JsPlatform.get()
-    .getInstructionOrExpressionGroupMetadata(key)
-    .getIcon();
-};
+export type InstructionOrObjectSelectorInterface = {|
+  reEnumerateInstructions: (i18n: I18nType) => void,
+|};
 
-export default class InstructionOrObjectSelector extends React.PureComponent<
+const InstructionOrObjectSelector = React.forwardRef<
   Props,
-  State
-> {
-  state = {
-    searchText: '',
-    searchResults: { objects: [], groups: [], instructions: [], folders: [] },
-  };
-  _searchBar = React.createRef<SearchBarInterface>();
-  _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItemRefType>();
-
-  // Free instructions, to be displayed in a tab next to the objects.
-  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
-  freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
-    this.freeInstructionsInfo
-  );
-  initialInstructionTypePath = findInTree(
-    this.freeInstructionsInfoTree,
-    this.props.chosenInstructionType
-  );
-
-  instructionSearchApi = null;
-  objectSearchApi = null;
-  groupSearchApi = null;
-  folderSearchApi = null;
-
-  reEnumerateInstructions = (i18n: I18nType) => {
-    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructions(this.props.isCondition, i18n),
-      this.props.scope
+  InstructionOrObjectSelectorInterface
+>(
+  (
+    {
+      project,
+      projectScopedContainersAccessor,
+      scope,
+      currentTab,
+      onChangeTab,
+      isCondition,
+      focusOnMount,
+      chosenInstructionType,
+      onChooseInstruction,
+      chosenObjectName,
+      onChooseObject,
+      onSearchStartOrReset,
+      style,
+      onClickMore,
+      i18n,
+    },
+    ref
+  ) => {
+    const searchBarRef = React.useRef<?SearchBarInterface>(null);
+    const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
+      null
     );
-    this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
-    this.forceUpdate();
-  };
+    const freeInstructionTreeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
+      null
+    );
+    const freeInstructionsInfoTreeRef = React.useRef<InstructionOrExpressionTreeNode>(
+      createTree(
+        filterEnumeratedInstructionOrExpressionMetadataByScope(
+          enumerateFreeInstructions(isCondition, i18n),
+          scope
+        ),
+        i18n
+      )
+    );
+    const initialInstructionTypePathRef = React.useRef<?Array<string>>(
+      findInTree(freeInstructionsInfoTreeRef.current, chosenInstructionType)
+    );
+    const initialInstructionAscendanceRef = React.useRef<Array<string>>(
+      initialInstructionTypePathRef.current
+        ? initialInstructionTypePathRef.current.reduce(
+            (nodeIds, categoryName) => {
+              const parentId =
+                nodeIds.length > 0 ? nodeIds[nodeIds.length - 1] : null;
+              nodeIds.push(getInstructionGroupId(categoryName, parentId));
+              return nodeIds;
+            },
+            []
+          )
+        : []
+    );
+    // All the instructions, to be used when searching, so that the search is done
+    // across all the instructions (including object and behaviors instructions).
+    const allInstructionsInfoRef = React.useRef<
+      Array<EnumeratedInstructionMetadata>
+    >(
+      filterEnumeratedInstructionOrExpressionMetadataByScope(
+        enumerateAllInstructions(isCondition, i18n),
+        scope
+      )
+    );
+    // Instructions search results are handled by Fuse because the text is searched
+    // in different attributes of the object. Objects, groups and folders search is
+    // directly handled by the tree view since they only have one field and their name
+    // are straightforward.
+    const instructionSearchApiRef = React.useRef<Fuse>(
+      new Fuse(allInstructionsInfoRef.current, {
+        ...sharedFuseConfiguration,
+        keys: [
+          { name: 'displayedName', weight: 5 },
+          { name: 'fullGroupName', weight: 1 },
+          { name: 'description', weight: 3 },
+        ],
+      })
+    );
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
 
-  // All the instructions, to be used when searching, so that the search is done
-  // across all the instructions (including object and behaviors instructions).
-  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
-
-  componentDidMount() {
-    if (this._selectedItem.current && this._scrollView.current) {
-      this._scrollView.current.scrollTo(this._selectedItem.current);
-    }
+    const [searchText, setSearchText] = React.useState<string>('');
+    const [searchResults, setSearchResults] = React.useState<{
+      instructions: Array<SearchResult<EnumeratedInstructionMetadata>>,
+    }>({ instructions: [] });
+    const [selectedItem, setSelectedItem] = React.useState<?TreeViewItem>(null);
 
     // The objects must never be kept in a state as they may be temporary copies.
     // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
     // in the codebase.
-    const objectsContainersList = this.props.projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
-
-    const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      objectsContainersList
+    const objectsContainersList = React.useMemo(
+      () => projectScopedContainersAccessor.get().getObjectsContainersList(),
+      [projectScopedContainersAccessor]
     );
 
     if (objectsContainersList.getObjectsContainersCount() === 0) {
@@ -195,6 +319,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         'Used InstructionOrObjectSelector with more than 2 object containers.'
       );
     }
+    const { allObjectsList } = React.useMemo(
+      () => enumerateObjectsAndGroups(objectsContainersList),
+      [objectsContainersList]
+    );
+
     const globalObjectsContainer =
       objectsContainersList.getObjectsContainersCount() > 1
         ? objectsContainersList.getObjectsContainer(0)
@@ -203,161 +332,187 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       objectsContainersList.getObjectsContainersCount() - 1
     );
 
-    const allFolders = [
-      ...(globalObjectsContainer
-        ? enumerateFoldersInContainer(globalObjectsContainer).map(
-            folderWithPath => ({ ...folderWithPath, global: true })
-          )
-        : []),
-      ...enumerateFoldersInContainer(objectsContainer).map(folderWithPath => ({
-        ...folderWithPath,
-        global: false,
-      })),
-    ];
-
-    this.instructionSearchApi = new Fuse(this.allInstructionsInfo, {
-      ...sharedFuseConfiguration,
-      keys: [
-        { name: 'displayedName', weight: 5 },
-        { name: 'fullGroupName', weight: 1 },
-        { name: 'description', weight: 3 },
-      ],
-    });
-    this.objectSearchApi = new Fuse(allObjectsList, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.object.getName(),
-      keys: ['name'], // Not used as we only use the name of the object
-    });
-    this.groupSearchApi = new Fuse(allGroupsList, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.group.getName(),
-      keys: ['name'], // Not used as we only use the name of the group
-    });
-    this.folderSearchApi = new Fuse(allFolders, {
-      ...sharedFuseConfiguration,
-      getFn: (item, property) => item.path,
-      keys: ['name'], // Not used as we only use the path to the folder
-    });
-  }
-
-  _search = (searchText: string) => {
-    if (searchText === '') return;
-
-    const extendedSearchText = getFuseSearchQueryForSimpleArray(searchText);
-
-    this.setState({
-      searchResults: {
-        objects: this.objectSearchApi
-          ? this.objectSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-        groups: this.groupSearchApi
-          ? this.groupSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-        folders: this.folderSearchApi
-          ? this.folderSearchApi.search(extendedSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-          : [],
-        instructions: this.instructionSearchApi
-          ? moveDeprecatedInstructionsDown(
-              this.instructionSearchApi
-                .search(
-                  getFuseSearchQueryForMultipleKeys(searchText, [
-                    'displayedName',
-                    'fullGroupName',
-                    'description',
-                  ])
-                )
-                .map(result => ({
-                  item: result.item,
-                  matches: tuneMatches(result, searchText),
-                }))
+    const initiallyOpenedFolderIdsRef = React.useRef<string[]>(
+      // TODO: Once it is possible to store the opened state of folders,
+      // Reuse it here to have the same state between the scene editor
+      // and the event sheets + Open the folder ascendance until the chosen object
+      // if there is one, to make sure it is displayed if the user is opening
+      // an already set up instruction.
+      // Also: if an in-app tutorial is running, open all folders.
+      [
+        ...enumerateFoldersInContainer(objectsContainer).map(
+          folderWithPath => folderWithPath.folder
+        ),
+        ...(globalObjectsContainer
+          ? enumerateFoldersInContainer(globalObjectsContainer).map(
+              folderWithPath => folderWithPath.folder
             )
-          : [],
+          : []),
+      ].map(getObjectFolderTreeViewItemId)
+    );
+    const initiallyOpenedInstructionsGroupIdsRef = React.useRef<string[]>([
+      ...Object.keys(freeInstructionsInfoTreeRef.current).map(categoryName =>
+        getInstructionGroupId(categoryName)
+      ),
+    ]);
+
+    const forceUpdate = useForceUpdate();
+
+    const reEnumerateInstructions = React.useCallback(
+      (i18n: I18nType) => {
+        freeInstructionsInfoTreeRef.current = createTree(
+          filterEnumeratedInstructionOrExpressionMetadataByScope(
+            enumerateFreeInstructions(isCondition, i18n),
+            scope
+          ),
+          i18n
+        );
+        forceUpdate();
       },
-    });
-  };
-
-  render() {
-    const {
-      style,
-      projectScopedContainersAccessor,
-      project,
-      chosenInstructionType,
-      onChooseInstruction,
-      chosenObjectName,
-      onChooseObject,
-      isCondition,
-      currentTab,
-      onChangeTab,
-      onSearchStartOrReset,
-      onClickMore,
-    } = this.props;
-
-    // The objects must never be kept in a state as they may be temporary copies.
-    // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
-    // in the codebase.
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
-
-    if (objectsContainersList.getObjectsContainersCount() === 0) {
-      throw new Error(
-        'Called InstructionOrObjectSelector without any object container.'
-      );
-    }
-    // TODO Use a loop instead of looking for 2 object containers.
-    if (objectsContainersList.getObjectsContainersCount() > 2) {
-      console.error(
-        'Called InstructionOrObjectSelector with more than 2 object containers.'
-      );
-    }
-    const globalObjectsContainer =
-      objectsContainersList.getObjectsContainersCount() > 1
-        ? objectsContainersList.getObjectsContainer(0)
-        : null;
-    const objectsContainer = objectsContainersList.getObjectsContainer(
-      objectsContainersList.getObjectsContainersCount() - 1
+      [forceUpdate, isCondition, scope]
     );
 
-    const { searchText, searchResults } = this.state;
+    React.useImperativeHandle(ref, () => ({ reEnumerateInstructions }));
 
-    // If the global objects container is not the project, consider that we're
-    // not in the events of a layout or an external events sheet - but in an extension.
-    const isOutsideLayout = globalObjectsContainer !== project;
-
-    const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
-      objectsContainersList
+    React.useEffect(
+      () => {
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          treeView.updateRowHeights();
+          treeView.scrollTo(0);
+        }
+      },
+      // Recompute row heights when search changes and reset scroll.
+      // Keep this effect before the effect that scrolls to the selected item
+      // at opening to avoid this effect take priority over this other, more
+      // important one.
+      [searchText]
     );
+
+    React.useEffect(
+      () => {
+        if (chosenObjectName) {
+          let itemToSelect;
+          const objectOrGroupName = chosenObjectName;
+          const treeView = treeViewRef.current;
+          if (!treeView) return;
+
+          for (const item of treeView.getDisplayedItemsIterator()) {
+            if (item.content instanceof ObjectGroupTreeViewItemContent) {
+              const group = item.content.getGroup();
+              if (!group) return;
+              if (group.getName() === objectOrGroupName) {
+                itemToSelect = item;
+                break;
+              }
+            }
+            if (item.content instanceof ObjectTreeViewItemContent) {
+              const objectFolderOrObject = item.content.getObjectFolderOrObject();
+              if (!objectFolderOrObject) return;
+              if (
+                objectFolderOrObject.getObject().getName() === objectOrGroupName
+              ) {
+                itemToSelect = item;
+                break;
+              }
+            }
+          }
+          if (itemToSelect) {
+            setSelectedItem(itemToSelect);
+            treeView.scrollToItem(itemToSelect, 'start');
+          }
+        } else if (chosenInstructionType) {
+          let itemToSelect;
+
+          const treeView = freeInstructionTreeViewRef.current;
+          if (!treeView) return;
+
+          for (const item of treeView.getDisplayedItemsIterator()) {
+            if (item.content instanceof FreeInstructionTreeViewItemContent) {
+              const instructionMetadata = item.content.getInstructionMetadata();
+              if (!instructionMetadata) return;
+              if (instructionMetadata.type === chosenInstructionType) {
+                setSelectedItem(item);
+                treeView.scrollToItem(item, 'start');
+                break;
+              }
+            }
+          }
+          if (itemToSelect) {
+            setSelectedItem(itemToSelect);
+            treeView.scrollToItem(itemToSelect, 'start');
+          }
+        }
+      },
+      // Scroll to and select the already chosen object/instruction at opening.
+      // chosenObjectName and chosenInstructionType are not dependencies to avoid
+      // the tree views to scroll at each item selection. This effect will be run
+      // when the components mounts only, and that's what we want.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+
+    const getTreeViewItemChildren = (item: TreeViewItem) =>
+      item.getChildren(searchText);
+
+    const search = React.useCallback((searchText: string) => {
+      if (!searchText) return;
+
+      const matchingInstructions = moveDeprecatedInstructionsDown(
+        instructionSearchApiRef.current
+          .search(
+            getFuseSearchQueryForMultipleKeys(searchText, [
+              'displayedName',
+              'fullGroupName',
+              'description',
+            ])
+          )
+          .map(result => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          }))
+      );
+
+      setSearchResults({ instructions: matchingInstructions });
+    }, []);
+
+    const onSubmitSearch = () => {
+      if (!searchText || !treeViewRef.current) return;
+
+      for (const item of treeViewRef.current.getDisplayedItemsIterator()) {
+        if (item.content instanceof ObjectGroupTreeViewItemContent) {
+          const group = item.content.getGroup();
+          if (!group) return;
+          onChooseObject(group.getName());
+          break;
+        }
+        if (item.content instanceof ObjectTreeViewItemContent) {
+          const objectFolderOrObject = item.content.getObjectFolderOrObject();
+          if (!objectFolderOrObject) return;
+          onChooseObject(objectFolderOrObject.getObject().getName());
+          break;
+        }
+        if (item.content instanceof ObjectGroupObjectTreeViewItemContent) {
+          const object = item.content.getObject();
+          if (!object) return;
+          onChooseObject(object.getName());
+          break;
+        }
+        if (item.content instanceof InstructionTreeViewItemContent) {
+          const instructionMetadata = item.content.getInstructionMetadata();
+          if (!instructionMetadata) return;
+          onChooseInstruction(instructionMetadata.type, instructionMetadata);
+          break;
+        }
+      }
+    };
 
     const isSearching = !!searchText;
 
-    let filteredObjectsList = [];
-    let displayedObjectGroupsList = [];
     let filteredInstructionsList = [];
-    let filteredFoldersList = [];
 
     if (isSearching) {
-      filteredObjectsList = searchResults.objects;
-      displayedObjectGroupsList = searchResults.groups;
       filteredInstructionsList = searchResults.instructions;
-      filteredFoldersList = searchResults.folders;
-    } else {
-      filteredObjectsList = allObjectsList.map(object => ({
-        item: object,
-        matches: [],
-      }));
-      displayedObjectGroupsList = allGroupsList.map(object => ({
-        item: object,
-        matches: [],
-      }));
     }
     const displayedInstructionsList = filteredInstructionsList.slice(
       0,
@@ -371,382 +526,381 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         )
       : 0;
 
-    const hasResults =
-      !isSearching ||
-      !!filteredObjectsList.length ||
-      !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length ||
-      !!filteredFoldersList;
+    const globalObjectsRootFolder = globalObjectsContainer
+      ? globalObjectsContainer.getRootFolder()
+      : null;
+    const objectsRootFolder = objectsContainer.getRootFolder();
+    const groups = objectsContainer.getObjectGroups();
+    const hasGroups = groups.count() > 0;
+    const globalGroups = globalObjectsContainer
+      ? globalObjectsContainer.getObjectGroups()
+      : null;
+    const hasGlobalGroups = globalGroups ? globalGroups.count() > 0 : false;
 
-    const onSubmitSearch = () => {
-      if (!isSearching) return;
-
-      if (filteredObjectsList.length > 0) {
-        onChooseObject(filteredObjectsList[0].item.object.getName());
-      } else if (displayedObjectGroupsList.length > 0) {
-        onChooseObject(displayedObjectGroupsList[0].item.group.getName());
-      } else if (displayedInstructionsList.length > 0) {
-        onChooseInstruction(
-          displayedInstructionsList[0].item.type,
-          displayedInstructionsList[0].item
-        );
-      }
+    const objectTreeViewItemProps = {
+      project,
+      getThumbnail: ObjectsRenderingService.getThumbnail.bind(
+        ObjectsRenderingService
+      ),
+    };
+    const objectFolderTreeViewItemProps = {
+      project,
     };
 
+    const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
+
+    const getFreeInstructionsTreeViewItems = i18n =>
+      [
+        ...createFreeInstructionTreeViewItem({
+          instructionOrGroup: freeInstructionsInfoTreeRef.current,
+          freeInstructionProps: { getGroupIconSrc: getInstructionIconSrc },
+        }),
+        onClickMore
+          ? new InstructionLeafTreeViewItem(
+              new MoreInstructionsTreeViewItemContent(
+                isCondition ? (
+                  <Trans>Search for new conditions in extensions</Trans>
+                ) : (
+                  <Trans>Search for new actions in extensions</Trans>
+                ),
+                onClickMore
+              ),
+              true
+            )
+          : null,
+      ].filter(Boolean);
+
+    const getTreeViewItems = i18n =>
+      [
+        new ObjectFolderTreeViewItem({
+          objectFolderOrObject: objectsRootFolder,
+          global: false,
+          isRoot: true,
+          content: new LabelTreeViewItemContent(
+            LOCAL_OBJECTS_ROOT_ITEM_ID,
+            i18n._(labels.localScopeObjectsTitle)
+          ),
+          objectTreeViewItemProps,
+          objectFolderTreeViewItemProps,
+        }),
+        globalObjectsRootFolder
+          ? new ObjectFolderTreeViewItem({
+              objectFolderOrObject: globalObjectsRootFolder,
+              global: true,
+              isRoot: true,
+              content: new LabelTreeViewItemContent(
+                HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
+                labels.higherScopeObjectsTitle
+                  ? i18n._(labels.higherScopeObjectsTitle)
+                  : ''
+              ),
+              objectTreeViewItemProps,
+              objectFolderTreeViewItemProps,
+            })
+          : null,
+        hasGroups
+          ? new RootTreeViewItem(
+              new LabelTreeViewItemContent(
+                LOCAL_GROUPS_ROOT_ITEM_ID,
+                labels.localScopeGroupsTitle
+                  ? i18n._(labels.localScopeGroupsTitle)
+                  : ''
+              ),
+              mapFor(0, groups.count(), index => {
+                const group = groups.getAt(index);
+                return new GroupTreeViewItem(
+                  new ObjectGroupTreeViewItemContent(group),
+                  group,
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectTreeViewItemProps
+                );
+              })
+            )
+          : null,
+        hasGlobalGroups && globalGroups
+          ? new RootTreeViewItem(
+              new LabelTreeViewItemContent(
+                HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
+                labels.higherScopeGroupsTitle
+                  ? i18n._(labels.higherScopeGroupsTitle)
+                  : ''
+              ),
+              mapFor(0, globalGroups.count(), index => {
+                const group = globalGroups.getAt(index);
+                return new GroupTreeViewItem(
+                  new ObjectGroupTreeViewItemContent(group),
+                  group,
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectTreeViewItemProps
+                );
+              })
+            )
+          : null,
+        displayedInstructionsList.length > 0
+          ? new RootTreeViewItem(
+              new LabelTreeViewItemContent(
+                'instructions',
+                i18n._(isCondition ? t`Conditions` : t`Actions`)
+              ),
+              [
+                ...displayedInstructionsList.map(searchResult => {
+                  return new LeafTreeViewItem(
+                    new InstructionTreeViewItemContent(searchResult.item)
+                  );
+                }),
+                remainingResultsCount
+                  ? new LeafTreeViewItem(
+                      new MoreResultsTreeViewItemContent(
+                        i18n._(t`And ${remainingResultsCount} more results.`),
+                        i18n._(
+                          t`Refine your search with more specific keywords.`
+                        )
+                      )
+                    )
+                  : null,
+              ].filter(Boolean)
+            )
+          : null,
+      ].filter(Boolean);
+
+    const hasResults = React.useMemo(
+      () => {
+        if (!isSearching) return true;
+        if (displayedInstructionsList.length > 0) return true;
+        const treeView = treeViewRef.current;
+        if (!treeView) return true;
+        return treeView.getDisplayedItemsCount() > 0;
+      },
+      [displayedInstructionsList, isSearching]
+    );
+
+    const hasNoObjects = !isSearching && !allObjectsList.length;
+    const searchHasNoResults = isSearching && !hasResults;
+
     return (
-      <I18n>
-        {({ i18n }) => (
-          <div
-            id="instruction-or-object-selector"
-            style={{
-              // Important for the component to not take the full height in a dialog,
-              // allowing to let the scrollview do its job.
-              minHeight: 0,
-              ...style,
-            }}
-          >
-            <SearchBar
-              id="search-bar"
-              value={searchText}
-              onChange={searchText => {
-                const oldSearchText = this.state.searchText;
-                if (!!searchText) this._search(searchText);
-                this.setState({
-                  searchText,
-                });
-
-                // Notify if needed that we started or cleared a search
-                if (
-                  (!oldSearchText && searchText) ||
-                  (oldSearchText && !searchText)
-                ) {
-                  if (onSearchStartOrReset) onSearchStartOrReset();
-                }
-              }}
-              onRequestSearch={onSubmitSearch}
-              ref={this._searchBar}
-              autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
-              placeholder={
-                isCondition
-                  ? t`Search objects or conditions`
-                  : t`Search objects or actions`
-              }
-            />
-            {!isSearching && (
-              <Line>
-                <Column expand noMargin>
-                  <Tabs
-                    value={currentTab}
-                    onChange={onChangeTab}
-                    options={[
-                      {
-                        label: <Trans>Objects</Trans>,
-                        value: 'objects',
-                      },
-                      {
-                        label: isCondition ? (
-                          <Trans>Other conditions</Trans>
-                        ) : (
-                          <Trans>Other actions</Trans>
-                        ),
-                        value: 'free-instructions',
-                      },
-                    ]}
-                  />
-                </Column>
-              </Line>
-            )}
-            <ScrollView ref={this._scrollView} autoHideScrollbar>
-              {hasResults && (
-                <List>
-                  {(isSearching || currentTab === 'objects') && (
-                    <React.Fragment>
-                      {filteredObjectsList.map(
-                        ({ item: objectWithContext, matches }, index) =>
-                          renderObjectListItem({
-                            project: project,
-                            objectWithContext: objectWithContext,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChooseObject(
-                                objectWithContext.object.getName()
-                              ),
-                            matchesCoordinates: matches.length
-                              ? matches[0].indices // Only field for objects is their name
-                              : [],
-                            selectedValue: chosenObjectName
-                              ? getObjectOrObjectGroupListItemValue(
-                                  chosenObjectName
-                                )
-                              : undefined,
-                            id: 'object-item-' + index,
-                            data: {
-                              objectName: objectWithContext.object.getName(),
-                            },
-                          })
-                      )}
-
-                      {displayedObjectGroupsList.length > 0 && (
-                        <Subheader>
-                          <Trans>Object groups</Trans>
-                        </Subheader>
-                      )}
-                      {displayedObjectGroupsList.map(
-                        ({ item: groupWithContext, matches }, index) => {
-                          const results = [];
-
-                          results.push(
-                            renderGroupObjectsListItem({
-                              id: 'objectGroup-item-' + index,
-                              data: {
-                                objectName: groupWithContext.group.getName(),
-                              },
-                              groupWithContext,
-                              iconSize,
-                              onClick: () =>
-                                onChooseObject(
-                                  groupWithContext.group.getName()
-                                ),
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices // Only field for groups is their name
-                                : [],
-                              selectedValue: chosenObjectName
-                                ? getObjectOrObjectGroupListItemValue(
-                                    chosenObjectName
-                                  )
-                                : undefined,
-                            })
-                          );
-                          if (isSearching) {
-                            const { group, global } = groupWithContext;
-                            const groupName = group.getName();
-                            const objectsInGroup = group
-                              .getAllObjectsNames()
-                              .toJSArray()
-                              .map(objectName => {
-                                // A global object group can contain scene objects so we cannot use
-                                // the group context to get directly get the object knowing the
-                                // appropriate container.
-                                const object = getObjectByName(
-                                  globalObjectsContainer,
-                                  objectsContainer,
-                                  objectName
-                                );
-                                if (!object) return null;
-
-                                return renderObjectListItem({
-                                  project,
-                                  objectWithContext: {
-                                    object,
-                                    global,
-                                  },
-                                  keyPrefix: `group-${groupName}`,
-                                  withIndent: true,
-                                  iconSize,
-                                  onClick: () => onChooseObject(objectName),
-                                  matchesCoordinates: [],
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                });
-                              })
-                              .filter(Boolean);
-                            if (objectsInGroup.length === 0) {
-                              results.push(
-                                <ListItem
-                                  key={`${group.getName()}-empty`}
-                                  primaryText={
-                                    <Text style={styles.noObjectsText} noMargin>
-                                      <Trans>No objects in the group</Trans>
-                                    </Text>
-                                  }
-                                  style={styles.indentedListItem}
-                                />
-                              );
-                            } else {
-                              results.push(...objectsInGroup);
-                            }
-                          }
-                          return results;
-                        }
-                      )}
-                      {filteredFoldersList.length > 0 && (
-                        <Subheader>
-                          <Trans>Folders</Trans>
-                        </Subheader>
-                      )}
-                      {filteredFoldersList.map(
-                        ({ item: folderWithPath, matches }) => {
-                          const results = [];
-
-                          results.push(
-                            renderFolderListItem({
-                              folderWithPath,
-                              iconSize,
-                              matchesCoordinates: matches.length
-                                ? matches[0].indices
-                                : [],
-                            })
-                          );
-                          const objectsInFolder = getObjectsInFolder(
-                            folderWithPath.folder
-                          );
-                          if (objectsInFolder.length === 0) {
-                            results.push(
-                              <ListItem
-                                key={`${folderWithPath.path}-empty`}
-                                primaryText={
-                                  <Text style={styles.noObjectsText} noMargin>
-                                    <Trans>No objects in the folder</Trans>
-                                  </Text>
-                                }
-                                style={styles.indentedListItem}
-                              />
-                            );
-                          } else {
-                            results.push(
-                              ...objectsInFolder.map(object =>
-                                renderObjectListItem({
-                                  project,
-                                  selectedValue: chosenObjectName
-                                    ? getObjectOrObjectGroupListItemValue(
-                                        chosenObjectName
-                                      )
-                                    : undefined,
-                                  keyPrefix: `folder-${folderWithPath.path}`,
-                                  iconSize,
-                                  matchesCoordinates: [],
-                                  objectWithContext: {
-                                    object,
-                                    global: folderWithPath.global,
-                                  },
-                                  withIndent: true,
-                                  onClick: () =>
-                                    onChooseObject(object.getName()),
-                                })
-                              )
-                            );
-                          }
-
-                          return results;
-                        }
-                      )}
-                    </React.Fragment>
-                  )}
-                  {isSearching && displayedInstructionsList.length > 0 && (
-                    <Subheader>
-                      {isCondition ? (
-                        <Trans>Conditions</Trans>
-                      ) : (
-                        <Trans>Actions</Trans>
-                      )}
-                    </Subheader>
-                  )}
-                  {isSearching &&
-                    displayedInstructionsList.map(
-                      ({ item: instructionMetadata, matches }) =>
-                        renderInstructionOrExpressionListItem({
-                          instructionOrExpressionMetadata: instructionMetadata,
-                          iconSize: iconSize,
-                          id: `instruction-item-${instructionMetadata.type.replace(
-                            /:/g,
-                            '-'
-                          )}`,
-                          onClick: () =>
-                            onChooseInstruction(
-                              instructionMetadata.type,
-                              instructionMetadata
-                            ),
-                          selectedValue: chosenInstructionType
-                            ? getInstructionListItemValue(chosenInstructionType)
-                            : undefined,
-                          matches,
-                        })
-                    )}
-                  {!isSearching && currentTab === 'free-instructions' && (
-                    <>
-                      {renderInstructionOrExpressionTree({
-                        instructionTreeNode: this.freeInstructionsInfoTree,
-                        onChoose: onChooseInstruction,
-                        iconSize,
-                        useSubheaders: true,
-                        selectedValue: chosenInstructionType
-                          ? getInstructionListItemValue(chosenInstructionType)
-                          : undefined,
-                        initiallyOpenedPath: this.initialInstructionTypePath,
-                        selectedItemRef: this._selectedItem,
-                        getGroupIconSrc,
-                      })}
-                      {onClickMore && (
-                        <ResponsiveLineStackLayout justifyContent="center">
-                          <RaisedButton
-                            primary
-                            icon={<Add />}
-                            onClick={onClickMore}
-                            label={
-                              isCondition ? (
-                                <Trans>
-                                  Search for new conditions in extensions
-                                </Trans>
-                              ) : (
-                                <Trans>
-                                  Search for new actions in extensions
-                                </Trans>
-                              )
-                            }
-                          />
-                        </ResponsiveLineStackLayout>
-                      )}
-                    </>
-                  )}
-                  {remainingResultsCount > 0 && (
-                    <ListItem
-                      primaryText={
-                        <Trans>And {remainingResultsCount} more results.</Trans>
-                      }
-                      disabled
-                      secondaryText={
-                        <Trans>
-                          Refine your search with more specific keyword to see
-                          them.
-                        </Trans>
-                      }
-                    />
-                  )}
-                </List>
-              )}
-              {!isSearching &&
-                currentTab === 'objects' &&
-                !allObjectsList.length && (
-                  <EmptyMessage>
-                    {isOutsideLayout ? (
-                      <Trans>
-                        There are no objects. Objects will appear if you add
-                        some as parameters.
-                      </Trans>
+      <div
+        id="instruction-or-object-selector"
+        style={{
+          // Important for the component to not take the full height in a dialog,
+          // allowing to let the scrollview do its job.
+          minHeight: 0,
+          ...style,
+        }}
+      >
+        <SearchBar
+          id="search-bar"
+          value={searchText}
+          onChange={newSearchText => {
+            const oldSearchText = searchText;
+            if (!!newSearchText) search(newSearchText);
+            setSearchText(newSearchText);
+            // Notify if needed that we started or cleared a search
+            if (
+              (!oldSearchText && newSearchText) ||
+              (oldSearchText && !newSearchText)
+            ) {
+              if (onSearchStartOrReset) onSearchStartOrReset();
+            }
+          }}
+          onRequestSearch={onSubmitSearch}
+          ref={searchBarRef}
+          autoFocus={focusOnMount ? 'desktop' : undefined}
+          placeholder={
+            isCondition
+              ? t`Search objects or conditions`
+              : t`Search objects or actions`
+          }
+        />
+        {!isSearching && (
+          <Line>
+            <Column expand noMargin>
+              <Tabs
+                value={currentTab}
+                onChange={onChangeTab}
+                options={[
+                  {
+                    label: <Trans>Objects</Trans>,
+                    value: 'objects',
+                  },
+                  {
+                    label: isCondition ? (
+                      <Trans>Other conditions</Trans>
                     ) : (
-                      <Trans>
-                        There is no object in your game or in this scene. Start
-                        by adding an new object in the scene editor, using the
-                        objects list.
-                      </Trans>
-                    )}
-                  </EmptyMessage>
-                )}
-              {!hasResults && (
-                <EmptyMessage>
-                  <Trans>
-                    Nothing corresponding to your search. Choose an object first
-                    or browse the list of actions/conditions.
-                  </Trans>
-                </EmptyMessage>
-              )}
-            </ScrollView>
-          </div>
+                      <Trans>Other actions</Trans>
+                    ),
+                    value: 'free-instructions',
+                  },
+                ]}
+              />
+            </Column>
+          </Line>
         )}
-      </I18n>
+        {hasNoObjects ? (
+          <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
+        ) : searchHasNoResults ? (
+          <EmptyMessage>
+            <Trans>
+              Nothing corresponding to your search. Choose an object first or
+              browse the list of actions/conditions.
+            </Trans>
+          </EmptyMessage>
+        ) : null}
+        <div
+          style={{
+            ...styles.treeViewContainer,
+            display:
+              (currentTab === 'objects' || isSearching) &&
+              !searchHasNoResults &&
+              !hasNoObjects
+                ? 'unset'
+                : 'none',
+          }}
+        >
+          <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
+            {({ height }) => (
+              <ReadOnlyTreeView
+                key="objects-and-search-results"
+                ref={treeViewRef}
+                height={height}
+                estimatedItemSize={singleLineTreeViewItemHeight}
+                items={getTreeViewItems(i18n)}
+                getItemHeight={getTreeViewItemHeight}
+                getItemName={getTreeViewItemName}
+                shouldApplySearchToItem={shouldApplySearchToItem}
+                getItemDescription={getTreeViewItemDescription}
+                forceAllOpened={!!currentlyRunningInAppTutorial}
+                getItemId={getTreeViewItemId}
+                getItemHtmlId={getTreeViewItemHtmlId}
+                getItemChildren={getTreeViewItemChildren}
+                getItemThumbnail={getTreeViewItemThumbnail}
+                getItemDataset={getTreeViewItemDataset}
+                selectedItems={selectedItem ? [selectedItem] : []}
+                initiallyOpenedNodeIds={[
+                  LOCAL_OBJECTS_ROOT_ITEM_ID,
+                  HIGHER_SCOPE_OBJECTS_ROOT_ITEM_ID,
+                  LOCAL_GROUPS_ROOT_ITEM_ID,
+                  HIGHER_SCOPE_GROUPS_ROOT_ITEM_ID,
+                  ...initiallyOpenedFolderIdsRef.current,
+                ]}
+                onSelectItems={(items: TreeViewItem[]) => {
+                  if (!items) return;
+                  const item = items[0];
+                  if (!item || item.isRoot) return;
+                  const itemContentToSelect = item.content;
+                  if (
+                    itemContentToSelect instanceof ObjectTreeViewItemContent
+                  ) {
+                    const objectFolderOrObjectToSelect = itemContentToSelect.getObjectFolderOrObject();
+                    if (
+                      !objectFolderOrObjectToSelect ||
+                      objectFolderOrObjectToSelect.isFolder()
+                    ) {
+                      return;
+                    }
+                    onChooseObject(
+                      objectFolderOrObjectToSelect.getObject().getName()
+                    );
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    ObjectGroupTreeViewItemContent
+                  ) {
+                    const group = itemContentToSelect.getGroup();
+                    if (!group) return;
+                    onChooseObject(group.getName());
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    ObjectGroupObjectTreeViewItemContent
+                  ) {
+                    const object = itemContentToSelect.getObject();
+                    if (!object) return;
+                    onChooseObject(object.getName());
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    InstructionTreeViewItemContent
+                  ) {
+                    const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                    if (!instructionMetadata) return;
+                    onChooseInstruction(
+                      instructionMetadata.type,
+                      instructionMetadata
+                    );
+                    setSelectedItem(item);
+                  }
+                }}
+                searchText={searchText}
+                multiSelect={false}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <div
+          style={{
+            ...styles.treeViewContainer,
+            display:
+              currentTab === 'free-instructions' && !isSearching
+                ? 'unset'
+                : 'none',
+          }}
+        >
+          <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
+            {({ height }) => (
+              <ReadOnlyTreeView
+                key="free-instructions"
+                ref={freeInstructionTreeViewRef}
+                height={height}
+                items={getFreeInstructionsTreeViewItems(i18n)}
+                getItemHeight={getTreeViewItemHeight}
+                getItemName={getTreeViewItemName}
+                shouldApplySearchToItem={() => false}
+                getItemDescription={getTreeViewItemDescription}
+                getItemId={getTreeViewItemId}
+                getItemHtmlId={getTreeViewItemHtmlId}
+                getItemChildren={getTreeViewItemChildren}
+                getItemThumbnail={getTreeViewItemThumbnail}
+                getItemDataset={getTreeViewItemDataset}
+                selectedItems={selectedItem ? [selectedItem] : []}
+                initiallyOpenedNodeIds={Array.from(
+                  new Set([
+                    ...initiallyOpenedInstructionsGroupIdsRef.current,
+                    ...initialInstructionAscendanceRef.current,
+                  ])
+                )}
+                onSelectItems={(items: TreeViewItem[]) => {
+                  if (!items) return;
+                  const item = items[0];
+                  if (!item || item.isRoot) return;
+                  const itemContentToSelect = item.content;
+                  if (
+                    itemContentToSelect instanceof
+                    FreeInstructionTreeViewItemContent
+                  ) {
+                    const instructionMetadata = itemContentToSelect.getInstructionMetadata();
+                    if (!instructionMetadata) return;
+                    onChooseInstruction(
+                      instructionMetadata.type,
+                      instructionMetadata
+                    );
+                    setSelectedItem(item);
+                  } else if (
+                    itemContentToSelect instanceof
+                    MoreInstructionsTreeViewItemContent
+                  ) {
+                    itemContentToSelect.onClick();
+                  }
+                }}
+                multiSelect={false}
+              />
+            )}
+          </AutoSizer>
+        </div>
+      </div>
     );
   }
-}
+);
+
+export default InstructionOrObjectSelector;

@@ -35,7 +35,7 @@ import { SubscriptionSuggestionProvider } from '../Profile/Subscription/Subscrip
 import { RouterContextProvider } from './RouterContext';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
-import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
+import { AssetStoreNavigatorStateProvider } from '../AssetStore/AssetStoreNavigator';
 import { Trans } from '@lingui/macro';
 import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
@@ -65,7 +65,6 @@ const Providers = ({
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
 }: Props) => {
-  const shopNavigationState = useShopNavigation();
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>
@@ -101,43 +100,37 @@ const Providers = ({
                                   >
                                     <SubscriptionSuggestionProvider>
                                       <CommandsContextProvider>
-                                        <AssetStoreStateProvider
-                                          shopNavigationState={
-                                            shopNavigationState
-                                          }
-                                        >
-                                          <ResourceStoreStateProvider>
-                                            <ExampleStoreStateProvider>
-                                              <PrivateGameTemplateStoreStateProvider
-                                                shopNavigationState={
-                                                  shopNavigationState
-                                                }
-                                              >
-                                                <CreditsPackageStoreStateProvider>
-                                                  <CourseChapterStoreStateProvider>
-                                                    <ProductLicenseStoreStateProvider>
-                                                      <MarketingPlansStoreStateProvider>
-                                                        <ExtensionStoreStateProvider>
-                                                          <BehaviorStoreStateProvider>
-                                                            <TutorialStateProvider>
-                                                              <AnnouncementsFeedStateProvider>
-                                                                <PrivateAssetsAuthorizationProvider>
-                                                                  {children({
-                                                                    i18n,
-                                                                  })}
-                                                                </PrivateAssetsAuthorizationProvider>
-                                                              </AnnouncementsFeedStateProvider>
-                                                            </TutorialStateProvider>
-                                                          </BehaviorStoreStateProvider>
-                                                        </ExtensionStoreStateProvider>
-                                                      </MarketingPlansStoreStateProvider>
-                                                    </ProductLicenseStoreStateProvider>
-                                                  </CourseChapterStoreStateProvider>
-                                                </CreditsPackageStoreStateProvider>
-                                              </PrivateGameTemplateStoreStateProvider>
-                                            </ExampleStoreStateProvider>
-                                          </ResourceStoreStateProvider>
-                                        </AssetStoreStateProvider>
+                                        <AssetStoreNavigatorStateProvider>
+                                          <AssetStoreStateProvider>
+                                            <ResourceStoreStateProvider>
+                                              <ExampleStoreStateProvider>
+                                                <PrivateGameTemplateStoreStateProvider>
+                                                  <CreditsPackageStoreStateProvider>
+                                                    <CourseChapterStoreStateProvider>
+                                                      <ProductLicenseStoreStateProvider>
+                                                        <MarketingPlansStoreStateProvider>
+                                                          <ExtensionStoreStateProvider>
+                                                            <BehaviorStoreStateProvider>
+                                                              <TutorialStateProvider>
+                                                                <AnnouncementsFeedStateProvider>
+                                                                  <PrivateAssetsAuthorizationProvider>
+                                                                    {children({
+                                                                      i18n,
+                                                                    })}
+                                                                  </PrivateAssetsAuthorizationProvider>
+                                                                </AnnouncementsFeedStateProvider>
+                                                              </TutorialStateProvider>
+                                                            </BehaviorStoreStateProvider>
+                                                          </ExtensionStoreStateProvider>
+                                                        </MarketingPlansStoreStateProvider>
+                                                      </ProductLicenseStoreStateProvider>
+                                                    </CourseChapterStoreStateProvider>
+                                                  </CreditsPackageStoreStateProvider>
+                                                </PrivateGameTemplateStoreStateProvider>
+                                              </ExampleStoreStateProvider>
+                                            </ResourceStoreStateProvider>
+                                          </AssetStoreStateProvider>
+                                        </AssetStoreNavigatorStateProvider>
                                       </CommandsContextProvider>
                                     </SubscriptionSuggestionProvider>
                                   </EventsFunctionsExtensionsProvider>

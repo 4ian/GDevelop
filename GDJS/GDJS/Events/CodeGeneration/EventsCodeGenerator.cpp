@@ -131,10 +131,12 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer parameterObjectsAndGroups(
       gd::ObjectsContainer::SourceType::Function);
+  gd::VariablesContainer parameterVariablesContainer(
+      gd::VariablesContainer::SourceType::Parameters);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForFreeEventsFunction(
           project, eventsFunctionsExtension, eventsFunction,
-          parameterObjectsAndGroups);
+          parameterObjectsAndGroups, parameterVariablesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -185,10 +187,15 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer parameterObjectsContainers(
       gd::ObjectsContainer::SourceType::Function);
+  gd::VariablesContainer parameterVariablesContainer(
+      gd::VariablesContainer::SourceType::Parameters);
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
           project, eventsFunctionsExtension, eventsBasedBehavior,
-          eventsFunction, parameterObjectsContainers);
+          eventsFunction, parameterObjectsContainers,
+          parameterVariablesContainer, propertyVariablesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -265,10 +272,15 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer parameterObjectsContainers(
       gd::ObjectsContainer::SourceType::Function);
+  gd::VariablesContainer parameterVariablesContainer(
+      gd::VariablesContainer::SourceType::Parameters);
+  gd::VariablesContainer propertyVariablesContainer(
+      gd::VariablesContainer::SourceType::Properties);
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
           project, eventsFunctionsExtension, eventsBasedObject, eventsFunction,
-          parameterObjectsContainers);
+          parameterObjectsContainers, parameterVariablesContainer,
+          propertyVariablesContainer);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -1350,7 +1362,8 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     const gd::String& variableName,
     const VariableScope& scope,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& objectName) {
+    const gd::String& objectName,
+    bool hasChild) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == ANY_VARIABLE) {
@@ -1381,6 +1394,30 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
                gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
       output = "eventsFunctionContext.sceneVariablesForExtension";
+    } else if (sourceType ==
+               gd::VariablesContainer::SourceType::Properties) {
+      if (hasChild) {
+        // Properties with children are not supported.
+        return "gdjs.VariablesContainer.badVariablesContainer";
+      }
+      const auto &propertiesContainersList =
+          GetProjectScopedContainers().GetPropertiesContainersList();
+      const auto &propertiesContainerAndProperty =
+          propertiesContainersList.Get(variableName);
+      return GeneratePropertyGetterWithoutCasting(
+          propertiesContainerAndProperty.first,
+          propertiesContainerAndProperty.second);
+    } else if (sourceType ==
+               gd::VariablesContainer::SourceType::Parameters) {
+      if (hasChild) {
+        // Parameters with children are not supported.
+        return "gdjs.VariablesContainer.badVariablesContainer";
+      }
+      const auto &parametersVectorsList =
+          GetProjectScopedContainers().GetParametersVectorsList();
+      const auto &parameter =
+          gd::ParameterMetadataTools::Get(parametersVectorsList, variableName);
+      return GenerateParameterGetterWithoutCasting(parameter);
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";
@@ -1489,11 +1526,10 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
-gd::String EventsCodeGenerator::GeneratePropertyGetter(
-    const gd::PropertiesContainer& propertiesContainer,
-    const gd::NamedPropertyDescriptor& property,
-    const gd::String& type,
-    gd::EventsCodeGenerationContext& context) {
+gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property,
+    const gd::String &operandCode) {
   bool isLocalProperty =
       projectScopedContainers.GetPropertiesContainersList()
           .GetBottomMostPropertiesContainer() == &propertiesContainer;
@@ -1506,6 +1542,34 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
                      gd::EventsFunctionsContainer::Object
                  ? "eventsFunctionContext.getObjects(\"Object\")[0]"
                  : "eventsFunctionContext.getProperties()");
+
+  gd::String propertySetterCode =
+      propertyHolderCode + "." +
+      (isLocalProperty
+           ? BehaviorCodeGenerator::GetBehaviorPropertySetterName(
+                 property.GetName())
+           : BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
+                 property.GetName())) +
+      "(" + operandCode + ")\n";
+  return propertySetterCode;
+}
+
+gd::String EventsCodeGenerator::GeneratePropertyGetterWithoutCasting(
+    const gd::PropertiesContainer &propertiesContainer,
+    const gd::NamedPropertyDescriptor &property) {
+  bool isLocalProperty =
+      projectScopedContainers.GetPropertiesContainersList()
+          .GetBottomMostPropertiesContainer() == &propertiesContainer;
+
+  gd::String propertyHolderCode =
+      propertiesContainer.GetOwner() == gd::EventsFunctionsContainer::Behavior
+          ? "eventsFunctionContext.getObjects(\"Object\")[0].getBehavior(" +
+                GenerateGetBehaviorNameCode("Behavior") + ")"
+          : (propertiesContainer.GetOwner() ==
+                     gd::EventsFunctionsContainer::Object
+                 ? "eventsFunctionContext.getObjects(\"Object\")[0]"
+                 : "eventsFunctionContext.getProperties()");
+
   gd::String propertyGetterCode =
       propertyHolderCode + "." +
       (isLocalProperty
@@ -1514,6 +1578,16 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
            : BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterName(
                  property.GetName())) +
       "()";
+  return propertyGetterCode;
+}
+
+gd::String EventsCodeGenerator::GeneratePropertyGetter(
+    const gd::PropertiesContainer& propertiesContainer,
+    const gd::NamedPropertyDescriptor& property,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+  gd::String propertyGetterCode =
+      GeneratePropertyGetterWithoutCasting(propertiesContainer, property);
 
   if (type == "number|string") {
     if (property.GetType() == "Number") {
@@ -1548,13 +1622,18 @@ gd::String EventsCodeGenerator::GeneratePropertyGetter(
   }
 }
 
+gd::String EventsCodeGenerator::GenerateParameterGetterWithoutCasting(
+    const gd::ParameterMetadata &parameter) {
+  return "eventsFunctionContext.getArgument(" +
+         ConvertToStringExplicit(parameter.GetName()) + ")";
+}
+
 gd::String EventsCodeGenerator::GenerateParameterGetter(
     const gd::ParameterMetadata& parameter,
     const gd::String& type,
     gd::EventsCodeGenerationContext& context) {
   gd::String parameterGetterCode =
-      "eventsFunctionContext.getArgument(" +
-      ConvertToStringExplicit(parameter.GetName()) + ")";
+      GenerateParameterGetterWithoutCasting(parameter);
 
   if (type == "number|string") {
     if (parameter.GetValueTypeMetadata().IsNumber()) {

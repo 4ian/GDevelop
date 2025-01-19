@@ -7,15 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import Cross from './CustomSvgIcons/Cross';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
-import { DialogTitleBar } from '../UI/Dialog';
+import { LineStackLayout } from './Layout';
+import { TitleBarLeftSafeMargins } from './TitleBarSafeMargins';
 
-const appBarHeight = 32;
-
-type Props = {|
-  title: React.Node,
-  onClose: () => void,
-  id: string,
-|};
+const appBarHeight = 38;
 
 const styles = {
   appBar: {
@@ -25,8 +20,11 @@ const styles = {
   toolbar: {
     height: appBarHeight,
     minHeight: appBarHeight,
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: 8,
+    paddingRight: 8,
+    // Ensure this part can be interacted with on macOS, when used as PWA.
+    // Otherwise, the buttons are not clickable.
+    WebkitAppRegion: 'no-drag',
   },
   title: {
     fontSize: '15px',
@@ -37,10 +35,16 @@ const styles = {
   },
 };
 
+type Props = {|
+  icon?: React.Node,
+  title: string,
+  onClose: () => void,
+  id: string,
+|};
+
 const DrawerTopBar = (props: Props) => {
   return (
     <>
-      <DialogTitleBar backgroundColor="transparent" />
       <AppBar
         position="static"
         style={styles.appBar}
@@ -49,15 +53,35 @@ const DrawerTopBar = (props: Props) => {
         elevation={0}
       >
         <Toolbar style={styles.toolbar}>
-          <Tooltip
-            title={props.title}
-            placement="bottom"
-            enterDelay={tooltipEnterDelay}
-          >
-            <Typography variant="h6" style={styles.title}>
-              {props.title}
-            </Typography>
-          </Tooltip>
+          <TitleBarLeftSafeMargins />
+          <LineStackLayout noMargin expand alignItems="center">
+            {props.icon && (
+              <IconButton
+                onClick={props.onClose}
+                edge="start"
+                color="inherit"
+                size="small"
+                id={`${props.id}-icon`}
+              >
+                {props.icon}
+              </IconButton>
+            )}
+            {props.title.length > 30 ? (
+              <Tooltip
+                title={props.title}
+                placement="bottom"
+                enterDelay={tooltipEnterDelay}
+              >
+                <Typography variant="h6" style={styles.title}>
+                  {props.title}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Typography variant="h6" style={styles.title}>
+                {props.title}
+              </Typography>
+            )}
+          </LineStackLayout>
           <IconButton
             onClick={props.onClose}
             edge="end"

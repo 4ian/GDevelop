@@ -12,7 +12,6 @@
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/SourceFile.h"
 
 DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
                                            const gd::Layout& layout_)
@@ -73,16 +72,6 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
         }
       }
     }
-
-    // Search for source files dependencies
-    std::vector<gd::String> dependencies =
-        events[i].GetSourceFileDependencies();
-    sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
-
-    const gd::String& associatedSourceFile =
-        events[i].GetAssociatedGDManagedSourceFile(const_cast<gd::Project&>(project));
-    if (!associatedSourceFile.empty())
-      sourceFilesDependencies.insert(associatedSourceFile);
 
     // Analyze sub events dependencies
     if (events[i].CanHaveSubEvents()) {

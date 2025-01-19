@@ -285,6 +285,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                         openSubscriptionDialog({
                           analyticsMetadata: {
                             reason: 'Unlock course chapter',
+                            recommendedPlanId: 'gdevelop_silver',
                           },
                         })
                       }

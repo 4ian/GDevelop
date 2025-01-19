@@ -245,9 +245,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
     const gd::AbstractEventsBasedEntity &eventsBasedEntity,
     const gd::NamedPropertyDescriptor &property) {
-  auto &type = property.GetType();
-  if (type != "Boolean" && type != "Number" && type != "String" &&
-      type != "Choice" && type != "Color" && type != "LeaderboardId") {
+  const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
+          property.GetType()));
+  if (primitiveType != "boolean" && primitiveType != "number" &&
+      primitiveType != "string") {
     return false;
   }
 

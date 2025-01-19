@@ -1,0 +1,15 @@
+.menuItem {
+  border-radius: 6px;
+}
+
+.menuItem:hover:not(.disabled) {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.horizontalSeparator {
+  border-bottom: 1px solid var(--theme-list-item-separator-color);
+}
+
+.verticalSeparator {
+  border-right: 1px solid var(--theme-list-item-separator-color);
+}

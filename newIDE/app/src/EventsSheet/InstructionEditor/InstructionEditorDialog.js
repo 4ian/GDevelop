@@ -11,6 +11,7 @@ import InstructionParametersEditor, {
   type InstructionParametersEditorInterface,
 } from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
+  type InstructionOrObjectSelectorInterface,
   type TabName,
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
@@ -138,7 +139,7 @@ const InstructionEditorDialog = ({
         chosenObjectName
       )
     : null;
-  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
+  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelectorInterface>(
     null
   );
   const [step, setStep] = React.useState(() =>

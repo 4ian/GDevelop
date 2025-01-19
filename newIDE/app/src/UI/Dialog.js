@@ -14,55 +14,23 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
-import { LineStackLayout } from './Layout';
+import { ColumnStackLayout, LineStackLayout } from './Layout';
 import RaisedButton from './RaisedButton';
 import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
-import { Line } from './Grid';
+import { Column, Line } from './Grid';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
-import optionalRequire from '../Utils/OptionalRequire';
-import useForceUpdate from '../Utils/UseForceUpdate';
-import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+
 import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
 import {
   getAvoidSoftKeyboardStyle,
   useSoftKeyboardBottomOffset,
 } from './MobileSoftKeyboard';
-
-const electron = optionalRequire('electron');
-
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
-
-export const DialogTitleBar = ({
-  backgroundColor,
-}: {|
-  backgroundColor: string,
-|}) => {
-  // An installed PWA can have window controls displayed as overlay. If supported,
-  // we set up a listener to detect any change and force a refresh that will read
-  // the latest size of the controls.
-  const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
-
-  // $FlowFixMe - this API is not handled by Flow.
-  const { windowControlsOverlay } = navigator;
-
-  if (!!electron || (windowControlsOverlay && windowControlsOverlay.visible)) {
-    // We're on the desktop app, or in an installed PWA with window controls displayed
-    // as overlay: we need to display a spacing at the top of the dialog.
-    return (
-      <div
-        className={DRAGGABLE_PART_CLASS_NAME}
-        style={{ height: 38, backgroundColor, flexShrink: 0 }}
-      />
-    );
-  }
-
-  // Not on the desktop app, and not in an installed PWA with window controls displayed
-  // as overlay: no need to display a spacing.
-  return null;
-};
+import {
+  TitleBarLeftSafeMargins,
+  TitleBarRightSafeMargins,
+} from './TitleBarSafeMargins';
 
 // Default.
 const dialogPaddingX = 24;
@@ -110,6 +78,11 @@ const styles = {
     // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
     overflowWrap: 'anywhere',
   },
+  closeDialogContainer: {
+    // Ensure this part can be interacted with on macOS, when the dialog is fullscreen and used as PWA.
+    // Otherwise, the close button is not clickable.
+    WebkitAppRegion: 'no-drag',
+  },
   fixedContentContainer: {
     paddingBottom: 8,
   },
@@ -126,6 +99,16 @@ const styles = {
   minHeightForFullHeightModal: 'calc(100% - 64px)',
   minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
   minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
+  topBackground: {
+    position: 'absolute',
+    top: 0,
+    zIndex: -1,
+    left: dialogPaddingX,
+    right: dialogPaddingX,
+    height: '100%',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+  },
 };
 
 const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
@@ -176,10 +159,13 @@ const useStylesForDialogContent = ({
 type DialogProps = {|
   open?: boolean,
   title: React.Node,
+  subtitle?: React.Node,
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
   dangerLevel?: 'warning' | 'danger',
+
+  topBackgroundSrc?: string,
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -247,6 +233,7 @@ const Dialog = ({
   maxWidth,
   minHeight,
   title,
+  subtitle,
   fixedContent,
   children,
   flexColumnBody,
@@ -258,6 +245,7 @@ const Dialog = ({
   fullscreen,
   actionsFullWidthOnMobile,
   forceScrollVisible,
+  topBackgroundSrc,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -369,6 +357,14 @@ const Dialog = ({
 
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
+  const paperMinHeight = fullHeight
+    ? styles.minHeightForFullHeightModal
+    : minHeight === 'lg'
+    ? styles.minHeightForLargeHeightModal
+    : minHeight === 'sm'
+    ? styles.minHeightForSmallHeightModal
+    : undefined;
+
   return (
     <MuiDialog
       classes={classesForDangerousDialog}
@@ -384,13 +380,7 @@ const Dialog = ({
         id,
         style: {
           backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          minHeight: fullHeight
-            ? styles.minHeightForFullHeightModal
-            : minHeight === 'lg'
-            ? styles.minHeightForLargeHeightModal
-            : minHeight === 'sm'
-            ? styles.minHeightForSmallHeightModal
-            : undefined,
+          minHeight: paperMinHeight,
           ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
         },
       }}
@@ -402,9 +392,12 @@ const Dialog = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
-      {isFullScreen && (
-        <DialogTitleBar
-          backgroundColor={gdevelopTheme.titlebar.backgroundColor}
+      {topBackgroundSrc && (
+        <div
+          style={{
+            ...styles.topBackground,
+            backgroundImage: `url(${topBackgroundSrc})`,
+          }}
         />
       )}
       <div style={dialogContainerStyle}>
@@ -415,18 +408,39 @@ const Dialog = ({
           }}
         >
           <Line noMargin justifyContent="space-between" alignItems="flex-start">
-            <Text noMargin size="section-title">
-              {title}
-            </Text>
-            {onRequestClose && !cannotBeDismissed && (
-              <IconButton
-                onClick={onRequestClose}
-                size="small"
-                disabled={cannotBeDismissed}
-              >
-                <Cross />
-              </IconButton>
-            )}
+            <Line noMargin alignItems="center">
+              {isFullScreen && (
+                <TitleBarLeftSafeMargins
+                  backgroundColor={gdevelopTheme.dialog.backgroundColor}
+                />
+              )}
+              <ColumnStackLayout noMargin>
+                <Text noMargin size="section-title">
+                  {title}
+                </Text>
+                {subtitle && <Text noMargin>{subtitle}</Text>}
+              </ColumnStackLayout>
+            </Line>
+            <Column noMargin>
+              <Line noMargin alignItems="center">
+                {onRequestClose && !cannotBeDismissed && (
+                  <div style={styles.closeDialogContainer}>
+                    <IconButton
+                      onClick={onRequestClose}
+                      size="small"
+                      disabled={cannotBeDismissed}
+                    >
+                      <Cross />
+                    </IconButton>
+                  </div>
+                )}
+                {isFullScreen && (
+                  <TitleBarRightSafeMargins
+                    backgroundColor={gdevelopTheme.dialog.backgroundColor}
+                  />
+                )}
+              </Line>
+            </Column>
           </Line>
         </div>
         {fixedContent && (

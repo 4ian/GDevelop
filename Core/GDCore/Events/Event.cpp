@@ -18,8 +18,6 @@ namespace gd {
 
 EventsList BaseEvent::badSubEvents;
 VariablesContainer BaseEvent::badLocalVariables;
-std::vector<gd::String> BaseEvent::emptyDependencies;
-gd::String BaseEvent::emptySourceFile;
 
 BaseEvent::BaseEvent()
     : totalTimeDuringLastSession(0),

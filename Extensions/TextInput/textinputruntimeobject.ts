@@ -1,3 +1,5 @@
+import { Console } from "console";
+
 namespace gdjs {
   const supportedInputTypes = [
     'text',
@@ -9,7 +11,7 @@ namespace gdjs {
     'search',
     'text area',
   ] as const;
-  const supportedtextAlignement = [
+  const supportedtextAlign = [
     'left',
     'center',
     'right',
@@ -17,7 +19,7 @@ namespace gdjs {
 
 
   type SupportedInputType = typeof supportedInputTypes[number]; 
-  type SupportedtextAlignement = typeof supportedtextAlignement[number]; 
+  type SupportedtextAlign = typeof supportedtextAlign[number]; 
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
 
@@ -28,12 +30,12 @@ namespace gdjs {
     return 'text';
   };
 
-  const parseTextAlignement = (potentialTextAlignement: string): SupportedtextAlignement => {
-    const lowercasedNewTextAlignement = potentialTextAlignement.toLowerCase();
+  const parseTextAlign = (potentialTextAlign: string): SupportedtextAlign => {
+    const lowercasedNewTextAlign = potentialTextAlign.toLowerCase();
 
     // @ts-ignore - we're actually checking that this value is correct.
-    if (supportedtextAlignement.includes(lowercasedNewTextAlignement))
-      return potentialTextAlignement as SupportedtextAlignement;
+    if (supportedtextAlign.includes(lowercasedNewTextAlign))
+      return potentialTextAlign as SupportedtextAlign;
 
     return 'left';
   };
@@ -51,7 +53,7 @@ namespace gdjs {
       fillColor: string;
       fillOpacity: float;
       padding : integer; 
-      textAlign : SupportedtextAlignement;
+      textAlign : SupportedtextAlign;
       maxLength : integer;
       borderColor: string;
       borderOpacity: float;
@@ -104,7 +106,7 @@ namespace gdjs {
     private _fillColor: [float, float, float];
     private _fillOpacity: float;
     private _padding : integer; 
-    private _textAlign : SupportedtextAlignement;
+    private _textAlign : SupportedtextAlign;
     private _maxLength : integer;
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
@@ -227,6 +229,7 @@ namespace gdjs {
         {
             this.SetPadding(newObjectData.content.padding);
         }
+        
       return true;
     }
 
@@ -538,6 +541,12 @@ namespace gdjs {
     isFocused(): boolean {
       return this._renderer.isFocused();
     }
+    isSubmitted() : boolean 
+    {
+        console.log(this._renderer.getSubmitted());
+      
+      return this._renderer.getSubmitted();
+    }
 
     getMaxLength() : integer {
       return this._maxLength;
@@ -555,17 +564,18 @@ namespace gdjs {
       this._padding = value;
     }
 
-    getTextAlignement() : SupportedtextAlignement
+  
+    getTextAlign() : SupportedtextAlign
     {
       return this._textAlign;
     } 
 
-    setTextAlignement(newTextAlignement: string) {
-      const lowercasedNewTextAlignement = newTextAlignement.toLowerCase();
-      if (lowercasedNewTextAlignement === this._textAlign) return;
+    setTextAlign(newTextAlign: string) {
+      const lowercasedNewTextAlign = newTextAlign.toLowerCase();
+      if (lowercasedNewTextAlign === this._textAlign) return;
 
-      this._textAlign = parseTextAlignement(lowercasedNewTextAlignement);
-      this._renderer.updateTextlignement();
+      this._textAlign = parseTextAlign(lowercasedNewTextAlign);
+      this._renderer.updateTextAlign();
     }
 
     focus(): void {

@@ -89,9 +89,9 @@ module.exports = {
         objectContent.padding = newValue;
         return true;
       }
-      else if(propertyName === 'textAlignement')
+      else if(propertyName === 'textAlign')
       {
-        objectContent.textAlignement = newValue;
+        objectContent.textAlign = newValue;
         return true;
       }
 
@@ -230,8 +230,8 @@ module.exports = {
         .setGroup(_('Border appearance'));
 
         objectProperties
-        .getOrCreate('textAlignement')
-        .setValue(objectContent.textAlignement || 'left')
+        .getOrCreate('textAlign')
+        .setValue(objectContent.textAlign || 'left')
         .setType('choice')
         .addExtraInfo('left')
         .addExtraInfo('right')
@@ -256,7 +256,7 @@ module.exports = {
       readOnly: false,
       disabled: false,
       padding: 0,
-      textAlignement: 'left',
+      textAlign: 'left',
       maxLength: '20',
     };
 
@@ -614,6 +614,21 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
+    object.addScopedCondition(
+      'IsInputSubmitted',
+      _('Input is Submitted (Enter pressed'),
+      _(
+        'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
+      ),
+      _('_PARAM0_ got input submitted'),
+      '',
+      'res/conditions/surObject24.png',
+      'res/conditions/surObject.png'
+    )
+    .addParameter('object', _('Text input'), 'TextInputObject',false)
+    .getCodeExtraInformation()
+    .setFunctionName('isSubmitted');
+    
     object
       .addScopedAction(
         'Focus',
@@ -797,8 +812,18 @@ module.exports = {
         this._pixiTextMask.endFill();
 
         const isTextArea = object.content.inputType === 'text area';
-
-        this._pixiText.position.x = textOffset;
+        const textAlign = object.content.textAlign;
+        console.log(this._pixiText.width);
+        if(textAlign === 'left')
+        this._pixiText.position.x = 0;
+      else if(textAlign === 'right')
+        this._pixiText.position.x =  0 + width - this._pixiText.width - textOffset;
+      else if (textAlign === 'center')
+      {
+        this._pixiText.align = 'center';
+        this._pixiText.position.x = 0 + width/2 - this._pixiText.width/2;
+      }
+        
         this._pixiText.position.y = isTextArea
           ? textOffset
           : height / 2 - this._pixiText.height / 2;

@@ -38,6 +38,8 @@ namespace gdjs {
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
     private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
+    private _form: HTMLFormElement | null = null;
+    private _isSubmited: boolean;
 
     constructor(
       runtimeObject: gdjs.TextInputRuntimeObject,
@@ -48,29 +50,36 @@ namespace gdjs {
       this._runtimeGame = this._instanceContainer.getGame();
 
       this._createElement();
+      this._isSubmited = false;
     }
 
     _createElement() {
       if (!!this._input)
         throw new Error('Tried to recreate an input while it already exists.');
 
+      this._form = document.createElement('form');
+      this._form.setAttribute('id', 'dynamicForm');
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
-      this._input.style.border = '1px solid black';
+      this._form.style.border = '0px';
       this._input.autocomplete = 'off';
-      this._input.style.borderRadius = '0px';
-      this._input.style.backgroundColor = 'white';
-      this._input.style.position = 'absolute';
-      this._input.style.resize = 'none';
-      this._input.style.outline = 'none';
-      this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
-      this._input.style.display = 'none'; // Hide while object is being set up.
-      this._input.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
+      this._form.style.borderRadius = '0px';
+      this._form.style.backgroundColor = 'transparent';
+      this._input.style.backgroundColor = 'red';
+      this._input.style.border = '1px solid black';
+      this._form.style.position = 'absolute';
+      this._form.style.resize = 'none';
+      this._form.style.outline = 'none';
+      this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
+      this._form.style.display = 'none'; // Hide while object is being set up.
+      this._form.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
       this._input.maxLength = this._object.getMaxLength();
       this._input.style.padding = this._object.getPadding() + 'px';
-      this._input.style.textAlign = this._object.getTextAlignement();
   
       
+      this._form.style.textAlign = this._object.getTextAlign();
+      this._form.appendChild(this._input);
+      this._isSubmited = false;
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -84,6 +93,11 @@ namespace gdjs {
         if (document.activeElement !== this._input) this._input.focus();
       });
 
+      this._form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this._isSubmited = true;
+      })
+
       this.updateString();
       this.updateFont();
       this.updatePlaceholder();
@@ -95,14 +109,14 @@ namespace gdjs {
       this.updateBorderWidth();
       this.updateDisabled();
       this.updateReadOnly();
-      this.updateTextlignement();
+      this.updateTextAlign();
       this.updateMaxLength();
       this.updatePadding();
 
       this._runtimeGame
         .getRenderer()
         .getDomElementContainer()!
-        .appendChild(this._input);
+        .appendChild(this._form);
     }
 
     _destroyElement() {
@@ -131,13 +145,14 @@ namespace gdjs {
     }
 
     updatePreRender() {
-      if (!this._input) return;
+      if (!this._input || !this._form) return;
 
+      this._isSubmited = false;
       // Hide the input entirely if the object is hidden.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
       if (this._object.isHidden()) {
-        this._input.style.display = 'none';
+        this._form.style.display = 'none';
         return;
       }
 
@@ -151,7 +166,7 @@ namespace gdjs {
         do {
           const layer = instanceContainer.getLayer(object.getLayer());
           if (!layer.isVisible() || !object.isVisible()) {
-            this._input.style.display = 'none';
+            this._form.style.display = 'none';
             return;
           }
           // TODO Declare an interface to move up in the object tree.
@@ -199,7 +214,7 @@ namespace gdjs {
         canvasLeft > runtimeGame.getGameResolutionWidth() ||
         canvasTop > runtimeGame.getGameResolutionHeight();
       if (isOutsideCanvas) {
-        this._input.style.display = 'none';
+        this._form.style.display = 'none';
         return;
       }
 
@@ -225,18 +240,18 @@ namespace gdjs {
       const widthInContainer = pageRight - pageLeft;
       const heightInContainer = pageBottom - pageTop;
 
-      this._input.style.left = pageLeft + 'px';
-      this._input.style.top = pageTop + 'px';
-      this._input.style.width = widthInContainer + 'px';
-      this._input.style.height = heightInContainer + 'px';
-      this._input.style.transform =
+      this._form.style.left = pageLeft + 'px';
+      this._form.style.top = pageTop + 'px';
+      this._form.style.width = widthInContainer + 'px';
+      this._form.style.height = heightInContainer + 'px';
+      this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
-        this._input.style.display = 'initial';
-        this._input.style.padding = this._object.getPadding() + 'px';
-        this._input.style.textAlign = this._object.getTextAlignement();
+        this._form.style.display = 'initial';
+        this._form.style.padding = this._object.getPadding() + 'px';
+        this._form.style.textAlign = this._object.getTextAlign();
 
       // Automatically adjust the font size to follow the game scale.
-      this._input.style.fontSize =
+      this._form.style.fontSize =
         this._object.getFontSize() *
           runtimeGameRenderer.getCanvasToDomElementContainerHeightScale() +
         'px';
@@ -255,16 +270,16 @@ namespace gdjs {
     }
 
     updateFont() {
-      if (!this._input) return;
-      this._input.style.fontFamily = this._instanceContainer
+      if (!this._form) return;
+      this._form.style.fontFamily = this._instanceContainer
         .getGame()
         .getFontManager()
         .getFontFamily(this._object.getFontResourceName());
     }
 
     updateOpacity() {
-      if (!this._input) return;
-      this._input.style.opacity = '' + this._object.getOpacity() / 255;
+      if (!this._form) return;
+      this._form.style.opacity = '' + this._object.getOpacity() / 255;
     }
 
     updateInputType() {
@@ -283,9 +298,9 @@ namespace gdjs {
     }
 
     updateTextColor() {
-      if (!this._input) return;
+      if (!this._form) return;
 
-      this._input.style.color = formatRgbAndOpacityToCssRgba(
+      this._form.style.color = formatRgbAndOpacityToCssRgba(
         this._object._getRawTextColor(),
         255
       );
@@ -314,14 +329,14 @@ namespace gdjs {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
     updateDisabled() {
-      if (!this._input) return;
+      if (!this._form) return;
 
-      this._input.disabled = this._object.isDisabled();
+      this._form.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
-      if (!this._input) return;
+      if (!this._form) return;
 
-      this._input.readOnly = this._object.isReadOnly();
+      this._form.readOnly = this._object.isReadOnly();
     }
 
     updateMaxLength() {
@@ -336,15 +351,19 @@ namespace gdjs {
       this._input.style.padding = this._object.getPadding() + 'px';
     }
 
-    updateTextlignement() {
+    updateTextAlign() {
       if (!this._input) return;
 
-      const newTextAlignement = userFriendlyToHtmlAlignement[this._object.getTextAlignement()] || 'right';
-      this._input.style.textAlign = newTextAlignement;
+      const newTextAlign = userFriendlyToHtmlAlignement[this._object.getTextAlign()] || 'left';
+      this._input.style.textAlign = newTextAlign;
     }
-
+    
     isFocused() {
       return this._input === document.activeElement;
+    }
+    getSubmitted()
+    {
+      return this._isSubmited;
     }
 
     focus() {

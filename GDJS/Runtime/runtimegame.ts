@@ -995,10 +995,11 @@ namespace gdjs {
             }
 
             if (this._paused) {
-              this._editor.render();
+              this._editor.updateAndRender();
               // The game is paused for edition: the game loop continues to run,
               // but the game logic is not executed.
               this._sceneStack.renderWithoutStep();
+              this.getInputManager().onFrameEnded();
 
               return true;
             }

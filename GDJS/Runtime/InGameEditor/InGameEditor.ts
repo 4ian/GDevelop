@@ -1,7 +1,15 @@
 namespace gdjs {
+  const LEFTKEY = 37;
+  const UPKEY = 38;
+  const RIGHTKEY = 39;
+  const DOWNKEY = 40;
+  const LSHIFTKEY = 1016;
+  const RSHIFTKEY = 2016;
+  const SPACEKEY = 32;
+
   export class InGameEditor {
-    _game: RuntimeGame;
-    _pointer = new THREE.Vector2();
+    _runtimeGame: RuntimeGame;
+    _tempVector2d = new THREE.Vector2();
     _selectedObjectData: {
       intersect: THREE.Intersection;
       camera: THREE.Camera;
@@ -12,20 +20,20 @@ namespace gdjs {
     _editionAbortController: AbortController = new AbortController();
     _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
     _shouldIgnoreNextClick: boolean = false;
+    _lastCursorX: number = 0;
+    _lastCursorY: number = 0;
 
     constructor(game: RuntimeGame) {
-      this._game = game;
+      this._runtimeGame = game;
     }
 
-    onPointerMove(event) {
-      // calculate pointer position in normalized device coordinates
-      // (-1 to +1) for both components
-
-      this._pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this._pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    getTempVector2d(x: float, y: float): THREE.Vector2 {
+      this._tempVector2d.x = x;
+      this._tempVector2d.y = y;
+      return this._tempVector2d;
     }
 
-    selectObject() {
+    private _selectObject() {
       // TODO: avoid calling this again, store instead.
       const firstIntersectsByLayer = this.getFirstIntersectsOnEachLayer(false);
 
@@ -59,7 +67,7 @@ namespace gdjs {
         }
         this._currentTransformControls = new THREE_ADDONS.TransformControls(
           this._selectedObjectData.camera,
-          this._game.getRenderer().getCanvas() || undefined
+          this._runtimeGame.getRenderer().getCanvas() || undefined
         );
         this._currentTransformControls.addEventListener(
           'dragging-changed',
@@ -74,7 +82,7 @@ namespace gdjs {
             if (!object) return;
 
             if (object instanceof gdjs.RuntimeObject3D) {
-              this._game.sendRuntimeObjectsUpdated([
+              this._runtimeGame.sendRuntimeObjectsUpdated([
                 {
                   object,
                   position: object
@@ -93,24 +101,22 @@ namespace gdjs {
       }
     }
 
-    setupListeners() {
-      this.cleanListeners();
+    private _handleCameraMovement() {
+      const inputManager = this._runtimeGame.getInputManager();
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
 
-      const canvas = this._game.getRenderer().getCanvas();
-      this._editionAbortController = new AbortController();
-      if (!canvas) return;
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      layerNames.forEach((layerName) => {
+        const layer = currentScene.getLayer(layerName);
 
-      canvas.addEventListener('pointermove', this.onPointerMove.bind(this), {
-        signal: this._editionAbortController.signal,
-      });
-      canvas.addEventListener('wheel', (event) => {
-        const currentScene = this._game.getSceneStack().getCurrentScene();
-        if (!currentScene) return;
+        // TODO: replace everything by "real 3D movement".
 
-        const layerNames = [];
-        currentScene.getAllLayerNames(layerNames);
-        layerNames.forEach((layerName) => {
-          const layer = currentScene.getLayer(layerName);
+        // Mouse wheel: forward/backward movement.
+        const wheelDelta = inputManager.getMouseWheelDelta();
+        if (wheelDelta !== 0) {
+          // TODO: factor this?
           const assumedFovIn2D = 45;
           const layerRenderer = layer.getRenderer();
           const threeCamera = layerRenderer.getThreeCamera();
@@ -120,20 +126,52 @@ namespace gdjs {
               : threeCamera.fov
             : assumedFovIn2D;
 
-          layer.setCameraZ(layer.getCameraZ(fov) + event.deltaY, fov);
-        });
+          layer.setCameraZ(layer.getCameraZ(fov) + wheelDelta, fov);
+        }
+
+        // Movement with the keyboard
+        if (inputManager.isKeyPressed(LEFTKEY)) {
+          layer.setCameraX(layer.getCameraX() - 5);
+        }
+        if (inputManager.isKeyPressed(RIGHTKEY)) {
+          layer.setCameraX(layer.getCameraX() + 5);
+        }
+        if (inputManager.isKeyPressed(UPKEY)) {
+          layer.setCameraY(layer.getCameraY() - 5);
+        }
+        if (inputManager.isKeyPressed(DOWNKEY)) {
+          layer.setCameraY(layer.getCameraY() + 5);
+        }
+
+        // Space + click: move the camera on its plane.
+        if (
+          inputManager.isKeyPressed(SPACEKEY) &&
+          inputManager.isMouseButtonPressed(0)
+        ) {
+          const xDelta = this._lastCursorX - inputManager.getCursorX();
+          const yDelta = this._lastCursorY - inputManager.getCursorY();
+          layer.setCameraX(layer.getCameraX() + xDelta);
+          layer.setCameraY(layer.getCameraY() + yDelta);
+        }
       });
-      canvas.addEventListener('click', this.selectObject.bind(this), {
-        signal: this._editionAbortController.signal,
-      });
+
+      // TODO: touch controls - pinch to zoom
+      // TODO: touch controls - two fingers to move the camera
+
+      // Left click: select the object.
+      if (inputManager.isMouseButtonReleased(0)) {
+        this._selectObject();
+      }
+
+      this._lastCursorX = inputManager.getCursorX();
+      this._lastCursorY = inputManager.getCursorY();
     }
-    cleanListeners() {
-      this._editionAbortController.abort();
-    }
+
     activate(enable: boolean) {
-      if (enable) this.setupListeners();
-      else {
-        this.cleanListeners();
+      if (enable) {
+        // Nothing to do.
+      } else {
+        // Disable transform controls.
         if (this._currentTransformControls) {
           this._currentTransformControls.detach();
           this._currentTransformControls = null;
@@ -148,7 +186,7 @@ namespace gdjs {
         position: { x: number; y: number; z: number };
       }>;
     }) {
-      const currentScene = this._game.getSceneStack().getCurrentScene();
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene || currentScene.getName() !== payload.layoutName) {
         return;
       }
@@ -169,6 +207,7 @@ namespace gdjs {
     }
 
     getFirstIntersectsOnEachLayer(highlightObject: boolean) {
+      const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {
         [layerName: string]: null | {
           intersect: THREE.Intersection;
@@ -178,9 +217,9 @@ namespace gdjs {
       } = {};
 
       const layerNames = new Array();
-      const currentScene = this._game.getSceneStack().getCurrentScene();
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return firstIntersectsByLayer;
-      const threeRenderer = this._game.getRenderer().getThreeRenderer();
+      const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
       if (!threeRenderer) return firstIntersectsByLayer;
 
       currentScene.getAllLayerNames(layerNames);
@@ -211,7 +250,16 @@ namespace gdjs {
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,
         // this must be handled by the game engine culling
-        this._raycaster.setFromCamera(this._pointer, threeCamera);
+        const inputManager = runtimeGame.getInputManager();
+        const normalizedDeviceCoordinates = this.getTempVector2d(
+          (inputManager.getCursorX() / runtimeGame.getGameResolutionWidth()) *
+            2 -
+            1,
+          -(inputManager.getCursorY() / runtimeGame.getGameResolutionHeight()) *
+            2 +
+            1
+        );
+        this._raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
         const intersects = this._raycaster.intersectObjects(
           threeGroup.children,
           false
@@ -244,7 +292,9 @@ namespace gdjs {
       return firstIntersectsByLayer;
     }
 
-    render() {
+    updateAndRender() {
+      this._handleCameraMovement();
+      // TODO: handle selection
       this.getFirstIntersectsOnEachLayer(true);
     }
   }

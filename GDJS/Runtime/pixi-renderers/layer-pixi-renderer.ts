@@ -133,6 +133,10 @@ namespace gdjs {
       return this._threeScene;
     }
 
+    getThreeGroup(): THREE.Group | null {
+      return this._threeGroup;
+    }
+
     getThreeCamera():
       | THREE.PerspectiveCamera
       | THREE.OrthographicCamera

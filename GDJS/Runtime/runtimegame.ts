@@ -158,239 +158,6 @@ namespace gdjs {
     environment?: 'dev';
   };
 
-  class RuntimeEditor {
-    _game: RuntimeGame;
-    _pointer = new THREE.Vector2();
-    // TODO: Use array
-    _selectedObjectData: {
-      intersect: THREE.Intersection;
-      camera: THREE.Camera;
-      scene: THREE.Scene;
-    } | null = null;
-    _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
-    _raycaster = new THREE.Raycaster()
-    _editionAbortController: AbortController = new AbortController();
-    _clearCurrentPasses: (() => void)[] = [];
-    _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
-    _shouldIgnoreNextClick: boolean = false;
-
-    constructor(game: RuntimeGame) {
-      this._game = game;
-    }
-
-    onPointerMove(event) {
-      // calculate pointer position in normalized device coordinates
-      // (-1 to +1) for both components
-
-      this._pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this._pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    }
-
-    selectObject() {
-      if (this._shouldIgnoreNextClick) {
-        this._shouldIgnoreNextClick = false;
-        return;
-      }
-      const firstIntersectsByLayer = this.getFirstIntersectsOnEachLayer(false);
-      if (!firstIntersectsByLayer) return;
-      let closestIntersect;
-      for (const intersect of Object.values(firstIntersectsByLayer)) {
-        if (
-          !closestIntersect ||
-          intersect.intersect.distance < closestIntersect.intersect.distance
-        ) {
-          closestIntersect = intersect;
-        }
-      }
-      this._selectedObjectData = closestIntersect;
-      if (!this._selectedObjectData) return;
-
-      if (
-        this._currentTransformControls &&
-        this._currentTransformControls.camera ===
-          this._selectedObjectData.camera
-      ) {
-        this._currentTransformControls.detach();
-        this._currentTransformControls.attach(
-          this._selectedObjectData.intersect.object
-        );
-      } else {
-        if (this._currentTransformControls) {
-          this._currentTransformControls.detach();
-          this._currentTransformControls = null;
-        }
-        this._currentTransformControls = new THREE_ADDONS.TransformControls(
-          this._selectedObjectData.camera,
-          this._game.getRenderer().getCanvas() || undefined
-        );
-        this._currentTransformControls.addEventListener('mouseDown', () => {
-          this._shouldIgnoreNextClick = true;
-        });
-        this._currentTransformControls.addEventListener(
-          'dragging-changed',
-          (e) => {
-            if (!this._selectedObjectData) return;
-            if (e.value) {
-              // Ignore if the user starts dragging
-              return;
-            }
-            const rendererObject = this._selectedObjectData.intersect.object;
-            const object = this._game.getObjectFromRenderer(rendererObject);
-            if (!object) return;
-            if (object instanceof gdjs.RuntimeObject3D) {
-              this._game.sendRuntimeObjectsUpdated([
-                {
-                  object,
-                  position: object
-                    .getRenderer()
-                    .getObjectPositionFrom3DRendererObject(),
-                },
-              ]);
-            }
-          }
-        );
-        this._currentTransformControls.scale.y = -1;
-        this._currentTransformControls.attach(
-          this._selectedObjectData.intersect.object
-        );
-        this._selectedObjectData.scene.add(this._currentTransformControls);
-      }
-    }
-
-    setupListeners() {
-      const canvas = this._game.getRenderer().getCanvas();
-      this._editionAbortController = new AbortController();
-      canvas?.addEventListener('pointermove', this.onPointerMove.bind(this), {
-        signal: this._editionAbortController.signal,
-      });
-      canvas?.addEventListener('click', this.selectObject.bind(this), {
-        signal: this._editionAbortController.signal,
-      });
-    }
-    cleanListeners() {
-      this._editionAbortController.abort();
-    }
-    activate(enable: boolean) {
-      if (enable) this.setupListeners();
-      else {
-        this.cleanListeners();
-        if (this._currentTransformControls) {
-          this._currentTransformControls.detach();
-          this._currentTransformControls = null;
-        }
-      }
-    }
-
-    reloadInstances(payload: {
-      layoutName: string;
-      instances: Array<{
-        persistentUuid: string;
-        position: { x: number; y: number; z: number };
-      }>;
-    }) {
-      const currentScene = this._game.getSceneStack().getCurrentScene();
-      if (!currentScene || currentScene.getName() !== payload.layoutName) {
-        return;
-      }
-      // TODO: Might be worth indexing instances data and runtime objects by their
-      // persistentUuid (See HotReloader.indexByPersistentUuid).
-      currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
-        const instance = payload.instances.find(
-          (instance) => instance.persistentUuid === runtimeObject.persistentUuid
-        );
-        if (instance) {
-          runtimeObject.setX(instance.position.x);
-          runtimeObject.setY(instance.position.y);
-          if (runtimeObject instanceof gdjs.RuntimeObject3D) {
-            runtimeObject.setZ(instance.position.z);
-          }
-        }
-      });
-    }
-
-    getFirstIntersectsOnEachLayer(highlightObject: boolean) {
-      if (highlightObject) {
-        this._clearCurrentPasses.forEach((callback) => callback());
-        this._clearCurrentPasses.length = 0;
-      }
-      const layerNames = new Array();
-      const currentScene = this._game.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
-      const threeRenderer = this._game.getRenderer().getThreeRenderer();
-      if (!threeRenderer) return;
-
-      currentScene.getAllLayerNames(layerNames);
-      const firstIntersectsByLayer: {
-        [layerName: string]: {
-          intersect: THREE.Intersection;
-          camera: THREE.Camera;
-          scene: THREE.Scene;
-        };
-      } = layerNames.reduce((acc, layerName) => {
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
-        const threeCamera = runtimeLayerRender.getThreeCamera();
-        const threeScene = runtimeLayerRender.getThreeScene();
-        if (!threeCamera || !threeScene) return acc;
-
-        if (!this._outlinePasses[layerName]) {
-          this._outlinePasses[layerName] = new THREE_ADDONS.OutlinePass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            threeScene,
-            threeCamera
-          );
-
-          runtimeLayerRender.addPostProcessingPass(this._outlinePasses[layerName]);
-        }
-        const outlinePass = this._outlinePasses[layerName];
-
-        // Note that raycasting is done by Three.js, which means it could slow down
-        // if lots of 3D objects are shown. We consider that if this needs improvements,
-        // this must be handled by the game engine culling
-        this._raycaster.setFromCamera(this._pointer, threeCamera);
-        const intersects = this._raycaster.intersectObjects(threeScene.children);
-
-        const firstIntersect = intersects.filter((intersect) => {
-          let isObjectChildOfTransformControls = false;
-          intersect.object.traverseAncestors((ancestor) => {
-            if (ancestor === this._currentTransformControls) {
-              isObjectChildOfTransformControls = true;
-            }
-          });
-          return !isObjectChildOfTransformControls;
-        })[0];
-
-        if (
-          firstIntersect &&
-          highlightObject &&
-          (!this._currentTransformControls ||
-            !this._currentTransformControls.dragging)
-        ) {
-          // TODO: OutlinePass currently wrongly highlights the transform controls helper.
-          // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
-
-          outlinePass.edgeStrength = 6.0;
-          outlinePass.edgeGlow = 0;
-          outlinePass.edgeThickness = 1.0;
-          outlinePass.pulsePeriod = 0;
-          outlinePass.selectedObjects = [firstIntersect.object];
-        }
-        acc[layerName] = {
-          intersect: firstIntersect,
-          camera: threeCamera,
-          scene: threeScene,
-        };
-        return acc;
-      }, {});
-      return firstIntersectsByLayer;
-    }
-
-    render() {
-      this.getFirstIntersectsOnEachLayer(true);
-    }
-  }
-
   /**
    * Represents a game being played.
    */
@@ -466,7 +233,7 @@ namespace gdjs {
     /** True if the RuntimeGame has been disposed and should not be used anymore. */
     _wasDisposed: boolean = false;
 
-    _editor: RuntimeEditor;
+    _editor: InGameEditor;
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data
@@ -510,7 +277,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
-      this._editor = new RuntimeEditor(this);
+      this._editor = new gdjs.InGameEditor(this);
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -1644,23 +1411,6 @@ namespace gdjs {
       return mapping && mapping[embeddedResourceName]
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
-    }
-
-    getObjectFromRenderer(
-      renderer: THREE.Object3D | gdjs.RendererObjectInterface
-    ): RuntimeObject | null {
-      const currentScene = this.getSceneStack().getCurrentScene();
-      if (!currentScene) return null;
-      // TODO: Should we instead have an index on the runtime object persistentUuid?
-      // In that case, it would require to store the persistentUuid on the renderer object.
-      const allInstances = currentScene.getAdhocListOfAllInstances();
-      const object = allInstances.find(
-        renderer instanceof THREE.Object3D
-          ? (instance) => instance.get3DRendererObject() === renderer
-          : (instance) => instance.getRendererObject() === renderer
-      );
-
-      return object || null;
     }
 
     sendRuntimeObjectsUpdated(

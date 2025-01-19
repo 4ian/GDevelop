@@ -172,7 +172,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('fillColor')
-        .setValue(objectContent.fillColor || '255;255;255')
+        .setValue(objectContent.fillColor || '0;0;0')
         .setType('color')
         .setLabel(_('Fill color'))
         .setGroup(_('Field appearance'));
@@ -313,6 +313,7 @@ module.exports = {
     // Properties expressions/conditions/actions:
 
     // Deprecated, see TextContainerCapability
+    object.addcon
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -707,7 +708,7 @@ module.exports = {
         this._pixiGraphics = new PIXI.Graphics();
         this._pixiTextMask = new PIXI.Graphics();
         this._pixiText = new PIXI.Text(' ', {
-          align: 'left',
+          align: 'right',
           fontSize: 20,
         });
         this._pixiText.mask = this._pixiTextMask;
@@ -800,7 +801,7 @@ module.exports = {
         const borderWidth = object.content.borderWidth || 0;
 
         // Draw the mask for the text.
-        const textOffset = borderWidth + TEXT_MASK_PADDING;
+        const textOffset = borderWidth + TEXT_MASK_PADDING;// + object.content.padding;
         this._pixiTextMask.clear();
         this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(

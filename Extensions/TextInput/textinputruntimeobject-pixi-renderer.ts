@@ -33,6 +33,7 @@ namespace gdjs {
     );
   };
 
+
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
@@ -75,8 +76,6 @@ namespace gdjs {
       this._form.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
       this._input.maxLength = this._object.getMaxLength();
       this._input.style.padding = this._object.getPadding() + 'px';
-  
-      
       this._form.style.textAlign = this._object.getTextAlign();
       this._form.appendChild(this._input);
       this._isSubmited = false;
@@ -313,6 +312,7 @@ namespace gdjs {
         this._object._getRawFillColor(),
         this._object.getFillOpacity()
       );
+      
     }
 
     updateBorderColorAndOpacity() {
@@ -372,7 +372,7 @@ namespace gdjs {
       this._input.focus();
     }
   }
-
   export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
   export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+
 }

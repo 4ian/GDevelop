@@ -146,18 +146,15 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      codeGenerator,
-      codeGenerator.GetCodeNamespaceAccessor() + "func",
+      codeGenerator, codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(eventsFunctionsExtension),
-          0,
-          true),
+          eventsFunction.GetParametersForEvents(
+              eventsFunctionsExtension.GetEventsFunctions()),
+          0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunctionsExtension,
-          eventsFunction,
+          eventsFunctionsExtension, eventsFunction,
           "runtimeScene.getOnceTriggers()"),
-      eventsFunction.GetEvents(),
-      "",
+      eventsFunction.GetEvents(), "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   // TODO: the editor should pass the diagnostic report and display it to the
@@ -387,7 +384,7 @@ gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
   gd::String objectArraysMap;
   gd::String behaviorNamesMap;
   return GenerateEventsFunctionContext(eventsFunctionsExtension,
-                                       eventsFunctionsExtension,
+                                       eventsFunctionsExtension.GetEventsFunctions(),
                                        eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,

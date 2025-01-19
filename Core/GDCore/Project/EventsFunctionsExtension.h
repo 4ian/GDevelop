@@ -36,7 +36,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
+class GD_CORE_API EventsFunctionsExtension {
  public:
   EventsFunctionsExtension();
   EventsFunctionsExtension(const EventsFunctionsExtension&);
@@ -179,6 +179,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   virtual const gd::String& GetOriginName() const { return originName; }
   virtual const gd::String& GetOriginIdentifier() const {
     return originIdentifier;
+  }
+
+  /**
+   * \brief Return a reference to the functions of the events based behavior or object.
+   */
+  EventsFunctionsContainer& GetEventsFunctions() {
+    return eventsFunctionsContainer;
+  }
+
+  /**
+   * \brief Return a const reference to the functions of the events based
+   * behavior or object.
+   */
+  const EventsFunctionsContainer& GetEventsFunctions() const {
+    return eventsFunctionsContainer;
   }
 
   /** \name Dependencies
@@ -375,6 +390,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   std::vector<gd::DependencyMetadata> dependencies;
   std::vector<gd::SourceFileMetadata> sourceFiles;
 
+  gd::EventsFunctionsContainer eventsFunctionsContainer;
   gd::VariablesContainer globalVariables;
   gd::VariablesContainer sceneVariables;
 };

@@ -11,9 +11,10 @@
 TEST_CASE("EventsFunctionsExtension", "[common]") {
   SECTION("Sanity checks") {
     gd::EventsFunctionsExtension eventsFunctionExtension;
-    eventsFunctionExtension.InsertNewEventsFunction("Function1", 0);
-    eventsFunctionExtension.InsertNewEventsFunction("Function2", 1);
-    eventsFunctionExtension.InsertNewEventsFunction("Function3", 2);
+    auto &freeEventsFunctions = eventsFunctionExtension.GetEventsFunctions();
+    freeEventsFunctions.InsertNewEventsFunction("Function1", 0);
+    freeEventsFunctions.InsertNewEventsFunction("Function2", 1);
+    freeEventsFunctions.InsertNewEventsFunction("Function3", 2);
     eventsFunctionExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior",
                                                                 0);
     eventsFunctionExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior2",
@@ -22,12 +23,13 @@ TEST_CASE("EventsFunctionsExtension", "[common]") {
     // Check that copy operator is working
     gd::EventsFunctionsExtension eventsFunctionExtension2 =
         eventsFunctionExtension;
-    REQUIRE(eventsFunctionExtension2.GetEventsFunctionsCount() == 3);
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(0).GetName() ==
+    auto &freeEventsFunctions2 = eventsFunctionExtension2.GetEventsFunctions();
+    REQUIRE(freeEventsFunctions2.GetEventsFunctionsCount() == 3);
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(0).GetName() ==
             "Function1");
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(1).GetName() ==
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(1).GetName() ==
             "Function2");
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(2).GetName() ==
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(2).GetName() ==
             "Function3");
     REQUIRE(eventsFunctionExtension2.GetEventsBasedBehaviors().GetCount() == 2);
     REQUIRE(
@@ -39,21 +41,21 @@ TEST_CASE("EventsFunctionsExtension", "[common]") {
 
     // Check that the copy has not somehow shared the same pointers
     // to the events functions.
-    eventsFunctionExtension.GetEventsFunction(1).SetName("Function2.x");
-    eventsFunctionExtension2.GetEventsFunction(0).SetName("Function1.y");
-    REQUIRE(eventsFunctionExtension.GetEventsFunctionsCount() == 3);
-    REQUIRE(eventsFunctionExtension.GetEventsFunction(0).GetName() ==
+    freeEventsFunctions.GetEventsFunction(1).SetName("Function2.x");
+    freeEventsFunctions2.GetEventsFunction(0).SetName("Function1.y");
+    REQUIRE(freeEventsFunctions.GetEventsFunctionsCount() == 3);
+    REQUIRE(freeEventsFunctions.GetEventsFunction(0).GetName() ==
             "Function1");
-    REQUIRE(eventsFunctionExtension.GetEventsFunction(1).GetName() ==
+    REQUIRE(freeEventsFunctions.GetEventsFunction(1).GetName() ==
             "Function2.x");
-    REQUIRE(eventsFunctionExtension.GetEventsFunction(2).GetName() ==
+    REQUIRE(freeEventsFunctions.GetEventsFunction(2).GetName() ==
             "Function3");
-    REQUIRE(eventsFunctionExtension2.GetEventsFunctionsCount() == 3);
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(0).GetName() ==
+    REQUIRE(freeEventsFunctions2.GetEventsFunctionsCount() == 3);
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(0).GetName() ==
             "Function1.y");
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(1).GetName() ==
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(1).GetName() ==
             "Function2");
-    REQUIRE(eventsFunctionExtension2.GetEventsFunction(2).GetName() ==
+    REQUIRE(freeEventsFunctions2.GetEventsFunction(2).GetName() ==
             "Function3");
   }
 }

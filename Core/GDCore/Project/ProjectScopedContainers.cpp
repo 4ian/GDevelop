@@ -77,7 +77,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
     gd::VariablesContainer &parameterVariablesContainer) {
 
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, eventsFunctionsExtension, eventsFunction,
+      project, eventsFunctionsExtension.GetEventsFunctions(), eventsFunction,
       parameterObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
@@ -91,8 +91,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
       &eventsFunctionsExtension.GetSceneVariables(),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
-  projectScopedContainers.AddParameters(
-      eventsFunction.GetParametersForEvents(eventsFunctionsExtension));
+  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
+      eventsFunctionsExtension.GetEventsFunctions()));
 
   return projectScopedContainers;
 };

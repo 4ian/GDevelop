@@ -52,7 +52,7 @@ VariablesContainersList::MakeNewVariablesContainersListForFreeEventsFunction(
   variablesContainersList.Push(extension.GetSceneVariables());
 
   gd::EventsFunctionTools::ParametersToVariablesContainer(
-      eventsFunction.GetParametersForEvents(extension),
+      eventsFunction.GetParametersForEvents(extension.GetEventsFunctions()),
       parameterVariablesContainer);
   variablesContainersList.Push(parameterVariablesContainer);
 

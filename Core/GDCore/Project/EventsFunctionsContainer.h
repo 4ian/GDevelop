@@ -33,6 +33,17 @@ public:
 
   EventsFunctionsContainer(FunctionOwner source_) : owner(source_) {}
 
+  EventsFunctionsContainer(const EventsFunctionsContainer &other) {
+    Init(other);
+  }
+
+  EventsFunctionsContainer &operator=(const EventsFunctionsContainer &other) {
+    if (this != &other)
+      Init(other);
+
+    return *this;
+  }
+
   /**
    * \brief Get the source of the function container.
    * 

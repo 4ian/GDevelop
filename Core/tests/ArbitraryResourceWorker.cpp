@@ -268,8 +268,9 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
-      auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
-      
+      auto &function = extension.GetEventsFunctions().InsertNewEventsFunction(
+          "MyFreeFunction", 0);
+
       gd::StandardEvent standardEvent;
       gd::Instruction instruction;
       instruction.SetType("MyExtension::DoSomethingWithResources");
@@ -777,8 +778,9 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       ArbitraryResourceWorkerTest worker(project.GetResourcesManager());
 
       auto& extension = project.InsertNewEventsFunctionsExtension("MyEventExtension", 0);
-      auto& function = extension.InsertNewEventsFunction("MyFreeFunction", 0);
-      
+      auto &function = extension.GetEventsFunctions().InsertNewEventsFunction(
+          "MyFreeFunction", 0);
+
       gd::StandardEvent standardEvent;
       gd::Instruction instruction;
       instruction.SetType("MyExtension::DoSomethingWithResources");

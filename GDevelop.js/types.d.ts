@@ -2343,6 +2343,7 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   addSourceFile(): SourceFileMetadata;
   removeSourceFileAt(index: number): void;
   getAllSourceFiles(): VectorSourceFileMetadata;
+  getEventsFunctions(): EventsFunctionsContainer;
   getGlobalVariables(): VariablesContainer;
   getSceneVariables(): VariablesContainer;
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
@@ -2350,15 +2351,6 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
-  insertNewEventsFunction(name: string, pos: number): EventsFunction;
-  insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
-  hasEventsFunctionNamed(name: string): boolean;
-  getEventsFunction(name: string): EventsFunction;
-  getEventsFunctionAt(pos: number): EventsFunction;
-  removeEventsFunction(name: string): void;
-  moveEventsFunction(oldIndex: number, newIndex: number): void;
-  getEventsFunctionsCount(): number;
-  getEventsFunctionPosition(eventsFunction: EventsFunction): number;
 }
 
 export class AbstractFileSystem extends EmscriptenObject {}

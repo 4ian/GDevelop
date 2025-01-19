@@ -15,14 +15,13 @@
 namespace gd {
 
 EventsFunctionsExtension::EventsFunctionsExtension() :
-    gd::EventsFunctionsContainer(
-        gd::EventsFunctionsContainer::FunctionOwner::Extension),
+      eventsFunctionsContainer(gd::EventsFunctionsContainer::FunctionOwner::Extension),
       globalVariables(gd::VariablesContainer::SourceType::ExtensionGlobal),
       sceneVariables(gd::VariablesContainer::SourceType::ExtensionScene) {}
 
 EventsFunctionsExtension::EventsFunctionsExtension(
     const EventsFunctionsExtension& other) :
-    gd::EventsFunctionsContainer(
+    eventsFunctionsContainer(
         gd::EventsFunctionsContainer::FunctionOwner::Extension) {
   Init(other);
 }
@@ -48,7 +47,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   previewIconUrl = other.previewIconUrl;
   iconUrl = other.iconUrl;
   helpPath = other.helpPath;
-  EventsFunctionsContainer::Init(other);
+  eventsFunctionsContainer = other.eventsFunctionsContainer;
   eventsBasedBehaviors = other.eventsBasedBehaviors;
   eventsBasedObjects = other.eventsBasedObjects;
   globalVariables = other.GetGlobalVariables();
@@ -97,7 +96,8 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   GetGlobalVariables().SerializeTo(element.AddChild("globalVariables"));
   GetSceneVariables().SerializeTo(element.AddChild("sceneVariables"));
 
-  SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
+  eventsFunctionsContainer.SerializeEventsFunctionsTo(
+      element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
       "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
   eventsBasedObjects.SerializeElementsTo(
@@ -205,7 +205,8 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
 void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
     gd::Project& project,
     const SerializerElement& element) {
-  UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
+  eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
+      project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
 

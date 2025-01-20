@@ -316,7 +316,11 @@ const VariableRow = React.memo<VariableRowProps>(
                       focusRipple
                       style={variableRowStyles.chevron}
                     >
-                      {isExpanded ? <ChevronArrowBottom /> : <ChevronArrowRight />}
+                      {isExpanded ? (
+                        <ChevronArrowBottom />
+                      ) : (
+                        <ChevronArrowRight />
+                      )}
                     </ButtonBase>
                   ) : (
                     <div style={variableRowStyles.chevron} />

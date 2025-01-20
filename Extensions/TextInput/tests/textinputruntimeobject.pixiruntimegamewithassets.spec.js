@@ -1,7 +1,5 @@
 // @ts-check
 
-
-
 describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM elements)', function () {
   /**
    * @param {gdjs.RuntimeScene} runtimeScene

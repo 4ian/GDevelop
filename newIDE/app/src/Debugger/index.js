@@ -266,7 +266,7 @@ export default class Debugger extends React.Component<Props, State> {
       }));
     } else if (data.command === 'hotReloader.logs') {
       // Nothing to do.
-    } else if (data.command === 'instances.updated') {
+    } else if (data.command === 'updateInstances') {
       // Nothing to do.
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.

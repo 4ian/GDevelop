@@ -288,14 +288,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     id: number,
     parsedMessage: {| command: string, payload: any |},
   }) {
-    if (parsedMessage.command === 'instances.updated') {
-      if (
-        !this.props.layout ||
-        this.props.layout.getName() !== parsedMessage.payload.layoutName
-      ) {
-        // TODO: handle external layout as well.
-        return;
-      }
+    // TODO: ensure this works for external layouts too.
+    if (parsedMessage.command === 'updateInstances') {
+      // TODO: adapt this to get all instances in one shot.
       const modifiedInstances: gdInitialInstance[] = [];
       parsedMessage.payload.instances.forEach(instanceUpdateData => {
         const { persistentUuid, position } = instanceUpdateData;
@@ -887,17 +882,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
       previewDebuggerServer.sendMessage(debuggerId, {
-        command: 'instances.updated',
+        command: 'updateInstances',
         payload: {
-          layoutName: layout.getName(),
-          instances: instances.map(instance => ({
-            persistentUuid: instance.getPersistentUuid(),
-            position: {
-              x: instance.getX(),
-              y: instance.getY(),
-              z: instance.getZ(),
-            },
-          })),
+          instances: instances.map(instance => serializeToJSObject(instance)),
         },
       });
     });

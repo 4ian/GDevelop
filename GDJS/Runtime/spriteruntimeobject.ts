@@ -187,6 +187,7 @@ namespace gdjs {
       if (initialInstanceData.opacity !== undefined) {
         this.setOpacity(initialInstanceData.opacity);
       }
+      // TODO: adapt this?
       if (initialInstanceData.flippedX) {
         this.flipX(initialInstanceData.flippedX);
       }

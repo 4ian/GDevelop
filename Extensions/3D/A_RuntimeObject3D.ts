@@ -168,13 +168,19 @@ namespace gdjs {
         this.setDepth(initialInstanceData.depth);
       }
       if (initialInstanceData.flippedX) {
-        this.flipX(initialInstanceData.flippedX);
+        this.flipX(true);
+      } else if (this.isFlippedX()) {
+        this.flipX(false);
       }
       if (initialInstanceData.flippedY) {
-        this.flipY(initialInstanceData.flippedY);
+        this.flipY(true);
+      } else if (this.isFlippedY()) {
+        this.flipY(false);
       }
       if (initialInstanceData.flippedZ) {
-        this.flipZ(initialInstanceData.flippedZ);
+        this.flipZ(true);
+      } else if (this.isFlippedZ()) {
+        this.flipZ(false);
       }
     }
 

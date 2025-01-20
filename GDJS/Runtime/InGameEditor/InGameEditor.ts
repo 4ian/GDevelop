@@ -146,6 +146,7 @@ namespace gdjs {
             if (!object) return;
 
             if (object instanceof gdjs.RuntimeObject3D) {
+              // TODO: do something that "serialize" the whole object back into a initial instance.
               this._runtimeGame.sendRuntimeObjectsUpdated([
                 {
                   object,
@@ -249,12 +250,8 @@ namespace gdjs {
       }
     }
 
-    reloadInstances(
-      instances: Array<{
-        persistentUuid: string;
-        position: { x: number; y: number; z: number };
-      }>
-    ) {
+    reloadInstances(instances: Array<InstanceData>) {
+      console.log(instances);
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) {
         return;
@@ -266,11 +263,22 @@ namespace gdjs {
           (instance) => instance.persistentUuid === runtimeObject.persistentUuid
         );
         if (instance) {
-          runtimeObject.setX(instance.position.x);
-          runtimeObject.setY(instance.position.y);
+          runtimeObject.setX(instance.x);
+          runtimeObject.setY(instance.y);
+          runtimeObject.setWidth(instance.width);
+          runtimeObject.setHeight(instance.height);
+          runtimeObject.setAngle(instance.angle);
+          runtimeObject.setLayer(instance.layer);
           if (runtimeObject instanceof gdjs.RuntimeObject3D) {
-            runtimeObject.setZ(instance.position.z);
+            if (instance.z !== undefined) runtimeObject.setZ(instance.z);
+            if (instance.rotationX !== undefined)
+              runtimeObject.setRotationX(instance.rotationX);
+            if (instance.rotationY !== undefined)
+              runtimeObject.setRotationY(instance.rotationY);
+            if (instance.depth !== undefined)
+              runtimeObject.setDepth(instance.depth);
           }
+          runtimeObject.extraInitializationFromInitialInstance(instance);
         }
       });
     }

@@ -262,8 +262,6 @@ namespace gdjs {
         that.sendProfilerStarted();
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
-      } else if (data.command === 'instances.updated') {
-        runtimeGame._editor.reloadInstances(data.payload.instances);
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
@@ -313,7 +311,7 @@ namespace gdjs {
           skipCreatingInstancesFromScene: !!externalLayoutName,
         };
       } else if (data.command === 'updateInstances') {
-        // TODO: do an update/partial hot reload of the instances
+        runtimeGame._editor.reloadInstances(data.payload.instances);
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.
@@ -647,7 +645,7 @@ namespace gdjs {
     ): void {
       this._sendMessage(
         circularSafeStringify({
-          command: 'instances.updated',
+          command: 'updateInstances',
           payload: {
             layoutName,
             instances: objectUpdates.map((objectUpdate) => ({

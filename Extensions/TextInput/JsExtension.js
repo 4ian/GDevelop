@@ -211,7 +211,7 @@ module.exports = {
 
         objectProperties
         .getOrCreate('padding')
-        .setValue((objectContent.padding || 0).toString())
+        .setValue((objectContent.padding || 0))
         .setType('number')
         .setLabel(_('Padding'))
         .setGroup(_('Font'));

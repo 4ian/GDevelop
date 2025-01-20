@@ -134,19 +134,21 @@
 }
 
 .gd-events-sheet  .rst__expandButton {
-    background-image: url('./unfold.png');
-    background-position: 11px 3px !important;
+    background-image: url('./Chevron-right.svg');
+    background-color: #292C33;
+    border-radius: 4px;
 }
 .gd-events-sheet .light-theme .rst__expandButton {
-    background-image: url('./unfoldDark.png');
+    filter: invert(1);
 }
 
 .gd-events-sheet  .rst__collapseButton {
-    background-image: url('./fold.png');
-    background-position: center 7px !important;
+    background-image: url('./Chevron-down.svg');
+    background-color: #292C33;
+    border-radius: 4px;
 }
 .gd-events-sheet .light-theme .rst__collapseButton {
-    background-image: url('./foldDark.png');
+    filter: invert(1);
 }
 
 /**

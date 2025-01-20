@@ -218,7 +218,7 @@ module.exports = {
 
         objectProperties
         .getOrCreate('maxLength')
-        .setValue(objectContent.maxLength || 40)
+        .setValue(objectContent.maxLength || 0)
         .setType('number')
         .setLabel(_('Max length'))
         .setAdvanced(true);
@@ -701,7 +701,7 @@ module.exports = {
         this._pixiGraphics = new PIXI.Graphics();
         this._pixiTextMask = new PIXI.Graphics();
         this._pixiText = new PIXI.Text(' ', {
-          align: 'right',
+          align: 'left',
           fontSize: 20,
         });
         this._pixiText.mask = this._pixiTextMask;

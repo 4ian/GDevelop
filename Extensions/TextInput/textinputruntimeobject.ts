@@ -210,11 +210,10 @@ namespace gdjs {
         this.setReadOnly(newObjectData.content.readOnly);
       }
       if (oldObjectData.content.maxLength !== newObjectData.content.maxLength) {
-        this.SetMaxLength(newObjectData.content.maxLength);
+        this.setMaxLength(newObjectData.content.maxLength);
       }
       if (oldObjectData.content.textAlign !== newObjectData.content.textAlign) {
         this._textAlign = newObjectData.content.textAlign;
-        //this.setTextAlignement(newObjectData.content.textAlign);
       }
       if (oldObjectData.content.padding !== newObjectData.content.padding) {
         this.SetPadding(newObjectData.content.padding);
@@ -543,7 +542,7 @@ namespace gdjs {
     getMaxLength(): integer {
       return this._maxLength;
     }
-    SetMaxLength(value: integer) {
+    setMaxLength(value: integer) {
       this._maxLength = value;
       this._renderer.updateMaxLength();
     }

@@ -809,7 +809,6 @@ module.exports = {
 
         const isTextArea = object.content.inputType === 'text area';
         const textAlign = object.content.textAlign;
-        console.log(this._pixiText.width);
         if (textAlign === 'left') this._pixiText.position.x = 0;
         else if (textAlign === 'right')
           this._pixiText.position.x =

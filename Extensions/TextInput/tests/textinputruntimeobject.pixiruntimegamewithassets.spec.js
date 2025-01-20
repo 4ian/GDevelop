@@ -1,5 +1,7 @@
 // @ts-check
 
+const { kMaxLength } = require("buffer");
+
 describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM elements)', function () {
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
@@ -25,6 +27,9 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
         borderWidth: 2,
         disabled: false,
         readOnly: false,
+        padding: '0 px',
+        textAlign: 'left',
+        kMaxLength : 20,
       },
     });
 

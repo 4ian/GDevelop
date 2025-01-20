@@ -166,7 +166,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('fillColor')
-        .setValue(objectContent.fillColor || '255;255;255')
+        .setValue(objectContent.fillColor || '0;0;0')
         .setType('color')
         .setLabel(_('Fill color'))
         .setGroup(_('Field appearance'));
@@ -209,29 +209,29 @@ module.exports = {
         .setLabel(_('Width'))
         .setGroup(_('Border appearance'));
 
-      objectProperties
+        objectProperties
         .getOrCreate('padding')
         .setValue((objectContent.padding || 0).toString())
         .setType('number')
         .setLabel(_('Padding'))
-        .setGroup(_('Border appearance'));
+        .setGroup(_('Font'));
 
-      objectProperties
+        objectProperties
         .getOrCreate('maxLength')
         .setValue(objectContent.maxLength || 40)
         .setType('number')
-        .setLabel(_('Input value max length'))
-        .setGroup(_('Border appearance'));
+        .setLabel(_('Max length'))
+        .setAdvanced(true);
 
-      objectProperties
+        objectProperties
         .getOrCreate('textAlign')
         .setValue(objectContent.textAlign || 'left')
         .setType('choice')
         .addExtraInfo('left')
-        .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Text alignement'))
-        .setGroup(_('Border appearance'));
+        .addExtraInfo('center')
+        .setLabel(_('text Alignement'))
+        .setGroup(_('Font'));
 
       return objectProperties;
     };
@@ -307,7 +307,6 @@ module.exports = {
     // Properties expressions/conditions/actions:
 
     // Deprecated, see TextContainerCapability
-
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -609,22 +608,21 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
-    object
-      .addScopedCondition(
-        'IsInputSubmitted',
-        _('Input is submitted'),
-        _(
-          'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
-        ),
-        _('_PARAM0_ value was submitted'),
-        '',
-        'res/conditions/surObject24.png',
-        'res/conditions/surObject.png'
-      )
-      .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('isSubmitted');
-
+    object.addScopedCondition(
+      'IsInputSubmitted',
+      _('Input is Submitted (Enter pressed'),
+      _(
+        'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
+      ),
+      _('_PARAM0_ got input submitted'),
+      '',
+      'res/conditions/surObject24.png',
+      'res/conditions/surObject.png'
+    )
+    .addParameter('object', _('Text input'), 'TextInputObject',false)
+    .getCodeExtraInformation()
+    .setFunctionName('isSubmitted');
+    
     object
       .addScopedAction(
         'Focus',
@@ -796,7 +794,7 @@ module.exports = {
         const borderWidth = object.content.borderWidth || 0;
 
         // Draw the mask for the text.
-        const textOffset = borderWidth + TEXT_MASK_PADDING; // + object.content.padding;
+        const textOffset = borderWidth + TEXT_MASK_PADDING;// + object.content.padding;
         this._pixiTextMask.clear();
         this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(
@@ -809,15 +807,17 @@ module.exports = {
 
         const isTextArea = object.content.inputType === 'text area';
         const textAlign = object.content.textAlign;
-        if (textAlign === 'left') this._pixiText.position.x = 0;
-        else if (textAlign === 'right')
-          this._pixiText.position.x =
-            0 + width - this._pixiText.width - textOffset;
-        else if (textAlign === 'center') {
-          this._pixiText.align = 'center';
-          this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
-        }
-
+        console.log(this._pixiText.width);
+        if(textAlign === 'left')
+        this._pixiText.position.x = 0;
+      else if(textAlign === 'right')
+        this._pixiText.position.x =  0 + width - this._pixiText.width - textOffset;
+      else if (textAlign === 'center')
+      {
+        this._pixiText.align = 'center';
+        this._pixiText.position.x = 0 + width/2 - this._pixiText.width/2;
+      }
+        
         this._pixiText.position.y = isTextArea
           ? textOffset
           : height / 2 - this._pixiText.height / 2;

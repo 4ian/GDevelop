@@ -27,9 +27,9 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
         borderWidth: 2,
         disabled: false,
         readOnly: false,
-        padding: '0 px',
+        padding: 0,
         textAlign: 'left',
-        kMaxLength : 20,
+        maxLength : 20,
       },
     });
 

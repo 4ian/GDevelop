@@ -741,7 +741,7 @@ namespace gdjs {
       };
       // @ts-ignore
       canvas.onwheel = function (event) {
-        manager.onMouseWheel(-event.deltaY);
+        manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
       };
 
       // Touches:

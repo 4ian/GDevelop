@@ -263,7 +263,7 @@ namespace gdjs {
       } else if (data.command === 'profiler.stop') {
         runtimeGame.stopCurrentSceneProfiler();
       } else if (data.command === 'instances.updated') {
-        runtimeGame._editor.reloadInstances(data.payload);
+        runtimeGame._editor.reloadInstances(data.payload.instances);
       } else if (data.command === 'hotReload') {
         that._hotReloader.hotReload().then((logs) => {
           that.sendHotReloaderLogs(logs);
@@ -276,7 +276,9 @@ namespace gdjs {
         const sceneName = data.sceneName || null;
         const externalLayoutName = data.externalLayoutName || null;
         if (!sceneName) {
-          logger.warn('No scene name specified, switchForInGameEdition aborted');
+          logger.warn(
+            'No scene name specified, switchForInGameEdition aborted'
+          );
           return;
         }
 
@@ -293,14 +295,12 @@ namespace gdjs {
           }
         }
 
-        runtimeGame
-          .getSceneStack()
-          .replace({
-            sceneName,
-            externalLayoutName,
-            skipCreatingInstancesFromScene: !!externalLayoutName,
-            clear: true,
-          });
+        runtimeGame.getSceneStack().replace({
+          sceneName,
+          externalLayoutName,
+          skipCreatingInstancesFromScene: !!externalLayoutName,
+          clear: true,
+        });
 
         // Update initialRuntimeGameStatus so that a hard reload
         // will come back to the same state, and so that we can check later

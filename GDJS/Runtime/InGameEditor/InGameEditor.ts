@@ -1,11 +1,75 @@
 namespace gdjs {
-  const LEFTKEY = 37;
-  const UPKEY = 38;
-  const RIGHTKEY = 39;
-  const DOWNKEY = 40;
-  const LSHIFTKEY = 1016;
-  const RSHIFTKEY = 2016;
-  const SPACEKEY = 32;
+  const LEFT_KEY = 37;
+  const UP_KEY = 38;
+  const RIGHT_KEY = 39;
+  const DOWN_KEY = 40;
+  const ALT_KEY = 18;
+  const LEFT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 1);
+  const RIGHT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 2);
+  const SHIFT_KEY = 16;
+  const LEFT_SHIFT_KEY = gdjs.InputManager.getLocationAwareKeyCode(
+    SHIFT_KEY,
+    1
+  );
+  const RIGHT_SHIFT_KEY = gdjs.InputManager.getLocationAwareKeyCode(
+    SHIFT_KEY,
+    2
+  );
+  const SPACE_KEY = 32;
+  const CTRL_KEY = 17;
+  const LEFT_CTRL_KEY = gdjs.InputManager.getLocationAwareKeyCode(CTRL_KEY, 1);
+  const RIGHT_CTRL_KEY = gdjs.InputManager.getLocationAwareKeyCode(CTRL_KEY, 2);
+  const LEFT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(91, 1);
+  const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
+
+  // TODO: factor this?
+  const isMacLike =
+    typeof navigator !== 'undefined' &&
+    navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i)
+      ? true
+      : false;
+
+  const isControlOrCmdPressed = (inputManager: gdjs.InputManager) => {
+    // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
+    return (
+      inputManager.isKeyPressed(LEFT_CTRL_KEY) ||
+      inputManager.isKeyPressed(RIGHT_CTRL_KEY) ||
+      inputManager.isKeyPressed(LEFT_META_KEY) ||
+      inputManager.isKeyPressed(RIGHT_META_KEY)
+    );
+  };
+
+  const isAltPressed = (inputManager: gdjs.InputManager) => {
+    return (
+      inputManager.isKeyPressed(LEFT_ALT_KEY) ||
+      inputManager.isKeyPressed(RIGHT_ALT_KEY)
+    );
+  };
+
+  const isShiftPressed = (inputManager: gdjs.InputManager) => {
+    return (
+      inputManager.isKeyPressed(LEFT_SHIFT_KEY) ||
+      inputManager.isKeyPressed(RIGHT_SHIFT_KEY)
+    );
+  };
+
+  const shouldScrollHorizontally = isAltPressed;
+
+  const shouldZoom = (inputManager: gdjs.InputManager) => {
+    // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
+    // does a pinch gesture on a trackpad. If this is the case, we zoom.
+    // see https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
+    if (isControlOrCmdPressed(inputManager)) return true;
+    if (isMacLike) {
+      return isControlOrCmdPressed(inputManager);
+    } else {
+      return (
+        !isControlOrCmdPressed(inputManager) &&
+        !isAltPressed(inputManager) &&
+        !isShiftPressed(inputManager)
+      );
+    }
+  };
 
   export class InGameEditor {
     _runtimeGame: RuntimeGame;
@@ -114,8 +178,9 @@ namespace gdjs {
         // TODO: replace everything by "real 3D movement".
 
         // Mouse wheel: forward/backward movement.
-        const wheelDelta = inputManager.getMouseWheelDelta();
-        if (wheelDelta !== 0) {
+        const wheelDeltaY = inputManager.getMouseWheelDelta();
+        const wheelDeltaX = inputManager.getMouseWheelDeltaX();
+        if (shouldZoom(inputManager)) {
           // TODO: factor this?
           const assumedFovIn2D = 45;
           const layerRenderer = layer.getRenderer();
@@ -126,26 +191,31 @@ namespace gdjs {
               : threeCamera.fov
             : assumedFovIn2D;
 
-          layer.setCameraZ(layer.getCameraZ(fov) + wheelDelta, fov);
+          layer.setCameraZ(layer.getCameraZ(fov) - wheelDeltaY, fov);
+        } else if (shouldScrollHorizontally(inputManager)) {
+          layer.setCameraX(layer.getCameraX() + wheelDeltaY / 5);
+        } else {
+          layer.setCameraX(layer.getCameraX() + wheelDeltaX / 5);
+          layer.setCameraY(layer.getCameraY() - wheelDeltaY / 5);
         }
 
         // Movement with the keyboard
-        if (inputManager.isKeyPressed(LEFTKEY)) {
+        if (inputManager.isKeyPressed(LEFT_KEY)) {
           layer.setCameraX(layer.getCameraX() - 5);
         }
-        if (inputManager.isKeyPressed(RIGHTKEY)) {
+        if (inputManager.isKeyPressed(RIGHT_KEY)) {
           layer.setCameraX(layer.getCameraX() + 5);
         }
-        if (inputManager.isKeyPressed(UPKEY)) {
+        if (inputManager.isKeyPressed(UP_KEY)) {
           layer.setCameraY(layer.getCameraY() - 5);
         }
-        if (inputManager.isKeyPressed(DOWNKEY)) {
+        if (inputManager.isKeyPressed(DOWN_KEY)) {
           layer.setCameraY(layer.getCameraY() + 5);
         }
 
         // Space + click: move the camera on its plane.
         if (
-          inputManager.isKeyPressed(SPACEKEY) &&
+          inputManager.isKeyPressed(SPACE_KEY) &&
           inputManager.isMouseButtonPressed(0)
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();
@@ -179,21 +249,20 @@ namespace gdjs {
       }
     }
 
-    reloadInstances(payload: {
-      layoutName: string;
+    reloadInstances(
       instances: Array<{
         persistentUuid: string;
         position: { x: number; y: number; z: number };
-      }>;
-    }) {
+      }>
+    ) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene || currentScene.getName() !== payload.layoutName) {
+      if (!currentScene) {
         return;
       }
       // TODO: Might be worth indexing instances data and runtime objects by their
       // persistentUuid (See HotReloader.indexByPersistentUuid).
       currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
-        const instance = payload.instances.find(
+        const instance = instances.find(
           (instance) => instance.persistentUuid === runtimeObject.persistentUuid
         );
         if (instance) {

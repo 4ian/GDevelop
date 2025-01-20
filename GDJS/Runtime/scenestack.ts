@@ -6,11 +6,11 @@ namespace gdjs {
     sceneName: string;
     externalLayoutName?: string;
     skipCreatingInstancesFromScene?: boolean;
-  };
+  }
 
   interface ReplaceSceneOptions extends PushSceneOptions {
     clear: boolean;
-  };
+  }
 
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
@@ -123,7 +123,6 @@ namespace gdjs {
       }
     }
 
-
     /**
      * Pause the scene currently being played and start the new scene that is specified in `options.sceneName`.
      * If `options.externalLayoutName` is set, also instantiate the objects from this external layout.
@@ -136,12 +135,14 @@ namespace gdjs {
       deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
-      console.log({options, deprecatedExternalLayoutName})
+      console.log({ options, deprecatedExternalLayoutName });
 
       const sceneName =
         typeof options === 'string' ? options : options.sceneName;
       const skipCreatingInstancesFromScene =
-        typeof options === 'string' ? false : options.skipCreatingInstancesFromScene;
+        typeof options === 'string'
+          ? false
+          : options.skipCreatingInstancesFromScene;
       const externalLayoutName =
         deprecatedExternalLayoutName ||
         (typeof options === 'string' ? undefined : options.externalLayoutName);
@@ -214,8 +215,12 @@ namespace gdjs {
      * @param options Contains the scene name and optional external layout name to instantiate.
      * @param deprecatedClear Deprecated, use `options.clear` instead.
      */
-    replace(options: ReplaceSceneOptions | string, deprecatedClear?: boolean): gdjs.RuntimeScene | null {
-      const clear = deprecatedClear || typeof options === 'string' ? false : options.clear;
+    replace(
+      options: ReplaceSceneOptions | string,
+      deprecatedClear?: boolean
+    ): gdjs.RuntimeScene | null {
+      const clear =
+        deprecatedClear || typeof options === 'string' ? false : options.clear;
 
       this._throwIfDisposed();
       if (!!clear) {

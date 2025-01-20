@@ -9,12 +9,11 @@ namespace gdjs {
     search: 'search',
   };
 
-  const userFriendlyToHtmlAlignement = 
-  {
+  const userFriendlyToHtmlAlignement = {
     left: 'left',
     center: 'center',
     right: 'right',
-  }
+  };
 
   const formatRgbAndOpacityToCssRgba = (
     rgbColor: [float, float, float],
@@ -32,7 +31,6 @@ namespace gdjs {
       ')'
     );
   };
-
 
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
@@ -95,7 +93,7 @@ namespace gdjs {
       this._form.addEventListener('submit', (event) => {
         event.preventDefault();
         this._isSubmited = true;
-      })
+      });
 
       this.updateString();
       this.updateFont();
@@ -245,9 +243,9 @@ namespace gdjs {
       this._form.style.height = heightInContainer + 'px';
       this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
-        this._form.style.display = 'initial';
-        this._form.style.padding = this._object.getPadding() + 'px';
-        this._form.style.textAlign = this._object.getTextAlign();
+      this._form.style.display = 'initial';
+      this._form.style.padding = this._object.getPadding() + 'px';
+      this._form.style.textAlign = this._object.getTextAlign();
 
       // Automatically adjust the font size to follow the game scale.
       this._form.style.fontSize =
@@ -312,7 +310,6 @@ namespace gdjs {
         this._object._getRawFillColor(),
         this._object.getFillOpacity()
       );
-      
     }
 
     updateBorderColorAndOpacity() {
@@ -340,13 +337,13 @@ namespace gdjs {
     }
 
     updateMaxLength() {
-      if(!this._input) return;
+      if (!this._input) return;
 
       this._input.maxLength = this._object.getMaxLength();
     }
 
     updatePadding() {
-      if(!this._input) return;
+      if (!this._input) return;
 
       this._input.style.padding = this._object.getPadding() + 'px';
     }
@@ -354,15 +351,15 @@ namespace gdjs {
     updateTextAlign() {
       if (!this._input) return;
 
-      const newTextAlign = userFriendlyToHtmlAlignement[this._object.getTextAlign()] || 'left';
+      const newTextAlign =
+        userFriendlyToHtmlAlignement[this._object.getTextAlign()] || 'left';
       this._input.style.textAlign = newTextAlign;
     }
-    
+
     isFocused() {
       return this._input === document.activeElement;
     }
-    getSubmitted()
-    {
+    getSubmitted() {
       return this._isSubmited;
     }
 
@@ -374,5 +371,4 @@ namespace gdjs {
   }
   export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
   export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-
 }

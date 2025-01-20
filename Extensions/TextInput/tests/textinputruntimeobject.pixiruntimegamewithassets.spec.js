@@ -1,6 +1,6 @@
 // @ts-check
 
-const { kMaxLength } = require("buffer");
+
 
 describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM elements)', function () {
   /**

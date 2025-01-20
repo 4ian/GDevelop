@@ -106,7 +106,7 @@ namespace gdjs {
     private _borderWidth: float;
     private _disabled: boolean;
     private _readOnly: boolean;
-
+    private _isSubmitted: boolean;
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
@@ -133,7 +133,7 @@ namespace gdjs {
       this._padding = objectData.content.padding;
       this._textAlign = objectData.content.textAlign;
       this._maxLength = objectData.content.maxLength;
-
+      this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -267,6 +267,7 @@ namespace gdjs {
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
+      this._isSubmitted =false;
       this._renderer.updatePreRender();
     }
 
@@ -378,6 +379,10 @@ namespace gdjs {
      */
     onRendererInputValueChanged(inputValue: string) {
       this._string = inputValue;
+    }
+    
+    onRendererFormSubmitted(inputValue: boolean) {
+      this._isSubmitted = inputValue;
     }
 
     getFontResourceName() {
@@ -532,9 +537,7 @@ namespace gdjs {
       return this._renderer.isFocused();
     }
     isSubmitted(): boolean {
-      console.log(this._renderer.getSubmitted());
-
-      return this._renderer.getSubmitted();
+      return this._isSubmitted;
     }
 
     getMaxLength(): integer {

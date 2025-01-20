@@ -9,12 +9,6 @@ namespace gdjs {
     search: 'search',
   };
 
-  const userFriendlyToHtmlAlignement = {
-    left: 'left',
-    center: 'center',
-    right: 'right',
-  };
-
   const formatRgbAndOpacityToCssRgba = (
     rgbColor: [float, float, float],
     opacity: float
@@ -38,7 +32,6 @@ namespace gdjs {
     private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
     private _form: HTMLFormElement | null = null;
-    private _isSubmited: boolean;
 
     constructor(
       runtimeObject: gdjs.TextInputRuntimeObject,
@@ -49,7 +42,6 @@ namespace gdjs {
       this._runtimeGame = this._instanceContainer.getGame();
 
       this._createElement();
-      this._isSubmited = false;
     }
 
     _createElement() {
@@ -76,7 +68,6 @@ namespace gdjs {
       this._input.style.padding = this._object.getPadding() + 'px';
       this._form.style.textAlign = this._object.getTextAlign();
       this._form.appendChild(this._input);
-      this._isSubmited = false;
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -92,7 +83,7 @@ namespace gdjs {
 
       this._form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this._isSubmited = true;
+        this._object.onRendererFormSubmitted(true);
       });
 
       this.updateString();
@@ -143,8 +134,6 @@ namespace gdjs {
 
     updatePreRender() {
       if (!this._input || !this._form) return;
-
-      this._isSubmited = false;
       // Hide the input entirely if the object is hidden.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
@@ -352,15 +341,12 @@ namespace gdjs {
       if (!this._input) return;
 
       const newTextAlign =
-        userFriendlyToHtmlAlignement[this._object.getTextAlign()] || 'left';
+        this._object.getTextAlign() || 'left';
       this._input.style.textAlign = newTextAlign;
     }
 
     isFocused() {
       return this._input === document.activeElement;
-    }
-    getSubmitted() {
-      return this._isSubmited;
     }
 
     focus() {

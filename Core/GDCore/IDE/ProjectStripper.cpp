@@ -63,7 +63,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
       eventsBasedObject.GetPropertyDescriptors().GetInternalVector().clear();
     }
     extension.GetEventsBasedBehaviors().Clear();
-    extension.ClearEventsFunctions();
+    extension.GetEventsFunctions().ClearEventsFunctions();
   }
 }
 

@@ -34,6 +34,7 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   addSourceFile(): gdSourceFileMetadata;
   removeSourceFileAt(index: number): void;
   getAllSourceFiles(): gdVectorSourceFileMetadata;
+  getEventsFunctions(): gdEventsFunctionsContainer;
   getGlobalVariables(): gdVariablesContainer;
   getSceneVariables(): gdVariablesContainer;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
@@ -41,15 +42,6 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
-  insertNewEventsFunction(name: string, pos: number): gdEventsFunction;
-  insertEventsFunction(eventsFunction: gdEventsFunction, pos: number): gdEventsFunction;
-  hasEventsFunctionNamed(name: string): boolean;
-  getEventsFunction(name: string): gdEventsFunction;
-  getEventsFunctionAt(pos: number): gdEventsFunction;
-  removeEventsFunction(name: string): void;
-  moveEventsFunction(oldIndex: number, newIndex: number): void;
-  getEventsFunctionsCount(): number;
-  getEventsFunctionPosition(eventsFunction: gdEventsFunction): number;
   delete(): void;
   ptr: number;
 };

@@ -265,8 +265,9 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
   const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
     project
   );
-  for (let i = 0; i < extension.getEventsFunctionsCount(); i++) {
-    const eventsFunction = extension.getEventsFunctionAt(i);
+  const freeEventsFunctions = extension.getEventsFunctions();
+  for (let i = 0; i < freeEventsFunctions.getEventsFunctionsCount(); i++) {
+    const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
     generatedExtensionModule.freeFunctions[
       eventsFunction.getName()
     ] = generatedEventsCodeToJSFunction(

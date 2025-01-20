@@ -115,8 +115,9 @@ const getExtensionIncludeFiles = (
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: Options
 ): Array<string> => {
-  return mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
-    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
+  const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+  return mapFor(0, freeEventsFunctions.getEventsFunctionsCount(), i => {
+    const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
 
     const functionName = gd.MetadataDeclarationHelper.getFreeFunctionCodeName(
       eventsFunctionsExtension,
@@ -192,19 +193,25 @@ const generateEventsFunctionExtension = (
     .then(() =>
       // Generate all free functions
       Promise.all(
-        mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
-          const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(
-            i
-          );
-          return generateFreeFunction(
-            project,
-            extension,
-            eventsFunctionsExtension,
-            eventsFunction,
-            options,
-            codeGenerationContext
-          );
-        })
+        mapFor(
+          0,
+          eventsFunctionsExtension
+            .getEventsFunctions()
+            .getEventsFunctionsCount(),
+          i => {
+            const eventsFunction = eventsFunctionsExtension
+              .getEventsFunctions()
+              .getEventsFunctionAt(i);
+            return generateFreeFunction(
+              project,
+              extension,
+              eventsFunctionsExtension,
+              eventsFunction,
+              options,
+              codeGenerationContext
+            );
+          }
+        )
       )
     )
     .then(functionInfos => {
@@ -278,8 +285,9 @@ const generateEventsFunctionExtensionMetadata = (
   );
   // Generate all free functions
   const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
-  mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
-    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
+  const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+  mapFor(0, freeEventsFunctions.getEventsFunctionsCount(), i => {
+    const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
     return generateFreeFunctionMetadata(
       project,
       extension,

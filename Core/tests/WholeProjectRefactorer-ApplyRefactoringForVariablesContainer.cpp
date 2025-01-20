@@ -1722,7 +1722,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto &extension = project.InsertNewEventsFunctionsExtension("Extension", 0);
     extension.GetSceneVariables().InsertNew("MySceneVariable").SetValue(123);
 
-    auto &function = extension.InsertNewEventsFunction("MyFunction", 0);
+    auto &function =
+        extension.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
     gd::StandardEvent &event =
         dynamic_cast<gd::StandardEvent &>(function.GetEvents().InsertNewEvent(
             project, "BuiltinCommonInstructions::Standard"));

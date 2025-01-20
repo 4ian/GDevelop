@@ -4596,22 +4596,23 @@ describe('libGD.js', function () {
         'http://resources.gdevelop-app.com/test'
       );
 
-      const eventsFunction = eventsFunctionsExtension.insertNewEventsFunction(
+      const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+      const eventsFunction = freeEventsFunctions.insertNewEventsFunction(
         'MyFunction',
         0
       );
       expect(
-        eventsFunctionsExtension.hasEventsFunctionNamed('MyFunction')
+        freeEventsFunctions.hasEventsFunctionNamed('MyFunction')
       ).toBe(true);
       expect(
-        eventsFunctionsExtension.hasEventsFunctionNamed('MyNotExistingFunction')
+        freeEventsFunctions.hasEventsFunctionNamed('MyNotExistingFunction')
       ).toBe(false);
-      expect(eventsFunctionsExtension.getEventsFunctionsCount()).toBe(1);
-      expect(eventsFunctionsExtension.getEventsFunctionAt(0).getName()).toBe(
+      expect(freeEventsFunctions.getEventsFunctionsCount()).toBe(1);
+      expect(freeEventsFunctions.getEventsFunctionAt(0).getName()).toBe(
         'MyFunction'
       );
       expect(
-        eventsFunctionsExtension.getEventsFunction('MyFunction').getName()
+        freeEventsFunctions.getEventsFunction('MyFunction').getName()
       ).toBe('MyFunction');
 
       eventsFunctionsExtension.delete();

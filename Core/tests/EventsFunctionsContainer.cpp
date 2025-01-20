@@ -38,6 +38,8 @@ TEST_CASE("EventsFunctionsContainer", "[common]") {
             "Function2.x");
     REQUIRE(eventsFunctionContainer.GetEventsFunction(2).GetName() ==
             "Function3");
+    REQUIRE(eventsFunctionContainer.GetOwner() ==
+            gd::EventsFunctionsContainer::FunctionOwner::Extension);
     REQUIRE(eventsFunctionContainer2.GetEventsFunctionsCount() == 3);
     REQUIRE(eventsFunctionContainer2.GetEventsFunction(0).GetName() ==
             "Function1.y");

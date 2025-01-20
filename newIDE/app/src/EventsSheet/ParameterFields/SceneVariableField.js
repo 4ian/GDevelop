@@ -13,8 +13,9 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateVariables } from './EnumerateVariables';
-import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
+
+const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -48,6 +49,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           : [];
       },
       [eventsFunctionsExtension, layout]
+    );
+
+    const getVariableSourceFromVariableName = React.useCallback(
+      variableName => {
+        const variablesContainer = variablesContainers.find(
+          variablesContainer => variablesContainer.has(variableName)
+        );
+        return variablesContainer ? variablesContainer.getSourceType() : null;
+      },
+      [variablesContainers]
     );
 
     const enumerateSceneVariables = React.useCallback(
@@ -95,6 +106,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ? `parameter-${props.parameterIndex}-scene-variable-field`
               : undefined
           }
+          getVariableSourceFromVariableName={getVariableSourceFromVariableName}
         />
         {editorOpen && layout && project && (
           <SceneVariablesDialog
@@ -128,6 +140,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
+const getVariableSourceFromVariableName = (
+  variableName: string,
+  projectScopedContainers: gdProjectScopedContainers
+): VariablesContainer_SourceType => gd.VariablesContainer.Scene;
+
 export const renderInlineSceneVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'scene variable', SceneVariableIcon);
+) =>
+  renderVariableWithIcon(
+    props,
+    'scene variable',
+    getVariableSourceFromVariableName
+  );

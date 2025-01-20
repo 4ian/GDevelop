@@ -157,6 +157,34 @@ VariablesContainersList::GetVariablesContainerFromVariableName(
   return badVariablesContainer;
 }
 
+const VariablesContainer &VariablesContainersList::
+    GetVariablesContainerFromVariableNameExcludingParameters(
+        const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Parameters &&
+        (*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
+}
+
+const VariablesContainer &VariablesContainersList::
+    GetVariablesContainerFromVariableNameExcludingParametersAndProperties(
+        const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Parameters &&
+        (*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Properties &&
+        (*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
+}
+
 std::size_t
 VariablesContainersList::GetVariablesContainerPositionFromVariableName(
     const gd::String &variableName) const {

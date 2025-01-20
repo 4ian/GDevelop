@@ -181,7 +181,7 @@ VariablesExtension::VariablesExtension() {
         const auto variablesContainersList =
             codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
         const auto& variablesContainer =
-            variablesContainersList.GetVariablesContainerFromVariableName(
+            variablesContainersList.GetVariablesContainerFromVariableNameExcludingParameters(
                 variableName);
         const auto sourceType = variablesContainer.GetSourceType();
         if (sourceType == gd::VariablesContainer::SourceType::Properties) {
@@ -244,7 +244,7 @@ VariablesExtension::VariablesExtension() {
         const auto variablesContainersList =
             codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
         const auto& variablesContainer =
-            variablesContainersList.GetVariablesContainerFromVariableName(
+            variablesContainersList.GetVariablesContainerFromVariableNameExcludingParameters(
                 variableName);
         const auto sourceType = variablesContainer.GetSourceType();
         if (sourceType == gd::VariablesContainer::SourceType::Properties) {
@@ -304,7 +304,7 @@ VariablesExtension::VariablesExtension() {
         const auto variablesContainersList =
             codeGenerator.GetProjectScopedContainers().GetVariablesContainersList();
         const auto& variablesContainer =
-            variablesContainersList.GetVariablesContainerFromVariableName(
+            variablesContainersList.GetVariablesContainerFromVariableNameExcludingParameters(
                 variableName);
         const auto sourceType = variablesContainer.GetSourceType();
         if (sourceType == gd::VariablesContainer::SourceType::Properties) {

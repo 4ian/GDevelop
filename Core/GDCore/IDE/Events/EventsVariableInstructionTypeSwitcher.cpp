@@ -71,6 +71,11 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
                     .GetObjectsContainersList()
                     .GetObjectOrGroupVariablesContainer(lastObjectName);
           }
+        } else if (type == "variableOrProperty") {
+            variablesContainer =
+                &GetProjectScopedContainers()
+                      .GetVariablesContainersList()
+                      .GetVariablesContainerFromVariableNameExcludingParameters(variableName);
         } else {
           if (GetProjectScopedContainers().GetVariablesContainersList().Has(
                   variableName)) {

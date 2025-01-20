@@ -260,6 +260,69 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(behavior._getMyProperty()).toBe(456);
   });
 
+  it('Can use a property in a variable action when a parameter with the same name exits', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    eventsBasedBehavior
+      .getPropertyDescriptors()
+      .insertNew('MyIdentifier', 0)
+      .setValue('123')
+      .setType('Number');
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyIdentifier', '=', '456'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+    const eventsFunction = eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0);
+    const parameter = eventsFunction
+      .getParameters()
+      .insertNewParameter(
+        'MyIdentifier',
+        eventsFunction.getParameters().getParametersCount()
+      );
+    parameter.setType('number');
+
+    const { runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+
+    // Check the default value is set.
+    expect(behavior._getMyIdentifier()).toBe(123);
+
+    behavior.MyFunction();
+    expect(behavior._getMyIdentifier()).toBe(456);
+  });
+
   it('Can use a property in a variable condition', () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const scene = project.insertNewLayout('MyScene', 0);

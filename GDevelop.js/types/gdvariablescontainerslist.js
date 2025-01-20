@@ -3,6 +3,8 @@ declare class gdVariablesContainersList {
   has(name: string): boolean;
   get(name: string): gdVariable;
   getVariablesContainerFromVariableName(variableName: string): gdVariablesContainer;
+  getVariablesContainerFromVariableNameExcludingParameters(variableName: string): gdVariablesContainer;
+  getVariablesContainerFromVariableNameExcludingParametersAndProperties(variableName: string): gdVariablesContainer;
   getVariablesContainer(index: number): gdVariablesContainer;
   getVariablesContainersCount(): number;
   delete(): void;

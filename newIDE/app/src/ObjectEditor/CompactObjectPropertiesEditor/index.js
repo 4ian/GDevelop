@@ -31,7 +31,7 @@ import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import SquaredChevronArrowDown from '../../UI/CustomSvgIcons/SquaredChevronArrowDown';
-import SquaredChevronArrowUp from '../../UI/CustomSvgIcons/SquaredChevronArrowUp';
+import SquaredChevronArrowRight from '../../UI/CustomSvgIcons/SquaredChevronArrowRight';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
@@ -164,9 +164,10 @@ const TopLevelCollapsibleSection = ({
     <Column noOverflowParent>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
+          s
           <IconButton size="small" onClick={toggleFolded}>
             {isFolded ? (
-              <SquaredChevronArrowUp style={styles.icon} />
+              <SquaredChevronArrowRight style={styles.icon} />
             ) : (
               <SquaredChevronArrowDown style={styles.icon} />
             )}

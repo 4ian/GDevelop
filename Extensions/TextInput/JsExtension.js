@@ -166,7 +166,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('fillColor')
-        .setValue(objectContent.fillColor || '0;0;0')
+        .setValue(objectContent.fillColor || '255;255;255')
         .setType('color')
         .setLabel(_('Fill color'))
         .setGroup(_('Field appearance'));

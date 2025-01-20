@@ -16,6 +16,7 @@ export const WithGameTemplates = () => (
     onClose={action('onClose')}
     onAssetPackOpen={action('onAssetPackOpen')}
     onGameTemplateOpen={action('onGameTemplateOpen')}
+    onExampleOpen={action('onExampleOpen')}
   />
 );
 
@@ -25,6 +26,7 @@ export const WithAssetPacks = () => (
     onClose={action('onClose')}
     onAssetPackOpen={action('onAssetPackOpen')}
     onGameTemplateOpen={action('onGameTemplateOpen')}
+    onExampleOpen={action('onExampleOpen')}
   />
 );
 
@@ -34,5 +36,6 @@ export const WithGames = () => (
     onClose={action('onClose')}
     onAssetPackOpen={action('onAssetPackOpen')}
     onGameTemplateOpen={action('onGameTemplateOpen')}
+    onExampleOpen={action('onExampleOpen')}
   />
 );

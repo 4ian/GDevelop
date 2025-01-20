@@ -218,9 +218,9 @@ module.exports = {
 
       objectProperties
         .getOrCreate('maxLength')
-        .setValue(objectContent.maxLength || 20)
+        .setValue(objectContent.maxLength || 40)
         .setType('number')
-        .setLabel(_('Max length'))
+        .setLabel(_('Input value max length'))
         .setGroup(_('Border appearance'));
 
       objectProperties
@@ -228,9 +228,9 @@ module.exports = {
         .setValue(objectContent.textAlign || 'left')
         .setType('choice')
         .addExtraInfo('left')
-        .addExtraInfo('right')
         .addExtraInfo('center')
-        .setLabel(_('text Alignement'))
+        .addExtraInfo('right')
+        .setLabel(_('Text alignement'))
         .setGroup(_('Border appearance'));
 
       return objectProperties;

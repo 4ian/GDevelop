@@ -313,7 +313,6 @@ module.exports = {
     // Properties expressions/conditions/actions:
 
     // Deprecated, see TextContainerCapability
-    object.addcon
     object
       .addExpressionAndConditionAndAction(
         'string',

@@ -9,10 +9,10 @@ namespace gdjs {
     'search',
     'text area',
   ] as const;
-  const supportedtextAlign = ['left', 'center', 'right'] as const;
+  const supportedTextAlign = ['left', 'center', 'right'] as const;
 
-  type SupportedInputType = typeof supportedInputTypes[number];
-  type SupportedtextAlign = typeof supportedtextAlign[number];
+  type SupportedInputType = (typeof supportedInputTypes)[number];
+  type SupportedTextAlign = (typeof supportedTextAlign)[number];
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
 
@@ -23,12 +23,12 @@ namespace gdjs {
     return 'text';
   };
 
-  const parseTextAlign = (potentialTextAlign: string): SupportedtextAlign => {
+  const parseTextAlign = (potentialTextAlign: string): SupportedTextAlign => {
     const lowercasedNewTextAlign = potentialTextAlign.toLowerCase();
 
     // @ts-ignore - we're actually checking that this value is correct.
-    if (supportedtextAlign.includes(lowercasedNewTextAlign))
-      return potentialTextAlign as SupportedtextAlign;
+    if (supportedTextAlign.includes(lowercasedNewTextAlign))
+      return potentialTextAlign as SupportedTextAlign;
 
     return 'left';
   };
@@ -46,7 +46,7 @@ namespace gdjs {
       fillColor: string;
       fillOpacity: float;
       padding: integer;
-      textAlign: SupportedtextAlign;
+      textAlign: SupportedTextAlign;
       maxLength: integer;
       borderColor: string;
       borderOpacity: float;
@@ -86,7 +86,8 @@ namespace gdjs {
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler
+  {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -99,7 +100,7 @@ namespace gdjs {
     private _fillColor: [float, float, float];
     private _fillOpacity: float;
     private _padding: integer;
-    private _textAlign: SupportedtextAlign;
+    private _textAlign: SupportedTextAlign;
     private _maxLength: integer;
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
@@ -130,9 +131,9 @@ namespace gdjs {
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
-      this._padding = objectData.content.padding;
-      this._textAlign = objectData.content.textAlign;
-      this._maxLength = objectData.content.maxLength;
+      this._padding = objectData.content.padding || 0;
+      this._textAlign = objectData.content.textAlign || 'left';
+      this._maxLength = objectData.content.maxLength || 0;
       this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
@@ -216,7 +217,7 @@ namespace gdjs {
         this._textAlign = newObjectData.content.textAlign;
       }
       if (oldObjectData.content.padding !== newObjectData.content.padding) {
-        this.SetPadding(newObjectData.content.padding);
+        this.setPadding(newObjectData.content.padding);
       }
 
       return true;
@@ -266,7 +267,7 @@ namespace gdjs {
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
-      this._isSubmitted =false;
+      this._isSubmitted = false;
       this._renderer.updatePreRender();
     }
 
@@ -379,9 +380,9 @@ namespace gdjs {
     onRendererInputValueChanged(inputValue: string) {
       this._string = inputValue;
     }
-    
-    onRendererFormSubmitted(inputValue: boolean) {
-      this._isSubmitted = inputValue;
+
+    onRendererFormSubmitted() {
+      this._isSubmitted = true;
     }
 
     getFontResourceName() {
@@ -549,11 +550,12 @@ namespace gdjs {
     getPadding(): integer {
       return this._padding;
     }
-    SetPadding(value: integer) {
+    setPadding(value: integer) {
       this._padding = value;
+      this._renderer.updatePadding();
     }
 
-    getTextAlign(): SupportedtextAlign {
+    getTextAlign(): SupportedTextAlign {
       return this._textAlign;
     }
 

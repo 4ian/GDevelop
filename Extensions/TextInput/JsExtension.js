@@ -166,7 +166,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('fillColor')
-        .setValue(objectContent.fillColor || '0;0;0')
+        .setValue(objectContent.fillColor || '255;255;255')
         .setType('color')
         .setLabel(_('Fill color'))
         .setGroup(_('Field appearance'));
@@ -209,21 +209,22 @@ module.exports = {
         .setLabel(_('Width'))
         .setGroup(_('Border appearance'));
 
-        objectProperties
+      objectProperties
         .getOrCreate('padding')
-        .setValue((objectContent.padding || 0))
+        .setValue((objectContent.padding || 0).toString())
         .setType('number')
         .setLabel(_('Padding'))
         .setGroup(_('Font'));
-
-        objectProperties
+      console.log(objectContent.maxLength);
+      objectProperties
         .getOrCreate('maxLength')
-        .setValue(objectContent.maxLength || 0)
+        .setValue((objectContent.maxLength || 0).toString())
         .setType('number')
         .setLabel(_('Max length'))
+        .setDescription(_('The maximum length of the input value.'))
         .setAdvanced(true);
 
-        objectProperties
+      objectProperties
         .getOrCreate('textAlign')
         .setValue(objectContent.textAlign || 'left')
         .setType('choice')
@@ -608,21 +609,22 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
-    object.addScopedCondition(
-      'IsInputSubmitted',
-      _('Input is Submitted (Enter pressed'),
-      _(
-        'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
-      ),
-      _('_PARAM0_ got input submitted'),
-      '',
-      'res/conditions/surObject24.png',
-      'res/conditions/surObject.png'
-    )
-    .addParameter('object', _('Text input'), 'TextInputObject',false)
-    .getCodeExtraInformation()
-    .setFunctionName('isSubmitted');
-    
+    object
+      .addScopedCondition(
+        'IsInputSubmitted',
+        _('Input is Submitted (Enter pressed'),
+        _(
+          'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
+        ),
+        _('_PARAM0_ got input submitted'),
+        '',
+        'res/conditions/surObject24.png',
+        'res/conditions/surObject.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isSubmitted');
+
     object
       .addScopedAction(
         'Focus',
@@ -794,7 +796,7 @@ module.exports = {
         const borderWidth = object.content.borderWidth || 0;
 
         // Draw the mask for the text.
-        const textOffset = borderWidth + TEXT_MASK_PADDING;// + object.content.padding;
+        const textOffset = borderWidth + TEXT_MASK_PADDING;
         this._pixiTextMask.clear();
         this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(
@@ -807,17 +809,15 @@ module.exports = {
 
         const isTextArea = object.content.inputType === 'text area';
         const textAlign = object.content.textAlign;
-        console.log(this._pixiText.width);
-        if(textAlign === 'left')
-        this._pixiText.position.x = 0;
-      else if(textAlign === 'right')
-        this._pixiText.position.x =  0 + width - this._pixiText.width - textOffset;
-      else if (textAlign === 'center')
-      {
-        this._pixiText.align = 'center';
-        this._pixiText.position.x = 0 + width/2 - this._pixiText.width/2;
-      }
-        
+        if (textAlign === 'left') this._pixiText.position.x = textOffset;
+        else if (textAlign === 'right')
+          this._pixiText.position.x =
+            0 + width - this._pixiText.width - textOffset;
+        else if (textAlign === 'center') {
+          this._pixiText.align = 'center';
+          this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
+        }
+
         this._pixiText.position.y = isTextArea
           ? textOffset
           : height / 2 - this._pixiText.height / 2;

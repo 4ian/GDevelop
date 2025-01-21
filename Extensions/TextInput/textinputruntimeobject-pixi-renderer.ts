@@ -49,14 +49,13 @@ namespace gdjs {
         throw new Error('Tried to recreate an input while it already exists.');
 
       this._form = document.createElement('form');
-      this._form.setAttribute('id', 'dynamicForm');
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
       this._form.style.border = '0px';
       this._input.autocomplete = 'off';
       this._form.style.borderRadius = '0px';
       this._form.style.backgroundColor = 'transparent';
-      this._input.style.backgroundColor = 'red';
+      this._input.style.backgroundColor = 'white';
       this._input.style.border = '1px solid black';
       this._form.style.position = 'absolute';
       this._form.style.resize = 'none';
@@ -64,10 +63,13 @@ namespace gdjs {
       this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._form.style.display = 'none'; // Hide while object is being set up.
       this._form.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
-      this._input.maxLength = this._object.getMaxLength();
+      this._input.style.boxSizing = 'border-box';
+      this._input.style.width = '100%';
+      this._input.style.height = '100%';
       this._input.style.padding = this._object.getPadding() + 'px';
       this._form.style.textAlign = this._object.getTextAlign();
       this._form.appendChild(this._input);
+      this._input.maxLength = this._object.getMaxLength();
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -83,7 +85,7 @@ namespace gdjs {
 
       this._form.addEventListener('submit', (event) => {
         event.preventDefault();
-        this._object.onRendererFormSubmitted(true);
+        this._object.onRendererFormSubmitted();
       });
 
       this.updateString();
@@ -232,17 +234,17 @@ namespace gdjs {
       this._form.style.height = heightInContainer + 'px';
       this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
-      this._form.style.display = 'initial';
-      this._form.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = this._object.getPadding() + 'px';
       this._form.style.textAlign = this._object.getTextAlign();
 
       // Automatically adjust the font size to follow the game scale.
-      this._form.style.fontSize =
+      this._input.style.fontSize =
         this._object.getFontSize() *
           runtimeGameRenderer.getCanvasToDomElementContainerHeightScale() +
         'px';
 
       // Display after the object is positioned.
+      this._form.style.display = 'initial';
     }
 
     updateString() {
@@ -256,8 +258,8 @@ namespace gdjs {
     }
 
     updateFont() {
-      if (!this._form) return;
-      this._form.style.fontFamily = this._instanceContainer
+      if (!this._input) return;
+      this._input.style.fontFamily = this._instanceContainer
         .getGame()
         .getFontManager()
         .getFontFamily(this._object.getFontResourceName());
@@ -284,9 +286,9 @@ namespace gdjs {
     }
 
     updateTextColor() {
-      if (!this._form) return;
+      if (!this._input) return;
 
-      this._form.style.color = formatRgbAndOpacityToCssRgba(
+      this._input.style.color = formatRgbAndOpacityToCssRgba(
         this._object._getRawTextColor(),
         255
       );
@@ -327,7 +329,10 @@ namespace gdjs {
 
     updateMaxLength() {
       if (!this._input) return;
-
+      if (this._object.getMaxLength() <= 0) {
+        this._input?.removeAttribute('maxLength');
+        return;
+      }
       this._input.maxLength = this._object.getMaxLength();
     }
 
@@ -340,8 +345,7 @@ namespace gdjs {
     updateTextAlign() {
       if (!this._input) return;
 
-      const newTextAlign =
-        this._object.getTextAlign() || 'left';
+      const newTextAlign = this._object.getTextAlign() || 'left';
       this._input.style.textAlign = newTextAlign;
     }
 
@@ -355,6 +359,8 @@ namespace gdjs {
       this._input.focus();
     }
   }
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

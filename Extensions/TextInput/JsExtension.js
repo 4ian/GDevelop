@@ -215,7 +215,6 @@ module.exports = {
         .setType('number')
         .setLabel(_('Padding'))
         .setGroup(_('Font'));
-      console.log(objectContent.maxLength);
       objectProperties
         .getOrCreate('maxLength')
         .setValue((objectContent.maxLength || 0).toString())

@@ -25,7 +25,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
-  tuneMatches,
+  exactMatchesSort,
   sharedFuseConfiguration,
   getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
@@ -467,10 +467,13 @@ const InstructionOrObjectSelector = React.forwardRef<
               'description',
             ])
           )
-          .map(result => ({
-            item: result.item,
-            matches: tuneMatches(result, searchText),
-          }))
+          .sort(
+            exactMatchesSort(searchText, [
+              'displayedName',
+              'description',
+              'fullGroupName',
+            ])
+          )
       );
 
       setSearchResults({ instructions: matchingInstructions });

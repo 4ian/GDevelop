@@ -83,6 +83,11 @@ export const getFuseSearchQueryForMultipleKeys = (
   };
 };
 
+/**
+ * Method that optimizes the match object returned by Fuse.js in the case
+ * the indices are used to display the matches.
+ * It gets rid of the indices that do not match the search text exactly.
+ */
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
   const lowerCaseSearchText = searchText.toLowerCase();
   return match.indices
@@ -111,12 +116,66 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
     .filter(Boolean);
 };
 
+const getFirstExactMatchPosition = (
+  match: SearchMatch,
+  lowerCaseSearchText: string,
+): { key: string, exactMatchIndex: number } | null => {
+  const exactMatchIndex = match.indices.find(index => {
+    const lowerCaseMatchedText = match.value
+      .slice(index[0], index[1] + 1)
+      .toLowerCase();
+    // Using startsWith here instead of `===` because of this behavior of Fuse.js:
+    // Searching `trig` will return the instruction `Trigger once` but the match first index
+    // will be on the `Trigg` part of `Trigger once`, and not only on the part `Trig`,
+    // because the `g` is repeated.
+    return lowerCaseMatchedText.startsWith(lowerCaseSearchText);
+  });
+  if (exactMatchIndex) {
+    return { key: match.key, exactMatchIndex: exactMatchIndex[0] };
+  }
+  return null;
+};
+
 export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
+
+export const exactMatchesSort = (
+  searchText: string,
+  orderedKeys?: string[]
+) => {
+  const lowerCaseSearchText = searchText.toLowerCase();
+
+  return <T>(resultA: SearchResult<T>, resultB: SearchResult<T>) => {
+    const resultAClosestMatch = resultA.matches
+      .map(match => getFirstExactMatchPosition(match, lowerCaseSearchText))
+      .filter(Boolean)
+      .sort((a, b) => a.exactMatchIndex - b.exactMatchIndex)[0];
+    const resultBClosestMatch = resultB.matches
+      .map(match => getFirstExactMatchPosition(match, lowerCaseSearchText))
+      .filter(Boolean)
+      .sort((a, b) => a.exactMatchIndex - b.exactMatchIndex)[0];
+    if (
+      resultAClosestMatch !== undefined &&
+      resultBClosestMatch !== undefined
+    ) {
+      const diff =
+        resultAClosestMatch.exactMatchIndex -
+        resultBClosestMatch.exactMatchIndex;
+      if (diff !== 0 || !orderedKeys) return diff;
+      return (
+        orderedKeys.indexOf(resultAClosestMatch.key) -
+        orderedKeys.indexOf(resultBClosestMatch.key)
+      );
+    }
+    if (resultAClosestMatch === undefined) return 1;
+    if (resultBClosestMatch === undefined) return -1;
+    return 0;
+  };
+};
 
 /**
  * Filter a list of items according to the chosen category

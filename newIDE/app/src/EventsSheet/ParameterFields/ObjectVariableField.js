@@ -134,18 +134,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ]
     );
 
-    const getVariableSourceFromVariableName = React.useCallback(
-      variableName => {
-        const variablesContainer = variablesContainers.find(
-          variablesContainer => variablesContainer.has(variableName)
-        );
-        return variablesContainer
-          ? variablesContainer.getSourceType()
-          : gd.VariablesContainer.Unknown;
-      },
-      [variablesContainers]
-    );
-
     const enumerateObjectVariables = React.useCallback(
       () =>
         variablesContainers.length > 0
@@ -216,7 +204,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
-          getVariableSourceFromVariableName={getVariableSourceFromVariableName}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen &&
           project &&
@@ -260,8 +248,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-const getVariableSourceFromVariableName = (
-  variableName: string,
+const getVariableSourceFromIdentifier = (
+  identifier: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => gd.VariablesContainer.Object;
 
@@ -271,5 +259,5 @@ export const renderInlineObjectVariable = (
   renderVariableWithIcon(
     props,
     'object variable',
-    getVariableSourceFromVariableName
+    getVariableSourceFromIdentifier
   );

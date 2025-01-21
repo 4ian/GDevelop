@@ -147,7 +147,7 @@ const Variable& VariablesContainersList::Get(const gd::String& name) const {
 }
 
 const VariablesContainer &
-VariablesContainersList::GetVariablesContainerFromVariableName(
+VariablesContainersList::GetVariablesContainerFromVariableOrPropertyOrParameterName(
     const gd::String &variableName) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {
@@ -158,7 +158,7 @@ VariablesContainersList::GetVariablesContainerFromVariableName(
 }
 
 const VariablesContainer &VariablesContainersList::
-    GetVariablesContainerFromVariableNameExcludingParameters(
+    GetVariablesContainerFromVariableOrPropertyName(
         const gd::String &variableName) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {
@@ -171,7 +171,7 @@ const VariablesContainer &VariablesContainersList::
 }
 
 const VariablesContainer &VariablesContainersList::
-    GetVariablesContainerFromVariableNameExcludingParametersAndProperties(
+    GetVariablesContainerFromVariableNameOnly(
         const gd::String &variableName) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {

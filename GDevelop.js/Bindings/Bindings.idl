@@ -341,9 +341,9 @@ interface VariablesContainer {
 interface VariablesContainersList {
   boolean Has([Const] DOMString name);
   [Const, Ref] Variable Get([Const] DOMString name);
-  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableName([Const] DOMString variableName);
-  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableNameExcludingParameters([Const] DOMString variableName);
-  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableNameExcludingParametersAndProperties([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableOrPropertyOrParameterName([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableOrPropertyName([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableNameOnly([Const] DOMString variableName);
 
   [Const, Ref] VariablesContainer GetVariablesContainer(unsigned long index);
   unsigned long GetVariablesContainersCount();

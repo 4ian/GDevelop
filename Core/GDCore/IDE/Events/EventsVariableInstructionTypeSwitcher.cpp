@@ -75,14 +75,14 @@ bool EventsVariableInstructionTypeSwitcher::DoVisitInstruction(gd::Instruction& 
             variablesContainer =
                 &GetProjectScopedContainers()
                       .GetVariablesContainersList()
-                      .GetVariablesContainerFromVariableNameExcludingParameters(variableName);
+                      .GetVariablesContainerFromVariableOrPropertyName(variableName);
         } else {
           if (GetProjectScopedContainers().GetVariablesContainersList().Has(
                   variableName)) {
             variablesContainer =
                 &GetProjectScopedContainers()
                       .GetVariablesContainersList()
-                      .GetVariablesContainerFromVariableName(variableName);
+                      .GetVariablesContainerFromVariableOrPropertyOrParameterName(variableName);
           }
         }
 

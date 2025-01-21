@@ -15,7 +15,7 @@ import {
 import InlinePopover from '../../InlinePopover';
 import AnyVariableField from '../../ParameterFields/AnyVariableField';
 import { getVariableSourceIcon } from '../../ParameterFields/VariableField';
-import { getVariableSourceFromVariableName } from '../../ParameterFields/AnyVariableField';
+import { getVariableSourceFromIdentifier } from '../../ParameterFields/AnyVariableField';
 
 import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
@@ -30,7 +30,7 @@ export const getVariableSourceOrSceneIcon = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
 ) => {
-  const variablesContainerSourceType = getVariableSourceFromVariableName(
+  const variablesContainerSourceType = getVariableSourceFromIdentifier(
     variableName,
     projectScopedContainersAccessor.get()
   );

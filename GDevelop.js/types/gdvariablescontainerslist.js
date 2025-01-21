@@ -2,9 +2,9 @@
 declare class gdVariablesContainersList {
   has(name: string): boolean;
   get(name: string): gdVariable;
-  getVariablesContainerFromVariableName(variableName: string): gdVariablesContainer;
-  getVariablesContainerFromVariableNameExcludingParameters(variableName: string): gdVariablesContainer;
-  getVariablesContainerFromVariableNameExcludingParametersAndProperties(variableName: string): gdVariablesContainer;
+  getVariablesContainerFromVariableOrPropertyOrParameterName(variableName: string): gdVariablesContainer;
+  getVariablesContainerFromVariableOrPropertyName(variableName: string): gdVariablesContainer;
+  getVariablesContainerFromVariableNameOnly(variableName: string): gdVariablesContainer;
   getVariablesContainer(index: number): gdVariablesContainer;
   getVariablesContainersCount(): number;
   delete(): void;

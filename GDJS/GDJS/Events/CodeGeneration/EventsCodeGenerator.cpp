@@ -1369,14 +1369,14 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
         GetProjectScopedContainers().GetVariablesContainersList();
     const auto &variablesContainer =
         scope == VARIABLE_OR_PROPERTY_OR_PARAMETER
-            ? variablesContainersList.GetVariablesContainerFromVariableName(
+            ? variablesContainersList.GetVariablesContainerFromVariableOrPropertyOrParameterName(
                   variableName)
         : scope == VARIABLE_OR_PROPERTY
             ? variablesContainersList
-                  .GetVariablesContainerFromVariableNameExcludingParameters(
+                  .GetVariablesContainerFromVariableOrPropertyName(
                       variableName)
             : variablesContainersList
-                  .GetVariablesContainerFromVariableNameExcludingParametersAndProperties(
+                  .GetVariablesContainerFromVariableNameOnly(
                       variableName);
     const auto sourceType = variablesContainer.GetSourceType();
     if (sourceType == gd::VariablesContainer::SourceType::Scene) {

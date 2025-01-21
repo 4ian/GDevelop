@@ -54,8 +54,8 @@ type Props = {
   ...ParameterFieldProps,
   isObjectVariable: boolean,
   variablesContainers: Array<gdVariablesContainer>,
-  getVariableSourceFromVariableName: (
-    variableRootName: string,
+  getVariableSourceFromIdentifier: (
+    identifier: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType,
   enumerateVariables: () => Array<EnumeratedVariable>,
@@ -102,8 +102,8 @@ export const getRootVariableName = (name: string): string => {
 export const quicklyAnalyzeVariableName = (
   name: string,
   variablesContainers?: Array<gdVariablesContainer>,
-  getVariableSourceFromVariableName?: (
-    variableRootName: string,
+  getVariableSourceFromIdentifier?: (
+    identifier: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType | null,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
@@ -159,9 +159,9 @@ export const quicklyAnalyzeVariableName = (
 
   if (
     name.length !== rootVariableName.length &&
-    getVariableSourceFromVariableName
+    getVariableSourceFromIdentifier
   ) {
-    const variableSource = getVariableSourceFromVariableName(
+    const variableSource = getVariableSourceFromIdentifier(
       rootVariableName,
       projectScopedContainers
     );
@@ -236,7 +236,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       id,
       onInstructionTypeChanged,
       isObjectVariable,
-      getVariableSourceFromVariableName,
+      getVariableSourceFromIdentifier,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -328,7 +328,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     const quicklyAnalysisResult = quicklyAnalyzeVariableName(
       value,
       variablesContainers,
-      getVariableSourceFromVariableName,
+      getVariableSourceFromIdentifier,
       projectScopedContainersAccessor,
       isObjectVariable
     );
@@ -514,7 +514,7 @@ export const renderVariableWithIcon = (
     projectScopedContainersAccessor,
   }: ParameterInlineRendererProps,
   tooltip: string,
-  getVariableSourceFromVariableName: (
+  getVariableSourceFromIdentifier: (
     variableName: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType
@@ -523,7 +523,7 @@ export const renderVariableWithIcon = (
     return <MissingParameterValue />;
   }
   const VariableIcon = getVariableSourceIcon(
-    getVariableSourceFromVariableName(
+    getVariableSourceFromIdentifier(
       value,
       projectScopedContainersAccessor.get()
     )

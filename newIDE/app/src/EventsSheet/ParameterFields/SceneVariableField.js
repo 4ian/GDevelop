@@ -51,18 +51,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [eventsFunctionsExtension, layout]
     );
 
-    const getVariableSourceFromVariableName = React.useCallback(
-      variableName => {
-        const variablesContainer = variablesContainers.find(
-          variablesContainer => variablesContainer.has(variableName)
-        );
-        return variablesContainer
-          ? variablesContainer.getSourceType()
-          : gd.VariablesContainer.Unknown;
-      },
-      [variablesContainers]
-    );
-
     const enumerateSceneVariables = React.useCallback(
       () => {
         return layout
@@ -108,7 +96,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ? `parameter-${props.parameterIndex}-scene-variable-field`
               : undefined
           }
-          getVariableSourceFromVariableName={getVariableSourceFromVariableName}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen && layout && project && (
           <SceneVariablesDialog
@@ -142,8 +130,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-const getVariableSourceFromVariableName = (
-  variableName: string,
+const getVariableSourceFromIdentifier = (
+  identifier: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => gd.VariablesContainer.Scene;
 
@@ -153,5 +141,5 @@ export const renderInlineSceneVariable = (
   renderVariableWithIcon(
     props,
     'scene variable',
-    getVariableSourceFromVariableName
+    getVariableSourceFromIdentifier
   );

@@ -39,18 +39,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
-    const getVariableSourceFromVariableName = React.useCallback(
-      variableName => {
-        const variablesContainer = variablesContainers.find(
-          variablesContainer => variablesContainer.has(variableName)
-        );
-        return variablesContainer
-          ? variablesContainer.getSourceType()
-          : gd.VariablesContainer.Unknown;
-      },
-      [variablesContainers]
-    );
-
     const enumerateGlobaleVariables = React.useCallback(
       () => {
         return project ? enumerateVariables(project.getVariables()) : [];
@@ -76,7 +64,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
-          getVariableSourceFromVariableName={getVariableSourceFromVariableName}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen && project && (
           <GlobalVariablesDialog
@@ -104,7 +92,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-const getVariableSourceFromVariableName = (
+const getVariableSourceFromIdentifier = (
   variableName: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => gd.VariablesContainer.Global;
@@ -115,5 +103,5 @@ export const renderInlineGlobalVariable = (
   renderVariableWithIcon(
     props,
     'global variable',
-    getVariableSourceFromVariableName
+    getVariableSourceFromIdentifier
   );

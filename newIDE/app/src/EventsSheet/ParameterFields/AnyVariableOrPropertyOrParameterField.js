@@ -115,7 +115,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
-          getVariableSourceFromVariableName={getVariableSourceFromVariableName}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen && (
           <GlobalAndSceneVariablesDialog
@@ -134,7 +134,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-export const getVariableSourceFromVariableName = (
+export const getVariableSourceFromIdentifier = (
   variableName: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => {
@@ -142,12 +142,13 @@ export const getVariableSourceFromVariableName = (
   const variablesContainersList = projectScopedContainers.getVariablesContainersList();
   return variablesContainersList.has(rootVariableName)
     ? variablesContainersList
-        .getVariablesContainerFromVariableName(rootVariableName)
+        .getVariablesContainerFromVariableOrPropertyOrParameterName(
+          rootVariableName
+        )
         .getSourceType()
     : gd.VariablesContainer.Unknown;
 };
 
 export const renderInlineAnyVariableOrPropertyOrParameter = (
   props: ParameterInlineRendererProps
-) =>
-  renderVariableWithIcon(props, 'variable', getVariableSourceFromVariableName);
+) => renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);

@@ -228,8 +228,8 @@ module.exports = {
         .setValue(objectContent.textAlign || 'left')
         .setType('choice')
         .addExtraInfo('left')
-        .addExtraInfo('right')
         .addExtraInfo('center')
+        .addExtraInfo('right')
         .setLabel(_('Text alignment'))
         .setGroup(_('Font'));
 
@@ -611,7 +611,7 @@ module.exports = {
     object
       .addScopedCondition(
         'IsInputSubmitted',
-        _('Input is Submitted (Enter pressed'),
+        _('Input is submitted'),
         _(
           'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
         ),

@@ -544,6 +544,9 @@ namespace gdjs {
       return this._maxLength;
     }
     setMaxLength(value: integer) {
+      if(this._maxLength === value)
+        return;
+
       this._maxLength = value;
       this._renderer.updateMaxLength();
     }
@@ -551,6 +554,9 @@ namespace gdjs {
       return this._padding;
     }
     setPadding(value: integer) {
+      if(this._padding === value)
+        return;
+
       this._padding = value;
       this._renderer.updatePadding();
     }
@@ -560,10 +566,10 @@ namespace gdjs {
     }
 
     setTextAlign(newTextAlign: string) {
-      const lowercasedNewTextAlign = newTextAlign.toLowerCase();
-      if (lowercasedNewTextAlign === this._textAlign) return;
-
-      this._textAlign = parseTextAlign(lowercasedNewTextAlign);
+      const parsedTextAlign = parseTextAlign(newTextAlign);
+      if (parsedTextAlign === this._textAlign) return;
+      
+      this._textAlign = parsedTextAlign;
       this._renderer.updateTextAlign();
     }
 

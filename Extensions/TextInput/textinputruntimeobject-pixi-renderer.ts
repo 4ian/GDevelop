@@ -61,7 +61,7 @@ namespace gdjs {
       this._form.style.resize = 'none';
       this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._form.style.display = 'none'; // Hide while object is being set up.
-      this._form.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
+      this._form.style.boxSizing = 'border-box';
       this._form.style.textAlign = this._object.getTextAlign();
       
       this._input.autocomplete = 'off';
@@ -333,12 +333,13 @@ namespace gdjs {
     }
 
     updateMaxLength() {
-      if (!this._input) return;
+      const input = this._input;
+      if (!input) return;
       if (this._object.getMaxLength() <= 0) {
-        this._input?.removeAttribute('maxLength');
+        input.removeAttribute('maxLength');
         return;
       }
-      this._input.maxLength = this._object.getMaxLength();
+      input.maxLength = this._object.getMaxLength();
     }
 
     updatePadding() {

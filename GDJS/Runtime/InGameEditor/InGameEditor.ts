@@ -22,6 +22,10 @@ namespace gdjs {
   const LEFT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(91, 1);
   const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
 
+  function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
+    return value !== null && value !== undefined;
+  }
+
   // TODO: factor this?
   const isMacLike =
     typeof navigator !== 'undefined' &&
@@ -71,21 +75,23 @@ namespace gdjs {
     }
   };
 
+  interface ObjectUnderCursor {
+    object: gdjs.RuntimeObject;
+  }
+
   export class InGameEditor {
-    _runtimeGame: RuntimeGame;
-    _tempVector2d = new THREE.Vector2();
-    _selectedObjectData: {
-      intersect: THREE.Intersection;
-      camera: THREE.Camera;
-      scene: THREE.Scene;
+    private _runtimeGame: RuntimeGame;
+    private _tempVector2d = new THREE.Vector2();
+    private _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
+    private _raycaster = new THREE.Raycaster();
+    private _currentTransformControls: {
+      object: gdjs.RuntimeObject;
+      threeTransformControls: THREE_ADDONS.TransformControls;
     } | null = null;
-    _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
-    _raycaster = new THREE.Raycaster();
-    _editionAbortController: AbortController = new AbortController();
-    _currentTransformControls: THREE_ADDONS.TransformControls | null = null;
-    _shouldIgnoreNextClick: boolean = false;
-    _lastCursorX: number = 0;
-    _lastCursorY: number = 0;
+    private _lastCursorX: number = 0;
+    private _lastCursorY: number = 0;
+    private _isManipulatingSelection = false;
+    private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
@@ -95,75 +101,6 @@ namespace gdjs {
       this._tempVector2d.x = x;
       this._tempVector2d.y = y;
       return this._tempVector2d;
-    }
-
-    private _selectObject() {
-      // TODO: avoid calling this again, store instead.
-      const firstIntersectsByLayer = this.getFirstIntersectsOnEachLayer(false);
-
-      let closestIntersect;
-      for (const intersect of Object.values(firstIntersectsByLayer)) {
-        if (
-          intersect &&
-          intersect.intersect &&
-          (!closestIntersect ||
-            intersect.intersect.distance < closestIntersect.intersect.distance)
-        ) {
-          closestIntersect = intersect;
-        }
-      }
-      this._selectedObjectData = closestIntersect;
-      if (!this._selectedObjectData) return;
-
-      if (
-        this._currentTransformControls &&
-        this._currentTransformControls.camera ===
-          this._selectedObjectData.camera
-      ) {
-        this._currentTransformControls.detach();
-        this._currentTransformControls.attach(
-          this._selectedObjectData.intersect.object
-        );
-      } else {
-        if (this._currentTransformControls) {
-          this._currentTransformControls.detach();
-          this._currentTransformControls = null;
-        }
-        this._currentTransformControls = new THREE_ADDONS.TransformControls(
-          this._selectedObjectData.camera,
-          this._runtimeGame.getRenderer().getCanvas() || undefined
-        );
-        this._currentTransformControls.addEventListener(
-          'dragging-changed',
-          (e) => {
-            if (!this._selectedObjectData) return;
-            if (e.value) {
-              // Ignore if the user starts dragging
-              return;
-            }
-            const threeObject = this._selectedObjectData.intersect.object;
-            const object = threeObject.gdjsRuntimeObject;
-            if (!object) return;
-
-            if (object instanceof gdjs.RuntimeObject3D) {
-              // TODO: do something that "serialize" the whole object back into a initial instance.
-              this._runtimeGame.sendRuntimeObjectsUpdated([
-                {
-                  object,
-                  position: object
-                    .getRenderer()
-                    .getObjectPositionFrom3DRendererObject(),
-                },
-              ]);
-            }
-          }
-        );
-        this._currentTransformControls.scale.y = -1;
-        this._currentTransformControls.attach(
-          this._selectedObjectData.intersect.object
-        );
-        this._selectedObjectData.scene.add(this._currentTransformControls);
-      }
     }
 
     private _handleCameraMovement() {
@@ -229,13 +166,138 @@ namespace gdjs {
       // TODO: touch controls - pinch to zoom
       // TODO: touch controls - two fingers to move the camera
 
-      // Left click: select the object.
-      if (inputManager.isMouseButtonReleased(0)) {
-        this._selectObject();
-      }
-
       this._lastCursorX = inputManager.getCursorX();
       this._lastCursorY = inputManager.getCursorY();
+    }
+
+    private _handleSelection({
+      objectUnderCursor,
+    }: {
+      objectUnderCursor: ObjectUnderCursor | null;
+    }) {
+      const inputManager = this._runtimeGame.getInputManager();
+
+      // Left click: select the object under the cursor.
+      if (
+        inputManager.isMouseButtonPressed(0) &&
+        !this._isManipulatingSelection
+      ) {
+        if (!isShiftPressed(inputManager)) {
+          this._selectedObjects = [];
+        }
+
+        if (objectUnderCursor) {
+          if (!this._selectedObjects.includes(objectUnderCursor.object)) {
+            this._selectedObjects.push(objectUnderCursor.object);
+            this._sendSelectionUpdate();
+          }
+        }
+      }
+    }
+
+    private _updateSelectionOutline({
+      objectUnderCursor,
+    }: {
+      objectUnderCursor: ObjectUnderCursor | null;
+    }) {
+      const runtimeGame = this._runtimeGame;
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      layerNames.forEach((layerName) => {
+        if (!this._outlinePasses[layerName]) {
+          const runtimeLayerRender = currentScene
+            .getLayer(layerName)
+            .getRenderer();
+          const threeCamera = runtimeLayerRender.getThreeCamera();
+          const threeScene = runtimeLayerRender.getThreeScene();
+          if (!threeCamera || !threeScene) return;
+
+          this._outlinePasses[layerName] = new THREE_ADDONS.OutlinePass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            threeScene,
+            threeCamera
+          );
+
+          runtimeLayerRender.addPostProcessingPass(
+            this._outlinePasses[layerName]
+          );
+        }
+        const outlinePass = this._outlinePasses[layerName];
+
+        outlinePass.edgeStrength = 6.0;
+        outlinePass.edgeGlow = 0;
+        outlinePass.edgeThickness = 1.0;
+        outlinePass.pulsePeriod = 0;
+        // TODO: OutlinePass currently wrongly highlights the transform controls helper.
+        // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
+        outlinePass.selectedObjects = this._selectedObjects
+          .filter((object) => object.getLayer() === layerName)
+          .map((object) => object.get3DRendererObject())
+          .filter(isDefined);
+      });
+    }
+
+    private _updateSelectionControls() {
+      const runtimeGame = this._runtimeGame;
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const lastSelectedObject =
+        this._selectedObjects[this._selectedObjects.length - 1] || null;
+
+      if (
+        this._currentTransformControls &&
+        (!lastSelectedObject ||
+          (lastSelectedObject &&
+            this._currentTransformControls.object !== lastSelectedObject))
+      ) {
+        this._currentTransformControls.threeTransformControls.detach();
+        this._currentTransformControls = null;
+      }
+
+      if (lastSelectedObject && !this._currentTransformControls) {
+        const threeObject = lastSelectedObject.get3DRendererObject();
+        if (!threeObject) return;
+
+        const layerName = lastSelectedObject.getLayer();
+        const runtimeLayerRender = currentScene
+          .getLayer(layerName)
+          .getRenderer();
+        const threeCamera = runtimeLayerRender.getThreeCamera();
+        const threeScene = runtimeLayerRender.getThreeScene();
+        if (!threeCamera || !threeScene) return;
+
+        // Create and attach the transform controls to the THREE object.
+        const threeTransformControls = new THREE_ADDONS.TransformControls(
+          threeCamera,
+          this._runtimeGame.getRenderer().getCanvas() || undefined
+        );
+        threeTransformControls.scale.y = -1;
+        threeTransformControls.attach(threeObject);
+        threeScene.add(threeTransformControls);
+
+        threeTransformControls.addEventListener('change', (e) => {
+          console.log('change', e);
+        });
+        threeTransformControls.addEventListener('dragging-changed', (e) => {
+          if (e.value) {
+            // Ignore if the user starts dragging
+            this._isManipulatingSelection = true;
+            return;
+          }
+          this._isManipulatingSelection = false;
+
+          this._sendSelectionUpdate();
+        });
+
+        this._currentTransformControls = {
+          object: lastSelectedObject,
+          threeTransformControls,
+        };
+      }
     }
 
     activate(enable: boolean) {
@@ -244,10 +306,57 @@ namespace gdjs {
       } else {
         // Disable transform controls.
         if (this._currentTransformControls) {
-          this._currentTransformControls.detach();
+          this._currentTransformControls.threeTransformControls.detach();
           this._currentTransformControls = null;
         }
       }
+    }
+
+    private _sendSelectionUpdate() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+
+      const instancesSelection = this._selectedObjects
+        .map((object) => {
+          if (!object.persistentUuid) return null;
+
+          return { persistentUuid: object.persistentUuid };
+        })
+        .filter(isDefined);
+
+      const instanceUpdates = this._selectedObjects
+        .map((object) => {
+          const rendererObject = object.getRendererObject();
+          if (!rendererObject) return null;
+
+          if (object instanceof gdjs.RuntimeObject3D) {
+            if (!object.persistentUuid) return null;
+
+            const instanceData: InstanceData = {
+              persistentUuid: object.persistentUuid,
+              ...object.getRenderer().getObjectPositionFrom3DRendererObject(),
+              layer: object.getLayer(),
+              angle: object.getAngle(),
+              width: object.getWidth(),
+              height: object.getHeight(),
+              depth: object.getDepth(),
+              locked: false, // TODO
+              customSize: false, // TODO
+              // TODO: how to transmit/should we transmit other properties?
+            };
+
+            return instanceData;
+          } else {
+            // TODO: handle 2D objects/instances.
+            return null;
+          }
+        })
+        .filter(isDefined);
+
+      debuggerClient.sendInstancesUpdated({
+        instanceUpdates,
+        instancesSelection,
+      });
     }
 
     reloadInstances(instances: Array<InstanceData>) {
@@ -283,26 +392,21 @@ namespace gdjs {
       });
     }
 
-    getFirstIntersectsOnEachLayer(highlightObject: boolean) {
+    getObjectUnderCursor(): ObjectUnderCursor | null {
       const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {
         [layerName: string]: null | {
           intersect: THREE.Intersection;
-          camera: THREE.Camera;
-          scene: THREE.Scene;
         };
       } = {};
 
-      const layerNames = new Array();
+      const layerNames = [];
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return firstIntersectsByLayer;
       const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
-      if (!threeRenderer) return firstIntersectsByLayer;
+      if (!currentScene || !threeRenderer) return null;
 
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
-        firstIntersectsByLayer[layerName] = null;
-
         const runtimeLayerRender = currentScene
           .getLayer(layerName)
           .getRenderer();
@@ -310,19 +414,6 @@ namespace gdjs {
         const threeScene = runtimeLayerRender.getThreeScene();
         const threeGroup = runtimeLayerRender.getThreeGroup();
         if (!threeCamera || !threeScene || !threeGroup) return;
-
-        if (!this._outlinePasses[layerName]) {
-          this._outlinePasses[layerName] = new THREE_ADDONS.OutlinePass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            threeScene,
-            threeCamera
-          );
-
-          runtimeLayerRender.addPostProcessingPass(
-            this._outlinePasses[layerName]
-          );
-        }
-        const outlinePass = this._outlinePasses[layerName];
 
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,
@@ -345,34 +436,39 @@ namespace gdjs {
         const firstIntersect = intersects[0];
         if (!firstIntersect) return;
 
-        if (
-          highlightObject &&
-          (!this._currentTransformControls ||
-            !this._currentTransformControls.dragging)
-        ) {
-          // TODO: OutlinePass currently wrongly highlights the transform controls helper.
-          // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
-
-          outlinePass.edgeStrength = 6.0;
-          outlinePass.edgeGlow = 0;
-          outlinePass.edgeThickness = 1.0;
-          outlinePass.pulsePeriod = 0;
-          outlinePass.selectedObjects = [firstIntersect.object];
-        }
         firstIntersectsByLayer[layerName] = {
           intersect: firstIntersect,
-          camera: threeCamera,
-          scene: threeScene,
         };
       });
 
-      return firstIntersectsByLayer;
+      let closestIntersect;
+      for (const intersect of Object.values(firstIntersectsByLayer)) {
+        if (
+          intersect &&
+          intersect.intersect &&
+          (!closestIntersect ||
+            intersect.intersect.distance < closestIntersect.intersect.distance)
+        ) {
+          closestIntersect = intersect;
+        }
+      }
+
+      if (!closestIntersect) return null;
+      const threeObject = closestIntersect.intersect.object;
+      if (!threeObject.gdjsRuntimeObject) return null;
+
+      return {
+        object: threeObject.gdjsRuntimeObject,
+      };
     }
 
     updateAndRender() {
+      const objectUnderCursor: ObjectUnderCursor | null = this.getObjectUnderCursor();
+
       this._handleCameraMovement();
-      // TODO: handle selection
-      this.getFirstIntersectsOnEachLayer(true);
+      this._handleSelection({ objectUnderCursor });
+      this._updateSelectionOutline({ objectUnderCursor });
+      this._updateSelectionControls();
     }
   }
 }

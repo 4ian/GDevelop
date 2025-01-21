@@ -311,7 +311,8 @@ namespace gdjs {
           skipCreatingInstancesFromScene: !!externalLayoutName,
         };
       } else if (data.command === 'updateInstances') {
-        runtimeGame._editor.reloadInstances(data.payload.instances);
+        if (runtimeGame._inGameEditor)
+          runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.
@@ -636,23 +637,16 @@ namespace gdjs {
       );
     }
 
-    sendInstancesUpdated(
-      objectUpdates: Array<{
-        object: RuntimeObject3D;
-        position: { x: number; y: number; z: number };
-      }>,
-      layoutName: string
-    ): void {
+    sendInstancesUpdated(update: {
+      instanceUpdates: Array<InstanceData>;
+      instancesSelection: Array<{
+        persistentUuid: string;
+      }>;
+    }): void {
       this._sendMessage(
         circularSafeStringify({
           command: 'updateInstances',
-          payload: {
-            layoutName,
-            instances: objectUpdates.map((objectUpdate) => ({
-              persistentUuid: objectUpdate.object.persistentUuid,
-              position: objectUpdate.position,
-            })),
-          },
+          payload: update,
         })
       );
     }

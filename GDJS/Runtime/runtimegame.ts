@@ -233,7 +233,7 @@ namespace gdjs {
     /** True if the RuntimeGame has been disposed and should not be used anymore. */
     _wasDisposed: boolean = false;
 
-    _editor: InGameEditor;
+    _inGameEditor: InGameEditor | null;
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data
@@ -277,7 +277,10 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
-      this._editor = new gdjs.InGameEditor(this);
+      this._inGameEditor = new gdjs.InGameEditor(this);
+      this._debuggerClient = gdjs.DebuggerClient
+        ? new gdjs.DebuggerClient(this)
+        : null;
       this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data.properties.maxFPS;
       this._minFPS = this._data.properties.minFPS;
@@ -302,9 +305,6 @@ namespace gdjs {
       );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
-      this._debuggerClient = gdjs.DebuggerClient
-        ? new gdjs.DebuggerClient(this)
-        : null;
       this._captureManager = gdjs.CaptureManager
         ? new gdjs.CaptureManager(
             this._renderer,
@@ -759,7 +759,7 @@ namespace gdjs {
       if (this._paused === enable) return;
 
       this._paused = enable;
-      this._editor.activate(enable);
+      if (this._inGameEditor) this._inGameEditor.activate(enable);
       if (this._debuggerClient) {
         this._debuggerClient.sendRuntimeGameStatus();
       }
@@ -995,7 +995,7 @@ namespace gdjs {
             }
 
             if (this._paused) {
-              this._editor.updateAndRender();
+              if (this._inGameEditor) this._inGameEditor.updateAndRender();
               // The game is paused for edition: the game loop continues to run,
               // but the game logic is not executed.
               this._sceneStack.renderWithoutStep();
@@ -1412,21 +1412,6 @@ namespace gdjs {
       return mapping && mapping[embeddedResourceName]
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
-    }
-
-    sendRuntimeObjectsUpdated(
-      runtimeObjectUpdates: Array<{
-        object: RuntimeObject3D;
-        position: { x: number; y: number; z: number };
-      }>
-    ) {
-      if (!this._debuggerClient) return;
-      const currentScene = this.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
-      this._debuggerClient.sendInstancesUpdated(
-        runtimeObjectUpdates,
-        currentScene.getName()
-      );
     }
 
     /**

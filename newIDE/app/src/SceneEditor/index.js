@@ -292,20 +292,42 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (parsedMessage.command === 'updateInstances') {
       // TODO: adapt this to get all instances in one shot.
       const modifiedInstances: gdInitialInstance[] = [];
-      parsedMessage.payload.instances.forEach(instanceUpdateData => {
-        const { persistentUuid, position } = instanceUpdateData;
+      parsedMessage.payload.instanceUpdates.forEach(instanceData => {
+        const { persistentUuid, x, y, z } = instanceData;
         const instance = getInstanceInLayoutWithPersistentUuid(
           this.props.initialInstances,
           persistentUuid
         );
         if (!instance) return;
-        instance.setX(position.x);
-        instance.setY(position.y);
-        instance.setZ(position.z);
+        instance.setX(x);
+        instance.setY(y);
+        instance.setZ(z);
 
         modifiedInstances.push(instance);
       });
       this._onInstancesMoved(modifiedInstances);
+
+      console.log("payload", parsedMessage.payload);
+      const newlySelectedInstances = parsedMessage.payload.instancesSelection
+        .map(instanceSelectionData => {
+          const { persistentUuid } = instanceSelectionData;
+          console.log('selecting', persistentUuid);
+          const instance = getInstanceInLayoutWithPersistentUuid(
+            this.props.initialInstances,
+            persistentUuid
+          );
+          return instance || null;
+        })
+        .filter(Boolean);
+
+      this.instancesSelection.selectInstances({
+        instances: newlySelectedInstances,
+        multiSelect: false,
+        layersLocks: null,
+        ignoreSeal: true
+      });
+      this.setState({ lastSelectionType: 'instance' });
+      this.updateToolbar();
     }
   }
 

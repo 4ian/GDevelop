@@ -467,7 +467,14 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GetCodeNamespace() { return ""; };
 
-  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE, ANY_VARIABLE };
+  enum VariableScope {
+    LAYOUT_VARIABLE = 0,
+    PROJECT_VARIABLE,
+    OBJECT_VARIABLE,
+    ANY_VARIABLE,
+    VARIABLE_OR_PROPERTY,
+    VARIABLE_OR_PROPERTY_OR_PARAMETER
+  };
 
   /**
    * Generate a single unique number for the specified instruction.
@@ -579,7 +586,9 @@ protected:
 
     } else if (scope == PROJECT_VARIABLE) {
       return "getProjectVariable(" + variableName + ")";
-    } else if (scope == ANY_VARIABLE) {
+    } else if (scope == ANY_VARIABLE || scope == VARIABLE_OR_PROPERTY ||
+               scope == VARIABLE_OR_PROPERTY_OR_PARAMETER) {
+      // TODO Split the 3 cases to make tests stronger.
       return "getAnyVariable(" + variableName + ")";
     }
 

@@ -361,7 +361,9 @@ export class VariablesContainer extends EmscriptenObject {
 export class VariablesContainersList extends EmscriptenObject {
   has(name: string): boolean;
   get(name: string): Variable;
-  getVariablesContainerFromVariableName(variableName: string): VariablesContainer;
+  getVariablesContainerFromVariableOrPropertyOrParameterName(variableName: string): VariablesContainer;
+  getVariablesContainerFromVariableOrPropertyName(variableName: string): VariablesContainer;
+  getVariablesContainerFromVariableNameOnly(variableName: string): VariablesContainer;
   getVariablesContainer(index: number): VariablesContainer;
   getVariablesContainersCount(): number;
 }

@@ -1034,7 +1034,7 @@ class GD_CORE_API ExpressionCompletionFinder
           description.SetVariableType(variable.GetType());
           description.SetVariableScope(
               projectScopedContainers.GetVariablesContainersList()
-                  .GetVariablesContainerFromVariableName(variableName)
+                  .GetVariablesContainerFromVariableOrPropertyOrParameterName(variableName)
                   .GetSourceType());
           completions.push_back(description);
 
@@ -1086,7 +1086,7 @@ class GD_CORE_API ExpressionCompletionFinder
           description.SetVariableType(variable.GetType());
           description.SetVariableScope(
               projectScopedContainers.GetVariablesContainersList()
-                  .GetVariablesContainerFromVariableName(variableName)
+                  .GetVariablesContainerFromVariableOrPropertyOrParameterName(variableName)
                   .GetSourceType());
           completions.push_back(description);
 

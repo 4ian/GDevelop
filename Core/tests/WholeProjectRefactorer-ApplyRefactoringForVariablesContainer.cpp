@@ -1540,7 +1540,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
   auto projectScopedContainers =
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     REQUIRE(&projectScopedContainers.GetVariablesContainersList()
-                   .GetVariablesContainerFromVariableName("MyVariable") == &scene.GetVariables());
+                   .GetVariablesContainerFromVariableOrPropertyOrParameterName("MyVariable") == &scene.GetVariables());
 
     // Do the changes and launch the refactoring.
     scene.GetVariables().ResetPersistentUuid();

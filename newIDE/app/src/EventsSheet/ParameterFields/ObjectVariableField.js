@@ -16,7 +16,6 @@ import {
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
-import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import { enumerateVariables } from './EnumerateVariables';
 import { intersectionBy } from 'lodash';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
@@ -205,6 +204,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen &&
           project &&
@@ -248,6 +248,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
+const getVariableSourceFromIdentifier = (
+  identifier: string,
+  projectScopedContainers: gdProjectScopedContainers
+): VariablesContainer_SourceType => gd.VariablesContainer.Object;
+
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'object variable', ObjectVariableIcon);
+) =>
+  renderVariableWithIcon(
+    props,
+    'object variable',
+    getVariableSourceFromIdentifier
+  );

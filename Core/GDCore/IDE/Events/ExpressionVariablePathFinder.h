@@ -215,7 +215,7 @@ class GD_CORE_API ExpressionVariablePathFinder
             if (projectScopedContainers.GetVariablesContainersList().Has(identifier)) {
               variablesContainer =
                   &(projectScopedContainers.GetVariablesContainersList()
-                        .GetVariablesContainerFromVariableName(identifier));
+                        .GetVariablesContainerFromVariableOrPropertyOrParameterName(identifier));
               variableName = identifier;
               if (childIdentifier) {
                 childVariableNames.push_back(*childIdentifier);
@@ -229,7 +229,7 @@ class GD_CORE_API ExpressionVariablePathFinder
                         identifier)) {
               variablesContainer =
                   &(projectScopedContainers.GetVariablesContainersList()
-                        .GetVariablesContainerFromVariableName(identifier));
+                        .GetVariablesContainerFromVariableOrPropertyOrParameterName(identifier));
               variableName = identifier;
               // There is no support for "children" of properties.
             }
@@ -241,7 +241,7 @@ class GD_CORE_API ExpressionVariablePathFinder
                     identifier)) {
               variablesContainer =
                   &(projectScopedContainers.GetVariablesContainersList()
-                        .GetVariablesContainerFromVariableName(identifier));
+                        .GetVariablesContainerFromVariableOrPropertyOrParameterName(identifier));
               variableName = identifier;
               // There is no support for "children" of parameters.
             }

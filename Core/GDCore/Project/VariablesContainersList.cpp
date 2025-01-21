@@ -147,11 +147,39 @@ const Variable& VariablesContainersList::Get(const gd::String& name) const {
 }
 
 const VariablesContainer &
-VariablesContainersList::GetVariablesContainerFromVariableName(
+VariablesContainersList::GetVariablesContainerFromVariableOrPropertyOrParameterName(
     const gd::String &variableName) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {
     if ((*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
+}
+
+const VariablesContainer &VariablesContainersList::
+    GetVariablesContainerFromVariableOrPropertyName(
+        const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Parameters &&
+        (*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
+}
+
+const VariablesContainer &VariablesContainersList::
+    GetVariablesContainerFromVariableNameOnly(
+        const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Parameters &&
+        (*it)->GetSourceType() !=
+            gd::VariablesContainer::SourceType::Properties &&
+        (*it)->Has(variableName))
       return **it;
   }
   return badVariablesContainer;

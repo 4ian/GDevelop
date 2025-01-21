@@ -122,7 +122,7 @@ class GD_CORE_API ExpressionVariableReplacer
         [&]() {
           // This is a variable.
           if (&projectScopedContainers.GetVariablesContainersList()
-                   .GetVariablesContainerFromVariableName(node.name) ==
+                   .GetVariablesContainerFromVariableOrPropertyOrParameterName(node.name) ==
               &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
@@ -235,7 +235,7 @@ class GD_CORE_API ExpressionVariableReplacer
         [&]() {
           // This is a variable.
           if (&projectScopedContainers.GetVariablesContainersList()
-                   .GetVariablesContainerFromVariableName(
+                   .GetVariablesContainerFromVariableOrPropertyOrParameterName(
                        node.identifierName) == &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:

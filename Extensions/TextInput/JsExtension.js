@@ -230,7 +230,7 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('right')
         .addExtraInfo('center')
-        .setLabel(_('text Alignement'))
+        .setLabel(_('Text alignment'))
         .setGroup(_('Font'));
 
       return objectProperties;

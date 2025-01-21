@@ -615,7 +615,7 @@ module.exports = {
         _(
           'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
         ),
-        _('_PARAM0_ got input submitted'),
+        _('_PARAM0_ value was submitted'),
         '',
         'res/conditions/surObject24.png',
         'res/conditions/surObject.png'

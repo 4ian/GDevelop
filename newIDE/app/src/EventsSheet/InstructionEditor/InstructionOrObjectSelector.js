@@ -676,7 +676,7 @@ const InstructionOrObjectSelector = React.forwardRef<
       [displayedInstructionsList, isSearching]
     );
 
-    const hasNoObjects = !isSearching && !allObjectsList.length;
+    const displayEmptyMessage = !isSearching && !allObjectsList.length;
     const searchHasNoResults = isSearching && !hasResults;
 
     return (
@@ -737,7 +737,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             </Column>
           </Line>
         )}
-        {hasNoObjects ? (
+        {displayEmptyMessage && currentTab === 'objects' ? (
           <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
         ) : searchHasNoResults ? (
           <EmptyMessage>
@@ -753,7 +753,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             display:
               (currentTab === 'objects' || isSearching) &&
               !searchHasNoResults &&
-              !hasNoObjects
+              !displayEmptyMessage
                 ? 'unset'
                 : 'none',
           }}

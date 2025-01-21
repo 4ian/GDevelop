@@ -73,18 +73,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [projectScopedContainersAccessor]
     );
 
-    const getVariableSourceFromVariableName = React.useCallback(
-      variableName =>
-        projectScopedContainersAccessor
-          .get()
-          .getVariablesContainersList()
-          .getVariablesContainerFromVariableNameExcludingParametersAndProperties(
-            variableName
-          )
-          .getSourceType(),
-      [projectScopedContainersAccessor]
-    );
-
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {

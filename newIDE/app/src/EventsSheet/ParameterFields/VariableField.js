@@ -55,8 +55,9 @@ type Props = {
   isObjectVariable: boolean,
   variablesContainers: Array<gdVariablesContainer>,
   getVariableSourceFromVariableName: (
-    variableRootName: string
-  ) => VariablesContainer_SourceType | null,
+    variableRootName: string,
+    projectScopedContainers: gdProjectScopedContainers
+  ) => VariablesContainer_SourceType,
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
   onOpenDialog: (VariableDialogOpeningProps => void) | null,
@@ -102,7 +103,8 @@ export const quicklyAnalyzeVariableName = (
   name: string,
   variablesContainers?: Array<gdVariablesContainer>,
   getVariableSourceFromVariableName?: (
-    variableRootName: string
+    variableRootName: string,
+    projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType | null,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   isObjectVariable: boolean = false
@@ -159,7 +161,10 @@ export const quicklyAnalyzeVariableName = (
     name.length !== rootVariableName.length &&
     getVariableSourceFromVariableName
   ) {
-    const variableSource = getVariableSourceFromVariableName(rootVariableName);
+    const variableSource = getVariableSourceFromVariableName(
+      rootVariableName,
+      projectScopedContainers
+    );
 
     if (variableSource === gd.VariablesContainer.Parameters) {
       return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;

@@ -297,6 +297,8 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       eventsFunctionsExtension,
       eventsBasedBehavior
     );
+    // Add a parameter with the same name as the property.
+    // It won't be used as SetNumberVariable has a variableOrProperty parameter.
     const eventsFunction = eventsBasedBehavior
       .getEventsFunctions()
       .insertNewEventsFunction('MyFunction', 0);
@@ -319,7 +321,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     // Check the default value is set.
     expect(behavior._getMyIdentifier()).toBe(123);
 
-    behavior.MyFunction();
+    behavior.MyFunction(222);
     expect(behavior._getMyIdentifier()).toBe(456);
   });
 

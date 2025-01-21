@@ -139,7 +139,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const variablesContainer = variablesContainers.find(
           variablesContainer => variablesContainer.has(variableName)
         );
-        return variablesContainer ? variablesContainer.getSourceType() : null;
+        return variablesContainer
+          ? variablesContainer.getSourceType()
+          : gd.VariablesContainer.Unknown;
       },
       [variablesContainers]
     );

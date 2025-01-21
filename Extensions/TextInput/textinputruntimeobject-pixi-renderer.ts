@@ -49,10 +49,10 @@ namespace gdjs {
         throw new Error('Tried to recreate an input while it already exists.');
 
       this._form = document.createElement('form');
-      
+
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
-      
+
       this._form.style.border = '0px';
       this._form.style.borderRadius = '0px';
       this._form.style.backgroundColor = 'transparent';
@@ -63,7 +63,7 @@ namespace gdjs {
       this._form.style.display = 'none'; // Hide while object is being set up.
       this._form.style.boxSizing = 'border-box';
       this._form.style.textAlign = this._object.getTextAlign();
-      
+
       this._input.autocomplete = 'off';
       this._input.style.backgroundColor = 'white';
       this._input.style.border = '1px solid black';
@@ -72,7 +72,7 @@ namespace gdjs {
       this._input.style.height = '100%';
       this._input.maxLength = this._object.getMaxLength();
       this._input.style.padding = this._object.getPadding() + 'px';
-      
+
       this._form.appendChild(this._input);
 
       this._input.addEventListener('input', () => {
@@ -239,7 +239,7 @@ namespace gdjs {
       this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
       this._form.style.textAlign = this._object.getTextAlign();
-      
+
       this._input.style.padding = this._object.getPadding() + 'px';
 
       // Automatically adjust the font size to follow the game scale.
@@ -365,8 +365,6 @@ namespace gdjs {
       this._input.focus();
     }
   }
-  export const TextInputRuntimeObjectRenderer =
-    TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer =
-    TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
 }

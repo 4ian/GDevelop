@@ -207,9 +207,9 @@ void UsedExtensionsFinder::OnVisitFunctionCallNode(FunctionCallNode& node) {
   }
 
   // Unused event-based objects or events-based behaviors may use object and
-  // behavior instructions that should not be detected as extension usage.
+  // behavior expressions that should not be detected as extension usage.
   // The extension of actually used objects and behaviors will be detected on
-  // scene objects. This is why object or behavior instructions usually don't
+  // scene objects. This is why object or behavior expressions usually don't
   // have any import.
   if (!metadata.GetMetadata().GetIncludeFiles().empty()) {
     result.AddUsedExtension(metadata.GetExtension());

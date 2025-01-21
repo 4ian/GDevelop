@@ -11,8 +11,8 @@ namespace gdjs {
   ] as const;
   const supportedTextAlign = ['left', 'center', 'right'] as const;
 
-  type SupportedInputType = (typeof supportedInputTypes)[number];
-  type SupportedTextAlign = (typeof supportedTextAlign)[number];
+  type SupportedInputType = typeof supportedInputTypes[number];
+  type SupportedTextAlign = typeof supportedTextAlign[number];
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
 

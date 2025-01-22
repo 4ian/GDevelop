@@ -222,7 +222,7 @@ module.exports = {
         .setLabel(_('Max length'))
         .setDescription(
           _(
-            'The maximum length of the input value. (this property will be ignored if the input type is a number'
+            'The maximum length of the input value (this property will be ignored if the input type is a number).'
           )
         )
         .setAdvanced(true);

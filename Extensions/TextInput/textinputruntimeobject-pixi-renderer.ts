@@ -31,6 +31,7 @@ namespace gdjs {
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
     private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
+    private _form: HTMLFormElement | null = null;
 
     constructor(
       runtimeObject: gdjs.TextInputRuntimeObject,
@@ -47,18 +48,32 @@ namespace gdjs {
       if (!!this._input)
         throw new Error('Tried to recreate an input while it already exists.');
 
+      this._form = document.createElement('form');
+
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
-      this._input.style.border = '1px solid black';
+
+      this._form.style.border = '0px';
+      this._form.style.borderRadius = '0px';
+      this._form.style.backgroundColor = 'transparent';
+      this._form.style.position = 'absolute';
+      this._form.style.outline = 'none';
+      this._form.style.resize = 'none';
+      this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
+      this._form.style.display = 'none'; // Hide while object is being set up.
+      this._form.style.boxSizing = 'border-box';
+      this._form.style.textAlign = this._object.getTextAlign();
+
       this._input.autocomplete = 'off';
-      this._input.style.borderRadius = '0px';
       this._input.style.backgroundColor = 'white';
-      this._input.style.position = 'absolute';
-      this._input.style.resize = 'none';
-      this._input.style.outline = 'none';
-      this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
-      this._input.style.display = 'none'; // Hide while object is being set up.
-      this._input.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
+      this._input.style.border = '1px solid black';
+      this._input.style.boxSizing = 'border-box';
+      this._input.style.width = '100%';
+      this._input.style.height = '100%';
+      this._input.maxLength = this._object.getMaxLength();
+      this._input.style.padding = this._object.getPadding() + 'px';
+
+      this._form.appendChild(this._input);
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -72,6 +87,11 @@ namespace gdjs {
         if (document.activeElement !== this._input) this._input.focus();
       });
 
+      this._form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this._object.onRendererFormSubmitted();
+      });
+
       this.updateString();
       this.updateFont();
       this.updatePlaceholder();
@@ -83,11 +103,14 @@ namespace gdjs {
       this.updateBorderWidth();
       this.updateDisabled();
       this.updateReadOnly();
+      this.updateTextAlign();
+      this.updateMaxLength();
+      this.updatePadding();
 
       this._runtimeGame
         .getRenderer()
         .getDomElementContainer()!
-        .appendChild(this._input);
+        .appendChild(this._form);
     }
 
     _destroyElement() {
@@ -116,13 +139,12 @@ namespace gdjs {
     }
 
     updatePreRender() {
-      if (!this._input) return;
-
+      if (!this._input || !this._form) return;
       // Hide the input entirely if the object is hidden.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
       if (this._object.isHidden()) {
-        this._input.style.display = 'none';
+        this._form.style.display = 'none';
         return;
       }
 
@@ -136,7 +158,7 @@ namespace gdjs {
         do {
           const layer = instanceContainer.getLayer(object.getLayer());
           if (!layer.isVisible() || !object.isVisible()) {
-            this._input.style.display = 'none';
+            this._form.style.display = 'none';
             return;
           }
           // TODO Declare an interface to move up in the object tree.
@@ -184,7 +206,7 @@ namespace gdjs {
         canvasLeft > runtimeGame.getGameResolutionWidth() ||
         canvasTop > runtimeGame.getGameResolutionHeight();
       if (isOutsideCanvas) {
-        this._input.style.display = 'none';
+        this._form.style.display = 'none';
         return;
       }
 
@@ -210,12 +232,15 @@ namespace gdjs {
       const widthInContainer = pageRight - pageLeft;
       const heightInContainer = pageBottom - pageTop;
 
-      this._input.style.left = pageLeft + 'px';
-      this._input.style.top = pageTop + 'px';
-      this._input.style.width = widthInContainer + 'px';
-      this._input.style.height = heightInContainer + 'px';
-      this._input.style.transform =
+      this._form.style.left = pageLeft + 'px';
+      this._form.style.top = pageTop + 'px';
+      this._form.style.width = widthInContainer + 'px';
+      this._form.style.height = heightInContainer + 'px';
+      this._form.style.transform =
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
+      this._form.style.textAlign = this._object.getTextAlign();
+
+      this._input.style.padding = this._object.getPadding() + 'px';
 
       // Automatically adjust the font size to follow the game scale.
       this._input.style.fontSize =
@@ -224,7 +249,7 @@ namespace gdjs {
         'px';
 
       // Display after the object is positioned.
-      this._input.style.display = 'initial';
+      this._form.style.display = 'initial';
     }
 
     updateString() {
@@ -246,8 +271,8 @@ namespace gdjs {
     }
 
     updateOpacity() {
-      if (!this._input) return;
-      this._input.style.opacity = '' + this._object.getOpacity() / 255;
+      if (!this._form) return;
+      this._form.style.opacity = (this._object.getOpacity() / 255).toFixed(3);
     }
 
     updateInputType() {
@@ -297,14 +322,37 @@ namespace gdjs {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
     updateDisabled() {
-      if (!this._input) return;
+      if (!this._form) return;
 
-      this._input.disabled = this._object.isDisabled();
+      this._form.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
+      if (!this._form) return;
+
+      this._form.readOnly = this._object.isReadOnly();
+    }
+
+    updateMaxLength() {
+      const input = this._input;
+      if (!input) return;
+      if (this._object.getMaxLength() <= 0) {
+        input.removeAttribute('maxLength');
+        return;
+      }
+      input.maxLength = this._object.getMaxLength();
+    }
+
+    updatePadding() {
       if (!this._input) return;
 
-      this._input.readOnly = this._object.isReadOnly();
+      this._input.style.padding = this._object.getPadding() + 'px';
+    }
+
+    updateTextAlign() {
+      if (!this._input) return;
+
+      const newTextAlign = this._object.getTextAlign();
+      this._input.style.textAlign = newTextAlign;
     }
 
     isFocused() {
@@ -317,7 +365,6 @@ namespace gdjs {
       this._input.focus();
     }
   }
-
   export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
   export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
 }

@@ -78,6 +78,15 @@ module.exports = {
       } else if (propertyName === 'disabled') {
         objectContent.disabled = newValue === '1';
         return true;
+      } else if (propertyName === 'maxLength') {
+        objectContent.maxLength = newValue;
+        return true;
+      } else if (propertyName === 'padding') {
+        objectContent.padding = newValue;
+        return true;
+      } else if (propertyName === 'textAlign') {
+        objectContent.textAlign = newValue;
+        return true;
       }
 
       return false;
@@ -200,6 +209,34 @@ module.exports = {
         .setLabel(_('Width'))
         .setGroup(_('Border appearance'));
 
+      objectProperties
+        .getOrCreate('padding')
+        .setValue((objectContent.padding || 0).toString())
+        .setType('number')
+        .setLabel(_('Padding'))
+        .setGroup(_('Font'));
+      objectProperties
+        .getOrCreate('maxLength')
+        .setValue((objectContent.maxLength || 0).toString())
+        .setType('number')
+        .setLabel(_('Max length'))
+        .setDescription(
+          _(
+            'The maximum length of the input value (this property will be ignored if the input type is a number).'
+          )
+        )
+        .setAdvanced(true);
+
+      objectProperties
+        .getOrCreate('textAlign')
+        .setValue(objectContent.textAlign || 'left')
+        .setType('choice')
+        .addExtraInfo('left')
+        .addExtraInfo('center')
+        .addExtraInfo('right')
+        .setLabel(_('Text alignment'))
+        .setGroup(_('Font'));
+
       return objectProperties;
     };
     textInputObject.content = {
@@ -216,6 +253,9 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
+      padding: 0,
+      textAlign: 'left',
+      maxLength: 0,
     };
 
     textInputObject.updateInitialInstanceProperty = function (
@@ -573,6 +613,22 @@ module.exports = {
       .setFunctionName('isFocused');
 
     object
+      .addScopedCondition(
+        'IsInputSubmitted',
+        _('Input is submitted'),
+        _(
+          'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
+        ),
+        _('_PARAM0_ value was submitted'),
+        '',
+        'res/conditions/surObject24.png',
+        'res/conditions/surObject.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isSubmitted');
+
+    object
       .addScopedAction(
         'Focus',
         _('Focus'),
@@ -755,8 +811,23 @@ module.exports = {
         this._pixiTextMask.endFill();
 
         const isTextArea = object.content.inputType === 'text area';
+        const textAlign = object.content.textAlign
+          ? object.content.textAlign
+          : 'left';
+        const padding = object.content.padding
+          ? parseFloat(object.content.padding)
+          : 0;
 
-        this._pixiText.position.x = textOffset;
+        if (textAlign === 'left')
+          this._pixiText.position.x = textOffset + padding;
+        else if (textAlign === 'right')
+          this._pixiText.position.x =
+            0 + width - this._pixiText.width - textOffset - padding;
+        else if (textAlign === 'center') {
+          this._pixiText.align = 'center';
+          this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
+        }
+
         this._pixiText.position.y = isTextArea
           ? textOffset
           : height / 2 - this._pixiText.height / 2;

@@ -10,6 +10,7 @@ const excludedPaths = [
   'Core/GDCore/Tools/Localization.cpp', // emscripten code which can't be linted
   'Core/GDCore/Serialization/Serializer.cpp', // Diagnostic that can't be ignored in rapidjson.
 ];
+const supportedExtensions = ['.cpp', '.h', '.hpp'];
 
 async function findClangTidy() {
   const tryClangTidy = (clangTidyCommandName) =>
@@ -86,7 +87,7 @@ function findFiles(directoryPath) {
       results = results.concat(findFiles(filePath));
     } else {
       if (
-        path.extname(filePath) === '.inl' ||
+        (!supportedExtensions.includes(path.extname(filePath))) ||
         path.basename(filePath) === '.gitignore' ||
         excludedPaths.includes(relativePath)
       ) {

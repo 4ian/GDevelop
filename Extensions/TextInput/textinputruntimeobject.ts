@@ -565,6 +565,10 @@ namespace gdjs {
     }
     setPadding(value: integer) {
       if (this._padding === value) return;
+      if (value < 0) {
+        this._padding = 0;
+        return;
+      }
 
       this._padding = value;
       this._renderer.updatePadding();

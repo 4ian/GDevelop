@@ -182,22 +182,14 @@ export const augmentSearchResult = <T>(
   result: SearchResult<T>,
   lowerCaseSearchText: string
 ): AugmentedSearchResult<T> => {
-  const augmentedSearchResult: AugmentedSearchResult<T> = {
+  return {
     item: result.item,
-    matches: [],
-  };
-  for (const match of result.matches) {
-    const exactMatchIndices = getFirstExactMatchPosition(
-      match,
-      lowerCaseSearchText
-    );
-    const augmentedMatch: AugmentedSearchMatch = {
+    score: result.score,
+    matches: result.matches.map(match => ({
       ...match,
-      ...exactMatchIndices,
-    };
-    augmentedSearchResult.matches.push(augmentedMatch);
-  }
-  return augmentedSearchResult;
+      ...getFirstExactMatchPosition(match, lowerCaseSearchText),
+    })),
+  };
 };
 
 export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>

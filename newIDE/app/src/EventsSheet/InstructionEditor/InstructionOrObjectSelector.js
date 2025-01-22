@@ -25,9 +25,11 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
-  exactMatchesSort,
+  sortResultsUsingExactMatches,
   sharedFuseConfiguration,
   getFuseSearchQueryForMultipleKeys,
+  nullifySingleCharacterMatches,
+  augmentSearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
@@ -283,6 +285,7 @@ const InstructionOrObjectSelector = React.forwardRef<
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
+        includeScore: true,
         keys: [
           { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },
@@ -457,6 +460,7 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const search = React.useCallback((searchText: string) => {
       if (!searchText) return;
+      const lowerCaseSearchText = searchText.toLowerCase();
 
       const matchingInstructions = moveDeprecatedInstructionsDown(
         instructionSearchApiRef.current
@@ -467,8 +471,11 @@ const InstructionOrObjectSelector = React.forwardRef<
               'description',
             ])
           )
+          .map(nullifySingleCharacterMatches)
+          .filter(Boolean)
+          .map(result => augmentSearchResult(result, lowerCaseSearchText))
           .sort(
-            exactMatchesSort(searchText, [
+            sortResultsUsingExactMatches([
               'displayedName',
               'description',
               'fullGroupName',

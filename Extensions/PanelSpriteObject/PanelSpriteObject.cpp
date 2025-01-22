@@ -26,7 +26,8 @@ PanelSpriteObject::PanelSpriteObject()
       leftMargin(0),
       topMargin(0),
       rightMargin(0),
-      bottomMargin(0) {}
+      bottomMargin(0),
+      tiled(false) {}
 
 PanelSpriteObject::~PanelSpriteObject() {}
 

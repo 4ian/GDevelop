@@ -61,7 +61,7 @@ type Props = {|
   disableRipple?: boolean,
   disableFocusRipple?: boolean,
 
-  color?: 'default',
+  color?: 'default' | 'inherit',
 |};
 
 const useStyles = makeStyles({

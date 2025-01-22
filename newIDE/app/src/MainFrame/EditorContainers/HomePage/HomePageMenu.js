@@ -6,9 +6,9 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '../../../UI/IconButton';
 import VerticalTabButton from '../../../UI/VerticalTabButton';
 import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArrowLeft';
-import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
+import HammerIcon from '../../../UI/CustomSvgIcons/Hammer';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
-import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
+import ControllerIcon from '../../../UI/CustomSvgIcons/Controller';
 import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
 import SunIcon from '../../../UI/CustomSvgIcons/Sun';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
@@ -63,7 +63,7 @@ export type HomePageMenuTab = {|
 
 const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
   'get-started': {
-    label: <Trans>Get Started</Trans>,
+    label: <Trans>Start</Trans>,
     tab: 'get-started',
     id: 'home-get-started-tab',
     getIcon: ({ color, fontSize }) => (
@@ -75,7 +75,7 @@ const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
     tab: 'create',
     id: 'home-create-tab',
     getIcon: ({ color, fontSize }) => (
-      <PickAxeIcon fontSize={fontSize} color={color} />
+      <HammerIcon fontSize={fontSize} color={color} />
     ),
   },
   shop: {
@@ -99,7 +99,7 @@ const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
     tab: 'play',
     id: 'home-play-tab',
     getIcon: ({ color, fontSize }) => (
-      <GoogleControllerIcon fontSize={fontSize} color={color} />
+      <ControllerIcon fontSize={fontSize} color={color} />
     ),
   },
   'team-view': {

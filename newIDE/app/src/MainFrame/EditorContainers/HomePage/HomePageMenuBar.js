@@ -20,18 +20,19 @@ import {
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { SECTION_DESKTOP_SPACING } from './SectionContainer';
+import Text from '../../../UI/Text';
 
-const iconSize = 20;
-const iconButtonPadding = 8;
+const iconSize = 24;
+const iconButtonPadding = 4;
 /**
  * Padding bottom is bigger than padding top to leave space for the Android/iOS
  * bottom navigation bar.
  */
 const iconButtonMarginBottom = 12;
-const iconButtonLabelPadding = 4;
+const iconButtonLabelSize = 20;
 const toolbarHeight =
   iconSize +
-  2 * iconButtonLabelPadding +
+  iconButtonLabelSize +
   2 * iconButtonPadding +
   iconButtonMarginBottom;
 export const homepageDesktopMenuBarWidth = 230;
@@ -57,6 +58,12 @@ export const styles = {
     fontSize: iconSize,
     height: toolbarHeight,
   },
+  buttonContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
   bottomButtonsContainer: {
     marginBottom: 'env(safe-area-inset-bottom)',
   },
@@ -65,7 +72,11 @@ export const styles = {
     marginBottom: iconButtonMarginBottom,
     fontSize: 'inherit',
   },
-  buttonLabel: { padding: iconButtonLabelPadding, display: 'flex' },
+  icon: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
 };
 
 type Props = {|
@@ -85,7 +96,7 @@ const HomePageMenuBar = ({
 }: Props) => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
-  const theme = React.useContext(GDevelopThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const tabsToDisplay = getTabsToDisplay({ limits });
   const largeScreenOnlyButtons: {
@@ -119,33 +130,53 @@ const HomePageMenuBar = ({
         square
         style={{
           ...styles.mobileContainer,
-          borderTop: `1px solid ${theme.home.separator.color}`,
+          borderTop: `1px solid ${gdevelopTheme.home.separator.color}`,
         }}
       >
         <Toolbar height={toolbarHeight}>
-          <ToolbarGroup>
+          <ToolbarGroup spaceOut>
             {tabsToDisplay.map(({ label, tab, getIcon, id }) => {
               const isActive = activeTab === tab;
               return (
-                <IconButton
-                  color="default"
-                  key={id}
-                  disableRipple
-                  disableFocusRipple
-                  style={styles.mobileButton}
-                  onClick={() => {
-                    setActiveTab(tab);
+                <div
+                  style={{
+                    ...styles.buttonContainer,
+                    borderTop: `3px solid ${
+                      isActive
+                        ? gdevelopTheme.iconButton.selectedBackgroundColor
+                        : // Always keep the border so there's no layout shift.
+                          'transparent'
+                    }`,
+                    ...(!isActive
+                      ? { color: gdevelopTheme.text.color.secondary }
+                      : {}),
                   }}
-                  selected={isActive}
-                  id={id}
                 >
-                  <span style={styles.buttonLabel}>
-                    {getIcon({
-                      color: isActive ? 'inherit' : 'secondary',
-                      fontSize: 'inherit',
-                    })}
-                  </span>
-                </IconButton>
+                  <IconButton
+                    color="inherit"
+                    key={id}
+                    disableRipple
+                    disableFocusRipple
+                    style={styles.mobileButton}
+                    onClick={() => {
+                      setActiveTab(tab);
+                    }}
+                    selected={false}
+                    id={id}
+                  >
+                    <Column noMargin>
+                      <span style={styles.icon}>
+                        {getIcon({
+                          color: 'inherit',
+                          fontSize: 'inherit',
+                        })}
+                      </span>
+                      <Text size="body-small" color="inherit" noMargin>
+                        {label}
+                      </Text>
+                    </Column>
+                  </IconButton>
+                </div>
               );
             })}
           </ToolbarGroup>
@@ -158,7 +189,7 @@ const HomePageMenuBar = ({
     <Paper
       style={{
         ...(isMobileOrSmallScreen ? styles.mobileMenu : styles.desktopMenu),
-        borderRight: `1px solid ${theme.home.separator.color}`,
+        borderRight: `1px solid ${gdevelopTheme.home.separator.color}`,
       }}
       square
       background="dark"

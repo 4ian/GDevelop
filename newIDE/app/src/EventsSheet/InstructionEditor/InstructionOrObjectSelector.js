@@ -285,7 +285,7 @@ const InstructionOrObjectSelector = React.forwardRef<
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
-        includeScore: true,
+        includeScore: true, // Use Fuse.js score to sort results that don't contain exact matches.
         keys: [
           { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },

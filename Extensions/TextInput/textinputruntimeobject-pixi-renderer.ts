@@ -272,7 +272,8 @@ namespace gdjs {
 
     updateOpacity() {
       if (!this._form) return;
-      this._form.style.opacity = '' + this._object.getOpacity() / 255;
+      this._form.style.opacity =
+        '' + (this._object.getOpacity() / 255).toFixed(3);
     }
 
     updateInputType() {
@@ -351,7 +352,7 @@ namespace gdjs {
     updateTextAlign() {
       if (!this._input) return;
 
-      const newTextAlign = this._object.getTextAlign() || 'left';
+      const newTextAlign = this._object.getTextAlign();
       this._input.style.textAlign = newTextAlign;
     }
 

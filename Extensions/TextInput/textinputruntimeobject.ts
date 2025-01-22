@@ -23,7 +23,10 @@ namespace gdjs {
     return 'text';
   };
 
-  const parseTextAlign = (potentialTextAlign: string): SupportedTextAlign => {
+  const parseTextAlign = (
+    potentialTextAlign: string | undefined
+  ): SupportedTextAlign => {
+    if (!potentialTextAlign) return 'left';
     const lowercasedNewTextAlign = potentialTextAlign.toLowerCase();
 
     // @ts-ignore - we're actually checking that this value is correct.
@@ -45,9 +48,9 @@ namespace gdjs {
       textColor: string;
       fillColor: string;
       fillOpacity: float;
-      padding: integer;
-      textAlign: SupportedTextAlign;
-      maxLength: integer;
+      padding?: float;
+      textAlign?: SupportedTextAlign;
+      maxLength?: integer;
       borderColor: string;
       borderOpacity: float;
       borderWidth: float;
@@ -130,9 +133,9 @@ namespace gdjs {
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
+      this._textAlign = parseTextAlign(objectData.content.textAlign); //textAlign is defaulted to 'left' by the parser if undefined.
+      this._maxLength = objectData.content.maxLength || 0; //maxlength and padding require a default value as they can be undefined in older projects.
       this._padding = objectData.content.padding || 0;
-      this._textAlign = objectData.content.textAlign || 'left';
-      this._maxLength = objectData.content.maxLength || 0;
       this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
@@ -209,13 +212,22 @@ namespace gdjs {
       if (oldObjectData.content.readOnly !== newObjectData.content.readOnly) {
         this.setReadOnly(newObjectData.content.readOnly);
       }
-      if (oldObjectData.content.maxLength !== newObjectData.content.maxLength) {
+      if (
+        newObjectData.content.maxLength &&
+        oldObjectData.content.maxLength !== newObjectData.content.maxLength
+      ) {
         this.setMaxLength(newObjectData.content.maxLength);
       }
-      if (oldObjectData.content.textAlign !== newObjectData.content.textAlign) {
+      if (
+        newObjectData.content.textAlign &&
+        oldObjectData.content.textAlign !== newObjectData.content.textAlign
+      ) {
         this._textAlign = newObjectData.content.textAlign;
       }
-      if (oldObjectData.content.padding !== newObjectData.content.padding) {
+      if (
+        newObjectData.content.padding &&
+        oldObjectData.content.padding !== newObjectData.content.padding
+      ) {
         this.setPadding(newObjectData.content.padding);
       }
 

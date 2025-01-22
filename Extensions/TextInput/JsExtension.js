@@ -220,7 +220,11 @@ module.exports = {
         .setValue((objectContent.maxLength || 0).toString())
         .setType('number')
         .setLabel(_('Max length'))
-        .setDescription(_('The maximum length of the input value.'))
+        .setDescription(
+          _(
+            'The maximum length of the input value. (this property will be ignored if the input type is a number'
+          )
+        )
         .setAdvanced(true);
 
       objectProperties
@@ -251,7 +255,7 @@ module.exports = {
       disabled: false,
       padding: 0,
       textAlign: 'left',
-      maxLength: '20',
+      maxLength: 0,
     };
 
     textInputObject.updateInitialInstanceProperty = function (
@@ -807,11 +811,18 @@ module.exports = {
         this._pixiTextMask.endFill();
 
         const isTextArea = object.content.inputType === 'text area';
-        const textAlign = object.content.textAlign;
-        if (textAlign === 'left') this._pixiText.position.x = textOffset;
+        const textAlign = object.content.textAlign
+          ? object.content.textAlign
+          : 'left';
+        const padding = object.content.padding
+          ? parseFloat(object.content.padding)
+          : 0;
+
+        if (textAlign === 'left')
+          this._pixiText.position.x = textOffset + padding;
         else if (textAlign === 'right')
           this._pixiText.position.x =
-            0 + width - this._pixiText.width - textOffset;
+            0 + width - this._pixiText.width - textOffset - padding;
         else if (textAlign === 'center') {
           this._pixiText.align = 'center';
           this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;

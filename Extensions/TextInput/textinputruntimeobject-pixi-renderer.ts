@@ -272,8 +272,7 @@ namespace gdjs {
 
     updateOpacity() {
       if (!this._form) return;
-      this._form.style.opacity =
-        (this._object.getOpacity() / 255).toFixed(3);
+      this._form.style.opacity = (this._object.getOpacity() / 255).toFixed(3);
     }
 
     updateInputType() {

@@ -9,7 +9,7 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchStructuredItem,
-  type SearchMatch,
+  type SearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { BEHAVIORS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
@@ -38,10 +38,9 @@ export type SearchableBehaviorMetadata = {|
 
 type BehaviorStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<{|
-    item: BehaviorShortHeader | SearchableBehaviorMetadata,
-    matches: SearchMatch[],
-  |}>,
+  searchResults: ?Array<
+    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
+  >,
   fetchBehaviors: () => void,
   error: ?Error,
   searchText: string,
@@ -244,10 +243,9 @@ export const BehaviorStoreStateProvider = ({
     [firstBehaviorIds, installedBehaviorMetadataList]
   );
 
-  const searchResults: ?Array<{|
-    item: BehaviorShortHeader | SearchableBehaviorMetadata,
-    matches: SearchMatch[],
-  |}> = useSearchStructuredItem(allBehaviors, {
+  const searchResults: ?Array<
+    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
+  > = useSearchStructuredItem(allBehaviors, {
     searchText,
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,

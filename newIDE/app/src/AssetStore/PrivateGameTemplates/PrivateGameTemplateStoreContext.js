@@ -4,7 +4,7 @@ import { type FiltersState, useFilters } from '../../UI/Search/FiltersChooser';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchStructuredItem,
-  type SearchMatch,
+  type SearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
 import {
@@ -44,10 +44,9 @@ type PrivateGameTemplateStoreState = {|
     setInitialGameTemplateUserFriendlySlug: string => void,
   },
   exampleStore: {
-    privateGameTemplateListingDatasSearchResults: ?Array<{|
-      item: PrivateGameTemplateListingData,
-      matches: SearchMatch[],
-    |}>,
+    privateGameTemplateListingDatasSearchResults: ?Array<
+      SearchResult<PrivateGameTemplateListingData>
+    >,
     searchText: string,
     setSearchText: string => void,
     filtersState: FiltersState,
@@ -284,10 +283,9 @@ export const PrivateGameTemplateStoreStateProvider = ({
 
   const currentPage = shopNavigationState.getCurrentPage();
 
-  const privateGameTemplateListingDatasSearchResultsForExampleStore: ?Array<{|
-    item: PrivateGameTemplateListingData,
-    matches: SearchMatch[],
-  |}> = useSearchStructuredItem(privateGameTemplateListingDatasById, {
+  const privateGameTemplateListingDatasSearchResultsForExampleStore: ?Array<
+    SearchResult<PrivateGameTemplateListingData>
+  > = useSearchStructuredItem(privateGameTemplateListingDatasById, {
     searchText: exampleStoreSearchText,
     chosenCategory: filtersStateForExampleStore.chosenCategory,
     chosenFilters: filtersStateForExampleStore.chosenFilters,

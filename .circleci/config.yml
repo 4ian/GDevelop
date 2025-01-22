@@ -301,13 +301,7 @@ workflows:
       - build-gdevelop_js-wasm-only
   gdevelop_js-wasm-extra-checks:
     jobs:
-      - build-gdevelop_js-debug-sanitizers-and-extra-checks:
-          # Extra checks are resource intensive so don't all run them.
-          filters:
-            branches:
-              only:
-                - master
-                - /experimental-build.*/
+      - build-gdevelop_js-debug-sanitizers-and-extra-checks
   builds:
     jobs:
       - build-macos:

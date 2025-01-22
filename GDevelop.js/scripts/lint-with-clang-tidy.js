@@ -4,10 +4,11 @@ const path = require('path');
 const { makeSimplePromisePool } = require('./utils/SimplePromisePool');
 
 const gdevelopRootPath = path.resolve(__dirname, '../../');
-const sourcesRootPath = path.join(gdevelopRootPath, 'Core/GDCore');
+const coreSourcesRootPath = path.join(gdevelopRootPath, 'Core/GDCore');
+const extensionSourcesRootPath = path.join(gdevelopRootPath, 'Extensions');
 const excludedPaths = [
-  'Tools/Localization.cpp', // emscripten code which can't be linted
-  'Serialization/Serializer.cpp', // Diagnostic that can't be ignored in rapidjson.
+  'Core/GDCore/Tools/Localization.cpp', // emscripten code which can't be linted
+  'Core/GDCore/Serialization/Serializer.cpp', // Diagnostic that can't be ignored in rapidjson.
 ];
 
 async function findClangTidy() {
@@ -78,7 +79,7 @@ function findFiles(directoryPath) {
 
   list.forEach((file) => {
     const filePath = path.resolve(directoryPath, file);
-    const relativePath = path.relative(sourcesRootPath, filePath);
+    const relativePath = path.relative(gdevelopRootPath, filePath);
 
     const stat = fs.statSync(filePath);
     if (stat && stat.isDirectory() && !excludedPaths.includes(relativePath)) {
@@ -89,7 +90,7 @@ function findFiles(directoryPath) {
         path.basename(filePath) === '.gitignore' ||
         excludedPaths.includes(relativePath)
       ) {
-        // Ignore .inl files
+        // Ignore the file.
       } else {
         results.push(filePath);
       }
@@ -108,7 +109,9 @@ async function main() {
     process.exit(1);
   }
 
-  const filesToCheck = findFiles(sourcesRootPath);
+  const coreFilesToCheck = findFiles(coreSourcesRootPath);
+  const extensionFilesToCheck = findFiles(extensionSourcesRootPath);
+  const filesToCheck = [...coreFilesToCheck, ...extensionFilesToCheck];
 
   // Run clang-tidy on each file.
   const filesWithErrors = [];

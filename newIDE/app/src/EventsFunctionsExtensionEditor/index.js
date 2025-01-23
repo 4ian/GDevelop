@@ -145,6 +145,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     onAddEventsBasedObjectCb: null,
   };
   editor: ?EventsSheetInterface;
+  _editorScrollPositions = new Map<number, number>();
   eventsFunctionList: ?EventsFunctionsListInterface;
   _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
@@ -596,6 +597,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
     selectedEventsBasedObject: ?gdEventsBasedObject
   ) => {
+    const previousEditor = this.editor;
+    const previousFunction = this.state.selectedEventsFunction;
+    if (previousEditor && previousFunction) {
+      this._editorScrollPositions.set(
+        previousFunction.ptr,
+        previousEditor.getScrollPosition()
+      );
+    }
     this._editBehavior(selectedEventsBasedBehavior);
     this._editObject(selectedEventsBasedObject);
   };
@@ -1457,6 +1466,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                initialScrollPosition={this._editorScrollPositions.get(
+                  selectedEventsFunction.ptr
+                )}
               />
             </Background>
           ) : selectedEventsBasedBehavior &&

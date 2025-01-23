@@ -53,7 +53,7 @@ namespace gdjs {
       borderWidth: float;
       disabled: boolean;
       readOnly: boolean;
-      // ---- Values can be undefined because of support added in v5.5.222.
+      // ---- Values can be undefined because of support for these feature was added in v5.5.222.
       paddingX?: float;
       paddingY?: float;
       textAlign?: SupportedTextAlign;

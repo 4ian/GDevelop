@@ -57,7 +57,6 @@ namespace gdjs {
       this._form.style.borderRadius = '0px';
       this._form.style.backgroundColor = 'transparent';
       this._form.style.position = 'absolute';
-      this._form.style.outline = 'none';
       this._form.style.resize = 'none';
       this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._form.style.display = 'none'; // Hide while object is being set up.
@@ -66,6 +65,7 @@ namespace gdjs {
 
       this._input.autocomplete = 'off';
       this._input.style.backgroundColor = 'white';
+      this._input.style.outline = 'none'; // Remove any style added by the browser to highlight the focused field in a form (:focus & :focus-visible modifiers).
       this._input.style.border = '1px solid black';
       this._input.style.boxSizing = 'border-box';
       this._input.style.width = '100%';

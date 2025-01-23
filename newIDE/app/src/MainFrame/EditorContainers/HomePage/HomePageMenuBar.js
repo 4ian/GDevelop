@@ -157,6 +157,7 @@ const HomePageMenuBar = ({
                     key={id}
                     disableRipple
                     disableFocusRipple
+                    disableHover
                     style={styles.mobileButton}
                     onClick={() => {
                       setActiveTab(tab);

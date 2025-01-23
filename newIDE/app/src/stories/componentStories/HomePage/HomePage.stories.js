@@ -26,6 +26,7 @@ import {
 import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import inAppTutorialDecorator from '../../InAppTutorialDecorator';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const apiDataServerSideError = {
   mockData: [
@@ -71,72 +72,79 @@ const WrappedHomePage = ({
   tutorialProgress?: InAppTutorialUserProgress,
   inAppTutorialsFetchingError?: string | null,
   user: AuthenticatedUser,
-|}) => (
-  <FixedHeightFlexContainer height={1080}>
-    <PreferencesContext.Provider
-      value={{
-        ...initialPreferences,
-        getRecentProjectFiles: () => recentProjectFiles,
-        getTutorialProgress: () => tutorialProgress,
-      }}
-    >
-      <AuthenticatedUserContext.Provider value={user}>
-        <ExampleStoreStateProvider>
-          <TutorialStateProvider>
-            <HomePage
-              project={project}
-              fileMetadata={null}
-              isActive={true}
-              projectItemName={null}
-              setToolbar={() => {}}
-              canOpen={true}
-              storageProviders={[CloudStorageProvider]}
-              onChooseProject={() => action('onChooseProject')()}
-              onOpenRecentFile={() => action('onOpenRecentFile')()}
-              onSelectExampleShortHeader={() =>
-                action('onSelectExampleShortHeader')()
-              }
-              onSelectPrivateGameTemplateListingData={() =>
-                action('onSelectPrivateGameTemplateListingData')()
-              }
-              onOpenPrivateGameTemplateListingData={() =>
-                action('onOpenPrivateGameTemplateListingData')()
-              }
-              onOpenVersionHistory={() => action('onOpenVersionHistory')()}
-              onOpenLanguageDialog={() => action('open language dialog')()}
-              onOpenNewProjectSetupDialog={() =>
-                action('onOpenNewProjectSetupDialog')()
-              }
-              onOpenTemplateFromTutorial={() =>
-                action('onOpenTemplateFromTutorial')()
-              }
-              onOpenTemplateFromCourseChapter={() =>
-                action('onOpenTemplateFromCourseChapter')()
-              }
-              canSave={true}
-              onSave={() => action('onSave')()}
-              selectInAppTutorial={() => action('select in app tutorial')()}
-              onOpenProfile={() => action('open profile')()}
-              onOpenPreferences={() => action('open preferences')()}
-              onOpenAbout={() => action('open about')()}
-              resourceManagementProps={fakeResourceManagementProps}
-              onCreateProjectFromExample={action('onCreateProjectFromExample')}
-              askToCloseProject={async () => true}
-              closeProject={async () => {}}
-              gamesList={{
-                games: null,
-                fetchGames: async () => {},
-                gamesFetchingError: null,
-                onGameUpdated: () => {},
-                markGameAsSavedIfRelevant: async () => {},
-              }}
-            />
-          </TutorialStateProvider>
-        </ExampleStoreStateProvider>
-      </AuthenticatedUserContext.Provider>
-    </PreferencesContext.Provider>
-  </FixedHeightFlexContainer>
-);
+|}) => {
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  // Adapt height for storybook to see the bottom menu on mobile.
+  const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;
+  return (
+    <FixedHeightFlexContainer height={fixedHeight}>
+      <PreferencesContext.Provider
+        value={{
+          ...initialPreferences,
+          getRecentProjectFiles: () => recentProjectFiles,
+          getTutorialProgress: () => tutorialProgress,
+        }}
+      >
+        <AuthenticatedUserContext.Provider value={user}>
+          <ExampleStoreStateProvider>
+            <TutorialStateProvider>
+              <HomePage
+                project={project}
+                fileMetadata={null}
+                isActive={true}
+                projectItemName={null}
+                setToolbar={() => {}}
+                canOpen={true}
+                storageProviders={[CloudStorageProvider]}
+                onChooseProject={() => action('onChooseProject')()}
+                onOpenRecentFile={() => action('onOpenRecentFile')()}
+                onSelectExampleShortHeader={() =>
+                  action('onSelectExampleShortHeader')()
+                }
+                onSelectPrivateGameTemplateListingData={() =>
+                  action('onSelectPrivateGameTemplateListingData')()
+                }
+                onOpenPrivateGameTemplateListingData={() =>
+                  action('onOpenPrivateGameTemplateListingData')()
+                }
+                onOpenVersionHistory={() => action('onOpenVersionHistory')()}
+                onOpenLanguageDialog={() => action('open language dialog')()}
+                onOpenNewProjectSetupDialog={() =>
+                  action('onOpenNewProjectSetupDialog')()
+                }
+                onOpenTemplateFromTutorial={() =>
+                  action('onOpenTemplateFromTutorial')()
+                }
+                onOpenTemplateFromCourseChapter={() =>
+                  action('onOpenTemplateFromCourseChapter')()
+                }
+                canSave={true}
+                onSave={() => action('onSave')()}
+                selectInAppTutorial={() => action('select in app tutorial')()}
+                onOpenProfile={() => action('open profile')()}
+                onOpenPreferences={() => action('open preferences')()}
+                onOpenAbout={() => action('open about')()}
+                resourceManagementProps={fakeResourceManagementProps}
+                onCreateProjectFromExample={action(
+                  'onCreateProjectFromExample'
+                )}
+                askToCloseProject={async () => true}
+                closeProject={async () => {}}
+                gamesList={{
+                  games: null,
+                  fetchGames: async () => {},
+                  gamesFetchingError: null,
+                  onGameUpdated: () => {},
+                  markGameAsSavedIfRelevant: async () => {},
+                }}
+              />
+            </TutorialStateProvider>
+          </ExampleStoreStateProvider>
+        </AuthenticatedUserContext.Provider>
+      </PreferencesContext.Provider>
+    </FixedHeightFlexContainer>
+  );
+};
 
 export default {
   title: 'HomePage',

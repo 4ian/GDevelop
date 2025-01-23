@@ -57,8 +57,6 @@ namespace gdjs {
       this._form.style.borderRadius = '0px';
       this._form.style.backgroundColor = 'transparent';
       this._form.style.position = 'absolute';
-      this._form.style.outline = 'none';
-      this._form.style.resize = 'none';
       this._form.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._form.style.display = 'none'; // Hide while object is being set up.
       this._form.style.boxSizing = 'border-box';
@@ -66,12 +64,16 @@ namespace gdjs {
 
       this._input.autocomplete = 'off';
       this._input.style.backgroundColor = 'white';
+      this._input.style.outline = 'none'; // Remove any style added by the browser to highlight the focused field in a form (:focus & :focus-visible modifiers).
+      this._input.style.resize = 'none'; // Prevent user from resizing the input when it's a text area.
       this._input.style.border = '1px solid black';
       this._input.style.boxSizing = 'border-box';
       this._input.style.width = '100%';
       this._input.style.height = '100%';
       this._input.maxLength = this._object.getMaxLength();
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
 
       this._form.appendChild(this._input);
 
@@ -240,7 +242,9 @@ namespace gdjs {
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
       this._form.style.textAlign = this._object.getTextAlign();
 
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
 
       // Automatically adjust the font size to follow the game scale.
       this._input.style.fontSize =
@@ -345,7 +349,9 @@ namespace gdjs {
     updatePadding() {
       if (!this._input) return;
 
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
     }
 
     updateTextAlign() {

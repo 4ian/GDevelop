@@ -135,7 +135,10 @@ namespace gdjs {
       this._readOnly = objectData.content.readOnly;
       this._textAlign = parseTextAlign(objectData.content.textAlign); //textAlign is defaulted to 'left' by the parser if undefined.
       this._maxLength = objectData.content.maxLength || 0; //maxlength and padding require a default value as they can be undefined in older projects.
-      this._padding = objectData.content.padding || 0;
+      this._padding =
+        objectData.content.padding !== undefined
+          ? objectData.content.padding
+          : 1;
       this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
@@ -213,7 +216,7 @@ namespace gdjs {
         this.setReadOnly(newObjectData.content.readOnly);
       }
       if (
-        newObjectData.content.maxLength &&
+        newObjectData.content.maxLength !== undefined &&
         oldObjectData.content.maxLength !== newObjectData.content.maxLength
       ) {
         this.setMaxLength(newObjectData.content.maxLength);
@@ -225,7 +228,7 @@ namespace gdjs {
         this._textAlign = newObjectData.content.textAlign;
       }
       if (
-        newObjectData.content.padding &&
+        newObjectData.content.padding !== undefined &&
         oldObjectData.content.padding !== newObjectData.content.padding
       ) {
         this.setPadding(newObjectData.content.padding);

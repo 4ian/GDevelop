@@ -211,7 +211,12 @@ module.exports = {
 
       objectProperties
         .getOrCreate('padding')
-        .setValue((objectContent.padding || 0).toString())
+        .setValue(
+          (objectContent.padding !== undefined
+            ? objectContent.padding
+            : 1
+          ).toString()
+        )
         .setType('number')
         .setLabel(_('Padding'))
         .setGroup(_('Font'));
@@ -253,7 +258,7 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
-      padding: 0,
+      padding: 1,
       textAlign: 'left',
       maxLength: 0,
     };

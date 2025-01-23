@@ -222,7 +222,7 @@ module.exports = {
         )
         .setType('number')
         .setLabel(_('Padding (horizontal)'))
-        .setGroup(_('Font'));
+        .setGroup(_('Field appearance'));
       objectProperties
         .getOrCreate('paddingY')
         .setValue(
@@ -233,7 +233,7 @@ module.exports = {
         )
         .setType('number')
         .setLabel(_('Padding (vertical)'))
-        .setGroup(_('Font'));
+        .setGroup(_('Field appearance'));
       objectProperties
         .getOrCreate('maxLength')
         .setValue((objectContent.maxLength || 0).toString())
@@ -254,7 +254,7 @@ module.exports = {
         .addExtraInfo('center')
         .addExtraInfo('right')
         .setLabel(_('Text alignment'))
-        .setGroup(_('Font'));
+        .setGroup(_('Field appearance'));
 
       return objectProperties;
     };

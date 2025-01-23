@@ -66,7 +66,7 @@ const BottomToolbar = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
       <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>
-        <ToolbarGroup>
+        <ToolbarGroup spaceOut>
           {Object.keys(editors).map(editorId => {
             const { icon, buttonId } = editors[editorId];
             const isSelected = props.selectedEditorId === editorId;

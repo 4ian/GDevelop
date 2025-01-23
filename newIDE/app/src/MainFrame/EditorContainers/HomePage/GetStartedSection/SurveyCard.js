@@ -33,8 +33,7 @@ export const SurveyCard = ({
           </Text>
           <Text noMargin size="body">
             <Trans>
-              Answer a 1-minute survey to personalize your “Get started”
-              content.
+              Answer a 1-minute survey to personalize your suggested content.
             </Trans>
           </Text>
           <Spacer />

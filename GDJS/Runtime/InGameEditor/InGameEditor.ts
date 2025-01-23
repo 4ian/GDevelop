@@ -4,6 +4,8 @@ namespace gdjs {
   const RIGHT_KEY = 39;
   const DOWN_KEY = 40;
   const ALT_KEY = 18;
+  const DEL_KEY = 46;
+  const BACKSPACE_KEY = 8;
   const LEFT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 1);
   const RIGHT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 2);
   const SHIFT_KEY = 16;
@@ -57,6 +59,13 @@ namespace gdjs {
     );
   };
 
+  const shouldDeleteSelection = (inputManager: gdjs.InputManager) => {
+    return (
+      inputManager.isKeyPressed(DEL_KEY) ||
+      inputManager.isKeyPressed(BACKSPACE_KEY)
+    );
+  };
+
   const shouldScrollHorizontally = isAltPressed;
 
   const shouldZoom = (inputManager: gdjs.InputManager) => {
@@ -90,6 +99,7 @@ namespace gdjs {
     } | null = null;
     private _lastCursorX: number = 0;
     private _lastCursorY: number = 0;
+    private _wasManipulatingSelectionLastFrame = false;
     private _isManipulatingSelection = false;
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
@@ -175,7 +185,17 @@ namespace gdjs {
     }: {
       objectUnderCursor: ObjectUnderCursor | null;
     }) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       const inputManager = this._runtimeGame.getInputManager();
+      if (!currentScene) return;
+
+      if (
+        this._wasManipulatingSelectionLastFrame &&
+        !this._isManipulatingSelection
+      ) {
+        // Just finished dragging/editing the selection.
+        this._sendSelectionUpdate();
+      }
 
       // Left click: select the object under the cursor.
       if (
@@ -193,6 +213,19 @@ namespace gdjs {
           }
         }
       }
+
+      if (shouldDeleteSelection(inputManager)) {
+        const removedObjects = this._selectedObjects;
+        removedObjects.forEach((object) => {
+          object.deleteFromScene(currentScene);
+        });
+        this._selectedObjects = [];
+        this._sendSelectionUpdate({
+          removedObjects,
+        });
+      }
+
+      this._wasManipulatingSelectionLastFrame = this._isManipulatingSelection;
     }
 
     private _updateSelectionOutline({
@@ -289,8 +322,6 @@ namespace gdjs {
             return;
           }
           this._isManipulatingSelection = false;
-
-          this._sendSelectionUpdate();
         });
 
         this._currentTransformControls = {
@@ -312,23 +343,25 @@ namespace gdjs {
       }
     }
 
-    private _sendSelectionUpdate() {
+    private _sendSelectionUpdate(options?: {
+      removedObjects: Array<gdjs.RuntimeObject>;
+    }) {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
 
-      const instancesSelection = this._selectedObjects
+      const getPersistentUuidsFromObjects = (
+        objects: Array<gdjs.RuntimeObject>
+      ): Array<InstancePersistentUuidData> =>
+        objects
+          .map((object) => {
+            if (!object.persistentUuid) return null;
+
+            return { persistentUuid: object.persistentUuid };
+          })
+          .filter(isDefined);
+
+      const updatedInstances = this._selectedObjects
         .map((object) => {
-          if (!object.persistentUuid) return null;
-
-          return { persistentUuid: object.persistentUuid };
-        })
-        .filter(isDefined);
-
-      const instanceUpdates = this._selectedObjects
-        .map((object) => {
-          const rendererObject = object.getRendererObject();
-          if (!rendererObject) return null;
-
           if (object instanceof gdjs.RuntimeObject3D) {
             if (!object.persistentUuid) return null;
 
@@ -353,9 +386,12 @@ namespace gdjs {
         })
         .filter(isDefined);
 
-      debuggerClient.sendInstancesUpdated({
-        instanceUpdates,
-        instancesSelection,
+      debuggerClient.sendInstanceChanges({
+        updatedInstances,
+        selectedInstances: getPersistentUuidsFromObjects(this._selectedObjects),
+        removedInstances: options
+          ? getPersistentUuidsFromObjects(options.removedObjects)
+          : [],
       });
     }
 

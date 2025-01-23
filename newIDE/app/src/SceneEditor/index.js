@@ -90,6 +90,16 @@ const gd: libGDevelop = global.gd;
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
+type InstancePersistentUuidData = {|
+  persistentUuid: string,
+|};
+
+type InstanceChanges = {|
+  updatedInstances: Array<any>, // TODO
+  selectedInstances: Array<InstancePersistentUuidData>,
+  removedInstances: Array<InstancePersistentUuidData>,
+|};
+
 export type EditorId =
   | 'objects-list'
   | 'properties'
@@ -263,7 +273,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           onConnectionOpened: () => {},
           onConnectionErrored: () => {},
           onServerStateChanged: () => {},
-          onHandleParsedMessage: this.onReceiveMessageFromGame.bind(this),
+          onHandleParsedMessage: ({ id, parsedMessage }) => {
+            if (parsedMessage.command === 'updateInstances') {
+              this.onReceiveInstanceChanges(parsedMessage.payload);
+            }
+          },
         }
       );
     }
@@ -281,54 +295,78 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.instancesEditorSettings;
   }
 
-  onReceiveMessageFromGame({
-    id,
-    parsedMessage,
-  }: {
-    id: number,
-    parsedMessage: {| command: string, payload: any |},
-  }) {
+  onReceiveInstanceChanges(changes: InstanceChanges) {
     // TODO: ensure this works for external layouts too.
-    if (parsedMessage.command === 'updateInstances') {
-      // TODO: adapt this to get all instances in one shot.
-      const modifiedInstances: gdInitialInstance[] = [];
-      parsedMessage.payload.instanceUpdates.forEach(instanceData => {
-        const { persistentUuid, x, y, z } = instanceData;
+
+    // TODO: adapt all of this to get all instances in one shot.
+    const modifiedInstances: gdInitialInstance[] = [];
+    changes.updatedInstances.forEach(instanceData => {
+      const { persistentUuid, x, y, z } = instanceData;
+      const instance = getInstanceInLayoutWithPersistentUuid(
+        this.props.initialInstances,
+        persistentUuid
+      );
+      if (!instance) return;
+      instance.setX(x);
+      instance.setY(y);
+      instance.setZ(z);
+
+      modifiedInstances.push(instance);
+    });
+    this._onInstancesMoved(modifiedInstances);
+
+    const newlySelectedInstances = changes.selectedInstances
+      .map(selectedInstanceData => {
+        const { persistentUuid } = selectedInstanceData;
         const instance = getInstanceInLayoutWithPersistentUuid(
           this.props.initialInstances,
           persistentUuid
         );
-        if (!instance) return;
-        instance.setX(x);
-        instance.setY(y);
-        instance.setZ(z);
+        return instance || null;
+      })
+      .filter(Boolean);
 
-        modifiedInstances.push(instance);
-      });
-      this._onInstancesMoved(modifiedInstances);
+    const justRemovedInstances = changes.removedInstances
+      .map(removedInstanceData => {
+        const { persistentUuid } = removedInstanceData;
+        const instance = getInstanceInLayoutWithPersistentUuid(
+          this.props.initialInstances,
+          persistentUuid
+        );
+        return instance || null;
+      })
+      .filter(Boolean);
 
-      console.log("payload", parsedMessage.payload);
-      const newlySelectedInstances = parsedMessage.payload.instancesSelection
-        .map(instanceSelectionData => {
-          const { persistentUuid } = instanceSelectionData;
-          console.log('selecting', persistentUuid);
-          const instance = getInstanceInLayoutWithPersistentUuid(
+    justRemovedInstances.forEach(instance => {
+      this.props.initialInstances.removeInstance(instance);
+    });
+    if (justRemovedInstances.length) {
+      this.setState(
+        {
+          selectedObjectFolderOrObjectsWithContext: [],
+          history: saveToHistory(
+            this.state.history,
             this.props.initialInstances,
-            persistentUuid
-          );
-          return instance || null;
-        })
-        .filter(Boolean);
-
-      this.instancesSelection.selectInstances({
-        instances: newlySelectedInstances,
-        multiSelect: false,
-        layersLocks: null,
-        ignoreSeal: true
-      });
-      this.setState({ lastSelectionType: 'instance' });
-      this.updateToolbar();
+            'DELETE'
+          ),
+        },
+        () => {
+          this.updateToolbar();
+          this.forceUpdatePropertiesEditor();
+        }
+      );
     }
+
+    console.log('Selecting', newlySelectedInstances.length);
+    console.log("Changes:", changes)
+    this.instancesSelection.selectInstances({
+      instances: newlySelectedInstances,
+      multiSelect: false,
+      layersLocks: null,
+      ignoreSeal: true,
+    });
+    this.setState({ lastSelectionType: 'instance' });
+    this.updateToolbar();
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|

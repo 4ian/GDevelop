@@ -100,17 +100,19 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
 
       ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
         console.info('Processing message received for debugger');
+        let parsedMessage = null;
         try {
-          const parsedMessage = JSON.parse(message);
-          callbacksList.forEach(({ onHandleParsedMessage }) =>
-            onHandleParsedMessage({ id, parsedMessage })
-          );
+          parsedMessage = JSON.parse(message);
         } catch (e) {
           console.warn(
             'Error while parsing message received from debugger client:',
             e
           );
         }
+
+        callbacksList.forEach(({ onHandleParsedMessage }) =>
+          onHandleParsedMessage({ id, parsedMessage })
+        );
       });
       ipcRenderer.send('debugger-start-server');
     });

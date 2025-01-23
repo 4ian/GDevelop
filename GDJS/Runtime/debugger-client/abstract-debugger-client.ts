@@ -637,16 +637,15 @@ namespace gdjs {
       );
     }
 
-    sendInstancesUpdated(update: {
-      instanceUpdates: Array<InstanceData>;
-      instancesSelection: Array<{
-        persistentUuid: string;
-      }>;
+    sendInstanceChanges(changes: {
+      updatedInstances: Array<InstanceData>;
+      selectedInstances: Array<InstancePersistentUuidData>;
+      removedInstances: Array<InstancePersistentUuidData>;
     }): void {
       this._sendMessage(
         circularSafeStringify({
           command: 'updateInstances',
-          payload: update,
+          payload: changes,
         })
       );
     }

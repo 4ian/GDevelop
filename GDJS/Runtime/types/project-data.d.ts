@@ -238,9 +238,11 @@ declare interface ExternalLayoutData {
   instances: InstanceData[];
 }
 
-declare interface InstanceData {
+declare interface InstancePersistentUuidData {
   persistentUuid: string;
+}
 
+declare interface InstanceData extends InstancePersistentUuidData {
   layer: string;
   locked: boolean;
   name: string;

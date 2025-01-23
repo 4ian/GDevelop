@@ -2004,6 +2004,10 @@ export class UsedExtensionsFinder extends EmscriptenObject {
   static scanProject(project: Project): UsedExtensionsResult;
 }
 
+export class ExampleExtensionUsagesFinder extends EmscriptenObject {
+  static getUsedExtensions(project: Project): SetString;
+}
+
 export class InstructionsCountEvaluator extends EmscriptenObject {
   static scanProject(project: Project): number;
 }

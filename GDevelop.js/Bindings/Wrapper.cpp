@@ -44,6 +44,7 @@
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
+#include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/GroupVariableHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
@@ -810,6 +811,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
 #define STATIC_ScanProject ScanProject
+#define STATIC_GetUsedExtensions GetUsedExtensions
 
 #define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetUndefined GetUndefined

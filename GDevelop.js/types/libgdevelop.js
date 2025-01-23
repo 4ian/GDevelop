@@ -188,6 +188,7 @@ declare class libGDevelop {
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
+  ExampleExtensionUsagesFinder: Class<gdExampleExtensionUsagesFinder>;
   InstructionsCountEvaluator: Class<gdInstructionsCountEvaluator>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;
   ExtensionAndObjectMetadata: Class<gdExtensionAndObjectMetadata>;

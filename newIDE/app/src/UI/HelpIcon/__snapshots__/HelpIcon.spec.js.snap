@@ -4,7 +4,7 @@ exports[`HelpIcon renders nothing if the helpPagePath is empty 1`] = `null`;
 
 exports[`HelpIcon renders the icon linking to a help page 1`] = `
 <button
-  className="MuiButtonBase-root MuiIconButton-root makeStyles-root-1 makeStyles-root-3 MuiIconButton-colorSecondary"
+  className="MuiButtonBase-root MuiIconButton-root makeStyles-root-1 MuiIconButton-colorSecondary"
   disabled={false}
   onBlur={[Function]}
   onClick={[Function]}
@@ -22,7 +22,7 @@ exports[`HelpIcon renders the icon linking to a help page 1`] = `
   type="button"
 >
   <span
-    className="MuiIconButton-label makeStyles-label-2 makeStyles-label-4"
+    className="MuiIconButton-label makeStyles-label-2"
   >
     <svg
       aria-hidden={true}

@@ -81,8 +81,11 @@ module.exports = {
       } else if (propertyName === 'maxLength') {
         objectContent.maxLength = newValue;
         return true;
-      } else if (propertyName === 'padding') {
-        objectContent.padding = newValue;
+      } else if (propertyName === 'paddingX') {
+        objectContent.paddingX = Math.max(0, parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'paddingY') {
+        objectContent.paddingY = Math.max(0, parseFloat(newValue));
         return true;
       } else if (propertyName === 'textAlign') {
         objectContent.textAlign = newValue;
@@ -210,15 +213,26 @@ module.exports = {
         .setGroup(_('Border appearance'));
 
       objectProperties
-        .getOrCreate('padding')
+        .getOrCreate('paddingX')
         .setValue(
-          (objectContent.padding !== undefined
-            ? objectContent.padding
+          (objectContent.paddingX !== undefined
+            ? objectContent.paddingX
+            : 2
+          ).toString()
+        )
+        .setType('number')
+        .setLabel(_('Padding (horizontal)'))
+        .setGroup(_('Font'));
+      objectProperties
+        .getOrCreate('paddingY')
+        .setValue(
+          (objectContent.paddingY !== undefined
+            ? objectContent.paddingY
             : 1
           ).toString()
         )
         .setType('number')
-        .setLabel(_('Padding'))
+        .setLabel(_('Padding (vertical)'))
         .setGroup(_('Font'));
       objectProperties
         .getOrCreate('maxLength')
@@ -688,7 +702,6 @@ module.exports = {
 
     const DEFAULT_WIDTH = 300;
     const DEFAULT_HEIGHT = 30;
-    const TEXT_MASK_PADDING = 2;
 
     class RenderedTextInputObjectInstance extends RenderedInstance {
       constructor(
@@ -802,16 +815,32 @@ module.exports = {
         );
 
         const borderWidth = object.content.borderWidth || 0;
+        const paddingX =
+          object.content.paddingX !== undefined
+            ? Math.min(
+                parseFloat(object.content.paddingX),
+                width / 2 - borderWidth
+              )
+            : 2;
+        const paddingY =
+          object.content.paddingY !== undefined
+            ? Math.min(
+                parseFloat(object.content.paddingY),
+                height / 2 - borderWidth
+              )
+            : 1;
 
         // Draw the mask for the text.
-        const textOffset = borderWidth + TEXT_MASK_PADDING;
+        const textOffsetX = borderWidth + paddingX;
+        // textOffsetY does not include the paddingY because browsers display the text, even if it is supposed to be cut off by vertical padding.
+        const textOffsetY = borderWidth;
         this._pixiTextMask.clear();
         this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(
-          textOffset,
-          textOffset,
-          width - 2 * textOffset,
-          height - 2 * textOffset
+          textOffsetX,
+          textOffsetY,
+          width - 2 * textOffsetX,
+          height - 2 * textOffsetY
         );
         this._pixiTextMask.endFill();
 
@@ -819,22 +848,18 @@ module.exports = {
         const textAlign = object.content.textAlign
           ? object.content.textAlign
           : 'left';
-        const padding = object.content.padding
-          ? parseFloat(object.content.padding)
-          : 0;
 
-        if (textAlign === 'left')
-          this._pixiText.position.x = textOffset + padding;
+        if (textAlign === 'left') this._pixiText.position.x = textOffsetX;
         else if (textAlign === 'right')
           this._pixiText.position.x =
-            0 + width - this._pixiText.width - textOffset - padding;
+            0 + width - this._pixiText.width - textOffsetX;
         else if (textAlign === 'center') {
           this._pixiText.align = 'center';
           this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
         }
 
         this._pixiText.position.y = isTextArea
-          ? textOffset
+          ? textOffsetY + paddingY
           : height / 2 - this._pixiText.height / 2;
 
         // Draw the background and border.

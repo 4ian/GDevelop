@@ -48,14 +48,17 @@ namespace gdjs {
       textColor: string;
       fillColor: string;
       fillOpacity: float;
-      padding?: float;
-      textAlign?: SupportedTextAlign;
-      maxLength?: integer;
       borderColor: string;
       borderOpacity: float;
       borderWidth: float;
       disabled: boolean;
       readOnly: boolean;
+      // ---- Values can be undefined because of support added in v5.5.222.
+      paddingX?: float;
+      paddingY?: float;
+      textAlign?: SupportedTextAlign;
+      maxLength?: integer;
+      // ----
     };
   }
 
@@ -84,6 +87,10 @@ namespace gdjs {
   const DEFAULT_WIDTH = 300;
   const DEFAULT_HEIGHT = 30;
 
+  const clampPadding = (value: float, dimension: float, borderWidth: float) => {
+    return Math.max(0, Math.min(dimension / 2 - borderWidth, value));
+  };
+
   /**
    * Shows a text input on the screen the player can type text into.
    */
@@ -101,7 +108,8 @@ namespace gdjs {
     private _textColor: [float, float, float];
     private _fillColor: [float, float, float];
     private _fillOpacity: float;
-    private _padding: integer;
+    private _paddingX: integer;
+    private _paddingY: integer;
     private _textAlign: SupportedTextAlign;
     private _maxLength: integer;
     private _borderColor: [float, float, float];
@@ -133,11 +141,15 @@ namespace gdjs {
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
-      this._textAlign = parseTextAlign(objectData.content.textAlign); //textAlign is defaulted to 'left' by the parser if undefined.
-      this._maxLength = objectData.content.maxLength || 0; //maxlength and padding require a default value as they can be undefined in older projects.
-      this._padding =
-        objectData.content.padding !== undefined
-          ? objectData.content.padding
+      this._textAlign = parseTextAlign(objectData.content.textAlign);
+      this._maxLength = objectData.content.maxLength || 0;
+      this._paddingX =
+        objectData.content.paddingX !== undefined
+          ? objectData.content.paddingX
+          : 2;
+      this._paddingY =
+        objectData.content.paddingY !== undefined
+          ? objectData.content.paddingY
           : 1;
       this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
@@ -228,10 +240,16 @@ namespace gdjs {
         this._textAlign = newObjectData.content.textAlign;
       }
       if (
-        newObjectData.content.padding !== undefined &&
-        oldObjectData.content.padding !== newObjectData.content.padding
+        newObjectData.content.paddingX !== undefined &&
+        oldObjectData.content.paddingX !== newObjectData.content.paddingX
       ) {
-        this.setPadding(newObjectData.content.padding);
+        this.setPaddingX(newObjectData.content.paddingX);
+      }
+      if (
+        newObjectData.content.paddingY !== undefined &&
+        oldObjectData.content.paddingY !== newObjectData.content.paddingY
+      ) {
+        this.setPaddingY(newObjectData.content.paddingY);
       }
 
       return true;
@@ -299,6 +317,7 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+        this._renderer.updatePadding();
       }
       if (initialInstanceData.opacity !== undefined) {
         this.setOpacity(initialInstanceData.opacity);
@@ -334,10 +353,12 @@ namespace gdjs {
 
     setWidth(width: float): void {
       this._width = width;
+      this._renderer.updatePadding();
     }
 
     setHeight(height: float): void {
       this._height = height;
+      this._renderer.updatePadding();
     }
 
     /**
@@ -563,17 +584,31 @@ namespace gdjs {
       this._maxLength = value;
       this._renderer.updateMaxLength();
     }
-    getPadding(): integer {
-      return this._padding;
+
+    getPaddingX(): integer {
+      return clampPadding(this._paddingX, this._width, this._borderWidth);
     }
-    setPadding(value: integer) {
-      if (this._padding === value) return;
+    setPaddingX(value: integer) {
+      if (this._paddingX === value) return;
       if (value < 0) {
-        this._padding = 0;
+        this._paddingX = 0;
         return;
       }
 
-      this._padding = value;
+      this._paddingX = value;
+      this._renderer.updatePadding();
+    }
+    getPaddingY(): integer {
+      return clampPadding(this._paddingY, this._height, this._borderWidth);
+    }
+    setPaddingY(value: integer) {
+      if (this._paddingY === value) return;
+      if (value < 0) {
+        this._paddingY = 0;
+        return;
+      }
+
+      this._paddingY = value;
       this._renderer.updatePadding();
     }
 

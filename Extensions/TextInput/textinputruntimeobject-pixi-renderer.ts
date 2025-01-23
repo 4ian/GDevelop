@@ -71,7 +71,9 @@ namespace gdjs {
       this._input.style.width = '100%';
       this._input.style.height = '100%';
       this._input.maxLength = this._object.getMaxLength();
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
 
       this._form.appendChild(this._input);
 
@@ -240,7 +242,9 @@ namespace gdjs {
         'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
       this._form.style.textAlign = this._object.getTextAlign();
 
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
 
       // Automatically adjust the font size to follow the game scale.
       this._input.style.fontSize =
@@ -345,7 +349,9 @@ namespace gdjs {
     updatePadding() {
       if (!this._input) return;
 
-      this._input.style.padding = this._object.getPadding() + 'px';
+      this._input.style.padding = `${this._object
+        .getPaddingY()
+        .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
     }
 
     updateTextAlign() {

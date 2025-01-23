@@ -272,7 +272,8 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
-      padding: 1,
+      paddingX: 2,
+      paddingY: 1,
       textAlign: 'left',
       maxLength: 0,
     };

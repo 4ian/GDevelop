@@ -4,10 +4,9 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 export default React.memo(props => (
   <SvgIcon
     {...props}
-    fontSize="small"
     width="16"
     height="16"
-    viewBox="2 2 12 12"
+    viewBox="0 0 16 16"
     fill="none"
   >
     <path

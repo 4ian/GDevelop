@@ -135,6 +135,20 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <Platformer {...props} />,
     },
     {
+      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
+      title: t`3D platforms`,
+      description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
+      durationInMinutes: 2,
+      renderImage: props => <Object3D {...props} />,
+    },
+    {
+      id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+      title: t`Background and cameras`,
+      description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
+      durationInMinutes: 2,
+      renderImage: props => <Parallax {...props} />,
+    },
+    {
       id: TOP_DOWN_RPG_MOVEMENT_ID,
       title: t`Top-Down RPG Pixel Perfect`,
       description: t`Make a character move like in a retro Pokemon game.`,
@@ -142,25 +156,11 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <TopDownRPGMovement {...props} />,
     },
     {
-      id: FIRE_A_BULLET_ID,
-      title: t`Fire a Bullet`,
-      description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.`,
-      durationInMinutes: 3,
-      renderImage: props => <FireABullet {...props} />,
-    },
-    {
       id: JOYSTICK_IN_APP_TUTORIAL_ID,
       title: t`Joystick controls`,
       description: t`Control your spaceship with a joystick, while avoiding asteroids.`,
       durationInMinutes: 1,
       renderImage: props => <Joystick {...props} />,
-    },
-    {
-      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
-      title: t`3D platforms`,
-      description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
-      durationInMinutes: 2,
-      renderImage: props => <Object3D {...props} />,
     },
     {
       id: COOP_PLATFORMER_ID,
@@ -177,11 +177,11 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <HealthBar {...props} />,
     },
     {
-      id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
-      title: t`Background and cameras`,
-      description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
-      durationInMinutes: 2,
-      renderImage: props => <Parallax {...props} />,
+      id: FIRE_A_BULLET_ID,
+      title: t`Fire a Bullet`,
+      description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.`,
+      durationInMinutes: 3,
+      renderImage: props => <FireABullet {...props} />,
     },
     {
       id: TIMER_IN_APP_TUTORIAL_ID,

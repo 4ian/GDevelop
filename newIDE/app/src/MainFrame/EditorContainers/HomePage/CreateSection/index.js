@@ -166,8 +166,9 @@ const CreateSection = ({
     authenticatedUser
   );
   const allRecentProjectFiles = useProjectsListFor(null);
-  const hasAProjectOpenedOrSavedOrGameRegistered =
-    !!project || (!!games && games.length) || !!allRecentProjectFiles.length;
+  const savedGames = (games || []).filter(game => game.savedStatus !== 'draft');
+  const hasAProjectOpenedNowOrRecentlyOrGameSaved =
+    !!project || savedGames.length || !!allRecentProjectFiles.length;
   const hidePerformanceDashboard =
     !!limits &&
     !!limits.capabilities.classrooms &&
@@ -460,7 +461,7 @@ const CreateSection = ({
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (
               <ColumnStackLayout noMargin>
-                {hidePerformanceDashboard ? null : hasAProjectOpenedOrSavedOrGameRegistered ? (
+                {hidePerformanceDashboard ? null : hasAProjectOpenedNowOrRecentlyOrGameSaved ? (
                   <ColumnStackLayout noMargin>
                     <Grid container spacing={2}>
                       <UserEarningsWidget
@@ -559,7 +560,7 @@ const CreateSection = ({
                     />
                   </ColumnStackLayout>
                 )}
-                {!hasAProjectOpenedOrSavedOrGameRegistered && (
+                {!hasAProjectOpenedNowOrRecentlyOrGameSaved && (
                   <ColumnStackLayout noMargin>
                     <Line noMargin justifyContent="space-between">
                       <Text size="block-title" noMargin>

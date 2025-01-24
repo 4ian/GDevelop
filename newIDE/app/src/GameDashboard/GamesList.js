@@ -146,13 +146,7 @@ const getDashboardItemsToDisplay = ({
   orderBy: GamesDashboardOrderBy,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
-  let itemsToDisplay: DashboardItem[] = allDashboardItems.filter(
-    item =>
-      // First, filter out unsaved games, unless they are the opened project.
-      !item.game ||
-      item.game.savedStatus !== 'draft' ||
-      (project && item.game.id === project.getProjectUuid())
-  );
+  let itemsToDisplay: DashboardItem[] = allDashboardItems;
 
   if (searchText) {
     // If there is a search, just return those items, ordered by the search relevance.
@@ -325,9 +319,19 @@ const GamesList = ({
           file => !games.find(game => game.id === file.fileMetadata.gameId)
         )
         .map(file => ({ projectFiles: [file] }));
-      return [...projectFilesWithGame, ...projectFilesWithoutGame];
+      const allItems = [...projectFilesWithGame, ...projectFilesWithoutGame];
+
+      return allItems.filter(
+        item =>
+          // Filter out draft games which are not the current opened project.
+          !(
+            item.game &&
+            item.game.savedStatus === 'draft' &&
+            (!project || item.game.id !== project.getProjectUuid())
+          )
+      );
     },
-    [games, allRecentProjectFiles]
+    [games, allRecentProjectFiles, project]
   );
 
   const totalNumberOfPages = allDashboardItems

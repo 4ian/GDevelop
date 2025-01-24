@@ -13,7 +13,6 @@ const styles = {
     textOverflow: 'ellipsis',
     lineHeight: '17px',
     maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
-    opacity: 0.7,
   },
 };
 type Props = {|
@@ -24,12 +23,27 @@ type Props = {|
   onCheck: (newValue: boolean) => void,
   disabled?: boolean,
   fullWidth?: boolean,
+  hideTooltip?: boolean,
+  labelColor?: 'primary',
 |};
 
 export const CompactToggleField = (props: Props) => {
-  const title = !props.markdownDescription
+  const title = props.hideTooltip
+    ? null
+    : !props.markdownDescription
     ? props.label
     : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
+
+  const label = (
+    <Text
+      noMargin
+      style={styles.label}
+      color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
+    >
+      {props.label}
+    </Text>
+  );
+
   return (
     <label
       className={classNames({
@@ -69,27 +83,29 @@ export const CompactToggleField = (props: Props) => {
           </span>
         </span>
       </div>
-      <Tooltip
-        title={title}
-        enterDelay={tooltipEnterDelay}
-        placement="bottom"
-        PopperProps={{
-          modifiers: {
-            offset: {
-              enabled: true,
-              /**
-               * It does not seem possible to get the tooltip closer to the anchor
-               * when positioned on top. So it is positioned on bottom with a negative offset.
-               */
-              offset: '0,-20',
+      {props.hideTooltip ? (
+        label
+      ) : (
+        <Tooltip
+          title={title}
+          enterDelay={tooltipEnterDelay}
+          placement="bottom"
+          PopperProps={{
+            modifiers: {
+              offset: {
+                enabled: true,
+                /**
+                 * It does not seem possible to get the tooltip closer to the anchor
+                 * when positioned on top. So it is positioned on bottom with a negative offset.
+                 */
+                offset: '0,-20',
+              },
             },
-          },
-        }}
-      >
-        <Text noMargin style={styles.label}>
-          {props.label}
-        </Text>
-      </Tooltip>
+          }}
+        >
+          {label}
+        </Tooltip>
+      )}
     </label>
   );
 };

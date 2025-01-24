@@ -179,6 +179,15 @@ export const buildMainMenuDeclarativeTemplate = ({
         onClickSendEvent: 'main-menu-close',
         enabled: !!project,
       },
+      ...(!isMacLike() || !isApplicationTopLevelMenu
+        ? [
+            { type: 'separator' },
+            {
+              label: i18n._(t`Preferences`),
+              onClickSendEvent: 'main-menu-open-preferences',
+            },
+          ]
+        : []),
     ],
   };
 

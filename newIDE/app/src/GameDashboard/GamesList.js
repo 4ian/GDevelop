@@ -146,7 +146,7 @@ const getDashboardItemsToDisplay = ({
   orderBy: GamesDashboardOrderBy,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
-  let itemsToDisplay: DashboardItem[] = allDashboardItems;
+  let itemsToDisplay: DashboardItem[] = [...allDashboardItems];
 
   if (searchText) {
     // If there is a search, just return those items, ordered by the search relevance.
@@ -159,14 +159,15 @@ const getDashboardItemsToDisplay = ({
     itemsToDisplay = searchResults.map(result => result.item);
   } else {
     // If there is no search, sort the items by the selected order.
-    itemsToDisplay =
-      orderBy === 'totalSessions'
-        ? itemsToDisplay.sort(totalSessionsSort)
-        : orderBy === 'weeklySessions'
-        ? itemsToDisplay.sort(lastWeekSessionsSort)
-        : orderBy === 'lastModifiedAt'
-        ? itemsToDisplay.sort(lastModifiedAtSort)
-        : itemsToDisplay;
+    if (orderBy) {
+      itemsToDisplay.sort(
+        orderBy === 'totalSessions'
+          ? totalSessionsSort
+          : orderBy === 'weeklySessions'
+          ? lastWeekSessionsSort
+          : lastModifiedAtSort
+      );
+    }
 
     // If a project is opened, no search is done, and sorted by last modified date,
     // then the opened project should be displayed first.

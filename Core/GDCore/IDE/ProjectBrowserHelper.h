@@ -58,6 +58,15 @@ public:
                                        gd::ArbitraryEventsWorker &worker);
 
   /**
+   * \brief Call the specified worker on all events of the project (layout and
+   * external events) but not events from extensions.
+   *
+   * Only use this for stats.
+   */
+  static void ExposeProjectEventsWithoutExtensions(
+      gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker);
+
+  /**
    * \brief Call the specified worker on all events of a layout and
    * its external events.
    */

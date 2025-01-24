@@ -39,6 +39,22 @@ void ProjectBrowserHelper::ExposeProjectEvents(
   }
 }
 
+void ProjectBrowserHelper::ExposeProjectEvents(
+    gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
+  // See also gd::ResourceExposer::ExposeWholeProjectResources
+  // for a method that traverses the whole project (this time for resources)
+  // and ExposeProjectEffects (this time for effects).
+
+  ExposeProjectEventsWithoutExtensions(project, worker);
+
+  // Add events based extensions
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(project, eventsFunctionsExtension, worker);
+  }
+}
+
 void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
     gd::Project& project, gd::ArbitraryEventsWorker& worker) {
   // Add layouts events
@@ -48,6 +64,28 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
   // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     worker.Launch(project.GetExternalEvents(s).GetEvents());
+  }
+}
+
+void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
+    gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
+  // Add layouts events
+  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
+    auto &layout = project.GetLayout(s);
+    auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+    worker.Launch(layout.GetEvents(), projectScopedContainers);
+  }
+  // Add external events events
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    const auto &externalEvents = project.GetExternalEvents(s);
+    const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
+    if (project.HasLayoutNamed(associatedLayout)) {
+      auto &layout = project.GetLayout(associatedLayout);
+      auto projectScopedContainers =
+        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+      worker.Launch(project.GetExternalEvents(s).GetEvents(), projectScopedContainers);
+    }
   }
 }
 
@@ -108,38 +146,6 @@ void ProjectBrowserHelper::ExposeLayoutEventsAndDependencies(
     gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
     worker.Launch(dependencyLayout.GetEvents());
-  }
-}
-
-void ProjectBrowserHelper::ExposeProjectEvents(
-    gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
-  // See also gd::ResourceExposer::ExposeWholeProjectResources
-  // for a method that traverses the whole project (this time for resources)
-  // and ExposeProjectEffects (this time for effects).
-
-  // Add layouts events
-  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
-    auto &layout = project.GetLayout(s);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
-    worker.Launch(layout.GetEvents(), projectScopedContainers);
-  }
-  // Add external events events
-  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
-    const auto &externalEvents = project.GetExternalEvents(s);
-    const gd::String &associatedLayout = externalEvents.GetAssociatedLayout();
-    if (project.HasLayoutNamed(associatedLayout)) {
-      auto &layout = project.GetLayout(associatedLayout);
-      auto projectScopedContainers =
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
-      worker.Launch(project.GetExternalEvents(s).GetEvents(), projectScopedContainers);
-    }
-  }
-  // Add events based extensions
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(project, eventsFunctionsExtension, worker);
   }
 }
 

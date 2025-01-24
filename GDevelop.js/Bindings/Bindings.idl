@@ -2809,6 +2809,10 @@ interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
 };
 
+interface ExampleExtensionUsagesFinder {
+  [Value] SetString STATIC_GetUsedExtensions([Ref] Project project);
+};
+
 interface InstructionsCountEvaluator {
   long STATIC_ScanProject([Ref] Project project);
 };

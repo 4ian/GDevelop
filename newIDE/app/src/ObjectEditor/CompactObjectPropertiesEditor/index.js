@@ -164,7 +164,6 @@ const TopLevelCollapsibleSection = ({
     <Column noOverflowParent>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
-          s
           <IconButton size="small" onClick={toggleFolded}>
             {isFolded ? (
               <ChevronArrowRightWithRoundedBorder style={styles.icon} />

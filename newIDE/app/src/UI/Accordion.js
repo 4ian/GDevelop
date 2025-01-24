@@ -52,7 +52,7 @@ type AccordionHeadProps = {|
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
   const classes = useStylesForExpandIcon();
-  console.log(classes);
+
   return (
     <Column noMargin={props.noMargin} expand>
       <Line noMargin expand alignItems="center">

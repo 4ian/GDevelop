@@ -1,18 +1,18 @@
 // @flow
 
 import * as React from 'react';
+import classNames from 'classnames';
 import { areEqual } from 'react-window';
 import IconButton from '../IconButton';
-import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
-import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import classes from './TreeView.module.css';
 import { type ItemBaseAttributes } from './ReadOnlyTreeView';
 import { type ItemData } from './ReadOnlyTreeView';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
-import classNames from 'classnames';
 import RaisedButton from '../RaisedButton';
+import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowBottom from '../CustomSvgIcons/ChevronArrowBottom';
 
 const iconSize = 24;
 
@@ -112,9 +112,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       disabled={node.disableCollapse}
                     >
                       {node.collapsed ? (
-                        <ArrowHeadRight fontSize="small" />
+                        <ChevronArrowRight />
                       ) : (
-                        <ArrowHeadBottom fontSize="small" />
+                        <ChevronArrowBottom />
                       )}
                     </IconButton>
                     {!node.thumbnailSrc ||

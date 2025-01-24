@@ -27,8 +27,11 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import Remove from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate, { useForceRecompute } from '../../Utils/UseForceUpdate';
+import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
+import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
+import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
@@ -44,13 +47,10 @@ import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
 import { getSchemaWithOpenFullEditorButton } from './CompactObjectPropertiesSchema';
 import FlatButton from '../../UI/FlatButton';
-import ChevronArrowTop from '../../UI/CustomSvgIcons/ChevronArrowTop';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
-import SquaredDoubleChevronArrowDown from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowDown';
-import SquaredDoubleChevronArrowUp from '../../UI/CustomSvgIcons/SquaredDoubleChevronArrowUp';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
 
@@ -164,11 +164,12 @@ const TopLevelCollapsibleSection = ({
     <Column noOverflowParent>
       <LineStackLayout alignItems="center" justifyContent="space-between">
         <LineStackLayout noMargin alignItems="center">
+          s
           <IconButton size="small" onClick={toggleFolded}>
             {isFolded ? (
-              <SquaredDoubleChevronArrowUp style={styles.icon} />
+              <ChevronArrowRightWithRoundedBorder style={styles.icon} />
             ) : (
-              <SquaredDoubleChevronArrowDown style={styles.icon} />
+              <ChevronArrowDownWithRoundedBorder style={styles.icon} />
             )}
           </IconButton>
           <Text size="sub-title" noMargin style={textEllipsisStyle}>
@@ -456,7 +457,7 @@ export const CompactObjectPropertiesEditor = ({
                   <FlatButton
                     fullWidth
                     primary
-                    leftIcon={<ChevronArrowRight />}
+                    leftIcon={<ChevronArrowRight style={styles.icon} />}
                     label={<Trans>Show more</Trans>}
                     onClick={() => {
                       setShowObjectAdvancedOptions(true);
@@ -482,7 +483,7 @@ export const CompactObjectPropertiesEditor = ({
                   <FlatButton
                     fullWidth
                     primary
-                    leftIcon={<ChevronArrowTop />}
+                    leftIcon={<ChevronArrowTop style={styles.icon} />}
                     label={<Trans>Show less</Trans>}
                     onClick={() => {
                       setShowObjectAdvancedOptions(false);

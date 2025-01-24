@@ -5,8 +5,8 @@ import DropIndicator from '../SortableVirtualizedItemList/DropIndicator';
 import memoizeOne from 'memoize-one';
 import { areEqual } from 'react-window';
 import IconButton from '../IconButton';
-import ArrowHeadBottom from '../CustomSvgIcons/ArrowHeadBottom';
-import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
+import ChevronArrowBottom from '../CustomSvgIcons/ChevronArrowBottom';
+import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -358,9 +358,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     disabled={node.disableCollapse}
                   >
                     {node.collapsed ? (
-                      <ArrowHeadRight fontSize="small" />
+                      <ChevronArrowRight viewBox="2 2 12 12" fontSize="small" />
                     ) : (
-                      <ArrowHeadBottom fontSize="small" />
+                      <ChevronArrowBottom
+                        viewBox="2 2 12 12"
+                        fontSize="small"
+                      />
                     )}
                   </IconButton>
                   {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (

@@ -14,6 +14,12 @@ import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { type Schema, type ActionButton } from '../../CompactPropertiesEditor';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
+export const styles = {
+  icon: {
+    fontSize: 18,
+  },
+};
+
 export const getSchemaWithOpenFullEditorButton = ({
   schema,
   fullEditorLabel,
@@ -149,7 +155,7 @@ export const CompactBehaviorPropertiesEditor = ({
         <FlatButton
           fullWidth
           primary
-          leftIcon={<ChevronArrowRight />}
+          leftIcon={<ChevronArrowRight style={styles.icon} />}
           label={<Trans>Show more</Trans>}
           onClick={() => {
             setShowAdvancedOptions(true);
@@ -170,7 +176,7 @@ export const CompactBehaviorPropertiesEditor = ({
         <FlatButton
           fullWidth
           primary
-          leftIcon={<ChevronArrowTop />}
+          leftIcon={<ChevronArrowTop style={styles.icon} />}
           label={<Trans>Show less</Trans>}
           onClick={() => {
             setShowAdvancedOptions(false);

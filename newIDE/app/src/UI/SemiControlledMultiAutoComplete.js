@@ -14,6 +14,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { textEllipsisStyle } from './TextEllipsis';
 import Text from './Text';
+import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const renderItem = (option: AutocompleteOption, state: Object): React.Node => (
   <ListItem dense component={'div'} style={autocompleteStyles.listItem}>
@@ -99,6 +100,7 @@ const SemiControlledMultiAutoComplete = React.forwardRef<
           inputValue={props.inputValue}
           onInputChange={props.onInputChange}
           options={props.dataSource}
+          popupIcon={<ChevronArrowBottom />}
           PaperComponent={AutocompletePaperComponent}
           renderOption={renderItem}
           getOptionLabel={(option: AutocompleteOption) => option.text}

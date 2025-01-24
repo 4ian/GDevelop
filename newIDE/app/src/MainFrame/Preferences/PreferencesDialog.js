@@ -7,9 +7,9 @@ import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SelectOption from '../../UI/SelectOption';
-import Toggle from '../../UI/Toggle';
+import { CompactToggleField } from '../../UI/CompactToggleField';
 import Dialog from '../../UI/Dialog';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
@@ -183,27 +183,17 @@ const PreferencesDialog = ({
           <Text size="block-title">
             <Trans>Layouts</Trans>
           </Text>
-          <Column noMargin>
+          <ColumnStackLayout expand noMargin>
             <RaisedButton
               label={<Trans>Reset Scene Editor layout</Trans>}
               onClick={() => setDefaultEditorMosaicNode('scene-editor', null)}
               disabled={!getDefaultEditorMosaicNode('scene-editor')}
             />
-            <Spacer />
-            <RaisedButton
-              label={<Trans>Reset Scene Editor (small window) layout</Trans>}
-              onClick={() =>
-                setDefaultEditorMosaicNode('scene-editor-small', null)
-              }
-              disabled={!getDefaultEditorMosaicNode('scene-editor-small')}
-            />
-            <Spacer />
             <RaisedButton
               label={<Trans>Reset Debugger layout</Trans>}
               onClick={() => setDefaultEditorMosaicNode('debugger', null)}
               disabled={!getDefaultEditorMosaicNode('debugger')}
             />
-            <Spacer />
             <RaisedButton
               label={<Trans>Reset Resource Editor layout</Trans>}
               onClick={() =>
@@ -211,7 +201,6 @@ const PreferencesDialog = ({
               }
               disabled={!getDefaultEditorMosaicNode('resources-editor')}
             />
-            <Spacer />
             <RaisedButton
               label={<Trans>Reset Extension Editor layout</Trans>}
               onClick={() =>
@@ -224,7 +213,7 @@ const PreferencesDialog = ({
                 !getDefaultEditorMosaicNode('events-functions-extension-editor')
               }
             />
-          </Column>
+          </ColumnStackLayout>
           <Text size="block-title">
             <Trans>Dialogs</Trans>
           </Text>
@@ -265,38 +254,34 @@ const PreferencesDialog = ({
           <Text size="block-title">
             <Trans>Updates</Trans>
           </Text>
-          <Toggle
-            onToggle={(e, check) => setAutoDownloadUpdates(check)}
-            toggled={values.autoDownloadUpdates}
-            labelPosition="right"
-            label={
-              <Trans>Auto download and install updates (recommended)</Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setAutoDownloadUpdates}
+            checked={values.autoDownloadUpdates}
+            label={i18n._(t`Auto download and install updates (recommended)`)}
           />
-          <Toggle
-            onToggle={(e, check) => setAutoDisplayChangelog(check)}
-            toggled={values.autoDisplayChangelog}
-            labelPosition="right"
-            label={
-              <Trans>
-                Display What's New when a new version is launched (recommended)
-              </Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setAutoDisplayChangelog}
+            checked={values.autoDisplayChangelog}
+            label={i18n._(
+              t`Display What's New when a new version is launched (recommended)`
+            )}
           />
           <Text size="block-title">
             <Trans>Events Sheet</Trans>
           </Text>
-          <Toggle
-            onToggle={(e, check) => setEventsSheetShowObjectThumbnails(check)}
-            toggled={values.eventsSheetShowObjectThumbnails}
-            labelPosition="right"
-            label={<Trans>Display object thumbnails in Events Sheets</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setEventsSheetShowObjectThumbnails}
+            checked={values.eventsSheetShowObjectThumbnails}
+            label={i18n._(t`Display object thumbnails in Events Sheets`)}
           />
-          <Toggle
-            onToggle={(e, check) => setEventsSheetUseAssignmentOperators(check)}
-            toggled={values.eventsSheetUseAssignmentOperators}
-            labelPosition="right"
-            label={<Trans>Display assignment operators in Events Sheets</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setEventsSheetUseAssignmentOperators}
+            checked={values.eventsSheetUseAssignmentOperators}
+            label={i18n._(t`Display assignment operators in Events Sheets`)}
           />
           <SelectField
             floatingLabelText={<Trans>Indent Scale in Events Sheet</Trans>}
@@ -333,142 +318,117 @@ const PreferencesDialog = ({
           <Text size="block-title">
             <Trans>Embedded help and tutorials</Trans>
           </Text>
-          <Column noMargin>
-            <Line>
-              <RaisedButton
-                label={<Trans>Reset hidden embedded explanations</Trans>}
-                onClick={() => showAllAlertMessages()}
-                disabled={!Object.keys(values.hiddenAlertMessages).length}
-              />
-            </Line>
-            <Line>
-              <RaisedButton
-                label={<Trans>Reset hidden embedded tutorials</Trans>}
-                onClick={() => showAllTutorialHints()}
-                disabled={!Object.keys(values.hiddenTutorialHints).length}
-              />
-            </Line>
-            <Line>
-              <RaisedButton
-                label={<Trans>Reset hidden announcements</Trans>}
-                onClick={() => showAllAnnouncements()}
-                disabled={!Object.keys(values.hiddenAnnouncements).length}
-              />
-            </Line>
-          </Column>
+          <ColumnStackLayout expand noMargin>
+            <RaisedButton
+              label={<Trans>Reset hidden embedded explanations</Trans>}
+              onClick={() => showAllAlertMessages()}
+              disabled={!Object.keys(values.hiddenAlertMessages).length}
+            />
+            <RaisedButton
+              label={<Trans>Reset hidden embedded tutorials</Trans>}
+              onClick={() => showAllTutorialHints()}
+              disabled={!Object.keys(values.hiddenTutorialHints).length}
+            />
+            <RaisedButton
+              label={<Trans>Reset hidden announcements</Trans>}
+              onClick={() => showAllAnnouncements()}
+              disabled={!Object.keys(values.hiddenAnnouncements).length}
+            />
+          </ColumnStackLayout>
           <Text size="block-title">
             <Trans>Advanced</Trans>
           </Text>
-          <Toggle
-            onToggle={(e, check) => setAutosaveOnPreview(check)}
-            toggled={values.autosaveOnPreview}
-            labelPosition="right"
-            label={<Trans>Auto-save project on preview</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setAutosaveOnPreview}
+            checked={values.autosaveOnPreview}
+            label={i18n._(t`Auto-save project on preview`)}
           />
-          <Toggle
-            onToggle={(e, check) =>
-              setFetchPlayerTokenForPreviewAutomatically(check)
-            }
-            toggled={values.fetchPlayerTokenForPreviewAutomatically}
-            labelPosition="right"
-            label={<Trans>Automatically log in as a player in preview</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setFetchPlayerTokenForPreviewAutomatically}
+            checked={values.fetchPlayerTokenForPreviewAutomatically}
+            label={i18n._(t`Automatically log in as a player in preview`)}
           />
-          <Toggle
-            onToggle={(e, check) =>
-              setDisplaySaveReminder({ activated: check })
-            }
-            toggled={values.displaySaveReminder.activated}
-            labelPosition="right"
-            label={
-              <Trans>
-                Display save reminder after significant changes in project
-              </Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={check => setDisplaySaveReminder({ activated: check })}
+            checked={values.displaySaveReminder.activated}
+            label={i18n._(
+              t`Display save reminder after significant changes in project`
+            )}
           />
-          <Toggle
-            onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
-            toggled={values.autoOpenMostRecentProject}
-            labelPosition="right"
-            label={
-              <Trans>
-                Automatically re-open the project edited during last session
-              </Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setAutoOpenMostRecentProject}
+            checked={values.autoOpenMostRecentProject}
+            label={i18n._(
+              t`Automatically re-open the project edited during last session`
+            )}
           />
-          <Toggle
-            onToggle={(e, check) => setShowCommunityExtensions(check)}
-            toggled={values.showCommunityExtensions}
-            labelPosition="right"
-            label={
-              <Trans>
-                Show community (non reviewed) extensions in the list of
-                extensions
-              </Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setShowCommunityExtensions}
+            checked={values.showCommunityExtensions}
+            label={i18n._(
+              t`Show community (non reviewed) extensions in the list of extensions`
+            )}
           />
           {!!electron && (
-            <Toggle
-              onToggle={(e, check) =>
+            <CompactToggleField
+              hideTooltip
+              onCheck={check =>
                 setWatchProjectFolderFilesForLocalProjects(check)
               }
-              toggled={values.watchProjectFolderFilesForLocalProjects}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Watch the project folder for file changes in order to refresh
-                  the resources used in the editor (images, 3D models, fonts,
-                  etc.)
-                </Trans>
-              }
+              checked={values.watchProjectFolderFilesForLocalProjects}
+              label={i18n._(
+                t`Watch the project folder for file changes in order to refresh the resources used in the editor (images, 3D models, fonts, etc.)`
+              )}
             />
           )}
-          <Toggle
-            onToggle={(e, check) => setOpenDiagnosticReportAutomatically(check)}
-            toggled={values.openDiagnosticReportAutomatically}
-            labelPosition="right"
-            label={
-              <Trans>Automatically open the diagnostic report at preview</Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setOpenDiagnosticReportAutomatically}
+            checked={values.openDiagnosticReportAutomatically}
+            label={i18n._(
+              t`Automatically open the diagnostic report at preview`
+            )}
           />
-          <Toggle
-            onToggle={(e, check) =>
+          <CompactToggleField
+            hideTooltip
+            onCheck={check =>
               setPreviewCrashReportUploadLevel(
                 check ? 'exclude-javascript-code-events' : 'none'
               )
             }
-            toggled={values.previewCrashReportUploadLevel !== 'none'}
-            labelPosition="right"
-            label={
-              <Trans>Send crash reports during previews to GDevelop</Trans>
-            }
+            checked={values.previewCrashReportUploadLevel !== 'none'}
+            label={i18n._(t`Send crash reports during previews to GDevelop`)}
           />
-          <Toggle
-            onToggle={(e, check) => setTakeScreenshotOnPreview(check)}
-            toggled={values.takeScreenshotOnPreview}
-            labelPosition="right"
-            label={
-              <Trans>Automatically take a screenshot in game previews</Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setTakeScreenshotOnPreview}
+            checked={values.takeScreenshotOnPreview}
+            label={i18n._(t`Automatically take a screenshot in game previews`)}
           />
-          <Toggle
-            onToggle={(e, check) => setShowDeprecatedInstructionWarning(check)}
-            toggled={values.showDeprecatedInstructionWarning}
-            labelPosition="right"
-            label={
-              <Trans>Show a warning on deprecated actions and conditions</Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setShowDeprecatedInstructionWarning}
+            checked={values.showDeprecatedInstructionWarning}
+            label={i18n._(
+              t`Show a warning on deprecated actions and conditions`
+            )}
           />
-          <Toggle
-            onToggle={(e, check) => setShowBasicProfilingCounters(check)}
-            toggled={values.showBasicProfilingCounters}
-            labelPosition="right"
-            label={<Trans>Display profiling information in scene editor</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setShowBasicProfilingCounters}
+            checked={values.showBasicProfilingCounters}
+            label={i18n._(t`Display profiling information in scene editor`)}
           />
-          <Toggle
-            onToggle={(e, check) => setUse3DEditor(check)}
-            toggled={values.use3DEditor}
-            labelPosition="right"
-            label={<Trans>Show objects in 3D in the scene editor</Trans>}
+          <CompactToggleField
+            hideTooltip
+            onCheck={setUse3DEditor}
+            checked={values.use3DEditor}
+            label={i18n._(t`Show objects in 3D in the scene editor`)}
           />
           {initialUse3DEditor.current !== values.use3DEditor && (
             <AlertMessage kind="info">
@@ -481,40 +441,32 @@ const PreferencesDialog = ({
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>
-                <Toggle
-                  onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
-                  toggled={values.isMenuBarHiddenInPreview}
-                  labelPosition="right"
-                  label={<Trans>Hide the menu bar in the preview window</Trans>}
+                <CompactToggleField
+                  hideTooltip
+                  onCheck={setIsMenuBarHiddenInPreview}
+                  checked={values.isMenuBarHiddenInPreview}
+                  label={i18n._(t`Hide the menu bar in the preview window`)}
                 />
-                <Toggle
-                  onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
-                  toggled={values.isAlwaysOnTopInPreview}
-                  labelPosition="right"
-                  label={
-                    <Trans>
-                      Always display the preview window on top of the editor
-                    </Trans>
-                  }
+                <CompactToggleField
+                  hideTooltip
+                  onCheck={setIsAlwaysOnTopInPreview}
+                  checked={values.isAlwaysOnTopInPreview}
+                  label={i18n._(
+                    t`Always display the preview window on top of the editor`
+                  )}
                 />
-                <Toggle
-                  onToggle={(e, check) =>
-                    setUseShortcutToClosePreviewWindow(check)
-                  }
-                  toggled={values.useShortcutToClosePreviewWindow}
-                  labelPosition="right"
-                  label={
-                    <Trans>
-                      Enable "Close project" shortcut (
-                      {adaptAcceleratorString(
-                        getElectronAccelerator(
-                          values.userShortcutMap['CLOSE_PROJECT'] ||
-                            defaultShortcuts['CLOSE_PROJECT']
-                        )
-                      )}
-                      ) to close preview window
-                    </Trans>
-                  }
+                <CompactToggleField
+                  hideTooltip
+                  onCheck={setUseShortcutToClosePreviewWindow}
+                  checked={values.useShortcutToClosePreviewWindow}
+                  label={i18n._(
+                    t`Enable "Close project" shortcut (${adaptAcceleratorString(
+                      getElectronAccelerator(
+                        values.userShortcutMap['CLOSE_PROJECT'] ||
+                          defaultShortcuts['CLOSE_PROJECT']
+                      )
+                    )}) to close preview window`
+                  )}
                 />
               </ColumnStackLayout>
             </>
@@ -522,37 +474,34 @@ const PreferencesDialog = ({
           <Text size="block-title">
             <Trans>Contributor options</Trans>
           </Text>
-          <Toggle
-            onToggle={(e, check) => setShowInAppTutorialDeveloperMode(check)}
-            toggled={values.showInAppTutorialDeveloperMode}
-            labelPosition="right"
-            label={
-              <Trans>
-                Show button to load guided lesson from file and test it.
-              </Trans>
-            }
+          <CompactToggleField
+            hideTooltip
+            onCheck={setShowInAppTutorialDeveloperMode}
+            checked={values.showInAppTutorialDeveloperMode}
+            label={i18n._(
+              t`Show button to load guided lesson from file and test it`
+            )}
           />
           {Window.isDev() && (
             <>
-              <Text size="block-title">
-                <Trans>Developer options</Trans>
-              </Text>
-              <Toggle
-                onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
-                toggled={values.useGDJSDevelopmentWatcher}
-                labelPosition="right"
-                label={
-                  <Trans>
-                    Watch changes in game engine (GDJS) sources and auto import
-                    them (dev only)
-                  </Trans>
-                }
-              />
-              <FlatButton
-                fullWidth
-                onClick={onOpenQuickCustomizationDialog}
-                label={<Trans>Open quick customization</Trans>}
-              />
+              <ColumnStackLayout expand noMargin>
+                <Text size="block-title">
+                  <Trans>Developer options</Trans>
+                </Text>
+                <CompactToggleField
+                  hideTooltip
+                  onCheck={setUseGDJSDevelopmentWatcher}
+                  checked={values.useGDJSDevelopmentWatcher}
+                  label={i18n._(
+                    t`Watch changes in game engine (GDJS) sources and auto import them (dev only)`
+                  )}
+                />
+                <FlatButton
+                  fullWidth
+                  onClick={onOpenQuickCustomizationDialog}
+                  label={<Trans>Open quick customization</Trans>}
+                />
+              </ColumnStackLayout>
             </>
           )}
         </ColumnStackLayout>

@@ -24,10 +24,13 @@ type Props = {|
   onCheck: (newValue: boolean) => void,
   disabled?: boolean,
   fullWidth?: boolean,
+  hideTooltip?: boolean,
 |};
 
 export const CompactToggleField = (props: Props) => {
-  const title = !props.markdownDescription
+  const title = props.hideTooltip
+    ? null
+    : !props.markdownDescription
     ? props.label
     : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
   return (
@@ -69,27 +72,33 @@ export const CompactToggleField = (props: Props) => {
           </span>
         </span>
       </div>
-      <Tooltip
-        title={title}
-        enterDelay={tooltipEnterDelay}
-        placement="bottom"
-        PopperProps={{
-          modifiers: {
-            offset: {
-              enabled: true,
-              /**
-               * It does not seem possible to get the tooltip closer to the anchor
-               * when positioned on top. So it is positioned on bottom with a negative offset.
-               */
-              offset: '0,-20',
-            },
-          },
-        }}
-      >
+      {props.hideTooltip ? (
         <Text noMargin style={styles.label}>
           {props.label}
         </Text>
-      </Tooltip>
+      ) : (
+        <Tooltip
+          title={title}
+          enterDelay={tooltipEnterDelay}
+          placement="bottom"
+          PopperProps={{
+            modifiers: {
+              offset: {
+                enabled: true,
+                /**
+                 * It does not seem possible to get the tooltip closer to the anchor
+                 * when positioned on top. So it is positioned on bottom with a negative offset.
+                 */
+                offset: '0,-20',
+              },
+            },
+          }}
+        >
+          <Text noMargin style={styles.label}>
+            {props.label}
+          </Text>
+        </Tooltip>
+      )}
     </label>
   );
 };

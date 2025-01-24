@@ -49,7 +49,6 @@ export type AlertMessageIdentifier =
 
 export type EditorMosaicName =
   | 'scene-editor'
-  | 'scene-editor-small'
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor';

@@ -358,9 +358,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     disabled={node.disableCollapse}
                   >
                     {node.collapsed ? (
-                      <ChevronArrowRight />
+                      <ChevronArrowRight viewBox="2 2 12 12" fontSize="small" />
                     ) : (
-                      <ChevronArrowBottom />
+                      <ChevronArrowBottom
+                        viewBox="2 2 12 12"
+                        fontSize="small"
+                      />
                     )}
                   </IconButton>
                   {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (

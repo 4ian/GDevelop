@@ -2,14 +2,15 @@
 import { Trans } from '@lingui/macro';
 
 import React, { useContext } from 'react';
-import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import Text from '../../UI/Text';
 import Link from '../../UI/Link';
+import { LineStackLayout } from '../../UI/Layout';
+import CompactSelectField from '../../UI/CompactSelectField';
 
 type Props = {|
   onLanguageChanged: (language: string) => void,
@@ -52,26 +53,31 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
 
   return (
     <Column noMargin>
-      <Line noMargin expand>
-        <SelectField
-          floatingLabelText={<Trans>Choose GDevelop language</Trans>}
-          value={values.language}
-          onChange={(e, i, value: string) => {
-            setLanguage(value);
-            onLanguageChanged(value);
-          }}
-          fullWidth
-        >
-          <SelectOption value="en" label="English (default)" />
-          {goodProgressLocales.map(localeMetadata =>
-            renderLanguageSelectOption(localeMetadata)
-          )}
-          {startedLocales.map(localeMetadata =>
-            renderLanguageSelectOption(localeMetadata)
-          )}
-        </SelectField>
-      </Line>
-      <Text>
+      <LineStackLayout noMargin alignItems="center">
+        <Column noMargin expand>
+          <Text noMargin>
+            <Trans>Choose GDevelop language</Trans>
+          </Text>
+        </Column>
+        <Column noMargin expand>
+          <CompactSelectField
+            value={values.language}
+            onChange={(value: string) => {
+              setLanguage(value);
+              onLanguageChanged(value);
+            }}
+          >
+            <SelectOption value="en" label="English (default)" />
+            {goodProgressLocales.map(localeMetadata =>
+              renderLanguageSelectOption(localeMetadata)
+            )}
+            {startedLocales.map(localeMetadata =>
+              renderLanguageSelectOption(localeMetadata)
+            )}
+          </CompactSelectField>
+        </Column>
+      </LineStackLayout>
+      <Text color="secondary">
         <Trans>
           You can{' '}
           <Link

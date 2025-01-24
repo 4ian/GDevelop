@@ -13,7 +13,6 @@ const styles = {
     textOverflow: 'ellipsis',
     lineHeight: '17px',
     maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
-    opacity: 0.7,
   },
 };
 type Props = {|
@@ -25,6 +24,7 @@ type Props = {|
   disabled?: boolean,
   fullWidth?: boolean,
   hideTooltip?: boolean,
+  labelColor?: 'primary',
 |};
 
 export const CompactToggleField = (props: Props) => {
@@ -33,6 +33,17 @@ export const CompactToggleField = (props: Props) => {
     : !props.markdownDescription
     ? props.label
     : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
+
+  const label = (
+    <Text
+      noMargin
+      style={styles.label}
+      color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
+    >
+      {props.label}
+    </Text>
+  );
+
   return (
     <label
       className={classNames({
@@ -73,9 +84,7 @@ export const CompactToggleField = (props: Props) => {
         </span>
       </div>
       {props.hideTooltip ? (
-        <Text noMargin style={styles.label}>
-          {props.label}
-        </Text>
+        label
       ) : (
         <Tooltip
           title={title}
@@ -94,9 +103,7 @@ export const CompactToggleField = (props: Props) => {
             },
           }}
         >
-          <Text noMargin style={styles.label}>
-            {props.label}
-          </Text>
+          {label}
         </Tooltip>
       )}
     </label>

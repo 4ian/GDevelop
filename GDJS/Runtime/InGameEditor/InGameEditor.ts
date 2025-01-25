@@ -23,6 +23,12 @@ namespace gdjs {
   const RIGHT_CTRL_KEY = gdjs.InputManager.getLocationAwareKeyCode(CTRL_KEY, 2);
   const LEFT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(91, 1);
   const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
+  const W_KEY = 87;
+  const A_KEY = 65;
+  const S_KEY = 83;
+  const D_KEY = 68;
+  const Q_KEY = 81;
+  const E_KEY = 69;
 
   function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
     return value !== null && value !== undefined;
@@ -152,6 +158,36 @@ namespace gdjs {
     }
   }
 
+  const getCameraVectors = (threeCamera: THREE.Camera) => {
+    // Make sure camera's matrixWorld is up-to-date (usually is, but good practice).
+    threeCamera.updateMatrixWorld();
+
+    // threeCamera.matrixWorld is a 4x4. In Three.js, the columns correspond to:
+    //   [ right.x,   up.x,    forwardNeg.x,  pos.x
+    //     right.y,   up.y,    forwardNeg.y,  pos.y
+    //     right.z,   up.z,    forwardNeg.z,  pos.z
+    //     0,         0,       0,             1     ]
+    //
+    // By default, a Three.js camera looks down the -Z axis, so the "forward" axis
+    // in the matrix is actually the negative Z column. We'll call it "forward" below.
+    // We also invert the Y axis because it's inverted in GDevelop coordinates.
+    const elements = threeCamera.matrixWorld.elements;
+
+    // Local right axis in world space:
+    const right = new THREE.Vector3(elements[0], -elements[1], elements[2]);
+    // Local up axis in world space:
+    const up = new THREE.Vector3(elements[4], -elements[5], elements[6]);
+    // Local forward axis in world space (note we take the negative of that column).
+    const forward = new THREE.Vector3(-elements[8], elements[9], -elements[10]);
+
+    // Normalize them, just in case (they should generally be unit vectors).
+    right.normalize();
+    up.normalize();
+    forward.normalize();
+
+    return { right, up, forward };
+  };
+
   export class InGameEditor {
     private _runtimeGame: RuntimeGame;
     private _tempVector2d = new THREE.Vector2();
@@ -199,84 +235,102 @@ namespace gdjs {
       layerNames.forEach((layerName) => {
         const layer = currentScene.getLayer(layerName);
 
+        // TODO: factor this?
+        const assumedFovIn2D = 45;
+        const layerRenderer = layer.getRenderer();
+        const threeCamera = layerRenderer.getThreeCamera();
+        const fov = threeCamera
+          ? threeCamera instanceof THREE.OrthographicCamera
+            ? null
+            : threeCamera.fov
+          : assumedFovIn2D;
+        if (!threeCamera) return;
 
-        // Mouse wheel: forward/backward movement.
-        // TODO: replace this by a "real 3D movement" forward/backward.
+        const { right, up, forward } = getCameraVectors(threeCamera);
+
+        const moveCameraByVector = (vector: THREE.Vector3, scale: number) => {
+          layer.setCameraX(layer.getCameraX() + vector.x * scale);
+          layer.setCameraY(layer.getCameraY() + vector.y * scale);
+          layer.setCameraZ(layer.getCameraZ(fov) + vector.z * scale, fov);
+        };
+
+        // Mouse wheel: movement on the plane or forward/backward movement.
         const wheelDeltaY = inputManager.getMouseWheelDelta();
         const wheelDeltaX = inputManager.getMouseWheelDeltaX();
         if (shouldZoom(inputManager)) {
-          // TODO: factor this?
-          const assumedFovIn2D = 45;
-          const layerRenderer = layer.getRenderer();
-          const threeCamera = layerRenderer.getThreeCamera();
-          const fov = threeCamera
-            ? threeCamera instanceof THREE.OrthographicCamera
-              ? null
-              : threeCamera.fov
-            : assumedFovIn2D;
-
-          layer.setCameraZ(layer.getCameraZ(fov) - wheelDeltaY, fov);
+          moveCameraByVector(forward, wheelDeltaY);
         } else if (shouldScrollHorizontally(inputManager)) {
-          layer.setCameraX(layer.getCameraX() + wheelDeltaY / 5);
+          moveCameraByVector(right, wheelDeltaY / 5);
         } else {
-          layer.setCameraX(layer.getCameraX() + wheelDeltaX / 5);
-          layer.setCameraY(layer.getCameraY() - wheelDeltaY / 5);
+          moveCameraByVector(up, wheelDeltaY / 5);
+          moveCameraByVector(right, wheelDeltaX / 5);
         }
 
-        // Movement with the keyboard
-        // TODO: replace this by a "real 3D movement" in the camera plane.
+        // Movement with the keyboard:
+        // Either arrow keys (move in the camera plane) or WASD ("FPS move" + Q/E for up/down).
+        const moveSpeed = isShiftPressed(inputManager) ? 12 : 6;
+
         if (inputManager.isKeyPressed(LEFT_KEY)) {
-          layer.setCameraX(layer.getCameraX() - 5);
+          moveCameraByVector(right, -moveSpeed);
         }
         if (inputManager.isKeyPressed(RIGHT_KEY)) {
-          layer.setCameraX(layer.getCameraX() + 5);
+          moveCameraByVector(right, moveSpeed);
         }
         if (inputManager.isKeyPressed(UP_KEY)) {
-          layer.setCameraY(layer.getCameraY() - 5);
+          moveCameraByVector(up, moveSpeed);
         }
         if (inputManager.isKeyPressed(DOWN_KEY)) {
-          layer.setCameraY(layer.getCameraY() + 5);
+          moveCameraByVector(up, -moveSpeed);
+        }
+        // Forward/back
+        if (inputManager.isKeyPressed(W_KEY)) {
+          moveCameraByVector(forward, moveSpeed);
+        }
+        if (inputManager.isKeyPressed(S_KEY)) {
+          moveCameraByVector(forward, -moveSpeed);
+        }
+
+        // Left/right (strafe)
+        if (inputManager.isKeyPressed(A_KEY)) {
+          moveCameraByVector(right, -moveSpeed);
+        }
+        if (inputManager.isKeyPressed(D_KEY)) {
+          moveCameraByVector(right, moveSpeed);
+        }
+
+        // Up/down
+        if (inputManager.isKeyPressed(Q_KEY)) {
+          moveCameraByVector(up, -moveSpeed);
+        }
+        if (inputManager.isKeyPressed(E_KEY)) {
+          moveCameraByVector(up, moveSpeed);
         }
 
         // Space + click: move the camera on its plane.
-        // TODO: replace this by a "real 3D movement" in the camera plane.
         if (
           inputManager.isKeyPressed(SPACE_KEY) &&
           inputManager.isMouseButtonPressed(0)
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();
           const yDelta = this._lastCursorY - inputManager.getCursorY();
-          layer.setCameraX(layer.getCameraX() + xDelta);
-          layer.setCameraY(layer.getCameraY() + yDelta);
+          moveCameraByVector(up, -yDelta);
+          moveCameraByVector(right, xDelta);
         }
 
+        // Right click: rotate the camera.
         if (inputManager.isMouseButtonPressed(1)) {
           const xDelta = inputManager.getCursorX() - this._lastCursorX;
           const yDelta = inputManager.getCursorY() - this._lastCursorY;
 
           const layerRenderer = layer.getRenderer();
           const threeCamera = layerRenderer.getThreeCamera();
-          console.log("Rotating")
 
-          if (
-            threeCamera
-          ) {
-            // Adjust rotation speed to taste
-            const rotationSpeed = 0.002;
-
-            // Yaw (rotate around the Y axis)
-            // threeCamera.rotation.y -= xDelta * rotationSpeed;
-            // threeCamera.rotation.z += xDelta * rotationSpeed;
-            layer.setCameraRotation(layer.getCameraRotation() + gdjs.toDegrees(xDelta * rotationSpeed));
-            // Pitch (rotate around the X axis)
+          if (threeCamera) {
+            const rotationSpeed = 0.004;
+            layer.setCameraRotation(
+              layer.getCameraRotation() + gdjs.toDegrees(xDelta * rotationSpeed)
+            );
             threeCamera.rotation.x -= yDelta * rotationSpeed;
-
-            // OPTIONAL: Clamp the pitch to avoid flipping upside down
-            // const maxPitch = Math.PI / 2;
-            // threeCamera.rotation.x = Math.max(
-            //   -maxPitch,
-            //   Math.min(maxPitch, threeCamera.rotation.x)
-            // );
           }
         }
       });
@@ -330,6 +384,7 @@ namespace gdjs {
       if (
         inputManager.isMouseButtonPressed(0) &&
         !this._selectionControlsMovement
+        // TODO: add check for space key
       ) {
         if (!isShiftPressed(inputManager)) {
           this._selection.clear();

@@ -9,7 +9,7 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchStructuredItem,
-  type SearchMatch,
+  type SearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
@@ -21,10 +21,7 @@ const excludedCommunityTiers = new Set(['community']);
 
 type ExtensionStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<{|
-    item: ExtensionShortHeader,
-    matches: SearchMatch[],
-  |}>,
+  searchResults: ?Array<SearchResult<ExtensionShortHeader>>,
   fetchExtensionsAndFilters: () => void,
   error: ?Error,
   searchText: string,
@@ -177,10 +174,9 @@ export const ExtensionStoreStateProvider = ({
     [extensionShortHeadersByName]
   );
 
-  const searchResults: ?Array<{|
-    item: ExtensionShortHeader,
-    matches: SearchMatch[],
-  |}> = useSearchStructuredItem(extensionShortHeadersByName, {
+  const searchResults: ?Array<
+    SearchResult<ExtensionShortHeader>
+  > = useSearchStructuredItem(extensionShortHeadersByName, {
     searchText,
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,

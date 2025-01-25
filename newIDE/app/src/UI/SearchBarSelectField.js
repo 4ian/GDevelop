@@ -6,6 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { makeStyles } from '@material-ui/core';
 import Paper from './Paper';
+import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
@@ -143,6 +144,7 @@ const SearchBarSelectField = React.forwardRef<
               SelectProps={{
                 native: true,
                 classes: selectStyles,
+                IconComponent: ChevronArrowBottom,
               }}
               margin="none"
               style={styles.input}

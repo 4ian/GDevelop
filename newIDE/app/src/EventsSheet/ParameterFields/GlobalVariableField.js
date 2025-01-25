@@ -13,7 +13,8 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateVariables } from './EnumerateVariables';
-import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
+
+const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
@@ -63,6 +64,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen && project && (
           <GlobalVariablesDialog
@@ -90,6 +92,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
+const getVariableSourceFromIdentifier = (
+  variableName: string,
+  projectScopedContainers: gdProjectScopedContainers
+): VariablesContainer_SourceType => gd.VariablesContainer.Global;
+
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'global variable', GlobalVariableIcon);
+) =>
+  renderVariableWithIcon(
+    props,
+    'global variable',
+    getVariableSourceFromIdentifier
+  );

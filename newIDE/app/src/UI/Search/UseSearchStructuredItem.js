@@ -23,9 +23,19 @@ export type SearchMatch = {|
   indices: number[][],
   value: string,
 |};
+export type AugmentedSearchMatch = {|
+  ...SearchMatch,
+  closestExactMatchAtStartOfWordIndex: number | null,
+  closestExactMatchIndex: number | null,
+|};
 export type SearchResult<T> = {|
   item: T,
   matches: SearchMatch[],
+  score?: number,
+|};
+export type AugmentedSearchResult<T> = {|
+  ...SearchResult<T>,
+  matches: AugmentedSearchMatch[],
 |};
 
 type SearchOptions = {|
@@ -83,6 +93,11 @@ export const getFuseSearchQueryForMultipleKeys = (
   };
 };
 
+/**
+ * Method that optimizes the match object returned by Fuse.js in the case
+ * the indices are used to display the matches.
+ * It gets rid of the indices that do not match the search text exactly.
+ */
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
   const lowerCaseSearchText = searchText.toLowerCase();
   return match.indices
@@ -111,12 +126,170 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
     .filter(Boolean);
 };
 
+const getFirstExactMatchPosition = (
+  match: SearchMatch,
+  lowerCaseSearchText: string
+) => {
+  let closestExactMatchIndex = null;
+  let closestExactMatchAtStartOfWordIndex = null;
+  for (const index of match.indices) {
+    const lowerCaseMatchedText = match.value
+      .slice(index[0], index[1] + 1)
+      .toLowerCase();
+    // Using startsWith here instead of `===` because of this behavior of Fuse.js:
+    // Searching `trig` will return the instruction `Trigger once` but the match first index
+    // will be on the `Trigg` part of `Trigger once`, and not only on the part `Trig`,
+    // because the `g` is repeated.
+    const doesMatch = lowerCaseMatchedText.startsWith(lowerCaseSearchText);
+    if (!doesMatch) continue;
+    if (closestExactMatchIndex === null) {
+      closestExactMatchIndex = index[0];
+    }
+    if (closestExactMatchAtStartOfWordIndex === null) {
+      const characterBeforeMatch =
+        index[0] === 0 ? ' ' : match.value[index[0] - 1];
+      if (characterBeforeMatch.match(/[\s\-_/]/)) {
+        closestExactMatchAtStartOfWordIndex = index[0];
+        break;
+      }
+    }
+  }
+  return {
+    closestExactMatchIndex,
+    closestExactMatchAtStartOfWordIndex,
+  };
+};
+
+export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
+  const matchesWithAtLeastOneSignificantIndex = result.matches
+    .map(match => {
+      const newIndices = match.indices
+        .map(index => (index[1] - index[0] > 0 ? index : null))
+        .filter(Boolean);
+      if (newIndices.length > 0) {
+        return { ...match, indices: newIndices };
+      }
+      return null;
+    })
+    .filter(Boolean);
+  if (matchesWithAtLeastOneSignificantIndex.length > 0) {
+    return { ...result, matches: matchesWithAtLeastOneSignificantIndex };
+  }
+  return null;
+};
+
+export const augmentSearchResult = <T>(
+  result: SearchResult<T>,
+  lowerCaseSearchText: string
+): AugmentedSearchResult<T> => {
+  return {
+    item: result.item,
+    score: result.score,
+    matches: result.matches.map(match => ({
+      ...match,
+      ...getFirstExactMatchPosition(match, lowerCaseSearchText),
+    })),
+  };
+};
+
 export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
+
+export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
+  return <T>(
+    resultA: AugmentedSearchResult<T>,
+    resultB: AugmentedSearchResult<T>
+  ) => {
+    // First give priority to result that have an exact match at start of word and not the other.
+    const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
+      match => match.closestExactMatchAtStartOfWordIndex !== null
+    ).length;
+    const resultBExactMatchesAtStartOfWordCount = resultB.matches.filter(
+      match => match.closestExactMatchAtStartOfWordIndex !== null
+    ).length;
+    if (
+      resultAExactMatchesAtStartOfWordCount > 0 &&
+      resultBExactMatchesAtStartOfWordCount === 0
+    ) {
+      return -1;
+    }
+    if (
+      resultAExactMatchesAtStartOfWordCount === 0 &&
+      resultBExactMatchesAtStartOfWordCount > 0
+    ) {
+      return 1;
+    }
+    // Then give priority to result that have an exact match and not the other.
+    const resultAExactMatchesCount = resultA.matches.filter(
+      match => match.closestExactMatchIndex !== null
+    ).length;
+    const resultBExactMatchesCount = resultB.matches.filter(
+      match => match.closestExactMatchIndex !== null
+    ).length;
+    if (resultAExactMatchesCount > 0 && resultBExactMatchesCount === 0) {
+      return -1;
+    }
+    if (resultAExactMatchesCount === 0 && resultBExactMatchesCount > 0) {
+      return 1;
+    }
+    // If results have the same number of exact matches, both at start of word
+    // and in the whole text, use ordered keys and find matches in them.
+    for (const key of orderedKeys) {
+      const matchA = resultA.matches.find(match => match.key === key);
+      const matchB = resultB.matches.find(match => match.key === key);
+      if (matchA && matchB) {
+        if (
+          matchA.closestExactMatchAtStartOfWordIndex !== null &&
+          matchB.closestExactMatchAtStartOfWordIndex !== null
+        ) {
+          return (
+            matchA.closestExactMatchAtStartOfWordIndex -
+            matchB.closestExactMatchAtStartOfWordIndex
+          );
+        }
+        if (
+          matchA.closestExactMatchAtStartOfWordIndex !== null &&
+          matchB.closestExactMatchAtStartOfWordIndex === null
+        ) {
+          return -1;
+        }
+        if (
+          matchA.closestExactMatchAtStartOfWordIndex === null &&
+          matchB.closestExactMatchAtStartOfWordIndex !== null
+        ) {
+          return 1;
+        }
+        if (
+          matchA.closestExactMatchIndex !== null &&
+          matchB.closestExactMatchIndex !== null
+        ) {
+          return matchA.closestExactMatchIndex - matchB.closestExactMatchIndex;
+        }
+        if (
+          matchA.closestExactMatchIndex !== null &&
+          matchB.closestExactMatchIndex === null
+        ) {
+          return -1;
+        }
+        if (
+          matchA.closestExactMatchIndex === null &&
+          matchB.closestExactMatchIndex !== null
+        ) {
+          return 1;
+        }
+      }
+    }
+    // At that point, neither result have an exact match anywhere.
+    if (resultA.score !== undefined && resultB.score !== undefined) {
+      return resultA.score - resultB.score;
+    }
+    return -(resultA.matches.length - resultB.matches.length);
+  };
+};
 
 /**
  * Filter a list of items according to the chosen category
@@ -208,12 +381,11 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
     defaultFirstSearchItemIds,
     shuffleResults = true,
   }: SearchOptions
-): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
+): ?Array<SearchResult<SearchItem>> => {
   const searchApiRef = React.useRef<?any>(null);
-  const [searchResults, setSearchResults] = React.useState<?Array<{|
-    item: SearchItem,
-    matches: SearchMatch[],
-  |}>>(null);
+  const [searchResults, setSearchResults] = React.useState<?Array<
+    SearchResult<SearchItem>
+  >>(null);
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
   const orderedSearchResults: Array<

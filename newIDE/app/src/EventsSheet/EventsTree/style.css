@@ -117,36 +117,37 @@
 /**
  * Expand/collapse buttons
  */
-.gd-events-sheet .rst__collapseButton, .rst__expandButton {
+.gd-events-sheet .rst__collapseButton,
+.gd-events-sheet .rst__expandButton {
     border-radius: 0;
     border: none;
     box-shadow: none;
     background-repeat: no-repeat;
     background-color: transparent;
-    height: 12px;
-    width: 22px;
+    height: var(--icon-size); /*Keep the height of a single-line event, more-or-less*/
+    width: 16px; /*Leave space for the line to be visible between the button and the handle*/
+    background-color: var(--event-sheet-event-tree-background-color);
+    border-radius: 4px;
 }
 
 .gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {
     background-size: initial !important; /*Avoid buttons size to change*/
-    height: 12px !important; /*Avoid buttons size to change*/
-    width: 22px !important; /*Avoid buttons size to change*/
+    height: var(--icon-size) !important; /*Avoid buttons size to change*/
+    width: 16px !important; /*Avoid buttons size to change*/
 }
 
-.gd-events-sheet  .rst__expandButton {
-    background-image: url('./unfold.png');
-    background-position: 11px 3px !important;
+.gd-events-sheet .rst__expandButton {
+    background-image: url('./Chevron-right.svg');
 }
 .gd-events-sheet .light-theme .rst__expandButton {
-    background-image: url('./unfoldDark.png');
+    background-image: url('./Chevron-right_black.svg');
 }
 
-.gd-events-sheet  .rst__collapseButton {
-    background-image: url('./fold.png');
-    background-position: center 7px !important;
+.gd-events-sheet .rst__collapseButton {
+    background-image: url('./Chevron-down.svg');
 }
 .gd-events-sheet .light-theme .rst__collapseButton {
-    background-image: url('./foldDark.png');
+    background-image: url('./Chevron-down_black.svg');
 }
 
 /**

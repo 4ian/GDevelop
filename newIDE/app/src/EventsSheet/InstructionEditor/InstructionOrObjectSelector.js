@@ -25,9 +25,11 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
-  tuneMatches,
+  sortResultsUsingExactMatches,
   sharedFuseConfiguration,
   getFuseSearchQueryForMultipleKeys,
+  nullifySingleCharacterMatches,
+  augmentSearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 import { enumerateFoldersInContainer } from '../../ObjectsList/EnumerateObjectFolderOrObject';
@@ -283,6 +285,7 @@ const InstructionOrObjectSelector = React.forwardRef<
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
+        includeScore: true, // Use Fuse.js score to sort results that don't contain exact matches.
         keys: [
           { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },
@@ -457,6 +460,7 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const search = React.useCallback((searchText: string) => {
       if (!searchText) return;
+      const lowerCaseSearchText = searchText.toLowerCase();
 
       const matchingInstructions = moveDeprecatedInstructionsDown(
         instructionSearchApiRef.current
@@ -467,10 +471,16 @@ const InstructionOrObjectSelector = React.forwardRef<
               'description',
             ])
           )
-          .map(result => ({
-            item: result.item,
-            matches: tuneMatches(result, searchText),
-          }))
+          .map(nullifySingleCharacterMatches)
+          .filter(Boolean)
+          .map(result => augmentSearchResult(result, lowerCaseSearchText))
+          .sort(
+            sortResultsUsingExactMatches([
+              'displayedName',
+              'description',
+              'fullGroupName',
+            ])
+          )
       );
 
       setSearchResults({ instructions: matchingInstructions });
@@ -676,7 +686,7 @@ const InstructionOrObjectSelector = React.forwardRef<
       [displayedInstructionsList, isSearching]
     );
 
-    const hasNoObjects = !isSearching && !allObjectsList.length;
+    const displayEmptyMessage = !isSearching && !allObjectsList.length;
     const searchHasNoResults = isSearching && !hasResults;
 
     return (
@@ -737,7 +747,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             </Column>
           </Line>
         )}
-        {hasNoObjects ? (
+        {displayEmptyMessage && currentTab === 'objects' ? (
           <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
         ) : searchHasNoResults ? (
           <EmptyMessage>
@@ -753,7 +763,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             display:
               (currentTab === 'objects' || isSearching) &&
               !searchHasNoResults &&
-              !hasNoObjects
+              !displayEmptyMessage
                 ? 'unset'
                 : 'none',
           }}

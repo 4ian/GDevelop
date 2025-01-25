@@ -78,6 +78,18 @@ module.exports = {
       } else if (propertyName === 'disabled') {
         objectContent.disabled = newValue === '1';
         return true;
+      } else if (propertyName === 'maxLength') {
+        objectContent.maxLength = newValue;
+        return true;
+      } else if (propertyName === 'paddingX') {
+        objectContent.paddingX = Math.max(0, parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'paddingY') {
+        objectContent.paddingY = Math.max(0, parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'textAlign') {
+        objectContent.textAlign = newValue;
+        return true;
       }
 
       return false;
@@ -200,6 +212,50 @@ module.exports = {
         .setLabel(_('Width'))
         .setGroup(_('Border appearance'));
 
+      objectProperties
+        .getOrCreate('paddingX')
+        .setValue(
+          (objectContent.paddingX !== undefined
+            ? objectContent.paddingX
+            : 2
+          ).toString()
+        )
+        .setType('number')
+        .setLabel(_('Padding (horizontal)'))
+        .setGroup(_('Field appearance'));
+      objectProperties
+        .getOrCreate('paddingY')
+        .setValue(
+          (objectContent.paddingY !== undefined
+            ? objectContent.paddingY
+            : 1
+          ).toString()
+        )
+        .setType('number')
+        .setLabel(_('Padding (vertical)'))
+        .setGroup(_('Field appearance'));
+      objectProperties
+        .getOrCreate('maxLength')
+        .setValue((objectContent.maxLength || 0).toString())
+        .setType('number')
+        .setLabel(_('Max length'))
+        .setDescription(
+          _(
+            'The maximum length of the input value (this property will be ignored if the input type is a number).'
+          )
+        )
+        .setAdvanced(true);
+
+      objectProperties
+        .getOrCreate('textAlign')
+        .setValue(objectContent.textAlign || 'left')
+        .setType('choice')
+        .addExtraInfo('left')
+        .addExtraInfo('center')
+        .addExtraInfo('right')
+        .setLabel(_('Text alignment'))
+        .setGroup(_('Field appearance'));
+
       return objectProperties;
     };
     textInputObject.content = {
@@ -216,6 +272,10 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
+      paddingX: 2,
+      paddingY: 1,
+      textAlign: 'left',
+      maxLength: 0,
     };
 
     textInputObject.updateInitialInstanceProperty = function (
@@ -573,6 +633,22 @@ module.exports = {
       .setFunctionName('isFocused');
 
     object
+      .addScopedCondition(
+        'IsInputSubmitted',
+        _('Input is submitted'),
+        _(
+          'Check if the input is submitted, which usually happens when the Enter key is pressed on a keyboard, or a specific button on mobile virtual keyboards.'
+        ),
+        _('_PARAM0_ value was submitted'),
+        '',
+        'res/conditions/surObject24.png',
+        'res/conditions/surObject.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isSubmitted');
+
+    object
       .addScopedAction(
         'Focus',
         _('Focus'),
@@ -627,7 +703,6 @@ module.exports = {
 
     const DEFAULT_WIDTH = 300;
     const DEFAULT_HEIGHT = 30;
-    const TEXT_MASK_PADDING = 2;
 
     class RenderedTextInputObjectInstance extends RenderedInstance {
       constructor(
@@ -741,24 +816,51 @@ module.exports = {
         );
 
         const borderWidth = object.content.borderWidth || 0;
+        const paddingX =
+          object.content.paddingX !== undefined
+            ? Math.min(
+                parseFloat(object.content.paddingX),
+                width / 2 - borderWidth
+              )
+            : 2;
+        const paddingY =
+          object.content.paddingY !== undefined
+            ? Math.min(
+                parseFloat(object.content.paddingY),
+                height / 2 - borderWidth
+              )
+            : 1;
 
         // Draw the mask for the text.
-        const textOffset = borderWidth + TEXT_MASK_PADDING;
+        const textOffsetX = borderWidth + paddingX;
+        // textOffsetY does not include the paddingY because browsers display the text, even if it is supposed to be cut off by vertical padding.
+        const textOffsetY = borderWidth;
         this._pixiTextMask.clear();
         this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(
-          textOffset,
-          textOffset,
-          width - 2 * textOffset,
-          height - 2 * textOffset
+          textOffsetX,
+          textOffsetY,
+          width - 2 * textOffsetX,
+          height - 2 * textOffsetY
         );
         this._pixiTextMask.endFill();
 
         const isTextArea = object.content.inputType === 'text area';
+        const textAlign = object.content.textAlign
+          ? object.content.textAlign
+          : 'left';
 
-        this._pixiText.position.x = textOffset;
+        if (textAlign === 'left') this._pixiText.position.x = textOffsetX;
+        else if (textAlign === 'right')
+          this._pixiText.position.x =
+            0 + width - this._pixiText.width - textOffsetX;
+        else if (textAlign === 'center') {
+          this._pixiText.align = 'center';
+          this._pixiText.position.x = 0 + width / 2 - this._pixiText.width / 2;
+        }
+
         this._pixiText.position.y = isTextArea
-          ? textOffset
+          ? textOffsetY + paddingY
           : height / 2 - this._pixiText.height / 2;
 
         // Draw the background and border.

@@ -269,8 +269,9 @@ const std::vector<const gd::EventsList *> GetEventsListsNotAssociatedToScene(gd:
           .GetEventsFunctions()
           .GetEventsFunction("MyBehaviorEventsFunction")
           .GetEvents();
-  auto &freeFunctionEvents =
-      eventsExtension.GetEventsFunction("MyOtherEventsFunction").GetEvents();
+  auto &freeFunctionEvents = eventsExtension.GetEventsFunctions()
+                                 .GetEventsFunction("MyOtherEventsFunction")
+                                 .GetEvents();
   eventLists.push_back(&objectFunctionEvents);
   eventLists.push_back(&behaviorFunctionEvents);
   eventLists.push_back(&freeFunctionEvents);
@@ -1197,8 +1198,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
 
   // Add (free) functions and a (free) expression
   {
+    auto &freeEventsFunctions = eventsExtension.GetEventsFunctions();
     auto &action =
-        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+        freeEventsFunctions.InsertNewEventsFunction("MyEventsFunction", 0);
     action.GetParameters()
         .InsertNewParameter("currentScene", 0)
         .SetType("")
@@ -1213,21 +1215,21 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
 
     auto &expression =
-        eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpression", 1)
+        freeEventsFunctions.InsertNewEventsFunction("MyEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
     expression.GetParameters()
         .InsertNewParameter("currentScene", 0)
         .SetType("")
         .SetCodeOnly(true);
 
-    auto &freeExpressionAndCondition = eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpressionAndCondition", 2)
+    auto &freeExpressionAndCondition = freeEventsFunctions.InsertNewEventsFunction("MyEventsFunctionExpressionAndCondition", 2)
         .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
     freeExpressionAndCondition.GetParameters().InsertNewParameter("Value1", 0)
             .SetType("expression");
     freeExpressionAndCondition.GetParameters().InsertNewParameter("Value2", 1)
             .SetType("expression");
 
-    eventsExtension.InsertNewEventsFunction("MyEventsFunctionActionWithOperator", 2)
+    freeEventsFunctions.InsertNewEventsFunction("MyEventsFunctionActionWithOperator", 2)
         .SetFunctionType(gd::EventsFunction::ActionWithOperator)
         .SetGetterName("MyEventsFunctionExpressionAndCondition");
   }
@@ -1236,8 +1238,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
   // object and behavior.
   {
     // Add functions, and parameters that should be there by convention.
-    auto &action =
-        eventsExtension.InsertNewEventsFunction("MyOtherEventsFunction", 0);
+    auto &action = eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyOtherEventsFunction", 0);
     // Define the same objects as in the layout to be consistent with events.
     action.GetParameters()
         .InsertNewParameter("ObjectWithMyBehavior", 0)
@@ -1299,7 +1301,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
                     .GetEventsFunctions()
                     .GetEventsFunction("MyBehaviorEventsFunction")
                     .GetEvents());
-    SetupEvents(eventsExtension.GetEventsFunction("MyOtherEventsFunction")
+    SetupEvents(eventsExtension.GetEventsFunctions()
+                    .GetEventsFunction("MyOtherEventsFunction")
                     .GetEvents());
   }
 
@@ -1651,7 +1654,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Add a (free) function with an object group
       gd::EventsFunction &eventsFunction =
-          eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+          eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+              "MyEventsFunction", 0);
       gd::ObjectGroup &objectGroup =
           eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
       objectGroup.AddObject("Object1");
@@ -1688,7 +1692,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       SetupProjectWithDummyPlatform(project, platform);
       auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
       auto &eventsFunction =
-          eventsExtension.GetEventsFunction("MyOtherEventsFunction");
+          eventsExtension.GetEventsFunctions().GetEventsFunction(
+              "MyOtherEventsFunction");
 
       // Create the objects container for the events function
       gd::ObjectsContainer parametersObjectsContainer(
@@ -1940,7 +1945,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Add a (free) function with an object group
       gd::EventsFunction &eventsFunction =
-          eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+          eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+              "MyEventsFunction", 0);
       gd::ObjectGroup &objectGroup =
           eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
       objectGroup.AddObject("Object1");
@@ -2138,7 +2144,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Add the function used by the instruction that is checked in this test.
     // When the function doesn't exist the destination extension, the
     // instruction keeps pointing to the old extension.
-    destinationExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    destinationExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyEventsFunction", 0);
 
     auto &duplicatedBehavior =
         destinationExtension.GetEventsBasedBehaviors().InsertNew(
@@ -2180,7 +2187,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Add the function used by the instruction that is checked in this test.
     // When the function doesn't exist the destination extension, the
     // instruction keeps pointing to the old extension.
-    destinationExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+    destinationExtension.GetEventsFunctions().InsertNewEventsFunction(
+        "MyEventsFunction", 0);
 
     auto &duplicatedObject =
         destinationExtension.GetEventsBasedObjects().InsertNew(
@@ -2289,6 +2297,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Free function
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
+            .GetEventsFunctions()
             .GetEventsFunction("MyEventsFunction");
     REQUIRE(myEventsFunction.GetParameters().GetParameter(1).GetExtraInfo() ==
             "MyRenamedExtension::MyEventsBasedObject");
@@ -2405,8 +2414,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               "MyEventsExtension::MyRenamedFunctionExpressionAndCondition");
 
       // Check that the action still refer to the right ExpressionAndCondition.
-      REQUIRE(eventsExtension.GetEventsFunction("MyEventsFunctionActionWithOperator")
-          .GetGetterName() == "MyRenamedFunctionExpressionAndCondition");
+      REQUIRE(eventsExtension.GetEventsFunctions()
+                  .GetEventsFunction("MyEventsFunctionActionWithOperator")
+                  .GetGetterName() ==
+              "MyRenamedFunctionExpressionAndCondition");
     }
   }
 
@@ -2417,7 +2428,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2453,7 +2465,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2484,7 +2497,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2515,7 +2529,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2546,7 +2561,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2577,7 +2593,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyParameter")
         .GetValueTypeMetadata()
@@ -2615,7 +2632,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyObject")
         .GetValueTypeMetadata()
@@ -2656,7 +2674,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyObject")
         .GetValueTypeMetadata()
@@ -2695,7 +2714,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyObject")
         .GetValueTypeMetadata()
@@ -2741,7 +2761,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     auto &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyFreeEventsFunction", 0);
+        eventsExtension.GetEventsFunctions().InsertNewEventsFunction(
+            "MyFreeEventsFunction", 0);
     eventsFunction.GetParameters()
         .AddNewParameter("MyObject")
         .GetValueTypeMetadata()
@@ -2935,6 +2956,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Free function
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
+            .GetEventsFunctions()
             .GetEventsFunction("MyEventsFunction");
     REQUIRE(myEventsFunction.GetParameters().GetParameter(2).GetExtraInfo() ==
             "MyEventsExtension::MyRenamedEventsBasedBehavior");
@@ -3045,6 +3067,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Free function
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
+            .GetEventsFunctions()
             .GetEventsFunction("MyEventsFunction");
     REQUIRE(myEventsFunction.GetParameters().GetParameter(1).GetExtraInfo() ==
             "MyEventsExtension::MyRenamedEventsBasedObject");

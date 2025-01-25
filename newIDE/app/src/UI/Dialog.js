@@ -135,24 +135,30 @@ const useStylesForDialogContent = ({
   forceScroll,
 }: {|
   forceScroll: boolean,
-|}) =>
-  makeStyles({
-    root: {
-      ...(forceScroll ? { overflowY: 'scroll' } : {}), // Force a scrollbar to prevent layout shifts.
-      '&::-webkit-scrollbar': {
-        width: 11,
-      },
-      '&::-webkit-scrollbar-track': {
-        background: 'rgba(0, 0, 0, 0.04)',
-        borderRadius: 6,
-      },
-      '&::-webkit-scrollbar-thumb': {
-        border: '3px solid rgba(0, 0, 0, 0)',
-        backgroundClip: 'padding-box',
-        borderRadius: 6,
-      },
-    },
-  })();
+|}) => {
+  const useStyles = React.useMemo(
+    () =>
+      makeStyles({
+        root: {
+          ...(forceScroll ? { overflowY: 'scroll' } : {}), // Force a scrollbar to prevent layout shifts.
+          '&::-webkit-scrollbar': {
+            width: 11,
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(0, 0, 0, 0.04)',
+            borderRadius: 6,
+          },
+          '&::-webkit-scrollbar-thumb': {
+            border: '3px solid rgba(0, 0, 0, 0)',
+            backgroundClip: 'padding-box',
+            borderRadius: 6,
+          },
+        },
+      }),
+    [forceScroll]
+  );
+  return useStyles();
+};
 
 // We support a subset of the props supported by Material-UI v0.x Dialog
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -364,6 +370,18 @@ const Dialog = ({
     : minHeight === 'sm'
     ? styles.minHeightForSmallHeightModal
     : undefined;
+  const paperStyle = React.useMemo(
+    () => ({
+      backgroundColor: gdevelopTheme.dialog.backgroundColor,
+      minHeight: paperMinHeight,
+      ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
+    }),
+    [
+      gdevelopTheme.dialog.backgroundColor,
+      paperMinHeight,
+      softKeyboardBottomOffset,
+    ]
+  );
 
   return (
     <MuiDialog
@@ -378,11 +396,7 @@ const Dialog = ({
       })}
       PaperProps={{
         id,
-        style: {
-          backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          minHeight: paperMinHeight,
-          ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
-        },
+        style: paperStyle,
       }}
       maxWidth={
         maxWidth !== undefined

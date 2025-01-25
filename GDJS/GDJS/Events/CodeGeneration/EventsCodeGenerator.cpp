@@ -146,18 +146,15 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      codeGenerator,
-      codeGenerator.GetCodeNamespaceAccessor() + "func",
+      codeGenerator, codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(eventsFunctionsExtension),
-          0,
-          true),
+          eventsFunction.GetParametersForEvents(
+              eventsFunctionsExtension.GetEventsFunctions()),
+          0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunctionsExtension,
-          eventsFunction,
+          eventsFunctionsExtension, eventsFunction,
           "runtimeScene.getOnceTriggers()"),
-      eventsFunction.GetEvents(),
-      "",
+      eventsFunction.GetEvents(), "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   // TODO: the editor should pass the diagnostic report and display it to the
@@ -387,7 +384,7 @@ gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
   gd::String objectArraysMap;
   gd::String behaviorNamesMap;
   return GenerateEventsFunctionContext(eventsFunctionsExtension,
-                                       eventsFunctionsExtension,
+                                       eventsFunctionsExtension.GetEventsFunctions(),
                                        eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
@@ -1366,12 +1363,21 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     bool hasChild) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
-  if (scope == ANY_VARIABLE) {
+  if (scope == ANY_VARIABLE || scope == VARIABLE_OR_PROPERTY ||
+      scope == VARIABLE_OR_PROPERTY_OR_PARAMETER) {
     const auto variablesContainersList =
         GetProjectScopedContainers().GetVariablesContainersList();
-    const auto& variablesContainer =
-        variablesContainersList.GetVariablesContainerFromVariableName(
-            variableName);
+    const auto &variablesContainer =
+        scope == VARIABLE_OR_PROPERTY_OR_PARAMETER
+            ? variablesContainersList.GetVariablesContainerFromVariableOrPropertyOrParameterName(
+                  variableName)
+        : scope == VARIABLE_OR_PROPERTY
+            ? variablesContainersList
+                  .GetVariablesContainerFromVariableOrPropertyName(
+                      variableName)
+            : variablesContainersList
+                  .GetVariablesContainerFromVariableNameOnly(
+                      variableName);
     const auto sourceType = variablesContainer.GetSourceType();
     if (sourceType == gd::VariablesContainer::SourceType::Scene) {
       variables = &variablesContainer;

@@ -658,10 +658,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testEventsFunctionsExtension.setDescription('My description');
 
   // Events function
-  const testEventsFunction = testEventsFunctionsExtension.insertNewEventsFunction(
-    'MyTestFunction',
-    0
-  );
+  const testEventsFunction = testEventsFunctionsExtension
+    .getEventsFunctions()
+    .insertNewEventsFunction('MyTestFunction', 0);
 
   testEventsFunction
     .getParameters()
@@ -688,8 +687,11 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
-  testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
   testEventsFunctionsExtension
+    .getEventsFunctions()
+    .insertNewEventsFunction('MyTestFunction2', 1);
+  testEventsFunctionsExtension
+    .getEventsFunctions()
     .insertNewEventsFunction('MyPrivateTestFunction3', 2)
     .setPrivate(true);
 

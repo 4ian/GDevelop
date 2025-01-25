@@ -14,10 +14,9 @@ import {
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import AnyVariableField from '../../ParameterFields/AnyVariableField';
-import {
-  getVariableSourceIcon,
-  getVariablesContainerSourceType,
-} from '../../ParameterFields/VariableField';
+import { getVariableSourceIcon } from '../../ParameterFields/VariableField';
+import { getVariableSourceFromIdentifier } from '../../ParameterFields/AnyVariableField';
+
 import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -31,9 +30,9 @@ export const getVariableSourceOrSceneIcon = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
 ) => {
-  const variablesContainerSourceType = getVariablesContainerSourceType(
-    projectScopedContainersAccessor,
-    variableName
+  const variablesContainerSourceType = getVariableSourceFromIdentifier(
+    variableName,
+    projectScopedContainersAccessor.get()
   );
   return getVariableSourceIcon(
     variablesContainerSourceType === gd.VariablesContainer.Unknown

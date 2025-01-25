@@ -326,8 +326,9 @@ const generateEventsFunctionExtensionMetadata = (
   );
   // Generate all free functions
   const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
-  mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
-    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
+  const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+  mapFor(0, freeEventsFunctions.getEventsFunctionsCount(), i => {
+    const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
     metadataDeclarationHelper.generateFreeFunctionMetadata(
       project,
       extension,

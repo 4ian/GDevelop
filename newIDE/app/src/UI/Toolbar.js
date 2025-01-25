@@ -52,7 +52,9 @@ const toolbarGroupStyle = props => ({
   flex: 1,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: props.firstChild
+  justifyContent: props.spaceOut
+    ? 'space-around'
+    : props.firstChild
     ? 'flex-start'
     : props.lastChild
     ? 'flex-end'
@@ -63,6 +65,7 @@ type ToolbarGroupProps = {|
   children?: React.Node,
   firstChild?: boolean,
   lastChild?: boolean,
+  spaceOut?: boolean,
 |};
 
 export const ToolbarGroup = React.memo<ToolbarGroupProps>(

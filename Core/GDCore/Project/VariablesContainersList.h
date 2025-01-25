@@ -115,10 +115,22 @@ public:
   }
 
   /**
+   * Get the variables container for a given variable or property or parameter.
+   */
+  const VariablesContainer &
+  GetVariablesContainerFromVariableOrPropertyOrParameterName(const gd::String &variableName) const;
+
+  /**
+   * Get the variables container for a given variable or property.
+   */
+  const VariablesContainer &
+  GetVariablesContainerFromVariableOrPropertyName(const gd::String &variableName) const;
+
+  /**
    * Get the variables container for a given variable.
    */
   const VariablesContainer &
-  GetVariablesContainerFromVariableName(const gd::String &variableName) const;
+  GetVariablesContainerFromVariableNameOnly(const gd::String &variableName) const;
 
   /**
    * Get the variables container index for a given variable.

@@ -8,6 +8,7 @@ import { computeTextFieldStyleProps } from './TextField';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import { MarkdownText } from './MarkdownText';
 import { makeStyles } from '@material-ui/core';
+import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
@@ -137,6 +138,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             SelectProps={{
               native: true,
               classes: selectStyles,
+              IconComponent: ChevronArrowBottom,
             }}
             style={props.style}
             inputRef={inputRef}

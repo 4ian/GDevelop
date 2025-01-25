@@ -114,12 +114,13 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     const eventsFunctionsExtension = project.getEventsFunctionsExtension(
       extensionName
     );
+    const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
     for (
       let index = 0;
-      index < eventsFunctionsExtension.getEventsFunctionsCount();
+      index < freeEventsFunctions.getEventsFunctionsCount();
       index++
     ) {
-      const groupName = eventsFunctionsExtension
+      const groupName = freeEventsFunctions
         .getEventsFunctionAt(index)
         .getGroup();
       if (groupName) {

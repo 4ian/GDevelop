@@ -341,7 +341,9 @@ interface VariablesContainer {
 interface VariablesContainersList {
   boolean Has([Const] DOMString name);
   [Const, Ref] Variable Get([Const] DOMString name);
-  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableName([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableOrPropertyOrParameterName([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableOrPropertyName([Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableNameOnly([Const] DOMString variableName);
 
   [Const, Ref] VariablesContainer GetVariablesContainer(unsigned long index);
   unsigned long GetVariablesContainersCount();
@@ -3219,6 +3221,7 @@ interface EventsFunctionsExtension {
     void RemoveSourceFileAt(unsigned long index);
     [Ref] VectorSourceFileMetadata GetAllSourceFiles();
 
+    [Ref] EventsFunctionsContainer GetEventsFunctions();
     [Ref] VariablesContainer GetGlobalVariables();
     [Ref] VariablesContainer GetSceneVariables();
 
@@ -3229,17 +3232,6 @@ interface EventsFunctionsExtension {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);
-
-    // Inherited from EventsFunctionsContainer:
-    [Ref] EventsFunction InsertNewEventsFunction([Const] DOMString name, unsigned long pos);
-    [Ref] EventsFunction InsertEventsFunction([Const, Ref] EventsFunction eventsFunction, unsigned long pos);
-    boolean HasEventsFunctionNamed([Const] DOMString name);
-    [Ref] EventsFunction GetEventsFunction([Const] DOMString name);
-    [Ref] EventsFunction GetEventsFunctionAt(unsigned long pos);
-    void RemoveEventsFunction([Const] DOMString name);
-    void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
-    unsigned long GetEventsFunctionsCount();
-    unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
 };
 
 interface AbstractFileSystem {

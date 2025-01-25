@@ -16,6 +16,8 @@ import {
 import { enumerateVariablesOrPropertiesOrParametersOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
+const gd: libGDevelop = global.gd;
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
@@ -113,6 +115,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
+          getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
         {editorOpen && (
           <GlobalAndSceneVariablesDialog
@@ -131,6 +134,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
+export const getVariableSourceFromIdentifier = (
+  variableName: string,
+  projectScopedContainers: gdProjectScopedContainers
+): VariablesContainer_SourceType => {
+  const rootVariableName = getRootVariableName(variableName);
+  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
+  return variablesContainersList.has(rootVariableName)
+    ? variablesContainersList
+        .getVariablesContainerFromVariableOrPropertyOrParameterName(
+          rootVariableName
+        )
+        .getSourceType()
+    : gd.VariablesContainer.Unknown;
+};
+
 export const renderInlineAnyVariableOrPropertyOrParameter = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'variable');
+) => renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);

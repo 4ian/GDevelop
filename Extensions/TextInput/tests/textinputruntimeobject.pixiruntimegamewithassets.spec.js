@@ -25,6 +25,10 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
         borderWidth: 2,
         disabled: false,
         readOnly: false,
+        paddingX: 2,
+        paddingY: 1,
+        textAlign: 'left',
+        maxLength: 20,
       },
     });
 
@@ -166,33 +170,33 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
       object,
     } = await setupObjectAndGetDomElementContainer();
 
-    const inputElement = gameDomElementContainer.querySelector('input');
-    if (!inputElement) throw new Error('Expected input element to be found');
+    const formElement = gameDomElementContainer.querySelector('form');
+    if (!formElement) throw new Error('Expected form element to be found');
 
     // Check visibility of the DOM element is visible by default, if it should be visible
     // on the screen.
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     // Check visibility of the DOM element is updated at each frame,
     // according to the object visibility.
     object.hide(true);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('none');
+    expect(formElement.style.display).to.be('none');
 
     object.hide(false);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     // Check visibility of the DOM element is updated at each frame,
     // according to the layer visibility.
     runtimeScene.getLayer('').show(false);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('none');
+    expect(formElement.style.display).to.be('none');
 
     runtimeScene.getLayer('').show(true);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     // Clean up - not mandatory but to avoid overloading the testing browser.
     runtimeScene.unloadScene();
@@ -205,31 +209,31 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
       object,
     } = await setupObjectAndGetDomElementContainer();
 
-    const inputElement = gameDomElementContainer.querySelector('input');
-    if (!inputElement) throw new Error('Expected input element to be found');
+    const formElement = gameDomElementContainer.querySelector('form');
+    if (!formElement) throw new Error('Expected input element to be found');
 
     // Check visibility of the DOM element is visible by default, if it should be visible
     // on the screen.
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     // Check visibility of the DOM element is updated at each frame,
     // according to the object position of screen.
     object.setX(-500); // -500 + 300 (object default width) = -200, still outside the camera.
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('none');
+    expect(formElement.style.display).to.be('none');
 
     object.setWidth(600); // -500 + 600 = 100, inside the camera
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     runtimeScene.getLayer('').setCameraX(900);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('none');
+    expect(formElement.style.display).to.be('none');
 
     runtimeScene.getLayer('').setCameraX(400);
     runtimeScene.renderAndStep(1000 / 60);
-    expect(inputElement.style.display).to.be('initial');
+    expect(formElement.style.display).to.be('initial');
 
     // Clean up - not mandatory but to avoid overloading the testing browser.
     runtimeScene.unloadScene();

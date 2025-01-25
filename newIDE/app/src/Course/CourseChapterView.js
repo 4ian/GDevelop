@@ -18,7 +18,7 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Divider from '@material-ui/core/Divider';
 import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
-import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cloud from '../UI/CustomSvgIcons/Cloud';
 import CourseChapterTaskItem from './CourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -51,6 +51,9 @@ const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
 };
 
 const styles = {
+  icon: {
+    fontSize: 18,
+  },
   stickyTitle: {
     position: 'sticky',
     top: -1, // If 0, it somehow lets a 1px gap between the parent, letting the user see the text scroll behind.
@@ -383,9 +386,9 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                 }
                 leftIcon={
                   openTasks ? (
-                    <ChevronArrowTop size="small" />
+                    <ChevronArrowBottom style={styles.icon} />
                   ) : (
-                    <ChevronArrowBottom size="small" />
+                    <ChevronArrowRight style={styles.icon} />
                   )
                 }
                 onClick={() => setOpenTasks(!openTasks)}

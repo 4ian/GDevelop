@@ -8,7 +8,7 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchStructuredItem,
-  type SearchMatch,
+  type SearchResult,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
@@ -18,10 +18,7 @@ const firstExampleIds = [];
 
 type ExampleStoreState = {|
   exampleFilters: ?Filters,
-  exampleShortHeadersSearchResults: ?Array<{|
-    item: ExampleShortHeader,
-    matches: SearchMatch[],
-  |}>,
+  exampleShortHeadersSearchResults: ?Array<SearchResult<ExampleShortHeader>>,
   fetchExamplesAndFilters: () => void,
   exampleShortHeaders: ?Array<ExampleShortHeader>,
   error: ?Error,
@@ -133,10 +130,9 @@ export const ExampleStoreStateProvider = ({
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
-  const exampleShortHeadersSearchResults: ?Array<{|
-    item: ExampleShortHeader,
-    matches: SearchMatch[],
-  |}> = useSearchStructuredItem(exampleShortHeadersById, {
+  const exampleShortHeadersSearchResults: ?Array<
+    SearchResult<ExampleShortHeader>
+  > = useSearchStructuredItem(exampleShortHeadersById, {
     searchText,
     chosenCategory,
     chosenFilters,

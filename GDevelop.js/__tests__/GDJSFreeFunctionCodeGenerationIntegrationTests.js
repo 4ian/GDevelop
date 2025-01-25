@@ -42,7 +42,8 @@ describe('libGD.js - GDJS Free Function Code Generation integration tests', func
         ],
       },
     ]);
-    const eventsFunction = eventsFunctionsExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+    const eventsFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -117,7 +118,8 @@ describe('libGD.js - GDJS Free Function Code Generation integration tests', func
         ],
       },
     ]);
-    const eventsFunction = eventsFunctionsExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+    const eventsFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -199,7 +201,8 @@ describe('libGD.js - GDJS Free Function Code Generation integration tests', func
         ],
       },
     ]);
-    const eventsFunction = eventsFunctionsExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+    const eventsFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );

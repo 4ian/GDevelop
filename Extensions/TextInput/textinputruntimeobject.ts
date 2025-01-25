@@ -9,9 +9,10 @@ namespace gdjs {
     'search',
     'text area',
   ] as const;
+  const supportedTextAlign = ['left', 'center', 'right'] as const;
 
   type SupportedInputType = typeof supportedInputTypes[number];
-
+  type SupportedTextAlign = typeof supportedTextAlign[number];
   const parseInputType = (potentialInputType: string): SupportedInputType => {
     const lowercasedNewInputType = potentialInputType.toLowerCase();
 
@@ -20,6 +21,19 @@ namespace gdjs {
       return potentialInputType as SupportedInputType;
 
     return 'text';
+  };
+
+  const parseTextAlign = (
+    potentialTextAlign: string | undefined
+  ): SupportedTextAlign => {
+    if (!potentialTextAlign) return 'left';
+    const lowercasedNewTextAlign = potentialTextAlign.toLowerCase();
+
+    // @ts-ignore - we're actually checking that this value is correct.
+    if (supportedTextAlign.includes(lowercasedNewTextAlign))
+      return potentialTextAlign as SupportedTextAlign;
+
+    return 'left';
   };
 
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
@@ -39,6 +53,12 @@ namespace gdjs {
       borderWidth: float;
       disabled: boolean;
       readOnly: boolean;
+      // ---- Values can be undefined because of support for these feature was added in v5.5.222.
+      paddingX?: float;
+      paddingY?: float;
+      textAlign?: SupportedTextAlign;
+      maxLength?: integer;
+      // ----
     };
   }
 
@@ -67,6 +87,10 @@ namespace gdjs {
   const DEFAULT_WIDTH = 300;
   const DEFAULT_HEIGHT = 30;
 
+  const clampPadding = (value: float, dimension: float, borderWidth: float) => {
+    return Math.max(0, Math.min(dimension / 2 - borderWidth, value));
+  };
+
   /**
    * Shows a text input on the screen the player can type text into.
    */
@@ -84,12 +108,16 @@ namespace gdjs {
     private _textColor: [float, float, float];
     private _fillColor: [float, float, float];
     private _fillOpacity: float;
+    private _paddingX: integer;
+    private _paddingY: integer;
+    private _textAlign: SupportedTextAlign;
+    private _maxLength: integer;
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
     private _borderWidth: float;
     private _disabled: boolean;
     private _readOnly: boolean;
-
+    private _isSubmitted: boolean;
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
@@ -113,7 +141,17 @@ namespace gdjs {
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
-
+      this._textAlign = parseTextAlign(objectData.content.textAlign);
+      this._maxLength = objectData.content.maxLength || 0;
+      this._paddingX =
+        objectData.content.paddingX !== undefined
+          ? objectData.content.paddingX
+          : 2;
+      this._paddingY =
+        objectData.content.paddingY !== undefined
+          ? objectData.content.paddingY
+          : 1;
+      this._isSubmitted = false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -189,6 +227,31 @@ namespace gdjs {
       if (oldObjectData.content.readOnly !== newObjectData.content.readOnly) {
         this.setReadOnly(newObjectData.content.readOnly);
       }
+      if (
+        newObjectData.content.maxLength !== undefined &&
+        oldObjectData.content.maxLength !== newObjectData.content.maxLength
+      ) {
+        this.setMaxLength(newObjectData.content.maxLength);
+      }
+      if (
+        newObjectData.content.textAlign &&
+        oldObjectData.content.textAlign !== newObjectData.content.textAlign
+      ) {
+        this._textAlign = newObjectData.content.textAlign;
+      }
+      if (
+        newObjectData.content.paddingX !== undefined &&
+        oldObjectData.content.paddingX !== newObjectData.content.paddingX
+      ) {
+        this.setPaddingX(newObjectData.content.paddingX);
+      }
+      if (
+        newObjectData.content.paddingY !== undefined &&
+        oldObjectData.content.paddingY !== newObjectData.content.paddingY
+      ) {
+        this.setPaddingY(newObjectData.content.paddingY);
+      }
+
       return true;
     }
 
@@ -236,6 +299,7 @@ namespace gdjs {
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
+      this._isSubmitted = false;
       this._renderer.updatePreRender();
     }
 
@@ -253,6 +317,7 @@ namespace gdjs {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
+        this._renderer.updatePadding();
       }
       if (initialInstanceData.opacity !== undefined) {
         this.setOpacity(initialInstanceData.opacity);
@@ -288,10 +353,12 @@ namespace gdjs {
 
     setWidth(width: float): void {
       this._width = width;
+      this._renderer.updatePadding();
     }
 
     setHeight(height: float): void {
       this._height = height;
+      this._renderer.updatePadding();
     }
 
     /**
@@ -347,6 +414,10 @@ namespace gdjs {
      */
     onRendererInputValueChanged(inputValue: string) {
       this._string = inputValue;
+    }
+
+    onRendererFormSubmitted() {
+      this._isSubmitted = true;
     }
 
     getFontResourceName() {
@@ -499,6 +570,58 @@ namespace gdjs {
 
     isFocused(): boolean {
       return this._renderer.isFocused();
+    }
+    isSubmitted(): boolean {
+      return this._isSubmitted;
+    }
+
+    getMaxLength(): integer {
+      return this._maxLength;
+    }
+    setMaxLength(value: integer) {
+      if (this._maxLength === value) return;
+
+      this._maxLength = value;
+      this._renderer.updateMaxLength();
+    }
+
+    getPaddingX(): integer {
+      return clampPadding(this._paddingX, this._width, this._borderWidth);
+    }
+    setPaddingX(value: integer) {
+      if (this._paddingX === value) return;
+      if (value < 0) {
+        this._paddingX = 0;
+        return;
+      }
+
+      this._paddingX = value;
+      this._renderer.updatePadding();
+    }
+    getPaddingY(): integer {
+      return clampPadding(this._paddingY, this._height, this._borderWidth);
+    }
+    setPaddingY(value: integer) {
+      if (this._paddingY === value) return;
+      if (value < 0) {
+        this._paddingY = 0;
+        return;
+      }
+
+      this._paddingY = value;
+      this._renderer.updatePadding();
+    }
+
+    getTextAlign(): SupportedTextAlign {
+      return this._textAlign;
+    }
+
+    setTextAlign(newTextAlign: string) {
+      const parsedTextAlign = parseTextAlign(newTextAlign);
+      if (parsedTextAlign === this._textAlign) return;
+
+      this._textAlign = parsedTextAlign;
+      this._renderer.updateTextAlign();
     }
 
     focus(): void {

@@ -2,7 +2,7 @@ import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 export default React.memo(props => (
-  <SvgIcon {...props} width="16" height="16" viewBox="0 0 16 16">
+  <SvgIcon width="16" height="16" viewBox="0 0 16 16" {...props} fill="none">
     <path
       fillRule="evenodd"
       clipRule="evenodd"

@@ -7,6 +7,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { adaptAcceleratorString } from '../UI/AcceleratorString';
 import { tooltipEnterDelay } from './Tooltip';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import { type GDevelopTheme } from './Theme';
 import { makeStyles } from '@material-ui/core/styles';
 
 type IconProps =
@@ -60,25 +61,32 @@ type Props = {|
 
   disableRipple?: boolean,
   disableFocusRipple?: boolean,
+  disableHover?: boolean,
 
-  color?: 'default',
+  color?: 'default' | 'inherit',
 |};
 
-const useStyles = makeStyles({
-  root: props =>
-    props.color
-      ? {
-          color: props.color,
-        }
-      : undefined,
-  label: props =>
-    props.backgroundColor
-      ? {
-          backgroundColor: props.backgroundColor,
-          borderRadius: 4,
-        }
-      : undefined,
-});
+const useStylesForIconButton = ({
+  theme,
+  selected,
+  disableHover,
+}: {|
+  theme: GDevelopTheme,
+  selected?: boolean,
+  disableHover?: boolean,
+|}) =>
+  makeStyles({
+    root: {
+      color: selected ? theme.iconButton.selectedColor : undefined,
+      '&:hover': disableHover ? { backgroundColor: 'transparent' } : {},
+    },
+    label: {
+      backgroundColor: selected
+        ? theme.iconButton.selectedBackgroundColor
+        : undefined,
+      borderRadius: selected ? 4 : undefined,
+    },
+  })();
 
 /**
  * A button showing just an icon, based on Material-UI icon button.
@@ -92,16 +100,15 @@ const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
     acceleratorString,
     color,
     style,
+    disableHover,
     ...otherProps
   } = props;
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const classes = useStyles({
-    // Override Material-UI colors only when the button is selected.
-    color: selected ? gdevelopTheme.iconButton.selectedColor : undefined,
-    backgroundColor: selected
-      ? gdevelopTheme.iconButton.selectedBackgroundColor
-      : undefined,
+  const classes = useStylesForIconButton({
+    theme: gdevelopTheme,
+    selected,
+    disableHover,
   });
 
   const iconButton = (

@@ -133,9 +133,12 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     // The node is a variable inside an expression waiting for a *variable* to be returned, not its value.
     EventsCodeGenerator::VariableScope scope =
-        type == "variable" || type == "variableOrProperty" ||
-                type == "variableOrPropertyOrParameter"
+        type == "variable"
             ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "variableOrProperty"
+            ? gd::EventsCodeGenerator::VARIABLE_OR_PROPERTY
+        : type == "variableOrPropertyOrParameter"
+            ? gd::EventsCodeGenerator::VARIABLE_OR_PROPERTY_OR_PARAMETER
         : type == "globalvar" ? gd::EventsCodeGenerator::PROJECT_VARIABLE
         : type == "scenevar"  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                               : gd::EventsCodeGenerator::OBJECT_VARIABLE;
@@ -223,9 +226,12 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         codeGenerator.GenerateObject(node.identifierName, type, context);
   } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
     EventsCodeGenerator::VariableScope scope =
-        type == "variable" || type == "variableOrProperty" ||
-                type == "variableOrPropertyOrParameter"
+        type == "variable"
             ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "variableOrProperty"
+            ? gd::EventsCodeGenerator::VARIABLE_OR_PROPERTY
+        : type == "variableOrPropertyOrParameter"
+            ? gd::EventsCodeGenerator::VARIABLE_OR_PROPERTY_OR_PARAMETER
         : type == "globalvar" ? gd::EventsCodeGenerator::PROJECT_VARIABLE
         : type == "scenevar"  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                               : gd::EventsCodeGenerator::OBJECT_VARIABLE;
@@ -254,7 +260,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
       output += codeGenerator.GenerateGetVariable(
-          node.identifierName, gd::EventsCodeGenerator::ANY_VARIABLE, context,
+          node.identifierName, gd::EventsCodeGenerator::VARIABLE_OR_PROPERTY_OR_PARAMETER, context,
           "", !node.childIdentifierName.empty());
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);

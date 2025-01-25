@@ -14,7 +14,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -50,7 +51,8 @@ describe('MetadataDeclarationHelper', () => {
       'My🧩Extension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'My_📝Function',
       0
     );
@@ -83,7 +85,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -119,7 +122,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -153,7 +157,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction('Value', 0);
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction('Value', 0);
     eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
     eventFunction.setFullName('Some value');
     eventFunction.setDescription('some value.');
@@ -192,14 +197,15 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
 
-    const getter = eventExtension.insertNewEventsFunction('Value', 0);
+    const getter = freeEventsFunctions.insertNewEventsFunction('Value', 0);
     getter.setFunctionType(gd.EventsFunction.ExpressionAndConditions);
     getter.setFullName('Some value');
     getter.setDescription('some value.');
     getter.setSentence('some value');
 
-    const eventFunction = eventExtension.insertNewEventsFunction('SetValue', 0);
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction('SetValue', 0);
     eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
     eventFunction.setGetterName('Value');
 
@@ -1682,7 +1688,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -1723,7 +1730,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction(
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
       'MyFunction',
       0
     );
@@ -1764,7 +1772,8 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
-    const eventFunction = eventExtension.insertNewEventsFunction('Value', 0);
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction('Value', 0);
     eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
     eventFunction.setFullName('');
     eventFunction.setDescription('');
@@ -1807,8 +1816,9 @@ describe('MetadataDeclarationHelper', () => {
       'MyExtension',
       0
     );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
 
-    const getter = eventExtension.insertNewEventsFunction('Value', 0);
+    const getter = freeEventsFunctions.insertNewEventsFunction('Value', 0);
     getter.setFunctionType(gd.EventsFunction.ExpressionAndConditions);
     getter.setFullName('');
     getter.setDescription('');
@@ -1819,7 +1829,7 @@ describe('MetadataDeclarationHelper', () => {
       .addNewParameter('Parameter')
       .setType('number');
 
-    const eventFunction = eventExtension.insertNewEventsFunction('SetValue', 0);
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction('SetValue', 0);
     eventFunction.setFunctionType(gd.EventsFunction.ActionWithOperator);
     eventFunction.setGetterName('Value');
 

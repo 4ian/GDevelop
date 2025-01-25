@@ -1540,7 +1540,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
   auto projectScopedContainers =
     gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
     REQUIRE(&projectScopedContainers.GetVariablesContainersList()
-                   .GetVariablesContainerFromVariableName("MyVariable") == &scene.GetVariables());
+                   .GetVariablesContainerFromVariableOrPropertyOrParameterName("MyVariable") == &scene.GetVariables());
 
     // Do the changes and launch the refactoring.
     scene.GetVariables().ResetPersistentUuid();
@@ -1722,7 +1722,8 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto &extension = project.InsertNewEventsFunctionsExtension("Extension", 0);
     extension.GetSceneVariables().InsertNew("MySceneVariable").SetValue(123);
 
-    auto &function = extension.InsertNewEventsFunction("MyFunction", 0);
+    auto &function =
+        extension.GetEventsFunctions().InsertNewEventsFunction("MyFunction", 0);
     gd::StandardEvent &event =
         dynamic_cast<gd::StandardEvent &>(function.GetEvents().InsertNewEvent(
             project, "BuiltinCommonInstructions::Standard"));

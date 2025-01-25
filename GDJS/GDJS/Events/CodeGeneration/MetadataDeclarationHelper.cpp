@@ -517,6 +517,7 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction) {
   auto functionType = eventsFunction.GetFunctionType();
+  auto &freeEventsFunctions = eventsFunctionsExtension.GetEventsFunctions();
   if (functionType == gd::EventsFunction::ExpressionAndCondition) {
     auto expressionAndCondition = extension.AddExpressionAndCondition(
         gd::ValueTypeMetadata::GetPrimitiveValueType(
@@ -530,7 +531,7 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
         eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
     expressionAndCondition.AddCodeOnlyParameter("currentScene", "");
-    DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+    DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     expressionAndCondition, 0);
     expressionAndConditions.push_back(expressionAndCondition);
     return expressionAndConditions.back();
@@ -551,7 +552,7 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
     expression.AddCodeOnlyParameter("currentScene", "");
-    DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+    DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     expression, 0);
     return expression;
   }
@@ -566,6 +567,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction) {
   auto functionType = eventsFunction.GetFunctionType();
+  auto &freeEventsFunctions = eventsFunctionsExtension.GetEventsFunctions();
   if (functionType == gd::EventsFunction::Condition) {
     auto &condition = extension.AddCondition(
         eventsFunction.GetName(),
@@ -575,14 +577,14 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
     condition.AddCodeOnlyParameter("currentScene", "");
-    DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+    DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     condition, 0);
     return condition;
   } else if (functionType == gd::EventsFunction::ActionWithOperator) {
-    if (eventsFunctionsExtension.HasEventsFunctionNamed(
+    if (freeEventsFunctions.HasEventsFunctionNamed(
             eventsFunction.GetGetterName())) {
-      auto &getterFunction = eventsFunctionsExtension.GetEventsFunction(
-          eventsFunction.GetGetterName());
+      auto &getterFunction =
+          freeEventsFunctions.GetEventsFunction(eventsFunction.GetGetterName());
 
       auto &action = extension.AddAction(
           eventsFunction.GetName(),
@@ -601,7 +603,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
                                              getterFunction));
       // By convention, first parameter is always the Runtime Scene.
       action.AddCodeOnlyParameter("currentScene", "");
-      DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+      DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                       action, 0);
       return action;
     } else {
@@ -615,7 +617,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
           GetExtensionIconUrl(extension));
       // By convention, first parameter is always the Runtime Scene.
       action.AddCodeOnlyParameter("currentScene", "");
-      DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+      DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                       action, 0);
       return action;
     }
@@ -628,7 +630,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
     action.AddCodeOnlyParameter("currentScene", "");
-    DeclareEventsFunctionParameters(eventsFunctionsExtension, eventsFunction,
+    DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     action, 0);
     return action;
   }

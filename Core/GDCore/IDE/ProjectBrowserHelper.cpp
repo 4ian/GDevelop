@@ -147,7 +147,8 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     gd::ArbitraryEventsWorker &worker) {
     // Add (free) events functions
-    for (auto &&eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
+    for (auto &&eventsFunction :
+         eventsFunctionsExtension.GetEventsFunctions().GetInternalVector()) {
       worker.Launch(eventsFunction->GetEvents());
     }
 
@@ -169,7 +170,8 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     gd::ArbitraryEventsWorkerWithContext &worker) {
     // Add (free) events functions
-    for (auto &&eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
+    for (auto &&eventsFunction :
+         eventsFunctionsExtension.GetEventsFunctions().GetInternalVector()) {
       gd::ObjectsContainer parameterObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
     gd::VariablesContainer parameterVariablesContainer(
@@ -324,7 +326,7 @@ void ProjectBrowserHelper::ExposeProjectFunctions(
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
     auto &eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    worker.Launch(eventsFunctionsExtension);
+    worker.Launch(eventsFunctionsExtension.GetEventsFunctions());
 
     for (auto &&eventsBasedBehavior :
          eventsFunctionsExtension.GetEventsBasedBehaviors()

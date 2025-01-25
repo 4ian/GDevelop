@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { makeStyles } from '@material-ui/styles';
 import MUIAccordion from '@material-ui/core/Accordion';
 import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
 import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
@@ -7,7 +8,16 @@ import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import IconButton from './IconButton';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from '../UI/Grid';
-import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
+import ChevronArrowRight from './CustomSvgIcons/ChevronArrowRight';
+
+const useStylesForExpandIcon = () =>
+  makeStyles(theme => ({
+    root: {
+      '& .MuiAccordionSummary-expandIcon.Mui-expanded': {
+        transform: 'rotate(90deg)',
+      },
+    },
+  }))();
 
 const styles = {
   bodyRoot: {
@@ -41,16 +51,19 @@ type AccordionHeadProps = {|
  * Based on Material-UI AccordionSummary (but we could almost remove it).
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
+  const classes = useStylesForExpandIcon();
+
   return (
     <Column noMargin={props.noMargin} expand>
       <Line noMargin expand alignItems="center">
         <Column noMargin expand>
           <MUIAccordionSummary
+            classes={classes}
             style={styles.accordionSummaryWithExpandOnLeft}
             expandIcon={
               props.expandIcon || (
                 <IconButton size="small">
-                  <ChevronArrowBottom />
+                  <ChevronArrowRight />
                 </IconButton>
               )
             }

@@ -131,7 +131,7 @@ class ProjectScopedContainers {
       return objectCallback();
     else if (variablesContainersList.Has(name)) {
       const auto &variablesContainer =
-          variablesContainersList.GetVariablesContainerFromVariableName(name);
+          variablesContainersList.GetVariablesContainerFromVariableOrPropertyOrParameterName(name);
       const auto sourceType = variablesContainer.GetSourceType();
       if (sourceType == gd::VariablesContainer::SourceType::Properties) {
         return propertyCallback();

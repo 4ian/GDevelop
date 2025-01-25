@@ -84,8 +84,72 @@ namespace gdjs {
     }
   };
 
-  interface ObjectUnderCursor {
-    object: gdjs.RuntimeObject;
+  class Selection {
+    private _selectedObjects: Array<gdjs.RuntimeObject> = [];
+
+    add(object: gdjs.RuntimeObject) {
+      if (!this._selectedObjects.includes(object)) {
+        this._selectedObjects.push(object);
+      }
+    }
+
+    clear() {
+      this._selectedObjects = [];
+    }
+
+    getSelectedObjects() {
+      return this._selectedObjects;
+    }
+
+    getLastSelectedObject(): gdjs.RuntimeObject | null {
+      return this._selectedObjects[this._selectedObjects.length - 1] || null;
+    }
+  }
+
+  class ObjectMover {
+    _objectInitialPositions: Map<
+      gdjs.RuntimeObject,
+      { x: float; y: float; z: float }
+    > = new Map();
+
+    startMove() {
+      this._objectInitialPositions.clear();
+    }
+
+    endMove() {
+      this._objectInitialPositions.clear();
+    }
+
+    // TODO: add support for snapping to grid.
+    move(
+      selectedObjects: Array<gdjs.RuntimeObject>,
+      movement: { totalDeltaX: float; totalDeltaY: float; totalDeltaZ: float }
+    ) {
+      selectedObjects.forEach((object) => {
+        let initialPosition = this._objectInitialPositions.get(object);
+        if (!initialPosition) {
+          initialPosition =
+            object instanceof gdjs.RuntimeObject3D
+              ? {
+                  x: object.getX(),
+                  y: object.getY(),
+                  z: object.getZ(),
+                }
+              : {
+                  x: object.getX(),
+                  y: object.getY(),
+                  z: 0,
+                };
+          this._objectInitialPositions.set(object, initialPosition);
+        }
+
+        object.setX(initialPosition.x + movement.totalDeltaX);
+        object.setY(initialPosition.y + movement.totalDeltaY);
+        if (object instanceof gdjs.RuntimeObject3D) {
+          object.setZ(initialPosition.z + movement.totalDeltaZ);
+        }
+      });
+    }
   }
 
   export class InGameEditor {
@@ -93,15 +157,27 @@ namespace gdjs {
     private _tempVector2d = new THREE.Vector2();
     private _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
     private _raycaster = new THREE.Raycaster();
-    private _currentTransformControls: {
+
+    // The controls shown to manipulate the selection.
+    private _selectionControls: {
       object: gdjs.RuntimeObject;
+      dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
     } | null = null;
+    private _selectionControlsMovement: {
+      totalDeltaX: float;
+      totalDeltaY: float;
+      totalDeltaZ: float;
+    } | null = null;
+    private _wasMovingSelectionLastFrame = false;
+
+    // The selected objects.
+    private _selection = new Selection();
+
+    private _objectMover = new ObjectMover();
+
     private _lastCursorX: number = 0;
     private _lastCursorY: number = 0;
-    private _wasManipulatingSelectionLastFrame = false;
-    private _isManipulatingSelection = false;
-    private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
@@ -123,9 +199,9 @@ namespace gdjs {
       layerNames.forEach((layerName) => {
         const layer = currentScene.getLayer(layerName);
 
-        // TODO: replace everything by "real 3D movement".
 
         // Mouse wheel: forward/backward movement.
+        // TODO: replace this by a "real 3D movement" forward/backward.
         const wheelDeltaY = inputManager.getMouseWheelDelta();
         const wheelDeltaX = inputManager.getMouseWheelDeltaX();
         if (shouldZoom(inputManager)) {
@@ -148,6 +224,7 @@ namespace gdjs {
         }
 
         // Movement with the keyboard
+        // TODO: replace this by a "real 3D movement" in the camera plane.
         if (inputManager.isKeyPressed(LEFT_KEY)) {
           layer.setCameraX(layer.getCameraX() - 5);
         }
@@ -162,6 +239,7 @@ namespace gdjs {
         }
 
         // Space + click: move the camera on its plane.
+        // TODO: replace this by a "real 3D movement" in the camera plane.
         if (
           inputManager.isKeyPressed(SPACE_KEY) &&
           inputManager.isMouseButtonPressed(0)
@@ -170,6 +248,36 @@ namespace gdjs {
           const yDelta = this._lastCursorY - inputManager.getCursorY();
           layer.setCameraX(layer.getCameraX() + xDelta);
           layer.setCameraY(layer.getCameraY() + yDelta);
+        }
+
+        if (inputManager.isMouseButtonPressed(1)) {
+          const xDelta = inputManager.getCursorX() - this._lastCursorX;
+          const yDelta = inputManager.getCursorY() - this._lastCursorY;
+
+          const layerRenderer = layer.getRenderer();
+          const threeCamera = layerRenderer.getThreeCamera();
+          console.log("Rotating")
+
+          if (
+            threeCamera
+          ) {
+            // Adjust rotation speed to taste
+            const rotationSpeed = 0.002;
+
+            // Yaw (rotate around the Y axis)
+            // threeCamera.rotation.y -= xDelta * rotationSpeed;
+            // threeCamera.rotation.z += xDelta * rotationSpeed;
+            layer.setCameraRotation(layer.getCameraRotation() + gdjs.toDegrees(xDelta * rotationSpeed));
+            // Pitch (rotate around the X axis)
+            threeCamera.rotation.x -= yDelta * rotationSpeed;
+
+            // OPTIONAL: Clamp the pitch to avoid flipping upside down
+            // const maxPitch = Math.PI / 2;
+            // threeCamera.rotation.x = Math.max(
+            //   -maxPitch,
+            //   Math.min(maxPitch, threeCamera.rotation.x)
+            // );
+          }
         }
       });
 
@@ -180,58 +288,75 @@ namespace gdjs {
       this._lastCursorY = inputManager.getCursorY();
     }
 
+    private _handleSelectionMovement() {
+      // Finished moving the selection.
+      if (
+        this._wasMovingSelectionLastFrame &&
+        !this._selectionControlsMovement
+      ) {
+        this._objectMover.endMove();
+        this._sendSelectionUpdate();
+      }
+
+      // Start moving the selection.
+      if (
+        !this._wasMovingSelectionLastFrame &&
+        this._selectionControlsMovement
+      ) {
+        this._objectMover.startMove();
+      }
+
+      // Move the selection.
+      if (this._selectionControlsMovement) {
+        this._objectMover.move(
+          this._selection.getSelectedObjects(),
+          this._selectionControlsMovement
+        );
+      }
+
+      this._wasMovingSelectionLastFrame = !!this._selectionControlsMovement;
+    }
+
     private _handleSelection({
       objectUnderCursor,
     }: {
-      objectUnderCursor: ObjectUnderCursor | null;
+      objectUnderCursor: gdjs.RuntimeObject | null;
     }) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       const inputManager = this._runtimeGame.getInputManager();
       if (!currentScene) return;
 
-      if (
-        this._wasManipulatingSelectionLastFrame &&
-        !this._isManipulatingSelection
-      ) {
-        // Just finished dragging/editing the selection.
-        this._sendSelectionUpdate();
-      }
-
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonPressed(0) &&
-        !this._isManipulatingSelection
+        !this._selectionControlsMovement
       ) {
         if (!isShiftPressed(inputManager)) {
-          this._selectedObjects = [];
+          this._selection.clear();
         }
 
         if (objectUnderCursor) {
-          if (!this._selectedObjects.includes(objectUnderCursor.object)) {
-            this._selectedObjects.push(objectUnderCursor.object);
-            this._sendSelectionUpdate();
-          }
+          this._selection.add(objectUnderCursor);
+          this._sendSelectionUpdate();
         }
       }
 
       if (shouldDeleteSelection(inputManager)) {
-        const removedObjects = this._selectedObjects;
+        const removedObjects = this._selection.getSelectedObjects();
         removedObjects.forEach((object) => {
           object.deleteFromScene(currentScene);
         });
-        this._selectedObjects = [];
+        this._selection.clear();
         this._sendSelectionUpdate({
           removedObjects,
         });
       }
-
-      this._wasManipulatingSelectionLastFrame = this._isManipulatingSelection;
     }
 
     private _updateSelectionOutline({
       objectUnderCursor,
     }: {
-      objectUnderCursor: ObjectUnderCursor | null;
+      objectUnderCursor: gdjs.RuntimeObject | null;
     }) {
       const runtimeGame = this._runtimeGame;
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
@@ -266,7 +391,8 @@ namespace gdjs {
         outlinePass.pulsePeriod = 0;
         // TODO: OutlinePass currently wrongly highlights the transform controls helper.
         // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
-        outlinePass.selectedObjects = this._selectedObjects
+        outlinePass.selectedObjects = this._selection
+          .getSelectedObjects()
           .filter((object) => object.getLayer() === layerName)
           .map((object) => object.get3DRendererObject())
           .filter(isDefined);
@@ -278,20 +404,21 @@ namespace gdjs {
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const lastSelectedObject =
-        this._selectedObjects[this._selectedObjects.length - 1] || null;
+      const lastSelectedObject = this._selection.getLastSelectedObject();
 
       if (
-        this._currentTransformControls &&
+        this._selectionControls &&
         (!lastSelectedObject ||
           (lastSelectedObject &&
-            this._currentTransformControls.object !== lastSelectedObject))
+            this._selectionControls.object !== lastSelectedObject))
       ) {
-        this._currentTransformControls.threeTransformControls.detach();
-        this._currentTransformControls = null;
+        this._selectionControls.threeTransformControls.detach();
+        this._selectionControls.threeTransformControls.removeFromParent();
+        this._selectionControls.dummyThreeObject.removeFromParent();
+        this._selectionControls = null;
       }
 
-      if (lastSelectedObject && !this._currentTransformControls) {
+      if (lastSelectedObject && !this._selectionControls) {
         const threeObject = lastSelectedObject.get3DRendererObject();
         if (!threeObject) return;
 
@@ -303,29 +430,48 @@ namespace gdjs {
         const threeScene = runtimeLayerRender.getThreeScene();
         if (!threeCamera || !threeScene) return;
 
-        // Create and attach the transform controls to the THREE object.
+        // Create and attach the transform controls. It is attached to a dummy object
+        // to avoid the controls to directly move the runtime object (we handle this
+        // manually).
         const threeTransformControls = new THREE_ADDONS.TransformControls(
           threeCamera,
           this._runtimeGame.getRenderer().getCanvas() || undefined
         );
         threeTransformControls.scale.y = -1;
-        threeTransformControls.attach(threeObject);
+
+        // The dummy object is an invisible object that is the one moved by the transform
+        // controls.
+        const dummyThreeObject = new THREE.Object3D();
+        dummyThreeObject.position.copy(threeObject.position);
+        dummyThreeObject.rotation.copy(threeObject.rotation);
+        threeScene.add(dummyThreeObject);
+
+        threeTransformControls.attach(dummyThreeObject);
         threeScene.add(threeTransformControls);
 
+        // Keep track of the movement so the editor can apply it to the selection.
+        const initialPosition = new THREE.Vector3();
+        initialPosition.copy(dummyThreeObject.position);
         threeTransformControls.addEventListener('change', (e) => {
-          console.log('change', e);
-        });
-        threeTransformControls.addEventListener('dragging-changed', (e) => {
-          if (e.value) {
-            // Ignore if the user starts dragging
-            this._isManipulatingSelection = true;
+          if (!threeTransformControls.dragging) {
+            this._selectionControlsMovement = null;
+
+            // Reset the initial position to the current position, so that
+            // it's ready to be dragged again.
+            initialPosition.copy(dummyThreeObject.position);
             return;
           }
-          this._isManipulatingSelection = false;
+
+          this._selectionControlsMovement = {
+            totalDeltaX: dummyThreeObject.position.x - initialPosition.x,
+            totalDeltaY: dummyThreeObject.position.y - initialPosition.y,
+            totalDeltaZ: dummyThreeObject.position.z - initialPosition.z,
+          };
         });
 
-        this._currentTransformControls = {
+        this._selectionControls = {
           object: lastSelectedObject,
+          dummyThreeObject,
           threeTransformControls,
         };
       }
@@ -335,10 +481,12 @@ namespace gdjs {
       if (enable) {
         // Nothing to do.
       } else {
-        // Disable transform controls.
-        if (this._currentTransformControls) {
-          this._currentTransformControls.threeTransformControls.detach();
-          this._currentTransformControls = null;
+        if (this._selectionControls) {
+          // TODO: factor this.
+          this._selectionControls.threeTransformControls.detach();
+          this._selectionControls.threeTransformControls.removeFromParent();
+          this._selectionControls.dummyThreeObject.removeFromParent();
+          this._selectionControls = null;
         }
       }
     }
@@ -360,7 +508,8 @@ namespace gdjs {
           })
           .filter(isDefined);
 
-      const updatedInstances = this._selectedObjects
+      const updatedInstances = this._selection
+        .getSelectedObjects()
         .map((object) => {
           if (object instanceof gdjs.RuntimeObject3D) {
             if (!object.persistentUuid) return null;
@@ -388,7 +537,9 @@ namespace gdjs {
 
       debuggerClient.sendInstanceChanges({
         updatedInstances,
-        selectedInstances: getPersistentUuidsFromObjects(this._selectedObjects),
+        selectedInstances: getPersistentUuidsFromObjects(
+          this._selection.getSelectedObjects()
+        ),
         removedInstances: options
           ? getPersistentUuidsFromObjects(options.removedObjects)
           : [],
@@ -428,7 +579,7 @@ namespace gdjs {
       });
     }
 
-    getObjectUnderCursor(): ObjectUnderCursor | null {
+    getObjectUnderCursor(): gdjs.RuntimeObject | null {
       const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {
         [layerName: string]: null | {
@@ -493,15 +644,14 @@ namespace gdjs {
       const threeObject = closestIntersect.intersect.object;
       if (!threeObject.gdjsRuntimeObject) return null;
 
-      return {
-        object: threeObject.gdjsRuntimeObject,
-      };
+      return threeObject.gdjsRuntimeObject;
     }
 
     updateAndRender() {
-      const objectUnderCursor: ObjectUnderCursor | null = this.getObjectUnderCursor();
+      const objectUnderCursor: gdjs.RuntimeObject | null = this.getObjectUnderCursor();
 
       this._handleCameraMovement();
+      this._handleSelectionMovement();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updateSelectionControls();

@@ -344,12 +344,6 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
     // TODO: these should be expressed in Bindings.idl using "implements".
     shell.sed(
       '-i',
-      'declare class gdEventsFunctionsExtension {',
-      'declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {',
-      'types/gdeventsfunctionsextension.js'
-    );
-    shell.sed(
-      '-i',
       'declare class gdObjectJsImplementation {',
       'declare class gdObjectJsImplementation extends gdObjectConfiguration {',
       'types/gdobjectjsimplementation.js'

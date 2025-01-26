@@ -29,7 +29,7 @@ export const DefaultFreeFunction = () => (
       eventsFunction={testProject.testEventsFunction}
       eventsBasedBehavior={null}
       eventsBasedObject={null}
-      eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
+      eventsFunctionsContainer={testProject.testEventsFunctionsExtension.getEventsFunctions()}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
       onFunctionParameterWillBeRenamed={action(

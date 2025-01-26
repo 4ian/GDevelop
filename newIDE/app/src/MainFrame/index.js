@@ -2224,7 +2224,7 @@ const MainFrame = (props: Props) => {
       );
     }
 
-    extension.insertEventsFunction(eventsFunction, 0);
+    extension.getEventsFunctions().insertEventsFunction(eventsFunction, 0);
     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );

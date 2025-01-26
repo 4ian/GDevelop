@@ -198,9 +198,9 @@ export const validateEventsFunctionNameUniqueness = (
       extensionName
     );
 
-    return !eventsFunctionsExtension.hasEventsFunctionNamed(
-      eventsFunction.getName()
-    );
+    return !eventsFunctionsExtension
+      .getEventsFunctions()
+      .hasEventsFunctionNamed(eventsFunction.getName());
   }
 
   return true;

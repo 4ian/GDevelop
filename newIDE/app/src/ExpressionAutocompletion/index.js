@@ -372,7 +372,9 @@ const getAutocompletionsForText = function(
       scope.eventsBasedBehavior || scope.eventsBasedObject;
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
-      : scope.eventsFunctionsExtension;
+      : scope.eventsFunctionsExtension
+      ? scope.eventsFunctionsExtension.getEventsFunctions()
+      : null;
     const eventsFunction = scope.eventsFunction;
     if (eventsFunction && functionsContainer) {
       const allowedParameterTypes = completionDescription

@@ -95,6 +95,7 @@ namespace gdjs {
         });
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
+        this._threeRenderer.pixelRatio = window.devicePixelRatio;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()

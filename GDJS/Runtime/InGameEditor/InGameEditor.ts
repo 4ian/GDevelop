@@ -440,10 +440,12 @@ namespace gdjs {
         }
         const outlinePass = this._outlinePasses[layerName];
 
-        outlinePass.edgeStrength = 6.0;
+        outlinePass.edgeStrength = 5;
         outlinePass.edgeGlow = 0;
         outlinePass.edgeThickness = 1.0;
         outlinePass.pulsePeriod = 0;
+        outlinePass.downSampleRatio = 1.0;
+        // outlinePass.overlayMaterial.blending = THREE.CustomBlending
         // TODO: OutlinePass currently wrongly highlights the transform controls helper.
         // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
         outlinePass.selectedObjects = this._selection
@@ -493,6 +495,10 @@ namespace gdjs {
           this._runtimeGame.getRenderer().getCanvas() || undefined
         );
         threeTransformControls.scale.y = -1;
+        threeTransformControls.traverse((obj) => { // To be detected correctly by OutlinePass.
+          // @ts-ignore
+          obj.isTransformControls = true;
+        });
 
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.

@@ -257,7 +257,7 @@ class OutlinePass extends Pass {
 
 				}
 
-			} else if ( object.isPoints || object.isLine ) {
+			} else if ( object.isPoints || object.isLine || object.isTransformControls ) {
 
 				// the visibilty of points and lines is always set to false in order to
 				// not affect the outline computation

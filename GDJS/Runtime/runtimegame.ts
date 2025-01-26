@@ -995,6 +995,12 @@ namespace gdjs {
             }
 
             if (this._paused) {
+              // Manage resize events.
+              if (this._notifyScenesForGameResolutionResize) {
+                this._sceneStack.onGameResolutionResized();
+                this._notifyScenesForGameResolutionResize = false;
+              }
+
               if (this._inGameEditor) this._inGameEditor.updateAndRender();
               // The game is paused for edition: the game loop continues to run,
               // but the game logic is not executed.

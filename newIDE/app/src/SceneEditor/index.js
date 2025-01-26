@@ -357,8 +357,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
 
-    console.log('Selecting', newlySelectedInstances.length);
-    console.log("Changes:", changes)
     this.instancesSelection.selectInstances({
       instances: newlySelectedInstances,
       multiSelect: false,

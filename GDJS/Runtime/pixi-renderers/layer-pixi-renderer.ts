@@ -502,6 +502,7 @@ namespace gdjs {
     updateResolution() {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
+        this._threeEffectComposer.setPixelRatio(window.devicePixelRatio);
         this._threeEffectComposer.setSize(
           game.getGameResolutionWidth(),
           game.getGameResolutionHeight()

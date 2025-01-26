@@ -619,7 +619,7 @@ const EventsFunctionsList = React.forwardRef<
         const eventBasedEntity = eventsBasedBehavior || eventsBasedObject;
         const eventsFunctionsContainer = eventBasedEntity
           ? eventBasedEntity.getEventsFunctions()
-          : eventsFunctionsExtension;
+          : eventsFunctionsExtension.getEventsFunctions();
 
         // Let EventsFunctionsExtensionEditor know if the function is:
         // a free function, a behavior one or an object one.
@@ -1288,7 +1288,7 @@ const EventsFunctionsList = React.forwardRef<
             selectedEventsBasedBehavior || selectedEventsBasedObject;
           const eventsFunctionsContainer = eventsBasedEntity
             ? eventsBasedEntity.getEventsFunctions()
-            : eventsFunctionsExtension;
+            : eventsFunctionsExtension.getEventsFunctions();
           const eventFunctionProps = {
             eventsBasedBehavior: selectedEventsBasedBehavior,
             eventsBasedObject: selectedEventsBasedObject,

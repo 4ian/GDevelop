@@ -280,9 +280,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       }
     } else {
       // Free function
-      if (eventsFunctionsExtension.hasEventsFunctionNamed(functionName)) {
+      const eventsFunctions = eventsFunctionsExtension.getEventsFunctions();
+      if (eventsFunctions.hasEventsFunctionNamed(functionName)) {
         this._selectEventsFunction(
-          eventsFunctionsExtension.getEventsFunction(functionName),
+          eventsFunctions.getEventsFunction(functionName),
           null,
           null
         );
@@ -389,7 +390,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
             tentativeNewName
           ) ||
-          eventsFunctionsExtension.hasEventsFunctionNamed(tentativeNewName)
+          eventsFunctionsExtension
+            .getEventsFunctions()
+            .hasEventsFunctionNamed(tentativeNewName)
         ) {
           return true;
         }
@@ -1356,7 +1359,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     eventsFunctionsContainer={
                       (selectedEventsBasedEntity &&
                         selectedEventsBasedEntity.getEventsFunctions()) ||
-                      eventsFunctionsExtension
+                      eventsFunctionsExtension.getEventsFunctions()
                     }
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     globalObjectsContainer={
@@ -1719,7 +1722,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         )}
         {extensionFunctionSelectorDialogOpen && eventsFunctionsExtension && (
           <ExtensionFunctionSelectorDialog
-            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsFunctionsContainer={eventsFunctionsExtension.getEventsFunctions()}
             onCancel={() => this._onCloseExtensionFunctionSelectorDialog(null)}
             onChoose={parameters =>
               this._onCloseExtensionFunctionSelectorDialog(parameters)

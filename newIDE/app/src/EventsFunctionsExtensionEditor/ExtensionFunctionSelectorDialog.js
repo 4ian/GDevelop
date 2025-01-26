@@ -22,7 +22,7 @@ import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   onCancel: () => void,
   onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
@@ -58,8 +58,8 @@ const FunctionListItem = ({
   );
 };
 
-export default function BehaviorMethodSelectorDialog({
-  eventsFunctionsExtension,
+export default function ExtensionFunctionSelectorDialog({
+  eventsFunctionsContainer,
   onChoose,
   onCancel,
 }: Props) {
@@ -139,7 +139,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Create style={styles.icon} />}
               name={'onFirstSceneLoaded'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onFirstSceneLoaded'
               )}
               onChoose={() =>
@@ -158,7 +158,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Create style={styles.icon} />}
               name={'onSceneLoaded'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneLoaded'
               )}
               onChoose={() =>
@@ -177,7 +177,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Step style={styles.icon} />}
               name={'onScenePreEvents'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePreEvents'
               )}
               onChoose={() =>
@@ -196,7 +196,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Step style={styles.icon} />}
               name={'onScenePostEvents'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePostEvents'
               )}
               onChoose={() =>
@@ -215,7 +215,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Deactivate style={styles.icon} />}
               name={'onScenePaused'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onScenePaused'
               )}
               onChoose={() =>
@@ -234,7 +234,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Activate style={styles.icon} />}
               name={'onSceneResumed'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneResumed'
               )}
               onChoose={() =>
@@ -253,7 +253,7 @@ export default function BehaviorMethodSelectorDialog({
             <FunctionListItem
               icon={<Destroy style={styles.icon} />}
               name={'onSceneUnloading'}
-              disabled={eventsFunctionsExtension.hasEventsFunctionNamed(
+              disabled={eventsFunctionsContainer.hasEventsFunctionNamed(
                 'onSceneUnloading'
               )}
               onChoose={() =>

@@ -3523,7 +3523,7 @@ const MainFrame = (props: Props) => {
     i18n: i18n,
     project: state.currentProject,
     canSaveProjectAs,
-    recentProjectFiles: preferences.getRecentProjectFiles(),
+    recentProjectFiles: preferences.getRecentProjectFiles({ limit: 20 }),
     shortcutMap,
     isApplicationTopLevelMenu: false,
   };

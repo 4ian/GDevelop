@@ -274,7 +274,9 @@ export type Preferences = {|
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => void,
-  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  getRecentProjectFiles: (
+    options: ?{| limit: number |}
+  ) => Array<FileMetadataAndStorageProviderName>,
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
@@ -423,7 +425,7 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
-  getRecentProjectFiles: () => [],
+  getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: () => true,

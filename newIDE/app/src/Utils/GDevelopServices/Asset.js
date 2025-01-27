@@ -191,6 +191,7 @@ export type UnlockedCourseChapter = {|
   title: string,
   videoUrl: string,
   isLocked?: false,
+  isFree?: boolean,
   templateUrl: string,
   tasks: Array<CourseChapterTask>,
 |};
@@ -199,6 +200,7 @@ export type LockedCourseChapter = {|
   title: string,
   videoUrl: string,
   isLocked: true,
+  isFree?: boolean,
   priceInCredits?: number,
   productId: string,
 |};

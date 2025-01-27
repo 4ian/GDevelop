@@ -17,6 +17,17 @@ namespace gdjs {
     }[];
   };
 
+  type Lobby = {
+    id: string;
+    status: 'waiting' | 'starting' | 'playing' | 'migrating' | 'migrated';
+  };
+
+  type QuickJoinLobbyResponse =
+    | { status: 'join-game'; lobby: Lobby }
+    | { status: 'join-lobby'; lobby: Lobby }
+    | { status: 'not-enough-players' }
+    | { status: 'full' };
+
   const getTimeNow =
     window.performance && typeof window.performance.now === 'function'
       ? window.performance.now.bind(window.performance)
@@ -27,11 +38,13 @@ namespace gdjs {
     method,
     body,
     dev,
+    isPreview,
   }: {
     relativeUrl: string;
     method: 'GET' | 'POST';
     body?: string;
     dev: boolean;
+    isPreview?: true;
   }) => {
     const playerId = gdjs.playerAuthentication.getUserId();
     const playerToken = gdjs.playerAuthentication.getUserToken();
@@ -47,6 +60,9 @@ namespace gdjs {
       : 'https://api.gdevelop.io';
     const url = new URL(`${rootApi}${relativeUrl}`);
     url.searchParams.set('playerId', playerId);
+    if (isPreview) {
+      url.searchParams.set('isPreview', 'true');
+    }
     const formattedUrl = url.toString();
 
     const headers = {
@@ -98,6 +114,9 @@ namespace gdjs {
     let _lobbyChangeHostRequestInitiatedAt: number | null = null;
     let _isChangingHost = false;
     let _lobbyNewHostPickedAt: number | null = null;
+    let _shouldJoinGameRightAfterJoiningLobby = false;
+    let _shouldStartGameRightAfterJoiningLobby = false;
+    let _shouldOpenLobbyPageRightAfterJoiningLobby = false;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -663,6 +682,7 @@ namespace gdjs {
         secure: boolean;
       };
     }) {
+      console.log('connectionId received');
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
       if (validIceServers.length) {
         for (const server of validIceServers) {
@@ -689,6 +709,20 @@ namespace gdjs {
       playerNumber = positionInLobby;
       // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
       _lobbyId = lobbyId;
+
+      if (_shouldOpenLobbyPageRightAfterJoiningLobby) {
+        console.log('open lobbies');
+        openLobbiesWindow(runtimeScene);
+        return;
+      } else if (_shouldJoinGameRightAfterJoiningLobby) {
+        console.log('join game');
+        handleJoinGameMessage();
+        return;
+      } else if (_shouldStartGameRightAfterJoiningLobby) {
+        console.log('send peer id');
+        sendPeerId();
+        return;
+      }
 
       // Then we inform the lobbies window that the player has joined.
       const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
@@ -852,6 +886,7 @@ namespace gdjs {
       // If we are the host, still start the game, as this allows a player to test the game alone.
       const allConnectedPeers = gdjs.multiplayerPeerJsHelper.getAllPeers();
       if (!isCurrentPlayerHost() && allConnectedPeers.length === 0) {
+        console.log(isCurrentPlayerHost(), allConnectedPeers);
         gdjs.multiplayerComponents.displayConnectionErrorNotification(
           runtimeScene
         );
@@ -919,6 +954,7 @@ namespace gdjs {
       peerId: string;
       compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod;
     }) {
+      console.log('handle peer id event');
       // When a peerId is received, trigger a P2P connection with the peer, just after setting the compression method.
       gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
       const currentPeerId = gdjs.multiplayerPeerJsHelper.getCurrentId();
@@ -990,7 +1026,7 @@ namespace gdjs {
     const handleJoinGameMessage = function () {
       if (!_websocket) {
         logger.error(
-          'No connection to send the start countdown message. Are you connected to a lobby?'
+          'No connection to send the join game message. Are you connected to a lobby?'
         );
         return;
       }
@@ -1433,7 +1469,9 @@ namespace gdjs {
           if (!event.data.lobbyId) {
             throw new Error('Malformed message.');
           }
-
+          _shouldStartGameRightAfterJoiningLobby = false;
+          _shouldJoinGameRightAfterJoiningLobby = false;
+          _shouldOpenLobbyPageRightAfterJoiningLobby = false;
           handleJoinLobbyEvent(runtimeScene, event.data.lobbyId);
           break;
         }
@@ -1517,6 +1555,82 @@ namespace gdjs {
         runtimeScene,
         targetUrl
       );
+    };
+
+    const doQuickJoinLobby = async (runtimeScene: gdjs.RuntimeScene) => {
+      const _gameId = gdjs.projectData.properties.projectUuid;
+      if (!_gameId) {
+        handleLobbiesError(
+          runtimeScene,
+          'The game ID is missing, the quick join lobby action cannot continue.'
+        );
+        return;
+      }
+
+      const quickJoinLobbyRelativeUrl = `/play/game/${_gameId}/public-lobby/action/quick-join`;
+
+      // TODO: Protect against the action sent once per frame.
+
+      const quickJoinLobbyResponse: QuickJoinLobbyResponse = await fetchAsPlayer(
+        {
+          relativeUrl: quickJoinLobbyRelativeUrl,
+          method: 'POST',
+          dev: isUsingGDevelopDevelopmentEnvironment,
+          isPreview: runtimeScene.getGame().isPreview(),
+        }
+      );
+
+      if (
+        quickJoinLobbyResponse.status === 'full' ||
+        quickJoinLobbyResponse.status === 'not-enough-players'
+      ) {
+        return;
+      }
+
+      console.log(quickJoinLobbyResponse.lobby);
+
+      if (quickJoinLobbyResponse.status === 'join-game') {
+        if (quickJoinLobbyResponse.lobby.status === 'waiting') {
+          _shouldStartGameRightAfterJoiningLobby = true;
+        } else if (quickJoinLobbyResponse.lobby.status === 'playing') {
+          _shouldJoinGameRightAfterJoiningLobby = true;
+        } else {
+          throw new Error('Lobby in wrong status');
+        }
+      } else {
+        if (_connectionId) {
+          // Already connected to a lobby.
+          openLobbiesWindow(runtimeScene);
+          return;
+        } else {
+          _shouldOpenLobbyPageRightAfterJoiningLobby = true;
+        }
+      }
+      handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
+    };
+
+    export const quickJoinLobby = async (
+      runtimeScene: gdjs.RuntimeScene,
+      variable: gdjs.Variable
+    ) => {
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+      if (!playerId || !playerToken) {
+        _isWaitingForLogin = true;
+        const {
+          status,
+        } = await gdjs.playerAuthentication.openAuthenticationWindow(
+          runtimeScene
+        ).promise;
+        _isWaitingForLogin = false;
+
+        if (status === 'logged') {
+          await doQuickJoinLobby(runtimeScene);
+        }
+
+        return;
+      }
+      await doQuickJoinLobby(runtimeScene);
     };
 
     /**

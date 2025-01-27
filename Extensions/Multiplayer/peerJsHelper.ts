@@ -233,6 +233,7 @@ namespace gdjs {
      * @param connection The DataConnection of the peer
      */
     const _onConnect = (connection: Peer.DataConnection<NetworkMessage>) => {
+      console.log('onConnect', connection);
       connections.set(connection.peer, connection);
       connection.on('data', async (data) => {
         if (isValidNetworkMessage(data)) {
@@ -293,13 +294,16 @@ namespace gdjs {
       if (peer !== null) return;
       peer = new Peer(peerConfig);
       peer.on('open', () => {
+        console.log('peer open');
         ready = true;
       });
       peer.on('error', (errorMessage) => {
         logger.error('PeerJS error:', errorMessage);
       });
       peer.on('connection', (connection) => {
+        console.log('peer connection');
         connection.on('open', () => {
+          console.log('peer connection open');
           _onConnect(connection);
           justConnectedPeers.push(connection.peer);
         });

@@ -56,7 +56,6 @@ namespace gdjs {
     const resourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
     if (!resourceName || resourceName === '') {
       const material = new THREE.MeshBasicMaterial({ vertexColors: true });
-      console.log('on est bien passés ici !!');
       return material;
     }
     return runtimeObject

@@ -200,7 +200,6 @@ namespace gdjs {
 
     setFaceResourceName(faceName: FaceName, resourceName: string): void {
       const faceIndex = faceNameToBitmaskIndex[faceName];
-      console.log(resourceName);
       if (faceIndex === undefined) {
         return;
       }

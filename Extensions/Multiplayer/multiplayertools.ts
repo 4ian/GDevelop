@@ -44,7 +44,7 @@ namespace gdjs {
     method: 'GET' | 'POST';
     body?: string;
     dev: boolean;
-    isPreview?: true;
+    isPreview?: boolean;
   }) => {
     const playerId = gdjs.playerAuthentication.getUserId();
     const playerToken = gdjs.playerAuthentication.getUserToken();

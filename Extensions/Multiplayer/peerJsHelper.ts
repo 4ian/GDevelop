@@ -100,6 +100,8 @@ namespace gdjs {
      */
     let ready = false;
 
+    let _peerIdToConnectToOnceReady: string | null = null;
+
     /**
      * List of IDs of peers that just disconnected.
      */
@@ -228,6 +230,14 @@ namespace gdjs {
       return newMessagesList;
     };
 
+    const _onReady = () => {
+      ready = true;
+      if (_peerIdToConnectToOnceReady) {
+        connect(_peerIdToConnectToOnceReady);
+        _peerIdToConnectToOnceReady = null;
+      }
+    };
+
     /**
      * Internal function called when a connection with a remote peer is initiated.
      * @param connection The DataConnection of the peer
@@ -295,7 +305,7 @@ namespace gdjs {
       peer = new Peer(peerConfig);
       peer.on('open', () => {
         console.log('peer open');
-        ready = true;
+        _onReady();
       });
       peer.on('error', (errorMessage) => {
         logger.error('PeerJS error:', errorMessage);
@@ -321,6 +331,10 @@ namespace gdjs {
      */
     export const connect = (id: string) => {
       if (peer === null) return;
+      if (!ready) {
+        _peerIdToConnectToOnceReady = id;
+        return;
+      }
       const connection = peer.connect(id);
       connection.on('open', () => {
         _onConnect(connection);
@@ -426,8 +440,8 @@ namespace gdjs {
      * @see Peer.id
      */
     export const getCurrentId = (): string => {
-      if (peer == undefined) return '';
-      return peer.id || '';
+      if (peer === null) return '';
+      return peer.id;
     };
 
     /**

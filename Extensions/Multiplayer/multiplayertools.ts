@@ -117,6 +117,7 @@ namespace gdjs {
     let _shouldJoinGameRightAfterJoiningLobby = false;
     let _shouldStartGameRightAfterJoiningLobby = false;
     let _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+    let _retryPeerIdEventHandlingTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -225,6 +226,12 @@ namespace gdjs {
 
       _hasLobbyGameJustStarted = false;
       _hasLobbyGameJustEnded = false;
+    });
+
+    gdjs.registerRuntimeSceneUnloadingCallback(() => {
+      if (_retryPeerIdEventHandlingTimeoutId) {
+        clearTimeout(_retryPeerIdEventHandlingTimeoutId);
+      }
     });
 
     const getLobbiesWindowUrl = ({
@@ -611,8 +618,25 @@ namespace gdjs {
                 logger.error('Malformed message received');
                 return;
               }
-
-              handlePeerIdEvent({ peerId, compressionMethod });
+              try {
+                handlePeerIdEvent({ peerId, compressionMethod });
+              } catch (error) {
+                logger.warn(
+                  `An error occurred while handling peerId message from websocket: ${error.message}. Retrying in a few.`
+                );
+                const retryDelay = 500;
+                _retryPeerIdEventHandlingTimeoutId = setTimeout(() => {
+                  try {
+                    handlePeerIdEvent({ peerId, compressionMethod });
+                  } catch (error) {
+                    logger.error(
+                      `Second try of handling peerId message from websocket failed (delayed ${retryDelay}ms). Not trying anymore.`
+                    );
+                  } finally {
+                    _retryPeerIdEventHandlingTimeoutId = null;
+                  }
+                }, retryDelay);
+              }
               break;
             }
           }
@@ -962,7 +986,7 @@ namespace gdjs {
         logger.error(
           'No peerId found, the player does not seem connected to the broker server.'
         );
-        return;
+        throw new Error('Missing player peerId.');
       }
 
       if (currentPeerId === peerId) {

@@ -92,14 +92,16 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
-  extension.AddCondition(
-      "Once",
-      _("Trigger once while true"),
-      _("Run actions only once, for each time the conditions have been met."),
-      _("Trigger once"),
-      "",
-      "res/conditions/once24.png",
-      "res/conditions/once.png");
+  extension
+      .AddCondition("Once",
+                    _("Trigger once while true"),
+                    _("Run actions only once, for each time the conditions "
+                      "have been met."),
+                    _("Trigger once"),
+                    "",
+                    "res/conditions/once24.png",
+                    "res/conditions/once.png")
+      .SetHelpPath("/all-features/advanced-conditions/trigger-once");
 
   extension
       .AddCondition("CompareNumbers",

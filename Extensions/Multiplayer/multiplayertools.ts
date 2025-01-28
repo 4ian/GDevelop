@@ -38,13 +38,13 @@ namespace gdjs {
     method,
     body,
     dev,
-    isPreview,
+    additionalQueryStringParameters,
   }: {
     relativeUrl: string;
     method: 'GET' | 'POST';
     body?: string;
     dev: boolean;
-    isPreview?: boolean;
+    additionalQueryStringParameters?: { [key: string]: string };
   }) => {
     const playerId = gdjs.playerAuthentication.getUserId();
     const playerToken = gdjs.playerAuthentication.getUserToken();
@@ -60,8 +60,12 @@ namespace gdjs {
       : 'https://api.gdevelop.io';
     const url = new URL(`${rootApi}${relativeUrl}`);
     url.searchParams.set('playerId', playerId);
-    if (isPreview) {
-      url.searchParams.set('isPreview', 'true');
+    if (additionalQueryStringParameters) {
+      Object.entries(additionalQueryStringParameters).forEach(
+        ([key, value]) => {
+          url.searchParams.set(key, value);
+        }
+      );
     }
     const formattedUrl = url.toString();
 
@@ -118,6 +122,7 @@ namespace gdjs {
     let _shouldStartGameRightAfterJoiningLobby = false;
     let _shouldOpenLobbyPageRightAfterJoiningLobby = false;
     let _retryPeerIdEventHandlingTimeoutId: NodeJS.Timeout | null = null;
+    let _retryPeerIdSendingTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -231,6 +236,9 @@ namespace gdjs {
     gdjs.registerRuntimeSceneUnloadingCallback(() => {
       if (_retryPeerIdEventHandlingTimeoutId) {
         clearTimeout(_retryPeerIdEventHandlingTimeoutId);
+      }
+      if (_retryPeerIdSendingTimeoutId) {
+        clearTimeout(_retryPeerIdSendingTimeoutId);
       }
     });
 
@@ -743,8 +751,28 @@ namespace gdjs {
         handleJoinGameMessage();
         return;
       } else if (_shouldStartGameRightAfterJoiningLobby) {
-        console.log('send peer id');
-        sendPeerId();
+        console.log('start game');
+        try {
+          sendPeerId();
+          handleStartGameMessage();
+        } catch (error) {
+          logger.warn(
+            `An error occurred while sending peerId message to websocket: ${error.message}. Retrying in a few.`
+          );
+          const retryDelay = 500;
+          _retryPeerIdSendingTimeoutId = setTimeout(() => {
+            try {
+              sendPeerId();
+              handleStartGameMessage();
+            } catch (error) {
+              logger.error(
+                `Second try of sending peerId message to websocket failed (delayed ${retryDelay}ms). Not trying anymore.`
+              );
+            } finally {
+              _retryPeerIdSendingTimeoutId = null;
+            }
+          }, retryDelay);
+        }
         return;
       }
 
@@ -1448,7 +1476,7 @@ namespace gdjs {
         logger.error(
           "No peerId found, the player doesn't seem connected to the broker server."
         );
-        return;
+        throw new Error('Missing player peerId.');
       }
 
       _websocket.send(
@@ -1600,7 +1628,11 @@ namespace gdjs {
           relativeUrl: quickJoinLobbyRelativeUrl,
           method: 'POST',
           dev: isUsingGDevelopDevelopmentEnvironment,
-          isPreview: runtimeScene.getGame().isPreview(),
+          additionalQueryStringParameters: {
+            isPreview: runtimeScene.getGame().isPreview().toString(),
+            gameVersion: runtimeScene.getGame().getGameData().properties
+              .version,
+          },
         }
       );
 

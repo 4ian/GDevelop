@@ -53,6 +53,12 @@ namespace gdjs {
     if (!runtimeObject.isFaceAtIndexVisible(faceIndex))
       return getTransparentMaterial();
 
+    const resourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
+    if (!resourceName || resourceName === '') {
+      const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+      console.log('on est bien passés ici !!');
+      return material;
+    }
     return runtimeObject
       .getInstanceContainer()
       .getGame()
@@ -75,14 +81,37 @@ namespace gdjs {
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
       // TODO (3D) - feature: support color instead of texture?
-      const materials = [
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[1]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[2]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[3]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[4]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[5]),
-      ];
+      const materials: THREE.Material[] = [];
+
+      for (let i = 0; i < 6; i++) {
+        const material: THREE.Material = getFaceMaterial(
+          runtimeObject,
+          materialIndexToFaceIndex[i]
+        );
+        const basicMaterial: THREE.MeshBasicMaterial =
+          new THREE.MeshBasicMaterial();
+        basicMaterial.copy(material);
+        materials.push(
+          basicMaterial.map
+            ? getFaceMaterial(runtimeObject, materialIndexToFaceIndex[i])
+            : new THREE.MeshBasicMaterial({ vertexColors: true })
+        );
+      }
+
+      let colors: number[] = [];
+      for (let i = 0; i < geometry.attributes.position.count; i++) {
+        colors.push(
+          runtimeObject._color.r,
+          runtimeObject._color.g,
+          runtimeObject._color.b
+        );
+      }
+
+      geometry.setAttribute(
+        'color',
+        new THREE.BufferAttribute(new Float32Array(colors), 3)
+      );
+
       const boxMesh = new THREE.Mesh(geometry, materials);
 
       super(runtimeObject, instanceContainer, boxMesh);
@@ -121,13 +150,11 @@ namespace gdjs {
      */
     updateTextureUvMapping(faceIndex?: number) {
       // @ts-ignore - position is stored as a Float32BufferAttribute
-      const pos: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'position'
-      );
+      const pos: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('position');
       // @ts-ignore - uv is stored as a Float32BufferAttribute
-      const uvMapping: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'uv'
-      );
+      const uvMapping: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('uv');
       const startIndex =
         faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
       const endIndex =
@@ -149,9 +176,10 @@ namespace gdjs {
           continue;
         }
 
-        const shouldRepeatTexture = this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
-          materialIndexToFaceIndex[materialIndex]
-        );
+        const shouldRepeatTexture =
+          this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
+            materialIndexToFaceIndex[materialIndex]
+          );
 
         const shouldOrientateFacesTowardsY =
           this._cube3DRuntimeObject.getFacesOrientation() === 'Y';
@@ -180,12 +208,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
               }
             }
             break;
@@ -211,12 +237,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 x = -x;
                 y = -y;
               }

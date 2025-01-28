@@ -24,10 +24,10 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
+      color: THREE.Color;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
-
   type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
   const faceNameToBitmaskIndex = {
     front: 0,
@@ -71,7 +71,7 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-
+    _color: THREE.Color;
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -117,6 +117,9 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
+
+      this._color = objectData.content.color || new THREE.Color(0.5, 0.5, 0.5);
+
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
@@ -197,15 +200,19 @@ namespace gdjs {
 
     setFaceResourceName(faceName: FaceName, resourceName: string): void {
       const faceIndex = faceNameToBitmaskIndex[faceName];
+      console.log(resourceName);
       if (faceIndex === undefined) {
         return;
       }
       if (this._faceResourceNames[faceIndex] === resourceName) {
         return;
       }
-
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
+    }
+    setCubeColor(color: THREE.Color): void {
+      if (color === this._color) return;
+      this._color = color;
     }
 
     /** @internal */
@@ -285,7 +292,11 @@ namespace gdjs {
       if (
         oldObjectData.content.frontFaceResourceName !==
         newObjectData.content.frontFaceResourceName
-      ) {
+      )
+        if (oldObjectData.content.color !== newObjectData.content.color) {
+          this.setCubeColor(newObjectData.content.color);
+        }
+      {
         this.setFaceResourceName(
           'front',
           newObjectData.content.frontFaceResourceName

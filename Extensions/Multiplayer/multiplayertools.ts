@@ -714,7 +714,6 @@ namespace gdjs {
         secure: boolean;
       };
     }) {
-      console.log('connectionId received');
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
       if (validIceServers.length) {
         for (const server of validIceServers) {
@@ -743,15 +742,12 @@ namespace gdjs {
       _lobbyId = lobbyId;
 
       if (_shouldOpenLobbyPageRightAfterJoiningLobby) {
-        console.log('open lobbies');
         openLobbiesWindow(runtimeScene);
         return;
       } else if (_shouldJoinGameRightAfterJoiningLobby) {
-        console.log('join game');
         handleJoinGameMessage();
         return;
       } else if (_shouldStartGameRightAfterJoiningLobby) {
-        console.log('start game');
         try {
           sendPeerId();
           handleStartGameMessage();
@@ -938,7 +934,6 @@ namespace gdjs {
       // If we are the host, still start the game, as this allows a player to test the game alone.
       const allConnectedPeers = gdjs.multiplayerPeerJsHelper.getAllPeers();
       if (!isCurrentPlayerHost() && allConnectedPeers.length === 0) {
-        console.log(isCurrentPlayerHost(), allConnectedPeers);
         gdjs.multiplayerComponents.displayConnectionErrorNotification(
           runtimeScene
         );
@@ -1006,7 +1001,6 @@ namespace gdjs {
       peerId: string;
       compressionMethod: gdjs.multiplayerPeerJsHelper.CompressionMethod;
     }) {
-      console.log('handle peer id event');
       // When a peerId is received, trigger a P2P connection with the peer, just after setting the compression method.
       gdjs.multiplayerPeerJsHelper.setCompressionMethod(compressionMethod);
       const currentPeerId = gdjs.multiplayerPeerJsHelper.getCurrentId();
@@ -1642,8 +1636,6 @@ namespace gdjs {
       ) {
         return;
       }
-
-      console.log(quickJoinLobbyResponse.lobby);
 
       if (quickJoinLobbyResponse.status === 'join-game') {
         if (quickJoinLobbyResponse.lobby.status === 'waiting') {

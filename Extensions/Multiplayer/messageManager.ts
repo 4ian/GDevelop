@@ -1945,7 +1945,7 @@ namespace gdjs {
     };
 
     const heartbeatMessageNamePrefix = '#heartbeat';
-    const heartbeastMessageRegex = /#heartbeat#(.+)/;
+    const heartbeatMessageRegex = /#heartbeat#(.+)/;
     const createHeartbeatMessage = (): {
       messageName: string;
       messageData: any;
@@ -2028,7 +2028,7 @@ namespace gdjs {
         messages.forEach((message) => {
           const messageData = message.getData();
           const messageSender = message.getSender();
-          const matches = heartbeastMessageRegex.exec(messageName);
+          const matches = heartbeatMessageRegex.exec(messageName);
           if (!matches) {
             return;
           }

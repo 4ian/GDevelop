@@ -99,9 +99,9 @@ namespace gdjs {
       let colors: number[] = [];
       for (let i = 0; i < geometry.attributes.position.count; i++) {
         colors.push(
-          runtimeObject._color.r,
-          runtimeObject._color.g,
-          runtimeObject._color.b
+          runtimeObject._color[0],
+          runtimeObject._color[1],
+          runtimeObject._color[2]
         );
       }
 

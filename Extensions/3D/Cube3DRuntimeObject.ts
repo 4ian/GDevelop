@@ -24,7 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
-      color: THREE.Color;
+      color: string;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
@@ -71,7 +71,7 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-    _color: THREE.Color;
+    _color: [float, float, float];
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -118,7 +118,9 @@ namespace gdjs {
         objectData.content.bottomFaceResourceName,
       ];
 
-      this._color = objectData.content.color || new THREE.Color(0.5, 0.5, 0.5);
+      this._color = objectData.content.color
+        ? rgbOrHexToRGBColor(objectData.content.color)
+        : [0.5, 0.5, 0.5];
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -209,9 +211,9 @@ namespace gdjs {
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
     }
-    setCubeColor(color: THREE.Color): void {
-      if (color === this._color) return;
-      this._color = color;
+    setCubeColor(color: string): void {
+      if (rgbOrHexToRGBColor(color) === this._color) return;
+      this._color = rgbOrHexToRGBColor(color);
     }
 
     /** @internal */

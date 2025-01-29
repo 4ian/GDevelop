@@ -96,6 +96,25 @@ namespace gdjs {
         );
       };
 
+      export const retryIfFailed = async <T>(
+        { times }: { times: number },
+        functionCalled: () => Promise<T>
+      ): Promise<T> => {
+        let tries = 0;
+        let latestError = null;
+        while (tries < times) {
+          tries++;
+          latestError = null;
+          try {
+            const latestReturnValue = await functionCalled();
+            return latestReturnValue;
+          } catch (error) {
+            latestError = error;
+          }
+        }
+
+        throw latestError;
+      };
       /**
        * @deprecated
        */

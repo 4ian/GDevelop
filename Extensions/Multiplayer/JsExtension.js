@@ -35,8 +35,43 @@ module.exports = {
       .addAction(
         'QuickJoinLobby',
         _('Join the next available lobby'),
-        _('Joins the next available lobby.'),
+        _(
+          'Join the next available lobby. The player will join the game instantly if this is possible.'
+        ),
         _('Join the next available lobby'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'yesorno',
+        _('Display loader while looking of a lobby.'),
+        '',
+        false
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.quickJoinLobby');
+
+    extension
+      .addCondition(
+        'IsSearchingForLobbyToJoin',
+        _('Is searching for a lobby to join'),
+        _('Is searching for a lobby to join.'),
+        _('Is searching for a lobby to join'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg',
         'JsPlatform/Extensions/multiplayer.svg'
@@ -56,7 +91,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.quickJoinLobby');
+      .setFunctionName('gdjs.multiplayer.isSearchingForLobbyToJoin');
 
     extension
       .addAction(

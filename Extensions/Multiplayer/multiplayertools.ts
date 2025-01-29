@@ -121,6 +121,7 @@ namespace gdjs {
     let _shouldJoinGameRightAfterJoiningLobby = false;
     let _shouldStartGameRightAfterJoiningLobby = false;
     let _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+    let _isJoiningOrStartingAGame = false;
     let _retryPeerIdEventHandlingTimeoutId: NodeJS.Timeout | null = null;
     let _retryPeerIdSendingTimeoutId: NodeJS.Timeout | null = null;
 
@@ -900,6 +901,8 @@ namespace gdjs {
           }),
           dev: isUsingGDevelopDevelopmentEnvironment,
         });
+        // TODO: if 404, there's chance that it means the lobby is now closed. Display a message
+        // to the player?
       } catch (error) {
         logger.error('Error while sending heartbeat, retrying:', error);
         try {
@@ -955,6 +958,7 @@ namespace gdjs {
       logger.info('Lobby game has started.');
       // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
       gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
+      if (_isJoiningOrStartingAGame) onLobbyQuickJoinFinished(runtimeScene);
       _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
@@ -1603,7 +1607,18 @@ namespace gdjs {
       );
     };
 
-    const doQuickJoinLobby = async (runtimeScene: gdjs.RuntimeScene) => {
+    const onLobbyQuickJoinFinished = (runtimeScene: gdjs.RuntimeScene) => {
+      _isJoiningOrStartingAGame = false;
+      gdjs.multiplayerComponents.displayLoader(runtimeScene, false);
+    };
+
+    const doQuickJoinLobby = async (
+      runtimeScene: gdjs.RuntimeScene,
+      displayLoader: boolean
+    ) => {
+      if (displayLoader) {
+        gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
+      }
       const _gameId = gdjs.projectData.properties.projectUuid;
       if (!_gameId) {
         handleLobbiesError(
@@ -1612,55 +1627,65 @@ namespace gdjs {
         );
         return;
       }
+      _isJoiningOrStartingAGame = true;
 
       const quickJoinLobbyRelativeUrl = `/play/game/${_gameId}/public-lobby/action/quick-join`;
 
       // TODO: Protect against the action sent once per frame.
 
-      // TODO: should the supported compression methods be sent to the endpoint?
-      const quickJoinLobbyResponse: QuickJoinLobbyResponse = await fetchAsPlayer(
-        {
-          relativeUrl: quickJoinLobbyRelativeUrl,
-          method: 'POST',
-          dev: isUsingGDevelopDevelopmentEnvironment,
-          additionalQueryStringParameters: {
-            isPreview: runtimeScene.getGame().isPreview().toString(),
-            gameVersion: runtimeScene.getGame().getGameData().properties
-              .version,
-          },
-        }
-      );
+      try {
+        const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(
+          { times: 2 },
+          () =>
+            // TODO: should the supported compression methods be sent to the endpoint?
+            fetchAsPlayer({
+              relativeUrl: quickJoinLobbyRelativeUrl,
+              method: 'POST',
+              dev: isUsingGDevelopDevelopmentEnvironment,
+              additionalQueryStringParameters: {
+                isPreview: runtimeScene.getGame().isPreview().toString(),
+                gameVersion: runtimeScene.getGame().getGameData().properties
+                  .version,
+              },
+            })
+        );
 
-      if (
-        quickJoinLobbyResponse.status === 'full' ||
-        quickJoinLobbyResponse.status === 'not-enough-players'
-      ) {
-        return;
-      }
-
-      if (quickJoinLobbyResponse.status === 'join-game') {
-        if (quickJoinLobbyResponse.lobby.status === 'waiting') {
-          _shouldStartGameRightAfterJoiningLobby = true;
-        } else if (quickJoinLobbyResponse.lobby.status === 'playing') {
-          _shouldJoinGameRightAfterJoiningLobby = true;
-        } else {
-          throw new Error('Lobby in wrong status');
-        }
-      } else {
-        if (_connectionId) {
-          // Already connected to a lobby.
-          openLobbiesWindow(runtimeScene);
+        if (
+          quickJoinLobbyResponse.status === 'full' ||
+          quickJoinLobbyResponse.status === 'not-enough-players'
+        ) {
           return;
-        } else {
-          _shouldOpenLobbyPageRightAfterJoiningLobby = true;
         }
+
+        if (quickJoinLobbyResponse.status === 'join-game') {
+          if (quickJoinLobbyResponse.lobby.status === 'waiting') {
+            _shouldStartGameRightAfterJoiningLobby = true;
+          } else if (quickJoinLobbyResponse.lobby.status === 'playing') {
+            _shouldJoinGameRightAfterJoiningLobby = true;
+          } else {
+            throw new Error(
+              `Lobby in wrong status: ${quickJoinLobbyResponse.status}`
+            );
+          }
+        } else {
+          if (_connectionId) {
+            // Already connected to a lobby.
+            openLobbiesWindow(runtimeScene);
+            return;
+          } else {
+            _shouldOpenLobbyPageRightAfterJoiningLobby = true;
+          }
+        }
+        handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
+      } catch (error) {
+        logger.error('An error occurred while joining a lobby:', error);
+        onLobbyQuickJoinFinished(runtimeScene);
       }
-      handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
     };
 
     export const quickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
-      variable: gdjs.Variable
+      displayLoader: boolean
     ) => {
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
@@ -1674,12 +1699,18 @@ namespace gdjs {
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
-          await doQuickJoinLobby(runtimeScene);
+          await doQuickJoinLobby(runtimeScene, displayLoader);
         }
 
         return;
       }
-      await doQuickJoinLobby(runtimeScene);
+      await doQuickJoinLobby(runtimeScene, displayLoader);
+    };
+
+    export const isSearchingForLobbyToJoin = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      return _isJoiningOrStartingAGame;
     };
 
     /**

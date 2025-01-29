@@ -1616,9 +1616,8 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean
     ) => {
-      if (displayLoader) {
-        gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
-      }
+      if (_isJoiningOrStartingAGame) return;
+
       const _gameId = gdjs.projectData.properties.projectUuid;
       if (!_gameId) {
         handleLobbiesError(
@@ -1627,11 +1626,13 @@ namespace gdjs {
         );
         return;
       }
+
       _isJoiningOrStartingAGame = true;
+      if (displayLoader) {
+        gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
+      }
 
       const quickJoinLobbyRelativeUrl = `/play/game/${_gameId}/public-lobby/action/quick-join`;
-
-      // TODO: Protect against the action sent once per frame.
 
       try {
         const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(

@@ -1950,7 +1950,7 @@ namespace gdjs {
       messageName: string;
       messageData: any;
     } => {
-      // If we create the heartbeat meassage, we are the host,
+      // If we create the heartbeat message, we are the host.
       // Ensure our player number is correctly set when the first heartbeat is sent.
       _playersInfo[gdjs.multiplayer.getCurrentPlayerNumber()] = {
         ping: 0, // we are the host, so we don't need to compute the ping.

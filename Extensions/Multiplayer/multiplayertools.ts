@@ -1617,6 +1617,7 @@ namespace gdjs {
 
       // TODO: Protect against the action sent once per frame.
 
+      // TODO: should the supported compression methods be sent to the endpoint?
       const quickJoinLobbyResponse: QuickJoinLobbyResponse = await fetchAsPlayer(
         {
           relativeUrl: quickJoinLobbyRelativeUrl,

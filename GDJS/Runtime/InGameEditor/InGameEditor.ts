@@ -445,7 +445,6 @@ namespace gdjs {
         outlinePass.edgeThickness = 1.0;
         outlinePass.pulsePeriod = 0;
         outlinePass.downSampleRatio = 1.0;
-        // outlinePass.overlayMaterial.blending = THREE.CustomBlending
         // TODO: OutlinePass currently wrongly highlights the transform controls helper.
         // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
         outlinePass.selectedObjects = this._selection
@@ -495,7 +494,8 @@ namespace gdjs {
           this._runtimeGame.getRenderer().getCanvas() || undefined
         );
         threeTransformControls.scale.y = -1;
-        threeTransformControls.traverse((obj) => { // To be detected correctly by OutlinePass.
+        threeTransformControls.traverse((obj) => {
+          // To be detected correctly by OutlinePass.
           // @ts-ignore
           obj.isTransformControls = true;
         });
@@ -678,7 +678,7 @@ namespace gdjs {
         this._raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
         const intersects = this._raycaster.intersectObjects(
           threeGroup.children,
-          false
+          true
         );
 
         const firstIntersect = intersects[0];
@@ -702,10 +702,16 @@ namespace gdjs {
       }
 
       if (!closestIntersect) return null;
-      const threeObject = closestIntersect.intersect.object;
-      if (!threeObject.gdjsRuntimeObject) return null;
 
-      return threeObject.gdjsRuntimeObject;
+      // Walk back up the object hierarchy to find the runtime object.
+      // We sadly need to do that because the intersection can be found on a Mesh or other
+      // child Three.js object, instead of the one exposed by the gdjs.RuntimeObject.
+      let threeObject = closestIntersect.intersect.object;
+      while (true) {
+        if (!threeObject) return null;
+        if (threeObject.gdjsRuntimeObject) return threeObject.gdjsRuntimeObject;
+        threeObject = threeObject.parent || null;
+      }
     }
 
     updateAndRender() {

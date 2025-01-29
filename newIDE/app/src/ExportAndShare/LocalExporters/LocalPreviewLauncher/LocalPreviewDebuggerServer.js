@@ -99,7 +99,6 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
       });
 
       ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
-        console.info('Processing message received for debugger');
         let parsedMessage = null;
         try {
           parsedMessage = JSON.parse(message);

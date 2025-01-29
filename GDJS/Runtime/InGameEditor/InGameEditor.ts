@@ -191,7 +191,6 @@ namespace gdjs {
   export class InGameEditor {
     private _runtimeGame: RuntimeGame;
     private _tempVector2d = new THREE.Vector2();
-    private _outlinePasses: Record<string, THREE_ADDONS.OutlinePass> = {};
     private _raycaster = new THREE.Raycaster();
 
     // The controls shown to manipulate the selection.
@@ -209,7 +208,10 @@ namespace gdjs {
 
     // The selected objects.
     private _selection = new Selection();
-
+    private _selectionBoxes: Map<
+      gdjs.RuntimeObject3D,
+      THREE.BoxHelper
+    > = new Map();
     private _objectMover = new ObjectMover();
 
     private _lastCursorX: number = 0;
@@ -417,41 +419,49 @@ namespace gdjs {
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const layerNames = [];
-      currentScene.getAllLayerNames(layerNames);
-      layerNames.forEach((layerName) => {
-        if (!this._outlinePasses[layerName]) {
-          const runtimeLayerRender = currentScene
-            .getLayer(layerName)
-            .getRenderer();
-          const threeCamera = runtimeLayerRender.getThreeCamera();
-          const threeScene = runtimeLayerRender.getThreeScene();
-          if (!threeCamera || !threeScene) return;
+      const selected3DObjects = this._selection
+        .getSelectedObjects()
+        .filter(
+          (obj): obj is gdjs.RuntimeObject3D =>
+            obj instanceof gdjs.RuntimeObject3D
+        );
 
-          this._outlinePasses[layerName] = new THREE_ADDONS.OutlinePass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            threeScene,
-            threeCamera
-          );
-
-          runtimeLayerRender.addPostProcessingPass(
-            this._outlinePasses[layerName]
-          );
+      // Remove boxes for deselected objects
+      this._selectionBoxes.forEach((box, obj) => {
+        if (!selected3DObjects.includes(obj)) {
+          box.removeFromParent();
+          this._selectionBoxes.delete(obj);
         }
-        const outlinePass = this._outlinePasses[layerName];
+      });
 
-        outlinePass.edgeStrength = 5;
-        outlinePass.edgeGlow = 0;
-        outlinePass.edgeThickness = 1.0;
-        outlinePass.pulsePeriod = 0;
-        outlinePass.downSampleRatio = 1.0;
-        // TODO: OutlinePass currently wrongly highlights the transform controls helper.
-        // (See https://discourse.threejs.org/t/outlinepass-with-transform-control/18722)
-        outlinePass.selectedObjects = this._selection
-          .getSelectedObjects()
-          .filter((object) => object.getLayer() === layerName)
-          .map((object) => object.get3DRendererObject())
-          .filter(isDefined);
+      // Add/update boxes for selected objects
+      selected3DObjects.forEach((object) => {
+        const threeObject = object.get3DRendererObject();
+        if (!threeObject) return;
+
+        const layer = currentScene.getLayer(object.getLayer());
+        const threeGroup = layer.getRenderer().getThreeGroup();
+        if (!threeGroup) return;
+
+        let box = this._selectionBoxes.get(object);
+        if (!box) {
+          // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
+          // compared to Three.js. This is somehow necessary because the position
+          // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
+          const parentGroup = new THREE.Group();
+          parentGroup.scale.y = -1;
+          box = new THREE.BoxHelper(threeObject, '#f2a63c');
+          box.material.depthTest = false;
+          box.material.fog = false;
+          threeGroup.add(parentGroup);
+
+          this._selectionBoxes.set(object, box);
+          parentGroup.add(box);
+        }
+      });
+
+      this._selectionBoxes.forEach((box) => {
+        box.update();
       });
     }
 
@@ -549,6 +559,12 @@ namespace gdjs {
           this._selectionControls.dummyThreeObject.removeFromParent();
           this._selectionControls = null;
         }
+
+        // Cleanup selection boxes
+        this._selectionBoxes.forEach((box) => {
+          box.removeFromParent();
+        });
+        this._selectionBoxes.clear();
       }
     }
 
@@ -653,6 +669,11 @@ namespace gdjs {
       const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
       if (!currentScene || !threeRenderer) return null;
 
+      // Only check layer 0, on which Three.js objects are by default
+      // and move selection boxes to layer 1.
+      this._raycaster.layers.set(0);
+      this._selectionBoxes.forEach((box) => box.layers.set(1));
+
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
         const runtimeLayerRender = currentScene
@@ -688,6 +709,9 @@ namespace gdjs {
           intersect: firstIntersect,
         };
       });
+
+      // Reset selection boxes layers so they are properly displayed.
+      this._selectionBoxes.forEach((box) => box.layers.set(0));
 
       let closestIntersect;
       for (const intersect of Object.values(firstIntersectsByLayer)) {

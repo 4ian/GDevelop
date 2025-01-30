@@ -1670,10 +1670,22 @@ namespace gdjs {
             })
         );
 
-        if (
-          quickJoinLobbyResponse.status === 'full' ||
-          quickJoinLobbyResponse.status === 'not-enough-players'
-        ) {
+        if (quickJoinLobbyResponse.status === 'full') {
+          gdjs.multiplayerComponents.showNotification({
+            runtimeScene,
+            content: 'All lobbies are full.',
+            type: 'error',
+          });
+          return;
+        }
+        if (quickJoinLobbyResponse.status === 'not-enough-players') {
+          // TODO: Should this notification be displayed? The creator might not want it displayed
+          // and open the lobbies iframe instead.
+          gdjs.multiplayerComponents.showNotification({
+            runtimeScene,
+            content: 'No available lobbies, create one.',
+            type: 'error',
+          });
           return;
         }
 

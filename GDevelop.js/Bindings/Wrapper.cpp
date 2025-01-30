@@ -78,6 +78,7 @@
 #include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
+#include <GDCore/Project/ObjectTools.h>
 #include <GDCore/Project/ObjectFolderOrObject.h>
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
@@ -659,6 +660,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindInvalidRequiredBehaviorProperties \
   FindInvalidRequiredBehaviorProperties
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
+#define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene

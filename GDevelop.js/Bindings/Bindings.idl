@@ -2786,6 +2786,13 @@ interface WholeProjectRefactorer {
     [Value] SetString STATIC_FindAllLeaderboardIds([Ref] Project project);
 };
 
+interface ObjectTools {
+    boolean STATIC_IsBehaviorCompatibleWithObject(
+        [Const, Ref] Platform platform,
+        [Const] DOMString objectType,
+        [Const] DOMString behaviorType);
+};
+
 interface EventsBasedObjectDependencyFinder {
   boolean STATIC_IsDependentFromEventsBasedObject(
     [Const, Ref] Project project,

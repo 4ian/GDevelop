@@ -11,6 +11,10 @@ namespace gdjs {
       data: Uint8Array | string;
     };
 
+    type PeerJSInitOptions = {
+      onPeerUnavailable?: () => void;
+    };
+
     export type CompressionMethod = 'none' | 'cs:gzip' | 'cs:deflate';
 
     /**
@@ -299,14 +303,27 @@ namespace gdjs {
      * Internal function called to initialize PeerJS after it
      * has been configured.
      */
-    const loadPeerJS = () => {
+    const initializePeerJS = (initOptions: PeerJSInitOptions = {}) => {
       if (peer !== null) return;
       peer = new Peer(peerConfig);
       peer.on('open', () => {
         _onReady();
       });
-      peer.on('error', (errorMessage) => {
-        logger.error('PeerJS error:', errorMessage);
+      peer.on('error', (error) => {
+        // TODO: Support other error types listed in https://peerjs.com/docs/#peeron-error
+        if (
+          initOptions.onPeerUnavailable &&
+          'type' in error &&
+          error.type === 'peer-unavailable'
+        ) {
+          logger.error('Peer is unavailable.');
+          initOptions.onPeerUnavailable();
+        } else {
+          logger.error(
+            `PeerJS error (${'type' in error ? error.type : 'unknown'}):`,
+            error
+          );
+        }
       });
       peer.on('connection', (connection) => {
         connection.on('open', () => {
@@ -316,10 +333,11 @@ namespace gdjs {
       });
       peer.on('close', () => {
         peer = null;
-        loadPeerJS();
+        initializePeerJS(initOptions);
       });
       peer.on('disconnected', peer.reconnect);
     };
+    export const useDefaultBrokerServer = initializePeerJS;
 
     /**
      * Connects to another p2p client.
@@ -379,13 +397,15 @@ namespace gdjs {
      * @param path The path (part of the url after the host) to the broker server.
      * @param key Optional password to connect to the broker server.
      * @param ssl Use ssl?
+     * @param peerJSInitOptions @see PeerJSInitOptions
      */
     export const useCustomBrokerServer = (
       host: string,
       port: number,
       path: string,
       key: string,
-      ssl: boolean
+      ssl: boolean,
+      peerJSInitOptions: PeerJSInitOptions = {}
     ) => {
       Object.assign(peerConfig, {
         host,
@@ -395,10 +415,8 @@ namespace gdjs {
         // All servers have "peerjs" as default key
         key: key.length === 0 ? 'peerjs' : key,
       });
-      loadPeerJS();
+      initializePeerJS(peerJSInitOptions);
     };
-
-    export const useDefaultBrokerServer = loadPeerJS;
 
     /**
      * Adds an ICE server candidate, and removes the default ones provided by PeerJs. Must be called before connecting to a broker.

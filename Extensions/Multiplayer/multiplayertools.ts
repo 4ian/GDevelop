@@ -686,6 +686,17 @@ namespace gdjs {
       };
     };
 
+    const onPeerUnavailable = (runtimeScene: gdjs.RuntimeScene) => {
+      gdjs.multiplayerComponents.displayConnectionErrorNotification(
+        runtimeScene
+      );
+      handleLeaveLobbyEvent();
+      _shouldJoinGameRightAfterJoiningLobby = false;
+      _shouldStartGameRightAfterJoiningLobby = false;
+      _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+      if (_isJoiningOrStartingAGame) onLobbyQuickJoinFinished(runtimeScene);
+    };
+
     const handleConnectionIdReceived = function ({
       runtimeScene,
       connectionId,
@@ -731,10 +742,13 @@ namespace gdjs {
           brokerServerConfig.port,
           brokerServerConfig.path,
           brokerServerConfig.key,
-          brokerServerConfig.secure
+          brokerServerConfig.secure,
+          { onPeerUnavailable: () => onPeerUnavailable(runtimeScene) }
         );
       } else {
-        gdjs.multiplayerPeerJsHelper.useDefaultBrokerServer();
+        gdjs.multiplayerPeerJsHelper.useDefaultBrokerServer({
+          onPeerUnavailable: () => onPeerUnavailable(runtimeScene),
+        });
       }
 
       _connectionId = connectionId;

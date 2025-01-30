@@ -46,7 +46,7 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
         'yesorno',
-        _('Display loader while looking of a lobby.'),
+        _('Display loader while searching for a lobby.'),
         '',
         false
       )

@@ -38,13 +38,11 @@ namespace gdjs {
     method,
     body,
     dev,
-    additionalQueryStringParameters,
   }: {
     relativeUrl: string;
     method: 'GET' | 'POST';
     body?: string;
     dev: boolean;
-    additionalQueryStringParameters?: { [key: string]: string };
   }) => {
     const playerId = gdjs.playerAuthentication.getUserId();
     const playerToken = gdjs.playerAuthentication.getUserToken();
@@ -60,13 +58,6 @@ namespace gdjs {
       : 'https://api.gdevelop.io';
     const url = new URL(`${rootApi}${relativeUrl}`);
     url.searchParams.set('playerId', playerId);
-    if (additionalQueryStringParameters) {
-      Object.entries(additionalQueryStringParameters).forEach(
-        ([key, value]) => {
-          url.searchParams.set(key, value);
-        }
-      );
-    }
     const formattedUrl = url.toString();
 
     const headers = {
@@ -1631,6 +1622,7 @@ namespace gdjs {
       }
 
       const quickJoinLobbyRelativeUrl = `/play/game/${_gameId}/public-lobby/action/quick-join`;
+      const platformInfo = runtimeScene.getGame().getPlatformInfo();
 
       try {
         const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(
@@ -1641,11 +1633,13 @@ namespace gdjs {
               relativeUrl: quickJoinLobbyRelativeUrl,
               method: 'POST',
               dev: isUsingGDevelopDevelopmentEnvironment,
-              additionalQueryStringParameters: {
-                isPreview: runtimeScene.getGame().isPreview().toString(),
+              body: JSON.stringify({
+                isPreview: runtimeScene.getGame().isPreview(),
                 gameVersion: runtimeScene.getGame().getGameData().properties
                   .version,
-              },
+                supportedCompressionMethods:
+                  platformInfo.supportedCompressionMethods,
+              }),
             })
         );
 

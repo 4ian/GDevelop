@@ -53,6 +53,11 @@ namespace gdjs {
     if (!runtimeObject.isFaceAtIndexVisible(faceIndex))
       return getTransparentMaterial();
 
+    const resourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
+    if (!resourceName || resourceName === '') {
+      const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+      return material;
+    }
     return runtimeObject
       .getInstanceContainer()
       .getGame()
@@ -75,14 +80,36 @@ namespace gdjs {
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
       // TODO (3D) - feature: support color instead of texture?
-      const materials = [
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[1]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[2]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[3]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[4]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[5]),
-      ];
+      const materials: THREE.Material[] = [];
+
+      for (let i = 0; i < 6; i++) {
+        const material: THREE.Material = getFaceMaterial(
+          runtimeObject,
+          materialIndexToFaceIndex[i]
+        );
+        const basicMaterial: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial();
+        basicMaterial.copy(material);
+        materials.push(
+          basicMaterial.map
+            ? getFaceMaterial(runtimeObject, materialIndexToFaceIndex[i])
+            : new THREE.MeshBasicMaterial({ vertexColors: true })
+        );
+      }
+
+      let colors: number[] = [];
+      for (let i = 0; i < geometry.attributes.position.count; i++) {
+        colors.push(
+          runtimeObject._color[0],
+          runtimeObject._color[1],
+          runtimeObject._color[2]
+        );
+      }
+
+      geometry.setAttribute(
+        'color',
+        new THREE.BufferAttribute(new Float32Array(colors), 3)
+      );
+
       const boxMesh = new THREE.Mesh(geometry, materials);
 
       super(runtimeObject, instanceContainer, boxMesh);

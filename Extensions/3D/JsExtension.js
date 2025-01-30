@@ -822,7 +822,8 @@ module.exports = {
         propertyName === 'bottomFaceResourceName' ||
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
         propertyName === 'facesOrientation' ||
-        propertyName === 'materialType'
+        propertyName === 'materialType' ||
+        propertyName === 'cubeColor'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -902,6 +903,12 @@ module.exports = {
         .setLabel(_('Depth'))
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('cubeColor')
+        .setValue(objectContent.color || (255, 255, 255))
+        .setType('Color')
+        .setLabel(_('Cube color'))
+        .setGroup(_('Texture'));
 
       objectProperties
         .getOrCreate('frontFaceResourceName')

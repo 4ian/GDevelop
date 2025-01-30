@@ -24,10 +24,10 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
+      color: string;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
-
   type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
   const faceNameToBitmaskIndex = {
     front: 0,
@@ -71,7 +71,7 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-
+    _color: [float, float, float];
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -117,6 +117,11 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
+
+      this._color = objectData.content.color
+        ? rgbOrHexToRGBColor(objectData.content.color)
+        : [0.5, 0.5, 0.5];
+
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
@@ -203,9 +208,12 @@ namespace gdjs {
       if (this._faceResourceNames[faceIndex] === resourceName) {
         return;
       }
-
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
+    }
+    setCubeColor(color: string): void {
+      if (rgbOrHexToRGBColor(color) === this._color) return;
+      this._color = rgbOrHexToRGBColor(color);
     }
 
     /** @internal */
@@ -285,7 +293,11 @@ namespace gdjs {
       if (
         oldObjectData.content.frontFaceResourceName !==
         newObjectData.content.frontFaceResourceName
-      ) {
+      )
+        if (oldObjectData.content.color !== newObjectData.content.color) {
+          this.setCubeColor(newObjectData.content.color);
+        }
+      {
         this.setFaceResourceName(
           'front',
           newObjectData.content.frontFaceResourceName

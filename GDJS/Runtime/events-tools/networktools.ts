@@ -96,8 +96,11 @@ namespace gdjs {
         );
       };
 
+      const delay = (ms: number): Promise<void> =>
+        new Promise((res) => setTimeout(res, ms));
+
       export const retryIfFailed = async <T>(
-        { times }: { times: number },
+        { times, delayInMs }: { times: number; delayInMs?: number },
         functionCalled: () => Promise<T>
       ): Promise<T> => {
         let tries = 0;
@@ -109,6 +112,7 @@ namespace gdjs {
             const latestReturnValue = await functionCalled();
             return latestReturnValue;
           } catch (error) {
+            if (delayInMs) await delay(delayInMs);
             latestError = error;
           }
         }

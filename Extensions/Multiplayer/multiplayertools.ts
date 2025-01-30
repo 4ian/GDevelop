@@ -130,8 +130,6 @@ namespace gdjs {
       | 'START_GAME'
       | null = null;
     let _isQuickJoiningOrStartingAGame = false;
-    let _retryPeerIdEventHandlingTimeoutId: NodeJS.Timeout | null = null;
-    let _retryPeerIdSendingTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -241,15 +239,6 @@ namespace gdjs {
       _hasLobbyGameJustStarted = false;
       _hasLobbyGameJustEnded = false;
       _quickJoinLobbyJustFailed = false;
-    });
-
-    gdjs.registerRuntimeSceneUnloadingCallback(() => {
-      if (_retryPeerIdEventHandlingTimeoutId) {
-        clearTimeout(_retryPeerIdEventHandlingTimeoutId);
-      }
-      if (_retryPeerIdSendingTimeoutId) {
-        clearTimeout(_retryPeerIdSendingTimeoutId);
-      }
     });
 
     const getLobbiesWindowUrl = ({
@@ -636,24 +625,15 @@ namespace gdjs {
                 logger.error('Malformed message received');
                 return;
               }
+              const retryData = { times: 2, delayInMs: 500 };
               try {
-                handlePeerIdEvent({ peerId, compressionMethod });
+                gdjs.evtTools.network.retryIfFailed(retryData, async () => {
+                  handlePeerIdEvent({ peerId, compressionMethod });
+                });
               } catch (error) {
-                logger.warn(
-                  `An error occurred while handling peerId message from websocket: ${error.message}. Retrying in a few.`
+                logger.error(
+                  `Handling peerId message from websocket failed (after {${retryData.times}} times with a delay of ${retryData.delayInMs}ms). Not trying anymore.`
                 );
-                const retryDelay = 500;
-                _retryPeerIdEventHandlingTimeoutId = setTimeout(() => {
-                  try {
-                    handlePeerIdEvent({ peerId, compressionMethod });
-                  } catch (error) {
-                    logger.error(
-                      `Second try of handling peerId message from websocket failed (delayed ${retryDelay}ms). Not trying anymore.`
-                    );
-                  } finally {
-                    _retryPeerIdEventHandlingTimeoutId = null;
-                  }
-                }, retryDelay);
               }
               break;
             }
@@ -772,26 +752,16 @@ namespace gdjs {
         handleJoinGameMessage();
         return;
       } else if (_actionAfterJoiningLobby === 'START_GAME') {
+        const retryData = { times: 2, delayInMs: 500 };
         try {
-          sendPeerId();
-          handleStartGameMessage();
+          gdjs.evtTools.network.retryIfFailed(retryData, async () => {
+            sendPeerId();
+            handleStartGameMessage();
+          });
         } catch (error) {
-          logger.warn(
-            `An error occurred while sending peerId message to websocket: ${error.message}. Retrying in a few.`
+          logger.error(
+            `Sending of peerId message from websocket failed (after {${retryData.times}} times with a delay of ${retryData.delayInMs}ms). Not trying anymore.`
           );
-          const retryDelay = 500;
-          _retryPeerIdSendingTimeoutId = setTimeout(() => {
-            try {
-              sendPeerId();
-              handleStartGameMessage();
-            } catch (error) {
-              logger.error(
-                `Second try of sending peerId message to websocket failed (delayed ${retryDelay}ms). Not trying anymore.`
-              );
-            } finally {
-              _retryPeerIdSendingTimeoutId = null;
-            }
-          }, retryDelay);
         }
         return;
       }

@@ -110,6 +110,12 @@ namespace gdjs {
     let _hasLobbyGameJustStarted = false;
     export let _isLobbyGameRunning = false;
     let _hasLobbyGameJustEnded = false;
+    let _quickJoinLobbyJustFailed = false;
+    let _quickJoinLobbyFailureReason:
+      | 'FULL'
+      | 'NOT_ENOUGH_PLAYERS'
+      | 'UNKNOWN'
+      | null = null;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
 
@@ -232,6 +238,7 @@ namespace gdjs {
 
       _hasLobbyGameJustStarted = false;
       _hasLobbyGameJustEnded = false;
+      _quickJoinLobbyJustFailed = false;
     });
 
     gdjs.registerRuntimeSceneUnloadingCallback(() => {
@@ -694,6 +701,7 @@ namespace gdjs {
       _shouldJoinGameRightAfterJoiningLobby = false;
       _shouldStartGameRightAfterJoiningLobby = false;
       _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+      _quickJoinLobbyFailureReason = null;
       if (_isJoiningOrStartingAGame) onLobbyQuickJoinFinished(runtimeScene);
     };
 
@@ -1628,6 +1636,9 @@ namespace gdjs {
 
     const onLobbyQuickJoinFinished = (runtimeScene: gdjs.RuntimeScene) => {
       _isJoiningOrStartingAGame = false;
+      _shouldStartGameRightAfterJoiningLobby = false;
+      _shouldJoinGameRightAfterJoiningLobby = false;
+      _shouldOpenLobbyPageRightAfterJoiningLobby = false;
       gdjs.multiplayerComponents.displayLoader(runtimeScene, false);
     };
 
@@ -1646,6 +1657,7 @@ namespace gdjs {
         return;
       }
 
+      _quickJoinLobbyFailureReason = null;
       _isJoiningOrStartingAGame = true;
       if (displayLoader) {
         gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
@@ -1676,6 +1688,8 @@ namespace gdjs {
             content: 'All lobbies are full.',
             type: 'error',
           });
+          _quickJoinLobbyJustFailed = true;
+          _quickJoinLobbyFailureReason = 'FULL';
           return;
         }
         if (quickJoinLobbyResponse.status === 'not-enough-players') {
@@ -1686,6 +1700,8 @@ namespace gdjs {
             content: 'No available lobbies, create one.',
             type: 'error',
           });
+          _quickJoinLobbyJustFailed = true;
+          _quickJoinLobbyFailureReason = 'NOT_ENOUGH_PLAYERS';
           return;
         }
 
@@ -1711,6 +1727,8 @@ namespace gdjs {
         handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
       } catch (error) {
         logger.error('An error occurred while joining a lobby:', error);
+        _quickJoinLobbyJustFailed = true;
+        _quickJoinLobbyFailureReason = 'UNKNOWN';
         onLobbyQuickJoinFinished(runtimeScene);
       }
     };
@@ -1743,6 +1761,16 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       return _isJoiningOrStartingAGame;
+    };
+
+    export const quickJoinFailedToJoinALobby = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      return _quickJoinLobbyJustFailed;
+    };
+
+    export const quickJoinFailureReason = () => {
+      return _quickJoinLobbyFailureReason;
     };
 
     /**

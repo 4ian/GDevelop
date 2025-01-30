@@ -124,10 +124,12 @@ namespace gdjs {
     let _lobbyChangeHostRequestInitiatedAt: number | null = null;
     let _isChangingHost = false;
     let _lobbyNewHostPickedAt: number | null = null;
-    let _shouldJoinGameRightAfterJoiningLobby = false;
-    let _shouldStartGameRightAfterJoiningLobby = false;
-    let _shouldOpenLobbyPageRightAfterJoiningLobby = false;
-    let _isJoiningOrStartingAGame = false;
+    let _actionAfterJoiningLobby:
+      | 'OPEN_LOBBY_PAGE'
+      | 'JOIN_GAME'
+      | 'START_GAME'
+      | null = null;
+    let _isQuickJoiningOrStartingAGame = false;
     let _retryPeerIdEventHandlingTimeoutId: NodeJS.Timeout | null = null;
     let _retryPeerIdSendingTimeoutId: NodeJS.Timeout | null = null;
 
@@ -698,11 +700,10 @@ namespace gdjs {
         runtimeScene
       );
       handleLeaveLobbyEvent();
-      _shouldJoinGameRightAfterJoiningLobby = false;
-      _shouldStartGameRightAfterJoiningLobby = false;
-      _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+      _actionAfterJoiningLobby = null;
       _quickJoinLobbyFailureReason = null;
-      if (_isJoiningOrStartingAGame) onLobbyQuickJoinFinished(runtimeScene);
+      if (_isQuickJoiningOrStartingAGame)
+        onLobbyQuickJoinFinished(runtimeScene);
     };
 
     const handleConnectionIdReceived = function ({
@@ -764,13 +765,13 @@ namespace gdjs {
       // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
       _lobbyId = lobbyId;
 
-      if (_shouldOpenLobbyPageRightAfterJoiningLobby) {
+      if (_actionAfterJoiningLobby === 'OPEN_LOBBY_PAGE') {
         openLobbiesWindow(runtimeScene);
         return;
-      } else if (_shouldJoinGameRightAfterJoiningLobby) {
+      } else if (_actionAfterJoiningLobby === 'JOIN_GAME') {
         handleJoinGameMessage();
         return;
-      } else if (_shouldStartGameRightAfterJoiningLobby) {
+      } else if (_actionAfterJoiningLobby === 'START_GAME') {
         try {
           sendPeerId();
           handleStartGameMessage();
@@ -980,7 +981,8 @@ namespace gdjs {
       logger.info('Lobby game has started.');
       // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
       gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
-      if (_isJoiningOrStartingAGame) onLobbyQuickJoinFinished(runtimeScene);
+      if (_isQuickJoiningOrStartingAGame)
+        onLobbyQuickJoinFinished(runtimeScene);
       _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
@@ -1546,9 +1548,7 @@ namespace gdjs {
           if (!event.data.lobbyId) {
             throw new Error('Malformed message.');
           }
-          _shouldStartGameRightAfterJoiningLobby = false;
-          _shouldJoinGameRightAfterJoiningLobby = false;
-          _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+          _actionAfterJoiningLobby = null;
           handleJoinLobbyEvent(runtimeScene, event.data.lobbyId);
           break;
         }
@@ -1635,10 +1635,8 @@ namespace gdjs {
     };
 
     const onLobbyQuickJoinFinished = (runtimeScene: gdjs.RuntimeScene) => {
-      _isJoiningOrStartingAGame = false;
-      _shouldStartGameRightAfterJoiningLobby = false;
-      _shouldJoinGameRightAfterJoiningLobby = false;
-      _shouldOpenLobbyPageRightAfterJoiningLobby = false;
+      _isQuickJoiningOrStartingAGame = false;
+      _actionAfterJoiningLobby = null;
       gdjs.multiplayerComponents.displayLoader(runtimeScene, false);
     };
 
@@ -1646,8 +1644,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean
     ) => {
-      if (_isJoiningOrStartingAGame) return;
-
+      if (_isQuickJoiningOrStartingAGame) return;
       const _gameId = gdjs.projectData.properties.projectUuid;
       if (!_gameId) {
         handleLobbiesError(
@@ -1658,7 +1655,7 @@ namespace gdjs {
       }
 
       _quickJoinLobbyFailureReason = null;
-      _isJoiningOrStartingAGame = true;
+      _isQuickJoiningOrStartingAGame = true;
       if (displayLoader) {
         gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
       }
@@ -1707,9 +1704,9 @@ namespace gdjs {
 
         if (quickJoinLobbyResponse.status === 'join-game') {
           if (quickJoinLobbyResponse.lobby.status === 'waiting') {
-            _shouldStartGameRightAfterJoiningLobby = true;
+            _actionAfterJoiningLobby = 'START_GAME';
           } else if (quickJoinLobbyResponse.lobby.status === 'playing') {
-            _shouldJoinGameRightAfterJoiningLobby = true;
+            _actionAfterJoiningLobby = 'JOIN_GAME';
           } else {
             throw new Error(
               `Lobby in wrong status: ${quickJoinLobbyResponse.status}`
@@ -1721,7 +1718,7 @@ namespace gdjs {
             openLobbiesWindow(runtimeScene);
             return;
           } else {
-            _shouldOpenLobbyPageRightAfterJoiningLobby = true;
+            _actionAfterJoiningLobby = 'OPEN_LOBBY_PAGE';
           }
         }
         handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
@@ -1760,7 +1757,7 @@ namespace gdjs {
     export const isSearchingForLobbyToJoin = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
-      return _isJoiningOrStartingAGame;
+      return _isQuickJoiningOrStartingAGame;
     };
 
     export const quickJoinFailedToJoinALobby = (

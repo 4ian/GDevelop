@@ -344,8 +344,7 @@ namespace gdjs {
      * @param id - The other client's ID.
      */
     export const connect = (id: string) => {
-      if (peer === null) return;
-      if (!ready) {
+      if (peer === null || !ready) {
         _peerIdToConnectToOnceReady = id;
         return;
       }

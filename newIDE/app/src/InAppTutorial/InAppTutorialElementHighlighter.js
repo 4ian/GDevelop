@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -13,6 +14,7 @@ import Mouse from '../UI/CustomSvgIcons/Mouse';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import Text from '../UI/Text';
 
 type Props = {|
   element: HTMLElement,
@@ -40,6 +42,7 @@ const styles = {
     boxShadow: `0 0 12px 2px ${highlighterPrimaryColor}`,
     padding: '2px 5px 2px 2px',
     borderRadius: 3,
+    gap: 1,
   },
 };
 
@@ -162,7 +165,7 @@ function InAppTutorialElementHighlighter({ element }: Props) {
                 ? scrollParentRectangle.left + 15
                 : scrollDirection === 'right'
                 ? scrollParentRectangle.right - 50
-                : elementRectangle.centerX() - 15,
+                : elementRectangle.centerX() - 35,
           }}
         >
           <div style={styles.scrollDirectionArrow}>
@@ -170,6 +173,9 @@ function InAppTutorialElementHighlighter({ element }: Props) {
               <>
                 <Icon fontSize="large" />
                 {isMobile ? <PointerFinger /> : <Mouse />}
+                <Text noMargin color="inherit">
+                  <Trans>Scroll</Trans>
+                </Text>
               </>
             )}
           </div>

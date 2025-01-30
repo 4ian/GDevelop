@@ -1080,6 +1080,11 @@ namespace gdjs {
         );
         return;
       }
+      // TODO: When the message is sent, it is expected to then receive a "peerId" message
+      // from the websocket. This "peerId" message might not be sent for different reasons.
+      // Should there be a security that checks if the "peerId" message has been received
+      // in the next 10s or something more global that checks the lobby status after the player
+      // has committed to open a connection with it?
 
       _websocket.send(
         JSON.stringify({

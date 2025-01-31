@@ -286,7 +286,7 @@ module.exports = {
       )
       .addParameter('string', _('Event name'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Variable containing the extra data'),
         '',
         false
@@ -309,7 +309,7 @@ module.exports = {
       .addParameter('string', _('ID of the other client'), '', false)
       .addParameter('string', _('Event name'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Variable containing the extra data'),
         '',
         false
@@ -336,7 +336,7 @@ module.exports = {
       )
       .addParameter('string', _('Event name'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Variable where to store the received data'),
         '',
         false

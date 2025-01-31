@@ -121,6 +121,7 @@ namespace gdjs {
       | 'START_GAME'
       | null = null;
     let _isQuickJoiningOrStartingAGame = false;
+    let _lastQuickJoinRequestDoneAt: number | null = null;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -1699,6 +1700,19 @@ namespace gdjs {
       displayLoader: boolean,
       openLobbiesPageIfNotEnoughPlayers: boolean
     ) => {
+      const requestDoneAt = Date.now();
+      if (_lastQuickJoinRequestDoneAt) {
+        if (requestDoneAt - _lastQuickJoinRequestDoneAt < 500) {
+          _lastQuickJoinRequestDoneAt = requestDoneAt;
+          logger.warn(
+            'Last request to quick join a lobby was sent too little time ago. Ignoring this one.'
+          );
+          return;
+        }
+      } else {
+        _lastQuickJoinRequestDoneAt = requestDoneAt;
+      }
+
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {

@@ -313,14 +313,15 @@ namespace gdjs {
         // TODO: Support other error types listed in https://peerjs.com/docs/#peeron-error
         if (
           initOptions.onPeerUnavailable &&
-          'type' in error &&
+          // @ts-ignore - PeerJS adds `type` on errors, but it doesn't show in their TS types.
           error.type === 'peer-unavailable'
         ) {
           logger.error('Peer is unavailable.');
           initOptions.onPeerUnavailable();
         } else {
           logger.error(
-            `PeerJS error (${'type' in error ? error.type : 'unknown'}):`,
+            // @ts-ignore - PeerJS adds `type` on errors, but it doesn't show in their TS types.
+            `PeerJS error (${error.type || 'unknown'}):`,
             error
           );
         }

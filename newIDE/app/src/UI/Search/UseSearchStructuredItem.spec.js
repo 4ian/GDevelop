@@ -78,7 +78,7 @@ const applySearch = (lowerCaseSearchText: string, instructions) => {
   return results;
 };
 
-describe.only('UseSearchStructuredItem', () => {
+describe('UseSearchStructuredItem', () => {
   it('should give priority to exact matches at start of word in the first ordered key', () => {
     // In the second key `description`, facebookInstantGameSavePlayerDataAction has an exact match at start of word closer than
     // changeVariableValueAction, so it could be sorted first. But changeVariableValueAction has an exact match at start of word

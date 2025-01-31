@@ -118,10 +118,10 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.quickJoinFailedToJoinALobby');
+      .setFunctionName('gdjs.multiplayer.didQuickJoinFailToJoinALobby');
 
     extension
-      .addExpression(
+      .addStrExpression(
         'QuickJoinFailureReason',
         _('Quick join action failure reason'),
         _(
@@ -144,7 +144,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName(
-        'gdjs.multiplayerMessageManager.getLatestPlayerWhoJustLeft'
+        'gdjs.multiplayer.getQuickJoinFailureReason'
       );
 
     extension

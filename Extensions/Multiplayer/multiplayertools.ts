@@ -1655,13 +1655,6 @@ namespace gdjs {
           return;
         }
         if (quickJoinLobbyResponse.status === 'not-enough-players') {
-          // TODO: Should this notification be displayed? The creator might not want it displayed
-          // and open the lobbies iframe instead.
-          gdjs.multiplayerComponents.showNotification({
-            runtimeScene,
-            content: 'No available lobbies, create one.',
-            type: 'error',
-          });
           _quickJoinLobbyJustFailed = true;
           _quickJoinLobbyFailureReason = 'NOT_ENOUGH_PLAYERS';
           onLobbyQuickJoinFinished(runtimeScene);
@@ -1726,13 +1719,13 @@ namespace gdjs {
       return _isQuickJoiningOrStartingAGame;
     };
 
-    export const quickJoinFailedToJoinALobby = (
+    export const didQuickJoinFailToJoinALobby = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
       return _quickJoinLobbyJustFailed;
     };
 
-    export const quickJoinFailureReason = () => {
+    export const getQuickJoinFailureReason = () => {
       return _quickJoinLobbyFailureReason;
     };
 

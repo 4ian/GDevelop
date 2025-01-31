@@ -1606,7 +1606,7 @@ namespace gdjs {
     const doQuickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean,
-      openLobbiesPageIfNotEnoughPlayers: boolean
+      openLobbiesPageIfFailure: boolean
     ) => {
       if (_isQuickJoiningOrStartingAGame) return;
       const _gameId = gdjs.projectData.properties.projectUuid;
@@ -1645,22 +1645,17 @@ namespace gdjs {
             })
         );
 
-        if (quickJoinLobbyResponse.status === 'full') {
-          gdjs.multiplayerComponents.showNotification({
-            runtimeScene,
-            content: 'All lobbies are full.',
-            type: 'error',
-          });
+        if (
+          quickJoinLobbyResponse.status === 'full' ||
+          quickJoinLobbyResponse.status === 'not-enough-players'
+        ) {
           _quickJoinLobbyJustFailed = true;
-          _quickJoinLobbyFailureReason = 'FULL';
+          _quickJoinLobbyFailureReason =
+            quickJoinLobbyResponse.status === 'full'
+              ? 'FULL'
+              : 'NOT_ENOUGH_PLAYERS';
           onLobbyQuickJoinFinished(runtimeScene);
-          return;
-        }
-        if (quickJoinLobbyResponse.status === 'not-enough-players') {
-          _quickJoinLobbyJustFailed = true;
-          _quickJoinLobbyFailureReason = 'NOT_ENOUGH_PLAYERS';
-          onLobbyQuickJoinFinished(runtimeScene);
-          if (openLobbiesPageIfNotEnoughPlayers) {
+          if (openLobbiesPageIfFailure) {
             openLobbiesWindow(runtimeScene);
           }
           return;
@@ -1692,13 +1687,16 @@ namespace gdjs {
         _quickJoinLobbyJustFailed = true;
         _quickJoinLobbyFailureReason = 'UNKNOWN';
         onLobbyQuickJoinFinished(runtimeScene);
+        if (openLobbiesPageIfFailure) {
+          openLobbiesWindow(runtimeScene);
+        }
       }
     };
 
     export const quickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean,
-      openLobbiesPageIfNotEnoughPlayers: boolean
+      openLobbiesPageIfFailure: boolean
     ) => {
       const requestDoneAt = Date.now();
       if (_lastQuickJoinRequestDoneAt) {
@@ -1728,7 +1726,7 @@ namespace gdjs {
           await doQuickJoinLobby(
             runtimeScene,
             displayLoader,
-            openLobbiesPageIfNotEnoughPlayers
+            openLobbiesPageIfFailure
           );
         }
 
@@ -1737,7 +1735,7 @@ namespace gdjs {
       await doQuickJoinLobby(
         runtimeScene,
         displayLoader,
-        openLobbiesPageIfNotEnoughPlayers
+        openLobbiesPageIfFailure
       );
     };
 

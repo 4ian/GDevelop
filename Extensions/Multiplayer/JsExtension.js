@@ -53,9 +53,7 @@ module.exports = {
       .setDefaultValue('yes')
       .addParameter(
         'yesorno',
-        _(
-          'Display game lobbies if the server determined that there are not enough players to start a game right away.'
-        ),
+        _('Display game lobbies if no lobby can be joined directly.'),
         '',
         true
       )

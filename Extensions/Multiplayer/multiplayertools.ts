@@ -1629,7 +1629,6 @@ namespace gdjs {
         const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(
           { times: 2 },
           () =>
-            // TODO: should the supported compression methods be sent to the endpoint?
             fetchAsPlayer({
               relativeUrl: quickJoinLobbyRelativeUrl,
               method: 'POST',

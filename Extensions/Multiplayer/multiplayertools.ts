@@ -738,6 +738,7 @@ namespace gdjs {
 
       if (_actionAfterJoiningLobby === 'OPEN_LOBBY_PAGE') {
         openLobbiesWindow(runtimeScene);
+        onLobbyQuickJoinFinished(runtimeScene);
         return;
       } else if (_actionAfterJoiningLobby === 'JOIN_GAME') {
         handleJoinGameMessage();
@@ -1651,6 +1652,7 @@ namespace gdjs {
           });
           _quickJoinLobbyJustFailed = true;
           _quickJoinLobbyFailureReason = 'FULL';
+          onLobbyQuickJoinFinished(runtimeScene);
           return;
         }
         if (quickJoinLobbyResponse.status === 'not-enough-players') {
@@ -1663,6 +1665,7 @@ namespace gdjs {
           });
           _quickJoinLobbyJustFailed = true;
           _quickJoinLobbyFailureReason = 'NOT_ENOUGH_PLAYERS';
+          onLobbyQuickJoinFinished(runtimeScene);
           return;
         }
 

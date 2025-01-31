@@ -1604,7 +1604,8 @@ namespace gdjs {
 
     const doQuickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
-      displayLoader: boolean
+      displayLoader: boolean,
+      openLobbiesPageIfNotEnoughPlayers: boolean
     ) => {
       if (_isQuickJoiningOrStartingAGame) return;
       const _gameId = gdjs.projectData.properties.projectUuid;
@@ -1658,6 +1659,9 @@ namespace gdjs {
           _quickJoinLobbyJustFailed = true;
           _quickJoinLobbyFailureReason = 'NOT_ENOUGH_PLAYERS';
           onLobbyQuickJoinFinished(runtimeScene);
+          if (openLobbiesPageIfNotEnoughPlayers) {
+            openLobbiesWindow(runtimeScene);
+          }
           return;
         }
 
@@ -1674,6 +1678,7 @@ namespace gdjs {
         } else {
           if (_connectionId) {
             // Already connected to a lobby.
+            onLobbyQuickJoinFinished(runtimeScene);
             openLobbiesWindow(runtimeScene);
             return;
           } else {
@@ -1691,7 +1696,8 @@ namespace gdjs {
 
     export const quickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
-      displayLoader: boolean
+      displayLoader: boolean,
+      openLobbiesPageIfNotEnoughPlayers: boolean
     ) => {
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
@@ -1705,12 +1711,20 @@ namespace gdjs {
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
-          await doQuickJoinLobby(runtimeScene, displayLoader);
+          await doQuickJoinLobby(
+            runtimeScene,
+            displayLoader,
+            openLobbiesPageIfNotEnoughPlayers
+          );
         }
 
         return;
       }
-      await doQuickJoinLobby(runtimeScene, displayLoader);
+      await doQuickJoinLobby(
+        runtimeScene,
+        displayLoader,
+        openLobbiesPageIfNotEnoughPlayers
+      );
     };
 
     export const isSearchingForLobbyToJoin = (

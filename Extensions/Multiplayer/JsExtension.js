@@ -48,8 +48,18 @@ module.exports = {
         'yesorno',
         _('Display loader while searching for a lobby.'),
         '',
-        false
+        true
       )
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _(
+          'Display game lobbies if the server determined that there are not enough players to start a game right away.'
+        ),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer/peer.js')
@@ -143,9 +153,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName(
-        'gdjs.multiplayer.getQuickJoinFailureReason'
-      );
+      .setFunctionName('gdjs.multiplayer.getQuickJoinFailureReason');
 
     extension
       .addAction(

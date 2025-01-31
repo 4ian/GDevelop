@@ -213,7 +213,7 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
-      .addParameter('scenevar', _('Structure with defaults'), '', false)
+      .addParameter('variable', _('Structure with defaults'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
       .addIncludeFile(
@@ -261,7 +261,7 @@ module.exports = {
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -290,7 +290,7 @@ module.exports = {
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -342,7 +342,7 @@ module.exports = {
         false
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -365,7 +365,7 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -699,7 +699,7 @@ module.exports = {
       )
       .setDefaultValue('true')
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -738,7 +738,7 @@ module.exports = {
       )
       .setDefaultValue('true')
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -779,7 +779,7 @@ module.exports = {
       )
       .setDefaultValue('true')
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -819,7 +819,7 @@ module.exports = {
       )
       .setDefaultValue('true')
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -849,7 +849,7 @@ module.exports = {
       .addParameter('string', _('Email'), '', false)
       .addParameter('string', _('Password'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -878,7 +878,7 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1035,13 +1035,13 @@ module.exports = {
       .addParameter('string', _('HTTP Function Name'), '', false)
       .addParameter('string', _('Parameter(s) as JSON or string.'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with returned value'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1336,7 +1336,7 @@ module.exports = {
       .addAction(
         'FirestoreExecuteQuery',
         _('Run a query once'),
-        _('Runs the query once and store results in a scene variable.'),
+        _('Runs the query once and store results in a Variable.'),
         _(
           'Run query _PARAM0_ and store results into _PARAM1_ (store result state in _PARAM2_)'
         ),
@@ -1346,7 +1346,7 @@ module.exports = {
       )
       .addParameter('string', _('Query name'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to load the results'),
         '',
         true
@@ -1355,7 +1355,7 @@ module.exports = {
         'See how the data will be filled in this structure variable on [the wiki page](https://wiki.gdevelop.io/gdevelop5/all-features/firebase/firestore#the_query_result).'
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error message)'),
         '',
         true
@@ -1388,7 +1388,7 @@ module.exports = {
       )
       .addParameter('string', _('Query name'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to load the results'),
         '',
         true
@@ -1397,7 +1397,7 @@ module.exports = {
         'See the shape of the returned data on [the wiki page]().'
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error message)'),
         '',
         true
@@ -1523,9 +1523,9 @@ module.exports = {
       )
       .addParameter('string', _('Collection'), '', false)
       .addParameter('string', _('Document'), '', false)
-      .addParameter('scenevar', _('Variable to write'), '', false)
+      .addParameter('variable', _('Variable to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1554,9 +1554,9 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Collection'), '', false)
-      .addParameter('scenevar', _('Variable to write'), '', false)
+      .addParameter('variable', _('Variable to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1589,7 +1589,7 @@ module.exports = {
       .addParameter('string', _('Field to write'), '', false)
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1627,9 +1627,9 @@ module.exports = {
       )
       .addParameter('string', _('Collection'), '', false)
       .addParameter('string', _('Document'), '', false)
-      .addParameter('scenevar', _('Variable to update with'), '', false)
+      .addParameter('variable', _('Variable to update with'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1662,7 +1662,7 @@ module.exports = {
       .addParameter('string', _('Field to update'), '', false)
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1693,7 +1693,7 @@ module.exports = {
       .addParameter('string', _('Collection'), '', false)
       .addParameter('string', _('Document'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1725,7 +1725,7 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter('string', _('Field to delete'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1756,13 +1756,13 @@ module.exports = {
       .addParameter('string', _('Collection'), '', false)
       .addParameter('string', _('Document'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to load the document'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1794,13 +1794,13 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter('string', _('Field to get'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _("Callback variable where to store the field's value"),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1833,13 +1833,13 @@ module.exports = {
       .addParameter('string', _('Collection'), '', false)
       .addParameter('string', _('Document'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1873,13 +1873,13 @@ module.exports = {
       .addParameter('string', _('Document'), '', false)
       .addParameter('string', _('Field to check'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback Variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1911,13 +1911,13 @@ module.exports = {
       )
       .addParameter('string', _('Collection'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback Variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -1959,13 +1959,13 @@ module.exports = {
       )
       .setDefaultValue('none')
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with the url to the uploaded file'),
         '',
         true
@@ -1991,13 +1991,13 @@ module.exports = {
       )
       .addParameter('string', _('Storage path to the file'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2024,9 +2024,9 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Path'), '', false)
-      .addParameter('scenevar', _('Variable to write'), '', false)
+      .addParameter('variable', _('Variable to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2054,7 +2054,7 @@ module.exports = {
       .addParameter('string', _('Field to write'), '', false)
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2079,9 +2079,9 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Path'), '', false)
-      .addParameter('scenevar', _('Variable to update with'), '', false)
+      .addParameter('variable', _('Variable to update with'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2109,7 +2109,7 @@ module.exports = {
       .addParameter('string', _('Field to update'), '', false)
       .addParameter('string', _('Value to write'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2135,7 +2135,7 @@ module.exports = {
       )
       .addParameter('string', _('Path'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2162,7 +2162,7 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter('string', _('Field to delete'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2179,7 +2179,7 @@ module.exports = {
         'DatabaseGetVariable',
         _('Get a variable from the database'),
         _(
-          'Gets a variable from the database and store it in a Scene variable.'
+          'Gets a variable from the database and store it in a Variable.'
         ),
         _(
           'Load database variable _PARAM0_ into _PARAM1_ (store result state in _PARAM2_)'
@@ -2190,13 +2190,13 @@ module.exports = {
       )
       .addParameter('string', _('Path'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to store the data'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2213,7 +2213,7 @@ module.exports = {
         'DatabaseGetField',
         _('Get a field of a variable'),
         _(
-          'Return the value of a field in a variable from the database and store it in a scene variable.'
+          'Return the value of a field in a variable from the database and store it in a Variable.'
         ),
         _(
           'Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
@@ -2225,13 +2225,13 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter('string', _('Field to get'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _("Callback variable where to store the field's value"),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2259,13 +2259,13 @@ module.exports = {
       )
       .addParameter('string', _('Path'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true
@@ -2294,13 +2294,13 @@ module.exports = {
       .addParameter('string', _('Path'), '', false)
       .addParameter('string', _('Field to check'), '', false)
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback Variable where to store the result'),
         '',
         true
       )
       .addParameter(
-        'scenevar',
+        'variable',
         _('Callback variable with state (ok or error)'),
         '',
         true

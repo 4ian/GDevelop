@@ -1,6 +1,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Multiplayer');
   export namespace multiplayerComponents {
+    const loaderContainerId = 'loader-container';
     const lobbiesRootContainerId = 'lobbies-root-container';
     const lobbiesFrameContainerId = 'lobbies-frame-container';
     const lobbiesCloseContainerId = 'lobbies-close-container';
@@ -115,6 +116,66 @@ namespace gdjs {
         `#${lobbiesIframeId}`
       ) as HTMLIFrameElement | null;
       return lobbiesIframe;
+    };
+
+    export const displayLoader = (
+      runtimeScene: gdjs.RuntimeScene,
+      yesOrNo: boolean
+    ) => {
+      const domElementContainer = getDomElementContainer(runtimeScene);
+      if (!domElementContainer) {
+        return;
+      }
+
+      if (yesOrNo) {
+        const loaderContainer: HTMLDivElement = document.createElement('div');
+        loaderContainer.id = loaderContainerId;
+        loaderContainer.style.backgroundColor = '#000000';
+        loaderContainer.style.display = 'flex';
+        loaderContainer.style.height = '100%';
+        loaderContainer.style.width = '100%';
+        loaderContainer.style.justifyContent = 'center';
+        loaderContainer.style.alignItems = 'center';
+        loaderContainer.style.position = 'relative';
+        loaderContainer.style.zIndex = '2';
+        const loader = document.createElement('img');
+        loader.setAttribute('width', '50px');
+        loader.setAttribute(
+          'src',
+          'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CjxjaXJjbGUgb3BhY2l0eT0nMC4yNScgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iNCI+PC9jaXJjbGU+CjxwYXRoIG9wYWNpdHk9JzAuNzUnIGZpbGw9IiNGRkZGRkYiIGQ9Ik00IDEyYTggOCAwIDAxOC04VjBDNS4zNzMgMCAwIDUuMzczIDAgMTJoNHptMiA1LjI5MUE3Ljk2MiA3Ljk2MiAwIDAxNCAxMkgwYzAgMy4wNDIgMS4xMzUgNS44MjQgMyA3LjkzOGwzLTIuNjQ3eiI+PC9wYXRoPgo8L3N2Zz4='
+        );
+        try {
+          loader.animate(
+            [{ transform: 'rotate(0deg)' }, { transform: 'rotate(359deg)' }],
+            {
+              duration: 3000,
+              iterations: Infinity,
+            }
+          );
+        } catch {
+          logger.warn('Animation not supported, loader will be fixed.');
+        }
+        loaderContainer.appendChild(loader);
+        if (
+          domElementContainer.children &&
+          domElementContainer.children.length > 0
+        ) {
+          domElementContainer.insertBefore(
+            loaderContainer,
+            domElementContainer.children[0]
+          );
+        } else {
+          domElementContainer.appendChild(loaderContainer);
+        }
+      } else {
+        const loaderContainer = domElementContainer.querySelector(
+          `#${loaderContainerId}`
+        );
+        if (!loaderContainer) return;
+        try {
+          domElementContainer.removeChild(loaderContainer);
+        } catch {}
+      }
     };
 
     /**

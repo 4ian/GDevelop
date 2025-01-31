@@ -82,7 +82,7 @@ namespace gdjs {
         }
         return;
       }
-      if (this._ws.readyState === 1) this._ws.send(message);
+      if (this._ws.readyState === WebSocket.OPEN) this._ws.send(message);
     }
   }
 

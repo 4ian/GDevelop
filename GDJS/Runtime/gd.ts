@@ -367,7 +367,7 @@ namespace gdjs {
   /**
    * Register a function to be called when a scene unload started. This is
    * before the object deletion and renderer destruction. It is safe to
-   * manipulate these. It is **not** be safe to release resources as other
+   * manipulate these. It is **not** safe to release resources as other
    * callbacks might do operations on objects or the scene.
    *
    * @param callback The function to be called.

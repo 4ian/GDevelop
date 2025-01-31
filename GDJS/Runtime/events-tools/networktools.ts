@@ -45,8 +45,7 @@ namespace gdjs {
           request.ontimeout = onError;
           request.onabort = onError;
           request.onreadystatechange = () => {
-            /* "DONE" */
-            if (request.readyState === 4) {
+            if (request.readyState === XMLHttpRequest.DONE) {
               if (request.status >= 400) {
                 onError('' + request.status);
               }
@@ -97,6 +96,29 @@ namespace gdjs {
         );
       };
 
+      const delay = (ms: number): Promise<void> =>
+        new Promise((res) => setTimeout(res, ms));
+
+      export const retryIfFailed = async <T>(
+        { times, delayInMs }: { times: number; delayInMs?: number },
+        functionCalled: () => Promise<T>
+      ): Promise<T> => {
+        let tries = 0;
+        let latestError = null;
+        while (tries < times) {
+          tries++;
+          latestError = null;
+          try {
+            const latestReturnValue = await functionCalled();
+            return latestReturnValue;
+          } catch (error) {
+            if (delayInMs) await delay(delayInMs);
+            latestError = error;
+          }
+        }
+
+        throw latestError;
+      };
       /**
        * @deprecated
        */

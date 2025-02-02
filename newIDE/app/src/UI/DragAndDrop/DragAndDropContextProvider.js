@@ -8,11 +8,11 @@ import { DragDropContext } from 'react-dnd';
 // be able to specify the delayTouchStart parameter of the TouchBackend.
 const HTML5toTouch = {
   backends: [
+    // {
+    //   backend: HTML5Backend,
+    // },
     {
-      backend: HTML5Backend,
-    },
-    {
-      backend: TouchBackend({ delayTouchStart: 100 }),
+      backend: TouchBackend({ delayTouchStart: 100, enableMouseEvents: true }),
       preview: true,
       transition: TouchTransition,
     },

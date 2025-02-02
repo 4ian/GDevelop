@@ -1,6 +1,10 @@
 // @flow
 import * as React from 'react';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
+import { objectWithContextReactDndType } from '../ObjectsList';
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import Text from '../UI/Text';
+import classes from './EmbeddedGameFrame.module.css';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -37,6 +41,8 @@ type Props = {|
     externalLayoutName: ?string,
   |}) => void,
 |};
+
+const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
 export const EmbeddedGameFrame = ({
   previewDebuggerServer,
@@ -109,6 +115,81 @@ export const EmbeddedGameFrame = ({
             border: 'none',
           }}
         />
+        <DropTarget
+          canDrop={() => true}
+          hover={monitor => {
+            if (!previewDebuggerServer) return;
+
+            const clientOffset = monitor.getClientOffset();
+            const name = monitor.getItem().name;
+            if (!name) return;
+
+            // TODO: Move these into a helper.
+            previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+              previewDebuggerServer.sendMessage(debuggerId, {
+                command: 'dragNewInstance',
+                x: clientOffset.x,
+                y: clientOffset.y,
+                name,
+                dropped: false,
+              });
+            });
+          }}
+          drop={monitor => {
+            if (!previewDebuggerServer) return;
+
+            const clientOffset = monitor.getClientOffset();
+            const name = monitor.getItem().name;
+            if (!name) return;
+
+            // TODO: Move these into a helper.
+            previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+              previewDebuggerServer.sendMessage(debuggerId, {
+                command: 'dragNewInstance',
+                x: clientOffset.x,
+                y: clientOffset.y,
+                name,
+                dropped: true,
+              });
+            });
+          }}
+        >
+          {({ connectDropTarget, canDrop, isOver }) => {
+            if (!isOver) {
+              // TODO: Move these into a helper.
+              if (previewDebuggerServer) {
+                previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+                  previewDebuggerServer.sendMessage(debuggerId, {
+                    command: 'cancelDragNewInstance',
+                  });
+                });
+              }
+            }
+
+            return connectDropTarget(
+              <div
+                style={{
+                  display: canDrop ? 'flex' : 'none',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                id="embedded-game-frame-drop-target"
+              >
+                {canDrop && (
+                  <div className={classes.hintText}>
+                    <Text color="inherit">Drag here to add to the scene</Text>
+                  </div>
+                )}
+              </div>
+            );
+          }}
+        </DropTarget>
       </div>
     </div>
   );

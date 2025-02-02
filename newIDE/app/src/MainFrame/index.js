@@ -1814,10 +1814,7 @@ const MainFrame = (props: Props) => {
 
       hardReloadAllPreviews();
     },
-    [
-      hardReloadAllPreviews,
-      launchPreview,
-    ]
+    [hardReloadAllPreviews, launchPreview]
   );
 
   const launchQuickCustomizationPreview = React.useCallback(

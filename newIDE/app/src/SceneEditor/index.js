@@ -95,7 +95,8 @@ type InstancePersistentUuidData = {|
 |};
 
 type InstanceChanges = {|
-  updatedInstances: Array<any>, // TODO
+  updatedInstances: Array<any>, // TODO: type this.
+  addedInstances: Array<any>, // TODO: type this.
   selectedInstances: Array<InstancePersistentUuidData>,
   removedInstances: Array<InstancePersistentUuidData>,
 |};
@@ -299,6 +300,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // TODO: ensure this works for external layouts too.
 
     // TODO: adapt all of this to get all instances in one shot.
+    // and reorganize this.
     const modifiedInstances: gdInitialInstance[] = [];
     changes.updatedInstances.forEach(instanceData => {
       const { persistentUuid, x, y, z } = instanceData;
@@ -355,6 +357,16 @@ export default class SceneEditor extends React.Component<Props, State> {
           this.forceUpdatePropertiesEditor();
         }
       );
+    }
+
+    const justAddedInstances = changes.addedInstances.map((addedInstance) => {
+      const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
+      unserializeFromJSObject(instance, addedInstance);
+      return instance;
+    });
+    if (justAddedInstances.length) {
+      console.log("ADDED", justAddedInstances);
+      this._onInstancesAdded(justAddedInstances);
     }
 
     this.instancesSelection.selectInstances({

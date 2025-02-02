@@ -90,6 +90,34 @@ namespace gdjs {
     }
   };
 
+  const getInstanceDataFromRuntimeObject = (
+    runtimeObject: gdjs.RuntimeObject
+  ): InstanceData | null => {
+    if (runtimeObject instanceof gdjs.RuntimeObject3D) {
+      if (!runtimeObject.persistentUuid) return null;
+
+      const instanceData: InstanceData = {
+        name: runtimeObject.getName(),
+        zOrder: runtimeObject.getZOrder(),
+        persistentUuid: runtimeObject.persistentUuid,
+        ...runtimeObject.getRenderer().getObjectPositionFrom3DRendererObject(),
+        layer: runtimeObject.getLayer(),
+        angle: runtimeObject.getAngle(),
+        width: runtimeObject.getWidth(),
+        height: runtimeObject.getHeight(),
+        depth: runtimeObject.getDepth(),
+        locked: false, // TODO
+        customSize: false, // TODO
+        // TODO: how to transmit/should we transmit other properties?
+      };
+
+      return instanceData;
+    } else {
+      // TODO: handle 2D objects/instances.
+      return null;
+    }
+  };
+
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
@@ -210,12 +238,15 @@ namespace gdjs {
     private _selection = new Selection();
     private _selectionBoxes: Map<
       gdjs.RuntimeObject3D,
-      THREE.BoxHelper
+      { container: THREE.Group; box: THREE.BoxHelper }
     > = new Map();
     private _objectMover = new ObjectMover();
 
     private _lastCursorX: number = 0;
     private _lastCursorY: number = 0;
+
+    // Dragged new object:
+    private _draggedNewObject: gdjs.RuntimeObject | null = null;
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
@@ -427,10 +458,10 @@ namespace gdjs {
         );
 
       // Remove boxes for deselected objects
-      this._selectionBoxes.forEach((box, obj) => {
-        if (!selected3DObjects.includes(obj)) {
-          box.removeFromParent();
-          this._selectionBoxes.delete(obj);
+      this._selectionBoxes.forEach(({ container }, object) => {
+        if (!selected3DObjects.includes(object)) {
+          container.removeFromParent();
+          this._selectionBoxes.delete(object);
         }
       });
 
@@ -443,24 +474,24 @@ namespace gdjs {
         const threeGroup = layer.getRenderer().getThreeGroup();
         if (!threeGroup) return;
 
-        let box = this._selectionBoxes.get(object);
-        if (!box) {
+        let containerAndBox = this._selectionBoxes.get(object);
+        if (!containerAndBox) {
           // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
           // compared to Three.js. This is somehow necessary because the position
           // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
-          const parentGroup = new THREE.Group();
-          parentGroup.scale.y = -1;
-          box = new THREE.BoxHelper(threeObject, '#f2a63c');
+          const container = new THREE.Group();
+          container.scale.y = -1;
+          const box = new THREE.BoxHelper(threeObject, '#f2a63c');
           box.material.depthTest = false;
           box.material.fog = false;
-          threeGroup.add(parentGroup);
+          threeGroup.add(container);
 
-          this._selectionBoxes.set(object, box);
-          parentGroup.add(box);
+          this._selectionBoxes.set(object, { container, box });
+          container.add(box);
         }
       });
 
-      this._selectionBoxes.forEach((box) => {
+      this._selectionBoxes.forEach(({ box }) => {
         box.update();
       });
     }
@@ -561,15 +592,16 @@ namespace gdjs {
         }
 
         // Cleanup selection boxes
-        this._selectionBoxes.forEach((box) => {
-          box.removeFromParent();
+        this._selectionBoxes.forEach(({ container }) => {
+          container.removeFromParent();
         });
         this._selectionBoxes.clear();
       }
     }
 
     private _sendSelectionUpdate(options?: {
-      removedObjects: Array<gdjs.RuntimeObject>;
+      addedObjects?: Array<gdjs.RuntimeObject>;
+      removedObjects?: Array<gdjs.RuntimeObject>;
     }) {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
@@ -587,40 +619,76 @@ namespace gdjs {
 
       const updatedInstances = this._selection
         .getSelectedObjects()
-        .map((object) => {
-          if (object instanceof gdjs.RuntimeObject3D) {
-            if (!object.persistentUuid) return null;
-
-            const instanceData: InstanceData = {
-              persistentUuid: object.persistentUuid,
-              ...object.getRenderer().getObjectPositionFrom3DRendererObject(),
-              layer: object.getLayer(),
-              angle: object.getAngle(),
-              width: object.getWidth(),
-              height: object.getHeight(),
-              depth: object.getDepth(),
-              locked: false, // TODO
-              customSize: false, // TODO
-              // TODO: how to transmit/should we transmit other properties?
-            };
-
-            return instanceData;
-          } else {
-            // TODO: handle 2D objects/instances.
-            return null;
-          }
-        })
+        .map((object) => getInstanceDataFromRuntimeObject(object))
         .filter(isDefined);
+
+      const addedInstances =
+        options && options.addedObjects
+          ? options.addedObjects
+              .map((object) => getInstanceDataFromRuntimeObject(object))
+              .filter(isDefined)
+          : [];
 
       debuggerClient.sendInstanceChanges({
         updatedInstances,
+        addedInstances,
         selectedInstances: getPersistentUuidsFromObjects(
           this._selection.getSelectedObjects()
         ),
-        removedInstances: options
-          ? getPersistentUuidsFromObjects(options.removedObjects)
-          : [],
+        removedInstances:
+          options && options.removedObjects
+            ? getPersistentUuidsFromObjects(options.removedObjects)
+            : [],
       });
+    }
+
+    cancelDragNewInstance() {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      if (this._draggedNewObject) {
+        this._draggedNewObject.deleteFromScene(currentScene);
+        this._draggedNewObject = null;
+      }
+    }
+
+    dragNewInstance({ name, dropped }: { name: string; dropped: boolean }) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      if (dropped) {
+        if (this._draggedNewObject) {
+          this._sendSelectionUpdate({
+            addedObjects: [this._draggedNewObject],
+          });
+        }
+
+        this._draggedNewObject = null;
+        return;
+      }
+
+      if (this._draggedNewObject && this._draggedNewObject.getName() !== name) {
+        this._draggedNewObject.deleteFromScene(currentScene);
+        this._draggedNewObject = null;
+      }
+
+      if (!this._draggedNewObject) {
+        const newObject = currentScene.createObject(name);
+        if (!newObject) return;
+        newObject.persistentUuid = gdjs.makeUuid();
+        this._draggedNewObject = newObject;
+      }
+
+      const closestIntersect = this._getClosestIntersectionUnderCursor();
+      if (!closestIntersect) return;
+
+      if (this._draggedNewObject instanceof gdjs.RuntimeObject3D) {
+        this._draggedNewObject.setX(closestIntersect.point.x);
+        this._draggedNewObject.setY(-closestIntersect.point.y);
+        this._draggedNewObject.setZ(closestIntersect.point.z);
+      } else {
+        // TODO: handle 2D objects (project on plane).
+      }
     }
 
     reloadInstances(instances: Array<InstanceData>) {
@@ -656,23 +724,35 @@ namespace gdjs {
       });
     }
 
-    getObjectUnderCursor(): gdjs.RuntimeObject | null {
+    private _getClosestIntersectionUnderCursor(): THREE.Intersection | null {
       const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {
         [layerName: string]: null | {
           intersect: THREE.Intersection;
         };
       } = {};
+      const cursorX = runtimeGame.getInputManager().getCursorX();
+      const cursorY = runtimeGame.getInputManager().getCursorY();
 
       const layerNames = [];
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
       if (!currentScene || !threeRenderer) return null;
 
-      // Only check layer 0, on which Three.js objects are by default
-      // and move selection boxes to layer 1.
+      // Only check layer 0, on which Three.js objects are by default,
+      // and move selection boxes + dragged object to layer 1 so they
+      // are not considered by raycasting.
       this._raycaster.layers.set(0);
-      this._selectionBoxes.forEach((box) => box.layers.set(1));
+      this._selectionBoxes.forEach(({ box }) => box.layers.set(1));
+      let draggedNewObjectPreviousMask = 0;
+      if (
+        this._draggedNewObject &&
+        this._draggedNewObject instanceof gdjs.RuntimeObject3D
+      ) {
+        draggedNewObjectPreviousMask = this._draggedNewObject.get3DRendererObject()
+          .layers.mask;
+        this._draggedNewObject.get3DRendererObject().layers.set(1);
+      }
 
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
@@ -687,14 +767,9 @@ namespace gdjs {
         // Note that raycasting is done by Three.js, which means it could slow down
         // if lots of 3D objects are shown. We consider that if this needs improvements,
         // this must be handled by the game engine culling
-        const inputManager = runtimeGame.getInputManager();
         const normalizedDeviceCoordinates = this.getTempVector2d(
-          (inputManager.getCursorX() / runtimeGame.getGameResolutionWidth()) *
-            2 -
-            1,
-          -(inputManager.getCursorY() / runtimeGame.getGameResolutionHeight()) *
-            2 +
-            1
+          (cursorX / runtimeGame.getGameResolutionWidth()) * 2 - 1,
+          -(cursorY / runtimeGame.getGameResolutionHeight()) * 2 + 1
         );
         this._raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
         const intersects = this._raycaster.intersectObjects(
@@ -711,7 +786,14 @@ namespace gdjs {
       });
 
       // Reset selection boxes layers so they are properly displayed.
-      this._selectionBoxes.forEach((box) => box.layers.set(0));
+      this._selectionBoxes.forEach(({ box }) => box.layers.set(0));
+      // Also reset the layer of the object being added.
+      if (
+        this._draggedNewObject &&
+        this._draggedNewObject instanceof gdjs.RuntimeObject3D
+      ) {
+        this._draggedNewObject.get3DRendererObject().layers.mask = draggedNewObjectPreviousMask;
+      }
 
       let closestIntersect;
       for (const intersect of Object.values(firstIntersectsByLayer)) {
@@ -721,18 +803,24 @@ namespace gdjs {
           (!closestIntersect ||
             intersect.intersect.distance < closestIntersect.intersect.distance)
         ) {
-          closestIntersect = intersect;
+          closestIntersect = intersect.intersect;
         }
       }
 
+      return closestIntersect || null;
+    }
+
+    getObjectUnderCursor(): gdjs.RuntimeObject | null {
+      const closestIntersect = this._getClosestIntersectionUnderCursor();
       if (!closestIntersect) return null;
 
       // Walk back up the object hierarchy to find the runtime object.
       // We sadly need to do that because the intersection can be found on a Mesh or other
       // child Three.js object, instead of the one exposed by the gdjs.RuntimeObject.
-      let threeObject = closestIntersect.intersect.object;
+      let threeObject: THREE.Object3D | null = closestIntersect.object;
       while (true) {
         if (!threeObject) return null;
+        // @ts-ignore
         if (threeObject.gdjsRuntimeObject) return threeObject.gdjsRuntimeObject;
         threeObject = threeObject.parent || null;
       }

@@ -74,45 +74,51 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   if (persistentUuid.empty()) ResetPersistentUuid();
 
   numberProperties.clear();
-  const SerializerElement& numberPropertiesElement =
-      element.GetChild("numberProperties", 0, "floatInfos");
-  numberPropertiesElement.ConsiderAsArrayOf("property", "Info");
-  for (std::size_t j = 0; j < numberPropertiesElement.GetChildrenCount(); ++j) {
-    gd::String name =
-        numberPropertiesElement.GetChild(j).GetStringAttribute("name");
-    double value =
-        numberPropertiesElement.GetChild(j).GetDoubleAttribute("value");
+  if (element.HasChild("numberProperties", "floatInfos")) {
+    const SerializerElement& numberPropertiesElement =
+        element.GetChild("numberProperties", 0, "floatInfos");
+    numberPropertiesElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < numberPropertiesElement.GetChildrenCount(); ++j) {
+      gd::String name =
+          numberPropertiesElement.GetChild(j).GetStringAttribute("name");
+      double value =
+          numberPropertiesElement.GetChild(j).GetDoubleAttribute("value");
 
-    // Compatibility with GD <= 5.1.164
-    if (name == "z") {
-      SetZ(value);
-    } else if (name == "rotationX") {
-      SetRotationX(value);
-    } else if (name == "rotationY") {
-      SetRotationY(value);
-    } else if (name == "depth") {
-      SetHasCustomDepth(true);
-      SetCustomDepth(value);
-    }
-    // end of compatibility code
-    else {
-      numberProperties[name] = value;
+      // Compatibility with GD <= 5.1.164
+      if (name == "z") {
+        SetZ(value);
+      } else if (name == "rotationX") {
+        SetRotationX(value);
+      } else if (name == "rotationY") {
+        SetRotationY(value);
+      } else if (name == "depth") {
+        SetHasCustomDepth(true);
+        SetCustomDepth(value);
+      }
+      // end of compatibility code
+      else {
+        numberProperties[name] = value;
+      }
     }
   }
 
   stringProperties.clear();
-  const SerializerElement& stringPropElement =
-      element.GetChild("stringProperties", 0, "stringInfos");
-  stringPropElement.ConsiderAsArrayOf("property", "Info");
-  for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j) {
-    gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
-    gd::String value =
-        stringPropElement.GetChild(j).GetStringAttribute("value");
-    stringProperties[name] = value;
+  if (element.HasChild("stringProperties", "stringInfos")) {
+    const SerializerElement& stringPropElement =
+        element.GetChild("stringProperties", 0, "stringInfos");
+    stringPropElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j) {
+      gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
+      gd::String value =
+          stringPropElement.GetChild(j).GetStringAttribute("value");
+      stringProperties[name] = value;
+    }
   }
 
-  GetVariables().UnserializeFrom(
-      element.GetChild("initialVariables", 0, "InitialVariables"));
+  if (element.HasChild("initialVariables", "InitialVariables")) {
+    GetVariables().UnserializeFrom(
+        element.GetChild("initialVariables", 0, "InitialVariables"));
+  }
 }
 
 void InitialInstance::SerializeTo(SerializerElement& element) const {

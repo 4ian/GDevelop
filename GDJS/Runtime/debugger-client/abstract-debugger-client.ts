@@ -313,6 +313,18 @@ namespace gdjs {
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
+      } else if (data.command === 'dragNewInstance') {
+        const gameCoords = runtimeGame.getRenderer().convertPageToGameCoords(data.x, data.y);
+        runtimeGame.getInputManager().onMouseMove(gameCoords[0], gameCoords[1]);
+
+        if (runtimeGame._inGameEditor)
+          runtimeGame._inGameEditor.dragNewInstance({
+            name: data.name,
+            dropped: data.dropped,
+          });
+      } else if (data.command === 'cancelDragNewInstance') {
+        if (runtimeGame._inGameEditor)
+          runtimeGame._inGameEditor.cancelDragNewInstance();
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.
@@ -639,6 +651,7 @@ namespace gdjs {
 
     sendInstanceChanges(changes: {
       updatedInstances: Array<InstanceData>;
+      addedInstances: Array<InstanceData>;
       selectedInstances: Array<InstancePersistentUuidData>;
       removedInstances: Array<InstancePersistentUuidData>;
     }): void {

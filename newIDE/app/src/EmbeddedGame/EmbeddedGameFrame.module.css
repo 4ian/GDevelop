@@ -1,0 +1,22 @@
+@keyframes disappear-after-a-bit {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.hintText {
+  color: white;
+  animation-name: disappear-after-a-bit;
+  animation-duration: 3.5s;
+  will-change: opacity;
+  opacity: 0;
+}

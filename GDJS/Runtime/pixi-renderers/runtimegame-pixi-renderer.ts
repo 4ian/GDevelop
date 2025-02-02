@@ -539,6 +539,24 @@ namespace gdjs {
     }
 
     /**
+     * Translate an event position (mouse or touch) made on the canvas
+     * on the page (or even outside the canvas) to game coordinates.
+     */
+    convertPageToGameCoords(pageX: float, pageY: float) {
+      const canvas = this._gameCanvas;
+      if (!canvas) return [0, 0];
+
+      const pos = [pageX - canvas.offsetLeft, pageY - canvas.offsetTop];
+
+      // Handle the fact that the game is stretched to fill the canvas.
+      pos[0] *=
+        this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pos[1] *=
+        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+      return pos;
+    }
+
+    /**
      * Add the standard events handler.
      *
      * The game canvas must have been initialized before calling this.
@@ -551,19 +569,6 @@ namespace gdjs {
       this._throwIfDisposed();
       const canvas = this._gameCanvas;
       if (!canvas) return;
-
-      //Translate an event (mouse or touch) made on the canvas on the page
-      //to game coordinates.
-      const getEventPosition = (e: MouseEvent | Touch) => {
-        const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
-
-        // Handle the fact that the game is stretched to fill the canvas.
-        pos[0] *=
-          this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
-        pos[1] *=
-          this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
-        return pos;
-      };
 
       const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
@@ -681,8 +686,8 @@ namespace gdjs {
         }
         return button;
       }
-      canvas.onmousemove = function (e) {
-        const pos = getEventPosition(e);
+      canvas.onmousemove = (e) => {
+        const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
       };
       canvas.onmousedown = function (e) {
@@ -748,7 +753,7 @@ namespace gdjs {
       // Touches:
       window.addEventListener(
         'touchmove',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -759,16 +764,17 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = getEventPosition(e.changedTouches[i]);
+              const touch = e.changedTouches[i];
+              const pos = this.convertPageToGameCoords(touch.pageX, touch.pageY);
               manager.onTouchMove(
-                e.changedTouches[i].identifier,
+                touch.identifier,
                 pos[0],
                 pos[1]
               );
               // This works because touch events are sent
               // when they continue outside of the canvas.
               if (manager.isSimulatingMouseWithTouch()) {
-                if (isInsideCanvas(e.changedTouches[i])) {
+                if (isInsideCanvas(touch)) {
                   manager.onMouseEnter();
                 } else {
                   manager.onMouseLeave();
@@ -782,7 +788,7 @@ namespace gdjs {
       );
       window.addEventListener(
         'touchstart',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -793,7 +799,8 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = getEventPosition(e.changedTouches[i]);
+              const touch = e.changedTouches[i];
+              const pos = this.convertPageToGameCoords(touch.pageX, touch.pageY);
               manager.onTouchStart(
                 e.changedTouches[i].identifier,
                 pos[0],

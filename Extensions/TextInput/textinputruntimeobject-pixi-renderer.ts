@@ -119,6 +119,8 @@ namespace gdjs {
       if (!this._input) return;
       this._input.remove();
       this._input = null;
+      this._form?.remove();
+      this._form = null;
     }
 
     onScenePaused() {
@@ -326,14 +328,14 @@ namespace gdjs {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
     updateDisabled() {
-      if (!this._form) return;
+      if (!this._input) return;
 
-      this._form.disabled = this._object.isDisabled();
+      this._input.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
-      if (!this._form) return;
+      if (!this._input) return;
 
-      this._form.readOnly = this._object.isReadOnly();
+      this._input.readOnly = this._object.isReadOnly();
     }
 
     updateMaxLength() {

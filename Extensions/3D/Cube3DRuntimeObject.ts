@@ -71,7 +71,7 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-    _color: [float, float, float];
+    _color: number;
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -119,8 +119,8 @@ namespace gdjs {
       ];
 
       this._color = objectData.content.color
-        ? rgbOrHexToRGBColor(objectData.content.color)
-        : [0.5, 0.5, 0.5];
+        ? gdjs.rgbOrHexStringToNumber(objectData.content.color)
+        : gdjs.rgbOrHexStringToNumber('#808080');
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -212,8 +212,10 @@ namespace gdjs {
       this._renderer.updateFace(faceIndex);
     }
     setCubeColor(color: string): void {
-      if (rgbOrHexToRGBColor(color) === this._color) return;
-      this._color = rgbOrHexToRGBColor(color);
+      let colorinHex = gdjs.rgbOrHexStringToNumber(color);
+      if (colorinHex === this._color) return;
+      this._color = colorinHex;
+      this._renderer.updateColor();
     }
 
     /** @internal */
@@ -293,16 +295,16 @@ namespace gdjs {
       if (
         oldObjectData.content.frontFaceResourceName !==
         newObjectData.content.frontFaceResourceName
-      )
-        if (oldObjectData.content.color !== newObjectData.content.color) {
-          this.setCubeColor(newObjectData.content.color);
-        }
-      {
+      ) {
         this.setFaceResourceName(
           'front',
           newObjectData.content.frontFaceResourceName
         );
       }
+      if (oldObjectData.content.color !== newObjectData.content.color) {
+        this.setCubeColor(newObjectData.content.color);
+      }
+
       if (
         oldObjectData.content.backFaceResourceName !==
         newObjectData.content.backFaceResourceName

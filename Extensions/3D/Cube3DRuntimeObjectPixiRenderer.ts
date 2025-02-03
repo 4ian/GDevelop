@@ -79,36 +79,16 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO (3D) - feature: support color instead of texture?
-      const materials: THREE.Material[] = [];
 
-      for (let i = 0; i < 6; i++) {
-        const material: THREE.Material = getFaceMaterial(
-          runtimeObject,
-          materialIndexToFaceIndex[i]
-        );
-        const basicMaterial: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial();
-        basicMaterial.copy(material);
-        materials.push(
-          basicMaterial.map
-            ? getFaceMaterial(runtimeObject, materialIndexToFaceIndex[i])
-            : new THREE.MeshBasicMaterial({ vertexColors: true })
-        );
-      }
-
-      let colors: number[] = [];
-      for (let i = 0; i < geometry.attributes.position.count; i++) {
-        colors.push(
-          runtimeObject._color[0],
-          runtimeObject._color[1],
-          runtimeObject._color[2]
-        );
-      }
-
-      geometry.setAttribute(
-        'color',
-        new THREE.BufferAttribute(new Float32Array(colors), 3)
-      );
+      const materials: THREE.Material[] = new Array(6)
+        .fill(0)
+        .map((_, index) => {
+          const material: THREE.Material = getFaceMaterial(
+            runtimeObject,
+            materialIndexToFaceIndex[index]
+          );
+          return material;
+        });
 
       const boxMesh = new THREE.Mesh(geometry, materials);
 
@@ -119,6 +99,24 @@ namespace gdjs {
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
+      this.updateColor();
+    }
+    updateColor() {
+      let colors: number[] = [];
+
+      let color = gdjs.hexNumberToRGBArray(this._cube3DRuntimeObject._color);
+      for (
+        let i = 0;
+        i < this._boxMesh.geometry.attributes.position.count;
+        i++
+      ) {
+        colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
+      }
+
+      this._boxMesh.geometry.setAttribute(
+        'color',
+        new THREE.BufferAttribute(new Float32Array(colors), 3)
+      );
     }
 
     updateFace(faceIndex: integer) {

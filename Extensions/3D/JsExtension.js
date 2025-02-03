@@ -823,7 +823,7 @@ module.exports = {
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
         propertyName === 'facesOrientation' ||
         propertyName === 'materialType' ||
-        propertyName === 'cubeColor'
+        propertyName === 'color'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -904,10 +904,10 @@ module.exports = {
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
       objectProperties
-        .getOrCreate('cubeColor')
-        .setValue(objectContent.color || (255, 255, 255))
+        .getOrCreate('color')
+        .setValue(objectContent.color || '128;128;128')
         .setType('Color')
-        .setLabel(_('Cube color'))
+        .setLabel(_('Color'))
         .setGroup(_('Texture'));
 
       objectProperties
@@ -2364,17 +2364,26 @@ module.exports = {
 
       async _updateThreeObjectMaterials() {
         const getFaceMaterial = async (project, faceIndex) => {
-          if (!this._faceVisibilities[faceIndex])
+          if (!this._faceVisibilities[faceIndex]) {
             return getTransparentMaterial();
-
+          }
+        
+          const resourceName = this._faceResourceNames[faceIndex];
+          
+          if (!resourceName || resourceName === '') {
+            return new THREE.MeshBasicMaterial({ vertexColors: true });
+          }
+        
+          // Utilisation du loader de ressources pour obtenir le matériau
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
-            this._faceResourceNames[faceIndex],
+            resourceName,
             {
               useTransparentTexture: this._shouldUseTransparentTexture,
             }
           );
         };
+        
 
         const materials = await Promise.all([
           getFaceMaterial(this._project, materialIndexToFaceIndex[0]),
@@ -2394,6 +2403,25 @@ module.exports = {
         this._threeObject.material[5] = materials[5];
 
         this._updateTextureUvMapping();
+        this.updateColor();
+      }
+
+      updateColor() {
+        let colors: number[] = [];
+  
+        let color = gdjs.hexNumberToRGBArray(this._cube3DRuntimeObject._color);
+        for (
+          let i = 0;
+          i < this._boxMesh.geometry.attributes.position.count;
+          i++
+        ) {
+          colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
+        }
+  
+        this._boxMesh.geometry.setAttribute(
+          'color',
+          new THREE.BufferAttribute(new Float32Array(colors), 3)
+        );
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {

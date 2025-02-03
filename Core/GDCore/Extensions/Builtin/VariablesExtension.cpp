@@ -116,6 +116,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("variable", _("Array variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -129,6 +130,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("variable", _("Variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -142,6 +144,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("variable", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -154,6 +157,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("variable", _("Structure or array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -170,6 +174,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
             "end of the array."))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -183,6 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("variable", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -195,6 +201,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("variable", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -207,6 +214,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("variable", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -221,6 +229,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("variable", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   extension
@@ -231,7 +240,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"));
+      .AddParameter("variable", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
       .AddExpression(
@@ -241,7 +251,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"));
+      .AddParameter("variable", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
       .AddStrExpression(
@@ -251,7 +262,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"));
+      .AddParameter("variable", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
       .AddExpression(
@@ -261,7 +273,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("variable", _("Array variable"));
+      .AddParameter("variable", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   // Legacy instructions
 
@@ -316,6 +329,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -330,6 +344,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -517,6 +532,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForFunctionEventsOnly();
 
@@ -531,6 +547,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForFunctionEventsOnly();
 
@@ -544,6 +561,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Structure or array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -557,6 +575,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Structure or array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -574,6 +593,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
             "end of the array."))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -588,6 +608,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -601,6 +622,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -614,6 +636,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -629,6 +652,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -644,6 +668,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Array variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -656,6 +681,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables/Scene variables/Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -667,6 +693,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables/Scene variables/Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -678,6 +705,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables/Scene variables/Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -689,6 +717,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables/Scene variables/Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -705,6 +734,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
             "end of the array."))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -720,6 +750,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -734,6 +765,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -747,6 +779,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -760,6 +793,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -775,6 +809,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Array variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -786,6 +821,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("External variables/Global variables/Arrays and structures"),
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -796,6 +832,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("External variables/Global variables/Arrays and structures"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -807,6 +844,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables/Global variables/Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -828,6 +866,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("External variables/Global variables/Arrays and structures"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Array or structure variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -837,7 +876,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "structure variable"),
                      _("Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("variable", _("Array or structure variable"), "AllowUndeclaredVariable");
+      .AddParameter("variable", _("Array or structure variable"), "AllowUndeclaredVariable")
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   extension
       .AddExpression("Variable",

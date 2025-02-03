@@ -255,7 +255,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Angle"),
                 "res/actions/rotate24_black.png",
                 "res/actions/rotate_black.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .AddCodeOnlyParameter("currentScene", "")
@@ -269,7 +268,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Angle"),
          "res/actions/rotate24_black.png",
          "res/actions/rotate_black.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
@@ -285,7 +283,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Angle"),
          "res/actions/rotate24_black.png",
          "res/actions/rotate_black.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
@@ -304,12 +301,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Movement using forces"),
          "res/actions/force24.png",
          "res/actions/force.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
-      .SetDefaultValue("0");
+      .SetDefaultValue("0")
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   obj.AddAction("AddForceAL",
                 _("Add a force (angle)"),
@@ -321,12 +318,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Movement using forces"),
                 "res/actions/force24.png",
                 "res/actions/force.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
       .SetDefaultValue("0")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -339,13 +336,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Movement using forces"),
          "res/actions/force24.png",
          "res/actions/force.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
       .SetDefaultValue("0")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -360,13 +357,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Movement using forces"),
          "res/actions/forceTourne24.png",
          "res/actions/forceTourne.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("expression", "X position of the center")
       .AddParameter("expression", "Y position of the center")
       .AddParameter("expression", "Speed (in Degrees per seconds)")
       .AddParameter("expression", "Distance (in pixels)")
       .AddParameter("forceMultiplier", "Force multiplier")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
   obj.AddAction("Arreter",
@@ -376,8 +373,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Movement using forces"),
                 "res/actions/arreter24.png",
                 "res/actions/arreter.png")
-
       .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddAction("Delete",
@@ -429,6 +426,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("SetStringObjectVariable",
@@ -443,6 +441,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("SetBooleanObjectVariable",
@@ -458,6 +457,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("yesorno", _("Value"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("NumberObjectVariable",
@@ -472,6 +472,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("StringObjectVariable",
@@ -486,6 +487,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("BooleanObjectVariable",
@@ -502,6 +504,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("yesorno", _("Value"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("ModVarObjet",
@@ -514,6 +517,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly();
@@ -528,6 +532,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly();
@@ -544,6 +549,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction(
@@ -560,6 +566,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("ObjectVariableChildExists",
@@ -573,6 +580,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Structure variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddAction("ObjectVariableRemoveChild",
@@ -585,6 +593,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddAction("ObjectVariableClearChildren",
@@ -597,6 +606,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array or structure variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddAction("Cache",
@@ -691,8 +701,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Movement using forces"),
                    "res/conditions/arret24.png",
                    "res/conditions/arret.png")
-
       .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddCondition("Vitesse",
@@ -702,10 +712,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Movement using forces"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
-
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   // Deprecated
@@ -722,6 +732,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Tolerance, in degrees"))
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddCondition("IsTotalForceAngleAround",
@@ -735,6 +746,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Tolerance, in degrees"))
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddCondition("VarObjet",
@@ -749,6 +761,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("VarObjetTxt",
@@ -763,6 +776,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("ObjectVariableAsBoolean",
@@ -777,6 +791,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("VarObjetDef",
@@ -802,6 +817,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
@@ -815,6 +831,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
@@ -829,6 +846,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
@@ -847,6 +865,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetParameterLongDescription(_("The content of the object variable will "
                                      "*be copied* and added at the "
                                      "end of the array."))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetHidden();
 
@@ -864,6 +883,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetParameterLongDescription(_("The content of the object variable will "
                                      "*be copied* and added at the "
                                      "end of the array."))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -877,6 +897,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForFunctionEventsOnly();
 
@@ -890,6 +911,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForFunctionEventsOnly();
 
@@ -904,6 +926,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
       .SetRelevantForFunctionEventsOnly();
 
@@ -920,6 +943,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddCondition(
@@ -934,6 +958,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced();
 
   obj.AddStrExpression(
@@ -944,7 +969,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables/Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"));
+      .AddParameter("objectvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddExpression(
          "ArrayVariableFirstNumber",
@@ -954,7 +980,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables/Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"));
+      .AddParameter("objectvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddStrExpression(
          "ArrayVariableLastString",
@@ -964,7 +991,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables/Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"));
+      .AddParameter("objectvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddExpression(
          "ArrayVariableLastNumber",
@@ -974,7 +1002,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables/Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array variable"));
+      .AddParameter("objectvar", _("Array variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddCondition("BehaviorActivated",
                    _("Behavior activated"),
@@ -1009,12 +1038,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Movement using forces"),
                 "res/actions/forceVers24.png",
                 "res/actions/forceVers.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
       .SetDefaultValue("0")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -1029,13 +1058,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Movement using forces"),
          "res/actions/forceTourne24.png",
          "res/actions/forceTourne.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Rotate around this object"))
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
       .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
       .SetDefaultValue("0")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   obj.AddAction("MettreAutour",
@@ -1063,10 +1092,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Movement using forces"),
                 "res/actions/ecarter24.png",
                 "res/actions/ecarter.png")
-
       .SetHidden()
       .AddParameter("object", _("Object"))
-      .AddParameter("objectList", "Object 2 (won't move)");
+      .AddParameter("objectList", "Object 2 (won't move)")
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   // Deprecated action
   obj.AddAction("Ecarter",
@@ -1090,7 +1119,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Position"),
                 "res/actions/ecarter24.png",
                 "res/actions/ecarter.png")
-
       .AddParameter("object", _("Object"))
       .AddParameter("objectList", _("Objects (won't move)"))
       .AddParameter("yesorno",
@@ -1099,6 +1127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "",
                     true)
       .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
       .MarkAsSimple();
 
   obj.AddCondition("CollisionPoint",
@@ -1111,6 +1140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position of the point"))
       .AddParameter("expression", _("Y position of the point"))
+      .SetHelpPath("/all-features/collisions/")
       .MarkAsSimple();
 
   extension
@@ -1142,6 +1172,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("expression", _("Time in seconds"))
+      .SetHelpPath("/all-features/timers-and-time/")
       .SetHidden();
 
   obj.AddCondition(
@@ -1157,6 +1188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
+      .SetHelpPath("/all-features/timers-and-time/")
       .SetManipulatedType("number");
 
   obj.AddCondition("ObjectTimerPaused",
@@ -1168,6 +1200,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/timerPaused.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -1180,7 +1213,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/timer24.png",
          "res/actions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("identifier", _("Timer's name"), "objectTimer");
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddAction("PauseObjectTimer",
                 _("Pause an object timer"),
@@ -1191,6 +1225,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/pauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
   obj.AddAction("UnPauseObjectTimer",
@@ -1202,6 +1237,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/unPauseTimer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
   obj.AddAction("RemoveObjectTimer",
@@ -1213,6 +1249,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/")
       .MarkAsAdvanced();
 
   obj.AddExpression("X",
@@ -1241,28 +1278,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("X coordinate of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   obj.AddExpression("ForceY",
                     _("Y coordinate of the sum of forces"),
                     _("Y coordinate of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   obj.AddExpression("ForceAngle",
                     _("Angle of the sum of forces"),
                     _("Angle of the sum of forces (in degrees)"),
                     _("Movement using forces"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   obj.AddExpression("ForceLength",
                     _("Length of the sum of forces"),
                     _("Length of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/");
 
   obj.AddExpression("Longueur",
                     _("Length of the sum of forces"),
@@ -1270,6 +1311,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"))
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .SetHidden();
 
   obj.AddExpression("Width",
@@ -1369,7 +1411,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Variables/Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Array or structure variable"));
+      .AddParameter("objectvar", _("Array or structure variable"))
+      .SetHelpPath("/all-features/variables/structures-and-arrays/");
 
   obj.AddStrExpression("VariableString",
                        _("Text variable"),
@@ -1378,6 +1421,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
+      .SetHelpPath("/all-features/variables/object-variables/")
       .SetRelevantForFunctionEventsOnly();
 
   obj.AddExpression("ObjectTimerElapsedTime",
@@ -1386,7 +1430,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("identifier", _("Timer's name"), "objectTimer");
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
+      .SetHelpPath("/all-features/timers-and-time/");
 
   obj.AddExpression("AngleToObject",
                     _("Angle between two objects"),
@@ -1606,6 +1651,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "res/actions/doMove24.png",
           "res/actions/doMove.png")
       .AddCodeOnlyParameter("currentScene", "")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   extension
@@ -1621,6 +1667,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object 2"))
       .AddParameter("expression", _("Tolerance, in degrees"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .SetHelpPath("/tutorials/how-to-move-objects/")
       .MarkAsAdvanced();
 
   extension
@@ -1753,6 +1800,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "",
                     true)
       .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
       .MarkAsSimple();
 
   extension
@@ -1815,6 +1863,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Scene variable where to store the Y position of the intersection. "
             "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .SetHelpPath("/all-features/collisions/")
       .MarkAsAdvanced();
 
   extension
@@ -1846,6 +1895,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Scene variable where to store the Y position of the intersection. "
             "If no intersection is found, the variable won't be changed."))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .SetHelpPath("/all-features/collisions/")
       .MarkAsAdvanced();
 
   extension

@@ -83,7 +83,7 @@ type SpriteObjectDataType = {
 
 export const canSwapAssetOfObject = (object: gdObject) => {
   const type = object.getType();
-  return type === 'Scene3D::Model3DObject' || type === 'Sprite';
+  return type !== 'TextObject::Text' && type !== 'BBText::BBText';
 };
 
 const mergeAnimations = function<A: { name: string }>(
@@ -312,7 +312,7 @@ export const swapAsset = (
   assetObject: gdObject,
   assetShortHeader?: ?AssetShortHeader
 ) => {
-  const serializedObject = serializeToJSObject(object);
+  let serializedObject = serializeToJSObject(object);
   const serializedAssetObject = serializeToJSObject(assetObject);
 
   if (object.getType() === 'Sprite') {
@@ -338,6 +338,7 @@ export const swapAsset = (
       scaleX,
       scaleY
     );
+    serializedObject.assetStoreId = serializedAssetObject.assetStoreId;
   } else if (object.getType() === 'Scene3D::Model3DObject') {
     const objectVolume =
       serializedObject.content.width *
@@ -365,6 +366,15 @@ export const swapAsset = (
       centerLocation: serializedObject.content.centerLocation,
     };
     serializedObject.assetStoreId = serializedAssetObject.assetStoreId;
+  } else {
+    serializedObject = {
+      ...serializedAssetObject,
+      name: serializedObject.name,
+      type: serializedObject.type,
+      variables: serializedObject.variables,
+      behaviors: serializedObject.behaviors,
+      effects: serializedObject.effects,
+    };
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };

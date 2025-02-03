@@ -2367,13 +2367,13 @@ module.exports = {
           if (!this._faceVisibilities[faceIndex]) {
             return getTransparentMaterial();
           }
-        
+
           const resourceName = this._faceResourceNames[faceIndex];
-          
+
           if (!resourceName || resourceName === '') {
             return new THREE.MeshBasicMaterial({ vertexColors: true });
           }
-        
+
           // Utilisation du loader de ressources pour obtenir le matériau
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
@@ -2383,7 +2383,6 @@ module.exports = {
             }
           );
         };
-        
 
         const materials = await Promise.all([
           getFaceMaterial(this._project, materialIndexToFaceIndex[0]),
@@ -2408,7 +2407,7 @@ module.exports = {
 
       updateColor() {
         let colors: number[] = [];
-  
+
         let color = gdjs.hexNumberToRGBArray(this._cube3DRuntimeObject._color);
         for (
           let i = 0;
@@ -2417,7 +2416,7 @@ module.exports = {
         ) {
           colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
         }
-  
+
         this._boxMesh.geometry.setAttribute(
           'color',
           new THREE.BufferAttribute(new Float32Array(colors), 3)

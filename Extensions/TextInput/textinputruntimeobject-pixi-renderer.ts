@@ -116,11 +116,14 @@ namespace gdjs {
     }
 
     _destroyElement() {
-      if (!this._input || !this._form) return;
-      this._input.remove();
-      this._input = null;
-      this._form.remove();
-      this._form = null;
+      if (this._form) {
+        this._form.remove();
+        this._form = null;
+      }
+      if (this._input) {
+        this._input.remove();
+        this._input = null;
+      }
     }
 
     onScenePaused() {

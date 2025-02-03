@@ -324,10 +324,12 @@ const GamesList = ({
 
       return allItems.filter(
         item =>
-          // Filter out draft games which are not the current opened project.
+          // Filter out draft games which don't have a project file linked to it (local or cloud)
+          // and which are not the current opened project.
           !(
             item.game &&
             item.game.savedStatus === 'draft' &&
+            (!item.projectFiles || !item.projectFiles.length) &&
             (!project || item.game.id !== project.getProjectUuid())
           )
       );

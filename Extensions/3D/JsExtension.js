@@ -1099,6 +1099,7 @@ module.exports = {
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
+      color: '128;128;128',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -2402,22 +2403,26 @@ module.exports = {
         this._threeObject.material[5] = materials[5];
 
         this._updateTextureUvMapping();
-        this.updateColor();
       }
 
-      updateColor() {
+      updateColor(object) {
         let colors: number[] = [];
 
-        let color = gdjs.hexNumberToRGBArray(this._cube3DRuntimeObject._color);
+        let color;
+        if (object.content.color) {
+          color = gdjs.hexNumberToRGBArray(object.content.color);
+        } else {
+          color = '128;128;128';
+        }
         for (
           let i = 0;
-          i < this._boxMesh.geometry.attributes.position.count;
+          i < this._threeObject.geometry.attributes.position.count;
           i++
         ) {
           colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
         }
 
-        this._boxMesh.geometry.setAttribute(
+        this._threeObject.geometry.setAttribute(
           'color',
           new THREE.BufferAttribute(new Float32Array(colors), 3)
         );
@@ -2554,6 +2559,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
+        this.updateColor(object.content);
       }
 
       /**

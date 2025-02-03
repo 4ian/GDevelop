@@ -278,6 +278,11 @@ namespace gdjs {
       if (playerToken) {
         url.searchParams.set('playerToken', playerToken);
       }
+      const platformInfo = runtimeGame.getPlatformInfo();
+      url.searchParams.set(
+        'scm',
+        platformInfo.supportedCompressionMethods.join(',')
+      );
       // Increment this value when a new feature is introduced so we can
       // adapt the interface of the lobbies.
       url.searchParams.set('multiplayerVersion', '2');

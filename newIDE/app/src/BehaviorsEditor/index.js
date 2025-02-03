@@ -477,6 +477,15 @@ export const useManageObjectBehaviors = ({
         if (!name || !type || !serializedBehavior) {
           return;
         }
+        if (
+          !gd.ObjectTools.isBehaviorCompatibleWithObject(
+            project.getCurrentPlatform(),
+            object.getType(),
+            type
+          )
+        ) {
+          return;
+        }
 
         const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
           project.getCurrentPlatform(),

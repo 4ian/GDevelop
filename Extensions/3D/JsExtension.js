@@ -2406,14 +2406,15 @@ module.exports = {
       }
 
       updateColor(object) {
-        let colors: number[] = [];
+        let colors = [];
 
         let color;
         if (object.content.color) {
-          color = gdjs.hexNumberToRGBArray(object.content.color);
+          color = object.content.color.split(';').map(Number);
         } else {
-          color = '128;128;128';
+          color = [128, 128, 128];
         }
+
         for (
           let i = 0;
           i < this._threeObject.geometry.attributes.position.count;
@@ -2559,7 +2560,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
-        this.updateColor(object.content);
+        this.updateColor(object);
       }
 
       /**

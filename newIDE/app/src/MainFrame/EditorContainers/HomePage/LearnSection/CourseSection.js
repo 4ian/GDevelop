@@ -173,7 +173,7 @@ const CourseSection = ({
             style={textEllipsisStyle}
             color={chapter.isLocked ? 'secondary' : 'primary'}
           >
-            {chapter.title}
+            {chapter.shortTitle || chapter.title}
           </Text>
         </Line>
         {chapter.isLocked ? (

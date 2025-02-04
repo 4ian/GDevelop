@@ -189,6 +189,7 @@ export type CourseChapterTask = {|
 export type UnlockedCourseChapter = {|
   id: string,
   title: string,
+  shortTitle?: string,
   videoUrl: string,
   isLocked?: false,
   isFree?: boolean,
@@ -198,6 +199,7 @@ export type UnlockedCourseChapter = {|
 export type LockedCourseChapter = {|
   id: string,
   title: string,
+  shortTitle?: string,
   videoUrl: string,
   isLocked: true,
   isFree?: boolean,

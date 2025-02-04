@@ -262,7 +262,16 @@ export class ColorAssetStoreSearchFilter
 }
 
 const toAssetStoreType = (type: string) => {
-  return type === 'Sprite' ? 'sprite' : type;
+  switch (type) {
+    case 'Sprite':
+      return 'sprite';
+    case 'TiledSpriteObject::TiledSprite':
+      return 'tiled';
+    case 'PanelSpriteObject::PanelSprite':
+      return '9patch';
+    default:
+      return type;
+  }
 };
 
 // Thematic tags are noise for asset swapping as changing the theme may be what

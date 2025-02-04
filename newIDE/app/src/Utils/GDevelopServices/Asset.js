@@ -102,10 +102,10 @@ export type PrivateAssetPackAssetType =
   | 'sprite'
   | '9patch'
   | 'tiled'
-  | 'partial'
   | 'Scene3D::Model3DObject'
   | 'TileMap::SimpleTileMap'
-  | 'ParticleSystem::ParticleEmitter';
+  | 'ParticleSystem::ParticleEmitter'
+  | string;
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 

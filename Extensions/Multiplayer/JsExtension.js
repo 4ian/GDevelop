@@ -72,7 +72,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.quickJoinLobby');
+      .setFunctionName('gdjs.multiplayer.authenticateAndQuickJoinLobby');
 
     extension
       .addCondition(
@@ -126,7 +126,7 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
-      .setFunctionName('gdjs.multiplayer.didQuickJoinFailToJoinALobby');
+      .setFunctionName('gdjs.multiplayer.hasQuickJoinJustFailed');
 
     extension
       .addStrExpression(

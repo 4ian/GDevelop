@@ -1608,7 +1608,7 @@ namespace gdjs {
       gdjs.multiplayerComponents.displayLoader(runtimeScene, false);
     };
 
-    const doQuickJoinLobby = async (
+    const quickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean,
       openLobbiesPageIfFailure: boolean
@@ -1698,7 +1698,7 @@ namespace gdjs {
       }
     };
 
-    export const quickJoinLobby = async (
+    export const authenticateAndQuickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean,
       openLobbiesPageIfFailure: boolean
@@ -1728,7 +1728,7 @@ namespace gdjs {
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
-          await doQuickJoinLobby(
+          await quickJoinLobby(
             runtimeScene,
             displayLoader,
             openLobbiesPageIfFailure
@@ -1737,7 +1737,7 @@ namespace gdjs {
 
         return;
       }
-      await doQuickJoinLobby(
+      await quickJoinLobby(
         runtimeScene,
         displayLoader,
         openLobbiesPageIfFailure
@@ -1750,9 +1750,7 @@ namespace gdjs {
       return _isQuickJoiningOrStartingAGame;
     };
 
-    export const didQuickJoinFailToJoinALobby = (
-      runtimeScene: gdjs.RuntimeScene
-    ) => {
+    export const hasQuickJoinJustFailed = (runtimeScene: gdjs.RuntimeScene) => {
       return _quickJoinLobbyJustFailed;
     };
 

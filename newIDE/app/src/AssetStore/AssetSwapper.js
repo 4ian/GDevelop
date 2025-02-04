@@ -81,10 +81,18 @@ type SpriteObjectDataType = {
   animations: Array<SpriteAnimationData>,
 };
 
-export const canSwapAssetOfObject = (object: gdObject) => {
-  const type = object.getType();
-  return type !== 'TextObject::Text' && type !== 'BBText::BBText';
-};
+const unswappableObjectTypes = [
+  'BBText::BBText',
+  'TextObject::Text',
+  'Lighting::LightObject',
+  'PrimitiveDrawing::Drawer',
+  'TileMap::TileMap',
+  'TileMap::CollisionMask',
+  'TileMap::SimpleTileMap',
+  'Video::VideoObject',
+];
+export const canSwapAssetOfObject = (object: gdObject) =>
+  !unswappableObjectTypes.includes(object.getType());
 
 const mergeAnimations = function<A: { name: string }>(
   project: gdProject,

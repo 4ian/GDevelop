@@ -15,7 +15,6 @@ import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopS
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
-import { type Game } from '../../../../Utils/GDevelopServices/Game';
 import {
   ExampleTile,
   PrivateGameTemplateTile,
@@ -101,21 +100,22 @@ export const getStorageProviderByInternalName = (
   );
 };
 
-export const useProjectsListFor = (game: ?Game) => {
+export const useProjectsListFor = (gameId: string | null) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { cloudProjects } = authenticatedUser;
 
   let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
-    file => !game || (file.fileMetadata && file.fileMetadata.gameId === game.id)
+    file =>
+      !gameId || (file.fileMetadata && file.fileMetadata.gameId === gameId)
   );
 
   if (cloudProjects) {
     projectFiles = projectFiles.concat(
       transformCloudProjectsIntoFileMetadataWithStorageProviderName(
         cloudProjects.filter(
-          cloudProject => !game || cloudProject.gameId === game.id
+          cloudProject => !gameId || cloudProject.gameId === gameId
         )
       )
     );

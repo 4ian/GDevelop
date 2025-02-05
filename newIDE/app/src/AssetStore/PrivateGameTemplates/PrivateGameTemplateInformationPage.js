@@ -24,7 +24,6 @@ import {
   getUserPublicProfile,
   type UserPublicProfile,
 } from '../../Utils/GDevelopServices/User';
-import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
@@ -59,6 +58,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import Play from '../../UI/CustomSvgIcons/Play';
 import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
 import PasswordPromptDialog from '../PasswordPromptDialog';
+import PublicProfileContext from '../../Profile/PublicProfileContext';
 
 const cellSpacing = 8;
 
@@ -158,10 +158,7 @@ const PrivateGameTemplateInformationPage = ({
     setPurchasingPrivateGameTemplateListingData,
   ] = React.useState<?PrivateGameTemplateListingData>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
-  const [
-    openSellerPublicProfileDialog,
-    setOpenSellerPublicProfileDialog,
-  ] = React.useState<boolean>(false);
+  const { openUserPublicProfile } = React.useContext(PublicProfileContext);
   const [
     sellerPublicProfile,
     setSellerPublicProfile,
@@ -494,7 +491,13 @@ const PrivateGameTemplateInformationPage = ({
                         <Text displayInlineAsSpan size="sub-title">
                           <Link
                             onClick={() =>
-                              setOpenSellerPublicProfileDialog(true)
+                              openUserPublicProfile({
+                                userId: sellerPublicProfile.id,
+                                callbacks: {
+                                  onAssetPackOpen,
+                                  onGameTemplateOpen,
+                                },
+                              })
                             }
                             href="#"
                           >
@@ -633,28 +636,6 @@ const PrivateGameTemplateInformationPage = ({
               </ScrollView>
             </Column>
           ) : null}
-          {openSellerPublicProfileDialog && (
-            <PublicProfileDialog
-              userId={sellerId}
-              onClose={() => setOpenSellerPublicProfileDialog(false)}
-              onGameTemplateOpen={
-                onGameTemplateOpen
-                  ? (gameTemplate: PrivateGameTemplateListingData) => {
-                      setOpenSellerPublicProfileDialog(false);
-                      onGameTemplateOpen(gameTemplate);
-                    }
-                  : undefined
-              }
-              onAssetPackOpen={
-                onAssetPackOpen
-                  ? (assetPack: PrivateAssetPackListingData) => {
-                      setOpenSellerPublicProfileDialog(false);
-                      onAssetPackOpen(assetPack);
-                    }
-                  : undefined
-              }
-            />
-          )}
           {displayPasswordPrompt && (
             <PasswordPromptDialog
               onApply={onWillBuyWithCredits}

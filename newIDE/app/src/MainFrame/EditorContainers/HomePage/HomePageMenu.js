@@ -24,6 +24,8 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { isNativeMobileApp } from '../../../Utils/Platform';
 
 export const styles = {
+  // Ensure it's always interactive, even when another iframe disable pointer events.
+  container: { pointerEvents: 'all', display: 'flex' },
   drawerContent: {
     height: '100%',
     width: 250,
@@ -189,7 +191,7 @@ export const HomePageMenu = ({
   ];
 
   return (
-    <>
+    <div style={styles.container}>
       <HomePageMenuBar
         activeTab={activeTab}
         onOpenAbout={onOpenAbout}
@@ -257,6 +259,6 @@ export const HomePageMenu = ({
           </Column>
         </Line>
       </Drawer>
-    </>
+    </div>
   );
 };

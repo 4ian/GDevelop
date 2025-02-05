@@ -9,6 +9,7 @@ import {
   type PrivateGameTemplateListingData,
   type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useStableUpToDateCallback } from '../Utils/UseStableUpToDateCallback';
 
 type Props = {|
@@ -20,6 +21,8 @@ type Props = {|
   onGameTemplateOpen?: (
     privateAssetPackListingData: PrivateGameTemplateListingData
   ) => void,
+  onGameOpen?: (gameId: string) => void,
+  onExampleOpen?: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
 const PublicProfileDialog = ({
@@ -27,6 +30,8 @@ const PublicProfileDialog = ({
   onClose,
   onAssetPackOpen,
   onGameTemplateOpen,
+  onGameOpen,
+  onExampleOpen,
 }: Props) => {
   const callbacks = React.useMemo(
     () => ({
@@ -44,8 +49,22 @@ const PublicProfileDialog = ({
             }
           }
         : null,
+      openGame: onGameOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.gameId) {
+              onGameOpen(data.gameId);
+            }
+          }
+        : null,
+      openExample: onExampleOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.exampleShortHeader) {
+              onExampleOpen(data.exampleShortHeader);
+            }
+          }
+        : null,
     }),
-    [onAssetPackOpen, onGameTemplateOpen]
+    [onAssetPackOpen, onGameTemplateOpen, onGameOpen, onExampleOpen]
   );
 
   const onMessageReceived = React.useCallback(

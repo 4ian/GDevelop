@@ -198,6 +198,8 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
+import { GamesPlatformFrameContext } from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
+import PublicProfileContext from '../Profile/PublicProfileContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -527,6 +529,10 @@ const MainFrame = (props: Props) => {
       ? currentProject.isFolderProject()
       : false,
   });
+
+  const { iframeVisible: gamesPlatformIframeVisible } = React.useContext(
+    GamesPlatformFrameContext
+  );
 
   const gamesList = useGamesList();
 
@@ -3412,6 +3418,13 @@ const MainFrame = (props: Props) => {
     }
   }, []);
 
+  const {
+    configureNewProjectActions: configureNewProjectActionsForGamesPlatformFrame,
+  } = React.useContext(GamesPlatformFrameContext);
+  const {
+    configureNewProjectActions: configureNewProjectActionsForProfile,
+  } = React.useContext(PublicProfileContext);
+
   React.useEffect(
     () => {
       openHomePage();
@@ -3479,6 +3492,13 @@ const MainFrame = (props: Props) => {
                 fileMetadataAndStorageProviderName
               );
           }
+
+          configureNewProjectActionsForGamesPlatformFrame({
+            fetchAndOpenNewProjectSetupDialogForExample,
+          });
+          configureNewProjectActionsForProfile({
+            fetchAndOpenNewProjectSetupDialogForExample,
+          });
         })
         .catch(() => {
           /* Ignore errors */
@@ -3716,7 +3736,13 @@ const MainFrame = (props: Props) => {
           const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+            <TabContentContainer
+              key={editorTab.key}
+              active={isCurrentTab}
+              // Deactivate pointer events when the play tab is active, so the iframe
+              // can be interacted with.
+              removePointerEvents={gamesPlatformIframeVisible}
+            >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}

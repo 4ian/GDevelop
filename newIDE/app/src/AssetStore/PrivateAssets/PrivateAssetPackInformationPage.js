@@ -29,7 +29,6 @@ import {
   getUserPublicProfile,
   type UserPublicProfile,
 } from '../../Utils/GDevelopServices/User';
-import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
@@ -64,6 +63,7 @@ import PasswordPromptDialog from '../PasswordPromptDialog';
 import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
+import PublicProfileContext from '../../Profile/PublicProfileContext';
 
 const cellSpacing = 8;
 
@@ -206,10 +206,7 @@ const PrivateAssetPackInformationPage = ({
   const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(
     false
   );
-  const [
-    openSellerPublicProfileDialog,
-    setOpenSellerPublicProfileDialog,
-  ] = React.useState<boolean>(false);
+  const { openUserPublicProfile } = React.useContext(PublicProfileContext);
   const [
     sellerPublicProfile,
     setSellerPublicProfile,
@@ -612,7 +609,13 @@ const PrivateAssetPackInformationPage = ({
                         <Text displayInlineAsSpan size="sub-title">
                           <Link
                             onClick={() =>
-                              setOpenSellerPublicProfileDialog(true)
+                              openUserPublicProfile({
+                                userId: sellerPublicProfile.id,
+                                callbacks: {
+                                  onAssetPackOpen,
+                                  onGameTemplateOpen,
+                                },
+                              })
                             }
                             href="#"
                           >
@@ -791,20 +794,6 @@ const PrivateAssetPackInformationPage = ({
               </ScrollView>
             </Column>
           ) : null}
-          {openSellerPublicProfileDialog && (
-            <PublicProfileDialog
-              userId={sellerId}
-              onClose={() => setOpenSellerPublicProfileDialog(false)}
-              onAssetPackOpen={assetPackListingData => {
-                onAssetPackOpen(assetPackListingData);
-                setOpenSellerPublicProfileDialog(false);
-              }}
-              onGameTemplateOpen={gameTemplateListingData => {
-                onGameTemplateOpen(gameTemplateListingData);
-                setOpenSellerPublicProfileDialog(false);
-              }}
-            />
-          )}
           {displayPasswordPrompt && (
             <PasswordPromptDialog
               onApply={onRedeemAssetPack}

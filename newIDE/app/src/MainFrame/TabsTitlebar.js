@@ -17,7 +17,12 @@ type Props = {|
 |};
 
 const styles = {
-  container: { display: 'flex', flexShrink: 0, alignItems: 'flex-end' },
+  container: {
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'flex-end',
+    position: 'relative', // to ensure it is displayed above any global iframe.
+  },
   menuIcon: {
     marginLeft: 4,
     marginRight: 4,

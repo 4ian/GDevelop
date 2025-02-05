@@ -461,8 +461,11 @@ namespace gdjs {
       checkOrigin: boolean;
       onDone?: (status: 'logged' | 'errored' | 'dismissed') => void;
     }) {
-      const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
-      // const allowedOrigins = ['localhost:4000'];
+      const allowedOrigins = [
+        'https://liluo.io',
+        'https://gd.games',
+        'http://localhost:4000',
+      ];
 
       // Check origin of message.
       if (checkOrigin && !allowedOrigins.includes(event.origin)) {

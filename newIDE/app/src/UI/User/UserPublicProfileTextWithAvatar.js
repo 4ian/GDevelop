@@ -24,7 +24,9 @@ export const UserPublicProfileTextWithAvatar = ({
 
   return (
     <ButtonBase
-      onClick={user ? () => openUserPublicProfile(user.id) : undefined}
+      onClick={
+        user ? () => openUserPublicProfile({ userId: user.id }) : undefined
+      }
       style={{ width: expand ? '100%' : undefined }}
     >
       <LineStackLayout

@@ -1576,6 +1576,21 @@ module.exports = {
       .addParameter('imageResource', _('Image'), '', false)
       .setFunctionName('setFaceResourceName');
 
+    object
+      .addScopedAction(
+        'SetColor',
+        _('Color'),
+        _('Change the color of the cube.'),
+        _('Change the color of _PARAM0_ to _PARAM1_'),
+        _('Color'),
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('3D Cube'), 'Cube3DObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
+
     extension
       .addExpressionAndConditionAndAction(
         'number',

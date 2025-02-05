@@ -45,6 +45,7 @@ namespace gdjs {
     trfb: integer;
     frn: [string, string, string, string, string, string];
     mt: number;
+    c: number;
   };
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -211,7 +212,7 @@ namespace gdjs {
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
     }
-    setCubeColor(color: string): void {
+    setColor(color: string): void {
       let colorinHex = gdjs.rgbOrHexStringToNumber(color);
       if (colorinHex === this._color) return;
       this._color = colorinHex;
@@ -302,7 +303,7 @@ namespace gdjs {
         );
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
-        this.setCubeColor(newObjectData.content.color);
+        this.setColor(newObjectData.content.color);
       }
 
       if (
@@ -437,6 +438,7 @@ namespace gdjs {
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         frn: this._faceResourceNames,
+        c: this._color,
       };
     }
 
@@ -488,6 +490,12 @@ namespace gdjs {
           for (let i = 0; i < this._faceResourceNames.length; i++) {
             this._renderer.updateFace(i);
           }
+        }
+      }
+      if (networkSyncData.c !== undefined) {
+        if (this._color !== networkSyncData.c) {
+          this._color = networkSyncData.c;
+          this._renderer.updateColor();
         }
       }
     }

@@ -2421,11 +2421,12 @@ module.exports = {
         this._updateTextureUvMapping();
       }
 
-      updateColor(object) {
+      _updateColor() {
         const colors = [];
-
         const normalizedColor = objectsRenderingService
-          .hexNumberToRGBArray(this._cube3DRuntimeObject._color)
+          .hexNumberToRGBArray(
+            objectsRenderingService.rgbOrHexToHexNumber(this._color)
+          )
           .map((component) => component / 255);
 
         for (
@@ -2482,7 +2483,7 @@ module.exports = {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
         }
-        const color = object.content.color;
+        const color = object.content.color || '128;128;128';
         if (this._color !== color) {
           this._color = color;
           colorDirty = true;
@@ -2579,7 +2580,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
-        if (colorDirty) this.updateColor(object);
+        if (colorDirty) this._updateColor();
       }
 
       /**

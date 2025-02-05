@@ -54,9 +54,8 @@ namespace gdjs {
       return getTransparentMaterial();
 
     const resourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
-    if (!resourceName || resourceName === '') {
-      const material = new THREE.MeshBasicMaterial({ vertexColors: true });
-      return material;
+    if (!resourceName) {
+      return new THREE.MeshBasicMaterial({ vertexColors: true });
     }
     return runtimeObject
       .getInstanceContainer()
@@ -82,13 +81,9 @@ namespace gdjs {
 
       const materials: THREE.Material[] = new Array(6)
         .fill(0)
-        .map((_, index) => {
-          const material: THREE.Material = getFaceMaterial(
-            runtimeObject,
-            materialIndexToFaceIndex[index]
-          );
-          return material;
-        });
+        .map((_, index) =>
+          getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
+        );
 
       const boxMesh = new THREE.Mesh(geometry, materials);
 
@@ -102,15 +97,18 @@ namespace gdjs {
       this.updateColor();
     }
     updateColor() {
-      let colors: number[] = [];
+      const colors: number[] = [];
 
-      let color = gdjs.hexNumberToRGBArray(this._cube3DRuntimeObject._color);
+      const normalizedColor = gdjs
+        .hexNumberToRGBArray(this._cube3DRuntimeObject._color)
+        .map((component) => component / 255);
+
       for (
         let i = 0;
         i < this._boxMesh.geometry.attributes.position.count;
         i++
       ) {
-        colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
+        colors.push(...normalizedColor);
       }
 
       this._boxMesh.geometry.setAttribute(

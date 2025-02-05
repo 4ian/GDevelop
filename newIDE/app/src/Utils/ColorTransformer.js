@@ -15,6 +15,16 @@ export const rgbColorToRGBString = (rgbColor: ?RGBColor) => {
   return `${rgbColor.r};${rgbColor.g};${rgbColor.b}`;
 };
 
+export const hexNumberToRGBArray = (
+  hexNumber: number
+): [integer, integer, integer] => {
+  return [
+    (hexNumber >> 16) & 0xff,
+    (hexNumber >> 8) & 0xff,
+    hexNumber & 0xff,
+  ];
+};
+
 /**
  * Convert a RGB color value to a Hex string.
  * @note No "#" or "0x" are added.

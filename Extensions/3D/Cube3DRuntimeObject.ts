@@ -119,9 +119,9 @@ namespace gdjs {
         objectData.content.bottomFaceResourceName,
       ];
 
-      this._color = objectData.content.color
-        ? gdjs.rgbOrHexStringToNumber(objectData.content.color)
-        : gdjs.rgbOrHexStringToNumber('#808080');
+      this._color = gdjs.rgbOrHexStringToNumber(
+        objectData.content.color || '128;128;128'
+      );
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -213,7 +213,7 @@ namespace gdjs {
       this._renderer.updateFace(faceIndex);
     }
     setColor(color: string): void {
-      let colorinHex = gdjs.rgbOrHexStringToNumber(color);
+      const colorinHex = gdjs.rgbOrHexStringToNumber(color);
       if (colorinHex === this._color) return;
       this._color = colorinHex;
       this._renderer.updateColor();

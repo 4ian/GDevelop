@@ -189,6 +189,7 @@ declare type ObjectsRenderingService = {
     objectConfiguration: gd.ObjectConfiguration
   ) => string;
   rgbOrHexToHexNumber: (value: string) => number;
+  hexNumberToRGBArray: (value: string) => [number, number, number];
   registerClearCache: (clearCache: (_: any) => void) => void;
 };
 

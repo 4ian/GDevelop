@@ -2361,6 +2361,7 @@ module.exports = {
         this._facesOrientation = 'Y';
         this._backFaceUpThroughWhichAxisRotation = 'X';
         this._shouldUseTransparentTexture = false;
+        this._color = '';
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
@@ -2386,7 +2387,7 @@ module.exports = {
 
           const resourceName = this._faceResourceNames[faceIndex];
 
-          if (!resourceName || resourceName === '') {
+          if (!resourceName) {
             return new THREE.MeshBasicMaterial({ vertexColors: true });
           }
 
@@ -2421,21 +2422,18 @@ module.exports = {
       }
 
       updateColor(object) {
-        let colors = [];
+        const colors = [];
 
-        let color;
-        if (object.content.color) {
-          color = object.content.color.split(';').map(Number);
-        } else {
-          color = [128, 128, 128];
-        }
+        const normalizedColor = objectsRenderingService
+          .hexNumberToRGBArray(this._cube3DRuntimeObject._color)
+          .map((component) => component / 255);
 
         for (
           let i = 0;
           i < this._threeObject.geometry.attributes.position.count;
           i++
         ) {
-          colors.push(color[0] / 255, color[1] / 255, color[2] / 255);
+          colors.push(...normalizedColor);
         }
 
         this._threeObject.geometry.setAttribute(
@@ -2476,12 +2474,18 @@ module.exports = {
 
         let materialsDirty = false;
         let uvMappingDirty = false;
+        let colorDirty = false;
 
         const shouldUseTransparentTexture =
           object.content.enableTextureTransparency;
         if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
+        }
+        const color = object.content.color;
+        if (this._color !== color) {
+          this._color = color;
+          colorDirty = true;
         }
 
         const faceResourceNames = [
@@ -2575,7 +2579,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
-        this.updateColor(object);
+        if (colorDirty) this.updateColor(object);
       }
 
       /**

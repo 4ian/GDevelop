@@ -53,10 +53,6 @@ namespace gdjs {
     if (!runtimeObject.isFaceAtIndexVisible(faceIndex))
       return getTransparentMaterial();
 
-    const resourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
-    if (!resourceName) {
-      return new THREE.MeshBasicMaterial({ vertexColors: true });
-    }
     return runtimeObject
       .getInstanceContainer()
       .getGame()
@@ -94,13 +90,13 @@ namespace gdjs {
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
-      this.updateColor();
+      this.updateTint();
     }
-    updateColor() {
-      const colors: number[] = [];
+    updateTint() {
+      const tints: number[] = [];
 
-      const normalizedColor = gdjs
-        .hexNumberToRGBArray(this._cube3DRuntimeObject._color)
+      const normalizedTint = gdjs
+        .hexNumberToRGBArray(this._cube3DRuntimeObject._tint)
         .map((component) => component / 255);
 
       for (
@@ -108,12 +104,12 @@ namespace gdjs {
         i < this._boxMesh.geometry.attributes.position.count;
         i++
       ) {
-        colors.push(...normalizedColor);
+        tints.push(...normalizedTint);
       }
 
       this._boxMesh.geometry.setAttribute(
         'color',
-        new THREE.BufferAttribute(new Float32Array(colors), 3)
+        new THREE.BufferAttribute(new Float32Array(tints), 3)
       );
     }
 

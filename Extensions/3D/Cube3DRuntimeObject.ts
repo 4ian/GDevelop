@@ -24,7 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
-      color: string;
+      tint: string;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
@@ -72,7 +72,7 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-    _color: number;
+    _tint: number;
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -119,8 +119,8 @@ namespace gdjs {
         objectData.content.bottomFaceResourceName,
       ];
 
-      this._color = gdjs.rgbOrHexStringToNumber(
-        objectData.content.color || '128;128;128'
+      this._tint = gdjs.rgbOrHexStringToNumber(
+        objectData.content.tint || '128;128;128'
       );
 
       this._materialType = this._convertMaterialType(
@@ -212,11 +212,11 @@ namespace gdjs {
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
     }
-    setColor(color: string): void {
-      const colorinHex = gdjs.rgbOrHexStringToNumber(color);
-      if (colorinHex === this._color) return;
-      this._color = colorinHex;
-      this._renderer.updateColor();
+    setTint(tint: string): void {
+      const tintInHex = gdjs.rgbOrHexStringToNumber(tint);
+      if (tintInHex === this._tint) return;
+      this._tint = tintInHex;
+      this._renderer.updateTint();
     }
 
     /** @internal */
@@ -302,8 +302,8 @@ namespace gdjs {
           newObjectData.content.frontFaceResourceName
         );
       }
-      if (oldObjectData.content.color !== newObjectData.content.color) {
-        this.setColor(newObjectData.content.color);
+      if (oldObjectData.content.tint !== newObjectData.content.tint) {
+        this.setTint(newObjectData.content.tint);
       }
 
       if (
@@ -438,7 +438,7 @@ namespace gdjs {
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         frn: this._faceResourceNames,
-        c: this._color,
+        c: this._tint,
       };
     }
 
@@ -493,9 +493,9 @@ namespace gdjs {
         }
       }
       if (networkSyncData.c !== undefined) {
-        if (this._color !== networkSyncData.c) {
-          this._color = networkSyncData.c;
-          this._renderer.updateColor();
+        if (this._tint !== networkSyncData.c) {
+          this._tint = networkSyncData.c;
+          this._renderer.updateTint();
         }
       }
     }

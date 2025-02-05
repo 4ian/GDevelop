@@ -823,7 +823,7 @@ module.exports = {
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
         propertyName === 'facesOrientation' ||
         propertyName === 'materialType' ||
-        propertyName === 'color'
+        propertyName === 'tint'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -904,10 +904,10 @@ module.exports = {
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
       objectProperties
-        .getOrCreate('color')
-        .setValue(objectContent.color || '128;128;128')
+        .getOrCreate('tint')
+        .setValue(objectContent.tint || '128;128;128')
         .setType('Color')
-        .setLabel(_('Color'))
+        .setLabel(_('Tint'))
         .setGroup(_('Texture'));
 
       objectProperties
@@ -1099,7 +1099,7 @@ module.exports = {
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
-      color: '128;128;128',
+      tint: '128;128;128',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -1578,18 +1578,18 @@ module.exports = {
 
     object
       .addScopedAction(
-        'SetColor',
-        _('Color'),
-        _('Change the color of the cube.'),
-        _('Change the color of _PARAM0_ to _PARAM1_'),
-        _('Color'),
+        'SetTint',
+        _('Tint'),
+        _('Change the tint of the cube.'),
+        _('Change the tint of _PARAM0_ to _PARAM1_'),
+        _('Tint'),
         'res/actions/color24.png',
         'res/actions/color.png'
       )
       .addParameter('object', _('3D Cube'), 'Cube3DObject', false)
-      .addParameter('color', _('Color'), '', false)
+      .addParameter('color', _('Tint'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setColor');
+      .setFunctionName('setTint');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -2361,7 +2361,7 @@ module.exports = {
         this._facesOrientation = 'Y';
         this._backFaceUpThroughWhichAxisRotation = 'X';
         this._shouldUseTransparentTexture = false;
-        this._color = '';
+        this._tint = '';
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
@@ -2385,16 +2385,10 @@ module.exports = {
             return getTransparentMaterial();
           }
 
-          const resourceName = this._faceResourceNames[faceIndex];
-
-          if (!resourceName) {
-            return new THREE.MeshBasicMaterial({ vertexColors: true });
-          }
-
           // Utilisation du loader de ressources pour obtenir le matériau
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
-            resourceName,
+            this._faceResourceNames[faceIndex],
             {
               useTransparentTexture: this._shouldUseTransparentTexture,
             }
@@ -2421,11 +2415,11 @@ module.exports = {
         this._updateTextureUvMapping();
       }
 
-      _updateColor() {
-        const colors = [];
-        const normalizedColor = objectsRenderingService
+      _updateTint() {
+        const tints = [];
+        const normalizedTint = objectsRenderingService
           .hexNumberToRGBArray(
-            objectsRenderingService.rgbOrHexToHexNumber(this._color)
+            objectsRenderingService.rgbOrHexToHexNumber(this._tint)
           )
           .map((component) => component / 255);
 
@@ -2434,12 +2428,12 @@ module.exports = {
           i < this._threeObject.geometry.attributes.position.count;
           i++
         ) {
-          colors.push(...normalizedColor);
+          tints.push(...normalizedTint);
         }
 
         this._threeObject.geometry.setAttribute(
           'color',
-          new THREE.BufferAttribute(new Float32Array(colors), 3)
+          new THREE.BufferAttribute(new Float32Array(tints), 3)
         );
       }
 
@@ -2475,7 +2469,7 @@ module.exports = {
 
         let materialsDirty = false;
         let uvMappingDirty = false;
-        let colorDirty = false;
+        let tintDirty = false;
 
         const shouldUseTransparentTexture =
           object.content.enableTextureTransparency;
@@ -2483,10 +2477,10 @@ module.exports = {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
         }
-        const color = object.content.color || '128;128;128';
-        if (this._color !== color) {
-          this._color = color;
-          colorDirty = true;
+        const tint = object.content.tint || '128;128;128';
+        if (this._tint !== tint) {
+          this._tint = tint;
+          tintDirty = true;
         }
 
         const faceResourceNames = [
@@ -2580,7 +2574,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
-        if (colorDirty) this._updateColor();
+        if (tintDirty) this._updateTint();
       }
 
       /**

@@ -46,6 +46,7 @@ struct PreviewExportOptions {
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         nonRuntimeScriptsCacheBurst(0),
+        inAppTutorialMessageInPreview(""),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""),
         playerId(""),
@@ -61,6 +62,16 @@ struct PreviewExportOptions {
       const gd::String &address, const gd::String &port) {
     websocketDebuggerServerAddress = address;
     websocketDebuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set the message to display to the user in a preview (as part
+   * of an in-app tutorial).
+   */
+  PreviewExportOptions &SetInAppTutorialMessageInPreview(
+      const gd::String &message) {
+    inAppTutorialMessageInPreview = message;
     return *this;
   }
 
@@ -286,6 +297,7 @@ struct PreviewExportOptions {
   gd::String playerId;
   gd::String playerUsername;
   gd::String playerToken;
+  gd::String inAppTutorialMessageInPreview;
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
@@ -468,12 +480,12 @@ class ExporterHelper {
    * gdjs.RuntimeGame object.
    */
   bool ExportIndexFile(const gd::Project &project,
-                           gd::String source,
-                           gd::String exportDir,
-                           const std::vector<gd::String> &includesFiles,
-                           const std::vector<gd::SourceFileMetadata> &sourceFiles,
-                           unsigned int nonRuntimeScriptsCacheBurst,
-                           gd::String additionalSpec = "");
+                       gd::String source,
+                       gd::String exportDir,
+                       const std::vector<gd::String> &includesFiles,
+                       const std::vector<gd::SourceFileMetadata> &sourceFiles,
+                       unsigned int nonRuntimeScriptsCacheBurst,
+                       gd::String additionalSpec = "");
 
   /**
    * \brief Replace the annotations in a index.html file by the specified

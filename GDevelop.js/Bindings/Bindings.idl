@@ -3887,6 +3887,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions UseWebsocketDebuggerClientWithServerAddress([Const] DOMString address, [Const] DOMString port);
     [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
     [Ref] PreviewExportOptions UseMinimalDebuggerClient();
+    [Ref] PreviewExportOptions SetInAppTutorialMessageInPreview([Const] DOMString message);
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] PreviewExportOptions SetAuthenticatedPlayer([Const] DOMString playerId, [Const] DOMString playerUsername, [Const] DOMString playerToken);

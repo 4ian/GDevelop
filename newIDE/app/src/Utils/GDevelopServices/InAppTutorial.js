@@ -73,6 +73,7 @@ export type InAppTutorialFlowStepTrigger =
   | {|
       previewLaunched: true,
       inGameMessage?: TranslatedText,
+      inGameTouchMessage?: TranslatedText,
       inGameMessagePosition?: string,
     |}
   | {| clickOnTooltipButton: TranslatedText |};
@@ -87,6 +88,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
   | {|
       previewLaunched: true,
       inGameMessage?: TranslatedText,
+      inGameTouchMessage?: TranslatedText,
       inGameMessagePosition?: string,
     |}
   | {| clickOnTooltipButton: string |};

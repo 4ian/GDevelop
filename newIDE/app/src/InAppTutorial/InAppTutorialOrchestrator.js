@@ -770,26 +770,26 @@ const InAppTutorialOrchestrator = React.forwardRef<
       message: string,
       position: string,
     |} | null => {
-      if (
-        currentStep.nextStepTrigger &&
-        currentStep.nextStepTrigger.previewLaunched
-      ) {
-        const message = currentStep.nextStepTrigger.inGameMessage
-          ? translateAndInterpolateText({
-              text: currentStep.nextStepTrigger.inGameMessage,
-              data,
-              i18n,
-              project,
-            }) || null
-          : null;
-        if (message) {
-          return {
-            message,
-            position:
-              currentStep.nextStepTrigger.inGameMessagePosition ||
-              'bottom-left',
-          };
-        }
+      const { nextStepTrigger } = currentStep;
+      if (!nextStepTrigger || !nextStepTrigger.previewLaunched) return null;
+
+      const messageToUse = isTouchScreen
+        ? nextStepTrigger.inGameTouchMessage || nextStepTrigger.inGameMessage
+        : nextStepTrigger.inGameMessage;
+
+      const message = messageToUse
+        ? translateAndInterpolateText({
+            text: messageToUse,
+            data,
+            i18n,
+            project,
+          }) || null
+        : null;
+      if (message) {
+        return {
+          message,
+          position: nextStepTrigger.inGameMessagePosition || 'bottom-left',
+        };
       }
       return null;
     };

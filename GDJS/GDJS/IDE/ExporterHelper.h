@@ -417,6 +417,7 @@ class ExporterHelper {
                       bool includeWindowMessageDebuggerClient,
                       bool includeMinimalDebuggerClient,
                       bool includeCaptureManager,
+                      bool includeInAppTutorialMessage,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 

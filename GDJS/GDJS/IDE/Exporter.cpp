@@ -102,6 +102,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         /*includeWindowMessageDebuggerClient=*/false,
         /*includeMinimalDebuggerClient=*/false,
         /*includeCaptureManager*/ false,
+        /*includeInAppTutorialMessage*/ false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 

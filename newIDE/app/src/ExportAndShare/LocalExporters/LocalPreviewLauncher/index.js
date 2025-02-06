@@ -279,6 +279,12 @@ export default class LocalPreviewLauncher extends React.Component<
             );
             previewExportOptions.setSourceGameId(this.props.sourceGameId);
 
+            if (previewOptions.inAppTutorialMessageInPreview) {
+              previewExportOptions.setInAppTutorialMessageInPreview(
+                previewOptions.inAppTutorialMessageInPreview
+              );
+            }
+
             if (previewOptions.fallbackAuthor) {
               previewExportOptions.setFallbackAuthor(
                 previewOptions.fallbackAuthor.id,

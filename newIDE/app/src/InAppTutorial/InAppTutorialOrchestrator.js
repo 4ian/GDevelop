@@ -445,6 +445,7 @@ export type InAppTutorialOrchestratorInterface = {|
     projectData: {| [key: string]: string |},
   |},
   changeData: (oldName: string, newName: string) => void,
+  getPreviewMessage: () => string | null,
 |};
 
 const InAppTutorialOrchestrator = React.forwardRef<
@@ -765,10 +766,28 @@ const InAppTutorialOrchestrator = React.forwardRef<
       }
     };
 
+    const getPreviewMessage = (): string | null => {
+      if (
+        currentStep.nextStepTrigger &&
+        currentStep.nextStepTrigger.previewLaunched
+      ) {
+        return currentStep.nextStepTrigger.inGameMessage
+          ? translateAndInterpolateText({
+              text: currentStep.nextStepTrigger.inGameMessage,
+              data,
+              i18n,
+              project,
+            }) || null
+          : null;
+      }
+      return null;
+    };
+
     React.useImperativeHandle(ref, () => ({
       onPreviewLaunch,
       getProgress,
       changeData,
+      getPreviewMessage,
     }));
 
     const onPreviewLaunch = React.useCallback(

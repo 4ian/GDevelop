@@ -70,7 +70,7 @@ export type InAppTutorialFlowStepTrigger =
   | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
-  | {| previewLaunched: true |}
+  | {| previewLaunched: true, inGameMessage?: TranslatedText |}
   | {| clickOnTooltipButton: TranslatedText |};
 
 export type InAppTutorialFlowStepFormattedTrigger =
@@ -80,7 +80,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
   | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
-  | {| previewLaunched: true |}
+  | {| previewLaunched: true, inGameMessage?: TranslatedText |}
   | {| clickOnTooltipButton: string |};
 
 export type InAppTutorialTooltip = {|

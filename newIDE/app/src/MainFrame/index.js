@@ -1651,6 +1651,9 @@ const MainFrame = (props: Props) => {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         const startTime = Date.now();
+        const inAppTutorialMessageInPreview = inAppTutorialOrchestratorRef.current
+          ? inAppTutorialOrchestratorRef.current.getPreviewMessage() || ''
+          : '';
         await previewLauncher.launchPreview({
           project: currentProject,
           layout,
@@ -1664,6 +1667,7 @@ const MainFrame = (props: Props) => {
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
+          inAppTutorialMessageInPreview,
           captureOptions,
           onCaptureFinished,
         });

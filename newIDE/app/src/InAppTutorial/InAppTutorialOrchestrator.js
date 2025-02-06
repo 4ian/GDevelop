@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { I18n } from '@lingui/react';
 import { I18n as I18nType } from '@lingui/core';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
@@ -428,6 +427,7 @@ type Props = {|
   tutorial: InAppTutorial,
   startStepIndex: number,
   startProjectData: { [key: string]: string },
+  i18n: I18nType,
   endTutorial: ({|
     shouldCloseProject: boolean,
     shouldWarnAboutUnsavedChanges: boolean,
@@ -460,6 +460,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       currentSceneName,
       startStepIndex,
       startProjectData,
+      i18n,
     },
     ref
   ) => {
@@ -1023,7 +1024,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
     const isTouchScreen = useScreenType() === 'touch';
 
-    const renderStepDisplayer = (i18n: I18nType) => {
+    const renderStepDisplayer = () => {
       if (!currentStep) return null;
       const stepTooltip = currentStep.tooltip;
       let formattedTooltip;
@@ -1142,37 +1143,33 @@ const InAppTutorialOrchestrator = React.forwardRef<
     });
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <>
-            {renderStepDisplayer(i18n)}
-            {displayEndDialog && (
-              <InAppTutorialDialog
-                isLastStep
-                dialogContent={endDialog}
-                endTutorial={() => {
-                  setDisplayEndDialog(false);
-                  if (isRunningMiniTutorial) {
-                    // If running a mini tutorial, we save the progress to indicate that the user has finished this lesson.
-                    preferences.saveTutorialProgress({
-                      tutorialId: tutorial.id,
-                      userId: authenticatedUser.profile
-                        ? authenticatedUser.profile.id
-                        : undefined,
-                      ...getProgress(),
-                      // We do not specify a storage provider, as we don't need to reload the project.
-                    });
-                  }
-                  endTutorial({
-                    shouldCloseProject: false,
-                    shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,
-                  });
-                }}
-              />
-            )}
-          </>
+      <>
+        {renderStepDisplayer()}
+        {displayEndDialog && (
+          <InAppTutorialDialog
+            isLastStep
+            dialogContent={endDialog}
+            endTutorial={() => {
+              setDisplayEndDialog(false);
+              if (isRunningMiniTutorial) {
+                // If running a mini tutorial, we save the progress to indicate that the user has finished this lesson.
+                preferences.saveTutorialProgress({
+                  tutorialId: tutorial.id,
+                  userId: authenticatedUser.profile
+                    ? authenticatedUser.profile.id
+                    : undefined,
+                  ...getProgress(),
+                  // We do not specify a storage provider, as we don't need to reload the project.
+                });
+              }
+              endTutorial({
+                shouldCloseProject: false,
+                shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,
+              });
+            }}
+          />
         )}
-      </I18n>
+      </>
     );
   }
 );

@@ -905,7 +905,7 @@ module.exports = {
         .setGroup(_('Default size'));
       objectProperties
         .getOrCreate('tint')
-        .setValue(objectContent.tint || '128;128;128')
+        .setValue(objectContent.tint || '255;255;255')
         .setType('Color')
         .setLabel(_('Tint'))
         .setGroup(_('Texture'));
@@ -1099,7 +1099,7 @@ module.exports = {
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
-      tint: '128;128;128',
+      tint: '255;255;255',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -2477,7 +2477,7 @@ module.exports = {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
         }
-        const tint = object.content.tint || '128;128;128';
+        const tint = object.content.tint || '255;255;255';
         if (this._tint !== tint) {
           this._tint = tint;
           tintDirty = true;

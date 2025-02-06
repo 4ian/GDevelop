@@ -120,7 +120,7 @@ namespace gdjs {
       ];
 
       this._tint = gdjs.rgbOrHexStringToNumber(
-        objectData.content.tint || '128;128;128'
+        objectData.content.tint || '255;255;255'
       );
 
       this._materialType = this._convertMaterialType(

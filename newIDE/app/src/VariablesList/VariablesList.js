@@ -1450,6 +1450,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
 
       const typeErrorMessage =
         parentType === gd.Variable.Array &&
+        parentVariable &&
         parentVariable.getChildrenCount() > 1 &&
         parentVariable.getAtIndex(0).getType() !== type
           ? i18n._(t`Array children must all be of the same type.`)

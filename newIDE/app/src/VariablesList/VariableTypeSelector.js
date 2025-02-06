@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import VariableStringIcon from './Icons/VariableStringIcon';
@@ -23,6 +24,7 @@ type Props = {|
   isHighlighted?: boolean,
   readOnlyWithIcon?: boolean,
   id?: string,
+  errorMessage: MessageDescriptor | null,
 |};
 
 let options;

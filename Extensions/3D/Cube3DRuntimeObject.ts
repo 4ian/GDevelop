@@ -45,7 +45,7 @@ namespace gdjs {
     trfb: integer;
     frn: [string, string, string, string, string, string];
     mt: number;
-    c: number;
+    tint: number;
   };
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -438,7 +438,7 @@ namespace gdjs {
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         frn: this._faceResourceNames,
-        c: this._tint,
+        tint: this._tint,
       };
     }
 

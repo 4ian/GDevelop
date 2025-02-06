@@ -90,13 +90,23 @@ type Props = {|
 const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
   parameterIndex: number,
-  objectParameterIndex: ?number
+  objectParameterIndex: number,
+  objectName: string,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor
 ) => {
   // Hide parameters that are used only for code generation
   if (parameterMetadata.isCodeOnly()) return false;
 
   // For objects, hide the first object parameter, which is by convention the object name.
-  if (parameterIndex === objectParameterIndex) return false;
+  if (
+    parameterIndex === objectParameterIndex &&
+    objectName &&
+    projectScopedContainersAccessor
+      .get()
+      .getObjectsContainersList()
+      .hasObjectOrGroupNamed(objectName)
+  )
+    return false;
 
   return true;
 };
@@ -132,6 +142,30 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
+    const getVisibleParametersCount = React.useCallback(
+      (instructionMetadata: ?gdInstructionMetadata, objectName: ?string) => {
+        if (!instructionMetadata) return 0;
+
+        const objectParameterIndex = getObjectParameterIndex(
+          instructionMetadata
+        );
+
+        return mapFor(0, instructionMetadata.getParametersCount(), i => {
+          if (!instructionMetadata) return false;
+          const parameterMetadata = instructionMetadata.getParameter(i);
+
+          return isParameterVisible(
+            parameterMetadata,
+            i,
+            objectParameterIndex,
+            objectName,
+            projectScopedContainersAccessor
+          );
+        }).filter(isVisible => isVisible).length;
+      },
+      [projectScopedContainersAccessor]
+    );
+
     const focus: FieldFocusFunction = React.useCallback(
       options => {
         // Verify that there is a field to focus.
@@ -150,30 +184,12 @@ const InstructionParametersEditor = React.forwardRef<
           }
         }
       },
-      [project, objectName, instruction, isCondition]
+      [getVisibleParametersCount, instruction, isCondition, project, objectName]
     );
 
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
-
-    const getVisibleParametersCount = (
-      instructionMetadata: ?gdInstructionMetadata,
-      objectName: ?string
-    ) => {
-      if (!instructionMetadata) return 0;
-
-      const objectParameterIndex = objectName
-        ? getObjectParameterIndex(instructionMetadata)
-        : -1;
-
-      return mapFor(0, instructionMetadata.getParametersCount(), i => {
-        if (!instructionMetadata) return false;
-        const parameterMetadata = instructionMetadata.getParameter(i);
-
-        return isParameterVisible(parameterMetadata, i, objectParameterIndex);
-      }).filter(isVisible => isVisible).length;
-    };
 
     const openExtension = (i18n: I18nType) => {
       if (isDirty) {
@@ -237,9 +253,7 @@ const InstructionParametersEditor = React.forwardRef<
       instructionType
     );
     const tutorialIds = getInstructionTutorialIds(instructionType);
-    const objectParameterIndex = objectName
-      ? getObjectParameterIndex(instructionMetadata)
-      : -1;
+    const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
 
     setupInstructionParameters(
       globalObjectsContainer,
@@ -322,7 +336,9 @@ const InstructionParametersEditor = React.forwardRef<
                       !isParameterVisible(
                         parameterMetadata,
                         i,
-                        objectParameterIndex
+                        objectParameterIndex,
+                        objectName,
+                        projectScopedContainersAccessor
                       )
                     )
                       return null;

@@ -20,7 +20,11 @@ import * as PIXI_SPINE from 'pixi-spine';
 import * as THREE from 'three';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import optionalRequire from '../Utils/OptionalRequire';
-import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
+import {
+  rgbOrHexToHexNumber,
+  hexNumberToRGBArray,
+} from '../Utils/ColorTransformer';
+
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
@@ -277,6 +281,7 @@ const ObjectsRenderingService = {
     }
   },
   rgbOrHexToHexNumber, // Expose a ColorTransformer function, useful to manage different color types for the extensions
+  hexNumberToRGBArray, // Expose a ColorTransformer function, useful to manage different color types for the extensions
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
   THREE, // Expose THREE so that it can be used by renderers

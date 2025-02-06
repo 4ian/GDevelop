@@ -109,6 +109,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  hideToolbar: (hidden: boolean) => void,
   storageProviders: Array<StorageProvider>,
 
   // Games
@@ -182,6 +183,7 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         onCreateProjectFromExample,
         setToolbar,
+        hideToolbar,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
@@ -425,9 +427,20 @@ export const HomePage = React.memo<Props>(
       // Ensure the toolbar is up to date when the active tab changes.
       React.useEffect(
         () => {
-          updateToolbar();
+          // Hide the toolbar when on mobile in the "play" tab.
+          if (activeTab === 'play' && isMobile) {
+            hideToolbar(true);
+          } else {
+            hideToolbar(false);
+            updateToolbar();
+          }
+
+          // Ensure we show it again when the tab changes.
+          return () => {
+            hideToolbar(false);
+          };
         },
-        [updateToolbar]
+        [updateToolbar, activeTab, hideToolbar, isMobile]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -608,6 +621,7 @@ export const renderHomePageContainer = (
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
+    hideToolbar={props.hideToolbar}
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}

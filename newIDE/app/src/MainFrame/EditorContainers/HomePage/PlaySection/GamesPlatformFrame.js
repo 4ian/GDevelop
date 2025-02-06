@@ -40,10 +40,16 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
   const url = new URL(
     gameId.current
       ? `/embedded/games/${gameId.current}`
-      : `/embedded/${paletteType}`,
+      : isMobile
+      ? '/games/random' // On mobile, go directly to a random game.
+      : `/embedded/${paletteType}`, // On desktop, access the homepage.
     gdGamesHost
   );
   if (gameId.current) url.searchParams.set('theme', paletteType);
+  if (isMobile) {
+    url.searchParams.set('theme', paletteType);
+    url.searchParams.set('embedded', 'true');
+  }
 
   const src = loaded ? url.toString() : '';
 
@@ -57,7 +63,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
     [loaded, initialGameId]
   );
 
-  const containerTop = 37 + 40; // tabs title bar + toolbar
+  const containerTop = 37 + (isMobile ? 0 : 40); // tabs title bar + toolbar
   const containerLeft = isMobile
     ? 0
     : isMediumScreen

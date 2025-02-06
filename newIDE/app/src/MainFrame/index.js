@@ -1244,6 +1244,12 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
+  const hideEditorToolbar = (hidden: boolean) => {
+    if (!toolbar.current) return;
+
+    toolbar.current.hideToolbar(hidden);
+  };
+
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
     if (!currentProject) return;
@@ -3757,6 +3763,7 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
+                    hideToolbar: hideEditorToolbar,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

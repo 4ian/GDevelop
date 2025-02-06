@@ -28,7 +28,7 @@ export const getInstructionListItemKey = (
 ) =>
   `instruction-key-${instruction.fullGroupName}${
     instruction.scope.objectMetadata
-      ? '-' + instruction.scope.objectMetadata.getName()
+      ? '-' + instruction.scope.objectMetadata.name
       : ''
   }-${instruction.type}`;
 
@@ -52,8 +52,9 @@ export const getInstructionOrExpressionIdentifier = (
 ): string =>
   `instruction-or-expression-${
     instructionOrExpressionMetadata.scope.objectMetadata
-      ? instructionOrExpressionMetadata.scope.objectMetadata
-          .getName()
-          .replace(/:/g, '-') + '-'
+      ? instructionOrExpressionMetadata.scope.objectMetadata.name.replace(
+          /:/g,
+          '-'
+        ) + '-'
       : ''
   }${instructionOrExpressionMetadata.type.replace(/:/g, '-')}`;

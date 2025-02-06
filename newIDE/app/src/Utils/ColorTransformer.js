@@ -17,7 +17,7 @@ export const rgbColorToRGBString = (rgbColor: ?RGBColor) => {
 
 export const hexNumberToRGBArray = (
   hexNumber: number
-): [integer, integer, integer] => {
+): [number, number, number] => {
   return [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff];
 };
 

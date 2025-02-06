@@ -492,9 +492,9 @@ namespace gdjs {
           }
         }
       }
-      if (networkSyncData.c !== undefined) {
-        if (this._tint !== networkSyncData.c) {
-          this._tint = networkSyncData.c;
+      if (networkSyncData.tint !== undefined) {
+        if (this._tint !== networkSyncData.tint) {
+          this._tint = networkSyncData.tint;
           this._renderer.updateTint();
         }
       }

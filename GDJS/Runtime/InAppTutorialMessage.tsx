@@ -8,6 +8,7 @@ const redHeroImage =
  */
 namespace gdjs {
   const logger = new gdjs.Logger('InAppTutorialMessage');
+  const padding = '20px';
 
   /** A minimal utility to define DOM elements. */
   function h<K extends keyof HTMLElementTagNameMap>(
@@ -38,8 +39,6 @@ namespace gdjs {
   const styles = {
     container: {
       position: 'absolute',
-      left: '20px',
-      bottom: '20px',
       zIndex: '1',
       display: 'flex',
     },
@@ -54,7 +53,6 @@ namespace gdjs {
       position: 'absolute',
       padding: '10px 12px',
       minWidth: '180px',
-      transform: 'translateY(calc(-100% - 10px))',
       borderRadius: '8px',
       backgroundColor: 'rgb(250, 250, 250)',
       boxShadow:
@@ -66,6 +64,14 @@ namespace gdjs {
       letterSpacing: '0.01em',
       color: 'rgb(73, 73, 82)',
     },
+  };
+
+  type AbsolutePositionStyle = {
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+    transform?: string;
   };
 
   export namespace inAppTutorialMessage {
@@ -105,7 +111,8 @@ namespace gdjs {
 
     export const displayInAppTutorialMessage = (
       runtimeGame: gdjs.RuntimeGame,
-      message: string
+      message: string,
+      position: string
     ) => {
       const domElementContainer = getDomElementContainer(runtimeGame);
       if (!domElementContainer) {
@@ -114,11 +121,55 @@ namespace gdjs {
 
       if (_container) return;
 
+      const leftOrRight = position.toLowerCase().includes('right')
+        ? 'right'
+        : 'left';
+      const topOrMiddleOrBottom = position.toLowerCase().includes('top')
+        ? 'top'
+        : position.toLowerCase().includes('middle')
+        ? 'middle'
+        : 'bottom';
+
+      const containerPositionStyle: AbsolutePositionStyle = {};
+      const messageContainerPositionStyle: AbsolutePositionStyle = {};
+
+      if (leftOrRight === 'left') {
+        containerPositionStyle.left = padding;
+        messageContainerPositionStyle.left =
+          topOrMiddleOrBottom === 'top' ? 'calc(100% + 10px)' : '0px';
+      } else {
+        containerPositionStyle.right = padding;
+        messageContainerPositionStyle.right =
+          topOrMiddleOrBottom === 'top' ? 'calc(100% + 10px)' : '0px';
+      }
+      if (topOrMiddleOrBottom === 'top') {
+        containerPositionStyle.top = padding;
+        messageContainerPositionStyle.top = '0px';
+      } else if (topOrMiddleOrBottom === 'middle') {
+        containerPositionStyle.top = '50%';
+        messageContainerPositionStyle.transform =
+          'translateY(calc(-100% - 10px))';
+      } else {
+        containerPositionStyle.bottom = padding;
+        messageContainerPositionStyle.transform =
+          'translateY(calc(-100% - 10px))';
+      }
+
       _loadFont();
       _container = (
-        <div id={containerId} style={styles.container}>
+        <div
+          id={containerId}
+          style={{ ...styles.container, ...containerPositionStyle }}
+        >
           <div style={styles.avatarContainer}>
-            <div style={styles.messageContainer}>{message}</div>
+            <div
+              style={{
+                ...styles.messageContainer,
+                ...messageContainerPositionStyle,
+              }}
+            >
+              {message}
+            </div>
             <img
               width={60}
               height={60}

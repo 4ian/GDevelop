@@ -253,6 +253,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (!options.inAppTutorialMessageInPreview.empty()) {
     runtimeGameOptions.AddChild("inAppTutorialMessageInPreview")
         .SetStringValue(options.inAppTutorialMessageInPreview);
+    runtimeGameOptions.AddChild("inAppTutorialMessagePositionInPreview")
+        .SetStringValue(options.inAppTutorialMessagePositionInPreview);
   }
   if (!options.crashReportUploadLevel.empty()) {
     runtimeGameOptions.AddChild("crashReportUploadLevel")

@@ -105,6 +105,7 @@ namespace gdjs {
 
     /** Message to display to the user during an in-app tutorial. */
     inAppTutorialMessageInPreview?: string;
+    inAppTutorialMessagePositionInPreview?: string;
 
     /**
      * If set, this data is used to authenticate automatically when launching the game.
@@ -925,7 +926,8 @@ namespace gdjs {
         ) {
           gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
             this,
-            this._options.inAppTutorialMessageInPreview
+            this._options.inAppTutorialMessageInPreview,
+            this._options.inAppTutorialMessagePositionInPreview || ''
           );
         }
 

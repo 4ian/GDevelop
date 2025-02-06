@@ -47,6 +47,7 @@ struct PreviewExportOptions {
         isDevelopmentEnvironment(false),
         nonRuntimeScriptsCacheBurst(0),
         inAppTutorialMessageInPreview(""),
+        inAppTutorialMessagePositionInPreview(""),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""),
         playerId(""),
@@ -70,8 +71,9 @@ struct PreviewExportOptions {
    * of an in-app tutorial).
    */
   PreviewExportOptions &SetInAppTutorialMessageInPreview(
-      const gd::String &message) {
+      const gd::String &message, const gd::String &position) {
     inAppTutorialMessageInPreview = message;
+    inAppTutorialMessagePositionInPreview = position;
     return *this;
   }
 
@@ -298,6 +300,7 @@ struct PreviewExportOptions {
   gd::String playerUsername;
   gd::String playerToken;
   gd::String inAppTutorialMessageInPreview;
+  gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;

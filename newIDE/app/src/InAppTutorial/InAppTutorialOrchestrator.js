@@ -445,7 +445,7 @@ export type InAppTutorialOrchestratorInterface = {|
     projectData: {| [key: string]: string |},
   |},
   changeData: (oldName: string, newName: string) => void,
-  getPreviewMessage: () => string | null,
+  getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
 const InAppTutorialOrchestrator = React.forwardRef<
@@ -766,12 +766,15 @@ const InAppTutorialOrchestrator = React.forwardRef<
       }
     };
 
-    const getPreviewMessage = (): string | null => {
+    const getPreviewMessage = (): {|
+      message: string,
+      position: string,
+    |} | null => {
       if (
         currentStep.nextStepTrigger &&
         currentStep.nextStepTrigger.previewLaunched
       ) {
-        return currentStep.nextStepTrigger.inGameMessage
+        const message = currentStep.nextStepTrigger.inGameMessage
           ? translateAndInterpolateText({
               text: currentStep.nextStepTrigger.inGameMessage,
               data,
@@ -779,6 +782,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
               project,
             }) || null
           : null;
+        if (message) {
+          return {
+            message,
+            position:
+              currentStep.nextStepTrigger.inGameMessagePosition ||
+              'bottom-left',
+          };
+        }
       }
       return null;
     };

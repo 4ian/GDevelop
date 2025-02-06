@@ -281,7 +281,8 @@ export default class LocalPreviewLauncher extends React.Component<
 
             if (previewOptions.inAppTutorialMessageInPreview) {
               previewExportOptions.setInAppTutorialMessageInPreview(
-                previewOptions.inAppTutorialMessageInPreview
+                previewOptions.inAppTutorialMessageInPreview,
+                previewOptions.inAppTutorialMessagePositionInPreview
               );
             }
 

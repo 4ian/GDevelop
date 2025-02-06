@@ -187,7 +187,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
       if (previewOptions.inAppTutorialMessageInPreview) {
         previewExportOptions.setInAppTutorialMessageInPreview(
-          previewOptions.inAppTutorialMessageInPreview
+          previewOptions.inAppTutorialMessageInPreview,
+          previewOptions.inAppTutorialMessagePositionInPreview
         );
       }
 

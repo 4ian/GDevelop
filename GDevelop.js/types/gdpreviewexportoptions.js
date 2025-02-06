@@ -4,7 +4,7 @@ declare class gdPreviewExportOptions {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): gdPreviewExportOptions;
   useWindowMessageDebuggerClient(): gdPreviewExportOptions;
   useMinimalDebuggerClient(): gdPreviewExportOptions;
-  setInAppTutorialMessageInPreview(message: string): gdPreviewExportOptions;
+  setInAppTutorialMessageInPreview(message: string, position: string): gdPreviewExportOptions;
   setLayoutName(layoutName: string): gdPreviewExportOptions;
   setFallbackAuthor(id: string, username: string): gdPreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): gdPreviewExportOptions;

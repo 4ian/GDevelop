@@ -10,8 +10,10 @@ import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
 import VariableMixedTypesIcon from '../UI/CustomSvgIcons/Cross';
+import WarningIcon from '../UI/CustomSvgIcons/Warning';
 import { Line, Spacer } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Tooltip from '@material-ui/core/Tooltip';
 const gd = global.gd;
 
 type Props = {|
@@ -85,14 +87,23 @@ const VariableTypeSelector = React.memo<Props>((props: Props) => {
 
   return (
     <Line alignItems="center" noMargin>
-      <Icon
-        fontSize="small"
-        htmlColor={
-          props.isHighlighted
-            ? gdevelopTheme.listItem.selectedTextColor
-            : undefined
-        }
-      />
+      {props.errorMessage ? (
+        <Tooltip title={props.errorMessage}>
+          <WarningIcon
+            fontSize="small"
+            htmlColor={gdevelopTheme.message.warning}
+          />
+        </Tooltip>
+      ) : (
+        <Icon
+          fontSize="small"
+          htmlColor={
+            props.isHighlighted
+              ? gdevelopTheme.message.selectedTextColor
+              : undefined
+          }
+        />
+      )}
       {!props.readOnlyWithIcon && (
         <>
           <Spacer />

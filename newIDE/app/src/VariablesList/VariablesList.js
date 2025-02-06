@@ -6,6 +6,7 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { ClickAwayListener } from '@material-ui/core';
 
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import Add from '../UI/CustomSvgIcons/Add';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Undo from '../UI/CustomSvgIcons/Undo';
@@ -172,6 +173,7 @@ type VariableRowProps = {|
   index: number,
   isTopLevel: boolean,
   type: Variable_Type,
+  typeErrorMessage: MessageDescriptor | null,
   onChangeType: (string, nodeId: string) => void,
   hasMixedValues: boolean,
   valueAsString: string | null,
@@ -211,6 +213,7 @@ const VariableRow = React.memo<VariableRowProps>(
     rowRightSideStyle,
     isTopLevel,
     type,
+    typeErrorMessage,
     onChangeType,
     hasMixedValues,
     valueAsString,
@@ -383,6 +386,7 @@ const VariableRow = React.memo<VariableRowProps>(
                               isInherited || overwritesInheritedVariable
                             }
                             id={`variable-${index}-type`}
+                            errorMessage={typeErrorMessage}
                           />
                         </Column>
                         <Column expand>
@@ -1444,6 +1448,13 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         props.inheritedVariablesContainer &&
         props.inheritedVariablesContainer.has(name);
 
+      const typeErrorMessage =
+        parentType === gd.Variable.Array &&
+        parentVariable.getChildrenCount() > 1 &&
+        parentVariable.getAtIndex(0).getType() !== type
+          ? i18n._(t`Array children must all be of the same type.`)
+          : null;
+
       if (!!searchText) {
         if (
           !(
@@ -1507,6 +1518,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           rowRightSideStyle={rowRightSideStyle}
           isTopLevel={isTopLevel}
           type={type}
+          typeErrorMessage={typeErrorMessage}
           variablePointer={variablePointer}
           onChangeType={onChangeType}
           hasMixedValues={hasMixedValues}

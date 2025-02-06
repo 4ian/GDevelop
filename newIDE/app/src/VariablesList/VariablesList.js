@@ -1453,7 +1453,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         parentVariable &&
         parentVariable.getChildrenCount() > 1 &&
         parentVariable.getAtIndex(0).getType() !== type
-          ? i18n._(t`Array children must all be of the same type.`)
+          ? i18n._(t`Every child of an array must be the same type.`)
           : null;
 
       if (!!searchText) {

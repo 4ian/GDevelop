@@ -2385,7 +2385,6 @@ module.exports = {
             return getTransparentMaterial();
           }
 
-          // Utilisation du loader de ressources pour obtenir le matériau
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
             this._faceResourceNames[faceIndex],

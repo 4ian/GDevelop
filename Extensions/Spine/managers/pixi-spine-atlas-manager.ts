@@ -23,9 +23,8 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases = new gdjs.ResourceCache<
-      pixi_spine.TextureAtlas
-    >();
+    private _loadedSpineAtlases =
+      new gdjs.ResourceCache<pixi_spine.TextureAtlas>();
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<pixi_spine.TextureAtlas>
     >();
@@ -128,9 +127,8 @@ namespace gdjs {
           resource.name,
           embeddedResourceName
         );
-        imagesMap[
-          embeddedResourceName
-        ] = this._imageManager.getOrLoadPIXITexture(mappedResourceName);
+        imagesMap[embeddedResourceName] =
+          this._imageManager.getOrLoadPIXITexture(mappedResourceName);
 
         return imagesMap;
       }, {});
@@ -201,6 +199,27 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();
+    }
+
+    /**
+     * To be called when the scene is disposed.
+     * Clear the Spine Atlases loaded in this manager.
+     * @param resourcesList The list of specific resources
+     */
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedSpineAtlas = this._loadedSpineAtlases.get(resourceData);
+        if (loadedSpineAtlas) {
+          loadedSpineAtlas.dispose();
+          this._loadedSpineAtlases.delete(resourceData);
+        }
+
+        const loadingSpineAtlas = this._loadingSpineAtlases.get(resourceData);
+        if (loadingSpineAtlas) {
+          loadingSpineAtlas.then((atl) => atl.dispose());
+          this._loadingSpineAtlases.delete(resourceData);
+        }
+      });
     }
   }
 }

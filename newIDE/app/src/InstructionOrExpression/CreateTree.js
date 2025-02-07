@@ -10,7 +10,7 @@ import {
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { getInstructionType } from '../EventsSheet/InstructionEditor/SelectorListItems/Keys';
 
-const GROUP_DELIMITER = '/';
+const GROUP_DELIMITER = ' ❯ ';
 const getSortedFreeInstructionsTopLevelGroups = (i18n: I18nType) => [
   i18n._(t`General`),
   i18n._(t`Input`),

@@ -8,7 +8,7 @@ import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategori
 
 const gd: libGDevelop = global.gd;
 
-const GROUP_DELIMITER = '/';
+const GROUP_DELIMITER = ' ❯ ';
 
 const freeInstructionsToKeep = {
   BuiltinObject: [
@@ -360,7 +360,7 @@ export const enumerateAllInstructions = (
       prefix,
       isCondition ? extension.getAllConditions() : extension.getAllActions(),
       {
-        extension,
+        extension: { name: extension.getName() },
         objectMetadata: undefined,
         behaviorMetadata: undefined,
       },
@@ -372,7 +372,13 @@ export const enumerateAllInstructions = (
     for (let j = 0; j < allObjectsTypes.size(); ++j) {
       const objectType = allObjectsTypes.at(j);
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = { extension, objectMetadata };
+      const scope = {
+        extension: { name: extension.getName() },
+        objectMetadata: {
+          name: objectMetadata.getName(),
+          isPrivate: objectMetadata.isPrivate(),
+        },
+      };
       allInstructions = [
         ...allInstructions,
         ...enumerateExtensionInstructions(
@@ -390,7 +396,13 @@ export const enumerateAllInstructions = (
     for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
       const behaviorType = allBehaviorsTypes.at(j);
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = { extension, behaviorMetadata };
+      const scope = {
+        extension: { name: extension.getName() },
+        behaviorMetadata: {
+          name: behaviorMetadata.getName(),
+          isPrivate: behaviorMetadata.isPrivate(),
+        },
+      };
 
       allInstructions = [
         ...allInstructions,
@@ -468,7 +480,13 @@ export const enumerateObjectAndBehaviorsInstructions = (
   );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
-  const scope = { extension, objectMetadata };
+  const scope = {
+    extension: { name: extension.getName() },
+    objectMetadata: {
+      name: objectMetadata.getName(),
+      isPrivate: objectMetadata.isPrivate(),
+    },
+  };
   const prefix = '';
 
   // Free instructions
@@ -490,7 +508,13 @@ export const enumerateObjectAndBehaviorsInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const scope = { extension, objectMetadata };
+    const scope = {
+      extension: { name: extension.getName() },
+      objectMetadata: {
+        name: objectMetadata.getName(),
+        isPrivate: objectMetadata.isPrivate(),
+      },
+    };
 
     allInstructions = [
       ...allInstructions,
@@ -538,7 +562,13 @@ export const enumerateObjectAndBehaviorsInstructions = (
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = { extension, behaviorMetadata };
+      const scope = {
+        extension: { name: extension.getName() },
+        behaviorMetadata: {
+          name: behaviorMetadata.getName(),
+          isPrivate: behaviorMetadata.isPrivate(),
+        },
+      };
 
       // Free functions can require a behavior even if this behavior is from
       // another extension.
@@ -613,7 +643,7 @@ export const enumerateFreeInstructions = (
         isCondition,
         extension,
         {
-          extension,
+          extension: { name: extension.getName() },
           objectMetadata: undefined,
           behaviorMetadata: undefined,
         },

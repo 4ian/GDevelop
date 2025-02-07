@@ -422,7 +422,7 @@ module.exports = {
         _('Is the user email address verified'),
         _('Checks if the email address of the user got verified.'),
         _('The email of the user is verified'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -440,7 +440,7 @@ module.exports = {
         'GetUserEmail',
         _('User email address'),
         _('Return the user email address.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -457,7 +457,7 @@ module.exports = {
         'GetAccountCreationTime',
         _('Accounts creation time'),
         _('Return the accounts creation time.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -474,7 +474,7 @@ module.exports = {
         'GetLastLoginTime',
         _('User last login time'),
         _('Return the user last login time.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -491,7 +491,7 @@ module.exports = {
         'GetUserDisplayName',
         _('User display name'),
         _('Return the user display name.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -508,7 +508,7 @@ module.exports = {
         'GetPhoneNumber',
         _('User phone number'),
         _('Return the user phone number.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -528,7 +528,7 @@ module.exports = {
           'Return the user Unique IDentifier. Use that to link data to an ' +
             'user instead of the name or email.'
         ),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -545,7 +545,7 @@ module.exports = {
         'GetTenantID',
         _('User tenant ID'),
         _('Return the user tenant ID. For advanced usage only.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -562,7 +562,7 @@ module.exports = {
         'GetRefreshToken',
         _('User refresh token'),
         _('Return the user refresh token. For advanced usage only.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -579,7 +579,7 @@ module.exports = {
         'GetPhotoURL',
         _('Profile picture URL'),
         _('Gets an URL to the user profile picture.'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -597,7 +597,7 @@ module.exports = {
         _('Send a password reset email'),
         _('Send a password reset link per email.'),
         _('Send a password reset email'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -619,7 +619,7 @@ module.exports = {
         _('Send a verification email'),
         _('Send a link per email to verify the user email.'),
         _('Send a verification email'),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -638,7 +638,7 @@ module.exports = {
         _('Display name'),
         _('Sets the user display name.'),
         _("Set the user's display name to _PARAM0_"),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -658,7 +658,7 @@ module.exports = {
         _('Profile picture'),
         _('Change the user profile picture URL to a new one.'),
         _("Change the user's profile picture URL to _PARAM0_"),
-        _('Authentication/User Management'),
+        _('Authentication ❯ User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -684,7 +684,7 @@ module.exports = {
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM4_ (send verification email: _PARAM3_)"
         ),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -725,7 +725,7 @@ module.exports = {
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM2_ (send verification email: _PARAM1_)"
         ),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -764,7 +764,7 @@ module.exports = {
           'Change the user password to _PARAM2_ and store result in ' +
             '_PARAM4_ (send verification email: _PARAM3_)'
         ),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -806,7 +806,7 @@ module.exports = {
           'Change the user password to _PARAM0_ and store result in ' +
             '_PARAM2_ (send verification email: _PARAM1_)'
         ),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -842,7 +842,7 @@ module.exports = {
             'Deletes the user account.'
         ),
         _('Delete the user account and store result in _PARAM2_'),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -873,7 +873,7 @@ module.exports = {
             'This is the same as "Delete the user account" but reauthenticates via an external provider.'
         ),
         _('Delete the user account and store result in _PARAM0_'),
-        _('Authentication/User Management/Advanced'),
+        _('Authentication ❯ User Management ❯ Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )

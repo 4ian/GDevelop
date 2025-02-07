@@ -117,7 +117,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the position of the center of _PARAM0_: _PARAM1_ "
                   "_PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
-                _("Position/Center"),
+                _("Position ❯ Center"),
                 "res/actions/position24_black.png",
                 "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
@@ -133,7 +133,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Center X position"),
          _("the X position of the center of rotation"),
          _("the X position of the center"),
-         _("Position/Center"),
+         _("Position ❯ Center"),
          "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -144,7 +144,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Center Y position"),
          _("the Y position of the center of rotation"),
          _("the Y position of the center"),
-         _("Position/Center"),
+         _("Position ❯ Center"),
          "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -155,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                 _("the bounding box (the area encapsulating "
                                   "the object) left position"),
                                 _("the bounding box left position"),
-                                _("Position/Bounding Box"),
+                                _("Position ❯ Bounding Box"),
                                 "res/conditions/bounding-box-left_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -166,7 +166,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Bounding box top position"),
          _("the bounding box (the area encapsulating the object) top position"),
          _("the bounding box top position"),
-         _("Position/Bounding Box"),
+         _("Position ❯ Bounding Box"),
          "res/conditions/bounding-box-top_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -177,7 +177,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                 _("the bounding box (the area encapsulating "
                                   "the object) right position"),
                                 _("the bounding box right position"),
-                                _("Position/Bounding Box"),
+                                _("Position ❯ Bounding Box"),
                                 "res/conditions/bounding-box-right_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -188,7 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                 _("the bounding box (the area encapsulating "
                                   "the object) bottom position"),
                                 _("the bounding box bottom position"),
-                                _("Position/Bounding Box"),
+                                _("Position ❯ Bounding Box"),
                                 "res/conditions/bounding-box-bottom_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -199,7 +199,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                 _("the bounding box (the area encapsulating "
                                   "the object) center X position"),
                                 _("the bounding box center X position"),
-                                _("Position/Bounding Box"),
+                                _("Position ❯ Bounding Box"),
                                 "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -210,7 +210,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                 _("the bounding box (the area encapsulating "
                                   "the object) center Y position"),
                                 _("the bounding box center Y position"),
-                                _("Position/Bounding Box"),
+                                _("Position ❯ Bounding Box"),
                                 "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions());
@@ -574,7 +574,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Check if the specified child of the object "
                      "structure variable exists."),
                    _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
-                   _("Variables/Arrays and structures"),
+                   _("Variables ❯ Arrays and structures"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
       .AddParameter("object", _("Object"))
@@ -587,7 +587,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Remove a child"),
                 _("Remove a child from an object structure variable."),
                 _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Arrays and structures"),
+                _("Variables ❯ Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -601,7 +601,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Remove all the children from the object array or structure "
                   "variable."),
                 _("Clear children from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Arrays and structures"),
+                _("Variables ❯ Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -811,7 +811,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add text variable"),
          _("Adds a text (string) to the end of an object array variable."),
          _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -825,7 +825,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Add variable array value"),
                 _("Adds a number to the end of an object array variable."),
                 _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Arrays and structures"),
+                _("Variables ❯ Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -840,7 +840,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add boolean variable"),
          _("Adds a boolean to the end of an object array variable."),
          _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -856,7 +856,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add existing variable"),
          _("Adds an existing variable to the end of an object array variable."),
          _("Add variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -874,7 +874,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add existing variable"),
          _("Adds an existing variable to the end of an object array variable."),
          _("Add variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -891,7 +891,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add text variable"),
          _("Adds a text (string) to the end of an object array variable."),
          _("Add text _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -905,7 +905,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Add number variable"),
                 _("Adds a number to the end of an object array variable."),
                 _("Add number _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Arrays and structures"),
+                _("Variables ❯ Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -920,7 +920,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Add boolean variable"),
          _("Adds a boolean to the end of an object array variable."),
          _("Add boolean _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -937,7 +937,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
            "variable."),
          _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
            "_PARAM0_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
@@ -951,7 +951,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Number of children"),
          _("Compare the number of children in an object array variable."),
          _("The number of children in the array variable _PARAM1_"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/conditions/var24.png",
          "res/conditions/var.png")
       .AddParameter("object", _("Object"))
@@ -966,7 +966,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("First text child"),
          _("Get the value of the first element of an object array variable, if "
            "it is a text (string) variable."),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
@@ -977,7 +977,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("First number child"),
          _("Get the value of the first element of an object array variable, if "
            "it is a number variable."),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
@@ -988,7 +988,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Last text child"),
          _("Get the value of the last element of an object array variable, if "
            "it is a text (string) variable."),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
@@ -999,7 +999,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Last number child"),
          _("Get the value of the last element of an object array variable, if "
            "it is a number variable."),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
@@ -1408,7 +1408,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "VariableChildCount",
          _("Number of children"),
          _("Number of children in an object array or structure variable"),
-         _("Variables/Arrays and structures"),
+         _("Variables ❯ Arrays and structures"),
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array or structure variable"))

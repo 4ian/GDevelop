@@ -3,9 +3,17 @@ import { type EventsScope } from './EventsScope';
 const gd: libGDevelop = global.gd;
 
 export type InstructionOrExpressionScope = {|
-  extension: gdPlatformExtension,
-  objectMetadata?: ?gdObjectMetadata,
-  behaviorMetadata?: ?gdBehaviorMetadata,
+  extension: {
+    name: string,
+  },
+  objectMetadata?: ?{
+    name: string,
+    isPrivate: boolean,
+  },
+  behaviorMetadata?: ?{
+    name: string,
+    isPrivate: boolean,
+  },
 |};
 
 export type EnumeratedInstructionMetadata = {|
@@ -14,13 +22,19 @@ export type EnumeratedInstructionMetadata = {|
   description: string,
   fullGroupName: string,
   iconFilename: string,
-  metadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
   isRelevantForLayoutEvents: boolean,
   isRelevantForFunctionEvents: boolean,
   isRelevantForAsynchronousFunctionEvents: boolean,
   isRelevantForCustomObjectEvents: boolean,
+
+  // TODO: remove this reference. While it's useful, it's also a risk
+  // to have the editor to keep a reference to a gdInstructionMetadata
+  // that would have been removed/replaced in memory (for example, when
+  // expressions are updated). Instead, we should add fields to store
+  // whatever is needed (in JavaScript, so it's safe).
+  metadata: gdInstructionMetadata,
 |};
 
 export type EnumeratedExpressionMetadata = {|
@@ -93,8 +107,8 @@ const isFunctionVisibleInGivenScope = (
         eventsBasedObject)) &&
     // Check visibility.
     ((!enumeratedInstructionOrExpressionMetadata.isPrivate &&
-      (!behaviorMetadata || !behaviorMetadata.isPrivate()) &&
-      (!objectMetadata || !objectMetadata.isPrivate())) ||
+      (!behaviorMetadata || !behaviorMetadata.isPrivate) &&
+      (!objectMetadata || !objectMetadata.isPrivate)) ||
       // The instruction or expression is marked as "private":
       // we now compare its scope (where it was declared) and the current scope
       // (where we are) to see if we should filter it or not.
@@ -106,17 +120,17 @@ const isFunctionVisibleInGivenScope = (
         gd.PlatformExtension.getBehaviorFullType(
           eventsFunctionsExtension.getName(),
           eventsBasedBehavior.getName()
-        ) === behaviorMetadata.getName()) ||
+        ) === behaviorMetadata.name) ||
       (objectMetadata &&
         eventsBasedObject &&
         eventsFunctionsExtension &&
         gd.PlatformExtension.getObjectFullType(
           eventsFunctionsExtension.getName(),
           eventsBasedObject.getName()
-        ) === objectMetadata.getName()) ||
+        ) === objectMetadata.name) ||
       // When editing the extension...
       (eventsFunctionsExtension &&
-        eventsFunctionsExtension.getName() === extension.getName() &&
+        eventsFunctionsExtension.getName() === extension.name &&
         // ...show public functions of a private behavior
         (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
           // ...show private non-behavior functions

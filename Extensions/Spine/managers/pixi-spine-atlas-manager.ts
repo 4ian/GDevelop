@@ -146,7 +146,7 @@ namespace gdjs {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add({alias: resource.name, src: url, data: { images }});
+      PIXI.Assets.add({ alias: resource.name, src: url, data: { images } });
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
           /**

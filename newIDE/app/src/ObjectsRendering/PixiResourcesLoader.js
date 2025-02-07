@@ -692,7 +692,11 @@ export default class PixiResourcesLoader {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add({ alias: spineTextureAtlasName, src: atlasUrl, data: { images }});
+      PIXI.Assets.add({
+        alias: spineTextureAtlasName,
+        src: atlasUrl,
+        data: { images },
+      });
       PIXI.Assets.load(spineTextureAtlasName).then(
         atlas => {
           // Ideally atlas of type `TextureAtlas` should be passed here.
@@ -811,8 +815,12 @@ export default class PixiResourcesLoader {
               ? 'use-credentials'
               : 'anonymous',
           });
-          PIXI.Assets.add(spineName, spineUrl, {
-            spineAtlas: textureAtlasOrLoadingError.textureAtlas,
+          PIXI.Assets.add({
+            alias: spineName,
+            src: spineUrl,
+            data: {
+              spineAtlas: textureAtlasOrLoadingError.textureAtlas,
+            },
           });
           PIXI.Assets.load(spineName).then(
             jsonData => {

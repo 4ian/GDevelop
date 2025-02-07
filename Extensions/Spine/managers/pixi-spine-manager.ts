@@ -72,7 +72,11 @@ namespace gdjs {
             ? 'use-credentials'
             : 'anonymous',
         });
-        PIXI.Assets.add({ alias: resource.name, src: url, data: { spineAtlas }});
+        PIXI.Assets.add({
+          alias: resource.name,
+          src: url,
+          data: { spineAtlas },
+        });
         const loadedJson = await PIXI.Assets.load(resource.name);
 
         if (loadedJson.spineData) {

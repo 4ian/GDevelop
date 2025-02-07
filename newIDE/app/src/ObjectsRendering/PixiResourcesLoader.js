@@ -696,7 +696,7 @@ export default class PixiResourcesLoader {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
+      PIXI.Assets.add({ alias: spineTextureAtlasName, src: atlasUrl, data: { images }});
       console.log(
         'added',
         spineTextureAtlasName,

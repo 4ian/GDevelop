@@ -23,9 +23,8 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases = new gdjs.ResourceCache<
-      pixi_spine.TextureAtlas
-    >();
+    private _loadedSpineAtlases =
+      new gdjs.ResourceCache<pixi_spine.TextureAtlas>();
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<pixi_spine.TextureAtlas>
     >();
@@ -128,9 +127,8 @@ namespace gdjs {
           resource.name,
           embeddedResourceName
         );
-        imagesMap[
-          embeddedResourceName
-        ] = this._imageManager.getOrLoadPIXITexture(mappedResourceName);
+        imagesMap[embeddedResourceName] =
+          this._imageManager.getOrLoadPIXITexture(mappedResourceName);
 
         return imagesMap;
       }, {});

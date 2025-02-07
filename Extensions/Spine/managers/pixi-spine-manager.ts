@@ -62,9 +62,8 @@ namespace gdjs {
           resource.name,
           embeddedResourcesNames[0]
         );
-        const spineAtlas = await this._spineAtlasManager.getOrLoad(
-          atlasResourceName
-        );
+        const spineAtlas =
+          await this._spineAtlasManager.getOrLoad(atlasResourceName);
         const url = this._resourceLoader.getFullUrl(resource.file);
         PIXI.Assets.setPreferences({
           preferWorkers: false,

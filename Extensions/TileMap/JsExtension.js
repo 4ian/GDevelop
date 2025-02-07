@@ -2103,8 +2103,8 @@ module.exports = {
             localPosition.y < this.height
           );
         };
-        this._placeholderTextPixiObject.interactive = true;
-        this._placeholderImagePixiObject.interactive = true;
+        this._placeholderTextPixiObject.eventMode = 'static';
+        this._placeholderImagePixiObject.eventMode = 'static';
         this._placeholderTextPixiObject.anchor.x = 0.5;
         this._placeholderTextPixiObject.anchor.y = 0.5;
         this._placeholderTextPixiObject.y = 30;

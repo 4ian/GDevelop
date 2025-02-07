@@ -60,8 +60,6 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "pixi-spine": "4.0.4",
-    "pixi.js-legacy": "7.4.2",
     "posthog-js": "^1.57.2",
     "prop-types": "^15.5.10",
     "qr-creator": "^1.0.0",
@@ -95,17 +93,19 @@
     "three": "0.160.0",
     "url-search-params": "^1.0.2",
     "wavesurfer.js": "^7.8.6",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "pixi-spine": "4.0.4",
+    "pixi.js-legacy": "7.4.2"
   },
   "overrides": {
     "pixi-spine": {
-      "@pixi/assets": "7.3.0",
-      "@pixi/core": "7.3.0",
-      "@pixi/display": "7.3.0",
-      "@pixi/graphics": "7.3.0",
-      "@pixi/mesh": "7.3.0",
-      "@pixi/mesh-extras": "7.3.0",
-      "@pixi/sprite": "7.3.0"
+      "@pixi/assets": "7.4.2",
+      "@pixi/core": "7.4.2",
+      "@pixi/display": "7.4.2",
+      "@pixi/graphics": "7.4.2",
+      "@pixi/mesh": "7.4.2",
+      "@pixi/mesh-extras": "7.4.2",
+      "@pixi/sprite": "7.4.2"
     }
   },
   "scripts": {

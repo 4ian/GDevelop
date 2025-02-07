@@ -539,8 +539,6 @@ namespace gdjs {
           threeMaterials.dispose();
           this._loadedThreeMaterials.remove(resourceName);
         }
-
-        // TODO: this._diskTextures, this._rectangleTextures, this._scaledTextures TODO: How clear a specific texture, not all?
       });
     }
   }

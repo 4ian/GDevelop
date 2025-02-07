@@ -23,6 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
+    _requestedClearParam: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -323,6 +324,10 @@ namespace gdjs {
       this.networkId = null;
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;
+
+      if (this._requestedClearParam) {
+        this._runtimeGame.getResourceLoader().disposeScene(this._name);
+      }
     }
 
     /**
@@ -745,10 +750,18 @@ namespace gdjs {
      * thanks to getRequestedChange and getRequestedScene methods.
      * @param change One of RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
      * @param sceneName The name of the new scene to launch, if applicable.
+     * @param clearSceneResources Boolean param for clearing all resources of the previous scene if true
      */
-    requestChange(change: SceneChangeRequest, sceneName?: string) {
+    requestChange(
+      change: SceneChangeRequest,
+      sceneName?: string,
+      clearSceneResources?: boolean
+    ) {
       this._requestedChange = change;
-      if (sceneName) this._requestedScene = sceneName;
+      if (sceneName) {
+        this._requestedScene = sceneName;
+        this._requestedClearParam = !!clearSceneResources;
+      }
     }
 
     /**

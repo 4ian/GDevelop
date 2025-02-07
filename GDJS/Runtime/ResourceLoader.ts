@@ -465,6 +465,29 @@ namespace gdjs {
     }
 
     /**
+     * To be called when the scene is disposed.
+     * Dispose all the scene resources managers.
+     * @param sceneName Scene name where need to clear all resources
+     */
+    disposeScene(sceneName: string): void {
+      if (!sceneName) return;
+
+      const sceneUniqueResourcesByKindMap = this._getSceneUniqueResourcesByKind(
+        sceneName
+      );
+
+      for (const [kindResourceManager, resourceManager] of this
+        ._resourceManagersMap) {
+        const resources = sceneUniqueResourcesByKindMap.get(
+          kindResourceManager
+        );
+        if (resources) {
+          resourceManager.disposeByResourcesList(resources);
+        }
+      }
+    }
+
+    /**
      * Put a given scene at the end of the queue.
      *
      * When the scene that is currently loading in background is done,
@@ -636,6 +659,48 @@ namespace gdjs {
      */
     getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
       return this._spineAtlasManager;
+    }
+
+    /**
+     * Get the Map of unique scene resources by resource type
+     * @param sceneName The scene name
+     * @return Map of unique scene resources by resource type
+     */
+    _getSceneUniqueResourcesByKind(
+      sceneName: string
+    ): Map<ResourceKind, ResourceData[]> {
+      if (!this._sceneResources.has(sceneName)) {
+        return new Map<ResourceKind, ResourceData[]>();
+      }
+
+      const resourceUsage: Map<string, number> = new Map();
+      for (const resources of this._sceneResources.values()) {
+        resources.forEach((resourceName) => {
+          resourceUsage.set(
+            resourceName,
+            (resourceUsage.get(resourceName) || 0) + 1
+          );
+        });
+      }
+
+      const sceneResourceNames = this._sceneResources.get(sceneName)!;
+      const uniqueResourceNames = sceneResourceNames.filter(
+        (resourceName) => resourceUsage.get(resourceName) === 1
+      );
+
+      const result = new Map<ResourceKind, ResourceData[]>();
+      uniqueResourceNames.forEach((resourceName) => {
+        const resourceData = this._resources.get(resourceName);
+        if (resourceData) {
+          const kind = resourceData.kind;
+          if (!result.has(kind)) {
+            result.set(kind, []);
+          }
+          result.get(kind)!.push(resourceData);
+        }
+      });
+
+      return result;
     }
   }
 

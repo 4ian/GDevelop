@@ -357,6 +357,14 @@ namespace gdjs {
     }
 
     /**
+     * Get the gdjs.ResourceLoader of the RuntimeGame.
+     * @return The resource loader.
+     */
+    getResourceLoader(): gdjs.ResourceLoader {
+      return this._resourcesLoader;
+    }
+
+    /**
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */

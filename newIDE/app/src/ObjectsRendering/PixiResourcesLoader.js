@@ -622,8 +622,6 @@ export default class PixiResourcesLoader {
     const promise = spineAtlasPromises[spineTextureAtlasName];
     if (promise) return promise;
 
-    console.log('in _getSpineTextureAtlas', spineTextureAtlasName);
-
     if (!spineTextureAtlasName) {
       return {
         textureAtlas: null,
@@ -681,7 +679,6 @@ export default class PixiResourcesLoader {
     );
 
     return (spineAtlasPromises[spineTextureAtlasName] = new Promise(resolve => {
-      console.log('in _getSpineTextureAtlas promise', spineTextureAtlasName);
       const atlasUrl = ResourcesLoader.getResourceFullUrl(
         project,
         spineTextureAtlasName,
@@ -689,7 +686,6 @@ export default class PixiResourcesLoader {
           isResourceForPixi: true,
         }
       );
-      console.log(atlasUrl);
       PIXI.Assets.setPreferences({
         preferWorkers: false,
         crossOrigin: checkIfCredentialsRequired(atlasUrl)
@@ -697,17 +693,8 @@ export default class PixiResourcesLoader {
           : 'anonymous',
       });
       PIXI.Assets.add({ alias: spineTextureAtlasName, src: atlasUrl, data: { images }});
-      console.log(
-        'added',
-        spineTextureAtlasName,
-        resource,
-        embeddedResourcesMapping
-      );
       PIXI.Assets.load(spineTextureAtlasName).then(
         atlas => {
-          // TODO: FIX.
-          // atlas returned here is null for some reason even if the resource exists.
-          console.log('loaded atlas', atlas);
           // Ideally atlas of type `TextureAtlas` should be passed here.
           // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
           // and search the other mentions to this issue in the codebase).
@@ -800,8 +787,6 @@ export default class PixiResourcesLoader {
       };
     }
 
-    console.log(spineName);
-
     return (spineDataPromises[spineName] = new Promise(resolve => {
       this._getSpineTextureAtlas(project, spineTextureAtlasName).then(
         textureAtlasOrLoadingError => {
@@ -812,8 +797,6 @@ export default class PixiResourcesLoader {
               loadingErrorReason: textureAtlasOrLoadingError.loadingErrorReason,
             });
           }
-
-          console.log(textureAtlasOrLoadingError);
 
           const spineUrl = ResourcesLoader.getResourceFullUrl(
             project,

@@ -341,7 +341,7 @@ module.exports = {
         _('Leave current lobby'),
         _('Marks the player as having left the current lobby.'),
         _('Leave the current lobby'),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg',
         'JsPlatform/Extensions/steam.svg'
       )
@@ -357,7 +357,7 @@ module.exports = {
           'Opens the steam invitation dialogue to let the player invite their Steam friends to the current lobby. Only works if the player is currently in a lobby.'
         ),
         _('Open lobby invitation dialogue'),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg',
         'JsPlatform/Extensions/steam.svg'
       )
@@ -377,7 +377,7 @@ module.exports = {
         _(
           'Set current lobby attribute _PARAM0_ to _PARAM1_ (store result in _PARAM2_)'
         ),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg',
         'JsPlatform/Extensions/steam.svg'
       )
@@ -402,7 +402,7 @@ module.exports = {
         _('Set the lobby joinability'),
         _('Sets whether other users can join the current lobby or not.'),
         _('Make current lobby joinable: _PARAM0_ (store result in _PARAM1_)'),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg',
         'JsPlatform/Extensions/steam.svg'
       )
@@ -421,7 +421,7 @@ module.exports = {
         _("Get the lobby's members"),
         _('Gets the Steam ID of all players in the current lobby.'),
         _('Store the array of all players in _PARAM0_'),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg',
         'JsPlatform/Extensions/steam.svg'
       )
@@ -463,7 +463,7 @@ module.exports = {
         _(
           'The ID of the current lobby, useful for letting other players join it.'
         ),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
@@ -475,7 +475,7 @@ module.exports = {
         'CurrentLobbyAttribute',
         _('Attribute of the lobby'),
         _("Obtains the value of one of the current lobby's attributes."),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
@@ -493,7 +493,7 @@ module.exports = {
         'CurrentLobbyMemberCount',
         _('Member count of the lobby'),
         _("Obtains the current lobby's member count."),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
@@ -505,7 +505,7 @@ module.exports = {
         'CurrentLobbyMemberLimit',
         _('Member limit of the lobby'),
         _("Obtains the current lobby's maximum member limit."),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
@@ -517,7 +517,7 @@ module.exports = {
         'CurrentLobbyOwner',
         _('Owner of the lobby'),
         _('Obtains the Steam ID of the user that owns the current lobby.'),
-        _('Matchmaking/Current lobby'),
+        _('Matchmaking ❯ Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
@@ -1200,7 +1200,7 @@ module.exports = {
         _(
           'The amount of data that has been downloaded by Steam for a currrently downloading item so far.'
         ),
-        _('Workshop/Download'),
+        _('Workshop ❯ Download'),
         'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
@@ -1220,7 +1220,7 @@ module.exports = {
         _(
           'The amount of data that needs to be downloaded in total by Steam for a currrently downloading item.'
         ),
-        _('Workshop/Download'),
+        _('Workshop ❯ Download'),
         'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(

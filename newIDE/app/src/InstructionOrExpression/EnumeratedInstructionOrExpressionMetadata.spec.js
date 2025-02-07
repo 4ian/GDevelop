@@ -26,7 +26,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
       expect.not.arrayContaining([
         expect.objectContaining({
           displayedName: 'Set number return value',
-          fullGroupName: 'Advanced/Event functions',
+          fullGroupName: 'Advanced ❯ Event functions',
           type: 'SetReturnNumber',
         }),
       ])
@@ -55,7 +55,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Set number return value',
-          fullGroupName: 'Advanced/Event functions',
+          fullGroupName: 'Advanced ❯ Event functions',
           type: 'SetReturnNumber',
         }),
       ])

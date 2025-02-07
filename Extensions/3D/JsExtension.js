@@ -69,7 +69,7 @@ module.exports = {
           _('Center Z position'),
           _('the Z position of the center of rotation'),
           _('the Z position of the center'),
-          _('Position/Center'),
+          _('Position ❯ Center'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)

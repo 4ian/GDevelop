@@ -876,6 +876,25 @@ namespace gdjs {
     dispose(): void {
       this.unloadAll();
     }
+
+    /**
+     * To be called when the scene is disposed.
+     * Unloads all audio from resourcesList from memory, clear Howl cache and stop all audio.
+     * @param resourcesList The list of specific resources
+     */
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const musicRes = this._loadedMusics.get(resourceData);
+        if (musicRes) {
+          this.unloadAudio(resourceData.name, true);
+        }
+
+        const soundRes = this._loadedSounds.get(resourceData);
+        if (soundRes) {
+          this.unloadAudio(resourceData.name, false);
+        }
+      });
+    }
   }
 
   // Register the class to let the engine use it.

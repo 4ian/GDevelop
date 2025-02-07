@@ -63,10 +63,14 @@ namespace gdjs {
           this.pop();
         } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
-          this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
-          this.replace(currentScene.getRequestedScene(), true);
+        } else if (
+          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
+          request === gdjs.SceneChangeRequest.CLEAR_SCENES
+        ) {
+          this.replace(
+            currentScene.getRequestedScene(),
+            request === gdjs.SceneChangeRequest.CLEAR_SCENES
+          );
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }

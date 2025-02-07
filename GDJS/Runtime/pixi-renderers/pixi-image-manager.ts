@@ -515,6 +515,36 @@ namespace gdjs {
       }
       this._scaledTextures.clear();
     }
+
+    /**
+     * To be called when the scene is disposed.
+     * Clear caches of loaded textures and materials.
+     * @param resourcesList The list of specific resources
+     */
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const resourceName = resourceData.name;
+        const resource = this._loadedTextures.get(resourceData);
+        if (resource) {
+          resource.destroy(true);
+          this._loadedTextures.delete(resourceData);
+        }
+
+        const threeTexture = this._loadedThreeTextures.get(resourceName);
+        if (threeTexture) {
+          threeTexture.dispose();
+          this._loadedThreeTextures.remove(resourceName);
+        }
+
+        const threeMaterials = this._loadedThreeMaterials.get(resourceName);
+        if (threeMaterials) {
+          threeMaterials.dispose();
+          this._loadedThreeMaterials.remove(resourceName);
+        }
+
+        // TODO: this._diskTextures, this._rectangleTextures, this._scaledTextures TODO: How clear a specific texture not all
+      });
+    }
   }
 
   //Register the class to let the engine use it.

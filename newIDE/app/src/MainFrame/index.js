@@ -2622,7 +2622,13 @@ const MainFrame = (props: Props) => {
               oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {
-            return; // Save as was cancelled.
+            // Save as was cancelled.
+            // Restore former storage provider. This is useful in case a user
+            // cancels the "save as" operation and then saves again. If the
+            // storage provider was kept selected, it would directly save the project
+            // if it's possible (LocalFile storage provider allows it).
+            getStorageProviderOperations(oldStorageProvider);
+            return;
           }
           newSaveAsLocation = saveAsLocation;
           newSaveAsOptions = saveAsOptions;

@@ -341,7 +341,7 @@ namespace gdjs {
      */
     _currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
-    private _destroyedDuringFrameLogic: boolean;
+    private _destroyedDuringFrameLogic: boolean = false;
     _body: Jolt.Body | null = null;
     /**
      * When set to `true` the body will be recreated before the next physics step.
@@ -402,7 +402,6 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this._destroyedDuringFrameLogic = false;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.name
@@ -614,11 +613,7 @@ namespace gdjs {
 
     onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
-      if (this._body !== null) {
-        this._sharedData.bodyInterface.RemoveBody(this._body.GetID());
-        this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
-        this._body = null;
-      }
+      this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
@@ -794,6 +789,10 @@ namespace gdjs {
       if (!this.activated() || this._destroyedDuringFrameLogic) return false;
 
       this._body = this.bodyUpdater.createAndAddBody();
+      if (!this._body) {
+        // It can only happen when the character behavior is destroyed.
+        return false;
+      }
       this._body.gdjsAssociatedBehavior = this;
 
       this._objectOldWidth = this.owner3D.getWidth();
@@ -1762,10 +1761,11 @@ namespace gdjs {
     }
 
     export interface BodyUpdater {
-      createAndAddBody(): Jolt.Body;
+      createAndAddBody(): Jolt.Body | null;
       updateObjectFromBody(): void;
       updateBodyFromObject(): void;
       recreateShape(): void;
+      destroyBody(): void;
     }
 
     export class DefaultBodyUpdater {
@@ -1775,7 +1775,7 @@ namespace gdjs {
         this.behavior = behavior;
       }
 
-      createAndAddBody(): Jolt.Body {
+      createAndAddBody(): Jolt.Body | null {
         const { behavior } = this;
         const { _sharedData } = behavior;
 
@@ -1867,6 +1867,16 @@ namespace gdjs {
           true,
           Jolt.EActivation_Activate
         );
+      }
+
+      destroyBody() {
+        const { behavior } = this;
+        const { _sharedData } = behavior;
+        if (behavior._body !== null) {
+          _sharedData.bodyInterface.RemoveBody(behavior._body.GetID());
+          _sharedData.bodyInterface.DestroyBody(behavior._body.GetID());
+          behavior._body = null;
+        }
       }
     }
 

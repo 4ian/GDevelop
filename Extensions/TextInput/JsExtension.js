@@ -641,8 +641,8 @@ module.exports = {
         ),
         _('_PARAM0_ value was submitted'),
         '',
-        'res/conditions/surObject24.png',
-        'res/conditions/surObject.png'
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .getCodeExtraInformation()

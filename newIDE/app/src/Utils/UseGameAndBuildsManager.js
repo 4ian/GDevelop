@@ -19,6 +19,7 @@ import {
   findLeaderboardsToReplaceInProject,
   replaceLeaderboardsInProject,
 } from '../Leaderboard/UseLeaderboardReplacer';
+import { useProjectsListFor } from '../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 
 export const getDefaultRegisterGameProperties = ({
   projectId,
@@ -69,6 +70,8 @@ export const useGameManager = ({
   } = useMultiplayerLobbyConfigurator();
 
   const [game, setGame] = React.useState<?Game>(null);
+  const projectId = project ? project.getProjectUuid() : null;
+  const projectFiles = useProjectsListFor(projectId);
   const [
     gameAvailabilityError,
     setGameAvailabilityError,
@@ -154,6 +157,7 @@ export const useGameManager = ({
           error
         );
         if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+          const hasProjectFiles = projectFiles.length > 0;
           // If the game is not registered, register it before launching the export.
           await registerGame(
             getAuthorizationHeader,
@@ -162,9 +166,7 @@ export const useGameManager = ({
               projectId: gameId,
               projectName: project.getName(),
               projectAuthor: project.getAuthor(),
-              // Assume a project going through the export process is not saved yet.
-              // It will be marked as saved when the user saves it next anyway.
-              savedStatus: 'draft',
+              savedStatus: hasProjectFiles ? 'saved' : 'draft',
             })
           );
 
@@ -209,6 +211,7 @@ export const useGameManager = ({
       configureMultiplayerLobbiesIfNeeded,
       authenticatedUser,
       onGameRegistered,
+      projectFiles,
     ]
   );
 

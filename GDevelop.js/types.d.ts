@@ -1985,6 +1985,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static findAllLeaderboardIds(project: Project): SetString;
 }
 
+export class ObjectTools extends EmscriptenObject {
+  static isBehaviorCompatibleWithObject(platform: Platform, objectType: string, behaviorType: string): boolean;
+}
+
 export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
   static isDependentFromEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, dependency: EventsBasedObject): boolean;
 }
@@ -2865,6 +2869,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
   useWindowMessageDebuggerClient(): PreviewExportOptions;
   useMinimalDebuggerClient(): PreviewExportOptions;
+  setInAppTutorialMessageInPreview(message: string, position: string): PreviewExportOptions;
   setLayoutName(layoutName: string): PreviewExportOptions;
   setFallbackAuthor(id: string, username: string): PreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): PreviewExportOptions;

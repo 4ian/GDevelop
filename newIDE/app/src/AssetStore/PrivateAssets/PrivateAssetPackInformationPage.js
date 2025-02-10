@@ -90,22 +90,22 @@ const sortedContentType: PrivateAssetPackAssetType[] = [
   'TileMap::SimpleTileMap',
   'ParticleSystem::ParticleEmitter',
   'font',
+  'bitmapFont',
   'audio',
-  'partial',
 ];
 
 const contentTypeToMessageDescriptor: {
   [PrivateAssetPackAssetType]: MessageDescriptor,
 } = {
-  sprite: t`Sprites`,
-  '9patch': t`Panel sprites`,
-  tiled: t`Tiled sprites`,
+  sprite: t`sprites`,
+  '9patch': t`panel sprites`,
+  tiled: t`tiled sprites`,
   'Scene3D::Model3DObject': t`3D models`,
-  'TileMap::SimpleTileMap': t`Tilemaps`,
-  'ParticleSystem::ParticleEmitter': t`Particle emitters`,
-  font: t`Fonts`,
-  audio: t`Audios`,
-  partial: t`Other`,
+  'TileMap::SimpleTileMap': t`tile maps`,
+  'ParticleSystem::ParticleEmitter': t`particle emitters`,
+  font: t`fonts`,
+  bitmapFont: t`bitmap fonts`,
+  audio: t`audios`,
 };
 
 const styles = {
@@ -521,6 +521,23 @@ const PrivateAssetPackInformationPage = ({
     { subscription, privateAssetPackListingData, isAlreadyReceived }
   );
 
+  const smartObjectsCount = React.useMemo(
+    () => {
+      if (!assetPack) {
+        return 0;
+      }
+      let smartObjectsCount = 0;
+      for (const type in assetPack.content) {
+        const assetCount = assetPack.content[type];
+        if (!sortedContentType.includes(type)) {
+          smartObjectsCount += assetCount;
+        }
+      }
+      return smartObjectsCount;
+    },
+    [assetPack]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -714,6 +731,13 @@ const PrivateAssetPackInformationPage = ({
                     }
                     return null;
                   })}
+                  {smartObjectsCount > 0 ? (
+                    <li>
+                      <Text displayInlineAsSpan noMargin>
+                        <Trans>{smartObjectsCount} smart objects</Trans>
+                      </Text>
+                    </li>
+                  ) : null}
                 </Column>
                 {bundlesContainingPackTiles &&
                 bundlesContainingPackTiles.length ? (

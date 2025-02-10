@@ -1945,12 +1945,12 @@ namespace gdjs {
     };
 
     const heartbeatMessageNamePrefix = '#heartbeat';
-    const heartbeastMessageRegex = /#heartbeat#(.+)/;
+    const heartbeatMessageRegex = /#heartbeat#(.+)/;
     const createHeartbeatMessage = (): {
       messageName: string;
       messageData: any;
     } => {
-      // If we create the heartbeat meassage, we are the host,
+      // If we create the heartbeat message, we are the host.
       // Ensure our player number is correctly set when the first heartbeat is sent.
       _playersInfo[gdjs.multiplayer.getCurrentPlayerNumber()] = {
         ping: 0, // we are the host, so we don't need to compute the ping.
@@ -2028,7 +2028,7 @@ namespace gdjs {
         messages.forEach((message) => {
           const messageData = message.getData();
           const messageSender = message.getSender();
-          const matches = heartbeastMessageRegex.exec(messageName);
+          const matches = heartbeatMessageRegex.exec(messageName);
           if (!matches) {
             return;
           }

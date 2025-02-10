@@ -54,6 +54,7 @@ namespace gdjs {
      */
     _sharedData: gdjs.Physics3DSharedData;
     collisionChecker: gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker;
+    private _destroyedDuringFrameLogic: boolean = false;
 
     // TODO Should there be angle were the character can climb but will slip?
     _slopeMaxAngle: float;
@@ -112,6 +113,9 @@ namespace gdjs {
      */
     private static readonly epsilon = 2 ** -20;
 
+    /** Handle collisions between characters that can push each other. */
+    charactersManager: gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager;
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -126,6 +130,9 @@ namespace gdjs {
       );
       this.collisionChecker = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker(
         this
+      );
+      this.charactersManager = gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager.getManager(
+        instanceContainer
       );
 
       this._slopeMaxAngle = 0;
@@ -158,7 +165,10 @@ namespace gdjs {
       return tempVec3;
     }
 
-    getPhysics3D(): Physics3D {
+    getPhysics3D(): Physics3D | null {
+      if (this._destroyedDuringFrameLogic) {
+        return null;
+      }
       if (this._physics3D) {
         return this._physics3D;
       }
@@ -318,7 +328,12 @@ namespace gdjs {
     }
 
     getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
-      const { behavior } = this.getPhysics3D();
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        result.Set(0, 0, 0);
+        return result;
+      }
+      const { behavior } = physics3D;
       // The character origin is at its feet:
       // - the center is used for X and Y because Box3D origin is at the top-left corner
       // - the origin is used for Z because, when the character is made smaller,
@@ -348,7 +363,11 @@ namespace gdjs {
     }
 
     moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
-      const { behavior } = this.getPhysics3D();
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        return;
+      }
+      const { behavior } = physics3D;
       this.owner3D.setCenterXInScene(
         physicsPosition.GetX() * this._sharedData.worldScale
       );
@@ -381,7 +400,45 @@ namespace gdjs {
     onActivate() {}
 
     onDestroy() {
+      this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+      this._destroyCharacter();
+    }
+
+    /**
+     * Remove the character and its body from the physics engine.
+     * This method is called when:
+     * - The Physics3D behavior is deactivated
+     * - The object is destroyed
+     *
+     * Only deactivating the character behavior won't destroy the character.
+     * Indeed, deactivated characters don't move as characters but still have collisions.
+     */
+    _destroyCharacter() {
+      if (this.character) {
+        if (this._canBePushed) {
+          this.charactersManager.removeCharacter(this.character);
+        }
+        // The body is destroyed with the character.
+        Jolt.destroy(this.character);
+        this.character = null;
+        if (this._physics3D) {
+          this._physics3D.behavior._body = null;
+          const {
+            extendedUpdateSettings,
+            broadPhaseLayerFilter,
+            objectLayerFilter,
+            bodyFilter,
+            shapeFilter,
+          } = this._physics3D;
+          Jolt.destroy(extendedUpdateSettings);
+          Jolt.destroy(broadPhaseLayerFilter);
+          Jolt.destroy(objectLayerFilter);
+          Jolt.destroy(bodyFilter);
+          Jolt.destroy(shapeFilter);
+          this._physics3D = null;
+        }
+      }
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -390,6 +447,13 @@ namespace gdjs {
     }
 
     doBeforePhysicsStep(timeDelta: float): void {
+      if (!this.activated()) {
+        return;
+      }
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        return;
+      }
       const {
         behavior,
         extendedUpdateSettings,
@@ -397,7 +461,7 @@ namespace gdjs {
         objectLayerFilter,
         bodyFilter,
         shapeFilter,
-      } = this.getPhysics3D();
+      } = physics3D;
       if (!this.character) {
         return;
       }
@@ -829,8 +893,13 @@ namespace gdjs {
     }
 
     setStairHeightMax(stairHeightMax: float): void {
-      const { extendedUpdateSettings } = this.getPhysics3D();
       this._stairHeightMax = stairHeightMax;
+
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        return;
+      }
+      const { extendedUpdateSettings } = physics3D;
       const walkStairsStepUp = stairHeightMax * this._sharedData.worldInvScale;
       extendedUpdateSettings.mWalkStairsStepUp = this.getVec3(
         0,
@@ -1355,18 +1424,74 @@ namespace gdjs {
   );
 
   export namespace PhysicsCharacter3DRuntimeBehavior {
+    /**
+     * Handle collisions between characters that can push each other.
+     */
+    export class CharactersManager {
+      /** Handle collisions between characters that can push each other. */
+      private characterVsCharacterCollision: Jolt.CharacterVsCharacterCollisionSimple;
+
+      constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
+        this.characterVsCharacterCollision = new Jolt.CharacterVsCharacterCollisionSimple();
+      }
+
+      /**
+       * Get the characters manager of an instance container.
+       */
+      static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
+        // @ts-ignore
+        if (!instanceContainer.charactersManager) {
+          //Create the shared manager if necessary.
+          // @ts-ignore
+          instanceContainer.charactersManager = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager(
+            instanceContainer
+          );
+        }
+        // @ts-ignore
+        return instanceContainer.charactersManager;
+      }
+
+      /**
+       * Add a character to the list of characters that can push each other.
+       */
+      addCharacter(character: Jolt.CharacterVirtual) {
+        this.characterVsCharacterCollision.Add(character);
+        character.SetCharacterVsCharacterCollision(
+          this.characterVsCharacterCollision
+        );
+      }
+
+      /**
+       * Remove a character from the list of characters that can push each other.
+       */
+      removeCharacter(character: Jolt.CharacterVirtual) {
+        this.characterVsCharacterCollision.Remove(character);
+      }
+
+      destroy() {
+        Jolt.destroy(this.characterVsCharacterCollision);
+      }
+    }
+    gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
+      gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager.getManager(
+        runtimeScene
+      ).destroy();
+    });
+
     export class CharacterBodyUpdater {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
-      /** Handle collisions between characters that can push each other. */
-      static characterVsCharacterCollision: Jolt.CharacterVsCharacterCollisionSimple | null = null;
 
       constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
         this.characterBehavior = characterBehavior;
       }
 
-      createAndAddBody(): Jolt.Body {
+      createAndAddBody(): Jolt.Body | null {
+        const physics3D = this.characterBehavior.getPhysics3D();
+        if (!physics3D) {
+          return null;
+        }
+        const { behavior } = physics3D;
         const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
-        const { behavior } = this.characterBehavior.getPhysics3D();
 
         const shape = behavior.createShape();
 
@@ -1420,16 +1545,7 @@ namespace gdjs {
 
         if (this.characterBehavior._canBePushed) {
           // CharacterVsCharacterCollisionSimple handle characters pushing each other.
-          let characterVsCharacterCollision =
-            CharacterBodyUpdater.characterVsCharacterCollision;
-          if (!characterVsCharacterCollision) {
-            characterVsCharacterCollision = new Jolt.CharacterVsCharacterCollisionSimple();
-            CharacterBodyUpdater.characterVsCharacterCollision = characterVsCharacterCollision;
-          }
-          characterVsCharacterCollision.Add(character);
-          character.SetCharacterVsCharacterCollision(
-            characterVsCharacterCollision
-          );
+          this.characterBehavior.charactersManager.addCharacter(character);
 
           const characterContactListener = new Jolt.CharacterContactListenerJS();
           characterContactListener.OnAdjustBodyVelocity = (
@@ -1537,7 +1653,11 @@ namespace gdjs {
       }
 
       updateBodyFromObject() {
-        const { behavior } = this.characterBehavior.getPhysics3D();
+        const physics3D = this.characterBehavior.getPhysics3D();
+        if (!physics3D) {
+          return;
+        }
+        const { behavior } = physics3D;
         const { character, owner3D, _sharedData } = this.characterBehavior;
         if (!character) {
           return;
@@ -1575,13 +1695,17 @@ namespace gdjs {
       }
 
       recreateShape() {
+        const physics3D = this.characterBehavior.getPhysics3D();
+        if (!physics3D) {
+          return;
+        }
         const {
           behavior,
           broadPhaseLayerFilter,
           objectLayerFilter,
           bodyFilter,
           shapeFilter,
-        } = this.characterBehavior.getPhysics3D();
+        } = physics3D;
         const { character, _sharedData } = this.characterBehavior;
         if (!character) {
           return;
@@ -1604,6 +1728,10 @@ namespace gdjs {
 
         // shapeHalfDepth may have changed, update the character position accordingly.
         this.updateCharacterPosition();
+      }
+
+      destroyBody() {
+        this.characterBehavior._destroyCharacter();
       }
     }
 

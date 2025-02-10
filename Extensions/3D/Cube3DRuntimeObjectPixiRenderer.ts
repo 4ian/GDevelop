@@ -74,15 +74,13 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO (3D) - feature: support color instead of texture?
-      const materials = [
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[1]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[2]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[3]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[4]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[5]),
-      ];
+
+      const materials: THREE.Material[] = new Array(6)
+        .fill(0)
+        .map((_, index) =>
+          getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
+        );
+
       const boxMesh = new THREE.Mesh(geometry, materials);
 
       super(runtimeObject, instanceContainer, boxMesh);
@@ -92,6 +90,27 @@ namespace gdjs {
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
+      this.updateTint();
+    }
+    updateTint() {
+      const tints: number[] = [];
+
+      const normalizedTint = gdjs
+        .hexNumberToRGBArray(this._cube3DRuntimeObject._tint)
+        .map((component) => component / 255);
+
+      for (
+        let i = 0;
+        i < this._boxMesh.geometry.attributes.position.count;
+        i++
+      ) {
+        tints.push(...normalizedTint);
+      }
+
+      this._boxMesh.geometry.setAttribute(
+        'color',
+        new THREE.BufferAttribute(new Float32Array(tints), 3)
+      );
     }
 
     updateFace(faceIndex: integer) {

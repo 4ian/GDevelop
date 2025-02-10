@@ -33,6 +33,128 @@ module.exports = {
 
     extension
       .addAction(
+        'QuickJoinLobby',
+        _('Join the next available lobby'),
+        _(
+          'Join the next available lobby. The player will join the game instantly if this is possible.'
+        ),
+        _('Join the next available lobby'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'yesorno',
+        _('Display loader while searching for a lobby.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _('Display game lobbies if no lobby can be joined directly.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.authenticateAndQuickJoinLobby');
+
+    extension
+      .addCondition(
+        'IsSearchingForLobbyToJoin',
+        _('Is searching for a lobby to join'),
+        _('Is searching for a lobby to join.'),
+        _('Is searching for a lobby to join'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.isSearchingForLobbyToJoin');
+
+    extension
+      .addCondition(
+        'QuickJoinJustFailed',
+        _('Quick join failed to join a lobby'),
+        _('Quick join failed to join a lobby.'),
+        _('Quick join failed to join a lobby'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.hasQuickJoinJustFailed');
+
+    extension
+      .addStrExpression(
+        'QuickJoinFailureReason',
+        _('Quick join action failure reason'),
+        _(
+          "Returns the reason why the Quick join action failed. It can either be 'FULL' if all lobbies were occupied, 'NOT_ENOUGH_PLAYERS' if the lobby's configuration requires more than 1 player to start the game and no other players were available. It can also take the value 'UNKNOWN'."
+        ),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getQuickJoinFailureReason');
+
+    extension
+      .addAction(
         'OpenGameLobbies',
         _('Open Game Lobbies'),
         _(

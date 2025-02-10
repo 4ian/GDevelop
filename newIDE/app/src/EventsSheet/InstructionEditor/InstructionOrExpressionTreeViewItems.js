@@ -192,9 +192,10 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
     return {
       instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
       object: this.instructionMetadata.scope.objectMetadata
-        ? this.instructionMetadata.scope.objectMetadata
-            .getName()
-            .replace(/:/g, '-') + '-'
+        ? this.instructionMetadata.scope.objectMetadata.name.replace(
+            /:/g,
+            '-'
+          ) + '-'
         : undefined,
     };
   }

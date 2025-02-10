@@ -17,6 +17,17 @@ namespace gdjs {
     }[];
   };
 
+  type Lobby = {
+    id: string;
+    status: 'waiting' | 'starting' | 'playing' | 'migrating' | 'migrated';
+  };
+
+  type QuickJoinLobbyResponse =
+    | { status: 'join-game'; lobby: Lobby }
+    | { status: 'join-lobby'; lobby: Lobby }
+    | { status: 'not-enough-players' }
+    | { status: 'full' };
+
   const getTimeNow =
     window.performance && typeof window.performance.now === 'function'
       ? window.performance.now.bind(window.performance)
@@ -90,6 +101,12 @@ namespace gdjs {
     let _hasLobbyGameJustStarted = false;
     export let _isLobbyGameRunning = false;
     let _hasLobbyGameJustEnded = false;
+    let _quickJoinLobbyJustFailed = false;
+    let _quickJoinLobbyFailureReason:
+      | 'FULL'
+      | 'NOT_ENOUGH_PLAYERS'
+      | 'UNKNOWN'
+      | null = null;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
 
@@ -98,6 +115,13 @@ namespace gdjs {
     let _lobbyChangeHostRequestInitiatedAt: number | null = null;
     let _isChangingHost = false;
     let _lobbyNewHostPickedAt: number | null = null;
+    let _actionAfterJoiningLobby:
+      | 'OPEN_LOBBY_PAGE'
+      | 'JOIN_GAME'
+      | 'START_GAME'
+      | null = null;
+    let _isQuickJoiningOrStartingAGame = false;
+    let _lastQuickJoinRequestDoneAt: number | null = null;
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -206,6 +230,7 @@ namespace gdjs {
 
       _hasLobbyGameJustStarted = false;
       _hasLobbyGameJustEnded = false;
+      _quickJoinLobbyJustFailed = false;
     });
 
     const getLobbiesWindowUrl = ({
@@ -253,6 +278,11 @@ namespace gdjs {
       if (playerToken) {
         url.searchParams.set('playerToken', playerToken);
       }
+      const platformInfo = runtimeGame.getPlatformInfo();
+      url.searchParams.set(
+        'scm',
+        platformInfo.supportedCompressionMethods.join(',')
+      );
       // Increment this value when a new feature is introduced so we can
       // adapt the interface of the lobbies.
       url.searchParams.set('multiplayerVersion', '2');
@@ -592,8 +622,16 @@ namespace gdjs {
                 logger.error('Malformed message received');
                 return;
               }
-
-              handlePeerIdEvent({ peerId, compressionMethod });
+              const retryData = { times: 2, delayInMs: 500 };
+              try {
+                gdjs.evtTools.network.retryIfFailed(retryData, async () => {
+                  handlePeerIdEvent({ peerId, compressionMethod });
+                });
+              } catch (error) {
+                logger.error(
+                  `Handling peerId message from websocket failed (after {${retryData.times}} times with a delay of ${retryData.delayInMs}ms). Not trying anymore.`
+                );
+              }
               break;
             }
           }
@@ -632,6 +670,17 @@ namespace gdjs {
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
       };
+    };
+
+    const onPeerUnavailable = (runtimeScene: gdjs.RuntimeScene) => {
+      gdjs.multiplayerComponents.displayConnectionErrorNotification(
+        runtimeScene
+      );
+      handleLeaveLobbyEvent();
+      _actionAfterJoiningLobby = null;
+      _quickJoinLobbyFailureReason = null;
+      if (_isQuickJoiningOrStartingAGame)
+        onLobbyQuickJoinFinished(runtimeScene);
     };
 
     const handleConnectionIdReceived = function ({
@@ -679,16 +728,41 @@ namespace gdjs {
           brokerServerConfig.port,
           brokerServerConfig.path,
           brokerServerConfig.key,
-          brokerServerConfig.secure
+          brokerServerConfig.secure,
+          { onPeerUnavailable: () => onPeerUnavailable(runtimeScene) }
         );
       } else {
-        gdjs.multiplayerPeerJsHelper.useDefaultBrokerServer();
+        gdjs.multiplayerPeerJsHelper.useDefaultBrokerServer({
+          onPeerUnavailable: () => onPeerUnavailable(runtimeScene),
+        });
       }
 
       _connectionId = connectionId;
       playerNumber = positionInLobby;
       // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
       _lobbyId = lobbyId;
+
+      if (_actionAfterJoiningLobby === 'OPEN_LOBBY_PAGE') {
+        openLobbiesWindow(runtimeScene);
+        onLobbyQuickJoinFinished(runtimeScene);
+        return;
+      } else if (_actionAfterJoiningLobby === 'JOIN_GAME') {
+        handleJoinGameMessage();
+        return;
+      } else if (_actionAfterJoiningLobby === 'START_GAME') {
+        const retryData = { times: 2, delayInMs: 500 };
+        try {
+          gdjs.evtTools.network.retryIfFailed(retryData, async () => {
+            sendPeerId();
+            handleStartGameMessage();
+          });
+        } catch (error) {
+          logger.error(
+            `Sending of peerId message from websocket failed (after {${retryData.times}} times with a delay of ${retryData.delayInMs}ms). Not trying anymore.`
+          );
+        }
+        return;
+      }
 
       // Then we inform the lobbies window that the player has joined.
       const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
@@ -818,6 +892,8 @@ namespace gdjs {
           }),
           dev: isUsingGDevelopDevelopmentEnvironment,
         });
+        // TODO: if 404, there's chance that it means the lobby is now closed. Display a message
+        // to the player?
       } catch (error) {
         logger.error('Error while sending heartbeat, retrying:', error);
         try {
@@ -873,6 +949,8 @@ namespace gdjs {
       logger.info('Lobby game has started.');
       // In case we're joining an existing lobby, read the saved messages to catch-up with the game state.
       gdjs.multiplayerMessageManager.handleSavedUpdateMessages(runtimeScene);
+      if (_isQuickJoiningOrStartingAGame)
+        onLobbyQuickJoinFinished(runtimeScene);
       _isReadyToSendOrReceiveGameUpdateMessages = true;
       _hasLobbyGameJustStarted = true;
       _isLobbyGameRunning = true;
@@ -926,7 +1004,7 @@ namespace gdjs {
         logger.error(
           'No peerId found, the player does not seem connected to the broker server.'
         );
-        return;
+        throw new Error('Missing player peerId.');
       }
 
       if (currentPeerId === peerId) {
@@ -990,10 +1068,15 @@ namespace gdjs {
     const handleJoinGameMessage = function () {
       if (!_websocket) {
         logger.error(
-          'No connection to send the start countdown message. Are you connected to a lobby?'
+          'No connection to send the join game message. Are you connected to a lobby?'
         );
         return;
       }
+      // TODO: When the message is sent, it is expected to then receive a "peerId" message
+      // from the websocket. This "peerId" message might not be sent for different reasons.
+      // Should there be a security that checks if the "peerId" message has been received
+      // in the next 10s or something more global that checks the lobby status after the player
+      // has committed to open a connection with it?
 
       _websocket.send(
         JSON.stringify({
@@ -1388,7 +1471,7 @@ namespace gdjs {
         logger.error(
           "No peerId found, the player doesn't seem connected to the broker server."
         );
-        return;
+        throw new Error('Missing player peerId.');
       }
 
       _websocket.send(
@@ -1433,7 +1516,7 @@ namespace gdjs {
           if (!event.data.lobbyId) {
             throw new Error('Malformed message.');
           }
-
+          _actionAfterJoiningLobby = null;
           handleJoinLobbyEvent(runtimeScene, event.data.lobbyId);
           break;
         }
@@ -1517,6 +1600,162 @@ namespace gdjs {
         runtimeScene,
         targetUrl
       );
+    };
+
+    const onLobbyQuickJoinFinished = (runtimeScene: gdjs.RuntimeScene) => {
+      _isQuickJoiningOrStartingAGame = false;
+      _actionAfterJoiningLobby = null;
+      gdjs.multiplayerComponents.displayLoader(runtimeScene, false);
+    };
+
+    const quickJoinLobby = async (
+      runtimeScene: gdjs.RuntimeScene,
+      displayLoader: boolean,
+      openLobbiesPageIfFailure: boolean
+    ) => {
+      if (_isQuickJoiningOrStartingAGame) return;
+      const _gameId = gdjs.projectData.properties.projectUuid;
+      if (!_gameId) {
+        handleLobbiesError(
+          runtimeScene,
+          'The game ID is missing, the quick join lobby action cannot continue.'
+        );
+        return;
+      }
+
+      _quickJoinLobbyFailureReason = null;
+      _isQuickJoiningOrStartingAGame = true;
+      if (displayLoader) {
+        gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
+      }
+
+      const quickJoinLobbyRelativeUrl = `/play/game/${_gameId}/public-lobby/action/quick-join`;
+      const platformInfo = runtimeScene.getGame().getPlatformInfo();
+
+      try {
+        const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(
+          { times: 2 },
+          () =>
+            fetchAsPlayer({
+              relativeUrl: quickJoinLobbyRelativeUrl,
+              method: 'POST',
+              dev: isUsingGDevelopDevelopmentEnvironment,
+              body: JSON.stringify({
+                isPreview: runtimeScene.getGame().isPreview(),
+                gameVersion: runtimeScene.getGame().getGameData().properties
+                  .version,
+                supportedCompressionMethods:
+                  platformInfo.supportedCompressionMethods,
+              }),
+            })
+        );
+
+        if (
+          quickJoinLobbyResponse.status === 'full' ||
+          quickJoinLobbyResponse.status === 'not-enough-players'
+        ) {
+          _quickJoinLobbyJustFailed = true;
+          _quickJoinLobbyFailureReason =
+            quickJoinLobbyResponse.status === 'full'
+              ? 'FULL'
+              : 'NOT_ENOUGH_PLAYERS';
+          onLobbyQuickJoinFinished(runtimeScene);
+          if (openLobbiesPageIfFailure) {
+            openLobbiesWindow(runtimeScene);
+          }
+          return;
+        }
+
+        if (quickJoinLobbyResponse.status === 'join-game') {
+          if (quickJoinLobbyResponse.lobby.status === 'waiting') {
+            _actionAfterJoiningLobby = 'START_GAME';
+          } else if (quickJoinLobbyResponse.lobby.status === 'playing') {
+            _actionAfterJoiningLobby = 'JOIN_GAME';
+          } else {
+            throw new Error(
+              `Lobby in wrong status: ${quickJoinLobbyResponse.status}`
+            );
+          }
+        } else {
+          if (_connectionId) {
+            // Already connected to a lobby.
+            onLobbyQuickJoinFinished(runtimeScene);
+            openLobbiesWindow(runtimeScene);
+            return;
+          } else {
+            _actionAfterJoiningLobby = 'OPEN_LOBBY_PAGE';
+          }
+        }
+        handleJoinLobbyEvent(runtimeScene, quickJoinLobbyResponse.lobby.id);
+      } catch (error) {
+        logger.error('An error occurred while joining a lobby:', error);
+        _quickJoinLobbyJustFailed = true;
+        _quickJoinLobbyFailureReason = 'UNKNOWN';
+        onLobbyQuickJoinFinished(runtimeScene);
+        if (openLobbiesPageIfFailure) {
+          openLobbiesWindow(runtimeScene);
+        }
+      }
+    };
+
+    export const authenticateAndQuickJoinLobby = async (
+      runtimeScene: gdjs.RuntimeScene,
+      displayLoader: boolean,
+      openLobbiesPageIfFailure: boolean
+    ) => {
+      const requestDoneAt = Date.now();
+      if (_lastQuickJoinRequestDoneAt) {
+        if (requestDoneAt - _lastQuickJoinRequestDoneAt < 500) {
+          _lastQuickJoinRequestDoneAt = requestDoneAt;
+          logger.warn(
+            'Last request to quick join a lobby was sent too little time ago. Ignoring this one.'
+          );
+          return;
+        }
+      } else {
+        _lastQuickJoinRequestDoneAt = requestDoneAt;
+      }
+
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+      if (!playerId || !playerToken) {
+        _isWaitingForLogin = true;
+        const {
+          status,
+        } = await gdjs.playerAuthentication.openAuthenticationWindow(
+          runtimeScene
+        ).promise;
+        _isWaitingForLogin = false;
+
+        if (status === 'logged') {
+          await quickJoinLobby(
+            runtimeScene,
+            displayLoader,
+            openLobbiesPageIfFailure
+          );
+        }
+
+        return;
+      }
+      await quickJoinLobby(
+        runtimeScene,
+        displayLoader,
+        openLobbiesPageIfFailure
+      );
+    };
+
+    export const isSearchingForLobbyToJoin = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      return _isQuickJoiningOrStartingAGame;
+    };
+
+    export const hasQuickJoinJustFailed = (runtimeScene: gdjs.RuntimeScene) => {
+      return _quickJoinLobbyJustFailed;
+    };
+
+    export const getQuickJoinFailureReason = () => {
+      return _quickJoinLobbyFailureReason;
     };
 
     /**

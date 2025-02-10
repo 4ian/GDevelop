@@ -241,6 +241,24 @@ export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
     for (const key of orderedKeys) {
       const matchA = resultA.matches.find(match => match.key === key);
       const matchB = resultB.matches.find(match => match.key === key);
+      // If a result has an exact math at the start of the word in the key but
+      // the other doesn't even has a match in the key, give priority.
+      if (
+        matchA &&
+        matchA.closestExactMatchAtStartOfWordIndex !== null &&
+        !matchB
+      ) {
+        return -1;
+      }
+      if (
+        !matchA &&
+        matchB &&
+        matchB.closestExactMatchAtStartOfWordIndex !== null
+      ) {
+        return 1;
+      }
+      // If both result have exact matches in the key, give priority to the one where
+      // the match is closer to the start of the sentence.
       if (matchA && matchB) {
         if (
           matchA.closestExactMatchAtStartOfWordIndex !== null &&

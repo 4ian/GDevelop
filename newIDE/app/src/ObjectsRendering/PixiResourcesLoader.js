@@ -583,6 +583,7 @@ export default class PixiResourcesLoader {
         map: texture,
         side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
         transparent: useTransparentTexture,
+        vertexColors: true,
       });
 
       return material;

@@ -32,7 +32,11 @@ const makeFakeEnumeratedExpressionMetadata = (
     parameterIndex =>
       expressionMetadata.getParameters().getParameterAt(parameterIndex)
   ),
-  scope: { extension },
+  scope: {
+    extension: {
+      name: extension.getName(),
+    },
+  },
   isPrivate: false,
   isRelevantForLayoutEvents: true,
   isRelevantForFunctionEvents: true,

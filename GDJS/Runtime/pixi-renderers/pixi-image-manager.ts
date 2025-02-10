@@ -242,12 +242,14 @@ namespace gdjs {
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
+            vertexColors: true,
           })
         : new THREE.MeshStandardMaterial({
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
             metalness: 0,
+            vertexColors: true,
           });
       this._loadedThreeMaterials.put(cacheKey, material);
       return material;

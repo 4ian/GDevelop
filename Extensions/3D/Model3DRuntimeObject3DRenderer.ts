@@ -390,7 +390,6 @@ namespace gdjs {
         console.log(this._action.time, previousAction.time);
       }
       this._action.play();
-
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);
     }

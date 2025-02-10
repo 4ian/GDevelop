@@ -124,7 +124,7 @@ namespace gdjs {
 
       this.onModelChanged(objectData);
 
-      this._crossfadeDuration = objectData.content.crossFadeDuration || 0;
+      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();

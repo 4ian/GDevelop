@@ -800,6 +800,20 @@ module.exports = {
         .markAsSimple()
         .setHidden()
         .setFunctionName('hasAnimationEnded');
+
+      object
+        .addScopedAction(
+          'SetCrossfadeDuration',
+          _('Set cross fade duration'),
+          _('Set the duration of the cross fading between two animations.'),
+          'Set cross fading duration of _PARAM0_ to _PARAM1_',
+          _('Duration'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Cross fade duration'), '', false)
+        .setFunctionName('setCrossfadeDuration');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();

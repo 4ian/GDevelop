@@ -357,6 +357,11 @@ namespace gdjs {
       return this._renderer.hasAnimationEnded();
     }
 
+    setCrossfadeDuration(duration: number): void {
+      if (this._crossFadeDuration === duration) return;
+      this._crossFadeDuration = duration;
+    }
+
     isAnimationPaused() {
       return this._animationPaused;
     }

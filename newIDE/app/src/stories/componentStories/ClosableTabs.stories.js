@@ -30,41 +30,48 @@ export const ThreeTabs = () => (
     render={(value, onChange) => (
       <FixedHeightFlexContainer height={400}>
         <Column expand>
-          <ClosableTabs>
-            <ClosableTab
-              onActivated={action('Tab 1 activated')}
-              closable={false}
-              active={value === 0}
-              onClick={() => onChange(0)}
-              label={null}
-              icon={<Home />}
-              onClose={action('Close tab 1')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-            <ClosableTab
-              onActivated={action('Tab 2 activated')}
-              closable
-              active={value === 1}
-              onClick={() => onChange(1)}
-              label="Tab 2"
-              icon={null}
-              onClose={action('Close tab 2')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-            <ClosableTab
-              onActivated={action('Tab 3 activated')}
-              closable
-              active={value === 2}
-              onClick={() => onChange(2)}
-              label="Tab 3 with a long label"
-              icon={null}
-              onClose={action('Close tab 3')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-          </ClosableTabs>
+          <ClosableTabs
+            renderTabs={({ containerWidth }) => (
+              <>
+                <ClosableTab
+                  onActivated={action('Tab 1 activated')}
+                  closable={false}
+                  active={value === 0}
+                  onClick={() => onChange(0)}
+                  label={null}
+                  icon={<Home />}
+                  onClose={action('Close tab 1')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 2 activated')}
+                  closable
+                  active={value === 1}
+                  onClick={() => onChange(1)}
+                  label="Tab 2"
+                  icon={null}
+                  onClose={action('Close tab 2')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 3 activated')}
+                  closable
+                  active={value === 2}
+                  onClick={() => onChange(2)}
+                  label="Tab 3 with a long label"
+                  icon={null}
+                  onClose={action('Close tab 3')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+              </>
+            )}
+          />
           {
             <TabContentContainer active={value === 0}>
               <div
@@ -104,52 +111,60 @@ export const LongLabels = () => (
     render={(value, onChange) => (
       <FixedHeightFlexContainer height={400}>
         <Column expand>
-          <ClosableTabs>
-            <ClosableTab
-              onActivated={action('Tab 1 activated')}
-              closable
-              active={value === 0}
-              label="Tab 1 with a very very long label"
-              icon={null}
-              onClose={action('Close tab 1')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-              onClick={() => onChange(0)}
-            />
-            <ClosableTab
-              onActivated={action('Tab 2 activated')}
-              closable
-              active={value === 1}
-              onClick={() => onChange(1)}
-              label="Small 2"
-              icon={null}
-              onClose={action('Close tab 2')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-            <ClosableTab
-              onActivated={action('Tab 3 activated')}
-              closable
-              active={value === 2}
-              onClick={() => onChange(2)}
-              label="Tab 3 with a very very loooooooooooooooooooooooooooooooooooooooooong label"
-              icon={null}
-              onClose={action('Close tab 3')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-            <ClosableTab
-              onActivated={action('Tab 4 activated')}
-              closable
-              active={value === 3}
-              onClick={() => onChange(3)}
-              label="Small 4"
-              icon={null}
-              onClose={action('Close tab 4')}
-              onCloseAll={action('Close all')}
-              onCloseOthers={action('Close others')}
-            />
-          </ClosableTabs>
+          <ClosableTabs
+            renderTabs={({ containerWidth }) => (
+              <>
+                <ClosableTab
+                  onActivated={action('Tab 1 activated')}
+                  closable
+                  active={value === 0}
+                  label="Tab 1 with a very very long label"
+                  icon={null}
+                  onClose={action('Close tab 1')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  onClick={() => onChange(0)}
+                  maxWidth={300}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 2 activated')}
+                  closable
+                  active={value === 1}
+                  onClick={() => onChange(1)}
+                  label="Small 2"
+                  icon={null}
+                  onClose={action('Close tab 2')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 3 activated')}
+                  closable
+                  active={value === 2}
+                  onClick={() => onChange(2)}
+                  label="Tab 3 with a very very loooooooooooooooooooooooooooooooooooooooooong label"
+                  icon={null}
+                  onClose={action('Close tab 3')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+                <ClosableTab
+                  onActivated={action('Tab 4 activated')}
+                  closable
+                  active={value === 3}
+                  onClick={() => onChange(3)}
+                  label="Small 4"
+                  icon={null}
+                  onClose={action('Close tab 4')}
+                  onCloseAll={action('Close all')}
+                  onCloseOthers={action('Close others')}
+                  maxWidth={300}
+                />
+              </>
+            )}
+          />
           {
             <TabContentContainer active={value === 0}>
               <div
@@ -208,41 +223,48 @@ export const WithObjectsList = () => (
       <DragAndDropContextProvider>
         <FixedHeightFlexContainer height={400}>
           <Column expand>
-            <ClosableTabs>
-              <ClosableTab
-                onActivated={action('Tab 1 activated')}
-                closable
-                active={value === 0}
-                label="Tab 1"
-                icon={null}
-                onClick={() => onChange(0)}
-                onClose={action('Close tab 1')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 2 activated')}
-                closable
-                active={value === 1}
-                label="Tab 2"
-                icon={null}
-                onClick={() => onChange(1)}
-                onClose={action('Close tab 2')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-              <ClosableTab
-                onActivated={action('Tab 3 activated')}
-                closable
-                active={value === 2}
-                label="Tab 3"
-                icon={null}
-                onClick={() => onChange(2)}
-                onClose={action('Close tab 3')}
-                onCloseAll={action('Close all')}
-                onCloseOthers={action('Close others')}
-              />
-            </ClosableTabs>
+            <ClosableTabs
+              renderTabs={({ containerWidth }) => (
+                <>
+                  <ClosableTab
+                    onActivated={action('Tab 1 activated')}
+                    closable
+                    active={value === 0}
+                    label="Tab 1"
+                    icon={null}
+                    onClick={() => onChange(0)}
+                    onClose={action('Close tab 1')}
+                    onCloseAll={action('Close all')}
+                    onCloseOthers={action('Close others')}
+                    maxWidth={300}
+                  />
+                  <ClosableTab
+                    onActivated={action('Tab 2 activated')}
+                    closable
+                    active={value === 1}
+                    label="Tab 2"
+                    icon={null}
+                    onClick={() => onChange(1)}
+                    onClose={action('Close tab 2')}
+                    onCloseAll={action('Close all')}
+                    onCloseOthers={action('Close others')}
+                    maxWidth={300}
+                  />
+                  <ClosableTab
+                    onActivated={action('Tab 3 activated')}
+                    closable
+                    active={value === 2}
+                    label="Tab 3"
+                    icon={null}
+                    onClick={() => onChange(2)}
+                    onClose={action('Close tab 3')}
+                    onCloseAll={action('Close all')}
+                    onCloseOthers={action('Close others')}
+                    maxWidth={300}
+                  />
+                </>
+              )}
+            />
             {
               <TabContentContainer active={value === 0}>
                 <div

@@ -19,7 +19,6 @@ const styles = {
     flex: 1,
   },
   tabLabel: {
-    maxWidth: 360,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -76,13 +75,14 @@ export class TabContentContainer extends React.Component<TabContentContainerProp
 
 type ClosableTabsProps = {|
   hideLabels?: boolean,
-  children: React.Node,
+  renderTabs: ({| containerWidth: number |}) => React.Node,
 |};
 
-export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
+export const ClosableTabs = ({ hideLabels, renderTabs }: ClosableTabsProps) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
+    flex: 1,
     display: hideLabels ? 'none' : 'flex',
     flexWrap: 'nowrap', // Single line of tab...
     overflowX: 'overlay', // ...scroll horizontally if needed
@@ -97,6 +97,10 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
     }
   }, []);
 
+  const containerWidth = containerRef.current
+    ? containerRef.current.clientWidth
+    : null;
+
   return (
     <div
       ref={containerRef}
@@ -104,7 +108,7 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
       style={tabItemContainerStyle}
       onWheel={onScroll}
     >
-      {children}
+      {containerWidth !== null ? renderTabs({ containerWidth }) : null}
     </div>
   );
 };
@@ -122,6 +126,7 @@ export type ClosableTabProps = {|
   onCloseAll: () => void,
   onClick: () => void,
   onActivated: () => void,
+  maxWidth: number,
 |};
 
 export function ClosableTab({
@@ -137,6 +142,7 @@ export function ClosableTab({
   closable,
   onClick,
   onActivated,
+  maxWidth,
 }: ClosableTabProps) {
   React.useEffect(
     () => {
@@ -189,6 +195,14 @@ export function ClosableTab({
       : active
       ? 0.022
       : 0.224;
+
+  const labelMaxWidth = Math.max(
+    0.1, // No negative max-width, which would actually not enforce any max width.
+    (maxWidth || 320) -
+    20 /* Close button */ -
+    32 /* Icon */ -
+      9 /* Extra margins */
+  );
 
   return (
     <React.Fragment>
@@ -244,7 +258,17 @@ export function ClosableTab({
                 {renderCustomIcon ? renderCustomIcon(brightness) : icon}
               </span>
             ) : null}
-            {label && <span style={styles.tabLabel}>{label}</span>}
+            {label && (
+              <span
+                style={{
+                  ...styles.tabLabel,
+                  maxWidth: labelMaxWidth,
+                }}
+                title={label}
+              >
+                {label}
+              </span>
+            )}
           </span>
         </ButtonBase>
         {closable && (

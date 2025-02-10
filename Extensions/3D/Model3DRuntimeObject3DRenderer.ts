@@ -359,7 +359,6 @@ namespace gdjs {
     }
 
     playAnimation(animationName: string, shouldLoop: boolean) {
-      //this._animationMixer.stopAllAction();
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
         animationName

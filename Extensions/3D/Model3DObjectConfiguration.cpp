@@ -177,9 +177,6 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetLabel(_("Crossfade duration"))
       .SetGroup(_("Animations"));
 
-
-
-
   return objectProperties;
 }
 

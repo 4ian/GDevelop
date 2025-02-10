@@ -1651,6 +1651,12 @@ const MainFrame = (props: Props) => {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         const startTime = Date.now();
+        let inAppTutorialMessageInPreview = { message: '', position: '' };
+        if (inAppTutorialOrchestratorRef.current) {
+          inAppTutorialMessageInPreview =
+            inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
+            inAppTutorialMessageInPreview;
+        }
         await previewLauncher.launchPreview({
           project: currentProject,
           layout,
@@ -1664,6 +1670,9 @@ const MainFrame = (props: Props) => {
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
+          inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
+          inAppTutorialMessagePositionInPreview:
+            inAppTutorialMessageInPreview.position,
           captureOptions,
           onCaptureFinished,
         });
@@ -4011,6 +4020,7 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
+          i18n={props.i18n}
           endTutorial={({
             shouldCloseProject,
             shouldWarnAboutUnsavedChanges,

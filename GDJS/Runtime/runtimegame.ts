@@ -103,6 +103,10 @@ namespace gdjs {
     /** Any capture that should be done during the preview. */
     captureOptions?: CaptureOptions;
 
+    /** Message to display to the user during an in-app tutorial. */
+    inAppTutorialMessageInPreview?: string;
+    inAppTutorialMessagePositionInPreview?: string;
+
     /**
      * If set, this data is used to authenticate automatically when launching the game.
      * This is only useful during previews.
@@ -915,6 +919,17 @@ namespace gdjs {
         // return;
 
         this._setupGameVisibilityEvents();
+
+        if (
+          this._options.inAppTutorialMessageInPreview &&
+          gdjs.inAppTutorialMessage
+        ) {
+          gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
+            this,
+            this._options.inAppTutorialMessageInPreview,
+            this._options.inAppTutorialMessagePositionInPreview || ''
+          );
+        }
 
         // The standard game loop
         let accumulatedElapsedTime = 0;

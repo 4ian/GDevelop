@@ -36,6 +36,7 @@ type Props = {|
   edge?: 'start' | 'end' | false,
   id?: string,
 
+  className?: string,
   style?: {|
     padding?: number | string,
     width?: number,

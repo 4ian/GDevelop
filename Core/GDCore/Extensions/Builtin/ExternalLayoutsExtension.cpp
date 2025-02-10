@@ -28,7 +28,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .AddAction("CreateObjectsFromExternalLayout",
                  _("Create objects from an external layout"),
                  _("Create objects from an external layout."),
-                 _("Create objects from the external layout named _PARAM1_"),
+                 _("Create objects from the external layout named _PARAM1_ at X: _PARAM2_, Y: _PARAM3_, Z: _PARAM4_"),
                  "",
                  "res/ribbon_default/externallayout32.png",
                  "res/ribbon_default/externallayout32.png")

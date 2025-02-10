@@ -372,7 +372,6 @@ namespace gdjs {
       }
       const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
-
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,
         Number.POSITIVE_INFINITY
@@ -381,13 +380,11 @@ namespace gdjs {
 
       if (previousAction && previousAction !== this._action) {
         this._action.enabled = true;
-
         this._action.crossFadeFrom(
           previousAction,
           this._model3DRuntimeObject._crossFadeDuration,
           false
         );
-        console.log(this._action.time, previousAction.time);
       }
       this._action.play();
       // Make sure the first frame is displayed.

@@ -82,10 +82,15 @@ export function DraggableEditorTabs({
         return editors.map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(editorTabs) === id;
 
-          // Maximum width of a tab is the width so that all tabs can fit it.
-          // The home tab is special because it's just an icon.
-          const maxWidth =
-            (containerWidth - homeTabApproximateWidth) / (editors.length - 1);
+          // Maximum width of a tab is the width so that all tabs can fit it,
+          // unless on a small screen, where we want to avoid compressing tabs too much
+          // (and encourage scrolling instead).
+          const minimumMaxWidth = windowSize === 'small' ? 100 : 0;
+          const maxWidth = Math.max(
+            minimumMaxWidth,
+            // The home tab is special because it's just an icon.
+            (containerWidth - homeTabApproximateWidth) / (editors.length - 1)
+          );
 
           return (
             <DraggableClosableTab

@@ -8,6 +8,8 @@ import { useLongTouch } from '../Utils/UseLongTouch';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import useOnResize from '../Utils/UseOnResize';
 
 const styles = {
   tabContentContainer: {
@@ -79,6 +81,7 @@ type ClosableTabsProps = {|
 |};
 
 export const ClosableTabs = ({ hideLabels, renderTabs }: ClosableTabsProps) => {
+  const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
@@ -100,6 +103,14 @@ export const ClosableTabs = ({ hideLabels, renderTabs }: ClosableTabsProps) => {
   const containerWidth = containerRef.current
     ? containerRef.current.clientWidth
     : null;
+
+  React.useLayoutEffect(
+    () => {
+      // Force a re-render the first time after we know the container width.
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
 
   return (
     <div

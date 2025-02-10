@@ -33,8 +33,8 @@ namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator(
     'MyDummyExtension::DummyEffect',
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
-      // MakePIXIFilter should return a PIXI.Filter, that will be applied on the PIXI.Container (for layers)
-      // or the PIXI.DisplayObject (for objects).
+      // MakePIXIFilter should return a PIXI.Filter, that will be applied on the
+      // PIXI.Container (for layers or objects).
       makePIXIFilter(layer, effectData) {
         const filter = new DummyPixiFilter();
 
@@ -72,7 +72,7 @@ namespace gdjs {
         value: number
       ) {
         if (parameterName === 'opacity') {
-          filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(
+          filter.resources.opacity = gdjs.PixiFiltersTools.clampValue(
             value,
             0,
             1
@@ -81,7 +81,7 @@ namespace gdjs {
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
         if (parameterName === 'opacity') {
-          return filter.uniforms.opacity;
+          return filter.resources.opacity;
         }
         return 0;
       }
@@ -106,10 +106,10 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): any {
-        return { opacity: filter.uniforms.opacity };
+        return { opacity: filter.resources.opacity };
       }
       updateFromNetworkSyncData(filter: PIXI.Filter, data: any) {
-        filter.uniforms.opacity = data.opacity;
+        filter.resources.opacity = data.opacity;
       }
     })()
   );

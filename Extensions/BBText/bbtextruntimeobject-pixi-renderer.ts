@@ -1,4 +1,5 @@
 namespace gdjs {
+  // TODO PIXI8 Use HTMLText instead.
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
    */

@@ -5,8 +5,7 @@ namespace gdjs {
   }
   export class NightPixiFilter extends PIXI.Filter {
     constructor() {
-      const vertexShader = undefined;
-      const fragmentShader = [
+      const fragment = [
         'precision mediump float;',
         '',
         'varying vec2 vTextureCoord;',
@@ -25,7 +24,10 @@ namespace gdjs {
         intensity: { type: '1f', value: 1 },
         opacity: { type: '1f', value: 1 },
       };
-      super(vertexShader, fragmentShader, uniforms);
+      super({
+        glProgram: new PIXI.GlProgram({ vertex: '', fragment }),
+        resources: uniforms,
+      });
     }
   }
   NightPixiFilter.prototype.constructor = gdjs.NightPixiFilter;
@@ -45,14 +47,14 @@ namespace gdjs {
         if (parameterName !== 'intensity' && parameterName !== 'opacity') {
           return;
         }
-        filter.uniforms[parameterName] = gdjs.PixiFiltersTools.clampValue(
+        filter.resources[parameterName] = gdjs.PixiFiltersTools.clampValue(
           value,
           0,
           1
         );
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        return filter.uniforms[parameterName] || 0;
+        return filter.resources[parameterName] || 0;
       }
       updateStringParameter(
         filter: PIXI.Filter,
@@ -74,16 +76,16 @@ namespace gdjs {
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): NightFilterNetworkSyncData {
         return {
-          i: filter.uniforms['intensity'],
-          o: filter.uniforms['opacity'],
+          i: filter.resources['intensity'],
+          o: filter.resources['opacity'],
         };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: NightFilterNetworkSyncData
       ) {
-        filter.uniforms['intensity'] = data.i;
-        filter.uniforms['opacity'] = data.o;
+        filter.resources['intensity'] = data.i;
+        filter.resources['opacity'] = data.o;
       }
     })()
   );

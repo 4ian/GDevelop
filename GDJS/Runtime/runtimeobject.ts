@@ -660,14 +660,14 @@ namespace gdjs {
 
     //Rendering:
     /**
-     * @return The internal object for a 2D rendering (PIXI.DisplayObject...)
+     * @return The internal object for a 2D rendering (PIXI.Container...)
      */
     getRendererObject(): RendererObjectInterface | null | undefined {
       return undefined;
     }
 
     /**
-     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     * @return The internal object for a 3D rendering (THREE.Object3D...)
      */
     get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;

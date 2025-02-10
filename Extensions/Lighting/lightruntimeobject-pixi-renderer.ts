@@ -1,6 +1,4 @@
 namespace gdjs {
-  const logger = new gdjs.Logger('Light object');
-
   /**
    * Pixi renderer for light runtime objects.
    */
@@ -15,7 +13,7 @@ namespace gdjs {
     _defaultVertexBuffer: Float32Array;
     _vertexBuffer: Float32Array;
     _indexBuffer: Uint16Array;
-    _light: PIXI.Mesh<PIXI.Shader> | null = null;
+    _light: PIXI.Mesh<PIXI.Geometry, PIXI.Shader> | null = null;
     _isPreview: boolean;
     _debugMode: boolean = false;
     _debugLight: PIXI.Container | null = null;
@@ -133,12 +131,6 @@ namespace gdjs {
     }
 
     updateMesh(): void {
-      if (!PIXI.utils.isWebGLSupported()) {
-        logger.warn(
-          'This device does not support webgl, which is required for Lighting Extension.'
-        );
-        return;
-      }
       this.updateTexture();
       const fragmentShader =
         this._texture === null
@@ -153,18 +145,22 @@ namespace gdjs {
         // @ts-ignore
         shaderUniforms.uSampler = this._texture;
       }
-      const shader = PIXI.Shader.from(
-        LightRuntimeObjectPixiRenderer.defaultVertexShader,
-        fragmentShader,
-        shaderUniforms
-      );
+      const shader = PIXI.Shader.from({
+        gl: {
+          vertex: LightRuntimeObjectPixiRenderer.defaultVertexShader,
+          fragment: fragmentShader,
+        },
+        resources: shaderUniforms,
+      });
       const geometry = new PIXI.Geometry();
-      geometry
-        .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-        .addIndex(this._indexBuffer);
+      geometry.addAttribute('aVertexPosition', {
+        buffer: this._vertexBuffer,
+        size: 2,
+      });
+      geometry.addIndex(this._indexBuffer);
       if (!this._light) {
-        this._light = new PIXI.Mesh(geometry, shader);
-        this._light.blendMode = PIXI.BLEND_MODES.ADD;
+        this._light = new PIXI.Mesh({ geometry, shader });
+        this._light.blendMode = 'add';
       } else {
         this._light.shader = shader;
         // @ts-ignore - replacing the read-only geometry
@@ -177,7 +173,9 @@ namespace gdjs {
         return;
       }
       this._radius = this._object.getRadius();
-      this._light.shader.uniforms.radius = this._radius;
+      if (this._light.shader) {
+        this._light.shader.resources.radius = this._radius;
+      }
     }
 
     updateColor(): void {
@@ -190,7 +188,9 @@ namespace gdjs {
         objectColor[1] / 255,
         objectColor[2] / 255,
       ];
-      this._light.shader.uniforms.color = this._color;
+      if (this._light.shader) {
+        this._light.shader.resources.color = this._color;
+      }
     }
 
     updateTexture(): void {
@@ -291,13 +291,23 @@ namespace gdjs {
         this._defaultVertexBuffer[5] = this._object.y - this._radius;
         this._defaultVertexBuffer[6] = this._object.x - this._radius;
         this._defaultVertexBuffer[7] = this._object.y - this._radius;
-        this._light.shader.uniforms.center = this._center;
+        if (this._light.shader) {
+          this._light.shader.resources.center = this._center;
+        }
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._defaultVertexBuffer);
+          .setDataWithSize(
+            this._defaultVertexBuffer,
+            this._defaultVertexBuffer.byteLength,
+            true
+          );
         this._light.geometry
           .getIndex()
-          .update(LightRuntimeObjectPixiRenderer._defaultIndexBuffer);
+          .setDataWithSize(
+            LightRuntimeObjectPixiRenderer._defaultIndexBuffer,
+            LightRuntimeObjectPixiRenderer._defaultIndexBuffer.byteLength,
+            true
+          );
         return;
       }
       const verticesCount = vertices.length;
@@ -347,12 +357,24 @@ namespace gdjs {
           this._indexBuffer[i + 2] = 1;
         }
       }
-      this._light.shader.uniforms.center = this._center;
+      if (this._light.shader) {
+        this._light.shader.resources.center = this._center;
+      }
       if (!isSubArrayUsed) {
         this._light.geometry
           .getBuffer('aVertexPosition')
-          .update(this._vertexBuffer);
-        this._light.geometry.getIndex().update(this._indexBuffer);
+          .setDataWithSize(
+            this._vertexBuffer,
+            this._vertexBuffer.byteLength,
+            true
+          );
+        this._light.geometry
+          .getIndex()
+          .setDataWithSize(
+            this._indexBuffer,
+            this._indexBuffer.byteLength,
+            true
+          );
       } else {
         this._light.geometry
           .getBuffer('aVertexPosition')

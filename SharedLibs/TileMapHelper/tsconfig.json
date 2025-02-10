@@ -14,7 +14,7 @@
       "expect.js",
       "offscreencanvas"
     ],
-    "lib": ["DOM", "ES5", "ES6"],
+    "lib": ["DOM", "ES5", "ES6", "ES2017", "ES2020"],
     "esModuleInterop": false, 
     "downlevelIteration": true,
     "moduleResolution": "node",

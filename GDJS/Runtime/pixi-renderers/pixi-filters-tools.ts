@@ -1,7 +1,64 @@
+const allBlendModes: Array<PIXI.BLEND_MODES> = [
+  'normal',
+  'add',
+  'multiply',
+  'screen',
+  'overlay',
+  'darken',
+  'lighten',
+  'color-dodge',
+  'color-burn',
+  'hard-light',
+  'soft-light',
+  'difference',
+  'exclusion',
+  // HUE
+  'normal',
+  'saturation',
+  'color',
+  'luminosity',
+  'normal-npm',
+  'add-npm',
+  'screen-npm',
+  'none',
+  // SRC_IN
+  'normal',
+  // SRC_OUT
+  'normal',
+  // SRC_ATOP
+  'normal',
+  // DST_OVER
+  'normal',
+  // DST_IN
+  'normal',
+  // DST_OUT
+  'normal',
+  // DST_ATOP
+  'normal',
+  // ERASE
+  'normal',
+  'subtract',
+  // XOR
+  'normal',
+];
+
 namespace gdjs {
   const logger = new gdjs.Logger('Filters');
 
   export namespace PixiFiltersTools {
+    export const getBlendModeName = (
+      blendModeIndex: integer
+    ): PIXI.BLEND_MODES => {
+      return allBlendModes[blendModeIndex];
+    };
+
+    export const getBlendModeIndex = (
+      blendModeName: PIXI.BLEND_MODES
+    ): integer => {
+      return allBlendModes.indexOf(blendModeName);
+    };
+    getBlendModeIndex;
+
     export const clampValue = function (value, min, max) {
       return Math.max(min, Math.min(max, value));
     };
@@ -71,7 +128,7 @@ namespace gdjs {
        */
       setEnabled(target: EffectsTarget, enabled: boolean): boolean;
       /**
-       * Apply the effect on the PixiJS DisplayObject.
+       * Apply the effect on the PixiJS Container.
        * Called after the effect is initialized.
        */
       applyEffect(target: EffectsTarget): boolean;
@@ -101,7 +158,7 @@ namespace gdjs {
       makeFilter(target: EffectsTarget, effectData: EffectData): Filter {
         const pixiFilter = this.makePIXIFilter(target, effectData);
         if (target.isLightingLayer && target.isLightingLayer()) {
-          pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
+          pixiFilter.blendMode = 'add';
         }
         return new PixiFilter(pixiFilter, this);
       }
@@ -177,27 +234,32 @@ namespace gdjs {
 
       applyEffect(target: EffectsTarget): boolean {
         const rendererObject = target.getRendererObject() as
-          | PIXI.DisplayObject
+          | PIXI.Container
           | null
           | undefined;
         if (!rendererObject) {
           return false;
         }
-        rendererObject.filters = (rendererObject.filters || []).concat(
-          this.pixiFilter
-        );
+        const filters = Array.isArray(rendererObject.filters)
+          ? rendererObject.filters
+          : [rendererObject.filters];
+        filters.push(this.pixiFilter);
+        rendererObject.filters = filters;
         return true;
       }
 
       removeEffect(target: EffectsTarget): boolean {
         const rendererObject = target.getRendererObject() as
-          | PIXI.DisplayObject
+          | PIXI.Container
           | null
           | undefined;
         if (!rendererObject) {
           return false;
         }
-        rendererObject.filters = (rendererObject.filters || []).filter(
+        const filters = Array.isArray(rendererObject.filters)
+          ? rendererObject.filters
+          : [rendererObject.filters];
+        rendererObject.filters = filters.filter(
           (pixiFilter) => pixiFilter !== this.pixiFilter
         );
         return true;

@@ -4,8 +4,7 @@ namespace gdjs {
   }
   export class LightNightPixiFilter extends PIXI.Filter {
     constructor() {
-      const vertexShader = undefined;
-      const fragmentShader = [
+      const fragment = [
         'precision mediump float;',
         '',
         'varying vec2 vTextureCoord;',
@@ -20,7 +19,10 @@ namespace gdjs {
         '}',
       ].join('\n');
       const uniforms = { opacity: { type: '1f', value: 1 } };
-      super(vertexShader, fragmentShader, uniforms);
+      super({
+        glProgram: new PIXI.GlProgram({ vertex: '', fragment }),
+        resources: uniforms,
+      });
     }
   }
   LightNightPixiFilter.prototype.constructor = gdjs.LightNightPixiFilter;
@@ -38,7 +40,7 @@ namespace gdjs {
         value: number
       ) {
         if (parameterName === 'opacity') {
-          filter.uniforms.opacity = gdjs.PixiFiltersTools.clampValue(
+          filter.resources.opacity = gdjs.PixiFiltersTools.clampValue(
             value,
             0,
             1
@@ -47,7 +49,7 @@ namespace gdjs {
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
         if (parameterName === 'opacity') {
-          return filter.uniforms.opacity;
+          return filter.resources.opacity;
         }
         return 0;
       }
@@ -71,14 +73,14 @@ namespace gdjs {
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): LightNightFilterExtra {
         return {
-          o: filter.uniforms.opacity,
+          o: filter.resources.opacity,
         };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: LightNightFilterExtra
       ) {
-        filter.uniforms.opacity = data.o;
+        filter.resources.opacity = data.o;
       }
     })()
   );

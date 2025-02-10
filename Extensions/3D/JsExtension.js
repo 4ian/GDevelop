@@ -806,10 +806,10 @@ module.exports = {
           'SetCrossfadeDuration',
           _('Set crossfade duration'),
           _('Set the crossfade duration when switching to a new animation.'),
-          'Set crossfade duration of _PARAM0_ to _PARAM1_',
+          _('Set crossfade duration of _PARAM0_ to _PARAM1_'),
           _('Duration'),
-          'res/conditions/3d_box.svg',
-          'res/conditions/3d_box.svg'
+          'res/conditions/animation24.png',
+          'res/conditions/animation.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Crossfade duration'), '', false)

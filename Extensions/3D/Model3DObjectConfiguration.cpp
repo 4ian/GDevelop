@@ -23,7 +23,7 @@ Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(0), rotationY(0),
       rotationZ(0), modelResourceName(""), materialType("StandardWithoutMetalness"),
       originLocation("ModelOrigin"), centerLocation("ModelOrigin"),
-      keepAspectRatio(true) {}
+      keepAspectRatio(true), crossfadeDuration(0.0f) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
                                                 const gd::String &newValue) {
@@ -69,6 +69,10 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
   }
   if (propertyName == "keepAspectRatio") {
     keepAspectRatio = newValue == "1";
+    return true;
+  }
+  if(propertyName == "crossfadeDuration") {
+    crossfadeDuration = newValue.To<double>();
     return true;
   }
 
@@ -167,6 +171,12 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetGroup(_("Points"))
       .SetAdvanced(true);
 
+  objectProperties["crossfadeDuration"]
+      .SetValue(gd::String::From(crossfadeDuration))
+      .SetType("number")
+      .SetLabel(_("Crossfade duration"))
+      .SetGroup(_("Animations"));
+
   return objectProperties;
 }
 
@@ -198,6 +208,7 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   originLocation = content.GetStringAttribute("originLocation");
   centerLocation = content.GetStringAttribute("centerLocation");
   keepAspectRatio = content.GetBoolAttribute("keepAspectRatio");
+  crossfadeDuration = content.GetDoubleAttribute("crossfadeDuration");
 
   RemoveAllAnimations();
   auto &animationsElement = content.GetChild("animations");
@@ -226,6 +237,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("originLocation", originLocation);
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
+  content.SetAttribute("crossFadeDuration", crossfadeDuration);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

@@ -800,6 +800,20 @@ module.exports = {
         .markAsSimple()
         .setHidden()
         .setFunctionName('hasAnimationEnded');
+
+      object
+        .addScopedAction(
+          'SetCrossfadeDuration',
+          _('Set crossfade duration'),
+          _('Set the crossfade duration when switching to a new animation.'),
+          _('Set crossfade duration of _PARAM0_ to _PARAM1_'),
+          _('Duration'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Crossfade duration'), '', false)
+        .setFunctionName('setCrossfadeDuration');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();

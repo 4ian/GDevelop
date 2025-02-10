@@ -9,6 +9,7 @@ namespace gdjs {
     ai: integer;
     ass: float;
     ap: boolean;
+    cfd: float;
   };
 
   type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -36,6 +37,7 @@ namespace gdjs {
         | 'BottomCenterZ'
         | 'BottomCenterY';
       animations: Model3DAnimation[];
+      crossfadeDuration: float;
     };
   }
 
@@ -97,6 +99,7 @@ namespace gdjs {
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
+    _crossfadeDuration: float = 0;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -120,6 +123,8 @@ namespace gdjs {
       );
 
       this.onModelChanged(objectData);
+
+      this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -202,6 +207,7 @@ namespace gdjs {
         ai: this._currentAnimationIndex,
         ass: this._animationSpeedScale,
         ap: this._animationPaused,
+        cfd: this._crossfadeDuration,
       };
     }
 
@@ -232,6 +238,9 @@ namespace gdjs {
         if (networkSyncData.ap !== this.isAnimationPaused()) {
           networkSyncData.ap ? this.pauseAnimation() : this.resumeAnimation();
         }
+      }
+      if (networkSyncData.cfd !== undefined) {
+        this._crossfadeDuration = networkSyncData.cfd;
       }
     }
 
@@ -346,6 +355,11 @@ namespace gdjs {
      */
     hasAnimationEnded(): boolean {
       return this._renderer.hasAnimationEnded();
+    }
+
+    setCrossfadeDuration(duration: number): void {
+      if (this._crossfadeDuration === duration) return;
+      this._crossfadeDuration = duration;
     }
 
     isAnimationPaused() {

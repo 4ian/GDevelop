@@ -381,7 +381,7 @@ namespace gdjs {
         this._action.enabled = true;
         this._action.crossFadeFrom(
           previousAction,
-          this._model3DRuntimeObject._crossFadeDuration,
+          this._model3DRuntimeObject._crossfadeDuration,
           false
         );
       }

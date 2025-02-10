@@ -237,7 +237,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("originLocation", originLocation);
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
-  content.SetAttribute("crossFadeDuration", crossFadeDuration);
+  content.SetAttribute("crossFadeDuration", crossfadeDuration);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

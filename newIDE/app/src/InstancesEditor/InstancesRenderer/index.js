@@ -220,8 +220,8 @@ export default class InstancesRenderer {
       : 0x888888;
 
     // Render the background color.
-    pixiRenderer.backgroundColor = backgroundColor;
-    pixiRenderer.backgroundAlpha = 1;
+    pixiRenderer.background.color = backgroundColor;
+    pixiRenderer.background.alpha = 1;
     pixiRenderer.clear();
     pixiRenderer.render(backgroundPixiContainer);
 

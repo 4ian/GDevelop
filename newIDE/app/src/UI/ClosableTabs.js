@@ -9,7 +9,6 @@ import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import useOnResize from '../Utils/UseOnResize';
 
 const styles = {
   tabContentContainer: {

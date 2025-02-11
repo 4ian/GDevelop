@@ -60,7 +60,6 @@ export const AssetPreviewImage = ({
       url={previewImageUrl}
       alt={assetShortHeader.name}
       onLoad={onLoad}
-      loading={loading}
     />
   ) : (
     <CorsAwareImage

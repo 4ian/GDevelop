@@ -804,12 +804,12 @@ module.exports = {
       object
         .addScopedAction(
           'SetCrossfadeDuration',
-          _('Set crossfade duration'),
+          _('Set crossfade duration (in seconds)'),
           _('Set the crossfade duration when switching to a new animation.'),
-          _('Set crossfade duration of _PARAM0_ to _PARAM1_'),
+          _('Set crossfade duration of _PARAM0_ to _PARAM1_ seconds'),
           _('Duration'),
           'res/conditions/animation24.png',
-          'res/conditions/animation.svg'
+          'res/conditions/animation.png'
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Crossfade duration'), '', false)

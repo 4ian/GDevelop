@@ -516,17 +516,17 @@ const GameDashboardCard = ({
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
 
-                const hasPlayerMessage = countOfSessionsLastWeek
-                  ? t`Has ${countOfSessionsLastWeek} players in the last 7 days`
-                  : t`Has no players`;
                 const hasBeenPublished = isPublishedOnGdGames
                   ? t`Is published on gd.games`
-                  : t`Is not published`;
+                  : t`Is not published on gd.games`;
+                const hasPlayerMessage = countOfSessionsLastWeek
+                  ? t`Had ${countOfSessionsLastWeek} players in the last week`
+                  : t`Had no players in the last week`;
 
                 const message = t`You're deleting a game which:${'\n\n'}
-                    - ${i18n._(hasPlayerMessage)}
+                  - ${i18n._(hasBeenPublished)}
                     ${'\n'}
-                    - ${i18n._(hasBeenPublished)}
+                  - ${i18n._(hasPlayerMessage)}
                     ${'\n\n'}
                     If you continue, the game and this project will be deleted.${'\n\n'}
                     This action is irreversible. Do you want to continue?`;

@@ -124,7 +124,7 @@ namespace gdjs {
       | gdjs.CustomRuntimeObject3DRenderer;
     protected abstract _reinitializeRenderer(): void;
 
-    reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
+    override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
       this._initializeFromObjectData(objectData);
@@ -134,7 +134,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: ObjectData & CustomObjectConfiguration,
       newObjectData: ObjectData & CustomObjectConfiguration
     ): boolean {
@@ -148,7 +148,9 @@ namespace gdjs {
       return true;
     }
 
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       const animator = this.getAnimator();
       if (initialInstanceData.numberProperties) {
         for (
@@ -177,7 +179,7 @@ namespace gdjs {
       }
     }
 
-    onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    override onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
       // Let subclasses do something before the object is destroyed.
       this.onDestroy(parent);
       // Let behaviors do something before the object is destroyed.
@@ -186,7 +188,7 @@ namespace gdjs {
       this._instanceContainer.onDestroyFromScene(parent);
     }
 
-    update(parent: gdjs.RuntimeInstanceContainer): void {
+    override update(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
 
       this.doStepPreEvents(this._instanceContainer);
@@ -224,7 +226,7 @@ namespace gdjs {
      */
     onDestroy(parent: gdjs.RuntimeInstanceContainer) {}
 
-    updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
     }
@@ -245,7 +247,7 @@ namespace gdjs {
       this.getRenderer().update();
     }
 
-    updateHitBoxes(): void {
+    override updateHitBoxes(): void {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -402,7 +404,7 @@ namespace gdjs {
       this.getLocalInverseTransformation().transform(source, destination);
     }
 
-    getDrawableX(): float {
+    override getDrawableX(): float {
       let minX = 0;
       if (this._innerArea) {
         minX = this._innerArea.min[0];
@@ -424,7 +426,7 @@ namespace gdjs {
       }
     }
 
-    getDrawableY(): float {
+    override getDrawableY(): float {
       let minY = 0;
       if (this._innerArea) {
         minY = this._innerArea.min[1];
@@ -582,29 +584,29 @@ namespace gdjs {
       return !!this._customCenter;
     }
 
-    getCenterX(): float {
+    override getCenterX(): float {
       return (
         (this.getUnscaledCenterX() - this._unrotatedAABB.min[0]) *
         this.getScaleX()
       );
     }
 
-    getCenterY(): float {
+    override getCenterY(): float {
       return (
         (this.getUnscaledCenterY() - this._unrotatedAABB.min[1]) *
         this.getScaleY()
       );
     }
 
-    getWidth(): float {
+    override getWidth(): float {
       return this.getUnscaledWidth() * this.getScaleX();
     }
 
-    getHeight(): float {
+    override getHeight(): float {
       return this.getUnscaledHeight() * this.getScaleY();
     }
 
-    setWidth(newWidth: float): void {
+    override setWidth(newWidth: float): void {
       const unscaledWidth = this.getUnscaledWidth();
       if (unscaledWidth === 0) {
         return;
@@ -618,7 +620,7 @@ namespace gdjs {
       }
     }
 
-    setHeight(newHeight: float): void {
+    override setHeight(newHeight: float): void {
       const unscaledHeight = this.getUnscaledHeight();
       if (unscaledHeight === 0) {
         return;
@@ -643,7 +645,7 @@ namespace gdjs {
       this.setHeight(newHeight);
     }
 
-    setX(x: float): void {
+    override setX(x: float): void {
       if (x === this.x) {
         return;
       }
@@ -653,7 +655,7 @@ namespace gdjs {
       this.getRenderer().updateX();
     }
 
-    setY(y: float): void {
+    override setY(y: float): void {
       if (y === this.y) {
         return;
       }
@@ -663,7 +665,7 @@ namespace gdjs {
       this.getRenderer().updateY();
     }
 
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       if (this.angle === angle) {
         return;
       }
@@ -798,7 +800,7 @@ namespace gdjs {
       return this.opacity;
     }
 
-    hide(enable: boolean): void {
+    override hide(enable: boolean): void {
       if (enable === undefined) {
         enable = true;
       }

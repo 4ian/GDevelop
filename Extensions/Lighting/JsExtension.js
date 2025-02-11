@@ -235,7 +235,8 @@ module.exports = {
     class RenderedLightObjectInstance extends RenderedInstance {
       _radius = 0;
       _color = 0;
-      _radiusGraphics = null;
+      /** The circle to show the radius of the light */
+      _radiusGraphics = new PIXI.Graphics();
 
       constructor(
         project,
@@ -258,9 +259,6 @@ module.exports = {
         );
         lightIconSprite.anchor.x = 0.5;
         lightIconSprite.anchor.y = 0.5;
-
-        // The circle to show the radius of the light.
-        this._radiusGraphics = new PIXI.Graphics();
 
         this._pixiObject = new PIXI.Container();
         this._pixiObject.addChild(lightIconSprite);

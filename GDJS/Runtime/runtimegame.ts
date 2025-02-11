@@ -202,7 +202,7 @@ namespace gdjs {
 
     /**
      * @param data The object (usually stored in data.json) containing the full project data
-     * @param
+     * @param options The game options
      */
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};

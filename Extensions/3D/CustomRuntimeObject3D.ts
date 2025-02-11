@@ -1,15 +1,4 @@
 namespace gdjs {
-  export interface Object3DDataContent {
-    width: float;
-    height: float;
-    depth: float;
-  }
-  /** Base parameters for {@link gdjs.RuntimeObject3D} */
-  export interface Object3DData extends ObjectData {
-    /** The base parameters of the RuntimeObject3D */
-    content: Object3DDataContent;
-  }
-
   /**
    * Base class for 3D custom objects.
    */
@@ -41,7 +30,7 @@ namespace gdjs {
 
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
-      objectData: Object3DData & CustomObjectConfiguration
+      objectData: gdjs.Object3DData & gdjs.CustomObjectConfiguration
     ) {
       super(parent, objectData);
       this._renderer.reinitialize(this, parent);

@@ -351,7 +351,7 @@ namespace gdjs {
 
     /**
      * Change the angle (or direction index) of the object
-     * @param The new angle (or direction index) to be applied
+     * @param newValue The new angle (or direction index) to be applied
      */
     setDirectionOrAngle(newValue: float): void {
       const actualValue = this._animator.setDirectionOrAngle(

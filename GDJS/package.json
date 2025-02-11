@@ -20,9 +20,9 @@
     "prettier": "2.1.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",
-    "typedoc": "^0.22.11",
-    "typedoc-plugin-reference-excluder": "^1.0.0",
-    "typescript": "4.3.2"
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-reference-excluder": "^1.1.3",
+    "typescript": "5.4.5"
   },
   "scripts": {
     "postinstall": "patch-package",
@@ -31,6 +31,6 @@
     "test": "cd tests && npm run test-benchmark",
     "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/JsExtension.js\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/JsExtension.js\" \"../Extensions/**/*.spec.js\"",
-    "generate-doc": "typedoc --options docs/typedoc.json"
+    "generate-doc": "typedoc --options docs/typedoc.json --plugin typedoc-plugin-reference-excluder"
   }
 }

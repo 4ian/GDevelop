@@ -1361,7 +1361,7 @@ namespace gdjs {
      * @deprecated Use addObjectColorHSLTween2 instead.
      * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
-     * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
+     * @param animateHue include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
      * @param toLightness The target lightness, or the same as the from color's lightness if blank
      * @param easing Easing function identifier
@@ -1395,7 +1395,7 @@ namespace gdjs {
      * Tween an object HSL color, with the "to" color given using HSL (H: any number, S and L: 0-100).
      * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
-     * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
+     * @param animateHue include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
      * @param toLightness The target lightness, or the same as the from color's lightness if blank
      * @param easing Easing function identifier

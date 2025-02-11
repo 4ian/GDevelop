@@ -1,10 +1,10 @@
 namespace gdjs {
-  /**
-   * Tools to manipulate the game window positioning and
-   * interactions with the operating system.
-   * @author arthuro555
-   */
   export namespace evtTools {
+    /**
+     * Tools to manipulate the game window positioning and
+     * interactions with the operating system.
+     * @author arthuro555
+     */
     export namespace advancedWindow {
       const getElectronBrowserWindow = (runtimeScene: gdjs.RuntimeScene) => {
         try {

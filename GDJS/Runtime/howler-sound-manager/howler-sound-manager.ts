@@ -383,7 +383,6 @@ namespace gdjs {
     _resourceLoader: gdjs.ResourceLoader;
 
     /**
-     * @param resources The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {

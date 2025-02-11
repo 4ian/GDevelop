@@ -104,8 +104,8 @@ namespace gdjs {
     /**
      * Reset to a translation.
      *
-     * @param x The horizontal translation value.
-     * @param y The vertical translation value.
+     * @param tx The horizontal translation value.
+     * @param ty The vertical translation value.
      */
     setToTranslation(tx: float, ty: float) {
       const matrix = this.matrix;
@@ -182,10 +182,10 @@ namespace gdjs {
      *
      * @param angle The angle of rotation in radians.
      */
-    setToRotation(theta: float) {
+    setToRotation(angle: float) {
       const matrix = this.matrix;
-      let cost = Math.cos(theta);
-      let sint = Math.sin(theta);
+      let cost = Math.cos(angle);
+      let sint = Math.sin(angle);
 
       // Avoid rounding errors around 0.
       if (cost === -1 || cost === 1) {

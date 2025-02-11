@@ -73,8 +73,6 @@ namespace gdjs {
       /**
        * Apply the effect on the PixiJS DisplayObject.
        * Called after the effect is initialized.
-       * @param rendererObject The renderer object
-       * @param effect The effect to be applied.
        */
       applyEffect(target: EffectsTarget): boolean;
       removeEffect(target: EffectsTarget): boolean;

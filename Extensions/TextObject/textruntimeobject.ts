@@ -583,10 +583,10 @@ namespace gdjs {
 
     /**
      * Change the text color.
-     * @param color color as a "R;G;B" string, for example: "255;0;0"
+     * @param colorString color as a "R;G;B" string, for example: "255;0;0"
      */
-    setColor(str: string): void {
-      const color = str.split(';');
+    setColor(colorString: string): void {
+      const color = colorString.split(';');
       if (color.length < 3) {
         return;
       }

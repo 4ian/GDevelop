@@ -60,7 +60,6 @@ namespace gdjs {
     _resourceLoader: gdjs.ResourceLoader;
 
     /**
-     * @param resourceDataArray The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      * @param imageManager The image manager to be used to get textures used by fonts.
      */

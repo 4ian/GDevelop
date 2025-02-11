@@ -230,7 +230,7 @@ namespace gdjs {
     protected _timers: Hashtable<gdjs.Timer>;
 
     /**
-     * @param runtimeScene The scene the object belongs to..
+     * @param instanceContainer The scene or custom object the object belongs to.
      * @param objectData The initial properties of the object.
      */
     constructor(
@@ -1472,7 +1472,7 @@ namespace gdjs {
 
     /**
      * Change the object center Y position in the scene.
-     * @param x The new Y position of the center in the scene.
+     * @param y The new Y position of the center in the scene.
      */
     setCenterYInScene(y: float): void {
       this.setY(y + this.y - (this.getDrawableY() + this.getCenterY()));

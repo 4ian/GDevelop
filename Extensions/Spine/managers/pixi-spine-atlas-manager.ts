@@ -31,8 +31,8 @@ namespace gdjs {
     >();
 
     /**
-     * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
+     * @param imageManager The image manager of the game.
      */
     constructor(
       resourceLoader: gdjs.ResourceLoader,
@@ -55,9 +55,9 @@ namespace gdjs {
     }
 
     /**
-     * Returns promisified loaded atlas resource if it is availble, loads it otherwise.
+     * Returns promisified loaded atlas resource if it is available, loads it otherwise.
      *
-     * @param resources The data of resource to load.
+     * @param resourceName The name of resource to load.
      */
     getOrLoad(resourceName: string): Promise<pixi_spine.TextureAtlas> {
       const resource = this._getAtlasResource(resourceName);
@@ -104,7 +104,7 @@ namespace gdjs {
     /**
      * Load specified atlas resource and pass it to callback once it is loaded.
      *
-     * @param resources The data of resource to load.
+     * @param resource The data of resource to load.
      * @param callback The callback to pass atlas to it once it is loaded.
      */
     load(

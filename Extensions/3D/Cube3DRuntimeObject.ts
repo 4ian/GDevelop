@@ -140,7 +140,7 @@ namespace gdjs {
      * Sets the visibility of a face of the 3D box.
      *
      * @param faceName - The name of the face to set visibility for.
-     * @param value - The visibility value to set.
+     * @param enable - The visibility value to set.
      */
     setFaceVisibility(faceName: FaceName, enable: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];
@@ -163,7 +163,7 @@ namespace gdjs {
      * Sets the texture repeat of a face of the 3D box.
      *
      * @param faceName - The name of the face to set visibility for.
-     * @param value - The visibility value to set.
+     * @param enable - The visibility value to set.
      */
     setRepeatTextureOnFace(faceName: FaceName, enable: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];

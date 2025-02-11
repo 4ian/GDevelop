@@ -20,8 +20,8 @@ const styles = {
   },
 };
 
-// const gdGamesHost = 'https://gd.games';
-const gdGamesHost = 'http://localhost:4000';
+const gdGamesHost = 'https://gd.games';
+// const gdGamesHost = 'http://localhost:4000';
 
 // Increment this when a breaking change is made to the embedded games platform.
 const gamesPlatformEmbeddedVersion = 1;

@@ -246,8 +246,8 @@ const GamesPlatformFrameStateProvider = ({
               },
               // Specify the target origin to avoid leaking the customToken.
               // Replace with '*' to test locally.
-              // 'https://gd.games'
-              '*'
+              'https://gd.games'
+              // '*'
             );
           } catch (error) {
             console.error(

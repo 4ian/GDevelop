@@ -34,8 +34,8 @@ const styles = {
   },
 };
 
-const gdGamesHost = 'https://gd.games';
-// const gdGamesHost = 'http://localhost:4000';
+// const gdGamesHost = 'https://gd.games';
+const gdGamesHost = 'http://localhost:4000';
 
 export const GdGamesFrame = ({
   loadErrorMessage,

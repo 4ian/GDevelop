@@ -17,6 +17,7 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../../UI/TextButton';
+import RouterContext from '../../../RouterContext';
 
 type CreditItemType = 'badge' | 'feedback';
 type BadgeInfo = {|
@@ -68,6 +69,7 @@ const styles = {
 };
 
 const FeedbackItem = () => {
+  const { navigateToRoute } = React.useContext(RouterContext);
   return (
     <LineStackLayout expand alignItems="center" noMargin>
       <div style={styles.badgeContainer}>
@@ -97,7 +99,9 @@ const FeedbackItem = () => {
         label={<Trans>Play a game</Trans>}
         secondary
         onClick={() => {
-          Window.openExternalURL('https://gd.games/games/random');
+          navigateToRoute('play', {
+            'playable-game-id': 'random',
+          });
         }}
       />
     </LineStackLayout>

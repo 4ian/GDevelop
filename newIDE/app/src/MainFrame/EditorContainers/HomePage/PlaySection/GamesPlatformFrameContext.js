@@ -121,7 +121,6 @@ const GamesPlatformFrameStateProvider = ({
 
   const notifyIframeToChangeGame = React.useCallback(
     (gameId: string) => {
-      console.log('Notify iframe to change game to', gameId);
       if (iframeLoaded) {
         // $FlowFixMe - we know it's an iframe.
         const iframe: ?HTMLIFrameElement = document.getElementById(
@@ -130,7 +129,7 @@ const GamesPlatformFrameStateProvider = ({
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage(
             {
-              id: 'open-game',
+              id: 'openGame',
               gameId,
             },
             '*'
@@ -143,11 +142,10 @@ const GamesPlatformFrameStateProvider = ({
 
   React.useEffect(
     () => {
-      if (routeArguments['playable-game-id']) {
+      const playableGameId = routeArguments['playable-game-id'];
+      if (playableGameId) {
         setLastGameId(routeArguments['playable-game-id']);
         removeRouteArguments(['playable-game-id']);
-
-        // TODO force the iframe to reload?
       }
     },
     [routeArguments, removeRouteArguments]
@@ -243,7 +241,7 @@ const GamesPlatformFrameStateProvider = ({
             );
             iframe.contentWindow.postMessage(
               {
-                id: 'authenticated-user-custom-token',
+                id: 'connectUserWithCustomToken',
                 token: userCustomToken,
               },
               // Specify the target origin to avoid leaking the customToken.
@@ -281,7 +279,7 @@ const GamesPlatformFrameStateProvider = ({
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage(
             {
-              id: 'user-disconnected',
+              id: 'disconnectUser',
             },
             // No need to specify the target origin, as this info is not sensitive.
             '*'

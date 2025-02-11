@@ -44,7 +44,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
     gameId.current
       ? `/embedded/games/${gameId.current}`
       : isMobile
-      ? '/embedded/games/random' // On mobile, go directly to a random game.
+      ? '/embedded/games/random' // On mobile, go directly to a random game if none is specified.
       : `/embedded/${paletteType}`, // On desktop, access the homepage.
     gdGamesHost
   );

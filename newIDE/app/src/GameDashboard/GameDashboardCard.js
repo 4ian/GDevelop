@@ -52,6 +52,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
+
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
@@ -223,6 +224,7 @@ const GameDashboardCard = ({
   } = useAlertDialog();
 
   const isPublishedOnGdGames = !!game && game.publicWebBuildId;
+  const countOfSessionsLastWeek = game ? game.cachedLastWeekSessionsCount : 0;
   const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
 
   const gameThumbnailUrl = React.useMemo(
@@ -513,9 +515,26 @@ const GameDashboardCard = ({
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
 
+                const hasPlayerMessage = countOfSessionsLastWeek
+                  ? t`Has ${countOfSessionsLastWeek} players in the last 7 days`
+                  : t`Has no players`;
+                const hasBeenPublished = isPublishedOnGdGames
+                  ? t`Is published on gd.games`
+                  : t`Is not published`;
+
+                const message = t`You're deleting a game which:${'\n\n'}
+                    - ${i18n._(hasPlayerMessage)}
+                    ${'\n'}
+                    - ${i18n._(hasBeenPublished)}
+                    ${'\n\n'}
+                    If you continue, the game and this project will be deleted.${'\n\n'}
+                    This action is irreversible. Do you want to continue?`;
+
                 const answer = await showDeleteConfirmation({
-                  title: t`Delete game`,
-                  message: t`Your game will be deleted. This action is irreversible. Do you want to continue?`,
+                  title: t`Delete ${gameName}`,
+                  header: renderThumbnail(),
+                  message: message,
+
                   confirmButtonLabel: t`Delete game`,
                   fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
                   confirmText: translatedConfirmText,

@@ -140,6 +140,7 @@ function ConfirmProvider({ children }: Props) {
           message={confirmDeleteDialogConfig.message}
           fieldMessage={confirmDeleteDialogConfig.fieldMessage}
           confirmText={confirmDeleteDialogConfig.confirmText}
+          header={confirmDeleteDialogConfig.header}
         />
       )}
       {yesNoCancelDialogConfig && (

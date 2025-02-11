@@ -223,8 +223,9 @@ const GameDashboardCard = ({
     showDeleteConfirmation,
   } = useAlertDialog();
 
-  const isPublishedOnGdGames = !!game && game.publicWebBuildId;
-  const countOfSessionsLastWeek = game ? game.cachedLastWeekSessionsCount : 0;
+  const isPublishedOnGdGames = !!game && !!game.publicWebBuildId;
+  const countOfSessionsLastWeek =
+    (game && game.cachedLastWeekSessionsCount) || 0;
   const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
 
   const gameThumbnailUrl = React.useMemo(

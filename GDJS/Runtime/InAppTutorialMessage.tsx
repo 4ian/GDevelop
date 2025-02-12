@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  declare var nmd: any;
   const logger = new gdjs.Logger('InAppTutorialMessage');
   const padding = '20px';
   const redHeroImage =
@@ -78,7 +79,7 @@ namespace gdjs {
 
     let _container: HTMLElement | null = null;
 
-    const _loadFont = () => {
+    const _loadFonts = () => {
       new FontFace(
         'Fira Sans',
         "url(https://fonts.gstatic.com/s/firasans/v17/va9E4kDNxMZdWfMOD5Vvl4jLazX3dA.woff2) format('woff2')",
@@ -92,6 +93,29 @@ namespace gdjs {
       )
         .load()
         .then((fontFace) => document.fonts.add(fontFace));
+      new FontFace(
+        'Fira Sans',
+        "url(https://fonts.gstatic.com/s/firasans/v17/va9B4kDNxMZdWfMOD5VnLK3eRhf6Xl7Glw.woff2) format('woff2')",
+        {
+          variant: 'normal',
+          weight: 'bold',
+          unicodeRange:
+            'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
+          display: 'swap',
+        }
+      )
+        .load()
+        .then((fontFace) => document.fonts.add(fontFace));
+    };
+
+    const _loadStyles = () => {
+      const adhocStyle = document.createElement('style');
+      adhocStyle.textContent = `
+        #${containerId} p {
+          margin-block: 0; /* To remove any browser built-in style */
+        }
+      `;
+      document.head.appendChild(adhocStyle);
     };
 
     const getDomElementContainer = (
@@ -154,7 +178,11 @@ namespace gdjs {
           'translateY(calc(-100% - 10px))';
       }
 
-      _loadFont();
+      const messageContent = document.createElement('div');
+      messageContent.innerHTML = nmd(message);
+
+      _loadFonts();
+      _loadStyles();
       _container = (
         <div
           id={containerId}
@@ -167,7 +195,7 @@ namespace gdjs {
                 ...messageContainerPositionStyle,
               }}
             >
-              {message}
+              {messageContent}
             </div>
             <img
               width={60}

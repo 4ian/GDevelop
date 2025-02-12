@@ -870,6 +870,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 
   if (includeInAppTutorialMessage) {
     InsertUnique(includesFiles, "InAppTutorialMessage.js");
+    InsertUnique(includesFiles, "libs/nanomarkdown.js");
   }
 
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {

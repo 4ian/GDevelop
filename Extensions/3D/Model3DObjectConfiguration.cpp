@@ -175,7 +175,8 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetValue(gd::String::From(crossfadeDuration))
       .SetType("number")
       .SetLabel(_("Crossfade duration"))
-      .SetGroup(_("Animations"));
+      .SetGroup(_("Animations"))
+      .SetMeasurementUnit(gd::MeasurementUnit::GetSecond());
 
   return objectProperties;
 }
@@ -237,7 +238,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("originLocation", originLocation);
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
-  content.SetAttribute("crossFadeDuration", crossfadeDuration);
+  content.SetAttribute("crossfadeDuration", crossfadeDuration);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

@@ -293,6 +293,18 @@ const Model3DEditor = ({
     [forceUpdate, modelSize, objectConfiguration, onDimensionChange]
   );
 
+  const setCrossfadeDuration = React.useCallback(
+    (duration: number) => {
+      objectConfiguration.updateProperty(
+        'crossfadeDuration',
+        duration.toString(10)
+      );
+
+      forceUpdate();
+    },
+    [forceUpdate, objectConfiguration]
+  );
+
   const scanNewAnimations = React.useCallback(
     () => {
       if (!gltf) {
@@ -667,6 +679,12 @@ const Model3DEditor = ({
             </SelectField>
           </ResponsiveLineStackLayout>
           <Text size="block-title">Animations</Text>
+          <Column noMargin expand>
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="crossfadeDuration"
+            />
+          </Column>
           <Column noMargin expand useFullHeight>
             {model3DConfiguration.getAnimationsCount() === 0 ? (
               <Column noMargin expand justifyContent="center">

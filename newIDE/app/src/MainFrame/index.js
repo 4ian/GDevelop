@@ -168,7 +168,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
-import TabsTitlebar from './TabsTitlebar';
+import TabsTitlebar, { type TabsTitlebarInterface } from './TabsTitlebar';
 import {
   useStableUpToDateCallback,
   useStableUpToDateRef,
@@ -346,6 +346,7 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
+  const tabsTitlebar = React.useRef<?TabsTitlebarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1248,6 +1249,12 @@ const MainFrame = (props: Props) => {
     if (!toolbar.current) return;
 
     toolbar.current.hideToolbar(hidden);
+  };
+
+  const hideTabsTitlebar = (hidden: boolean) => {
+    if (!tabsTitlebar.current) return;
+
+    tabsTitlebar.current.hideTitlebar(hidden);
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
@@ -3679,7 +3686,10 @@ const MainFrame = (props: Props) => {
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>
-      <TabsTitlebar toggleProjectManager={toggleProjectManager}>
+      <TabsTitlebar
+        ref={tabsTitlebar}
+        toggleProjectManager={toggleProjectManager}
+      >
         <DraggableEditorTabs
           hideLabels={false}
           editorTabs={state.editorTabs}
@@ -3764,6 +3774,7 @@ const MainFrame = (props: Props) => {
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
                     hideToolbar: hideEditorToolbar,
+                    hideTabsTitlebar: hideTabsTitlebar,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

@@ -5,6 +5,7 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import {
   homepageDesktopMenuBarWidth,
   homepageMediumMenuBarWidth,
+  homepageMobileMenuHeight,
 } from '../HomePageMenuBar';
 import { SECTION_DESKTOP_SPACING } from '../SectionContainer';
 import Paper from '../../../../UI/Paper';
@@ -66,18 +67,15 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
     [loaded, initialGameId]
   );
 
-  const containerTop = 37 + (isMobile ? 0 : 40); // tabs title bar + toolbar
+  const containerTop = isMobile ? 0 : 37 + 40; // tabs title bar + toolbar
+  const containerBottom = isMobile ? homepageMobileMenuHeight : 0;
   const containerLeft = isMobile
     ? 0
     : isMediumScreen
     ? homepageMediumMenuBarWidth
     : homepageDesktopMenuBarWidth;
-  const containerWidth = isMobile
-    ? '100%'
-    : isMediumScreen
-    ? `calc(100% - ${homepageMediumMenuBarWidth}px`
-    : `calc(100% - ${homepageDesktopMenuBarWidth}px`;
-  const containerHeight = `calc(100% - ${containerTop}px)`;
+  const containerWidth = `calc(100% - ${containerLeft}px`;
+  const containerHeight = `calc(100% - ${containerTop + containerBottom}px)`;
 
   const iframeSideMargin = isMobile ? 0 : SECTION_DESKTOP_SPACING;
   const iframeHeight = 'calc(100% - 4px)';

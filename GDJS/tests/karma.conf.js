@@ -151,8 +151,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/pixi-spine/pixi-spine.js',
-      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/spineruntimeobject.js',
-      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/spineruntimeobject-pixi-renderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/spineruntimeobject.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/spineruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/*.js',
 
       // Test extensions:

@@ -372,7 +372,6 @@ namespace gdjs {
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
     _soundSpatialSetting: Record<integer, [number, number, number]> = {};
-    _musicSpatialSetting: Record<integer, [number, number, number]> = {};
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
@@ -743,12 +742,7 @@ namespace gdjs {
         loop,
         pitch
       );
-      const spatialSetting = this._musicSpatialSetting[channel];
-      if (spatialSetting) {
-        music.once('play', () => {
-          music.setSpatialPosition(...spatialSetting);
-        });
-      }
+      // Musics are played with the html5 backend, that is not compatible with spatialization.
       this._musics[channel] = music;
       music.once('play', () => {
         if (this._paused) {
@@ -775,21 +769,8 @@ namespace gdjs {
         this._soundSpatialSetting[channel] = [x, y, z];
       }
     }
-    setMusicSpatialPositionOnChannel(
-      channel: number,
-      x: number,
-      y: number,
-      z: number
-    ) {
-      const music = this.getMusicOnChannel(channel);
-      if (music && !music.paused()) music.setSpatialPosition(x, y, z);
-      else {
-        this._musicSpatialSetting[channel] = [x, y, z];
-      }
-    }
 
     _clearCachedSpatialPosition() {
-      this._musicSpatialSetting = {};
       this._soundSpatialSetting = {};
     }
 

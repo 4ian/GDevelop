@@ -58,30 +58,6 @@ module.exports = {
 
     extension
       .addAction(
-        'SetMusicPosition',
-        _('Set position of music'),
-        _(
-          "Sets the spatial position of a music. When a music is at a distance of 1 to the listener, it's heard at 100% volume. Then, it follows an *inverse distance model*. At a distance of 2, it's heard at 50%, and at a distance of 4 it's heard at 25%."
-        ),
-        _(
-          'Set position of music on channel _PARAM1_ to position _PARAM2_, _PARAM3_, _PARAM4_'
-        ),
-        '',
-        'res/actions/son24.png',
-        'res/actions/son.png'
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .addParameter('expression', _('Channel'), '', false)
-      .addParameter('expression', _('X position'), '', false)
-      .addParameter('expression', _('Y position'), '', false)
-      .addParameter('expression', _('Z position'), '', false)
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/SpatialSound/howler.spatial.min.js')
-      .addIncludeFile('Extensions/SpatialSound/spatialsoundtools.js')
-      .setFunctionName('gdjs.evtTools.spatialSound.setMusicPosition');
-
-    extension
-      .addAction(
         'SetListenerPosition',
         _('Listener position'),
         _('Change the spatial position of the listener/player.'),

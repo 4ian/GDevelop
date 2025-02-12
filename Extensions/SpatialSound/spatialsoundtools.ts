@@ -12,17 +12,6 @@ namespace gdjs {
         const soundManager = instanceContainer.getScene().getSoundManager();
         soundManager.setSoundSpatialPositionOnChannel(channel, x, y, z);
       };
-      export const setMusicPosition = (
-        instanceContainer: gdjs.RuntimeInstanceContainer,
-        channel: integer,
-        x: float,
-        y: float,
-        z: float
-      ) => {
-        // TODO EBO The position must be transform to the scene position when it comes from a custom object.
-        const soundManager = instanceContainer.getScene().getSoundManager();
-        soundManager.setMusicSpatialPositionOnChannel(channel, x, y, z);
-      };
     }
   }
 }

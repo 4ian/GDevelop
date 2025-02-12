@@ -318,9 +318,8 @@ namespace gdjs {
         };
         let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
         if (authenticatedPlayerData) {
-          headers[
-            'Authorization'
-          ] = `player-game-token ${authenticatedPlayerData.playerToken}`;
+          headers['Authorization'] =
+            `player-game-token ${authenticatedPlayerData.playerToken}`;
           leaderboardEntryCreationUrl += `?playerId=${authenticatedPlayerData.playerId}`;
         } else {
           // In case playerName is empty, the backend will generate a random name.

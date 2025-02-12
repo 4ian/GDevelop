@@ -184,48 +184,54 @@ namespace gdjs {
         });
 
         // Hide the watermark
-        this._fadeOutTimeout = setTimeout(() => {
-          if (!this._containerElement || !this._backgroundElement) {
-            return;
-          }
-          this._containerElement.style.opacity = '0';
-          this._backgroundElement.style.opacity = '0';
+        this._fadeOutTimeout = setTimeout(
+          () => {
+            if (!this._containerElement || !this._backgroundElement) {
+              return;
+            }
+            this._containerElement.style.opacity = '0';
+            this._backgroundElement.style.opacity = '0';
 
-          // Completely remove the watermark once the fade out duration has ended.
-          this._hideTimeout = setTimeout(
-            () => {
-              if (
-                !this._containerElement ||
-                !this._backgroundElement ||
-                !this._linkElement
-              )
-                return;
-              this._linkElement.style.pointerEvents = 'none';
-              this._containerElement.style.display = 'none';
-              this._backgroundElement.style.display = 'none';
-              if (this._resizeObserver) this._resizeObserver.disconnect();
-            },
-            // Deactivate all interaction possibilities with watermark at
-            // the end of the animation to make sure it doesn't deactivate too early
-            this._fadeDuration * 1000
-          );
-        }, (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000);
+            // Completely remove the watermark once the fade out duration has ended.
+            this._hideTimeout = setTimeout(
+              () => {
+                if (
+                  !this._containerElement ||
+                  !this._backgroundElement ||
+                  !this._linkElement
+                )
+                  return;
+                this._linkElement.style.pointerEvents = 'none';
+                this._containerElement.style.display = 'none';
+                this._backgroundElement.style.display = 'none';
+                if (this._resizeObserver) this._resizeObserver.disconnect();
+              },
+              // Deactivate all interaction possibilities with watermark at
+              // the end of the animation to make sure it doesn't deactivate too early
+              this._fadeDuration * 1000
+            );
+          },
+          (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000
+        );
 
         // Change text below watermark
-        this._fadeOutFirstTextTimeout = setTimeout(() => {
-          const { _madeWithTextElement, _usernameTextElement } = this;
-          if (!_madeWithTextElement) return;
+        this._fadeOutFirstTextTimeout = setTimeout(
+          () => {
+            const { _madeWithTextElement, _usernameTextElement } = this;
+            if (!_madeWithTextElement) return;
 
-          // Do not hide madeWith text if there is no author username to display.
-          if (_usernameTextElement) {
-            _madeWithTextElement.style.opacity = '0';
-            this._fadeInSecondTextTimeout = setTimeout(() => {
-              _usernameTextElement.style.lineHeight = 'normal';
-              _usernameTextElement.style.opacity = '1';
-              _madeWithTextElement.style.lineHeight = '0';
-            }, this._fadeDuration * 1000);
-          }
-        }, (this._fadeInDelayAfterGameLoaded + this._changeTextDelay) * 1000);
+            // Do not hide madeWith text if there is no author username to display.
+            if (_usernameTextElement) {
+              _madeWithTextElement.style.opacity = '0';
+              this._fadeInSecondTextTimeout = setTimeout(() => {
+                _usernameTextElement.style.lineHeight = 'normal';
+                _usernameTextElement.style.opacity = '1';
+                _madeWithTextElement.style.lineHeight = '0';
+              }, this._fadeDuration * 1000);
+            }
+          },
+          (this._fadeInDelayAfterGameLoaded + this._changeTextDelay) * 1000
+        );
       }
 
       private createMadeWithTextElement() {

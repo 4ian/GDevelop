@@ -502,8 +502,8 @@ namespace gdjs {
       return sceneName === this.currentLoadingSceneName
         ? this.currentSceneLoadingProgress
         : this.areSceneAssetsLoaded(sceneName)
-        ? 1
-        : 0;
+          ? 1
+          : 0;
     }
 
     /**

@@ -1777,7 +1777,7 @@ declare namespace Box2D {
   export const wrapPointer: <
     TargetClass extends typeof WrapperObject & {
       new (...args: any[]): InstanceType<TargetClass>;
-    } = typeof WrapperObject
+    } = typeof WrapperObject,
   >(
     pointer: number,
     targetType?: TargetClass
@@ -1786,7 +1786,7 @@ declare namespace Box2D {
   export const castObject: <
     TargetClass extends typeof WrapperObject & {
       new (...args: any[]): InstanceType<TargetClass>;
-    } = typeof WrapperObject
+    } = typeof WrapperObject,
   >(
     instance: WrapperObject,
     targetType?: TargetClass
@@ -1796,7 +1796,7 @@ declare namespace Box2D {
     instance2: WrapperObject
   ) => boolean;
   export const getCache: <
-    Class extends typeof WrapperObject = typeof WrapperObject
+    Class extends typeof WrapperObject = typeof WrapperObject,
   >(
     type?: Class
   ) => {

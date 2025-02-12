@@ -915,8 +915,8 @@ namespace gdjs {
         this.bodyType === 'Static'
           ? Box2D.b2_staticBody
           : this.bodyType === 'Kinematic'
-          ? Box2D.b2_kinematicBody
-          : Box2D.b2_dynamicBody
+            ? Box2D.b2_kinematicBody
+            : Box2D.b2_dynamicBody
       );
       bodyDef.set_bullet(this.bullet);
       bodyDef.set_fixedRotation(this.fixedRotation);

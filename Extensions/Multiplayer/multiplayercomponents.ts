@@ -623,8 +623,8 @@ namespace gdjs {
         type === 'success'
           ? '#0E062D'
           : type === 'warning'
-          ? '#FFA500'
-          : '#FF0000';
+            ? '#FFA500'
+            : '#FF0000';
       // Space the notifications vertically, based on how many there are.
       divContainer.style.top = `${12 + notificationContainerIds.length * 32}px`;
       divContainer.style.right = '16px';

@@ -194,12 +194,11 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace linkedObjects {
-      gdjs.registerObjectDeletedFromSceneCallback(function (
-        instanceContainer,
-        obj
-      ) {
-        LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
-      });
+      gdjs.registerObjectDeletedFromSceneCallback(
+        function (instanceContainer, obj) {
+          LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
+        }
+      );
 
       export const linkObjects = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,

@@ -695,8 +695,8 @@ namespace gdjs {
         (this._verticalTextAlignment === 'center'
           ? this.getHeight() / 2
           : this._verticalTextAlignment === 'bottom'
-          ? this.getHeight()
-          : 0)
+            ? this.getHeight()
+            : 0)
       );
     }
 

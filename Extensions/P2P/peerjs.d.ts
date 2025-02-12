@@ -4,7 +4,7 @@
  */
 declare class EventEmitter<
   EventTypes extends EventEmitter.ValidEventTypes = string | symbol,
-  Context extends any = any
+  Context extends any = any,
 > {
   static prefixed: string | boolean;
 
@@ -87,7 +87,7 @@ declare namespace EventEmitter {
   export interface EventEmitterStatic {
     new <
       EventTypes extends ValidEventTypes = string | symbol,
-      Context = any
+      Context = any,
     >(): EventEmitter<EventTypes, Context>;
   }
 
@@ -110,13 +110,13 @@ declare namespace EventEmitter {
     [K in keyof T]: T[K] extends (...args: any[]) => void
       ? Parameters<T[K]>
       : T[K] extends any[]
-      ? T[K]
-      : any[];
+        ? T[K]
+        : any[];
   };
 
   export type EventListener<
     T extends ValidEventTypes,
-    K extends EventNames<T>
+    K extends EventNames<T>,
   > = T extends string | symbol
     ? (...args: any[]) => void
     : (
@@ -125,7 +125,7 @@ declare namespace EventEmitter {
 
   export type EventArgs<
     T extends ValidEventTypes,
-    K extends EventNames<T>
+    K extends EventNames<T>,
   > = Parameters<EventListener<T, K>>;
 
   export const EventEmitter: EventEmitterStatic;
@@ -265,7 +265,7 @@ declare namespace Peer {
   };
   abstract class BaseConnection<
     T extends EventEmitter.ValidEventTypes,
-    TT
+    TT,
   > extends EventEmitter<T & BaseConnectionEvents> {
     readonly peer: string;
     provider: Peer<TT>;

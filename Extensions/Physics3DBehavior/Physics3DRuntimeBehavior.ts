@@ -662,8 +662,8 @@ namespace gdjs {
           shapeDimensionB > 0
             ? shapeDimensionB
             : height > 0
-            ? height
-            : onePixel;
+              ? height
+              : onePixel;
         const boxDepth =
           shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -682,8 +682,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(
@@ -698,8 +698,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const cylinderDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -721,8 +721,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.pow(width * height * depth, 1 / 3) / 2
-            : onePixel;
+              ? Math.pow(width * height * depth, 1 / 3) / 2
+              : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
         this._shapeHalfDepth = radius;
@@ -1784,8 +1784,8 @@ namespace gdjs {
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
-            ? Jolt.EMotionType_Kinematic
-            : Jolt.EMotionType_Dynamic,
+              ? Jolt.EMotionType_Kinematic
+              : Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
         bodyCreationSettings.mMotionQuality = behavior.bullet

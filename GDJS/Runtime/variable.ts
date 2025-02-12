@@ -478,8 +478,8 @@ namespace gdjs {
       return this._type === 'number'
         ? this.getAsNumber()
         : this._type === 'boolean'
-        ? this.getAsBoolean()
-        : this.getAsString();
+          ? this.getAsBoolean()
+          : this.getAsString();
     }
 
     /**
@@ -515,8 +515,8 @@ namespace gdjs {
       return this._type === 'structure'
         ? this._children
         : this._type === 'array'
-        ? (Object.assign({}, this._childrenArray) as unknown as Children)
-        : {};
+          ? (Object.assign({}, this._childrenArray) as unknown as Children)
+          : {};
     }
 
     /**
@@ -526,8 +526,8 @@ namespace gdjs {
       return this._type === 'structure'
         ? Object.values(this._children)
         : this._type === 'array'
-        ? this._childrenArray
-        : [];
+          ? this._childrenArray
+          : [];
     }
 
     /**
@@ -537,8 +537,8 @@ namespace gdjs {
       return this._type === 'structure'
         ? Object.keys(this._children).length
         : this._type === 'array'
-        ? this._childrenArray.length
-        : 0;
+          ? this._childrenArray.length
+          : 0;
     }
 
     /**

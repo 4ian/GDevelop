@@ -29,7 +29,7 @@ namespace gdjs {
     }
 
     static indexByPersistentUuid<
-      ObjectWithPersistentId extends { persistentUuid: string | null }
+      ObjectWithPersistentId extends { persistentUuid: string | null },
     >(
       objectsWithPersistentId: ObjectWithPersistentId[]
     ): Map<string, ObjectWithPersistentId> {

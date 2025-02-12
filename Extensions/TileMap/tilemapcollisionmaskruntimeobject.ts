@@ -87,8 +87,8 @@ namespace gdjs {
         objectData.content.useAllLayers === undefined
           ? null
           : Number.isFinite(objectData.content.layerIndex)
-          ? objectData.content.layerIndex
-          : 1;
+            ? objectData.content.layerIndex
+            : 1;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = gdjs.rgbOrHexStringToNumber(
         objectData.content.fillColor

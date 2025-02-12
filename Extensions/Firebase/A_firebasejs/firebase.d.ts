@@ -9511,7 +9511,7 @@ declare namespace firebase.firestore {
    * 'undefined'.
    */
   export class QueryDocumentSnapshot<
-    T = DocumentData
+    T = DocumentData,
   > extends DocumentSnapshot<T> {
     private constructor();
 

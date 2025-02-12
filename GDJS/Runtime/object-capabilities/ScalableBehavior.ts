@@ -55,7 +55,8 @@ namespace gdjs {
    */
   export class ScalableBehavior
     extends gdjs.RuntimeBehavior
-    implements Scalable {
+    implements Scalable
+  {
     private object: gdjs.RuntimeObject & Scalable;
 
     constructor(

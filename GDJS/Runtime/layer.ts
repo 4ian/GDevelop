@@ -61,7 +61,7 @@ namespace gdjs {
      * Called by the RuntimeScene whenever the game resolution size is changed.
      * Updates the layer width/height and position.
      */
-    onGameResolutionResized(
+    override onGameResolutionResized(
       oldGameResolutionOriginX: float,
       oldGameResolutionOriginY: float
     ): void {
@@ -97,7 +97,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The x position of the camera
      */
-    getCameraX(cameraId?: integer): float {
+    override getCameraX(cameraId?: integer): float {
       this._forceDimensionUpdate();
       return this._cameraX;
     }
@@ -108,7 +108,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The y position of the camera
      */
-    getCameraY(cameraId?: integer): float {
+    override getCameraY(cameraId?: integer): float {
       this._forceDimensionUpdate();
       return this._cameraY;
     }
@@ -119,7 +119,7 @@ namespace gdjs {
      * @param x The new x position
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraX(x: float, cameraId?: integer): void {
+    override setCameraX(x: float, cameraId?: integer): void {
       this._forceDimensionUpdate();
       this._cameraX = x;
       this._renderer.updatePosition();
@@ -131,7 +131,7 @@ namespace gdjs {
      * @param y The new y position
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraY(y: float, cameraId?: integer): void {
+    override setCameraY(y: float, cameraId?: integer): void {
       this._forceDimensionUpdate();
       this._cameraY = y;
       this._renderer.updatePosition();
@@ -144,7 +144,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The width of the camera
      */
-    getCameraWidth(cameraId?: integer): float {
+    override getCameraWidth(cameraId?: integer): float {
       return this.getWidth() / this._zoomFactor;
     }
 
@@ -155,7 +155,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The height of the camera
      */
-    getCameraHeight(cameraId?: integer): float {
+    override getCameraHeight(cameraId?: integer): float {
       return this.getHeight() / this._zoomFactor;
     }
 
@@ -165,7 +165,7 @@ namespace gdjs {
      * @param newZoom The new zoom. Must be superior to 0. 1 is the default zoom.
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraZoom(newZoom: float, cameraId?: integer): void {
+    override setCameraZoom(newZoom: float, cameraId?: integer): void {
       this._zoomFactor = newZoom;
       this._isCameraZDirty = true;
       this._renderer.updatePosition();
@@ -177,7 +177,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The zoom.
      */
-    getCameraZoom(cameraId?: integer): float {
+    override getCameraZoom(cameraId?: integer): float {
       return this._zoomFactor;
     }
 
@@ -188,7 +188,7 @@ namespace gdjs {
      * @param fov The field of view.
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraZ(z: float, fov: float | null, cameraId?: integer): void {
+    override setCameraZ(z: float, fov: float | null, cameraId?: integer): void {
       if (fov) {
         const cameraFovInRadians = gdjs.toRad(fov);
 
@@ -216,7 +216,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The z position of the camera
      */
-    getCameraZ(fov: float | null, cameraId?: integer): float {
+    override getCameraZ(fov: float | null, cameraId?: integer): float {
       if (!this._isCameraZDirty || !fov) {
         return this._cameraZ;
       }
@@ -239,7 +239,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The rotation, in degrees.
      */
-    getCameraRotation(cameraId?: integer): float {
+    override getCameraRotation(cameraId?: integer): float {
       return this._cameraRotation;
     }
 
@@ -250,7 +250,7 @@ namespace gdjs {
      * @param rotation The new rotation, in degrees.
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraRotation(rotation: float, cameraId?: integer): void {
+    override setCameraRotation(rotation: float, cameraId?: integer): void {
       this._cameraRotation = rotation;
       this._renderer.updatePosition();
     }
@@ -266,7 +266,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @param result The point instance that is used to return the result.
      */
-    convertCoords(
+    override convertCoords(
       x: float,
       y: float,
       cameraId: integer = 0,
@@ -312,7 +312,7 @@ namespace gdjs {
      * @param result The point instance that is used to return the result.
      * (x and y position of the point in layer coordinates).
      */
-    applyLayerInverseTransformation(
+    override applyLayerInverseTransformation(
       x: float,
       y: float,
       cameraId: integer,
@@ -347,7 +347,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @param result The point instance that is used to return the result.
      */
-    convertInverseCoords(
+    override convertInverseCoords(
       x: float,
       y: float,
       cameraId: integer = 0,
@@ -388,7 +388,7 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in parent coordinates).
      */
-    applyLayerTransformation(
+    override applyLayerTransformation(
       x: float,
       y: float,
       cameraId: integer,

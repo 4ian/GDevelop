@@ -61,7 +61,8 @@ namespace gdjs {
    */
   export class EffectBehavior
     extends gdjs.RuntimeBehavior
-    implements EffectHandler {
+    implements EffectHandler
+  {
     private object: gdjs.RuntimeObject & EffectHandler;
 
     constructor(

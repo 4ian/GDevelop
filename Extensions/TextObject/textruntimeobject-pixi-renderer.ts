@@ -103,8 +103,8 @@ namespace gdjs {
           this._object._textAlign === 'right'
             ? 1
             : this._object._textAlign === 'center'
-            ? 0.5
-            : 0;
+              ? 0.5
+              : 0;
 
         const width = this._object.getWrappingWidth();
 
@@ -123,8 +123,8 @@ namespace gdjs {
         this._object._verticalTextAlignment === 'bottom'
           ? 1
           : this._object._verticalTextAlignment === 'center'
-          ? 0.5
-          : 0;
+            ? 0.5
+            : 0;
       this._text.position.y =
         this._object.y + this._text.height * (0.5 - alignmentY);
       this._text.anchor.y = 0.5;

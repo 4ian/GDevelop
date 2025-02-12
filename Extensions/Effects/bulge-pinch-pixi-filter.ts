@@ -18,7 +18,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        const bulgePinchFilter =
+          filter as unknown as PIXI.filters.BulgePinchFilter;
         if (parameterName === 'centerX') {
           bulgePinchFilter.center[0] = value;
         } else if (parameterName === 'centerY') {
@@ -34,7 +35,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        const bulgePinchFilter =
+          filter as unknown as PIXI.filters.BulgePinchFilter;
         if (parameterName === 'centerX') {
           return bulgePinchFilter.center[0];
         }
@@ -68,7 +70,8 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): BulgePinchFilterNetworkSyncData {
-        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        const bulgePinchFilter =
+          filter as unknown as PIXI.filters.BulgePinchFilter;
         return {
           cx: bulgePinchFilter.center[0],
           cy: bulgePinchFilter.center[1],
@@ -80,7 +83,8 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: BulgePinchFilterNetworkSyncData
       ) {
-        const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
+        const bulgePinchFilter =
+          filter as unknown as PIXI.filters.BulgePinchFilter;
         bulgePinchFilter.center[0] = data.cx;
         bulgePinchFilter.center[1] = data.cy;
         bulgePinchFilter.radius = data.r;

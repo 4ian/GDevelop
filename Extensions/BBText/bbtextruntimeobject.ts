@@ -43,7 +43,8 @@ namespace gdjs {
    */
   export class BBTextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler {
+    implements gdjs.OpacityHandler
+  {
     _opacity: float;
 
     _text: string;

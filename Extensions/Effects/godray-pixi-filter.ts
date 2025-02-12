@@ -24,7 +24,7 @@ namespace gdjs {
         return godrayFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         if (godrayFilter.animationSpeed !== 0) {
           godrayFilter.time +=
@@ -36,7 +36,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         if (parameterName === 'lacunarity') {
           godrayFilter.lacunarity = value;
@@ -57,7 +57,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         if (parameterName === 'lacunarity') {
           return godrayFilter.lacunarity;
@@ -103,14 +103,14 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         if (parameterName === 'parallel') {
           godrayFilter.parallel = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): GodrayFilterNetworkSyncData {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         return {
           la: godrayFilter.lacunarity,
@@ -128,7 +128,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: GodrayFilterNetworkSyncData
       ) {
-        const godrayFilter = (filter as unknown) as PIXI.filters.GodrayFilter &
+        const godrayFilter = filter as unknown as PIXI.filters.GodrayFilter &
           GodrayFilterExtra;
         godrayFilter.lacunarity = data.la;
         godrayFilter.angle = data.a;

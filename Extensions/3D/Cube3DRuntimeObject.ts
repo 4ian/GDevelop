@@ -68,7 +68,7 @@ namespace gdjs {
       string,
       string,
       string,
-      string
+      string,
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;

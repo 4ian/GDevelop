@@ -83,9 +83,8 @@ namespace gdjs {
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
       this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
-      this._manager = gdjs.PathfindingObstaclesManager.getManager(
-        instanceContainer
-      );
+      this._manager =
+        gdjs.PathfindingObstaclesManager.getManager(instanceContainer);
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
         this._manager
       );

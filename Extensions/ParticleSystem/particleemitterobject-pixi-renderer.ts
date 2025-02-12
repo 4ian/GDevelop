@@ -273,9 +273,8 @@ namespace gdjs {
      */
     private _updateRotateFlagFromSpeed() {
       const rotation: any = this.emitter.getBehavior('rotation');
-      const moveAcceleration: any = this.emitter.getBehavior(
-        'moveAcceleration'
-      );
+      const moveAcceleration: any =
+        this.emitter.getBehavior('moveAcceleration');
       moveAcceleration.rotate =
         rotation.minSpeed === 0 &&
         rotation.maxSpeed === 0 &&
@@ -347,10 +346,8 @@ namespace gdjs {
         flow < 0
           ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
           : 1.0 / flow;
-      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
-        flow,
-        tank
-      );
+      this.emitter.emitterLifetime =
+        ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -449,6 +446,7 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export const ParticleEmitterObjectRenderer =
+    ParticleEmitterObjectPixiRenderer;
   export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
 }

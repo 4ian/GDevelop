@@ -106,8 +106,7 @@ module.exports = {
       return objectProperties;
     };
     objectBBText.content = {
-      text:
-        '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+      text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
       opacity: 255,
       fontSize: 20,
       visible: true,
@@ -193,9 +192,10 @@ module.exports = {
           parameterType === 'string' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -245,9 +245,10 @@ module.exports = {
           parameterType === 'number' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)

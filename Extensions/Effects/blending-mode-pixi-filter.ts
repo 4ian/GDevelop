@@ -16,7 +16,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
         if (parameterName === 'alpha') {
           blendingModeFilter.alpha = value;
         } else if (parameterName === 'blendmode') {
@@ -24,7 +24,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
         if (parameterName === 'alpha') {
           return blendingModeFilter.alpha;
         }
@@ -54,7 +54,7 @@ namespace gdjs {
       getNetworkSyncData(
         filter: PIXI.Filter
       ): BlendingModeFilterNetworkSyncData {
-        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
         return {
           a: blendingModeFilter.alpha,
           bm: blendingModeFilter.blendMode,
@@ -64,7 +64,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: BlendingModeFilterNetworkSyncData
       ) {
-        const blendingModeFilter = (filter as unknown) as PIXI.AlphaFilter;
+        const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
         blendingModeFilter.alpha = data.a;
         blendingModeFilter.blendMode = data.bm;
       }

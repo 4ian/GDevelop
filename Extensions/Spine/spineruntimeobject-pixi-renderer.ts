@@ -161,9 +161,8 @@ namespace gdjs {
       if (!isSpine(this._rendererObject)) {
         return 0;
       }
-      const animation = this._rendererObject.spineData.findAnimation(
-        sourceAnimationName
-      );
+      const animation =
+        this._rendererObject.spineData.findAnimation(sourceAnimationName);
       return animation ? animation.duration : 0;
     }
 

@@ -223,9 +223,8 @@ namespace gdjs {
       let _leaderboardViewIframeLoading: boolean = false;
       let _leaderboardViewIframeLoaded: boolean = false;
       let _errorTimeoutId: NodeJS.Timeout | null = null;
-      let _leaderboardMessageListener:
-        | ((event: MessageEvent) => void)
-        | null = null;
+      let _leaderboardMessageListener: ((event: MessageEvent) => void) | null =
+        null;
 
       const _loaderContainer: HTMLDivElement = document.createElement('div');
       _loaderContainer.style.backgroundColor = '#000000';
@@ -319,9 +318,8 @@ namespace gdjs {
         };
         let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
         if (authenticatedPlayerData) {
-          headers[
-            'Authorization'
-          ] = `player-game-token ${authenticatedPlayerData.playerToken}`;
+          headers['Authorization'] =
+            `player-game-token ${authenticatedPlayerData.playerToken}`;
           leaderboardEntryCreationUrl += `?playerId=${authenticatedPlayerData.playerId}`;
         } else {
           // In case playerName is empty, the backend will generate a random name.
@@ -397,10 +395,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerName, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -443,10 +439,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerId, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -866,9 +860,8 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-              targetUrl
-            );
+            _leaderboardViewIframe =
+              computeLeaderboardDisplayingIframe(targetUrl);
             if (typeof window !== 'undefined') {
               _leaderboardMessageListener = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(

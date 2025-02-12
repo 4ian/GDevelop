@@ -377,6 +377,8 @@ namespace gdjs {
       this._input.focus();
     }
   }
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

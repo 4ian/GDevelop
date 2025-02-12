@@ -149,18 +149,16 @@ namespace gdjs {
     let lastSceneSyncTimestamp = 0;
     let lastSentSceneSyncData: LayoutNetworkSyncData | null = null;
     let numberOfForcedSceneUpdates = 0;
-    let lastReceivedSceneSyncDataUpdates = new SavedSyncDataUpdates<
-      LayoutNetworkSyncData
-    >();
+    let lastReceivedSceneSyncDataUpdates =
+      new SavedSyncDataUpdates<LayoutNetworkSyncData>();
 
     // The number of times per second the game data should be synchronized.
     const gameSyncDataSyncRate = 1;
     let lastGameSyncTimestamp = 0;
     let lastSentGameSyncData: GameNetworkSyncData | null = null;
     let numberOfForcedGameUpdates = 0;
-    let lastReceivedGameSyncDataUpdates = new SavedSyncDataUpdates<
-      GameNetworkSyncData
-    >();
+    let lastReceivedGameSyncDataUpdates =
+      new SavedSyncDataUpdates<GameNetworkSyncData>();
 
     // Send heartbeat messages from host to players, ensuring their connection is still alive,
     // measure the ping, and send other useful info.
@@ -261,9 +259,8 @@ namespace gdjs {
         _lastClockReceivedByInstanceByScene[sceneNetworkId] = {};
       }
 
-      _lastClockReceivedByInstanceByScene[sceneNetworkId][
-        instanceNetworkId
-      ] = clock;
+      _lastClockReceivedByInstanceByScene[sceneNetworkId][instanceNetworkId] =
+        clock;
     };
 
     /**
@@ -407,7 +404,8 @@ namespace gdjs {
     };
 
     const changeInstanceOwnerMessageNamePrefix = '#changeInstanceOwner';
-    const changeInstanceOwnerMessageNameRegex = /#changeInstanceOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const changeInstanceOwnerMessageNameRegex =
+      /#changeInstanceOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
     const createChangeInstanceOwnerMessage = ({
       objectOwner,
       objectName,
@@ -446,15 +444,15 @@ namespace gdjs {
       };
     };
     const instanceOwnerChangedMessageNamePrefix = '#instanceOwnerChanged';
-    const instanceOwnerChangedMessageNameRegex = /#instanceOwnerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
-    const createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage = (
-      messageName: string
-    ): string => {
-      return messageName.replace(
-        changeInstanceOwnerMessageNamePrefix,
-        instanceOwnerChangedMessageNamePrefix
-      );
-    };
+    const instanceOwnerChangedMessageNameRegex =
+      /#instanceOwnerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage =
+      (messageName: string): string => {
+        return messageName.replace(
+          changeInstanceOwnerMessageNamePrefix,
+          instanceOwnerChangedMessageNamePrefix
+        );
+      };
     const handleChangeInstanceOwnerMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
@@ -524,7 +522,8 @@ namespace gdjs {
             return;
           }
 
-          const currentPlayerObjectOwnership = behavior.getPlayerObjectOwnership();
+          const currentPlayerObjectOwnership =
+            behavior.getPlayerObjectOwnership();
           // Change is coherent if:
           const ownershipChangeIsCoherent =
             // the object is changing ownership from the same owner the host knew about,
@@ -550,9 +549,10 @@ namespace gdjs {
           );
           behavior.playerNumber = newOwner;
 
-          const instanceOwnerChangedMessageName = createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
-            messageName
-          );
+          const instanceOwnerChangedMessageName =
+            createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
+              messageName
+            );
 
           debugLogger.info(
             `Sending acknowledgment of ownership change of object ${objectName} from ${previousOwner} to ${newOwner} with instance network ID ${instanceNetworkId} to ${messageSender}.`
@@ -594,7 +594,8 @@ namespace gdjs {
     };
 
     const updateInstanceMessageNamePrefix = '#updateInstance';
-    const updateInstanceMessageNameRegex = /#updateInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
+    const updateInstanceMessageNameRegex =
+      /#updateInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
     const createUpdateInstanceMessage = ({
       objectOwner,
       objectName,
@@ -757,7 +758,8 @@ namespace gdjs {
     };
 
     const changeVariableOwnerMessageNamePrefix = '#changeVariableOwner';
-    const changeVariableOwnerMessageNameRegex = /#changeVariableOwner#owner_(\d+)#variable_(.+)/;
+    const changeVariableOwnerMessageNameRegex =
+      /#changeVariableOwner#owner_(\d+)#variable_(.+)/;
     const createChangeVariableOwnerMessage = ({
       variableOwner,
       variableNetworkId,
@@ -782,15 +784,15 @@ namespace gdjs {
       };
     };
     const variableOwnerChangedMessageNamePrefix = '#variableOwnerChanged';
-    const variableOwnerChangedMessageNameRegex = /#variableOwnerChanged#owner_(\d+)#variable_(.+)/;
-    const createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage = (
-      messageName: string
-    ): string => {
-      return messageName.replace(
-        changeVariableOwnerMessageNamePrefix,
-        variableOwnerChangedMessageNamePrefix
-      );
-    };
+    const variableOwnerChangedMessageNameRegex =
+      /#variableOwnerChanged#owner_(\d+)#variable_(.+)/;
+    const createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage =
+      (messageName: string): string => {
+        return messageName.replace(
+          changeVariableOwnerMessageNamePrefix,
+          variableOwnerChangedMessageNamePrefix
+        );
+      };
     const handleChangeVariableOwnerMessagesReceived = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
@@ -885,9 +887,10 @@ namespace gdjs {
           );
           variable.setPlayerOwnership(newOwner);
 
-          const variableOwnerChangedMessageName = createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
-            messageName
-          );
+          const variableOwnerChangedMessageName =
+            createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
+              messageName
+            );
 
           debugLogger.info(
             `Sending acknowledgment of ownership change of variable with ID ${variableNetworkId} from ${previousOwner} to ${newOwner} to ${messageSender}.`
@@ -1081,9 +1084,10 @@ namespace gdjs {
                       changeInstanceOwnerMessageNamePrefix
                     )
                   ) {
-                    const matches = changeInstanceOwnerMessageNameRegex.exec(
-                      originalMessageName
-                    );
+                    const matches =
+                      changeInstanceOwnerMessageNameRegex.exec(
+                        originalMessageName
+                      );
                     if (!matches) {
                       // This should not happen, if it does, remove the acknowledgment and return.
                       delete expectedMessageAcknowledgements[
@@ -1146,9 +1150,10 @@ namespace gdjs {
                       changeVariableOwnerMessageNamePrefix
                     )
                   ) {
-                    const matches = changeVariableOwnerMessageNameRegex.exec(
-                      originalMessageName
-                    );
+                    const matches =
+                      changeVariableOwnerMessageNameRegex.exec(
+                        originalMessageName
+                      );
                     if (!matches) {
                       // This should not happen, if it does, remove the acknowledgment and return.
                       delete expectedMessageAcknowledgements[
@@ -1229,7 +1234,8 @@ namespace gdjs {
     };
 
     const destroyInstanceMessageNamePrefix = '#destroyInstance';
-    const destroyInstanceMessageNameRegex = /#destroyInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
+    const destroyInstanceMessageNameRegex =
+      /#destroyInstance#owner_(\d+)#object_(.+)#instance_(.+)#scene_(.+)/;
     const createDestroyInstanceMessage = ({
       objectOwner,
       objectName,
@@ -1250,7 +1256,8 @@ namespace gdjs {
       };
     };
     const instanceDestroyedMessageNamePrefix = '#instanceDestroyed';
-    const instanceDestroyedMessageNameRegex = /#instanceDestroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const instanceDestroyedMessageNameRegex =
+      /#instanceDestroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
     const createInstanceDestroyedMessageNameFromDestroyInstanceMessage = (
       messageName: string
     ): string => {
@@ -1315,9 +1322,10 @@ namespace gdjs {
             instanceNetworkId,
           });
 
-          const instanceDestroyedMessageName = createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
-            messageName
-          );
+          const instanceDestroyedMessageName =
+            createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
+              messageName
+            );
 
           if (!instance) {
             debugLogger.info(
@@ -1420,9 +1428,8 @@ namespace gdjs {
         userMessageData,
         senderPlayerNumber: currentPlayerNumber,
       });
-      const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
-        messageName
-      );
+      const acknowledgmentMessageName =
+        createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
       addExpectedMessageAcknowledgement({
         originalMessageName: messageName,
         originalData: messageData,
@@ -1441,9 +1448,8 @@ namespace gdjs {
       // If we are the host, we can consider this messaged as received
       // and add it to the list of custom messages to process on top of the messages received.
       if (gdjs.multiplayer.isCurrentPlayerHost()) {
-        const messagesList = gdjs.multiplayerPeerJsHelper.getOrCreateMessagesList(
-          messageName
-        );
+        const messagesList =
+          gdjs.multiplayerPeerJsHelper.getOrCreateMessagesList(messageName);
         messagesList.pushMessage(
           messageData,
           gdjs.multiplayerPeerJsHelper.getCurrentId()
@@ -1467,9 +1473,8 @@ namespace gdjs {
     };
 
     const hasCustomMessageBeenReceived = (userMessageName: string) => {
-      const customMessageName = getCustomMessageNameFromUserMessageName(
-        userMessageName
-      );
+      const customMessageName =
+        getCustomMessageNameFromUserMessageName(userMessageName);
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messagesList = p2pMessagesMap.get(customMessageName);
       if (!messagesList) return; // No message received.
@@ -1499,9 +1504,8 @@ namespace gdjs {
     };
 
     const getCustomMessageData = (userMessageName: string) => {
-      const customMessageName = getCustomMessageNameFromUserMessageName(
-        userMessageName
-      );
+      const customMessageName =
+        getCustomMessageNameFromUserMessageName(userMessageName);
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messagesList = p2pMessagesMap.get(customMessageName);
       if (!messagesList) return; // No message received.
@@ -1531,9 +1535,8 @@ namespace gdjs {
     };
 
     const getCustomMessageSender = (userMessageName: string): number => {
-      const customMessageName = getCustomMessageNameFromUserMessageName(
-        userMessageName
-      );
+      const customMessageName =
+        getCustomMessageNameFromUserMessageName(userMessageName);
       const p2pMessagesMap = gdjs.multiplayerPeerJsHelper.getAllMessagesMap();
       const messagesList = p2pMessagesMap.get(customMessageName);
       if (!messagesList) return 0;
@@ -1593,9 +1596,8 @@ namespace gdjs {
             return;
           }
 
-          const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
-            messageName
-          );
+          const acknowledgmentMessageName =
+            createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
           debugLogger.info(
             `Sending acknowledgment of custom message ${messageName} to ${messageSender}.`
           );
@@ -1681,9 +1683,8 @@ namespace gdjs {
         return;
       }
 
-      const isSceneSyncDataDifferent = isSceneDifferentFromLastSync(
-        sceneNetworkSyncData
-      );
+      const isSceneSyncDataDifferent =
+        isSceneDifferentFromLastSync(sceneNetworkSyncData);
       const shouldSyncScene =
         !hasSceneBeenSyncedRecently() ||
         isSceneSyncDataDifferent ||
@@ -1845,9 +1846,8 @@ namespace gdjs {
         return;
       }
 
-      const isGameSyncDataDifferent = isGameDifferentFromLastSync(
-        gameNetworkSyncData
-      );
+      const isGameSyncDataDifferent =
+        isGameDifferentFromLastSync(gameNetworkSyncData);
       const shouldSyncGame =
         !hasGameBeenSyncedRecently() ||
         isGameSyncDataDifferent ||
@@ -2039,10 +2039,11 @@ namespace gdjs {
           // If we are not the host, save what the host told us about the other players info
           // and respond with a heartbeat immediately, informing the host of our playerId and username.
           if (!gdjs.multiplayer.isCurrentPlayerHost()) {
-            const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
-            const currentlyKnownPlayerNumbers = Object.keys(
-              _playersInfo
-            ).map((playerNumber) => parseInt(playerNumber, 10));
+            const currentPlayerNumber =
+              gdjs.multiplayer.getCurrentPlayerNumber();
+            const currentlyKnownPlayerNumbers = Object.keys(_playersInfo).map(
+              (playerNumber) => parseInt(playerNumber, 10)
+            );
             const receivedPlayerNumbers = Object.keys(
               messageData.playersInfo
             ).map((playerNumber) => parseInt(playerNumber, 10));
@@ -2061,18 +2062,19 @@ namespace gdjs {
               );
               _playerNumbersWhoJustJoined.push(...newPlayerNumbers);
               // Or players who have disconnected.
-              const playerNumbersWhoHaveDisconnected = currentlyKnownPlayerNumbers.filter(
-                (playerNumber) => !receivedPlayerNumbers.includes(playerNumber)
-              );
+              const playerNumbersWhoHaveDisconnected =
+                currentlyKnownPlayerNumbers.filter(
+                  (playerNumber) =>
+                    !receivedPlayerNumbers.includes(playerNumber)
+                );
               _playerNumbersWhoJustLeft.push(
                 ...playerNumbersWhoHaveDisconnected
               );
               for (const playerNumber of playerNumbersWhoHaveDisconnected) {
                 // Temporarily save the username in another variable to be used for the notification,
                 // as we're deleting its playerInfo just after.
-                _temporaryPlayerNumberToUsername[
-                  playerNumber
-                ] = getPlayerUsername(playerNumber);
+                _temporaryPlayerNumberToUsername[playerNumber] =
+                  getPlayerUsername(playerNumber);
               }
             }
 
@@ -2188,14 +2190,14 @@ namespace gdjs {
       _playerNumbersWhoJustLeft.push(playerNumber);
       // Temporarily save the username in another variable to be used for the notification,
       // as we're deleting its playerInfo just after.
-      _temporaryPlayerNumberToUsername[playerNumber] = getPlayerUsername(
-        playerNumber
-      );
+      _temporaryPlayerNumberToUsername[playerNumber] =
+        getPlayerUsername(playerNumber);
       clearPlayerTempData(playerNumber);
 
       // If Host has disconnected, either switch host or stop the game.
       if (peerId && peerId === gdjs.multiplayer.hostPeerId) {
-        const shouldEndLobbyGame = gdjs.multiplayer.shouldEndLobbyWhenHostLeaves();
+        const shouldEndLobbyGame =
+          gdjs.multiplayer.shouldEndLobbyWhenHostLeaves();
         if (shouldEndLobbyGame) {
           logger.info('Host has disconnected, ending the game.');
 
@@ -2243,7 +2245,8 @@ namespace gdjs {
         peerId: string;
       }[] = [];
 
-      const justDisconnectedPeers = gdjs.multiplayerPeerJsHelper.getJustDisconnectedPeers();
+      const justDisconnectedPeers =
+        gdjs.multiplayerPeerJsHelper.getJustDisconnectedPeers();
       if (justDisconnectedPeers.length) {
         for (const disconnectedPeer of justDisconnectedPeers) {
           const disconnectedPlayerNumber =
@@ -2273,7 +2276,8 @@ namespace gdjs {
               behavior &&
               behavior.getPlayerObjectOwnership() === playerNumber
             ) {
-              const actionOnPlayerDisconnect = behavior.getActionOnPlayerDisconnect();
+              const actionOnPlayerDisconnect =
+                behavior.getActionOnPlayerDisconnect();
               if (actionOnPlayerDisconnect === 'DestroyObject') {
                 // No need to remove the ownership, as the destroy message will be sent to all players.
                 instance.deleteFromScene(runtimeScene);

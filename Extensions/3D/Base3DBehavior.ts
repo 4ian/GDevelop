@@ -142,7 +142,8 @@ namespace gdjs {
    */
   export class Base3DBehavior
     extends gdjs.RuntimeBehavior
-    implements Base3DHandler {
+    implements Base3DHandler
+  {
     private object: gdjs.RuntimeObject & Base3DHandler;
 
     constructor(

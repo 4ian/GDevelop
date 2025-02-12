@@ -20,7 +20,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        const advancedBloomFilter =
+          filter as unknown as PIXI.filters.AdvancedBloomFilter;
         if (parameterName === 'threshold') {
           advancedBloomFilter.threshold = value;
         } else if (parameterName === 'bloomScale') {
@@ -36,7 +37,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        const advancedBloomFilter =
+          filter as unknown as PIXI.filters.AdvancedBloomFilter;
         if (parameterName === 'threshold') {
           return advancedBloomFilter.threshold;
         }
@@ -78,7 +80,8 @@ namespace gdjs {
       getNetworkSyncData(
         filter: PIXI.Filter
       ): AdvancedBloomFilterNetworkSyncData {
-        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        const advancedBloomFilter =
+          filter as unknown as PIXI.filters.AdvancedBloomFilter;
         return {
           th: advancedBloomFilter.threshold,
           bs: advancedBloomFilter.bloomScale,
@@ -92,7 +95,8 @@ namespace gdjs {
         filter: PIXI.Filter,
         syncData: AdvancedBloomFilterNetworkSyncData
       ) {
-        const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
+        const advancedBloomFilter =
+          filter as unknown as PIXI.filters.AdvancedBloomFilter;
         advancedBloomFilter.threshold = syncData.th;
         advancedBloomFilter.bloomScale = syncData.bs;
         advancedBloomFilter.brightness = syncData.bn;

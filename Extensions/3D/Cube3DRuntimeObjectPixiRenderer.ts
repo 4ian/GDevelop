@@ -140,13 +140,11 @@ namespace gdjs {
      */
     updateTextureUvMapping(faceIndex?: number) {
       // @ts-ignore - position is stored as a Float32BufferAttribute
-      const pos: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'position'
-      );
+      const pos: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('position');
       // @ts-ignore - uv is stored as a Float32BufferAttribute
-      const uvMapping: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'uv'
-      );
+      const uvMapping: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('uv');
       const startIndex =
         faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
       const endIndex =
@@ -168,9 +166,10 @@ namespace gdjs {
           continue;
         }
 
-        const shouldRepeatTexture = this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
-          materialIndexToFaceIndex[materialIndex]
-        );
+        const shouldRepeatTexture =
+          this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
+            materialIndexToFaceIndex[materialIndex]
+          );
 
         const shouldOrientateFacesTowardsY =
           this._cube3DRuntimeObject.getFacesOrientation() === 'Y';
@@ -199,12 +198,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
               }
             }
             break;
@@ -230,12 +227,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 x = -x;
                 y = -y;
               }

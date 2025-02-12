@@ -72,7 +72,8 @@ namespace gdjs {
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler
+  {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -694,8 +695,8 @@ namespace gdjs {
         (this._verticalTextAlignment === 'center'
           ? this.getHeight() / 2
           : this._verticalTextAlignment === 'bottom'
-          ? this.getHeight()
-          : 0)
+            ? this.getHeight()
+            : 0)
       );
     }
 

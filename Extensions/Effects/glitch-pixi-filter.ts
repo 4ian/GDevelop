@@ -24,13 +24,13 @@ namespace gdjs {
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.GlitchFilter();
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         glitchFilter._animationTimer = 0;
         return glitchFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         if (glitchFilter.animationFrequency !== 0) {
           glitchFilter._animationTimer += target.getElapsedTime() / 1000;
@@ -48,7 +48,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         if (parameterName === 'slices') {
           glitchFilter.slices = value;
@@ -79,7 +79,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         if (parameterName === 'slices') {
           return glitchFilter.slices;
@@ -140,14 +140,14 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         if (parameterName === 'average') {
           glitchFilter.average = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): GlitchFilterNetworkSyncData {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         return {
           s: glitchFilter.slices,
@@ -170,7 +170,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: GlitchFilterNetworkSyncData
       ) {
-        const glitchFilter = (filter as unknown) as PIXI.filters.GlitchFilter &
+        const glitchFilter = filter as unknown as PIXI.filters.GlitchFilter &
           GlitchFilterExtra;
         glitchFilter.slices = data.s;
         glitchFilter.offset = data.o;

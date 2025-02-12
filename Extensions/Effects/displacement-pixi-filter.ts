@@ -25,7 +25,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        const displacementFilter = filter as unknown as PIXI.DisplacementFilter;
         if (parameterName === 'scaleX') {
           displacementFilter.scale.x = value;
         }
@@ -34,7 +34,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        const displacementFilter = filter as unknown as PIXI.DisplacementFilter;
         if (parameterName === 'scaleX') {
           return displacementFilter.scale.x;
         }
@@ -64,7 +64,7 @@ namespace gdjs {
       getNetworkSyncData(
         filter: PIXI.Filter
       ): DisplacementFilterNetworkSyncData {
-        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        const displacementFilter = filter as unknown as PIXI.DisplacementFilter;
         return {
           sx: displacementFilter.scale.x,
           sy: displacementFilter.scale.y,
@@ -74,7 +74,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: DisplacementFilterNetworkSyncData
       ) {
-        const displacementFilter = (filter as unknown) as PIXI.DisplacementFilter;
+        const displacementFilter = filter as unknown as PIXI.DisplacementFilter;
         displacementFilter.scale.x = data.sx;
         displacementFilter.scale.y = data.sy;
       }

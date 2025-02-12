@@ -11,7 +11,7 @@ namespace gdjs {
       this.getRenderer().reinitialize(this, parent);
     }
 
-    protected _createRender(): gdjs.CustomRuntimeObject2DRenderer {
+    protected override _createRender(): gdjs.CustomRuntimeObject2DRenderer {
       const parent = this._runtimeScene;
       return new gdjs.CustomRuntimeObject2DRenderer(
         this,
@@ -20,15 +20,15 @@ namespace gdjs {
       );
     }
 
-    protected _reinitializeRenderer(): void {
+    protected override _reinitializeRenderer(): void {
       this.getRenderer().reinitialize(this, this.getParent());
     }
 
-    getRenderer(): gdjs.CustomRuntimeObject2DRenderer {
+    override getRenderer(): gdjs.CustomRuntimeObject2DRenderer {
       return super.getRenderer() as gdjs.CustomRuntimeObject2DRenderer;
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this.getRenderer().getRendererObject();
     }
   }

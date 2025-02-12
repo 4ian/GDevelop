@@ -194,12 +194,11 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace linkedObjects {
-      gdjs.registerObjectDeletedFromSceneCallback(function (
-        instanceContainer,
-        obj
-      ) {
-        LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
-      });
+      gdjs.registerObjectDeletedFromSceneCallback(
+        function (instanceContainer, obj) {
+          LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
+        }
+      );
 
       export const linkObjects = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -245,9 +244,10 @@ namespace gdjs {
         if (obj === null) {
           return false;
         }
-        const linkedObjectMap = LinksManager.getManager(
-          instanceContainer
-        )._getMapOfObjectsLinkedWith(obj);
+        const linkedObjectMap =
+          LinksManager.getManager(instanceContainer)._getMapOfObjectsLinkedWith(
+            obj
+          );
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {

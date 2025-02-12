@@ -27,9 +27,8 @@ namespace gdjs {
       if (!instanceContainer.platformsObjectsManager) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        instanceContainer.platformsObjectsManager = new gdjs.PlatformObjectsManager(
-          instanceContainer
-        );
+        instanceContainer.platformsObjectsManager =
+          new gdjs.PlatformObjectsManager(instanceContainer);
       }
       // @ts-ignore
       return instanceContainer.platformsObjectsManager;
@@ -79,9 +78,8 @@ namespace gdjs {
       searchArea.minY = y - oh / 2 - maxMovementLength;
       searchArea.maxX = x + ow / 2 + maxMovementLength;
       searchArea.maxY = y + oh / 2 + maxMovementLength;
-      const nearbyPlatforms: gdjs.BehaviorRBushAABB<
-        PlatformRuntimeBehavior
-      >[] = this._platformRBush.search(searchArea);
+      const nearbyPlatforms: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior>[] =
+        this._platformRBush.search(searchArea);
 
       result.length = 0;
 
@@ -122,9 +120,8 @@ namespace gdjs {
     _oldWidth: float = 0;
     _oldHeight: float = 0;
     _oldAngle: float = 0;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      PlatformRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior> | null =
+      null;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
 

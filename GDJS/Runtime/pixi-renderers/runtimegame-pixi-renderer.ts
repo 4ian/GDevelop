@@ -55,7 +55,11 @@ namespace gdjs {
       this._forceFullscreen = forceFullscreen;
 
       //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
-      this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
+      this._marginLeft =
+        this._marginTop =
+        this._marginRight =
+        this._marginBottom =
+          0;
       this._setupOrientation();
     }
 

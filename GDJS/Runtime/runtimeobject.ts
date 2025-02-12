@@ -201,10 +201,8 @@ namespace gdjs {
     protected _variables: gdjs.VariablesContainer;
 
     //Effects:
-    protected _rendererEffects: Record<
-      string,
-      gdjs.PixiFiltersTools.Filter
-    > = {};
+    protected _rendererEffects: Record<string, gdjs.PixiFiltersTools.Filter> =
+      {};
 
     //Forces:
     protected _instantForces: gdjs.Force[] = [];
@@ -475,16 +473,14 @@ namespace gdjs {
 
       const effectsNetworkSyncData = {};
       for (const effectName in this._rendererEffects) {
-        effectsNetworkSyncData[effectName] = this._rendererEffects[
-          effectName
-        ].getNetworkSyncData();
+        effectsNetworkSyncData[effectName] =
+          this._rendererEffects[effectName].getNetworkSyncData();
       }
 
       const timersNetworkSyncData = {};
       for (const timerName in this._timers.items) {
-        timersNetworkSyncData[timerName] = this._timers.items[
-          timerName
-        ].getNetworkSyncData();
+        timersNetworkSyncData[timerName] =
+          this._timers.items[timerName].getNetworkSyncData();
       }
 
       return {

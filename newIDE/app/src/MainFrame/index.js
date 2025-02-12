@@ -258,6 +258,21 @@ const isCurrentProjectFresh = (
   currentProjectRef.current &&
   currentProject.ptr === currentProjectRef.current.ptr;
 
+/**
+ * When a project is created or opened, the fileMetadata is not aware of some project
+ * properties like the projectUuid or the name, until the project is deserialized.
+ * This function returns a new fileMetadata with the latest project properties,
+ * allowing the editor to have the latest information.
+ */
+const updateFileMetadataWithOpenedProject = (
+  fileMetadata: FileMetadata,
+  project: gdProject
+) => ({
+  ...fileMetadata,
+  gameId: project.getProjectUuid(),
+  name: project.getName(),
+});
+
 export type State = {|
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -855,11 +870,7 @@ const MainFrame = (props: Props) => {
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
-        ? {
-            ...fileMetadata,
-            name: project.getName(),
-            gameId: project.getProjectUuid(),
-          }
+        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
         : null;
 
       if (updatedFileMetadata) {
@@ -1142,11 +1153,10 @@ const MainFrame = (props: Props) => {
       // it can have been updated in the meantime (gameId, project name, etc...).
       // Use the ref here to be sure to have the latest file metadata.
       if (currentFileMetadataRef.current) {
-        const newFileMetadata: FileMetadata = {
-          ...currentFileMetadataRef.current,
-          name: project.getName(),
-          gameId: project.getProjectUuid(),
-        };
+        const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
+          currentFileMetadataRef.current,
+          project
+        );
         setState(state => ({
           ...state,
           currentFileMetadata: newFileMetadata,

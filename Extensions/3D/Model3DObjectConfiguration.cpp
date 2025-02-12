@@ -23,7 +23,7 @@ Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(0), rotationY(0),
       rotationZ(0), modelResourceName(""), materialType("StandardWithoutMetalness"),
       originLocation("ModelOrigin"), centerLocation("ModelOrigin"),
-      keepAspectRatio(true), crossfadeDuration(0.0f) {}
+      keepAspectRatio(true), crossfadeDuration(0.1f) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
                                                 const gd::String &newValue) {

@@ -1573,7 +1573,7 @@ namespace gdjs {
 
     /**
      * Set the jump sustain time of the Platformer Object.
-     * @param jumpSpeed The new jump sustain time.
+     * @param jumpSustainTime The new jump sustain time.
      */
     setJumpSustainTime(jumpSustainTime: float): void {
       this._jumpSustainTime = jumpSustainTime;

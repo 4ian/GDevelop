@@ -65,8 +65,10 @@ namespace gdjs {
 
     /**
      * Returns all the platforms around the specified object.
-     * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
-     * @return An array with all platforms near the object.
+     * @param x The center X of the area to search.
+     * @param y The center Y of the area to search.
+     * @param radius The maximum distance, in pixels, the object is going to do.
+     * @param result An array returned with all platforms near the object.
      */
     getAllObstaclesAround(
       x: float,

@@ -17,8 +17,8 @@ namespace gdjs {
     private _loadedSpines = new gdjs.ResourceCache<pixi_spine.ISkeletonData>();
 
     /**
-     * @param resourceDataArray The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
+     * @param spineAtlasManager The resources data of the game.
      */
     constructor(
       resourceLoader: gdjs.ResourceLoader,

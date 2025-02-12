@@ -329,7 +329,7 @@ namespace gdjs {
      *
      * @param x The X position of the point, in object coordinates.
      * @param y The Y position of the point, in object coordinates.
-     * @param result Array that will be updated with the result
+     * @param destination Array that will be updated with the result
      * (x and y position of the point in parent coordinates).
      */
     applyObjectTransformation(x: float, y: float, destination: FloatPoint) {
@@ -388,7 +388,7 @@ namespace gdjs {
      *
      * @param x The X position of the point, in parent coordinates.
      * @param y The Y position of the point, in parent coordinates.
-     * @param result Array that will be updated with the result
+     * @param destination Array that will be updated with the result
      * (x and y position of the point in object coordinates).
      */
     applyObjectInverseTransformation(
@@ -798,10 +798,6 @@ namespace gdjs {
       return this.opacity;
     }
 
-    /**
-     * Hide (or show) the object
-     * @param enable true to hide the object, false to show it again.
-     */
     hide(enable: boolean): void {
       if (enable === undefined) {
         enable = true;

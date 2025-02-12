@@ -738,7 +738,7 @@ namespace gdjs {
      * Change the position of a layer.
      *
      * @param layerName The name of the layer to reorder
-     * @param index The new position in the list of layers
+     * @param newIndex The new position in the list of layers
      */
     setLayerIndex(layerName: string, newIndex: integer): void {
       const layer: gdjs.RuntimeLayer = this._layers.get(layerName);

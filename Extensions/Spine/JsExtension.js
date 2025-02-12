@@ -137,10 +137,11 @@ module.exports = {
     const { PIXI, RenderedInstance, gd } = objectsRenderingService;
 
     class RenderedSpineInstance extends RenderedInstance {
+      /** @type {pixi_spine.Spine | null} */
       _spine = null;
       _rect = new PIXI.Graphics();
-      _initialWidth = null;
-      _initialHeight = null;
+      _initialWidth = 256;
+      _initialHeight = 256;
       _animationIndex = -1;
       _spineOriginOffsetX = 0;
       _spineOriginOffsetY = 0;
@@ -304,14 +305,14 @@ module.exports = {
        * @returns {number} default width
        */
       getDefaultWidth() {
-        return this._initialWidth !== null ? this._initialWidth : 256;
+        return this._initialWidth;
       }
 
       /**
        * @returns {number} default height
        */
       getDefaultHeight() {
-        return this._initialHeight !== null ? this._initialHeight : 256;
+        return this._initialHeight;
       }
 
       onRemovedFromScene() {

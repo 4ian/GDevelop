@@ -102,8 +102,8 @@ namespace gdjs {
     points: Hashtable<SpritePoint>;
 
     /**
-     * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
+     * @param textureManager The game image manager
      */
     constructor(
       frameData: SpriteFrameData,
@@ -204,8 +204,8 @@ namespace gdjs {
     frames: SpriteAnimationFrame<T>[] = [];
 
     /**
-     * @param imageManager The game image manager
      * @param directionData The direction data used to initialize the direction
+     * @param textureManager The game image manager
      */
     constructor(
       directionData: SpriteDirectionData,
@@ -315,7 +315,7 @@ namespace gdjs {
     private _onFrameChange: (() => void) | null = null;
 
     /**
-     * @param frameData The frame data used to initialize the frame
+     * @param animations The animation list data used to initialize the animator
      * @param textureManager The game image manager
      */
     constructor(
@@ -649,7 +649,8 @@ namespace gdjs {
 
     /**
      * Change the angle (or direction index) of the object
-     * @param The new angle (or direction index) to be applied
+     * @param oldValue The old angle
+     * @param newValue The new angle (or direction index) to be applied
      * @deprecated
      */
     setDirectionOrAngle(oldValue: float, newValue: float): float | null {

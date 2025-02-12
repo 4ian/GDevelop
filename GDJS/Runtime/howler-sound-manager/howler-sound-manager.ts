@@ -371,7 +371,7 @@ namespace gdjs {
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
-    _soundSpatialSetting: Record<integer, [number, number, number]> = {};
+    _cachedSpatialPosition: Record<integer, [number, number, number]> = {};
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
@@ -688,10 +688,10 @@ namespace gdjs {
         loop,
         pitch
       );
-      const spatialSetting = this._soundSpatialSetting[channel];
-      if (spatialSetting) {
+      const spatialPosition = this._cachedSpatialPosition[channel];
+      if (spatialPosition) {
         sound.once('play', () => {
-          sound.setSpatialPosition(...spatialSetting);
+          sound.setSpatialPosition(...spatialPosition);
         });
       }
       this._sounds[channel] = sound;
@@ -766,12 +766,19 @@ namespace gdjs {
       const sound = this.getSoundOnChannel(channel);
       if (sound && !sound.paused()) sound.setSpatialPosition(x, y, z);
       else {
-        this._soundSpatialSetting[channel] = [x, y, z];
+        // If no sound is playing at the time the method is called, the
+        // position is cached and will be used by the `playSoundOnChannel` method
+        // to set the spatial position right after the sound starts playing.
+        // This cached value is then cleared at the end of the frame.
+        // Without this caching strategy, if actions are in the wrong order,
+        // the spatial position will not apply to the sound because
+        // it is not playing yet.
+        this._cachedSpatialPosition[channel] = [x, y, z];
       }
     }
 
     _clearCachedSpatialPosition() {
-      this._soundSpatialSetting = {};
+      this._cachedSpatialPosition = {};
     }
 
     setGlobalVolume(volume: float): void {

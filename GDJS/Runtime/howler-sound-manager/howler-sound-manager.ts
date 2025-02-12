@@ -371,6 +371,8 @@ namespace gdjs {
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
+    _soundSpatialSetting: Record<integer, [number, number, number]> = {};
+    _musicSpatialSetting: Record<integer, [number, number, number]> = {};
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
@@ -388,6 +390,9 @@ namespace gdjs {
     constructor(resourceLoader: gdjs.ResourceLoader) {
       this._resourceLoader = resourceLoader;
 
+      gdjs.registerRuntimeScenePostEventsCallback(
+        this._clearCachedSpatialPosition.bind(this)
+      );
       const that = this;
       document.addEventListener('deviceready', function () {
         // pause/resume sounds in Cordova when the app is being paused/resumed
@@ -684,6 +689,12 @@ namespace gdjs {
         loop,
         pitch
       );
+      const spatialSetting = this._soundSpatialSetting[channel];
+      if (spatialSetting) {
+        sound.once('play', () => {
+          sound.setSpatialPosition(...spatialSetting);
+        });
+      }
       this._sounds[channel] = sound;
       sound.once('play', () => {
         if (this._paused) {
@@ -732,6 +743,12 @@ namespace gdjs {
         loop,
         pitch
       );
+      const spatialSetting = this._musicSpatialSetting[channel];
+      if (spatialSetting) {
+        music.once('play', () => {
+          music.setSpatialPosition(...spatialSetting);
+        });
+      }
       this._musics[channel] = music;
       music.once('play', () => {
         if (this._paused) {
@@ -744,6 +761,36 @@ namespace gdjs {
 
     getMusicOnChannel(channel: integer): HowlerSound | null {
       return this._musics[channel] || null;
+    }
+
+    setSoundSpatialPositionOnChannel(
+      channel: number,
+      x: number,
+      y: number,
+      z: number
+    ) {
+      const sound = this.getSoundOnChannel(channel);
+      if (sound && !sound.paused()) sound.setSpatialPosition(x, y, z);
+      else {
+        this._soundSpatialSetting[channel] = [x, y, z];
+      }
+    }
+    setMusicSpatialPositionOnChannel(
+      channel: number,
+      x: number,
+      y: number,
+      z: number
+    ) {
+      const music = this.getMusicOnChannel(channel);
+      if (music && !music.paused()) music.setSpatialPosition(x, y, z);
+      else {
+        this._musicSpatialSetting[channel] = [x, y, z];
+      }
+    }
+
+    _clearCachedSpatialPosition() {
+      this._musicSpatialSetting = {};
+      this._soundSpatialSetting = {};
     }
 
     setGlobalVolume(volume: float): void {

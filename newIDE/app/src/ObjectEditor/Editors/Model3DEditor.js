@@ -293,18 +293,6 @@ const Model3DEditor = ({
     [forceUpdate, modelSize, objectConfiguration, onDimensionChange]
   );
 
-  const setCrossfadeDuration = React.useCallback(
-    (duration: number) => {
-      objectConfiguration.updateProperty(
-        'crossfadeDuration',
-        duration.toString(10)
-      );
-
-      forceUpdate();
-    },
-    [forceUpdate, objectConfiguration]
-  );
-
   const scanNewAnimations = React.useCallback(
     () => {
       if (!gltf) {

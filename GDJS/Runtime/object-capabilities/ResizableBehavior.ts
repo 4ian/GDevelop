@@ -45,7 +45,8 @@ namespace gdjs {
    */
   export class ResizableBehavior
     extends gdjs.RuntimeBehavior
-    implements Resizable {
+    implements Resizable
+  {
     private object: gdjs.RuntimeObject & Resizable;
 
     constructor(

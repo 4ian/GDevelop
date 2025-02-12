@@ -28,7 +28,8 @@ namespace gdjs {
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Flippable,
-      gdjs.OpacityHandler {
+      gdjs.OpacityHandler
+  {
     _renderer:
       | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer;
@@ -61,8 +62,10 @@ namespace gdjs {
     private _flippedY: boolean = false;
     private opacity: float = 255;
     private _customCenter: FloatPoint | null = null;
-    private _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-    private _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    private _localTransformation: gdjs.AffineTransformation =
+      new gdjs.AffineTransformation();
+    private _localInverseTransformation: gdjs.AffineTransformation =
+      new gdjs.AffineTransformation();
     private _isLocalTransformationDirty: boolean = true;
     _type: string;
 
@@ -272,9 +275,8 @@ namespace gdjs {
             this.hitBoxes[i].vertices[j]
           );
         }
-        this.hitBoxes[i].vertices.length = this._untransformedHitBoxes[
-          i
-        ].vertices.length;
+        this.hitBoxes[i].vertices.length =
+          this._untransformedHitBoxes[i].vertices.length;
       }
     }
 

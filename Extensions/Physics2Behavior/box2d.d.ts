@@ -1774,16 +1774,20 @@ declare namespace Box2D {
     protected readonly __class__: typeof VoidPtr;
     protected ptr?: number;
   }
-  export const wrapPointer: <TargetClass extends typeof WrapperObject & {
-    new (...args: any[]): InstanceType<TargetClass>;
-  } = typeof WrapperObject>(
+  export const wrapPointer: <
+    TargetClass extends typeof WrapperObject & {
+      new (...args: any[]): InstanceType<TargetClass>;
+    } = typeof WrapperObject
+  >(
     pointer: number,
     targetType?: TargetClass
   ) => InstanceType<TargetClass>;
   export const getPointer: (instance: WrapperObject) => number;
-  export const castObject: <TargetClass extends typeof WrapperObject & {
-    new (...args: any[]): InstanceType<TargetClass>;
-  } = typeof WrapperObject>(
+  export const castObject: <
+    TargetClass extends typeof WrapperObject & {
+      new (...args: any[]): InstanceType<TargetClass>;
+    } = typeof WrapperObject
+  >(
     instance: WrapperObject,
     targetType?: TargetClass
   ) => InstanceType<TargetClass>;
@@ -1791,7 +1795,9 @@ declare namespace Box2D {
     instance: WrapperObject,
     instance2: WrapperObject
   ) => boolean;
-  export const getCache: <Class extends typeof WrapperObject = typeof WrapperObject>(
+  export const getCache: <
+    Class extends typeof WrapperObject = typeof WrapperObject
+  >(
     type?: Class
   ) => {
     [ptr: number]: InstanceType<Class>;

@@ -50,12 +50,12 @@ namespace gdjs {
         // `effectData.booleanParameters.someBoolean`
         logger.info(
           'The PIXI texture found for the Dummy Effect (not actually used):',
-          (layer
-            .getRuntimeScene()
-            .getGame()
-            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-            effectData.stringParameters.someImage
-          )
+          (
+            layer
+              .getRuntimeScene()
+              .getGame()
+              .getImageManager() as gdjs.PixiImageManager
+          ).getPIXITexture(effectData.stringParameters.someImage)
         );
         return filter;
       }

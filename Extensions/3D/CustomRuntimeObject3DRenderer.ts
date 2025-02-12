@@ -6,7 +6,8 @@ namespace gdjs {
    * The renderer for a {@link gdjs.CustomRuntimeObject3D} using Three.js.
    */
   export class CustomRuntimeObject3DRenderer
-    implements gdjs.RuntimeInstanceContainerRenderer {
+    implements gdjs.RuntimeInstanceContainerRenderer
+  {
     _object: gdjs.CustomRuntimeObject3D;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
@@ -139,16 +140,16 @@ namespace gdjs {
       imageManager: gdjs.PixiImageManager
     ): ThreeAnimationFrameTextureManager {
       if (!imageManager._threeAnimationFrameTextureManager) {
-        imageManager._threeAnimationFrameTextureManager = new ThreeAnimationFrameTextureManager(
-          imageManager
-        );
+        imageManager._threeAnimationFrameTextureManager =
+          new ThreeAnimationFrameTextureManager(imageManager);
       }
       return imageManager._threeAnimationFrameTextureManager;
     }
   }
 
   class ThreeAnimationFrameTextureManager
-    implements gdjs.AnimationFrameTextureManager<THREE.Material> {
+    implements gdjs.AnimationFrameTextureManager<THREE.Material>
+  {
     private _imageManager: gdjs.PixiImageManager;
 
     constructor(imageManager: gdjs.PixiImageManager) {
@@ -163,16 +164,16 @@ namespace gdjs {
     }
 
     getAnimationFrameWidth(material: THREE.Material) {
-      const map = (material as
-        | THREE.MeshBasicMaterial
-        | THREE.MeshStandardMaterial).map;
+      const map = (
+        material as THREE.MeshBasicMaterial | THREE.MeshStandardMaterial
+      ).map;
       return map ? map.image.width : 0;
     }
 
     getAnimationFrameHeight(material: THREE.Material) {
-      const map = (material as
-        | THREE.MeshBasicMaterial
-        | THREE.MeshStandardMaterial).map;
+      const map = (
+        material as THREE.MeshBasicMaterial | THREE.MeshStandardMaterial
+      ).map;
       return map ? map.image.height : 0;
     }
   }

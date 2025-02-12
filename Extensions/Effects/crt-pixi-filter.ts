@@ -23,13 +23,13 @@ namespace gdjs {
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.CRTFilter();
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         crtFilter._animationTimer = 0;
         return crtFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         if (crtFilter.animationSpeed !== 0) {
           // Multiply by 10 so that the default value is a sensible speed
@@ -49,7 +49,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         if (parameterName === 'lineWidth') {
           crtFilter.lineWidth = value;
@@ -76,7 +76,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         if (parameterName === 'lineWidth') {
           return crtFilter.lineWidth;
@@ -131,13 +131,13 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter;
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter;
         if (parameterName === 'verticalLine') {
           crtFilter.verticalLine = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): CRTFilterNetworkSyncData {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         return {
           lw: crtFilter.lineWidth,
@@ -158,7 +158,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: CRTFilterNetworkSyncData
       ) {
-        const crtFilter = (filter as unknown) as PIXI.filters.CRTFilter &
+        const crtFilter = filter as unknown as PIXI.filters.CRTFilter &
           CRTFilterExtra;
         crtFilter.lineWidth = data.lw;
         crtFilter.lineContrast = data.lc;

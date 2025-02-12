@@ -20,7 +20,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        const rgbSplitFilter = filter as unknown as PIXI.filters.RGBSplitFilter;
         if (parameterName === 'redX') {
           rgbSplitFilter.red.x = value;
         } else if (parameterName === 'redY') {
@@ -36,7 +36,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        const rgbSplitFilter = filter as unknown as PIXI.filters.RGBSplitFilter;
         if (parameterName === 'redX') {
           return rgbSplitFilter.red.x;
         }
@@ -76,7 +76,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): RGBSplitFilterNetworkSyncData {
-        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        const rgbSplitFilter = filter as unknown as PIXI.filters.RGBSplitFilter;
         return {
           rX: rgbSplitFilter.red.x,
           rY: rgbSplitFilter.red.y,
@@ -90,7 +90,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: RGBSplitFilterNetworkSyncData
       ) {
-        const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+        const rgbSplitFilter = filter as unknown as PIXI.filters.RGBSplitFilter;
         rgbSplitFilter.red.x = data.rX;
         rgbSplitFilter.red.y = data.rY;
         rgbSplitFilter.green.x = data.gX;

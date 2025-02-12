@@ -423,9 +423,10 @@ namespace gdjs {
         this._currentDirection <
           this._animations[this._currentAnimation].directions.length
       ) {
-        const direction = this._animations[this._currentAnimation].directions[
-          this._currentDirection
-        ];
+        const direction =
+          this._animations[this._currentAnimation].directions[
+            this._currentDirection
+          ];
         if (this._currentFrameIndex < direction.frames.length) {
           this._animationFrame = direction.frames[this._currentFrameIndex];
           return this._animationFrame;
@@ -449,9 +450,10 @@ namespace gdjs {
       ) {
         return false;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       const animationDuration = this.getAnimationDuration();
       if (
         !this._animationPaused &&
@@ -533,9 +535,10 @@ namespace gdjs {
       ) {
         return true;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       if (direction.loop) {
         return false;
       }
@@ -578,9 +581,10 @@ namespace gdjs {
       ) {
         return false;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       if (
         newFrameIndex >= 0 &&
         newFrameIndex < direction.frames.length &&
@@ -608,9 +612,10 @@ namespace gdjs {
     }
 
     setAnimationElapsedTime(time: float): boolean {
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       this._animationElapsedTime = gdjs.evtTools.common.clamp(
         time,
         0,
@@ -630,9 +635,10 @@ namespace gdjs {
     }
 
     getAnimationDuration(): float {
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       return direction.frames.length * direction.timeBetweenFrames;
     }
 
@@ -740,9 +746,10 @@ namespace gdjs {
       ) {
         return true;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       if (direction.loop) {
         return false;
       }

@@ -19,7 +19,8 @@ namespace gdjs {
    */
   export class FlippableBehavior
     extends gdjs.RuntimeBehavior
-    implements Flippable {
+    implements Flippable
+  {
     private object: gdjs.RuntimeObject & Flippable;
 
     constructor(

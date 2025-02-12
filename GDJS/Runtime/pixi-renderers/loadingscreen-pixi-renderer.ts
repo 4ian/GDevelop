@@ -169,15 +169,16 @@ namespace gdjs {
         return true;
       }
       if (this._state == LoadingScreenState.NOT_STARTED) {
-        this._pixiRenderer.background.color = this._loadingScreenData.backgroundColor;
+        this._pixiRenderer.background.color =
+          this._loadingScreenData.backgroundColor;
         if (!this._backgroundSprite || this._backgroundSprite.texture.valid) {
           this._startLoadingScreen();
         }
         return true;
       }
 
-      const backgroundFadeInDuration = this._loadingScreenData
-        .backgroundFadeInDuration;
+      const backgroundFadeInDuration =
+        this._loadingScreenData.backgroundFadeInDuration;
 
       if (!this._backgroundSprite) {
         fadeIn(
@@ -193,10 +194,10 @@ namespace gdjs {
         if (!this._backgroundReadyTimeInMs)
           this._backgroundReadyTimeInMs = timeInMs;
 
-        const logoAndProgressFadeInDuration = this._loadingScreenData
-          .logoAndProgressFadeInDuration;
-        const logoAndProgressLogoFadeInDelay = this._loadingScreenData
-          .logoAndProgressLogoFadeInDelay;
+        const logoAndProgressFadeInDuration =
+          this._loadingScreenData.logoAndProgressFadeInDuration;
+        const logoAndProgressLogoFadeInDelay =
+          this._loadingScreenData.logoAndProgressLogoFadeInDelay;
 
         if (
           timeInMs - this._backgroundReadyTimeInMs >

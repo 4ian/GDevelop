@@ -30,9 +30,8 @@ namespace gdjs {
     static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (!instanceContainer.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
-        instanceContainer.pathfindingObstaclesManager = new gdjs.PathfindingObstaclesManager(
-          instanceContainer
-        );
+        instanceContainer.pathfindingObstaclesManager =
+          new gdjs.PathfindingObstaclesManager(instanceContainer);
       }
       return instanceContainer.pathfindingObstaclesManager;
     }
@@ -46,9 +45,8 @@ namespace gdjs {
       if (pathfindingObstacleBehavior.currentRBushAABB)
         pathfindingObstacleBehavior.currentRBushAABB.updateAABBFromOwner();
       else
-        pathfindingObstacleBehavior.currentRBushAABB = new gdjs.BehaviorRBushAABB(
-          pathfindingObstacleBehavior
-        );
+        pathfindingObstacleBehavior.currentRBushAABB =
+          new gdjs.BehaviorRBushAABB(pathfindingObstacleBehavior);
 
       this._obstaclesRBush.insert(pathfindingObstacleBehavior.currentRBushAABB);
     }
@@ -87,9 +85,8 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles: gdjs.BehaviorRBushAABB<
-        gdjs.PathfindingObstacleRuntimeBehavior
-      >[] = this._obstaclesRBush.search(searchArea);
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<gdjs.PathfindingObstacleRuntimeBehavior>[] =
+        this._obstaclesRBush.search(searchArea);
       result.length = 0;
       nearbyObstacles.forEach((nearbyObstacle) =>
         result.push(nearbyObstacle.behavior)
@@ -110,9 +107,8 @@ namespace gdjs {
     _oldHeight: float = 0;
     _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      PathfindingObstacleRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<PathfindingObstacleRuntimeBehavior> | null =
+      null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,

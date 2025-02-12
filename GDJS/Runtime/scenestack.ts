@@ -158,9 +158,8 @@ namespace gdjs {
 
       // Optionally create the objects from an external layout.
       if (externalLayoutName) {
-        const externalLayoutData = this._runtimeGame.getExternalLayoutData(
-          externalLayoutName
-        );
+        const externalLayoutData =
+          this._runtimeGame.getExternalLayoutData(externalLayoutName);
         if (externalLayoutData) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,

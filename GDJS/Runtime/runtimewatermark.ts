@@ -72,7 +72,8 @@ namespace gdjs {
         if (gameContainer) {
           this.addWatermarkToGameContainer(gameContainer);
           this._resizeObserver = new ResizeObserver(() => {
-            const gameContainerRectangle = gameContainer.getBoundingClientRect();
+            const gameContainerRectangle =
+              gameContainer.getBoundingClientRect();
             this.onResizeGameContainer(gameContainerRectangle.height);
           });
           this._resizeObserver.observe(gameContainer);

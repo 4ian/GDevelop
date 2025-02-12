@@ -47,9 +47,8 @@ namespace gdjs {
       this._color = gdjs.rgbOrHexToRGBColor(lightObjectData.content.color);
       this._debugMode = lightObjectData.content.debugMode;
       this._texture = lightObjectData.content.texture;
-      this._obstaclesManager = gdjs.LightObstaclesManager.getManager(
-        runtimeScene
-      );
+      this._obstaclesManager =
+        gdjs.LightObstaclesManager.getManager(runtimeScene);
       this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
       this._instanceContainer = runtimeScene;
 

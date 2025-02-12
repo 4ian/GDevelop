@@ -39,7 +39,8 @@ namespace gdjs {
       gdjs.Scalable,
       gdjs.Flippable,
       gdjs.Animatable,
-      gdjs.OpacityHandler {
+      gdjs.OpacityHandler
+  {
     _animator: gdjs.SpriteAnimator<any>;
     _scaleX: float = 1;
     _scaleY: float = 1;
@@ -305,9 +306,8 @@ namespace gdjs {
     }
 
     setAnimationIndex(newAnimation: integer): void {
-      const hasAnimationChanged = this._animator.setAnimationIndex(
-        newAnimation
-      );
+      const hasAnimationChanged =
+        this._animator.setAnimationIndex(newAnimation);
       if (hasAnimationChanged) {
         //TODO: This may be unnecessary.
         this._renderer.update();
@@ -317,9 +317,8 @@ namespace gdjs {
     }
 
     setAnimationName(newAnimationName: string): void {
-      const hasAnimationChanged = this._animator.setAnimationName(
-        newAnimationName
-      );
+      const hasAnimationChanged =
+        this._animator.setAnimationName(newAnimationName);
       if (hasAnimationChanged) {
         //TODO: This may be unnecessary.
         this._renderer.update();
@@ -535,9 +534,8 @@ namespace gdjs {
      * (x and y position of the point in global coordinates).
      */
     private _transformToGlobal(x: float, y: float, result: float[]) {
-      const animationFrame = this._animator.getCurrentFrame() as SpriteAnimationFrame<
-        any
-      >;
+      const animationFrame =
+        this._animator.getCurrentFrame() as SpriteAnimationFrame<any>;
       let cx = animationFrame.center.x;
       let cy = animationFrame.center.y;
 

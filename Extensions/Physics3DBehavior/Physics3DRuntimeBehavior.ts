@@ -75,9 +75,8 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
-    private _physics3DHooks: Array<
-      gdjs.Physics3DRuntimeBehavior.Physics3DHook
-    > = [];
+    private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
+      [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
@@ -181,9 +180,8 @@ namespace gdjs {
       behaviorName: string
     ): gdjs.Physics3DSharedData {
       if (!runtimeScene.physics3DSharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
@@ -207,9 +205,8 @@ namespace gdjs {
       const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
       );
-      const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
-        2
-      );
+      const broadPhaseLayerInterfaceMask =
+        new Jolt.BroadPhaseLayerInterfaceMask(2);
       broadPhaseLayerInterfaceMask.ConfigureLayer(
         staticBroadPhaseLayer,
         gdjs.Physics3DSharedData.staticLayersMask,
@@ -226,9 +223,10 @@ namespace gdjs {
 
       settings.mObjectLayerPairFilter = objectFilter;
       settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-      settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
-        broadPhaseLayerInterfaceMask
-      );
+      settings.mObjectVsBroadPhaseLayerFilter =
+        new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+          broadPhaseLayerInterfaceMask
+        );
     }
 
     /**
@@ -382,9 +380,8 @@ namespace gdjs {
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
         this
       );
-      this.collisionChecker = new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(
-        this
-      );
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;

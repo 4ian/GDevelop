@@ -1887,14 +1887,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1996,7 +1996,8 @@ module.exports = {
             // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
             // @ts-ignore - only this type of layer has setAlpha.
             if (layer.setAlpha) {
-              const editableLayer = /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
+              const editableLayer =
+                /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
               editableLayer.setAlpha(alphaForDisplay);
             }
           }
@@ -2392,7 +2393,8 @@ module.exports = {
             // Only update layers that are of type TileMapHelper.EditableTileMapLayer.
             // @ts-ignore - only this type of layer has setAlpha.
             if (layer.setAlpha) {
-              const editableLayer = /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
+              const editableLayer =
+                /** @type {TileMapHelper.EditableTileMapLayer} */ (layer);
               editableLayer.setAlpha(alphaForDisplay);
             }
           }
@@ -2576,14 +2578,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

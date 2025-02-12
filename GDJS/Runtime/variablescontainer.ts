@@ -356,9 +356,8 @@ namespace gdjs {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
-        const variableData = that._getVariableDataFromNetworkSyncData(
-          variableSyncData
-        );
+        const variableData =
+          that._getVariableDataFromNetworkSyncData(variableSyncData);
         const variableName = variableData.name;
         if (!variableName) continue;
 

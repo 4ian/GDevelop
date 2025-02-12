@@ -42,7 +42,8 @@ namespace gdjs {
 
   export class PhysicsCharacter3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
-    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook {
+    implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
+  {
     owner3D: gdjs.RuntimeObject3D;
     private _physics3DBehaviorName: string;
     private _physics3D: Physics3D | null = null;
@@ -128,12 +129,14 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
-      this.collisionChecker = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker(
-        this
-      );
-      this.charactersManager = gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager.getManager(
-        instanceContainer
-      );
+      this.collisionChecker =
+        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterCollisionChecker(
+          this
+        );
+      this.charactersManager =
+        gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager.getManager(
+          instanceContainer
+        );
 
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -201,9 +204,8 @@ namespace gdjs {
       this.setStairHeightMax(this._stairHeightMax);
       sharedData.registerHook(this);
 
-      behavior.bodyUpdater = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(
-        this
-      );
+      behavior.bodyUpdater =
+        new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
       behavior.collisionChecker = this.collisionChecker;
       behavior.recreateBody();
 
@@ -660,14 +662,15 @@ namespace gdjs {
           this._stickForce *
           Math.sin(gdjs.toRad(this._stickAngle));
       }
-      this._currentForwardSpeed = PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
-        this._currentForwardSpeed,
-        targetedForwardSpeed,
-        this._forwardSpeedMax,
-        this._forwardAcceleration,
-        this._forwardDeceleration,
-        timeDelta
-      );
+      this._currentForwardSpeed =
+        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+          this._currentForwardSpeed,
+          targetedForwardSpeed,
+          this._forwardSpeedMax,
+          this._forwardAcceleration,
+          this._forwardDeceleration,
+          timeDelta
+        );
       /** A stick with a half way force targets a lower speed than the maximum speed. */
       let targetedSidewaysSpeed = 0;
       if (this._hasPressedLeftKey !== this._hasPressedRightKey) {
@@ -682,14 +685,15 @@ namespace gdjs {
           this._stickForce *
           Math.cos(gdjs.toRad(this._stickAngle));
       }
-      this._currentSidewaysSpeed = PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
-        this._currentSidewaysSpeed,
-        targetedSidewaysSpeed,
-        this._sidewaysSpeedMax,
-        this._sidewaysAcceleration,
-        this._sidewaysDeceleration,
-        timeDelta
-      );
+      this._currentSidewaysSpeed =
+        PhysicsCharacter3DRuntimeBehavior.getAcceleratedSpeed(
+          this._currentSidewaysSpeed,
+          targetedSidewaysSpeed,
+          this._sidewaysSpeedMax,
+          this._sidewaysAcceleration,
+          this._sidewaysDeceleration,
+          timeDelta
+        );
     }
 
     private static getAcceleratedSpeed(
@@ -1432,7 +1436,8 @@ namespace gdjs {
       private characterVsCharacterCollision: Jolt.CharacterVsCharacterCollisionSimple;
 
       constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
-        this.characterVsCharacterCollision = new Jolt.CharacterVsCharacterCollisionSimple();
+        this.characterVsCharacterCollision =
+          new Jolt.CharacterVsCharacterCollisionSimple();
       }
 
       /**
@@ -1443,9 +1448,10 @@ namespace gdjs {
         if (!instanceContainer.charactersManager) {
           //Create the shared manager if necessary.
           // @ts-ignore
-          instanceContainer.charactersManager = new gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager(
-            instanceContainer
-          );
+          instanceContainer.charactersManager =
+            new gdjs.PhysicsCharacter3DRuntimeBehavior.CharactersManager(
+              instanceContainer
+            );
         }
         // @ts-ignore
         return instanceContainer.charactersManager;
@@ -1547,7 +1553,8 @@ namespace gdjs {
           // CharacterVsCharacterCollisionSimple handle characters pushing each other.
           this.characterBehavior.charactersManager.addCharacter(character);
 
-          const characterContactListener = new Jolt.CharacterContactListenerJS();
+          const characterContactListener =
+            new Jolt.CharacterContactListenerJS();
           characterContactListener.OnAdjustBodyVelocity = (
             character,
             body2Ptr,
@@ -1744,7 +1751,8 @@ namespace gdjs {
      * using Jolt `CharacterVirtual::GetActiveContacts`.
      */
     export class CharacterCollisionChecker
-      implements gdjs.Physics3DRuntimeBehavior.CollisionChecker {
+      implements gdjs.Physics3DRuntimeBehavior.CollisionChecker
+    {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
 
       _currentContacts: Array<Physics3DRuntimeBehavior> = [];
@@ -1773,7 +1781,8 @@ namespace gdjs {
         for (let index = 0; index < contacts.size(); index++) {
           const contact = contacts.at(index);
 
-          const bodyLockInterface = _sharedData.physicsSystem.GetBodyLockInterface();
+          const bodyLockInterface =
+            _sharedData.physicsSystem.GetBodyLockInterface();
           const body = bodyLockInterface.TryGetBody(contact.mBodyB);
           const behavior = body.gdjsAssociatedBehavior;
           if (behavior) {

@@ -17,7 +17,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         if (parameterName === 'thickness') {
           outlineFilter.thickness = value;
         } else if (parameterName === 'padding') {
@@ -25,7 +25,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         if (parameterName === 'thickness') {
           return outlineFilter.thickness;
         }
@@ -39,7 +39,7 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         if (parameterName === 'color') {
           outlineFilter.color = gdjs.rgbOrHexStringToNumber(value);
         }
@@ -49,13 +49,13 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         if (parameterName === 'color') {
           outlineFilter.color = value;
         }
       }
       getColorParameter(filter: PIXI.Filter, parameterName: string): number {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         if (parameterName === 'color') {
           return outlineFilter.color;
         }
@@ -67,7 +67,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): OutlineFilterNetworkSyncData {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         return {
           t: outlineFilter.thickness,
           p: outlineFilter.padding,
@@ -78,7 +78,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: OutlineFilterNetworkSyncData
       ) {
-        const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+        const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
         outlineFilter.thickness = data.t;
         outlineFilter.padding = data.p;
         outlineFilter.color = data.c;

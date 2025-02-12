@@ -72,7 +72,8 @@ namespace gdjs {
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler
+  {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;

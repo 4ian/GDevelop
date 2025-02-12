@@ -392,7 +392,8 @@ namespace gdjs {
     };
 
     const handleLeavingPlayer = (runtimeScene: gdjs.RuntimeScene) => {
-      const lastestPlayerWhoJustLeft = gdjs.multiplayerMessageManager.getLatestPlayerWhoJustLeft();
+      const lastestPlayerWhoJustLeft =
+        gdjs.multiplayerMessageManager.getLatestPlayerWhoJustLeft();
       if (lastestPlayerWhoJustLeft) {
         const playerUsername = getPlayerUsername(lastestPlayerWhoJustLeft);
         gdjs.multiplayerComponents.displayPlayerLeftNotification(
@@ -416,7 +417,8 @@ namespace gdjs {
     };
 
     const handleJoiningPlayer = (runtimeScene: gdjs.RuntimeScene) => {
-      const lastestPlayerWhoJustJoined = gdjs.multiplayerMessageManager.getLatestPlayerWhoJustJoined();
+      const lastestPlayerWhoJustJoined =
+        gdjs.multiplayerMessageManager.getLatestPlayerWhoJustJoined();
       if (lastestPlayerWhoJustJoined) {
         const playerUsername = getPlayerUsername(lastestPlayerWhoJustJoined);
         gdjs.multiplayerComponents.displayPlayerJoinedNotification(
@@ -654,9 +656,8 @@ namespace gdjs {
           return;
         }
 
-        const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
-          runtimeScene
-        );
+        const lobbiesIframe =
+          gdjs.multiplayerComponents.getLobbiesIframe(runtimeScene);
 
         if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
           return;
@@ -765,9 +766,8 @@ namespace gdjs {
       }
 
       // Then we inform the lobbies window that the player has joined.
-      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
-        runtimeScene
-      );
+      const lobbiesIframe =
+        gdjs.multiplayerComponents.getLobbiesIframe(runtimeScene);
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.error(
@@ -816,9 +816,8 @@ namespace gdjs {
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
-      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
-        runtimeScene
-      );
+      const lobbiesIframe =
+        gdjs.multiplayerComponents.getLobbiesIframe(runtimeScene);
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         return;
@@ -850,9 +849,8 @@ namespace gdjs {
       }
 
       // Just pass along the message to the iframe so that it can display the countdown.
-      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
-        runtimeScene
-      );
+      const lobbiesIframe =
+        gdjs.multiplayerComponents.getLobbiesIframe(runtimeScene);
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.info('The lobbies iframe is not opened, not sending message.');
@@ -1282,13 +1280,15 @@ namespace gdjs {
       );
 
       // First look for players who left during the migration.
-      const playerNumbersConnectedBeforeMigration = gdjs.multiplayerMessageManager
-        .getConnectedPlayers()
-        .map((player) => player.playerNumber);
-      const playerNumbersWhoLeftDuringMigration = playerNumbersConnectedBeforeMigration.filter(
-        (playerNumberBeforeMigration) =>
-          !expectedNewOtherPlayerNumbers.includes(playerNumberBeforeMigration)
-      );
+      const playerNumbersConnectedBeforeMigration =
+        gdjs.multiplayerMessageManager
+          .getConnectedPlayers()
+          .map((player) => player.playerNumber);
+      const playerNumbersWhoLeftDuringMigration =
+        playerNumbersConnectedBeforeMigration.filter(
+          (playerNumberBeforeMigration) =>
+            !expectedNewOtherPlayerNumbers.includes(playerNumberBeforeMigration)
+        );
       playerNumbersWhoLeftDuringMigration.map((playerNumberWhoLeft) => {
         logger.info(
           `Player ${playerNumberWhoLeft} left during the host migration. Marking as disconnected.`
@@ -1300,13 +1300,14 @@ namespace gdjs {
       });
 
       // Then check if all expected players are connected.
-      const playerNumbersWhoDidNotConnect = expectedNewOtherPlayerNumbers.filter(
-        (otherPlayerNumber) =>
-          otherPlayerNumber !== playerNumber && // We don't look for ourselves
-          !gdjs.multiplayerMessageManager.hasReceivedHeartbeatFromPlayer(
-            otherPlayerNumber
-          )
-      );
+      const playerNumbersWhoDidNotConnect =
+        expectedNewOtherPlayerNumbers.filter(
+          (otherPlayerNumber) =>
+            otherPlayerNumber !== playerNumber && // We don't look for ourselves
+            !gdjs.multiplayerMessageManager.hasReceivedHeartbeatFromPlayer(
+              otherPlayerNumber
+            )
+        );
 
       if (playerNumbersWhoDidNotConnect.length === 0) {
         logger.info('All expected players are connected. Resuming the game.');
@@ -1552,9 +1553,8 @@ namespace gdjs {
     };
 
     const sendSessionInformation = (runtimeScene: gdjs.RuntimeScene) => {
-      const lobbiesIframe = gdjs.multiplayerComponents.getLobbiesIframe(
-        runtimeScene
-      );
+      const lobbiesIframe =
+        gdjs.multiplayerComponents.getLobbiesIframe(runtimeScene);
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         // Cannot send the message if the iframe is not opened.
         return;
@@ -1633,9 +1633,8 @@ namespace gdjs {
       const platformInfo = runtimeScene.getGame().getPlatformInfo();
 
       try {
-        const quickJoinLobbyResponse: QuickJoinLobbyResponse = await gdjs.evtTools.network.retryIfFailed(
-          { times: 2 },
-          () =>
+        const quickJoinLobbyResponse: QuickJoinLobbyResponse =
+          await gdjs.evtTools.network.retryIfFailed({ times: 2 }, () =>
             fetchAsPlayer({
               relativeUrl: quickJoinLobbyRelativeUrl,
               method: 'POST',
@@ -1648,7 +1647,7 @@ namespace gdjs {
                   platformInfo.supportedCompressionMethods,
               }),
             })
-        );
+          );
 
         if (
           quickJoinLobbyResponse.status === 'full' ||
@@ -1720,11 +1719,9 @@ namespace gdjs {
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
         _isWaitingForLogin = true;
-        const {
-          status,
-        } = await gdjs.playerAuthentication.openAuthenticationWindow(
-          runtimeScene
-        ).promise;
+        const { status } =
+          await gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene)
+            .promise;
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
@@ -1806,11 +1803,9 @@ namespace gdjs {
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
         _isWaitingForLogin = true;
-        const {
-          status,
-        } = await gdjs.playerAuthentication.openAuthenticationWindow(
-          runtimeScene
-        ).promise;
+        const { status } =
+          await gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene)
+            .promise;
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
@@ -1879,9 +1874,8 @@ namespace gdjs {
     export const isLobbiesWindowOpen = function (
       runtimeScene: gdjs.RuntimeScene
     ): boolean {
-      const lobbiesRootContainer = gdjs.multiplayerComponents.getLobbiesRootContainer(
-        runtimeScene
-      );
+      const lobbiesRootContainer =
+        gdjs.multiplayerComponents.getLobbiesRootContainer(runtimeScene);
       return !!lobbiesRootContainer;
     };
 

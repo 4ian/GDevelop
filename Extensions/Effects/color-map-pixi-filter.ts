@@ -29,7 +29,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
         if (parameterName === 'mix') {
           colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(
             value / 100,
@@ -39,7 +39,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
         if (parameterName === 'mix') {
           return colorMapFilter.mix;
         }
@@ -63,20 +63,20 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
         if (parameterName === 'nearest') {
           colorMapFilter.nearest = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): ColorMapFilterNetworkSyncData {
-        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
         return { mix: colorMapFilter.mix, near: colorMapFilter.nearest };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: ColorMapFilterNetworkSyncData
       ) {
-        const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+        const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
         colorMapFilter.mix = data.mix;
         colorMapFilter.nearest = data.near;
       }

@@ -34,15 +34,18 @@ namespace gdjs {
     runtimeObject: gdjs.RuntimeObject
   ) => void;
 
-  export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
+  export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> =
+    [];
   export const callbacksRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeScenePreEvents: Array<RuntimeSceneCallback> = [];
-  export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> = [];
+  export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> =
+    [];
   export const callbacksRuntimeScenePaused: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneResumed: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
-  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> = [];
+  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
 
   /** Base64 encoded logo of GDevelop for the splash screen. */
   export let gdevelopLogo: string = '';

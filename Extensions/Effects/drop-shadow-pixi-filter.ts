@@ -22,7 +22,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'blur') {
           dropShadowFilter.blur = value;
         } else if (parameterName === 'quality') {
@@ -38,7 +39,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'blur') {
           return dropShadowFilter.blur;
         }
@@ -64,7 +66,8 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'color') {
           dropShadowFilter.color = gdjs.rgbOrHexStringToNumber(value);
         }
@@ -74,13 +77,15 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'color') {
           dropShadowFilter.color = value;
         }
       }
       getColorParameter(filter: PIXI.Filter, parameterName: string): number {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'color') {
           return dropShadowFilter.color;
         }
@@ -91,13 +96,15 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         if (parameterName === 'shadowOnly') {
           dropShadowFilter.shadowOnly = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): DropShadowFilterNetworkSyncData {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         return {
           b: dropShadowFilter.blur,
           q: dropShadowFilter.quality,
@@ -113,7 +120,8 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: DropShadowFilterNetworkSyncData
       ) {
-        const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
+        const dropShadowFilter =
+          filter as unknown as PIXI.filters.DropShadowFilter;
         dropShadowFilter.blur = data.b;
         dropShadowFilter.quality = data.q;
         dropShadowFilter.alpha = data.a;

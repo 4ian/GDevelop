@@ -238,11 +238,13 @@ namespace gdjs {
       this._originalWidth = this._gameResolutionWidth;
       this._originalHeight = this._gameResolutionHeight;
       this._resizeMode = this._data.properties.sizeOnStartupMode;
-      this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
+      this._adaptGameResolutionAtRuntime =
+        this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
       this._antialiasingMode = this._data.properties.antialiasingMode;
-      this._isAntialisingEnabledOnMobile = this._data.properties.antialisingEnabledOnMobile;
+      this._isAntialisingEnabledOnMobile =
+        this._data.properties.antialisingEnabledOnMobile;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -310,9 +312,10 @@ namespace gdjs {
     }
 
     private _updateSceneAndExtensionsData(): void {
-      const usedExtensionsWithVariablesData = this._data.eventsFunctionsExtensions.filter(
-        (extensionData) => extensionData.sceneVariables.length > 0
-      );
+      const usedExtensionsWithVariablesData =
+        this._data.eventsFunctionsExtensions.filter(
+          (extensionData) => extensionData.sceneVariables.length > 0
+        );
       this._sceneAndExtensionsData = this._data.layouts.map((sceneData) => ({
         sceneData,
         usedExtensionsWithVariablesData,
@@ -580,8 +583,10 @@ namespace gdjs {
           gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
           gdjs.RuntimeGameRenderer.getWindowInnerHeight
         ) {
-          const windowInnerWidth = gdjs.RuntimeGameRenderer.getWindowInnerWidth();
-          const windowInnerHeight = gdjs.RuntimeGameRenderer.getWindowInnerHeight();
+          const windowInnerWidth =
+            gdjs.RuntimeGameRenderer.getWindowInnerWidth();
+          const windowInnerHeight =
+            gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
           // Enlarge either the width or the eight to fill the inner window space.
           if (this._resizeMode === 'adaptWidth') {
@@ -788,8 +793,8 @@ namespace gdjs {
       try {
         // Download the loading screen background image first to be able to
         // display the loading screen as soon as possible.
-        const backgroundImageResourceName = this._data.properties.loadingScreen
-          .backgroundImageResourceName;
+        const backgroundImageResourceName =
+          this._data.properties.loadingScreen.backgroundImageResourceName;
         if (backgroundImageResourceName) {
           await this._resourcesLoader
             .getImageManager()
@@ -1355,14 +1360,12 @@ namespace gdjs {
 
       const extensionsVariablesSyncData = {};
       this._variablesByExtensionName.forEach((variables, extensionName) => {
-        const extensionVariablesSyncData = variables.getNetworkSyncData(
-          syncOptions
-        );
+        const extensionVariablesSyncData =
+          variables.getNetworkSyncData(syncOptions);
         // If there is no variables to sync, don't include the extension in the sync data.
         if (extensionVariablesSyncData.length) {
-          extensionsVariablesSyncData[
-            extensionName
-          ] = extensionVariablesSyncData;
+          extensionsVariablesSyncData[extensionName] =
+            extensionVariablesSyncData;
         }
       });
       syncData.extVar = extensionsVariablesSyncData;
@@ -1393,9 +1396,8 @@ namespace gdjs {
             continue;
           }
           const extensionVariablesData = syncData.extVar[extensionName];
-          const extensionVariables = this.getVariablesForExtension(
-            extensionName
-          );
+          const extensionVariables =
+            this.getVariablesForExtension(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
               extensionVariablesData

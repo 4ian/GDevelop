@@ -519,9 +519,9 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
 
     // Delete the temporary namespace to not bloat the DB
     after(async () =>
-      (
-        await firebase.firestore().collection(namespace).get()
-      ).forEach(({ ref }) => ref.delete())
+      (await firebase.firestore().collection(namespace).get()).forEach(
+        ({ ref }) => ref.delete()
+      )
     );
   });
 

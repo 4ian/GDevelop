@@ -91,11 +91,8 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   };
 
   it('creates the DOM element', async () => {
-    const {
-      runtimeScene,
-      gameDomElementContainer,
-      object,
-    } = await setupObjectAndGetDomElementContainer();
+    const { runtimeScene, gameDomElementContainer, object } =
+      await setupObjectAndGetDomElementContainer();
 
     // Check the default size.
     expect(object.getWidth()).to.be(300);
@@ -116,10 +113,8 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   });
 
   it('destroys the DOM element when the scene is paused/resumed/stopped', async () => {
-    const {
-      runtimeScene,
-      gameDomElementContainer,
-    } = await setupObjectAndGetDomElementContainer();
+    const { runtimeScene, gameDomElementContainer } =
+      await setupObjectAndGetDomElementContainer();
 
     expect(gameDomElementContainer.querySelector('input')).not.to.be(null);
 
@@ -138,11 +133,8 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   });
 
   it('changes the DOM element when the object type is updated', async () => {
-    const {
-      runtimeScene,
-      gameDomElementContainer,
-      object,
-    } = await setupObjectAndGetDomElementContainer();
+    const { runtimeScene, gameDomElementContainer, object } =
+      await setupObjectAndGetDomElementContainer();
 
     expect(gameDomElementContainer.querySelector('input')).not.to.be(null);
 
@@ -164,11 +156,8 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   });
 
   it('hides the DOM element when the object or layer is hidden', async () => {
-    const {
-      runtimeScene,
-      gameDomElementContainer,
-      object,
-    } = await setupObjectAndGetDomElementContainer();
+    const { runtimeScene, gameDomElementContainer, object } =
+      await setupObjectAndGetDomElementContainer();
 
     const formElement = gameDomElementContainer.querySelector('form');
     if (!formElement) throw new Error('Expected form element to be found');
@@ -203,11 +192,8 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
   });
 
   it('hides the DOM element when the object is far from the camera', async () => {
-    const {
-      runtimeScene,
-      gameDomElementContainer,
-      object,
-    } = await setupObjectAndGetDomElementContainer();
+    const { runtimeScene, gameDomElementContainer, object } =
+      await setupObjectAndGetDomElementContainer();
 
     const formElement = gameDomElementContainer.querySelector('form');
     if (!formElement) throw new Error('Expected input element to be found');

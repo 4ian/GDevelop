@@ -290,9 +290,8 @@ namespace gdjs {
 
       // Clean any point text from an object that is not rendered.
       for (const objectID in this._debugDrawRenderedObjectsPoints) {
-        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[
-          objectID
-        ];
+        const renderedObjectPoints =
+          this._debugDrawRenderedObjectsPoints[objectID];
         if (renderedObjectPoints.wasRendered) continue;
 
         const points = renderedObjectPoints.points;

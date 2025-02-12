@@ -245,9 +245,10 @@ namespace gdjs {
         if (obj === null) {
           return false;
         }
-        const linkedObjectMap = LinksManager.getManager(
-          instanceContainer
-        )._getMapOfObjectsLinkedWith(obj);
+        const linkedObjectMap =
+          LinksManager.getManager(instanceContainer)._getMapOfObjectsLinkedWith(
+            obj
+          );
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {

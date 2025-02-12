@@ -22,7 +22,8 @@ namespace gdjs {
    */
   export class TextContainerBehavior
     extends gdjs.RuntimeBehavior
-    implements TextContainer {
+    implements TextContainer
+  {
     private object: gdjs.RuntimeObject & TextContainer;
 
     constructor(

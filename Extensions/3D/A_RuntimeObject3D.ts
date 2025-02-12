@@ -28,7 +28,8 @@ namespace gdjs {
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Flippable,
-      gdjs.Base3DHandler {
+      gdjs.Base3DHandler
+  {
     /**
      * Position on the Z axis.
      */

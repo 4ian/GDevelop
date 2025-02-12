@@ -18,7 +18,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        const kawaseBlurFilter =
+          filter as unknown as PIXI.filters.KawaseBlurFilter;
         if (parameterName === 'pixelizeX') {
           kawaseBlurFilter.pixelSize[0] = value;
         } else if (parameterName === 'pixelizeY') {
@@ -30,7 +31,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        const kawaseBlurFilter =
+          filter as unknown as PIXI.filters.KawaseBlurFilter;
         if (parameterName === 'pixelizeX') {
           return kawaseBlurFilter.pixelSize[0];
         }
@@ -64,7 +66,8 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): KawaseBlurFilterNetworkSyncData {
-        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        const kawaseBlurFilter =
+          filter as unknown as PIXI.filters.KawaseBlurFilter;
         return {
           px: kawaseBlurFilter.pixelSize[0],
           py: kawaseBlurFilter.pixelSize[1],
@@ -76,7 +79,8 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: KawaseBlurFilterNetworkSyncData
       ) {
-        const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
+        const kawaseBlurFilter =
+          filter as unknown as PIXI.filters.KawaseBlurFilter;
         kawaseBlurFilter.pixelSize[0] = data.px;
         kawaseBlurFilter.pixelSize[1] = data.py;
         kawaseBlurFilter.blur = data.b;

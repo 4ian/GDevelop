@@ -30,7 +30,8 @@ namespace gdjs {
    */
   export class SimpleTileMapRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler
+  {
     /**
      * A reusable Point to avoid allocations.
      */
@@ -48,8 +49,10 @@ namespace gdjs {
     _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject;
     readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
-    _sceneToTileMapTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-    _tileMapToSceneTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    _sceneToTileMapTransformation: gdjs.AffineTransformation =
+      new gdjs.AffineTransformation();
+    _tileMapToSceneTransformation: gdjs.AffineTransformation =
+      new gdjs.AffineTransformation();
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
     _hitBoxTag: string = 'collision';
     private _transformationIsUpToDate: boolean = false;
@@ -73,14 +76,14 @@ namespace gdjs {
         dimY: 1,
         layers: [{ id: 0, alpha: this._opacity / 255, tiles: [] }],
       };
-      this._initialTilesWithHitBox = (objectData.content
-        .tilesWithHitBox as string)
+      this._initialTilesWithHitBox = (
+        objectData.content.tilesWithHitBox as string
+      )
         .split(',')
         .filter((id) => !!id)
         .map((idAsString) => parseInt(idAsString, 10));
-      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        instanceContainer
-      );
+      this._tileMapManager =
+        gdjs.TileMap.TileMapRuntimeManager.getManager(instanceContainer);
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -110,12 +113,12 @@ namespace gdjs {
         let shouldContinue = true;
         this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
           (textureName) => {
-            return (this.getInstanceContainer()
+            return this.getInstanceContainer()
               .getGame()
               .getImageManager()
-              .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
-              PIXI.Resource
-            >;
+              .getPIXITexture(
+                textureName
+              ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
           },
           this._atlasImage,
           this._tileSize,
@@ -281,12 +284,12 @@ namespace gdjs {
 
           this._tileMapManager.getOrLoadSimpleTileMapTextureCache(
             (textureName) => {
-              return (this.getInstanceContainer()
+              return this.getInstanceContainer()
                 .getGame()
                 .getImageManager()
-                .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
-                PIXI.Resource
-              >;
+                .getPIXITexture(
+                  textureName
+                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
             },
             this._atlasImage,
             this._tileSize,
@@ -574,7 +577,8 @@ namespace gdjs {
       // Scale
       this._tileMapToSceneTransformation.scale(absScaleX, absScaleY);
       if (this._collisionTileMap) {
-        const collisionTileMapTransformation = this._collisionTileMap.getTransformation();
+        const collisionTileMapTransformation =
+          this._collisionTileMap.getTransformation();
         collisionTileMapTransformation.copyFrom(
           this._tileMapToSceneTransformation
         );
@@ -646,10 +650,8 @@ namespace gdjs {
     }
 
     getTileAtPosition(x: float, y: float): integer {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
       return this.getTileAtGridCoordinates(columnIndex, rowIndex);
     }
 
@@ -658,10 +660,8 @@ namespace gdjs {
     }
 
     setTileAtPosition(tileId: number, x: float, y: float) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
       this.setTileAtGridCoordinates(tileId, columnIndex, rowIndex);
     }
 
@@ -707,18 +707,14 @@ namespace gdjs {
     }
 
     flipTileOnYAtPosition(x: float, y: float, flip: boolean) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
       this.flipTileOnYAtGridCoordinates(columnIndex, rowIndex, flip);
     }
 
     flipTileOnXAtPosition(x: float, y: float, flip: boolean) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
       this.flipTileOnXAtGridCoordinates(columnIndex, rowIndex, flip);
     }
 
@@ -745,10 +741,8 @@ namespace gdjs {
     }
 
     isTileFlippedOnXAtPosition(x: float, y: float) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
 
       return this._renderer.isTileFlippedOnX(columnIndex, rowIndex, 0);
     }
@@ -758,10 +752,8 @@ namespace gdjs {
     }
 
     isTileFlippedOnYAtPosition(x: float, y: float) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
 
       return this._renderer.isTileFlippedOnY(columnIndex, rowIndex, 0);
     }
@@ -771,10 +763,8 @@ namespace gdjs {
     }
 
     removeTileAtPosition(x: float, y: float) {
-      const [
-        columnIndex,
-        rowIndex,
-      ] = this.getGridCoordinatesFromSceneCoordinates(x, y);
+      const [columnIndex, rowIndex] =
+        this.getGridCoordinatesFromSceneCoordinates(x, y);
       this.removeTileAtGridCoordinates(columnIndex, rowIndex);
     }
 

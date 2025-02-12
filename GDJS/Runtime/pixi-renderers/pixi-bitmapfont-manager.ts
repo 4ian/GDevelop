@@ -172,7 +172,8 @@ namespace gdjs {
         }
         if (this._pixiBitmapFontsToUninstall.length > uninstallCacheSize) {
           // Remove the first font (i.e: the oldest one)
-          const oldestUnloadedPixiBitmapFontName = this._pixiBitmapFontsToUninstall.shift() as string;
+          const oldestUnloadedPixiBitmapFontName =
+            this._pixiBitmapFontsToUninstall.shift() as string;
 
           PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
           logger.log(

@@ -110,9 +110,8 @@ namespace gdjs {
     /**
      * A queue of scenes whose resources are still to be pre-loaded.
      */
-    private _sceneToLoadQueue: Array<SceneLoadingTask> = new Array<
-      SceneLoadingTask
-    >();
+    private _sceneToLoadQueue: Array<SceneLoadingTask> =
+      new Array<SceneLoadingTask>();
     /**
      * The resource managers that actually download and remember downloaded
      * content.

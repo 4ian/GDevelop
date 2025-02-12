@@ -20,13 +20,13 @@ namespace gdjs {
     new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
       makePIXIFilter(layer, effectData) {
         const filter = new PIXI.filters.OldFilmFilter();
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         oldFilmFilter._animationTimer = 0;
         return oldFilmFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         if (oldFilmFilter.animationFrequency !== 0) {
           oldFilmFilter._animationTimer += target.getElapsedTime() / 1000;
@@ -44,7 +44,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         if (parameterName === 'sepia') {
           oldFilmFilter.sepia = value;
@@ -69,7 +69,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         if (parameterName === 'sepia') {
           return oldFilmFilter.sepia;
@@ -122,7 +122,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): OldFilmFilterNetworkSyncData {
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         return {
           se: oldFilmFilter.sepia,
@@ -141,7 +141,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: OldFilmFilterNetworkSyncData
       ) {
-        const oldFilmFilter = (filter as unknown) as PIXI.filters.OldFilmFilter &
+        const oldFilmFilter = filter as unknown as PIXI.filters.OldFilmFilter &
           OldFilmFilterExtra;
         oldFilmFilter.sepia = data.se;
         oldFilmFilter.noise = data.n;

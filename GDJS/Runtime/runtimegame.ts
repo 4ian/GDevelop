@@ -828,6 +828,33 @@ namespace gdjs {
     }
 
     /**
+     * Load all assets needed to display the scene, displaying progress in
+     * renderer.
+     */
+    async loadSceneAssetsBySceneName(
+      sceneName: string,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      try {
+        await Promise.all([
+          this._loadAssetsWithLoadingScreen(
+            /* isFirstScene = */ false,
+            async (onProgress) => {
+              await this._resourcesLoader.loadSceneResourcesBySceneName(
+                sceneName,
+                onProgress
+              );
+            },
+            progressCallback
+          ),
+        ]);
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+        throw e;
+      }
+    }
+
+    /**
      * Load all assets for a given scene, displaying progress in renderer.
      */
     async loadSceneAssets(

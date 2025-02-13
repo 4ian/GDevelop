@@ -12,6 +12,7 @@ namespace gdjs {
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
     _wasDisposed: boolean = false;
+    _sceneWasUnloadedResources: Set<string>;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -21,6 +22,7 @@ namespace gdjs {
         throw 'SceneStack must be constructed with a gdjs.RuntimeGame.';
       }
       this._runtimeGame = runtimeGame;
+      this._sceneWasUnloadedResources = new Set<string>();
     }
 
     /**
@@ -63,10 +65,14 @@ namespace gdjs {
           this.pop();
         } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
-          this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
-          this.replace(currentScene.getRequestedScene(), true);
+        } else if (
+          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
+          request === gdjs.SceneChangeRequest.CLEAR_SCENES
+        ) {
+          this._doReplaceScene(
+            currentScene,
+            request === gdjs.SceneChangeRequest.CLEAR_SCENES
+          );
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
@@ -174,6 +180,30 @@ namespace gdjs {
       }
       this._stack.push(newScene);
       return newScene;
+    }
+
+    /**
+     * Replace the scene and check if a next scene was unloaded already
+     * @param currentScene The currentScene
+     * @param isClear  If `clear` is set to true, all running scenes are also removed from the stack of scenes.
+     */
+
+    private _doReplaceScene(currentScene: gdjs.RuntimeScene, isClear: boolean) {
+      const currentSceneName = currentScene.getName();
+      const newSceneName = currentScene.getRequestedScene();
+
+      if (this._sceneWasUnloadedResources.has(newSceneName)) {
+        this._runtimeGame.loadSceneAssetsBySceneName(newSceneName).then(() => {
+          this.replace(newSceneName, isClear);
+          this._sceneWasUnloadedResources.delete(newSceneName);
+        });
+      } else {
+        this.replace(newSceneName, isClear);
+      }
+
+      if (currentScene.getRequestedClearResourcesParam()) {
+        this._sceneWasUnloadedResources.add(currentSceneName);
+      }
     }
 
     /**

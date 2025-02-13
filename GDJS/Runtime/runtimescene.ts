@@ -587,6 +587,13 @@ namespace gdjs {
     }
 
     /**
+     * Get requestedClearParam if need to unload resources of scene
+     */
+    getRequestedClearResourcesParam(): boolean {
+      return this._requestedClearParam;
+    }
+
+    /**
      * Create an identifier for a new object of the scene.
      */
     createNewUniqueId(): integer {

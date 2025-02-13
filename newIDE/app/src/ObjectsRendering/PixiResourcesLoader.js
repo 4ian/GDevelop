@@ -583,6 +583,7 @@ export default class PixiResourcesLoader {
         map: texture,
         side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
         transparent: useTransparentTexture,
+        vertexColors: true,
       });
 
       return material;
@@ -691,7 +692,11 @@ export default class PixiResourcesLoader {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
+      PIXI.Assets.add({
+        alias: spineTextureAtlasName,
+        src: atlasUrl,
+        data: { images },
+      });
       PIXI.Assets.load(spineTextureAtlasName).then(
         atlas => {
           // Ideally atlas of type `TextureAtlas` should be passed here.
@@ -810,8 +815,12 @@ export default class PixiResourcesLoader {
               ? 'use-credentials'
               : 'anonymous',
           });
-          PIXI.Assets.add(spineName, spineUrl, {
-            spineAtlas: textureAtlasOrLoadingError.textureAtlas,
+          PIXI.Assets.add({
+            alias: spineName,
+            src: spineUrl,
+            data: {
+              spineAtlas: textureAtlasOrLoadingError.textureAtlas,
+            },
           });
           PIXI.Assets.load(spineName).then(
             jsonData => {

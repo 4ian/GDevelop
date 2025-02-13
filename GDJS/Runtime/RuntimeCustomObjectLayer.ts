@@ -23,50 +23,50 @@ namespace gdjs {
       this._renderer.onCreated();
     }
 
-    onGameResolutionResized(
+    override onGameResolutionResized(
       oldGameResolutionOriginX: float,
       oldGameResolutionOriginY: float
     ): void {}
 
-    getCameraX(cameraId?: integer): float {
+    override getCameraX(cameraId?: integer): float {
       return 0;
     }
 
-    getCameraY(cameraId?: integer): float {
+    override getCameraY(cameraId?: integer): float {
       return 0;
     }
 
-    setCameraX(x: float, cameraId?: integer): void {}
+    override setCameraX(x: float, cameraId?: integer): void {}
 
-    setCameraY(y: float, cameraId?: integer): void {}
+    override setCameraY(y: float, cameraId?: integer): void {}
 
-    getCameraWidth(cameraId?: integer): float {
+    override getCameraWidth(cameraId?: integer): float {
       return 0;
     }
 
-    getCameraHeight(cameraId?: integer): float {
+    override getCameraHeight(cameraId?: integer): float {
       return 0;
     }
 
-    setCameraZoom(newZoom: float, cameraId?: integer): void {}
+    override setCameraZoom(newZoom: float, cameraId?: integer): void {}
 
-    getCameraZoom(cameraId?: integer): float {
+    override getCameraZoom(cameraId?: integer): float {
       return 1;
     }
 
-    setCameraZ(z: float, fov: float, cameraId?: integer): void {}
+    override setCameraZ(z: float, fov: float, cameraId?: integer): void {}
 
-    getCameraZ(fov: float | null, cameraId?: integer): float {
+    override getCameraZ(fov: float | null, cameraId?: integer): float {
       return 0;
     }
 
-    getCameraRotation(cameraId?: integer): float {
+    override getCameraRotation(cameraId?: integer): float {
       return 0;
     }
 
-    setCameraRotation(rotation: float, cameraId?: integer): void {}
+    override setCameraRotation(rotation: float, cameraId?: integer): void {}
 
-    convertCoords(
+    override convertCoords(
       x: float,
       y: float,
       cameraId: integer,
@@ -77,7 +77,7 @@ namespace gdjs {
       return this._runtimeScene.convertCoords(x, y, result || [0, 0]);
     }
 
-    convertInverseCoords(
+    override convertInverseCoords(
       x: float,
       y: float,
       cameraId: integer,
@@ -88,7 +88,7 @@ namespace gdjs {
       return this._runtimeScene.convertInverseCoords(x, y, result || [0, 0]);
     }
 
-    applyLayerInverseTransformation(
+    override applyLayerInverseTransformation(
       x: float,
       y: float,
       cameraId: integer,
@@ -99,7 +99,7 @@ namespace gdjs {
       return result;
     }
 
-    applyLayerTransformation(
+    override applyLayerTransformation(
       x: float,
       y: float,
       cameraId: integer,

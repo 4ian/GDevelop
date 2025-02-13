@@ -114,9 +114,8 @@ namespace gdjs {
     /**
      * A queue of scenes whose resources are still to be pre-loaded.
      */
-    private _sceneToLoadQueue: Array<SceneLoadingTask> = new Array<
-      SceneLoadingTask
-    >();
+    private _sceneToLoadQueue: Array<SceneLoadingTask> =
+      new Array<SceneLoadingTask>();
     /**
      * The resource managers that actually download and remember downloaded
      * content.
@@ -574,8 +573,8 @@ namespace gdjs {
       return sceneName === this.currentLoadingSceneName
         ? this.currentSceneLoadingProgress
         : this.areSceneAssetsLoaded(sceneName)
-        ? 1
-        : 0;
+          ? 1
+          : 0;
     }
 
     /**

@@ -39,7 +39,8 @@ namespace gdjs {
    */
   export class TileMapCollisionMaskRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable {
+    implements gdjs.Resizable, gdjs.Scalable
+  {
     private _tilemapJsonFile: string;
     private _tilesetJsonFile: string;
     private _renderer: gdjs.TileMap.TileMapCollisionMaskRenderer;
@@ -86,8 +87,8 @@ namespace gdjs {
         objectData.content.useAllLayers === undefined
           ? null
           : Number.isFinite(objectData.content.layerIndex)
-          ? objectData.content.layerIndex
-          : 1;
+            ? objectData.content.layerIndex
+            : 1;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = gdjs.rgbOrHexStringToNumber(
         objectData.content.fillColor
@@ -98,9 +99,8 @@ namespace gdjs {
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = objectData.content.outlineSize;
-      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        instanceContainer
-      );
+      this._tileMapManager =
+        gdjs.TileMap.TileMapRuntimeManager.getManager(instanceContainer);
 
       // The actual size is set when the tile map file is loaded.
       this._width = 0;

@@ -70,7 +70,8 @@ namespace gdjs {
    */
   export class AnimatableBehavior
     extends gdjs.RuntimeBehavior
-    implements Animatable {
+    implements Animatable
+  {
     private object: gdjs.RuntimeObject & Animatable;
 
     constructor(

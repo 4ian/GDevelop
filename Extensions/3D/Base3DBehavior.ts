@@ -117,6 +117,17 @@ namespace gdjs {
     getUnrotatedAABBMaxZ(): number;
   }
 
+  export interface Object3DDataContent {
+    width: float;
+    height: float;
+    depth: float;
+  }
+  /** Base parameters for {@link gdjs.RuntimeObject3D} */
+  export interface Object3DData extends ObjectData {
+    /** The base parameters of the RuntimeObject3D */
+    content: Object3DDataContent;
+  }
+
   export namespace Base3DHandler {
     export const is3D = (
       object: gdjs.RuntimeObject
@@ -131,7 +142,8 @@ namespace gdjs {
    */
   export class Base3DBehavior
     extends gdjs.RuntimeBehavior
-    implements Base3DHandler {
+    implements Base3DHandler
+  {
     private object: gdjs.RuntimeObject & Base3DHandler;
 
     constructor(

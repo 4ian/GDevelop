@@ -68,6 +68,7 @@ namespace gdjs {
       this._input.style.resize = 'none'; // Prevent user from resizing the input when it's a text area.
       this._input.style.border = '1px solid black';
       this._input.style.boxSizing = 'border-box';
+      this._input.style.borderRadius = '0px'; // Remove any style added by the browser (Safari adds some radius for instance).
       this._input.style.width = '100%';
       this._input.style.height = '100%';
       this._input.maxLength = this._object.getMaxLength();
@@ -376,6 +377,8 @@ namespace gdjs {
       this._input.focus();
     }
   }
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

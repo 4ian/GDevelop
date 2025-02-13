@@ -371,6 +371,7 @@ namespace gdjs {
     _availableResources: Record<string, ResourceData> = {};
     _globalVolume: float = 100;
     _sounds: Record<integer, HowlerSound> = {};
+    _cachedSpatialPosition: Record<integer, [number, number, number]> = {};
     _musics: Record<integer, HowlerSound> = {};
     _freeSounds: HowlerSound[] = []; // Sounds without an assigned channel.
     _freeMusics: HowlerSound[] = []; // Musics without an assigned channel.
@@ -382,12 +383,14 @@ namespace gdjs {
     _resourceLoader: gdjs.ResourceLoader;
 
     /**
-     * @param resources The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {
       this._resourceLoader = resourceLoader;
 
+      gdjs.registerRuntimeScenePostEventsCallback(
+        this._clearCachedSpatialPosition.bind(this)
+      );
       const that = this;
       document.addEventListener('deviceready', function () {
         // pause/resume sounds in Cordova when the app is being paused/resumed
@@ -539,9 +542,8 @@ namespace gdjs {
               src: [this._resourceLoader.getFullUrl(fileName)],
               html5: isMusic,
               xhr: {
-                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  fileName
-                ),
+                withCredentials:
+                  this._resourceLoader.checkIfCredentialsRequired(fileName),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -578,9 +580,10 @@ namespace gdjs {
               src: [this._resourceLoader.getFullUrl(resource.file)],
               html5: isMusic,
               xhr: {
-                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                ),
+                withCredentials:
+                  this._resourceLoader.checkIfCredentialsRequired(
+                    resource.file
+                  ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -684,6 +687,12 @@ namespace gdjs {
         loop,
         pitch
       );
+      const spatialPosition = this._cachedSpatialPosition[channel];
+      if (spatialPosition) {
+        sound.once('play', () => {
+          sound.setSpatialPosition(...spatialPosition);
+        });
+      }
       this._sounds[channel] = sound;
       sound.once('play', () => {
         if (this._paused) {
@@ -732,6 +741,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      // Musics are played with the html5 backend, that is not compatible with spatialization.
       this._musics[channel] = music;
       music.once('play', () => {
         if (this._paused) {
@@ -744,6 +754,30 @@ namespace gdjs {
 
     getMusicOnChannel(channel: integer): HowlerSound | null {
       return this._musics[channel] || null;
+    }
+
+    setSoundSpatialPositionOnChannel(
+      channel: number,
+      x: number,
+      y: number,
+      z: number
+    ) {
+      const sound = this.getSoundOnChannel(channel);
+      if (sound && !sound.paused()) sound.setSpatialPosition(x, y, z);
+      else {
+        // If no sound is playing at the time the method is called, the
+        // position is cached and will be used by the `playSoundOnChannel` method
+        // to set the spatial position right after the sound starts playing.
+        // This cached value is then cleared at the end of the frame.
+        // Without this caching strategy, if actions are in the wrong order,
+        // the spatial position will not apply to the sound because
+        // it is not playing yet.
+        this._cachedSpatialPosition[channel] = [x, y, z];
+      }
+    }
+
+    _clearCachedSpatialPosition() {
+      this._cachedSpatialPosition = {};
     }
 
     setGlobalVolume(volume: float): void {
@@ -804,9 +838,8 @@ namespace gdjs {
               onloaderror: (soundId: number, error?: string) => reject(error),
               html5: isMusic,
               xhr: {
-                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  file
-                ),
+                withCredentials:
+                  this._resourceLoader.checkIfCredentialsRequired(file),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -848,9 +881,8 @@ namespace gdjs {
         try {
           await new Promise((resolve, reject) => {
             const sound = new XMLHttpRequest();
-            sound.withCredentials = this._resourceLoader.checkIfCredentialsRequired(
-              file
-            );
+            sound.withCredentials =
+              this._resourceLoader.checkIfCredentialsRequired(file);
             sound.addEventListener('load', resolve);
             sound.addEventListener('error', (_) =>
               reject('XHR error: ' + file)

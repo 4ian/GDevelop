@@ -111,9 +111,8 @@ namespace gdjs {
     }
 
     updateX(): void {
-      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame<
-        PIXI.Texture
-      >;
+      const animationFrame =
+        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture>;
       this._sprite.position.x =
         this._object.x +
         (animationFrame.center.x - animationFrame.origin.x) *
@@ -121,9 +120,8 @@ namespace gdjs {
     }
 
     updateY(): void {
-      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame<
-        PIXI.Texture
-      >;
+      const animationFrame =
+        this._object._animator.getCurrentFrame() as SpriteAnimationFrame<PIXI.Texture>;
       this._sprite.position.y =
         this._object.y +
         (animationFrame.center.y - animationFrame.origin.y) *
@@ -183,16 +181,16 @@ namespace gdjs {
       imageManager: gdjs.PixiImageManager
     ): PixiAnimationFrameTextureManager {
       if (!imageManager._pixiAnimationFrameTextureManager) {
-        imageManager._pixiAnimationFrameTextureManager = new PixiAnimationFrameTextureManager(
-          imageManager
-        );
+        imageManager._pixiAnimationFrameTextureManager =
+          new PixiAnimationFrameTextureManager(imageManager);
       }
       return imageManager._pixiAnimationFrameTextureManager;
     }
   }
 
   class PixiAnimationFrameTextureManager
-    implements gdjs.AnimationFrameTextureManager<PIXI.Texture> {
+    implements gdjs.AnimationFrameTextureManager<PIXI.Texture>
+  {
     private _imageManager: gdjs.PixiImageManager;
 
     constructor(imageManager: gdjs.PixiImageManager) {

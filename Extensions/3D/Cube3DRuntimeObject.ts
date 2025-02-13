@@ -24,10 +24,10 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
+      tint: string;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
-
   type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
   const faceNameToBitmaskIndex = {
     front: 0,
@@ -45,6 +45,7 @@ namespace gdjs {
     trfb: integer;
     frn: [string, string, string, string, string, string];
     mt: number;
+    tint: string;
   };
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -67,10 +68,11 @@ namespace gdjs {
       string,
       string,
       string,
-      string
+      string,
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
+    _tint: string;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -117,6 +119,9 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
+
+      this._tint = objectData.content.tint || '255;255;255';
+
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
       );
@@ -134,7 +139,7 @@ namespace gdjs {
      * Sets the visibility of a face of the 3D box.
      *
      * @param faceName - The name of the face to set visibility for.
-     * @param value - The visibility value to set.
+     * @param enable - The visibility value to set.
      */
     setFaceVisibility(faceName: FaceName, enable: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];
@@ -157,7 +162,7 @@ namespace gdjs {
      * Sets the texture repeat of a face of the 3D box.
      *
      * @param faceName - The name of the face to set visibility for.
-     * @param value - The visibility value to set.
+     * @param enable - The visibility value to set.
      */
     setRepeatTextureOnFace(faceName: FaceName, enable: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];
@@ -203,9 +208,20 @@ namespace gdjs {
       if (this._faceResourceNames[faceIndex] === resourceName) {
         return;
       }
-
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
+    }
+
+    setColor(tint: string): void {
+      if (this._tint === tint) {
+        return;
+      }
+      this._tint = tint;
+      this._renderer.updateTint();
+    }
+
+    getColor(): string {
+      return this._tint;
     }
 
     /** @internal */
@@ -291,6 +307,10 @@ namespace gdjs {
           newObjectData.content.frontFaceResourceName
         );
       }
+      if (oldObjectData.content.tint !== newObjectData.content.tint) {
+        this.setColor(newObjectData.content.tint);
+      }
+
       if (
         oldObjectData.content.backFaceResourceName !==
         newObjectData.content.backFaceResourceName
@@ -423,6 +443,7 @@ namespace gdjs {
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
         frn: this._faceResourceNames,
+        tint: this._tint,
       };
     }
 
@@ -474,6 +495,12 @@ namespace gdjs {
           for (let i = 0; i < this._faceResourceNames.length; i++) {
             this._renderer.updateFace(i);
           }
+        }
+      }
+      if (networkSyncData.tint !== undefined) {
+        if (this._tint !== networkSyncData.tint) {
+          this._tint = networkSyncData.tint;
+          this._renderer.updateTint();
         }
       }
     }

@@ -1,21 +1,11 @@
 namespace gdjs {
-  export interface Object3DDataContent {
-    width: float;
-    height: float;
-    depth: float;
-  }
-  /** Base parameters for {@link gdjs.RuntimeObject3D} */
-  export interface Object3DData extends ObjectData {
-    /** The base parameters of the RuntimeObject3D */
-    content: Object3DDataContent;
-  }
-
   /**
    * Base class for 3D custom objects.
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
-    implements gdjs.Base3DHandler {
+    implements gdjs.Base3DHandler
+  {
     /**
      * Position on the Z axis.
      */
@@ -41,13 +31,13 @@ namespace gdjs {
 
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
-      objectData: Object3DData & CustomObjectConfiguration
+      objectData: gdjs.Object3DData & gdjs.CustomObjectConfiguration
     ) {
       super(parent, objectData);
       this._renderer.reinitialize(this, parent);
     }
 
-    protected _createRender() {
+    protected override _createRender() {
       const parent = this._runtimeScene;
       return new gdjs.CustomRuntimeObject3DRenderer(
         this,
@@ -56,21 +46,23 @@ namespace gdjs {
       );
     }
 
-    protected _reinitializeRenderer(): void {
+    protected override _reinitializeRenderer(): void {
       this.getRenderer().reinitialize(this, this.getParent());
     }
 
-    getRenderer(): gdjs.CustomRuntimeObject3DRenderer {
+    override getRenderer(): gdjs.CustomRuntimeObject3DRenderer {
       return super.getRenderer() as gdjs.CustomRuntimeObject3DRenderer;
     }
 
-    get3DRendererObject() {
+    override get3DRendererObject() {
       // It can't be null because Three.js is always loaded
       // when a custom 3D object is used.
       return this.getRenderer().get3DRendererObject()!;
     }
 
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       super.extraInitializationFromInitialInstance(initialInstanceData);
       if (initialInstanceData.depth !== undefined) {
         this.setDepth(initialInstanceData.depth);
@@ -292,7 +284,7 @@ namespace gdjs {
       return this._maxZ - this._minZ;
     }
 
-    _updateUntransformedHitBoxes(): void {
+    override _updateUntransformedHitBoxes(): void {
       super._updateUntransformedHitBoxes();
 
       let minZ = Number.MAX_VALUE;

@@ -2869,6 +2869,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
   useWindowMessageDebuggerClient(): PreviewExportOptions;
   useMinimalDebuggerClient(): PreviewExportOptions;
+  setInAppTutorialMessageInPreview(message: string, position: string): PreviewExportOptions;
   setLayoutName(layoutName: string): PreviewExportOptions;
   setFallbackAuthor(id: string, username: string): PreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): PreviewExportOptions;

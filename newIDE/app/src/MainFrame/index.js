@@ -258,6 +258,21 @@ const isCurrentProjectFresh = (
   currentProjectRef.current &&
   currentProject.ptr === currentProjectRef.current.ptr;
 
+/**
+ * When a project is created or opened, the fileMetadata is not aware of some project
+ * properties like the projectUuid or the name, until the project is deserialized.
+ * This function returns a new fileMetadata with the latest project properties,
+ * allowing the editor to have the latest information.
+ */
+const updateFileMetadataWithOpenedProject = (
+  fileMetadata: FileMetadata,
+  project: gdProject
+) => ({
+  ...fileMetadata,
+  gameId: project.getProjectUuid(),
+  name: project.getName(),
+});
+
 export type State = {|
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -854,7 +869,11 @@ const MainFrame = (props: Props) => {
 
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
-      if (fileMetadata) {
+      let updatedFileMetadata: ?FileMetadata = fileMetadata
+        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
+        : null;
+
+      if (updatedFileMetadata) {
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -867,11 +886,7 @@ const MainFrame = (props: Props) => {
         // (like locally or on Google Drive).
         if (onSaveProject) {
           preferences.insertRecentProjectFile({
-            fileMetadata: {
-              ...fileMetadata,
-              name: project.getName(),
-              gameId: project.getProjectUuid(),
-            },
+            fileMetadata: updatedFileMetadata,
             storageProviderName: storageProvider.internalName,
           });
         }
@@ -888,7 +903,7 @@ const MainFrame = (props: Props) => {
       const state = await setState(state => ({
         ...state,
         currentProject: project,
-        currentFileMetadata: fileMetadata,
+        currentFileMetadata: updatedFileMetadata,
       }));
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
@@ -897,8 +912,8 @@ const MainFrame = (props: Props) => {
         project
       );
 
-      if (fileMetadata) {
-        project.setProjectFile(fileMetadata.fileIdentifier);
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
 
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
@@ -915,7 +930,7 @@ const MainFrame = (props: Props) => {
         // See `ResourceFetcher` for all the cases.
         await ensureResourcesAreFetched(() => ({
           project,
-          fileMetadata,
+          fileMetadata: updatedFileMetadata,
           storageProvider,
           storageProviderOperations,
           authenticatedUser,
@@ -1138,11 +1153,10 @@ const MainFrame = (props: Props) => {
       // it can have been updated in the meantime (gameId, project name, etc...).
       // Use the ref here to be sure to have the latest file metadata.
       if (currentFileMetadataRef.current) {
-        const newFileMetadata: FileMetadata = {
-          ...currentFileMetadataRef.current,
-          name: project.getName(),
-          gameId: project.getProjectUuid(),
-        };
+        const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
+          currentFileMetadataRef.current,
+          project
+        );
         setState(state => ({
           ...state,
           currentFileMetadata: newFileMetadata,
@@ -1651,6 +1665,12 @@ const MainFrame = (props: Props) => {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         const startTime = Date.now();
+        let inAppTutorialMessageInPreview = { message: '', position: '' };
+        if (inAppTutorialOrchestratorRef.current) {
+          inAppTutorialMessageInPreview =
+            inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
+            inAppTutorialMessageInPreview;
+        }
         await previewLauncher.launchPreview({
           project: currentProject,
           layout,
@@ -1664,6 +1684,9 @@ const MainFrame = (props: Props) => {
           getIsMenuBarHiddenInPreview: preferences.getIsMenuBarHiddenInPreview,
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows || 1,
+          inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
+          inAppTutorialMessagePositionInPreview:
+            inAppTutorialMessageInPreview.position,
           captureOptions,
           onCaptureFinished,
         });
@@ -2613,7 +2636,13 @@ const MainFrame = (props: Props) => {
               oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {
-            return; // Save as was cancelled.
+            // Save as was cancelled.
+            // Restore former storage provider. This is useful in case a user
+            // cancels the "save as" operation and then saves again. If the
+            // storage provider was kept selected, it would directly save the project
+            // if it's possible (LocalFile storage provider allows it).
+            getStorageProviderOperations(oldStorageProvider);
+            return;
           }
           newSaveAsLocation = saveAsLocation;
           newSaveAsOptions = saveAsOptions;
@@ -4011,6 +4040,7 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
+          i18n={props.i18n}
           endTutorial={({
             shouldCloseProject,
             shouldWarnAboutUnsavedChanges,

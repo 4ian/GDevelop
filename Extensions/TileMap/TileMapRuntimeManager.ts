@@ -48,9 +48,8 @@ namespace gdjs {
       ): TileMapRuntimeManager {
         if (!instanceContainer.tileMapCollisionMaskManager) {
           // Create the shared manager if necessary.
-          instanceContainer.tileMapCollisionMaskManager = new TileMapRuntimeManager(
-            instanceContainer
-          );
+          instanceContainer.tileMapCollisionMaskManager =
+            new TileMapRuntimeManager(instanceContainer);
         }
         return instanceContainer.tileMapCollisionMaskManager;
       }
@@ -178,9 +177,8 @@ namespace gdjs {
               callback(null);
               return;
             }
-            const tileMapFileContent = TileMapHelper.TileMapManager.identify(
-              tileMapJsonData
-            );
+            const tileMapFileContent =
+              TileMapHelper.TileMapManager.identify(tileMapJsonData);
             if (!tileMapFileContent) {
               callback(null);
               return;

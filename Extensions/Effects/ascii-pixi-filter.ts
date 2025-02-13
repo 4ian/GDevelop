@@ -15,13 +15,13 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        const asciiFilter = filter as unknown as PIXI.filters.AsciiFilter;
         if (parameterName === 'size') {
           asciiFilter.size = value;
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        const asciiFilter = filter as unknown as PIXI.filters.AsciiFilter;
         if (parameterName === 'size') {
           return asciiFilter.size;
         }
@@ -46,14 +46,14 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): AsciiFilterNetworkSyncData {
-        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        const asciiFilter = filter as unknown as PIXI.filters.AsciiFilter;
         return { size: asciiFilter.size };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: AsciiFilterNetworkSyncData
       ) {
-        const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
+        const asciiFilter = filter as unknown as PIXI.filters.AsciiFilter;
         asciiFilter.size = data.size;
       }
     })()

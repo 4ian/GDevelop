@@ -23,16 +23,15 @@ namespace gdjs {
   export class SpineAtlasManager implements gdjs.ResourceManager {
     private _imageManager: ImageManager;
     private _resourceLoader: ResourceLoader;
-    private _loadedSpineAtlases = new gdjs.ResourceCache<
-      pixi_spine.TextureAtlas
-    >();
+    private _loadedSpineAtlases =
+      new gdjs.ResourceCache<pixi_spine.TextureAtlas>();
     private _loadingSpineAtlases = new gdjs.ResourceCache<
       Promise<pixi_spine.TextureAtlas>
     >();
 
     /**
-     * @param resources The resources data of the game.
-     * @param resourcesLoader The resources loader of the game.
+     * @param resourceLoader The resources loader of the game.
+     * @param imageManager The image manager of the game.
      */
     constructor(
       resourceLoader: gdjs.ResourceLoader,
@@ -55,9 +54,9 @@ namespace gdjs {
     }
 
     /**
-     * Returns promisified loaded atlas resource if it is availble, loads it otherwise.
+     * Returns promisified loaded atlas resource if it is available, loads it otherwise.
      *
-     * @param resources The data of resource to load.
+     * @param resourceName The name of resource to load.
      */
     getOrLoad(resourceName: string): Promise<pixi_spine.TextureAtlas> {
       const resource = this._getAtlasResource(resourceName);
@@ -104,7 +103,7 @@ namespace gdjs {
     /**
      * Load specified atlas resource and pass it to callback once it is loaded.
      *
-     * @param resources The data of resource to load.
+     * @param resource The data of resource to load.
      * @param callback The callback to pass atlas to it once it is loaded.
      */
     load(
@@ -128,9 +127,8 @@ namespace gdjs {
           resource.name,
           embeddedResourceName
         );
-        imagesMap[
-          embeddedResourceName
-        ] = this._imageManager.getOrLoadPIXITexture(mappedResourceName);
+        imagesMap[embeddedResourceName] =
+          this._imageManager.getOrLoadPIXITexture(mappedResourceName);
 
         return imagesMap;
       }, {});
@@ -146,7 +144,7 @@ namespace gdjs {
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add(resource.name, url, { images });
+      PIXI.Assets.add({ alias: resource.name, src: url, data: { images } });
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
           /**
@@ -159,6 +157,7 @@ namespace gdjs {
             new pixi_spine.TextureAtlas(
               atlas,
               (textureName, textureCb) =>
+                //@ts-ignore
                 textureCb(images[textureName].baseTexture),
               onLoad
             );

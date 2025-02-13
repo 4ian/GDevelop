@@ -20,7 +20,6 @@ namespace gdjs {
     _loadedFontFamilySet = new Set<string>();
 
     /**
-     * @param resources The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {
@@ -163,7 +162,7 @@ namespace gdjs {
     /**
      * Load the specified resources, so that fonts are loaded and can then be
      * used by using the font family returned by getFontFamily.
-     * @param onProgress Callback called each time a new file is loaded.
+     * @param resourceName The name of the resource to load.
      */
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);

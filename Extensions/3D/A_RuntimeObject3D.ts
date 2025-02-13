@@ -1,15 +1,4 @@
 namespace gdjs {
-  export interface Object3DDataContent {
-    width: float;
-    height: float;
-    depth: float;
-  }
-  /** Base parameters for {@link gdjs.RuntimeObject3D} */
-  export interface Object3DData extends ObjectData {
-    /** The base parameters of the RuntimeObject3D */
-    content: Object3DDataContent;
-  }
-
   const getValidDimensionValue = (value: float | undefined) =>
     value === undefined ? 100 : value <= 0 ? 1 : value;
 
@@ -35,11 +24,8 @@ namespace gdjs {
    */
   export abstract class RuntimeObject3D
     extends gdjs.RuntimeObject
-    implements
-      gdjs.Resizable,
-      gdjs.Scalable,
-      gdjs.Flippable,
-      gdjs.Base3DHandler {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable, gdjs.Base3DHandler
+  {
     /**
      * Position on the Z axis.
      */
@@ -84,7 +70,7 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: Object3DData
+      objectData: gdjs.Object3DData
     ) {
       super(instanceContainer, objectData);
       // TODO Should 0 be replaced by 0.01 instead of using the default value?

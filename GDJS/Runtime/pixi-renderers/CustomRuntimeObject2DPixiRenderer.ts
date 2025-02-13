@@ -3,7 +3,8 @@ namespace gdjs {
    * The renderer for a {@link gdjs.CustomRuntimeObject2D} using Pixi.js.
    */
   export class CustomRuntimeObject2DPixiRenderer
-    implements gdjs.RuntimeInstanceContainerPixiRenderer {
+    implements gdjs.RuntimeInstanceContainerPixiRenderer
+  {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
@@ -138,10 +139,8 @@ namespace gdjs {
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
       const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
-      let layerPixiObject:
-        | PIXI.Container
-        | PIXI.Sprite
-        | null = layerPixiRenderer.getRendererObject();
+      let layerPixiObject: PIXI.Container | PIXI.Sprite | null =
+        layerPixiRenderer.getRendererObject();
       if (layer.isLightingLayer()) {
         layerPixiObject = layerPixiRenderer.getLightingSprite();
       }
@@ -165,7 +164,8 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type CustomRuntimeObject2DRenderer = gdjs.CustomRuntimeObject2DPixiRenderer;
+  export type CustomRuntimeObject2DRenderer =
+    gdjs.CustomRuntimeObject2DPixiRenderer;
   export const CustomRuntimeObject2DRenderer =
     gdjs.CustomRuntimeObject2DPixiRenderer;
 }

@@ -146,8 +146,8 @@ namespace gdjs {
                       ? 'endAt'
                       : 'endBefore'
                     : includeSelf
-                    ? 'startAt'
-                    : 'startAfter'
+                      ? 'startAt'
+                      : 'startAfter'
                 ](value)
             );
         };

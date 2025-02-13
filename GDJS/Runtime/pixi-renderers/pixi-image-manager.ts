@@ -64,7 +64,6 @@ namespace gdjs {
     private _resourceLoader: gdjs.ResourceLoader;
 
     /**
-     * @param resources The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {
@@ -242,12 +241,14 @@ namespace gdjs {
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
+            vertexColors: true,
           })
         : new THREE.MeshStandardMaterial({
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
             metalness: 0,
+            vertexColors: true,
           });
       this._loadedThreeMaterials.put(cacheKey, material);
       return material;

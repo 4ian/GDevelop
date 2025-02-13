@@ -359,7 +359,6 @@ namespace gdjs {
     }
 
     playAnimation(animationName: string, shouldLoop: boolean) {
-      this._animationMixer.stopAllAction();
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
         animationName
@@ -370,12 +369,22 @@ namespace gdjs {
         );
         return;
       }
+      const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,
         Number.POSITIVE_INFINITY
       );
       this._action.clampWhenFinished = true;
+
+      if (previousAction && previousAction !== this._action) {
+        this._action.enabled = true;
+        this._action.crossFadeFrom(
+          previousAction,
+          this._model3DRuntimeObject._crossfadeDuration,
+          false
+        );
+      }
       this._action.play();
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);

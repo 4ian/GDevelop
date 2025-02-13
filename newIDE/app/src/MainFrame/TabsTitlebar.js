@@ -9,6 +9,8 @@ import {
   TitleBarRightSafeMargins,
 } from '../UI/TitleBarSafeMargins';
 
+const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
+
 type Props = {|
   children: React.Node,
   toggleProjectManager: () => void,
@@ -49,6 +51,7 @@ export default function TabsTitlebar({
         size="small"
         // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
         id="main-toolbar-project-manager-button"
+        className={DRAGGABLE_PART_CLASS_NAME}
         style={styles.menuIcon}
         color="default"
         onClick={toggleProjectManager}
@@ -56,7 +59,7 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {children}
-      <TitleBarRightSafeMargins rightSideAdditionalOffsetToGiveSpaceToDrag />
+      <TitleBarRightSafeMargins />
     </div>
   );
 }

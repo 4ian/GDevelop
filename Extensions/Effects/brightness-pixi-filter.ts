@@ -20,7 +20,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+        const brightnessFilter = filter as unknown as PIXI.ColorMatrixFilter &
           BrightnessFilterExtra;
         if (parameterName !== 'brightness') {
           return;
@@ -30,7 +30,7 @@ namespace gdjs {
         brightnessFilter.brightness(brightness, false);
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+        const brightnessFilter = filter as unknown as PIXI.ColorMatrixFilter &
           BrightnessFilterExtra;
         if (parameterName === 'brightness') {
           return brightnessFilter.__brightness;
@@ -56,7 +56,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): BrightnessFilterNetworkSyncData {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+        const brightnessFilter = filter as unknown as PIXI.ColorMatrixFilter &
           BrightnessFilterExtra;
         return { b: brightnessFilter.__brightness };
       }
@@ -64,7 +64,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: BrightnessFilterNetworkSyncData
       ) {
-        const brightnessFilter = (filter as unknown) as PIXI.ColorMatrixFilter &
+        const brightnessFilter = filter as unknown as PIXI.ColorMatrixFilter &
           BrightnessFilterExtra;
         brightnessFilter.__brightness = data.b;
         brightnessFilter.brightness(data.b, false);

@@ -72,7 +72,8 @@ namespace gdjs {
    */
   export class TextRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.TextContainer, gdjs.OpacityHandler {
+    implements gdjs.TextContainer, gdjs.OpacityHandler
+  {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -583,10 +584,10 @@ namespace gdjs {
 
     /**
      * Change the text color.
-     * @param color color as a "R;G;B" string, for example: "255;0;0"
+     * @param colorString color as a "R;G;B" string, for example: "255;0;0"
      */
-    setColor(str: string): void {
-      const color = str.split(';');
+    setColor(colorString: string): void {
+      const color = colorString.split(';');
       if (color.length < 3) {
         return;
       }
@@ -694,8 +695,8 @@ namespace gdjs {
         (this._verticalTextAlignment === 'center'
           ? this.getHeight() / 2
           : this._verticalTextAlignment === 'bottom'
-          ? this.getHeight()
-          : 0)
+            ? this.getHeight()
+            : 0)
       );
     }
 

@@ -22,8 +22,9 @@ namespace gdjs {
         return shockwaveFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const shockwaveFilter = (filter as unknown) as PIXI.filters.ShockwaveFilter &
-          ShockwaveFilterExtra;
+        const shockwaveFilter =
+          filter as unknown as PIXI.filters.ShockwaveFilter &
+            ShockwaveFilterExtra;
         if (shockwaveFilter.speed !== 0) {
           shockwaveFilter.time += target.getElapsedTime() / 1000;
         }

@@ -34,15 +34,18 @@ namespace gdjs {
     runtimeObject: gdjs.RuntimeObject
   ) => void;
 
-  export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
+  export const callbacksFirstRuntimeSceneLoaded: Array<RuntimeSceneCallback> =
+    [];
   export const callbacksRuntimeSceneLoaded: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeScenePreEvents: Array<RuntimeSceneCallback> = [];
-  export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> = [];
+  export const callbacksRuntimeScenePostEvents: Array<RuntimeSceneCallback> =
+    [];
   export const callbacksRuntimeScenePaused: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneResumed: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloading: Array<RuntimeSceneCallback> = [];
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
-  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> = [];
+  export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
 
   /** Base64 encoded logo of GDevelop for the splash screen. */
   export let gdevelopLogo: string = '';
@@ -367,7 +370,7 @@ namespace gdjs {
   /**
    * Register a function to be called when a scene unload started. This is
    * before the object deletion and renderer destruction. It is safe to
-   * manipulate these. It is **not** be safe to release resources as other
+   * manipulate these. It is **not** safe to release resources as other
    * callbacks might do operations on objects or the scene.
    *
    * @param callback The function to be called.

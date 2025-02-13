@@ -197,11 +197,11 @@ namespace gdjs {
       const texture = this._object.getTexture();
       this._texture =
         texture !== ''
-          ? (this._instanceContainer
-              .getGame()
-              .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-              texture
-            )
+          ? (
+              this._instanceContainer
+                .getGame()
+                .getImageManager() as gdjs.PixiImageManager
+            ).getPIXITexture(texture)
           : null;
     }
 
@@ -466,35 +466,38 @@ namespace gdjs {
         const xdiff = flattenVertices[i][0] - this._object.x;
         const ydiff = flattenVertices[i][1] - this._object.y;
         const angle = Math.atan2(ydiff, xdiff);
-        const closestVertex = LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-          this._object,
-          angle,
-          obstaclePolygons,
-          boundingSquareHalfDiag
-        );
+        const closestVertex =
+          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
+            this._object,
+            angle,
+            obstaclePolygons,
+            boundingSquareHalfDiag
+          );
         if (closestVertex) {
           closestVertices.push({ vertex: closestVertex, angle: angle });
         }
 
         // TODO: Check whether we need to raycast these two extra rays or not.
-        const closestVertexOffsetLeft = LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-          this._object,
-          angle + 0.0001,
-          obstaclePolygons,
-          boundingSquareHalfDiag
-        );
+        const closestVertexOffsetLeft =
+          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
+            this._object,
+            angle + 0.0001,
+            obstaclePolygons,
+            boundingSquareHalfDiag
+          );
         if (closestVertexOffsetLeft) {
           closestVertices.push({
             vertex: closestVertexOffsetLeft,
             angle: angle + 0.0001,
           });
         }
-        const closestVertexOffsetRight = LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
-          this._object,
-          angle - 0.0001,
-          obstaclePolygons,
-          boundingSquareHalfDiag
-        );
+        const closestVertexOffsetRight =
+          LightRuntimeObjectPixiRenderer._computeClosestIntersectionPoint(
+            this._object,
+            angle - 0.0001,
+            obstaclePolygons,
+            boundingSquareHalfDiag
+          );
         if (closestVertexOffsetRight) {
           closestVertices.push({
             vertex: closestVertexOffsetRight,

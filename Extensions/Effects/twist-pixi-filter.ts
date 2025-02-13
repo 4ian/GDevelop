@@ -20,7 +20,7 @@ namespace gdjs {
         return twistFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+        const twistFilter = filter as unknown as PIXI.filters.TwistFilter &
           TwistFilterExtra;
         twistFilter.offset.x = Math.round(
           twistFilter._offsetX * target.getWidth()
@@ -34,7 +34,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+        const twistFilter = filter as unknown as PIXI.filters.TwistFilter &
           TwistFilterExtra;
         if (parameterName === 'radius') {
           twistFilter.radius = value;
@@ -49,7 +49,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+        const twistFilter = filter as unknown as PIXI.filters.TwistFilter &
           TwistFilterExtra;
         if (parameterName === 'radius') {
           return twistFilter.radius;
@@ -87,7 +87,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): TwistFilterNetworkSyncData {
-        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+        const twistFilter = filter as unknown as PIXI.filters.TwistFilter &
           TwistFilterExtra;
         return {
           r: twistFilter.radius,
@@ -101,7 +101,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: TwistFilterNetworkSyncData
       ) {
-        const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter &
+        const twistFilter = filter as unknown as PIXI.filters.TwistFilter &
           TwistFilterExtra;
         twistFilter.radius = data.r;
         twistFilter.angle = data.a;

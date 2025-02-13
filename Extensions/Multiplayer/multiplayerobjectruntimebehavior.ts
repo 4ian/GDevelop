@@ -130,7 +130,8 @@ namespace gdjs {
     }
 
     private _hasObjectBeenSyncedWithinMaxRate() {
-      const objectMaxSyncRate = gdjs.multiplayer.getObjectsSynchronizationRate();
+      const objectMaxSyncRate =
+        gdjs.multiplayer.getObjectsSynchronizationRate();
       return (
         getTimeNow() - this._lastObjectSyncTimestamp < 1000 / objectMaxSyncRate
       );
@@ -287,8 +288,8 @@ namespace gdjs {
       //   )}`
       // );
 
-      const areBasicObjectNetworkSyncDataDifferent = this._isBasicObjectNetworkSyncDataDifferentFromLastSync(
-        {
+      const areBasicObjectNetworkSyncDataDifferent =
+        this._isBasicObjectNetworkSyncDataDifferentFromLastSync({
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
           z: objectNetworkSyncData.z,
@@ -299,8 +300,7 @@ namespace gdjs {
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
-        }
-      );
+        });
       const shouldSyncObjectBasicInfo =
         !this._hasObjectBasicInfoBeenSyncedRecently() ||
         areBasicObjectNetworkSyncDataDifferent ||
@@ -348,16 +348,14 @@ namespace gdjs {
         return;
       }
 
-      const {
-        messageName: updateMessageName,
-        messageData: updateMessageData,
-      } = gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
-        objectOwner: this.playerNumber,
-        objectName,
-        instanceNetworkId,
-        objectNetworkSyncData,
-        sceneNetworkId,
-      });
+      const { messageName: updateMessageName, messageData: updateMessageData } =
+        gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
+          objectOwner: this.playerNumber,
+          objectName,
+          instanceNetworkId,
+          objectNetworkSyncData,
+          sceneNetworkId,
+        });
       this._sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
@@ -440,16 +438,14 @@ namespace gdjs {
       }
 
       // Ensure we send a final update before the object is destroyed, if it had a networkId.
-      const {
-        messageName: updateMessageName,
-        messageData: updateMessageData,
-      } = gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
-        objectOwner: this.playerNumber,
-        objectName,
-        instanceNetworkId,
-        objectNetworkSyncData: this.owner.getNetworkSyncData(),
-        sceneNetworkId,
-      });
+      const { messageName: updateMessageName, messageData: updateMessageData } =
+        gdjs.multiplayerMessageManager.createUpdateInstanceMessage({
+          objectOwner: this.playerNumber,
+          objectName,
+          instanceNetworkId,
+          objectNetworkSyncData: this.owner.getNetworkSyncData(),
+          sceneNetworkId,
+        });
       this._sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
@@ -470,9 +466,10 @@ namespace gdjs {
         instanceNetworkId,
         sceneNetworkId,
       });
-      const destroyedMessageName = gdjs.multiplayerMessageManager.createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
-        destroyMessageName
-      );
+      const destroyedMessageName =
+        gdjs.multiplayerMessageManager.createInstanceDestroyedMessageNameFromDestroyInstanceMessage(
+          destroyMessageName
+        );
       gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
         originalMessageName: destroyMessageName,
         originalData: {
@@ -552,18 +549,16 @@ namespace gdjs {
       // When changing the ownership of an object with a networkId, we send a message to the host to ensure it is aware of the change,
       // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
       // We expect an acknowledgment from the host, if not, we will retry and eventually revert the ownership.
-      const {
-        messageName,
-        messageData,
-      } = gdjs.multiplayerMessageManager.createChangeInstanceOwnerMessage({
-        objectOwner: previousObjectPlayerNumber,
-        objectName,
-        instanceNetworkId,
-        newObjectOwner: newObjectPlayerNumber,
-        instanceX: this.owner.getX(),
-        instanceY: this.owner.getY(),
-        sceneNetworkId,
-      });
+      const { messageName, messageData } =
+        gdjs.multiplayerMessageManager.createChangeInstanceOwnerMessage({
+          objectOwner: previousObjectPlayerNumber,
+          objectName,
+          instanceNetworkId,
+          newObjectOwner: newObjectPlayerNumber,
+          instanceX: this.owner.getX(),
+          instanceY: this.owner.getY(),
+          sceneNetworkId,
+        });
       // Before sending the changeOwner message, if we are becoming the new owner,
       // we want to ensure this message is acknowledged, by everyone we're connected to.
       // If we are the host, we are connected to everyone, so we expect an acknowledgment from everyone.
@@ -571,9 +566,10 @@ namespace gdjs {
       // In both cases, this represents the list of peers the current user is connected to.
       if (newObjectPlayerNumber === currentPlayerNumber) {
         const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
-        const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
-          messageName
-        );
+        const changeOwnerAcknowledgedMessageName =
+          gdjs.multiplayerMessageManager.createInstanceOwnerChangedMessageNameFromChangeInstanceOwnerMessage(
+            messageName
+          );
         gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
           originalMessageName: messageName,
           originalData: {
@@ -583,7 +579,8 @@ namespace gdjs {
           expectedMessageName: changeOwnerAcknowledgedMessageName,
           otherPeerIds,
           // If we are not the host, we should revert the ownership if the host does not acknowledge the change.
-          shouldCancelMessageIfTimesOut: !gdjs.multiplayer.isCurrentPlayerHost(),
+          shouldCancelMessageIfTimesOut:
+            !gdjs.multiplayer.isCurrentPlayerHost(),
         });
       }
 

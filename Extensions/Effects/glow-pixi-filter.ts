@@ -21,7 +21,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'innerStrength') {
           glowFilter.innerStrength = value;
@@ -32,7 +32,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'innerStrength') {
           return glowFilter.innerStrength;
@@ -50,7 +50,7 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'color') {
           glowFilter.color = gdjs.rgbOrHexStringToNumber(value);
@@ -61,14 +61,14 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'color') {
           glowFilter.color = value;
         }
       }
       getColorParameter(filter: PIXI.Filter, parameterName: string): number {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         if (parameterName === 'color') {
           return glowFilter.color;
@@ -81,7 +81,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): GlowFilterNetworkSyncData {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         return {
           is: glowFilter.innerStrength,
@@ -94,7 +94,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: GlowFilterNetworkSyncData
       ): void {
-        const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter &
+        const glowFilter = filter as unknown as PIXI.filters.GlowFilter &
           GlowFilterExtra;
         glowFilter.innerStrength = data.is;
         glowFilter.outerStrength = data.os;

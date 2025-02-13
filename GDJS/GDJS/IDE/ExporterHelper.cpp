@@ -163,6 +163,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  options.useMinimalDebuggerClient,
                  /*includeCaptureManager=*/
                  !options.captureOptions.IsEmpty(),
+                 /*includeInAppTutorialMessage*/
+                 !options.inAppTutorialMessageInPreview.empty(),
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -247,6 +249,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     runtimeGameOptions.AddChild("playerId").SetStringValue(options.playerId);
     runtimeGameOptions.AddChild("playerToken")
         .SetStringValue(options.playerToken);
+  }
+  if (!options.inAppTutorialMessageInPreview.empty()) {
+    runtimeGameOptions.AddChild("inAppTutorialMessageInPreview")
+        .SetStringValue(options.inAppTutorialMessageInPreview);
+    runtimeGameOptions.AddChild("inAppTutorialMessagePositionInPreview")
+        .SetStringValue(options.inAppTutorialMessagePositionInPreview);
   }
   if (!options.crashReportUploadLevel.empty()) {
     runtimeGameOptions.AddChild("crashReportUploadLevel")
@@ -797,6 +805,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool includeWindowMessageDebuggerClient,
                                     bool includeMinimalDebuggerClient,
                                     bool includeCaptureManager,
+                                    bool includeInAppTutorialMessage,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -857,6 +866,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "splash/gd-logo-light-colored.js");
   } else {
     InsertUnique(includesFiles, "splash/gd-logo-light.js");
+  }
+
+  if (includeInAppTutorialMessage) {
+    InsertUnique(includesFiles, "InAppTutorialMessage.js");
+    InsertUnique(includesFiles, "libs/nanomarkdown.js");
   }
 
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {

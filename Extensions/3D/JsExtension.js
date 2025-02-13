@@ -69,7 +69,7 @@ module.exports = {
           _('Center Z position'),
           _('the Z position of the center of rotation'),
           _('the Z position of the center'),
-          _('Position/Center'),
+          _('Position ❯ Center'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -800,6 +800,20 @@ module.exports = {
         .markAsSimple()
         .setHidden()
         .setFunctionName('hasAnimationEnded');
+
+      object
+        .addScopedAction(
+          'SetCrossfadeDuration',
+          _('Set crossfade duration'),
+          _('Set the crossfade duration when switching to a new animation.'),
+          _('Set crossfade duration of _PARAM0_ to _PARAM1_ seconds'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Crossfade duration (in seconds)'), '', false)
+        .setFunctionName('setCrossfadeDuration');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
@@ -822,7 +836,8 @@ module.exports = {
         propertyName === 'bottomFaceResourceName' ||
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
         propertyName === 'facesOrientation' ||
-        propertyName === 'materialType'
+        propertyName === 'materialType' ||
+        propertyName === 'tint'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -902,6 +917,12 @@ module.exports = {
         .setLabel(_('Depth'))
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('tint')
+        .setValue(objectContent.tint || '255;255;255')
+        .setType('Color')
+        .setLabel(_('Tint'))
+        .setGroup(_('Texture'));
 
       objectProperties
         .getOrCreate('frontFaceResourceName')
@@ -1092,6 +1113,7 @@ module.exports = {
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
+      tint: '255;255;255',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -1567,6 +1589,21 @@ module.exports = {
       )
       .addParameter('imageResource', _('Image'), '', false)
       .setFunctionName('setFaceResourceName');
+
+    object
+      .addScopedAction(
+        'SetTint',
+        _('Tint color'),
+        _('Change the tint of the cube.'),
+        _('Change the tint of _PARAM0_ to _PARAM1_'),
+        _('Effects'),
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('3D Cube'), 'Cube3DObject', false)
+      .addParameter('color', _('Tint'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -2160,9 +2197,10 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          objectConfiguration
-        );
+        const textureResourceName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            objectConfiguration
+          );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2174,18 +2212,20 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2338,6 +2378,7 @@ module.exports = {
         this._facesOrientation = 'Y';
         this._backFaceUpThroughWhichAxisRotation = 'X';
         this._shouldUseTransparentTexture = false;
+        this._tint = '';
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
@@ -2357,8 +2398,9 @@ module.exports = {
 
       async _updateThreeObjectMaterials() {
         const getFaceMaterial = async (project, faceIndex) => {
-          if (!this._faceVisibilities[faceIndex])
+          if (!this._faceVisibilities[faceIndex]) {
             return getTransparentMaterial();
+          }
 
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
@@ -2387,6 +2429,28 @@ module.exports = {
         this._threeObject.material[5] = materials[5];
 
         this._updateTextureUvMapping();
+      }
+
+      _updateTint() {
+        const tints = [];
+        const normalizedTint = objectsRenderingService
+          .hexNumberToRGBArray(
+            objectsRenderingService.rgbOrHexToHexNumber(this._tint)
+          )
+          .map((component) => component / 255);
+
+        for (
+          let i = 0;
+          i < this._threeObject.geometry.attributes.position.count;
+          i++
+        ) {
+          tints.push(...normalizedTint);
+        }
+
+        this._threeObject.geometry.setAttribute(
+          'color',
+          new THREE.BufferAttribute(new Float32Array(tints), 3)
+        );
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {
@@ -2421,12 +2485,18 @@ module.exports = {
 
         let materialsDirty = false;
         let uvMappingDirty = false;
+        let tintDirty = false;
 
         const shouldUseTransparentTexture =
           object.content.enableTextureTransparency;
         if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
+        }
+        const tint = object.content.tint || '255;255;255';
+        if (this._tint !== tint) {
+          this._tint = tint;
+          tintDirty = true;
         }
 
         const faceResourceNames = [
@@ -2496,7 +2566,8 @@ module.exports = {
           backFaceUpThroughWhichAxisRotation !==
           this._backFaceUpThroughWhichAxisRotation
         ) {
-          this._backFaceUpThroughWhichAxisRotation = backFaceUpThroughWhichAxisRotation;
+          this._backFaceUpThroughWhichAxisRotation =
+            backFaceUpThroughWhichAxisRotation;
           uvMappingDirty = true;
         }
 
@@ -2520,6 +2591,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
+        if (tintDirty) this._updateTint();
       }
 
       /**
@@ -2552,9 +2624,10 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
-            materialIndexToFaceIndex[materialIndex]
-          ];
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2589,16 +2662,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                 }
               }
               break;
@@ -2628,16 +2698,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                   x = -x;
                   y = -y;
                 }

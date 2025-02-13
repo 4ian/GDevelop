@@ -157,9 +157,8 @@ namespace gdjs {
       if (!instanceContainer.touchDraggableManagers[touchId]) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        instanceContainer.touchDraggableManagers[
-          touchId
-        ] = new DraggableManager(instanceContainer, touchId);
+        instanceContainer.touchDraggableManagers[touchId] =
+          new DraggableManager(instanceContainer, touchId);
       }
       // @ts-ignore
       return instanceContainer.touchDraggableManagers[touchId];

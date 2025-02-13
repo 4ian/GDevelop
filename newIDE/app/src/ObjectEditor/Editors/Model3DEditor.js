@@ -667,6 +667,12 @@ const Model3DEditor = ({
             </SelectField>
           </ResponsiveLineStackLayout>
           <Text size="block-title">Animations</Text>
+          <Column noMargin expand>
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="crossfadeDuration"
+            />
+          </Column>
           <Column noMargin expand useFullHeight>
             {model3DConfiguration.getAnimationsCount() === 0 ? (
               <Column noMargin expand justifyContent="center">

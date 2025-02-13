@@ -135,13 +135,6 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <Platformer {...props} />,
     },
     {
-      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
-      title: t`3D platforms`,
-      description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
-      durationInMinutes: 2,
-      renderImage: props => <Object3D {...props} />,
-    },
-    {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
       title: t`Background and cameras`,
       description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
@@ -163,11 +156,11 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <Joystick {...props} />,
     },
     {
-      id: COOP_PLATFORMER_ID,
-      title: t`Co-op Multiplayer`,
-      description: t`Transform this platformer into a co-op game, where two players can play together.`,
-      durationInMinutes: 3,
-      renderImage: props => <CoopPlatformer {...props} />,
+      id: OBJECT_3D_IN_APP_TUTORIAL_ID,
+      title: t`3D platforms`,
+      description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
+      durationInMinutes: 2,
+      renderImage: props => <Object3D {...props} />,
     },
     {
       id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
@@ -175,6 +168,20 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Add a health bar to this jumping character, losing health when hitting spikes.`,
       durationInMinutes: 2,
       renderImage: props => <HealthBar {...props} />,
+    },
+    {
+      id: TILEMAP_PLATFORMER_ID,
+      title: t`Paint a Level with Tiles`,
+      description: t`Use a Tilemap to build a level and change it dynamically during the game.`,
+      durationInMinutes: 1,
+      renderImage: props => <TilemapPlatformer {...props} />,
+    },
+    {
+      id: COOP_PLATFORMER_ID,
+      title: t`Co-op Multiplayer`,
+      description: t`Transform this platformer into a co-op game, where two players can play together.`,
+      durationInMinutes: 3,
+      renderImage: props => <CoopPlatformer {...props} />,
     },
     {
       id: FIRE_A_BULLET_ID,
@@ -189,13 +196,6 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Add a time attack mode, where you have to reach the end as fast as possible.`,
       durationInMinutes: 2,
       renderImage: props => <Timer {...props} />,
-    },
-    {
-      id: TILEMAP_PLATFORMER_ID,
-      title: t`Paint a Level with Tiles`,
-      description: t`Use a Tilemap to build a level and change it dynamically during the game.`,
-      durationInMinutes: 1,
-      renderImage: props => <TilemapPlatformer {...props} />,
     },
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,

@@ -75,9 +75,8 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
-    private _physics3DHooks: Array<
-      gdjs.Physics3DRuntimeBehavior.Physics3DHook
-    > = [];
+    private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
+      [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
@@ -181,9 +180,8 @@ namespace gdjs {
       behaviorName: string
     ): gdjs.Physics3DSharedData {
       if (!runtimeScene.physics3DSharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
@@ -207,9 +205,8 @@ namespace gdjs {
       const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
       );
-      const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
-        2
-      );
+      const broadPhaseLayerInterfaceMask =
+        new Jolt.BroadPhaseLayerInterfaceMask(2);
       broadPhaseLayerInterfaceMask.ConfigureLayer(
         staticBroadPhaseLayer,
         gdjs.Physics3DSharedData.staticLayersMask,
@@ -226,9 +223,10 @@ namespace gdjs {
 
       settings.mObjectLayerPairFilter = objectFilter;
       settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-      settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
-        broadPhaseLayerInterfaceMask
-      );
+      settings.mObjectVsBroadPhaseLayerFilter =
+        new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+          broadPhaseLayerInterfaceMask
+        );
     }
 
     /**
@@ -382,9 +380,8 @@ namespace gdjs {
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
         this
       );
-      this.collisionChecker = new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(
-        this
-      );
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
@@ -665,8 +662,8 @@ namespace gdjs {
           shapeDimensionB > 0
             ? shapeDimensionB
             : height > 0
-            ? height
-            : onePixel;
+              ? height
+              : onePixel;
         const boxDepth =
           shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -685,8 +682,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(
@@ -701,8 +698,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const cylinderDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -724,8 +721,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.pow(width * height * depth, 1 / 3) / 2
-            : onePixel;
+              ? Math.pow(width * height * depth, 1 / 3) / 2
+              : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
         this._shapeHalfDepth = radius;
@@ -1787,8 +1784,8 @@ namespace gdjs {
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
-            ? Jolt.EMotionType_Kinematic
-            : Jolt.EMotionType_Dynamic,
+              ? Jolt.EMotionType_Kinematic
+              : Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
         bodyCreationSettings.mMotionQuality = behavior.bullet

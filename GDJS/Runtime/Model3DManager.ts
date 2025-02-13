@@ -28,7 +28,6 @@ namespace gdjs {
     _invalidModel: THREE_ADDONS.GLTF;
 
     /**
-     * @param resourceDataArray The resources data of the game.
      * @param resourceLoader The resources loader of the game.
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {

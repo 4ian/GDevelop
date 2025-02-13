@@ -74,15 +74,13 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO (3D) - feature: support color instead of texture?
-      const materials = [
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[1]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[2]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[3]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[4]),
-        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[5]),
-      ];
+
+      const materials: THREE.Material[] = new Array(6)
+        .fill(0)
+        .map((_, index) =>
+          getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
+        );
+
       const boxMesh = new THREE.Mesh(geometry, materials);
 
       super(runtimeObject, instanceContainer, boxMesh);
@@ -92,6 +90,28 @@ namespace gdjs {
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
+      this.updateTint();
+    }
+
+    updateTint() {
+      const tints: number[] = [];
+
+      const normalizedTint = gdjs
+        .rgbOrHexToRGBColor(this._cube3DRuntimeObject.getColor())
+        .map((component) => component / 255);
+
+      for (
+        let i = 0;
+        i < this._boxMesh.geometry.attributes.position.count;
+        i++
+      ) {
+        tints.push(...normalizedTint);
+      }
+
+      this._boxMesh.geometry.setAttribute(
+        'color',
+        new THREE.BufferAttribute(new Float32Array(tints), 3)
+      );
     }
 
     updateFace(faceIndex: integer) {
@@ -121,13 +141,11 @@ namespace gdjs {
      */
     updateTextureUvMapping(faceIndex?: number) {
       // @ts-ignore - position is stored as a Float32BufferAttribute
-      const pos: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'position'
-      );
+      const pos: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('position');
       // @ts-ignore - uv is stored as a Float32BufferAttribute
-      const uvMapping: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
-        'uv'
-      );
+      const uvMapping: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('uv');
       const startIndex =
         faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
       const endIndex =
@@ -149,9 +167,10 @@ namespace gdjs {
           continue;
         }
 
-        const shouldRepeatTexture = this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
-          materialIndexToFaceIndex[materialIndex]
-        );
+        const shouldRepeatTexture =
+          this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
+            materialIndexToFaceIndex[materialIndex]
+          );
 
         const shouldOrientateFacesTowardsY =
           this._cube3DRuntimeObject.getFacesOrientation() === 'Y';
@@ -180,12 +199,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
               }
             }
             break;
@@ -211,12 +228,10 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [
-                  x,
-                  y,
-                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                  vertexIndex % 4
-                ];
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 x = -x;
                 y = -y;
               }

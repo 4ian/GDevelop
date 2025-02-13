@@ -75,6 +75,8 @@ namespace gdjs {
     }
   }
 
-  export const TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
-  export type TextEntryRuntimeObjectRenderer = TextEntryRuntimeObjectPixiRenderer;
+  export const TextEntryRuntimeObjectRenderer =
+    TextEntryRuntimeObjectPixiRenderer;
+  export type TextEntryRuntimeObjectRenderer =
+    TextEntryRuntimeObjectPixiRenderer;
 }

@@ -19,8 +19,9 @@ namespace gdjs {
         return zoomBlurFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
-          ZoomBlurFilterExtra;
+        const zoomBlurFilter =
+          filter as unknown as PIXI.filters.ZoomBlurFilter &
+            ZoomBlurFilterExtra;
         zoomBlurFilter.center[0] = Math.round(
           zoomBlurFilter._centerX * target.getWidth()
         );
@@ -33,8 +34,9 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
-          ZoomBlurFilterExtra;
+        const zoomBlurFilter =
+          filter as unknown as PIXI.filters.ZoomBlurFilter &
+            ZoomBlurFilterExtra;
         if (parameterName === 'centerX') {
           zoomBlurFilter._centerX = value;
         } else if (parameterName === 'centerY') {
@@ -52,8 +54,9 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
-          ZoomBlurFilterExtra;
+        const zoomBlurFilter =
+          filter as unknown as PIXI.filters.ZoomBlurFilter &
+            ZoomBlurFilterExtra;
         if (parameterName === 'centerX') {
           return zoomBlurFilter._centerX;
         }
@@ -90,8 +93,9 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): ZoomBlurFilterNetworkSyncData {
-        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
-          ZoomBlurFilterExtra;
+        const zoomBlurFilter =
+          filter as unknown as PIXI.filters.ZoomBlurFilter &
+            ZoomBlurFilterExtra;
         return {
           cx: zoomBlurFilter._centerX,
           cy: zoomBlurFilter._centerY,
@@ -104,8 +108,9 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: ZoomBlurFilterNetworkSyncData
       ) {
-        const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter &
-          ZoomBlurFilterExtra;
+        const zoomBlurFilter =
+          filter as unknown as PIXI.filters.ZoomBlurFilter &
+            ZoomBlurFilterExtra;
         zoomBlurFilter._centerX = data.cx;
         zoomBlurFilter._centerY = data.cy;
         zoomBlurFilter.innerRadius = data.ir;

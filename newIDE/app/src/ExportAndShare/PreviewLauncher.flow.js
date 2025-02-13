@@ -44,6 +44,8 @@ export type PreviewOptions = {|
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,
   onCaptureFinished: CaptureOptions => Promise<void>,
+  inAppTutorialMessageInPreview: string,
+  inAppTutorialMessagePositionInPreview: string,
 |};
 
 /** The props that PreviewLauncher must support */

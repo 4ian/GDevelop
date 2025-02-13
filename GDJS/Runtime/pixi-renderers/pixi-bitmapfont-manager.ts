@@ -307,6 +307,31 @@ namespace gdjs {
       this._pixiBitmapFontsToUninstall.length = 0;
       this._loadedFontsData.clear();
     }
+
+    /**
+     * To be called when the scene is disposed.
+     * Uninstall fonts from resourcesList from memory and clear cache of loaded fonts.
+     * @param resourcesList The list of specific resources
+     */
+
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedFont = this._loadedFontsData.get(resourceData);
+        if (loadedFont) {
+          this._loadedFontsData.delete(resourceData);
+        }
+
+        for (const bitmapFontInstallKey in this._pixiBitmapFontsInUse) {
+          if (bitmapFontInstallKey.endsWith(resourceData.file))
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+
+        for (const bitmapFontInstallKey of this._pixiBitmapFontsToUninstall) {
+          if (bitmapFontInstallKey.endsWith(resourceData.file))
+            PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        }
+      });
+    }
   }
 
   // Register the class to let the engine use it.

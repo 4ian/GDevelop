@@ -81,6 +81,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
       .SetDefaultValue("true")
+      .AddParameter("yesorno", 
+                 _("Clear all resources from the scene?\nResources used " 
+                   "only in this scene will be cleared. "
+                   "After returned resources will be uploaded again"))
+      .SetDefaultValue("false")
       .MarkAsAdvanced();
 
   extension

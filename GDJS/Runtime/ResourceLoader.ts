@@ -351,7 +351,7 @@ namespace gdjs {
 
     /**
      * This method uploads the resources of a scene if they are not loaded now.
-     * @param {string} sceneName.
+     * @param sceneName
      * @param onProgress The callback for calculating in load progress
      */
 

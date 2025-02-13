@@ -208,5 +208,24 @@ namespace gdjs {
       this._loadedJsons.clear();
       this._callbacks.clear();
     }
+
+    /**
+     * To be called when the scene is disposed.
+     * Clear the JSONs loaded in this manager.
+     * @param resourcesList The list of specific resources
+     */
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedJson = this._loadedJsons.get(resourceData);
+        if (loadedJson) {
+          this._loadedJsons.delete(resourceData);
+        }
+
+        const callback = this._callbacks.get(resourceData);
+        if (callback) {
+          this._callbacks.delete(resourceData);
+        }
+      });
+    }
   }
 }

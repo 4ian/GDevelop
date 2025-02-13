@@ -45,7 +45,7 @@ namespace gdjs {
     trfb: integer;
     frn: [string, string, string, string, string, string];
     mt: number;
-    tint: number;
+    tint: string;
   };
 
   type Cube3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -72,7 +72,8 @@ namespace gdjs {
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
-    _tint: number;
+    _tint: string;
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Cube3DObjectData
@@ -119,9 +120,7 @@ namespace gdjs {
         objectData.content.bottomFaceResourceName,
       ];
 
-      this._tint = gdjs.rgbOrHexStringToNumber(
-        objectData.content.tint || '255;255;255'
-      );
+      this._tint = objectData.content.tint || '255;255;255';
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -212,11 +211,17 @@ namespace gdjs {
       this._faceResourceNames[faceIndex] = resourceName;
       this._renderer.updateFace(faceIndex);
     }
-    setTint(tint: string): void {
-      const tintInHex = gdjs.rgbOrHexStringToNumber(tint);
-      if (tintInHex === this._tint) return;
-      this._tint = tintInHex;
+
+    setColor(tint: string): void {
+      if (this._tint === tint) {
+        return;
+      }
+      this._tint = tint;
       this._renderer.updateTint();
+    }
+
+    getColor(): string {
+      return this._tint;
     }
 
     /** @internal */
@@ -303,7 +308,7 @@ namespace gdjs {
         );
       }
       if (oldObjectData.content.tint !== newObjectData.content.tint) {
-        this.setTint(newObjectData.content.tint);
+        this.setColor(newObjectData.content.tint);
       }
 
       if (

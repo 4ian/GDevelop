@@ -1593,17 +1593,17 @@ module.exports = {
     object
       .addScopedAction(
         'SetTint',
-        _('Tint'),
+        _('Tint color'),
         _('Change the tint of the cube.'),
         _('Change the tint of _PARAM0_ to _PARAM1_'),
-        _('Tint'),
+        _('Effects'),
         'res/actions/color24.png',
         'res/actions/color.png'
       )
       .addParameter('object', _('3D Cube'), 'Cube3DObject', false)
       .addParameter('color', _('Tint'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setTint');
+      .setFunctionName('setColor');
 
     extension
       .addExpressionAndConditionAndAction(

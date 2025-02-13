@@ -92,11 +92,12 @@ namespace gdjs {
       this.updateRotation();
       this.updateTint();
     }
+
     updateTint() {
       const tints: number[] = [];
 
       const normalizedTint = gdjs
-        .hexNumberToRGBArray(this._cube3DRuntimeObject._tint)
+        .rgbOrHexToRGBColor(this._cube3DRuntimeObject.getColor())
         .map((component) => component / 255);
 
       for (

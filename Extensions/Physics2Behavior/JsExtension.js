@@ -326,7 +326,7 @@ module.exports = {
         .setLabel(_('Density'))
         .setDescription(
           _(
-            'Define the weight of the object, according to its size. The biggeer the density, the heavier the object.'
+            'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
           )
         );
       behaviorProperties

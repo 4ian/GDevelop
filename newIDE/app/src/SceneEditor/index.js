@@ -108,6 +108,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
 
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -133,7 +134,8 @@ type Props = {|
   ) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    variantName: string
   ) => void,
 
   // Preview:
@@ -1563,7 +1565,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   ),
                   gd.PlatformExtension.getObjectNameFromFullObjectType(
                     object.getType()
-                  )
+                  ),
+                  // TODO open the right variant
+                  ''
                 ),
             }
           : null,
@@ -1894,6 +1898,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout,
       eventsFunctionsExtension,
       eventsBasedObject,
+      eventsBasedObjectVariant,
       initialInstances,
       resourceManagementProps,
       isActive,
@@ -1959,6 +1964,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
                 layersContainer={this.props.layersContainer}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
@@ -2120,6 +2126,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.updateBehaviorsSharedData()
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
+                        onOpenEventBasedObjectEditor={
+                          this.props.onOpenEventBasedObjectEditor
+                        }
                       />
                     )}
                   </React.Fragment>
@@ -2245,22 +2254,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                   resourceManagementProps={this.props.resourceManagementProps}
                 />
               )}
-              {this.state.scenePropertiesDialogOpen && eventsBasedObject && (
-                <EventsBasedObjectScenePropertiesDialog
-                  project={project}
-                  eventsBasedObject={eventsBasedObject}
-                  onClose={() => this.openSceneProperties(false)}
-                  onApply={() => this.openSceneProperties(false)}
-                  getContentAABB={
-                    this.editorDisplay
-                      ? this.editorDisplay.instancesHandlers.getContentAABB
-                      : () => null
-                  }
-                  onEventsBasedObjectChildrenEdited={
-                    this.props.onEventsBasedObjectChildrenEdited
-                  }
-                />
-              )}
+              {this.state.scenePropertiesDialogOpen &&
+                eventsBasedObject &&
+                eventsBasedObjectVariant && (
+                  <EventsBasedObjectScenePropertiesDialog
+                    project={project}
+                    eventsBasedObject={eventsBasedObject}
+                    eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    onClose={() => this.openSceneProperties(false)}
+                    onApply={() => this.openSceneProperties(false)}
+                    getContentAABB={
+                      this.editorDisplay
+                        ? this.editorDisplay.instancesHandlers.getContentAABB
+                        : () => null
+                    }
+                    onEventsBasedObjectChildrenEdited={
+                      this.props.onEventsBasedObjectChildrenEdited
+                    }
+                  />
+                )}
               {!!this.state.layoutVariablesDialogOpen && layout && (
                 <SceneVariablesDialog
                   open

@@ -18,7 +18,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
-import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { TabContentContainer } from '../UI/ClosableTabs';
@@ -380,7 +379,6 @@ const MainFrame = (props: Props) => {
     false
   );
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
-  const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
     openPreferencesDialog,
@@ -3128,7 +3126,7 @@ const MainFrame = (props: Props) => {
 
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
-    openProfileDialog,
+    openProfileDialog: authenticatedUser.onOpenProfileDialog,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -3555,7 +3553,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: authenticatedUser.onOpenProfileDialog,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3606,7 +3604,7 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: authenticatedUser.onOpenProfileDialog,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3833,7 +3831,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,
-                    onOpenProfile: () => openProfileDialog(true),
+                    onOpenProfile: authenticatedUser.onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3952,14 +3950,6 @@ const MainFrame = (props: Props) => {
             onResourceChosen([]);
           }}
           options={chooseResourceOptions}
-        />
-      )}
-      {profileDialogOpen && (
-        <ProfileDialog
-          open
-          onClose={() => {
-            openProfileDialog(false);
-          }}
         />
       )}
       {renderNewProjectDialog()}

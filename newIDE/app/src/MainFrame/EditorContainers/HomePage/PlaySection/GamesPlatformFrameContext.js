@@ -49,17 +49,18 @@ const GamesPlatformFrameStateProvider = ({
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
-  const { onOpenLoginDialog, onOpenCreateAccountDialog } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    onOpenLoginDialog,
+    onOpenCreateAccountDialog,
+    onOpenProfileDialog,
+    profile,
+    getAuthorizationHeader,
+  } = React.useContext(AuthenticatedUserContext);
   const [
     newProjectActions,
     setNewProjectActions,
   ] = React.useState<?NewProjectActions>(null);
 
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
   const userId = profile ? profile.id : null;
   const {
     navigateToRoute,
@@ -96,16 +97,29 @@ const GamesPlatformFrameStateProvider = ({
     [newProjectActions]
   );
 
-  const startTimeoutToUnloadIframe = React.useCallback(() => {
-    // The iframe becomes invisible right away,
-    // but we wait a bit before unloading it, so that navigating to another
-    // page doesn't cause the iframe to be reloaded.
-    setIframeVisible(false);
-    timeoutToUnloadIframe.current = setTimeout(() => {
-      setLoadIframeInDOM(false);
-      setIframeLoaded(false);
-    }, TIMEOUT_TO_UNLOAD_IFRAME_IN_MS);
-  }, []);
+  const startTimeoutToUnloadIframe = React.useCallback(
+    () => {
+      if (!loadIframeInDOM && !iframeLoaded) {
+        // Already unloaded.
+        return;
+      }
+      if (timeoutToUnloadIframe.current) {
+        // Cancel the previous timeout to start a new one.
+        clearTimeout(timeoutToUnloadIframe.current);
+        timeoutToUnloadIframe.current = null;
+      }
+
+      // The iframe becomes invisible right away,
+      // but we wait a bit before unloading it, so that navigating to another
+      // page doesn't cause the iframe to be reloaded.
+      setIframeVisible(false);
+      timeoutToUnloadIframe.current = setTimeout(() => {
+        setLoadIframeInDOM(false);
+        setIframeLoaded(false);
+      }, TIMEOUT_TO_UNLOAD_IFRAME_IN_MS);
+    },
+    [iframeLoaded, loadIframeInDOM]
+  );
 
   const loadIframeOrRemoveTimeout = React.useCallback(() => {
     if (timeoutToUnloadIframe.current) {
@@ -179,10 +193,20 @@ const GamesPlatformFrameStateProvider = ({
         });
       }
       if (event.data.id === 'openLoginDialog') {
-        onOpenLoginDialog();
+        if (profile) {
+          // If the user is already logged in, open the profile dialog instead.
+          onOpenProfileDialog();
+        } else {
+          onOpenLoginDialog();
+        }
       }
       if (event.data.id === 'openRegisterDialog') {
-        onOpenCreateAccountDialog();
+        if (profile) {
+          // If the user is already logged in, open the profile dialog instead.
+          onOpenProfileDialog();
+        } else {
+          onOpenCreateAccountDialog();
+        }
       }
       if (event.data.id === 'openGameTemplate') {
         onOpenGameTemplate(event.data.productId);
@@ -210,6 +234,8 @@ const GamesPlatformFrameStateProvider = ({
       onOpenGameTemplate,
       onOpenAssetPack,
       onOpenExample,
+      onOpenProfileDialog,
+      profile,
     ]
   );
 

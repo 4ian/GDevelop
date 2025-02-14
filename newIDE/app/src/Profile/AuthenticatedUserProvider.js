@@ -63,6 +63,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 import { listNotifications } from '../Utils/GDevelopServices/Notification';
+import ProfileDialog from './ProfileDialog';
 
 type Props = {|
   authentication: Authentication,
@@ -71,6 +72,7 @@ type Props = {|
 
 type State = {|
   authenticatedUser: AuthenticatedUser,
+  profileDialogOpen: boolean,
   loginDialogOpen: boolean,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
@@ -107,6 +109,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 > {
   state = {
     authenticatedUser: initialAuthenticatedUser,
+    profileDialogOpen: false,
     loginDialogOpen: false,
     createAccountDialogOpen: false,
     loginInProgress: false,
@@ -212,6 +215,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
         onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
+        onOpenProfileDialog: () => this.openProfileDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -1345,6 +1349,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  openProfileDialog = (open: boolean = true) => {
+    this.setState({
+      profileDialogOpen: open,
+    });
+  };
+
   openChangeEmailDialog = (open: boolean = true) => {
     this.setState({
       changeEmailDialogOpen: open,
@@ -1452,6 +1462,12 @@ export default class AuthenticatedUserProvider extends React.Component<
             >
               {this.props.children}
             </AuthenticatedUserContext.Provider>
+            {this.state.profileDialogOpen && (
+              <ProfileDialog
+                onClose={() => this.openProfileDialog(false)}
+                authenticatedUser={this.state.authenticatedUser}
+              />
+            )}
             {this.state.loginDialogOpen && (
               <LoginDialog
                 onClose={() => {

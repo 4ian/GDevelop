@@ -7,18 +7,7 @@ import SectionContainer, { SectionRow } from '../SectionContainer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 
 const PlaySection = () => {
-  const {
-    startTimeoutToUnloadIframe,
-    loadIframeOrRemoveTimeout,
-    iframeLoaded,
-  } = React.useContext(GamesPlatformFrameContext);
-  React.useEffect(
-    () => {
-      loadIframeOrRemoveTimeout();
-      return () => startTimeoutToUnloadIframe();
-    },
-    [startTimeoutToUnloadIframe, loadIframeOrRemoveTimeout]
-  );
+  const { iframeLoaded } = React.useContext(GamesPlatformFrameContext);
 
   // Iframe will be displayed here if loaded.
   return iframeLoaded ? null : (
@@ -30,13 +19,15 @@ const PlaySection = () => {
   );
 };
 
-const PlaySectionWithErrorBoundary = () => (
-  <ErrorBoundary
-    componentTitle={<Trans>Play section</Trans>}
-    scope="start-page-play"
-  >
-    <PlaySection />
-  </ErrorBoundary>
-);
+const PlaySectionWithErrorBoundary = () => {
+  return (
+    <ErrorBoundary
+      componentTitle={<Trans>Play section</Trans>}
+      scope="start-page-play"
+    >
+      <PlaySection />
+    </ErrorBoundary>
+  );
+};
 
 export default PlaySectionWithErrorBoundary;

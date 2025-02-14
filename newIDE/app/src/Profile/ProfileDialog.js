@@ -10,7 +10,7 @@ import HelpButton from '../UI/HelpButton';
 import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import UserAchievements from './Achievement/UserAchievements';
-import AuthenticatedUserContext from './AuthenticatedUserContext';
+import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -25,14 +25,13 @@ import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 
 type Props = {|
-  open: boolean,
+  authenticatedUser: AuthenticatedUser,
   onClose: () => void,
 |};
 
-const ProfileDialog = ({ open, onClose }: Props) => {
+const ProfileDialog = ({ onClose, authenticatedUser }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
     authenticatedUser,
@@ -113,11 +112,12 @@ const ProfileDialog = ({ open, onClose }: Props) => {
 
   React.useEffect(
     () => {
-      if (open) authenticatedUser.onRefreshUserProfile();
+      authenticatedUser.onRefreshUserProfile();
     },
     // We don't want to fetch again when authenticatedUser changes,
     // just the first time this page opens.
-    [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [authenticatedUser.onRefreshUserProfile]
   );
 
   const onLogout = React.useCallback(
@@ -162,7 +162,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
         ),
       ]}
       onRequestClose={onClose}
-      open={open}
+      open
       fullHeight={!!isConnected}
       maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody

@@ -44,6 +44,7 @@ import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
+import { GamesPlatformFrameContext } from './PlaySection/GamesPlatformFrameContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -209,6 +210,10 @@ export const HomePage = React.memo<Props>(
         onOpenLoginDialog,
         limits,
       } = authenticatedUser;
+      const {
+        startTimeoutToUnloadIframe,
+        loadIframeOrRemoveTimeout,
+      } = React.useContext(GamesPlatformFrameContext);
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -491,6 +496,35 @@ export const HomePage = React.memo<Props>(
         },
         // Reset flag that prevents multiple send of the same event on user change.
         [authenticated]
+      );
+
+      // As the homepage is never unmounted, we need to ensure the games platform
+      // iframe is unloaded & loaded from here,
+      // allowing to handle when the user navigates to another tab.
+      React.useEffect(
+        () => {
+          if (!isActive) {
+            // This happens when the user navigates to another tab. (ex: Scene or Events)
+            startTimeoutToUnloadIframe();
+            return;
+          }
+
+          if (activeTab === 'play') {
+            // This happens when the user navigates to the "Play" tab,
+            // - From another Home Tab.
+            // - From another tab (ex: Scene or Events).
+            loadIframeOrRemoveTimeout();
+          } else {
+            // This happens when the user navigates to another Home Tab.
+            startTimeoutToUnloadIframe();
+          }
+        },
+        [
+          isActive,
+          startTimeoutToUnloadIframe,
+          loadIframeOrRemoveTimeout,
+          activeTab,
+        ]
       );
 
       return (

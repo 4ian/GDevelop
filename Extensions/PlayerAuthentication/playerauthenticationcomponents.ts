@@ -5,7 +5,7 @@ namespace gdjs {
       platform,
       isGameRegistered,
     }: {
-      platform: 'cordova-websocket' | 'electron' | 'web-iframe' | 'web';
+      platform: PlayerAuthenticationPlatform;
       isGameRegistered: boolean;
     }) =>
       isGameRegistered
@@ -168,7 +168,7 @@ namespace gdjs {
      */
     export const addAuthenticationTextsToLoadingContainer = (
       loaderContainer: HTMLDivElement,
-      platform: 'cordova-websocket' | 'electron' | 'web-iframe' | 'web',
+      platform: PlayerAuthenticationPlatform,
       isGameRegistered: boolean,
       wikiOpenAction: (() => void) | null
     ) => {

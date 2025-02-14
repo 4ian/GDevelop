@@ -222,6 +222,8 @@ declare class libGDevelop {
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;
+  EventsBasedObjectVariant: Class<gdEventsBasedObjectVariant>;
+  EventsBasedObjectVariantsContainer: Class<gdEventsBasedObjectVariantsContainer>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
   PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;

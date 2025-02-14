@@ -42,7 +42,8 @@ export type ObjectTreeViewItemCallbacks = {|
   onAddObjectInstance: (objectName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    variantName: string
   ) => void,
   onRenameObjectFolderOrObjectWithContextFinish: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
@@ -366,7 +367,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
                 ),
                 gd.PlatformExtension.getObjectNameFromFullObjectType(
                   object.getType()
-                )
+                ),
+                // TODO open the right variant
+                ''
               ),
           }
         : null,

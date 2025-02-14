@@ -165,6 +165,7 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
     animations.SerializeTo(animatableElement);
   }
 
+  element.SetAttribute("variant", variantName);
   if (IsOverridingEventsBasedObjectChildrenConfiguration()) {
     auto &childrenContentElement = element.AddChild("childrenContent");
     for (auto &pair : childObjectConfigurations) {
@@ -184,6 +185,7 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
     animations.UnserializeFrom(animatableElement);
   }
 
+  variantName = element.GetStringAttribute("variant");
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
       element.HasChild("childrenContent");
   if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {

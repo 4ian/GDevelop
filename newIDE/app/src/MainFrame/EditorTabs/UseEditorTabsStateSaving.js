@@ -48,7 +48,17 @@ const projectHasItem = ({
     case 'external events':
       return project.hasExternalEventsNamed(name);
     case 'custom object':
-      return project.hasEventsBasedObject(name);
+      const nameElements = name.split('::');
+      const objectType = nameElements[0] + '::' + nameElements[1];
+      const variantName = nameElements[2];
+      return (
+        project.hasEventsBasedObject(objectType) &&
+        (!variantName ||
+          project
+            .getEventsBasedObject(objectType)
+            .getVariants()
+            .getVariant(variantName))
+      );
     default:
       return false;
   }

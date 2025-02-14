@@ -43,6 +43,9 @@ export const CustomObject = () => (
       }}
       openBehaviorEvents={() => action('Open behavior events')}
       onExtensionInstalled={action('extension installed')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
     />
   </DragAndDropContextProvider>
 );
@@ -75,6 +78,9 @@ export const StandardObject = () => (
       }}
       openBehaviorEvents={() => action('Open behavior events')}
       onExtensionInstalled={action('extension installed')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
     />
   </DragAndDropContextProvider>
 );

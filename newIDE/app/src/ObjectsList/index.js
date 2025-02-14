@@ -461,7 +461,8 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    variantName: string
   ) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,

@@ -63,6 +63,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    eventsBasedObjectVariant,
     updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
@@ -267,6 +268,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               project={project}
               layout={layout}
               eventsBasedObject={eventsBasedObject}
+              eventsBasedObjectVariant={eventsBasedObjectVariant}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
               layersContainer={layersContainer}

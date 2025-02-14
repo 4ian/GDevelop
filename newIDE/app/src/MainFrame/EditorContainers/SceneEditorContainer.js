@@ -129,6 +129,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         layout={layout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
+        eventsBasedObjectVariant={null}
         globalObjectsContainer={project.getObjects()}
         objectsContainer={layout.getObjects()}
         layersContainer={layout.getLayers()}

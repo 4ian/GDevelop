@@ -844,6 +844,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetVariantAt GetVariant
 #define GetEffectAt GetEffect
 #define GetParameterAt GetParameter
 

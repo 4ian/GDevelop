@@ -2,53 +2,77 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import EmptyMessage from '../../UI/EmptyMessage';
-import { type EditorProps } from './EditorProps.flow';
-import { Column, Line } from '../../UI/Grid';
-import { getExtraObjectsInformation } from '../../Hints';
-import { getObjectTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
-import AlertMessage from '../../UI/AlertMessage';
-import { ColumnStackLayout } from '../../UI/Layout';
-import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
-import { mapFor } from '../../Utils/MapFor';
-import ObjectsEditorService from '../ObjectsEditorService';
-import Text from '../../UI/Text';
-import useForceUpdate from '../../Utils/UseForceUpdate';
-import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
-import { IconContainer } from '../../UI/IconContainer';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import PropertiesEditor from '../../../PropertiesEditor';
+import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
+import EmptyMessage from '../../../UI/EmptyMessage';
+import { type EditorProps } from '../EditorProps.flow';
+import { Column, Line } from '../../../UI/Grid';
+import { getExtraObjectsInformation } from '../../../Hints';
+import { getObjectTutorialIds } from '../../../Utils/GDevelopServices/Tutorial';
+import AlertMessage from '../../../UI/AlertMessage';
+import { ColumnStackLayout } from '../../../UI/Layout';
+import DismissableTutorialMessage from '../../../Hints/DismissableTutorialMessage';
+import { mapFor } from '../../../Utils/MapFor';
+import ObjectsEditorService from '../../ObjectsEditorService';
+import Text from '../../../UI/Text';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+} from '../../../UI/Accordion';
+import { IconContainer } from '../../../UI/IconContainer';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 import AnimationList, {
   type AnimationListInterface,
-} from './SpriteEditor/AnimationList';
-import PointsEditor from './SpriteEditor/PointsEditor';
-import CollisionMasksEditor from './SpriteEditor/CollisionMasksEditor';
+} from '../SpriteEditor/AnimationList';
+import PointsEditor from '../SpriteEditor/PointsEditor';
+import CollisionMasksEditor from '../SpriteEditor/CollisionMasksEditor';
 import {
   hasAnyFrame,
   getFirstAnimationFrame,
   setCollisionMaskOnAllFrames,
-} from './SpriteEditor/Utils/SpriteObjectHelper';
-import { getMatchingCollisionMask } from './SpriteEditor/CollisionMasksEditor/CollisionMaskHelper';
-import ResourcesLoader from '../../ResourcesLoader';
-import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
-import FlatButton from '../../UI/FlatButton';
-import RaisedButton from '../../UI/RaisedButton';
-import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import Add from '../../UI/CustomSvgIcons/Add';
-import Dialog from '../../UI/Dialog';
-import HelpButton from '../../UI/HelpButton';
-import RestoreIcon from '../../UI/CustomSvgIcons/Restore';
+} from '../SpriteEditor/Utils/SpriteObjectHelper';
+import { getMatchingCollisionMask } from '../SpriteEditor/CollisionMasksEditor/CollisionMaskHelper';
+import ResourcesLoader from '../../../ResourcesLoader';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
+import FlatButton from '../../../UI/FlatButton';
+import RaisedButton from '../../../UI/RaisedButton';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
+import { ResponsiveLineStackLayout, LineStackLayout } from '../../../UI/Layout';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import Add from '../../../UI/CustomSvgIcons/Add';
+import Dialog from '../../../UI/Dialog';
+import HelpButton from '../../../UI/HelpButton';
+import RestoreIcon from '../../../UI/CustomSvgIcons/Restore';
+import SelectField from '../../../UI/SelectField';
+import SelectOption from '../../../UI/SelectOption';
+import NewVariantDialog from './NewVariantDialog';
+import newNameGenerator from '../../../Utils/NewNameGenerator';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
 const styles = {
   icon: { width: 16, height: 16 },
 };
+
+const getVariantName = (
+  eventBasedObject: gdEventsBasedObject | null,
+  customObjectConfiguration: gdCustomObjectConfiguration
+) =>
+  eventBasedObject &&
+  eventBasedObject
+    .getVariants()
+    .hasVariantNamed(customObjectConfiguration.getVariantName())
+    ? customObjectConfiguration.getVariantName()
+    : '';
 
 type Props = EditorProps;
 
@@ -69,6 +93,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     unsavedChanges,
     renderObjectNameField,
     isChildObject,
+    onOpenEventBasedObjectEditor,
   } = props;
 
   const { isMobile } = useResponsiveWindowSize();
@@ -160,6 +185,72 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     collisionMasksEditorOpen,
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
+  const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+
+  const editVariant = React.useCallback(
+    () => {
+      onOpenEventBasedObjectEditor &&
+        onOpenEventBasedObjectEditor(
+          gd.PlatformExtension.getExtensionFromFullObjectType(
+            customObjectConfiguration.getType()
+          ),
+          gd.PlatformExtension.getObjectNameFromFullObjectType(
+            customObjectConfiguration.getType()
+          ),
+          customObjectConfiguration.getVariantName()
+        );
+    },
+    [customObjectConfiguration, onOpenEventBasedObjectEditor]
+  );
+
+  const duplicateVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      if (!eventBasedObject) {
+        return;
+      }
+      const variants = eventBasedObject.getVariants();
+      // TODO Forbid name with `::`
+      const uniqueNewName = newNameGenerator(
+        newName || i18n._(t`New variant`),
+        tentativeNewName => variants.hasVariantNamed(tentativeNewName)
+      );
+      const oldVariantName = getVariantName(
+        eventBasedObject,
+        customObjectConfiguration
+      );
+      const oldVariant = oldVariantName
+        ? variants.getVariant(oldVariantName)
+        : eventBasedObject.getDefaultVariant();
+      const newVariant = variants.insertNewVariant(uniqueNewName, 0);
+      unserializeFromJSObject(
+        newVariant,
+        serializeToJSObject(oldVariant),
+        'unserializeFrom',
+        project
+      );
+      newVariant.setName(uniqueNewName);
+      customObjectConfiguration.setVariantName(uniqueNewName);
+      setNewVariantDialogOpen(false);
+      forceUpdate();
+    },
+    [customObjectConfiguration, eventBasedObject, forceUpdate, project]
+  );
+
+  const deleteVariant = React.useCallback(
+    () => {
+      if (!eventBasedObject) {
+        return;
+      }
+      const variants = eventBasedObject.getVariants();
+      const selectedVariantName = customObjectConfiguration.getVariantName();
+      if (variants.hasVariantNamed(selectedVariantName)) {
+        customObjectConfiguration.setVariantName('');
+        variants.removeVariant(selectedVariantName);
+        forceUpdate();
+      }
+    },
+    [customObjectConfiguration, eventBasedObject, forceUpdate]
+  );
 
   return (
     <I18n>
@@ -197,6 +288,58 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     project={project}
                     resourceManagementProps={resourceManagementProps}
                   />
+                  <LineStackLayout>
+                    <SelectField
+                      floatingLabelText={<Trans>Variant</Trans>}
+                      value={getVariantName(
+                        eventBasedObject,
+                        customObjectConfiguration
+                      )}
+                      onChange={(e, i, value: string) => {
+                        customObjectConfiguration.setVariantName(value);
+                        forceUpdate();
+                      }}
+                      fullWidth
+                    >
+                      <SelectOption
+                        key="default-variant"
+                        value=""
+                        label={t`Default`}
+                      />
+                      {eventBasedObject &&
+                        mapFor(
+                          0,
+                          eventBasedObject.getVariants().getVariantsCount(),
+                          i => {
+                            if (!eventBasedObject) {
+                              return null;
+                            }
+                            const variant = eventBasedObject
+                              .getVariants()
+                              .getVariantAt(i);
+                            return (
+                              <SelectOption
+                                key={'variant-' + variant.getName()}
+                                value={variant.getName()}
+                                label={variant.getName()}
+                              />
+                            );
+                          }
+                        )}
+                    </SelectField>
+                    <FlatButton
+                      label={<Trans>Edit</Trans>}
+                      onClick={editVariant}
+                    />
+                    <FlatButton
+                      label={<Trans>Duplicate</Trans>}
+                      onClick={() => setNewVariantDialogOpen(true)}
+                    />
+                    <FlatButton
+                      label={<Trans>Delete</Trans>}
+                      onClick={deleteVariant}
+                    />
+                  </LineStackLayout>
                   {eventBasedObject &&
                     (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
                     !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
@@ -524,6 +667,18 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 }
               />
             </Dialog>
+          )}
+          {newVariantDialogOpen && eventBasedObject && (
+            <NewVariantDialog
+              initialName={
+                getVariantName(eventBasedObject, customObjectConfiguration) ||
+                i18n._(t`New variant`)
+              }
+              onApply={name => duplicateVariant(i18n, name)}
+              onCancel={() => {
+                setNewVariantDialogOpen(false);
+              }}
+            />
           )}
         </>
       )}

@@ -66,6 +66,18 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
+  /**
+   * \brief Get the name of the events-based object variant used by this custom object.
+   */
+  const gd::String &GetVariantName() const { return variantName; };
+
+  /**
+   * \brief Set the name of the events-based object variant used by this custom object.
+   */
+  void SetVariantName(const gd::String &variantName_) {
+    variantName = variantName_;
+  }
+
   bool IsForcedToOverrideEventsBasedObjectChildrenConfiguration() const;
 
   bool IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() const {
@@ -145,6 +157,7 @@ protected:
   gd::SerializerElement objectContent;
   std::unordered_set<gd::String> unfoldedChildren;
 
+  gd::String variantName = "";
   bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration = false;
   mutable std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
 

@@ -7,6 +7,8 @@
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
+#include "GDCore/Project/EventsBasedObjectVariantsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/LayersContainer.h"
@@ -162,18 +164,38 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    */
   bool IsTextContainer() const { return isTextContainer; }
 
+  /**
+   * \brief Get the default variant of the custom object.
+   */
+  const gd::EventsBasedObjectVariant& GetDefaultVariant() const { return defaultVariant; }
+
+  /**
+   * \brief Get the default variant of the custom object.
+   */
+  gd::EventsBasedObjectVariant& GetDefaultVariant() { return defaultVariant; }
+
+  /**
+   * \brief Get the variants of the custom object.
+   */
+  const gd::EventsBasedObjectVariantsContainer& GetVariants() const { return variants; }
+
+  /**
+   * \brief Get the variants of the custom object.
+   */
+  gd::EventsBasedObjectVariantsContainer& GetVariants() { return variants; }
+
   /** \name Layers
    */
   ///@{
   /**
    * \brief Get the layers of the custom object.
    */
-  const gd::LayersContainer& GetLayers() const { return layers; }
+  const gd::LayersContainer& GetLayers() const { return defaultVariant.GetLayers(); }
 
   /**
    * \brief Get the layers of the custom object.
    */
-  gd::LayersContainer& GetLayers() { return layers; }
+  gd::LayersContainer& GetLayers() { return defaultVariant.GetLayers(); }
   ///@}
 
   /** \name Child objects
@@ -183,14 +205,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \brief Get the objects of the custom object.
    */
   gd::ObjectsContainer& GetObjects() {
-    return objectsContainer;
+    return defaultVariant.GetObjects();
   }
 
   /**
    * \brief Get the objects of the custom object.
    */
   const gd::ObjectsContainer& GetObjects() const {
-    return objectsContainer;
+    return defaultVariant.GetObjects();
   }
   ///@}
 
@@ -201,14 +223,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \brief Get the instances of the custom object.
    */
   gd::InitialInstancesContainer& GetInitialInstances() {
-    return initialInstances;
+    return defaultVariant.GetInitialInstances();
   }
 
   /**
    * \brief Get the instances of the custom object.
    */
   const gd::InitialInstancesContainer& GetInitialInstances() const {
-    return initialInstances;
+    return defaultVariant.GetInitialInstances();
   }
 
   /**
@@ -219,14 +241,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMinX() const {
-    return areaMinX;
+    return defaultVariant.GetAreaMinX();
   }
 
   /**
    * \brief Set the left bound of the custom object.
    */
-  void SetAreaMinX(int areaMinX_) {
-    areaMinX = areaMinX_;
+  void SetAreaMinX(int areaMinX) {
+    defaultVariant.SetAreaMinX(areaMinX);
   }
 
   /**
@@ -237,14 +259,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMinY() const {
-    return areaMinY;
+    return defaultVariant.GetAreaMinY();
   }
 
   /**
    * \brief Set the top bound of the custom object.
    */
-  void SetAreaMinY(int areaMinY_) {
-    areaMinY = areaMinY_;
+  void SetAreaMinY(int areaMinY) {
+    defaultVariant.SetAreaMinY(areaMinY);
   }
 
   /**
@@ -255,14 +277,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMinZ() const {
-    return areaMinZ;
+    return defaultVariant.GetAreaMinZ();
   }
 
   /**
    * \brief Set the min Z bound of the custom object.
    */
-  void SetAreaMinZ(int areaMinZ_) {
-    areaMinZ = areaMinZ_;
+  void SetAreaMinZ(int areaMinZ) {
+    defaultVariant.SetAreaMinZ(areaMinZ);
   }
 
   /**
@@ -273,14 +295,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMaxX() const {
-    return areaMaxX;
+    return defaultVariant.GetAreaMaxX();
   }
 
   /**
    * \brief Set the right bound of the custom object.
    */
-  void SetAreaMaxX(int areaMaxX_) {
-    areaMaxX = areaMaxX_;
+  void SetAreaMaxX(int areaMaxX) {
+    defaultVariant.SetAreaMaxX(areaMaxX);
   }
 
   /**
@@ -291,14 +313,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMaxY() const {
-    return areaMaxY;
+    return defaultVariant.GetAreaMaxY();
   }
 
   /**
    * \brief Set the bottom bound of the custom object.
    */
-  void SetAreaMaxY(int areaMaxY_) {
-    areaMaxY = areaMaxY_;
+  void SetAreaMaxY(int areaMaxY) {
+    defaultVariant.SetAreaMaxY(areaMaxY);
   }
 
   /**
@@ -309,14 +331,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \see EventsBasedObject::GetInitialInstances
    */
   int GetAreaMaxZ() const {
-    return areaMaxZ;
+    return defaultVariant.GetAreaMaxZ();
   }
 
   /**
    * \brief Set the bottom bound of the custom object.
    */
-  void SetAreaMaxZ(int areaMaxZ_) {
-    areaMaxZ = areaMaxZ_;
+  void SetAreaMaxZ(int areaMaxZ) {
+    defaultVariant.SetAreaMaxZ(areaMaxZ);
   }
   ///@}
 
@@ -332,15 +354,8 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
   bool isTextContainer;
   bool isInnerAreaFollowingParentSize;
   bool isUsingLegacyInstancesRenderer;
-  gd::InitialInstancesContainer initialInstances;
-  gd::LayersContainer layers;
-  gd::ObjectsContainer objectsContainer;
-  double areaMinX;
-  double areaMinY;
-  double areaMinZ;
-  double areaMaxX;
-  double areaMaxY;
-  double areaMaxZ;
+  gd::EventsBasedObjectVariant defaultVariant;
+  gd::EventsBasedObjectVariantsContainer variants;
 };
 
 }  // namespace gd

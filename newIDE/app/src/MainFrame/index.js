@@ -2059,7 +2059,8 @@ const MainFrame = (props: Props) => {
   const openCustomObjectEditor = React.useCallback(
     (
       eventsFunctionsExtension: gdEventsFunctionsExtension,
-      eventsBasedObject: gdEventsBasedObject
+      eventsBasedObject: gdEventsBasedObject,
+      variantName: string
     ) => {
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
@@ -2067,7 +2068,8 @@ const MainFrame = (props: Props) => {
       const foundTab = getCustomObjectEditor(
         editorTabs,
         eventsFunctionsExtension,
-        eventsBasedObject
+        eventsBasedObject,
+        variantName
       );
       if (foundTab) {
         setState(state => ({
@@ -2084,7 +2086,10 @@ const MainFrame = (props: Props) => {
               name:
                 eventsFunctionsExtension.getName() +
                 '::' +
-                eventsBasedObject.getName(),
+                eventsBasedObject.getName() +
+                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+                  ? '::' + variantName
+                  : ''),
               project: currentProject,
             }),
           }),
@@ -2166,7 +2171,8 @@ const MainFrame = (props: Props) => {
 
   const onOpenEventBasedObjectEditor = (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    variantName: string
   ) => {
     if (!currentProject) return;
     openEventsFunctionsExtension(
@@ -2186,7 +2192,11 @@ const MainFrame = (props: Props) => {
       return;
     }
     const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject);
+    openCustomObjectEditor(
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      variantName
+    );
 
     // Trigger reloading of extensions as an extension was modified (or even added)
     // to create the custom object.
@@ -3865,7 +3875,15 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
-                    onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
+                    onExtractAsEventBasedObject: (
+                      extensionName: string,
+                      eventsBasedObjectName: string
+                    ) =>
+                      onOpenEventBasedObjectEditor(
+                        extensionName,
+                        eventsBasedObjectName,
+                        ''
+                      ),
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,

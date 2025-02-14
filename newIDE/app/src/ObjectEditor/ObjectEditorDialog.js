@@ -60,6 +60,11 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
 |};
 
 type InnerDialogProps = {|
@@ -88,6 +93,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onOpenEventBasedObjectEditor,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -282,6 +288,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 autoFocus="desktop"
               />
             )}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
           />
         </Column>
       ) : null}

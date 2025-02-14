@@ -394,14 +394,16 @@ export const getEventsFunctionsExtensionEditor = (
 export const getCustomObjectEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsBasedObject: gdEventsBasedObject
+  eventsBasedObject: gdEventsBasedObject,
+  variantName: string
 ): ?{| editor: CustomObjectEditorContainer, tabIndex: number |} => {
   for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
     const editor = state.editors[tabIndex].editorRef;
     if (
       editor instanceof CustomObjectEditorContainer &&
       editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
-      editor.getEventsBasedObject() === eventsBasedObject
+      editor.getEventsBasedObject() === eventsBasedObject &&
+      editor.getVariantName() === variantName
     ) {
       return { editor, tabIndex };
     }

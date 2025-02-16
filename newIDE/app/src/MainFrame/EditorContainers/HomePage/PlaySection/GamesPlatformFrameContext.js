@@ -7,6 +7,9 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import { generateCustomAuthToken } from '../../../../Utils/GDevelopServices/User';
 import PublicProfileContext from '../../../../Profile/PublicProfileContext';
 import RouterContext from '../../../RouterContext';
+import { retryIfFailed } from '../../../../Utils/RetryIfFailed';
+import optionalRequire from '../../../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its sound as long as the iframe
 // exists, even if it's not visible. So we don't keep it alive for too long.
@@ -35,6 +38,49 @@ export const GamesPlatformFrameContext = React.createContext<GamesPlatformFrameS
     configureNewProjectActions: () => {},
   }
 );
+
+let gdevelopGamesMonetization: {|
+  initialize: (rootElement: HTMLElement) => Promise<void>,
+  sendCommand: (command: any) => Promise<void>,
+|} | null = null;
+let gdevelopGamesMonetizationPromise: Promise<void> | null = null;
+
+const ensureGDevelopGamesMonetizationReady = async () => {
+  if (!!electron) {
+    // Not supported on desktop.
+  }
+  if (gdevelopGamesMonetization) {
+    // Already loaded.
+    return;
+  }
+  if (gdevelopGamesMonetizationPromise) {
+    // Being loaded.
+    return gdevelopGamesMonetizationPromise;
+  }
+
+  gdevelopGamesMonetizationPromise = (async () => {
+    try {
+      // Load the library. If it fails, retry or throw so we can retry later.
+      const module = await retryIfFailed(
+        { times: 2 },
+        async () =>
+          (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/ggm-web.js'))
+            .default
+      );
+      if (module) {
+        await module.initialize(document.body);
+        gdevelopGamesMonetization = module;
+      }
+    } catch (error) {
+      console.error('Error while loading GDevelop Games Monetization:', error);
+    } finally {
+      // If loading fails, retry later.
+      gdevelopGamesMonetizationPromise = null;
+    }
+  })();
+
+  return gdevelopGamesMonetizationPromise;
+};
 
 type GamesPlatformFrameStateProviderProps = {|
   children: React.Node,
@@ -126,6 +172,8 @@ const GamesPlatformFrameStateProvider = ({
       clearTimeout(timeoutToUnloadIframe.current);
       timeoutToUnloadIframe.current = null;
     }
+
+    ensureGDevelopGamesMonetizationReady();
 
     // The iframe is loaded on the same page as where it's displayed,
     // so we assume it's visible right away.
@@ -224,6 +272,16 @@ const GamesPlatformFrameStateProvider = ({
       }
       if (event.data.id === 'openGame') {
         notifyIframeToChangeGame(event.data.gameId);
+      }
+      if (event.data.id === 'sendGgmCommand') {
+        try {
+          await ensureGDevelopGamesMonetizationReady();
+
+          if (gdevelopGamesMonetization)
+            gdevelopGamesMonetization.sendCommand(event.data.command);
+        } catch (error) {
+          console.error('Error while sending GGM command:', error);
+        }
       }
     },
     [

@@ -149,7 +149,8 @@ private:
       const int valueParameterIndex,
       std::function<gd::AbstractFunctionMetadata &(
           gd::AbstractFunctionMetadata &instructionOrExpression)>
-          addObjectAndBehaviorParameters);
+          addObjectAndBehaviorParameters,
+      bool isSharedProperty);
 
   /**
    * Declare the instructions (actions/conditions) and expressions for the

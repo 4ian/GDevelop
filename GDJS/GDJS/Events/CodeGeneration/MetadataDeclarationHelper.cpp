@@ -1057,7 +1057,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
-    conditionMetadata.SetFunctionName(getterName);
+    conditionMetadata.SetFunctionName(getterName).SetHidden();
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
@@ -1074,7 +1074,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     addObjectAndBehaviorParameters(setterActionMetadata);
     setterActionMetadata
         .AddParameter("yesorno", _("New value to set"), "", false)
-        .SetFunctionName(setterName);
+        .SetFunctionName(setterName).SetHidden();
 
     auto &toggleActionMetadata = entityMetadata.AddScopedAction(
         toggleActionName, _("Toggle") + " " + propertyLabel,
@@ -1087,7 +1087,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
-    toggleActionMetadata.SetFunctionName(toggleFunctionName);
+    toggleActionMetadata.SetFunctionName(toggleFunctionName).SetHidden();
   } else {
     auto typeExtraInfo = GetStringifiedExtraInfo(property);
     auto parameterOptions = gd::ParameterOptions::MakeNewOptions();
@@ -1110,7 +1110,8 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType),
             parameterOptions)
         .SetFunctionName(setterName)
-        .SetGetter(getterName);
+        .SetGetter(getterName)
+        .SetHidden();
   }
 }
 

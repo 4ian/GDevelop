@@ -133,6 +133,10 @@ private:
       gd::PlatformExtension &extension,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 
+  /**
+   * @brief Declare deprecated instructions to access properties.
+   * Variable instructions are now used instead of this.
+   */
   static void DeclarePropertyInstructionAndExpression(
       gd::PlatformExtension &extension,
       gd::InstructionOrExpressionContainerMetadata &entityMetadata,

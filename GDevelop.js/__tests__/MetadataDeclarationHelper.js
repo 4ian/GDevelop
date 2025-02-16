@@ -579,7 +579,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Change the property value for Value of _PARAM0_: _PARAM2_ _PARAM3_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(4);
@@ -603,7 +604,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'The property value for Value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(4);
@@ -757,7 +759,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Set property value for Value of _PARAM0_ to _PARAM2_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(3);
@@ -779,7 +782,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'Property Value of _PARAM0_ is true'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(2);
@@ -834,7 +838,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Change the property value for Value of _PARAM0_: _PARAM2_ _PARAM3_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(4);
@@ -858,7 +863,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'The property value for Value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(4);
@@ -933,7 +939,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Set property value for Value of _PARAM0_ to _PARAM2_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(3);
@@ -955,7 +962,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'Property Value of _PARAM0_ is true'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(2);
@@ -1444,7 +1452,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Change the property value for Value of _PARAM0_: _PARAM1_ _PARAM2_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(3);
@@ -1467,7 +1476,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'The property value for Value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(3);
@@ -1538,7 +1548,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getSentence()).toBe(
       'Set property value for Value of _PARAM0_ to _PARAM1_'
     );
-    expect(action.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(action.isHidden()).toBe(true);
     expect(action.isPrivate()).toBe(true);
 
     expect(action.getParametersCount()).toBe(2);
@@ -1559,7 +1570,8 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getSentence()).toBe(
       'Property Value of _PARAM0_ is true'
     );
-    expect(condition.isHidden()).toBe(false);
+    // It is deprecated, variable instructions are used instead.
+    expect(condition.isHidden()).toBe(true);
     expect(condition.isPrivate()).toBe(true);
 
     expect(condition.getParametersCount()).toBe(1);

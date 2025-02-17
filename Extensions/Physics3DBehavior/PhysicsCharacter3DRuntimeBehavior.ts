@@ -1358,7 +1358,9 @@ namespace gdjs {
      */
     isMovingEvenALittle(): boolean {
       return (
-        (this._hasReallyMoved && this._currentForwardSpeed !== 0) ||
+        (this._hasReallyMoved &&
+          (this._currentForwardSpeed !== 0 ||
+            this._currentSidewaysSpeed !== 0)) ||
         this._currentJumpSpeed !== 0 ||
         this._currentFallSpeed !== 0
       );

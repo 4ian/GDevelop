@@ -191,6 +191,7 @@ namespace gdjs {
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
+    _displayMessageInPreview: boolean = false;
 
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
@@ -269,6 +270,8 @@ namespace gdjs {
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
+      this._displayMessageInPreview =
+        !!this._options.inAppTutorialMessageInPreview;
 
       this._embeddedResourcesMappings = new Map();
       for (const resource of this._data.resources.resources) {
@@ -709,6 +712,19 @@ namespace gdjs {
       return this._isAntialisingEnabledOnMobile;
     }
 
+    _displayInAppMessage() {
+      if (this._displayMessageInPreview) {
+        if (gdjs.inAppTutorialMessage) {
+          gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
+            this,
+            this._options.inAppTutorialMessageInPreview,
+            this._options.inAppTutorialMessagePositionInPreview || ''
+          );
+        }
+        this._displayMessageInPreview = false;
+      }
+    }
+
     /**
      * Set or unset the game as paused.
      * When paused, the game won't step and will be freezed. Useful for debugging.
@@ -721,6 +737,9 @@ namespace gdjs {
       if (this._debuggerClient) {
         if (this._paused) this._debuggerClient.sendGamePaused();
         else this._debuggerClient.sendGameResumed();
+      }
+      if (!enable) {
+        this._displayInAppMessage();
       }
     }
 
@@ -925,16 +944,7 @@ namespace gdjs {
 
         this._setupGameVisibilityEvents();
 
-        if (
-          this._options.inAppTutorialMessageInPreview &&
-          gdjs.inAppTutorialMessage
-        ) {
-          gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
-            this,
-            this._options.inAppTutorialMessageInPreview,
-            this._options.inAppTutorialMessagePositionInPreview || ''
-          );
-        }
+        this._displayInAppMessage();
 
         // The standard game loop
         let accumulatedElapsedTime = 0;

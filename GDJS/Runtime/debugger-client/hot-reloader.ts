@@ -154,6 +154,8 @@ namespace gdjs {
 
       const oldProjectData: ProjectData = gdjs.projectData;
 
+      const oldInAppTutorialMessageInPreview =
+        gdjs.runtimeGameOptions.inAppTutorialMessageInPreview;
       const oldScriptFiles = gdjs.runtimeGameOptions
         .scriptFiles as RuntimeGameOptionsScriptFile[];
 
@@ -173,6 +175,17 @@ namespace gdjs {
 
         const newRuntimeGameOptions: RuntimeGameOptions =
           gdjs.runtimeGameOptions;
+
+        this._runtimeGame._displayMessageInPreview =
+          !!newRuntimeGameOptions.inAppTutorialMessageInPreview ||
+          !!oldInAppTutorialMessageInPreview; // If there was a message before the hot reload, set _displayMessageInPreview to true to make sure it's removed.
+        this._runtimeGame._options = {
+          ...this._runtimeGame._options,
+          inAppTutorialMessageInPreview:
+            newRuntimeGameOptions.inAppTutorialMessageInPreview,
+          inAppTutorialMessagePositionInPreview:
+            newRuntimeGameOptions.inAppTutorialMessagePositionInPreview,
+        };
 
         const newScriptFiles =
           newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];

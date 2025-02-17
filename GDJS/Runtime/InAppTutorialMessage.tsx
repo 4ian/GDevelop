@@ -76,6 +76,7 @@ namespace gdjs {
 
   export namespace inAppTutorialMessage {
     const containerId = 'in-app-tutorial-container';
+    const messageContentId = 'in-app-tutorial-message-content';
 
     let _container: HTMLElement | null = null;
 
@@ -108,7 +109,7 @@ namespace gdjs {
         .then((fontFace) => document.fonts.add(fontFace));
     };
 
-    const _loadStyles = () => {
+    const _loadStyleSheet = () => {
       const adhocStyle = document.createElement('style');
       adhocStyle.textContent = `
         #${containerId} p {
@@ -132,18 +133,7 @@ namespace gdjs {
       return domElementContainer;
     };
 
-    export const displayInAppTutorialMessage = (
-      runtimeGame: gdjs.RuntimeGame,
-      message: string,
-      position: string
-    ) => {
-      const domElementContainer = getDomElementContainer(runtimeGame);
-      if (!domElementContainer) {
-        return;
-      }
-
-      if (_container) return;
-
+    const _getPositioningStyle = (position: string) => {
       const leftOrRight = position.toLowerCase().includes('right')
         ? 'right'
         : 'left';
@@ -177,12 +167,39 @@ namespace gdjs {
         messageContainerPositionStyle.transform =
           'translateY(calc(-100% - 10px))';
       }
+      return { containerPositionStyle, messageContainerPositionStyle };
+    };
+
+    export const displayInAppTutorialMessage = (
+      runtimeGame: gdjs.RuntimeGame,
+      /**
+       * When undefined, removes the current message.
+       */
+      message: string | undefined,
+      position: string
+    ) => {
+      const domElementContainer = getDomElementContainer(runtimeGame);
+      if (!domElementContainer) {
+        return;
+      }
+
+      if (_container) {
+        domElementContainer.removeChild(_container);
+        _container = null;
+        if (!message) return;
+      }
 
       const messageContent = document.createElement('div');
+      messageContent.id = messageContentId;
       messageContent.innerHTML = nmd(message);
 
+      const {
+        containerPositionStyle,
+        messageContainerPositionStyle,
+      } = _getPositioningStyle(position);
+
       _loadFonts();
-      _loadStyles();
+      _loadStyleSheet();
       _container = (
         <div
           id={containerId}

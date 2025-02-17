@@ -925,10 +925,7 @@ namespace gdjs {
 
         this._setupGameVisibilityEvents();
 
-        if (
-          this._options.inAppTutorialMessageInPreview &&
-          gdjs.inAppTutorialMessage
-        ) {
+        if (gdjs.inAppTutorialMessage) {
           gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
             this,
             this._options.inAppTutorialMessageInPreview,

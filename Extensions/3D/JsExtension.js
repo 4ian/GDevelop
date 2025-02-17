@@ -2488,7 +2488,7 @@ module.exports = {
         let tintDirty = false;
 
         const shouldUseTransparentTexture =
-          object.content.enableTextureTransparency;
+          object.content.enableTextureTransparency || false;
         if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
@@ -2541,12 +2541,12 @@ module.exports = {
         }
 
         const shouldRepeatTextureOnFace = [
-          object.content.frontFaceResourceRepeat,
-          object.content.backFaceResourceRepeat,
-          object.content.leftFaceResourceRepeat,
-          object.content.rightFaceResourceRepeat,
-          object.content.topFaceResourceRepeat,
-          object.content.bottomFaceResourceRepeat,
+          object.content.frontFaceResourceRepeat || false,
+          object.content.backFaceResourceRepeat || false,
+          object.content.leftFaceResourceRepeat || false,
+          object.content.rightFaceResourceRepeat || false,
+          object.content.topFaceResourceRepeat || false,
+          object.content.bottomFaceResourceRepeat || false,
         ];
         if (
           this._shouldRepeatTextureOnFace[0] !== shouldRepeatTextureOnFace[0] ||
@@ -2561,7 +2561,7 @@ module.exports = {
         }
 
         const backFaceUpThroughWhichAxisRotation =
-          object.content.backFaceUpThroughWhichAxisRotation;
+          object.content.backFaceUpThroughWhichAxisRotation || 'X';
         if (
           backFaceUpThroughWhichAxisRotation !==
           this._backFaceUpThroughWhichAxisRotation
@@ -2571,7 +2571,7 @@ module.exports = {
           uvMappingDirty = true;
         }
 
-        const facesOrientation = object.content.facesOrientation;
+        const facesOrientation = object.content.facesOrientation || 'Y';
         if (facesOrientation !== this._facesOrientation) {
           this._facesOrientation = facesOrientation;
           uvMappingDirty = true;

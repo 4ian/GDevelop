@@ -82,7 +82,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
   const iframeWidth = `calc(100% - ${2 * iframeSideMargin}px)`;
 
   // We wrap the iframe in a paper, as its content has a transparent background,
-  // and we don't want what's behing the iframe to be visible.
+  // and we don't want what's behind the iframe to be visible.
   return (
     <Paper
       square

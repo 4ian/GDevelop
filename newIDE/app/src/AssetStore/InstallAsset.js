@@ -155,6 +155,19 @@ export type InstallAssetArgs = {|
   targetObjectFolderOrObject?: ?gdObjectFolderOrObject,
 |};
 
+const findVariant = (
+  container: gdEventsBasedObjectVariantsContainer,
+  assetStoreId: string
+): gdEventsBasedObjectVariant | null => {
+  for (let index = 0; index < container.getVariantsCount(); index++) {
+    const variant = container.getVariantAt(index);
+    if (variant.getAssetStoreId()) {
+      return variant;
+    }
+  }
+  return null;
+};
+
 export const addAssetToProject = async ({
   asset,
   project,
@@ -169,6 +182,36 @@ export const addAssetToProject = async ({
   asset.objectAssets.forEach(objectAsset => {
     const type: ?string = objectAsset.object.type;
     if (!type) throw new Error('An object has no type specified');
+
+    let variantName: string | null = null;
+    const serializedVariant = objectAsset.variant;
+    const isCustomObjectWithVariant =
+      serializedVariant && project.hasEventsBasedObject(type);
+    if (isCustomObjectWithVariant && serializedVariant) {
+      const eventsBasedObject = project.getEventsBasedObject(type);
+      const variants = eventsBasedObject.getVariants();
+      variantName = serializedVariant.name;
+      let variant = findVariant(variants, serializedVariant.assetStoreId);
+      if (!variant) {
+        // TODO Forbid name with `::`
+        const uniqueNewName = newNameGenerator(variantName, tentativeNewName =>
+          variants.hasVariantNamed(tentativeNewName)
+        );
+        variant = variants.insertNewVariant(
+          uniqueNewName,
+          variants.getVariantsCount()
+        );
+        variantName = uniqueNewName;
+      }
+      unserializeFromJSObject(
+        variant,
+        serializedVariant,
+        'unserializeFrom',
+        project
+      );
+      variant.setName(variantName);
+      variant.setAssetStoreId(asset.id);
+    }
 
     // Insert the object
     const originalName = sanitizeObjectName(objectAsset.object.name);
@@ -206,6 +249,15 @@ export const addAssetToProject = async ({
     );
 
     object.setAssetStoreId(asset.id);
+    if (isCustomObjectWithVariant && variantName) {
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        object.getConfiguration()
+      );
+      customObjectConfiguration.setVariantName(variantName);
+      customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+        false
+      );
+    }
     // The name was overwritten after unserialization.
     object.setName(newName);
 

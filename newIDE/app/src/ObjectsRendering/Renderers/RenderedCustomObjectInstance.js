@@ -1,6 +1,7 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
 import Rendered3DInstance from './Rendered3DInstance';
+import RenderedUnknownInstance from './RenderedUnknownInstance';
 import PixiResourcesLoader from '../PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -153,21 +154,34 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   ): RenderedInstance | Rendered3DInstance => {
     let renderedInstance = this.renderedInstances.get(instance.ptr);
     if (!renderedInstance) {
-      const customObjectConfiguration = gd.asCustomObjectConfiguration(
-        this._associatedObjectConfiguration
-      );
-      //No renderer associated yet, the instance must have been just created!...
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        instance.getObjectName()
-      );
+      // No renderer associated yet, the instance must have been just created!...
+      let childObjectConfiguration = null;
+      const variant = this.getVariant();
+      if (variant) {
+        const childObjects = variant.getObjects();
+        if (childObjects.hasObjectNamed(instance.getObjectName())) {
+          childObjectConfiguration = childObjects
+            .getObject(instance.getObjectName())
+            .getConfiguration();
+        }
+      }
       //...so let's create a renderer.
-      renderedInstance = ObjectsRenderingService.createNewInstanceRenderer(
-        this._project,
-        instance,
-        childObjectConfiguration,
-        this._pixiObject,
-        this._threeObject
-      );
+      renderedInstance = childObjectConfiguration
+        ? ObjectsRenderingService.createNewInstanceRenderer(
+            this._project,
+            instance,
+            childObjectConfiguration,
+            this._pixiObject,
+            this._threeObject
+          )
+        : new RenderedUnknownInstance(
+            this._project,
+            instance,
+            // $FlowFixMe It's not actually used.
+            null,
+            this._pixiObject,
+            PixiResourcesLoader
+          );
       this.renderedInstances.set(instance.ptr, renderedInstance);
     }
     return renderedInstance;

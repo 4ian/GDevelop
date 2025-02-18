@@ -3194,6 +3194,8 @@ interface EventsBasedObjectVariant {
     void SetAreaMaxX(double value);
     void SetAreaMaxY(double value);
     void SetAreaMaxZ(double value);
+    void SetAssetStoreId([Const] DOMString assetStoreId);
+    [Const, Ref] DOMString GetAssetStoreId();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

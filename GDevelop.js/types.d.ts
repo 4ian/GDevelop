@@ -2314,6 +2314,8 @@ export class EventsBasedObjectVariant extends EmscriptenObject {
   setAreaMaxX(value: number): void;
   setAreaMaxY(value: number): void;
   setAreaMaxZ(value: number): void;
+  setAssetStoreId(assetStoreId: string): void;
+  getAssetStoreId(): string;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }

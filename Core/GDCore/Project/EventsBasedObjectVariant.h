@@ -19,7 +19,7 @@ class Project;
 namespace gd {
 /**
  * \brief Represents a variation of style of an events-based object.
- * 
+ *
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API EventsBasedObjectVariant {
@@ -178,6 +178,16 @@ public:
   void SetAreaMaxZ(int areaMaxZ_) { areaMaxZ = areaMaxZ_; }
   ///@}
 
+  /** \brief Change the asset store id of the object.
+   */
+  void SetAssetStoreId(const gd::String &assetStoreId_) {
+    assetStoreId = assetStoreId_;
+  };
+
+  /** \brief Return the asset store id of the object.
+   */
+  const gd::String &GetAssetStoreId() const { return assetStoreId; };
+
   void SerializeTo(SerializerElement &element) const;
 
   void UnserializeFrom(gd::Project &project, const SerializerElement &element);
@@ -193,6 +203,10 @@ private:
   double areaMaxX;
   double areaMaxY;
   double areaMaxZ;
+  /**
+   * The ID of the asset if the object comes from the store.
+   */
+  gd::String assetStoreId;
 };
 
 } // namespace gd

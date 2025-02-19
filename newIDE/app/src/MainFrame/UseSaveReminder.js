@@ -28,9 +28,9 @@ const CHECK_FREQUENCY = 5000;
 export const getUnsavedChangesAmount = (
   unsavedChanges: UnsavedChanges
 ): UnsavedChangesAmount => {
-  const { getChangesCount, getLastCheckpointTime } = unsavedChanges;
+  const { getChangesCount, getTimeOfFirstChangeSinceLastSave } = unsavedChanges;
   const changesCount = getChangesCount();
-  const lastCheckpointTime = getLastCheckpointTime();
+  const lastCheckpointTime = getTimeOfFirstChangeSinceLastSave();
 
   if (changesCount === 0 || !lastCheckpointTime) return 'none';
   const now = Date.now();

@@ -3,10 +3,10 @@ import * as React from 'react';
 
 export type UnsavedChanges = {|
   hasUnsavedChanges: boolean,
-  sealUnsavedChanges: (options?: {| setCheckpointTime: boolean |}) => void,
+  sealUnsavedChanges: () => void,
   triggerUnsavedChanges: () => void,
   getChangesCount: () => number,
-  getLastCheckpointTime: () => number | null,
+  getTimeOfFirstChangeSinceLastSave: () => number | null,
 |};
 
 const initialState: UnsavedChanges = {
@@ -14,7 +14,7 @@ const initialState: UnsavedChanges = {
   sealUnsavedChanges: () => {},
   triggerUnsavedChanges: () => {},
   getChangesCount: () => 0,
-  getLastCheckpointTime: () => null,
+  getTimeOfFirstChangeSinceLastSave: () => null,
 };
 
 const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
@@ -30,26 +30,25 @@ export const UnsavedChangesContextProvider = (props: Props) => {
     false
   );
   const changesCount = React.useRef<number>(0); // Cannot be stored in a state variable, otherwise it re-renders children at each change.
-  const lastCheckpointTime = React.useRef<number | null>(null); // Cannot be stored in a state variable, otherwise it re-renders children at each change.
+  const timeOfFirstChangeSinceLastSave = React.useRef<number | null>(null); // Cannot be stored in a state variable, otherwise it re-renders children at each change.
 
   const triggerUnsavedChanges = React.useCallback((): void => {
+    if (changesCount.current === 0) {
+      timeOfFirstChangeSinceLastSave.current = Date.now();
+    }
     changesCount.current = changesCount.current + 1;
     setHasUnsavedChanges(true);
   }, []);
 
-  const sealUnsavedChanges = React.useCallback(
-    (options?: {| setCheckpointTime: boolean |}): void => {
-      changesCount.current = 0;
-      lastCheckpointTime.current =
-        options && options.setCheckpointTime ? Date.now() : null;
-      setHasUnsavedChanges(false);
-    },
-    []
-  );
+  const sealUnsavedChanges = React.useCallback((): void => {
+    changesCount.current = 0;
+    timeOfFirstChangeSinceLastSave.current = null;
+    setHasUnsavedChanges(false);
+  }, []);
 
   const getChangesCount = React.useCallback(() => changesCount.current, []);
-  const getLastCheckpointTime = React.useCallback(
-    () => lastCheckpointTime.current,
+  const getTimeOfFirstChangeSinceLastSave = React.useCallback(
+    () => timeOfFirstChangeSinceLastSave.current,
     []
   );
 
@@ -60,7 +59,7 @@ export const UnsavedChangesContextProvider = (props: Props) => {
         triggerUnsavedChanges,
         sealUnsavedChanges,
         getChangesCount,
-        getLastCheckpointTime,
+        getTimeOfFirstChangeSinceLastSave,
       }}
     >
       {props.children}

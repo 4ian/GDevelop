@@ -48,6 +48,7 @@ let gdevelopGamesMonetizationPromise: Promise<void> | null = null;
 const ensureGDevelopGamesMonetizationReady = async () => {
   if (!!electron) {
     // Not supported on desktop.
+    return;
   }
   if (gdevelopGamesMonetization) {
     // Already loaded.

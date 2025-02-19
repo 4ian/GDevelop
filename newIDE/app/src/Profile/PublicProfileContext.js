@@ -147,7 +147,7 @@ export const PublicProfileProvider = ({ children }: Props) => {
         (profileCallbacks && profileCallbacks.onAssetPackOpen) ||
         defaultOpenAssetPackCallback;
       action(privateAssetPackListingData);
-      // Assume that the dialog is awlays closed after the asset pack is opened.
+      // Assume that the dialog is always closed after the asset pack is opened.
       closeUserPublicProfile();
     },
     [profileCallbacks, closeUserPublicProfile, defaultOpenAssetPackCallback]
@@ -158,7 +158,7 @@ export const PublicProfileProvider = ({ children }: Props) => {
         (profileCallbacks && profileCallbacks.onGameTemplateOpen) ||
         defaultOpenGameTemplateCallback;
       action(privateGameTemplateListingData);
-      // Assume that the dialog is awlays closed after the asset pack is opened.
+      // Assume that the dialog is always closed after the asset pack is opened.
       closeUserPublicProfile();
     },
     [profileCallbacks, closeUserPublicProfile, defaultOpenGameTemplateCallback]
@@ -169,7 +169,7 @@ export const PublicProfileProvider = ({ children }: Props) => {
         (profileCallbacks && profileCallbacks.onGameOpen) ||
         defaultOpenGameCallback;
       action(gameId);
-      // Assume that the dialog is awlays closed after the game is opened.
+      // Assume that the dialog is always closed after the game is opened.
       closeUserPublicProfile();
     },
     [profileCallbacks, closeUserPublicProfile, defaultOpenGameCallback]

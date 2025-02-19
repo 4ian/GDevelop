@@ -102,6 +102,14 @@ const useSaveReminder = ({
     [onSave]
   );
 
+  React.useEffect(
+    () => {
+      if (!project) setDisplayReminder(false);
+    },
+    // If project is closed while the reminder is displayed, close it.
+    [project]
+  );
+
   const renderSaveReminder = React.useCallback(
     () => {
       return (

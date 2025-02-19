@@ -555,19 +555,6 @@ namespace gdjs {
       const canvas = this._gameCanvas;
       if (!canvas) return;
 
-      //Translate an event (mouse or touch) made on the canvas on the page
-      //to game coordinates.
-      const getEventPosition = (e: MouseEvent | Touch) => {
-        const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
-
-        // Handle the fact that the game is stretched to fill the canvas.
-        pos[0] *=
-          this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
-        pos[1] *=
-          this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
-        return pos;
-      };
-
       const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
         const y = e.pageY - canvas.offsetTop;
@@ -581,7 +568,7 @@ namespace gdjs {
       };
 
       //Some browsers lacks definition of some variables used to do calculations
-      //in getEventPosition. They are defined to 0 as they are useless.
+      //in _getEventPosition. They are defined to 0 as they are useless.
 
       (function ensureOffsetsExistence() {
         if (isNaN(canvas.offsetLeft)) {
@@ -684,11 +671,13 @@ namespace gdjs {
         }
         return button;
       }
-      canvas.onmousemove = function (e) {
-        const pos = getEventPosition(e);
+      canvas.onmousemove = (e) => {
+        const pos = this._getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
       };
-      canvas.onmousedown = function (e) {
+      canvas.onmousedown = (e) => {
+        const pos = this._getEventPosition(e);
+        manager.onMouseMove(pos[0], pos[1]);
         manager.onMouseButtonPressed(
           convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
@@ -750,8 +739,7 @@ namespace gdjs {
 
       // Touches:
       window.addEventListener(
-        'touchmove',
-        function (e) {
+        'touchmove', (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -762,7 +750,7 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = getEventPosition(e.changedTouches[i]);
+              const pos = this._getEventPosition(e.changedTouches[i]);
               manager.onTouchMove(
                 e.changedTouches[i].identifier,
                 pos[0],
@@ -784,8 +772,7 @@ namespace gdjs {
         { passive: false }
       );
       window.addEventListener(
-        'touchstart',
-        function (e) {
+        'touchstart', (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -796,7 +783,7 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = getEventPosition(e.changedTouches[i]);
+              const pos = this._getEventPosition(e.changedTouches[i]);
               manager.onTouchStart(
                 e.changedTouches[i].identifier,
                 pos[0],
@@ -1048,6 +1035,20 @@ namespace gdjs {
         throw 'The RuntimeGameRenderer has been disposed and should not be used anymore.';
       }
     }
+
+    //Translate an event (mouse or touch) made on the canvas on the page to game coordinates.
+    private _getEventPosition(e: MouseEvent | Touch): number[] {
+      const canvas = this._gameCanvas;
+      if (!canvas) return [0, 0];
+
+      const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
+
+      // Handle the fact that the game is stretched to fill the canvas.
+      pos[0] *= this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pos[1] *= this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+
+      return pos;
+    };
   }
 
   //Register the class to let the engine use it.

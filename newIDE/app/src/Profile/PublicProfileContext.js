@@ -133,7 +133,6 @@ export const PublicProfileProvider = ({ children }: Props) => {
   const defaultOpenExampleCallback = React.useCallback(
     async (exampleShortHeader: ExampleShortHeader) => {
       if (newProjectActions) {
-        console.log('Opening example', exampleShortHeader);
         await newProjectActions.fetchAndOpenNewProjectSetupDialogForExample(
           exampleShortHeader.slug
         );

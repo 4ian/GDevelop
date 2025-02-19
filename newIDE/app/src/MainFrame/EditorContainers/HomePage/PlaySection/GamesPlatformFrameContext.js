@@ -11,7 +11,7 @@ import { retryIfFailed } from '../../../../Utils/RetryIfFailed';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
-// If the iframe is displaying a game, it will continue playing its sound as long as the iframe
+// If the iframe is displaying a game, it will continue playing its audio as long as the iframe
 // exists, even if it's not visible. So we don't keep it alive for too long.
 const TIMEOUT_TO_UNLOAD_IFRAME_IN_MS = 2000;
 
@@ -64,6 +64,7 @@ const ensureGDevelopGamesMonetizationReady = async () => {
       const module = await retryIfFailed(
         { times: 2 },
         async () =>
+          // $FlowExpectedError - Remote script cannot be found.
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/ggm-web.js'))
             .default
       );

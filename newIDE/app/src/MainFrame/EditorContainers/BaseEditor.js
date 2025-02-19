@@ -34,8 +34,7 @@ export type RenderEditorContainerProps = {|
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
-  hideToolbar: (hidden: boolean) => void,
-  hideTabsTitlebar: (hidden: boolean) => void,
+  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
 
   // Some optional extra props to pass to the rendered editor
   extraEditorProps: ?EditorContainerExtraProps,

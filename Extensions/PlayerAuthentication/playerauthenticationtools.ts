@@ -491,7 +491,9 @@ namespace gdjs {
       checkOrigin: boolean;
       onDone?: (status: 'logged' | 'errored' | 'dismissed') => void;
     }) {
-      const onLoginSuccessFul = (event: MessageEvent) => {
+      // This happens when the user triggers the login from the game.
+      // -> This will close the authentication window and log the user in.
+      const onManualLoginSuccessFul = (event: MessageEvent) => {
         login({
           runtimeScene,
           userId: event.data.body.userId,
@@ -502,7 +504,10 @@ namespace gdjs {
         if (onDone) onDone('logged');
       };
 
-      const onLoginWithoutLoginDialog = (event: MessageEvent) => {
+      // This happens when the login happens automatically, because the parent window
+      // (e.g: GDevelop games platform) is already authenticated.
+      // -> This logs the user in, without closing the banner or showing the login notification.
+      const onAutomaticLoginSuccessful = (event: MessageEvent) => {
         saveAuthKeyToStorage({
           userId: event.data.body.userId,
           username: event.data.body.username,
@@ -532,7 +537,7 @@ namespace gdjs {
           }
 
           logger.info('Received authentication result, logging in player.');
-          onLoginSuccessFul(event);
+          onManualLoginSuccessFul(event);
           break;
         }
         case 'alreadyAuthenticated': {
@@ -541,15 +546,17 @@ namespace gdjs {
           }
 
           logger.info('Player is already authenticated, logging in player.');
-          // If we receive this message while the authentication is happening,
-          // it can come from the parent window (e.g: GDevelop games platform).
-          // In this case, we assume the log-in was successful.
+          // If we receive this message while the authentication dialog is open,
+          // it can come from the parent window (e.g: GDevelop games platform) which is handling the authentication for the game.
+          // In this case, we assume the log-in was successful and initiated by the player.
           if (_authenticationRootContainer) {
-            onLoginSuccessFul(event);
+            onManualLoginSuccessFul(event);
             break;
           }
 
-          onLoginWithoutLoginDialog(event);
+          // If the authentication dialog is not open, it means that the parent window (e.g: GDevelop games platform) has informed the game
+          // that the player is already authenticated. We can log the player in automatically.
+          onAutomaticLoginSuccessful(event);
           break;
         }
       }
@@ -976,6 +983,10 @@ namespace gdjs {
       authWindowOptions: AuthenticationWindowOptions
     ) =>
       new Promise<AuthenticationWindowStatus>((resolve) => {
+        // First, clear the automatic authentication timeout.
+        // It can still exist if the user triggers a log-in manually, while the automatic authentication is still waiting.
+        removeAutomaticGamesPlatformAuthenticationCallback();
+
         // Listen to messages posted by the authentication window, so that we can
         // know when the user is authenticated.
         _authenticationMessageCallback = (event: MessageEvent) => {
@@ -995,7 +1006,7 @@ namespace gdjs {
         // Login dialog will be handled by the platform.
         window.parent.postMessage(
           {
-            id: 'openGameAuthDialog',
+            id: 'openGameAuthenticationDialog',
             gameId,
             disableGuestLogin: authWindowOptions.disableGuestLogin,
           },
@@ -1194,7 +1205,6 @@ namespace gdjs {
       _authenticationLoaderContainer = null;
       _authenticationIframeContainer = null;
       _authenticationTextContainer = null;
-      removeAutomaticGamesPlatformAuthenticationCallback();
     };
 
     /*
@@ -1216,10 +1226,6 @@ namespace gdjs {
      * Remove the automatic authentication callback when running on web.
      */
     const removeAutomaticGamesPlatformAuthenticationCallback = function () {
-      // If the banner or the login dialog is still displayed, do not remove the callback.
-      // It will be removed when they are removed.
-      if (_authenticationBanner || _authenticationRootContainer) return;
-
       if (_automaticGamesPlatformAuthenticationCallback) {
         window.removeEventListener(
           'message',
@@ -1259,7 +1265,6 @@ namespace gdjs {
 
       domElementContainer.removeChild(_authenticationBanner);
       _authenticationBanner = null;
-      removeAutomaticGamesPlatformAuthenticationCallback();
     };
 
     /**

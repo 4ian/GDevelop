@@ -1243,17 +1243,13 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const hideEditorToolbar = (hidden: boolean) => {
-    if (!toolbar.current) return;
-
-    toolbar.current.hideToolbar(hidden);
-  };
-
-  const hideTabsTitlebar = (hidden: boolean) => {
-    if (!tabsTitlebar.current) return;
-
-    tabsTitlebar.current.hideTitlebar(hidden);
-  };
+  const hideTabsTitleBarAndEditorToolbar = React.useCallback(
+    (hidden: boolean) => {
+      if (tabsTitlebar.current) tabsTitlebar.current.hideTitlebar(hidden);
+      if (toolbar.current) toolbar.current.hideToolbar(hidden);
+    },
+    []
+  );
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
@@ -3771,8 +3767,7 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
-                    hideToolbar: hideEditorToolbar,
-                    hideTabsTitlebar: hideTabsTitlebar,
+                    hideTabsTitleBarAndEditorToolbar,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

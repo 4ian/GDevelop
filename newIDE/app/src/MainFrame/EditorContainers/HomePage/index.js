@@ -110,8 +110,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
-  hideToolbar: (hidden: boolean) => void,
-  hideTabsTitlebar: (hidden: boolean) => void,
+  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
   storageProviders: Array<StorageProvider>,
 
   // Games
@@ -185,8 +184,7 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         onCreateProjectFromExample,
         setToolbar,
-        hideToolbar,
-        hideTabsTitlebar,
+        hideTabsTitleBarAndEditorToolbar,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
@@ -436,21 +434,18 @@ export const HomePage = React.memo<Props>(
         () => {
           // Hide the toolbars when on mobile in the "play" tab.
           if (activeTab === 'play' && isMobile) {
-            hideToolbar(true);
-            hideTabsTitlebar(true);
+            hideTabsTitleBarAndEditorToolbar(true);
           } else {
-            hideToolbar(false);
+            hideTabsTitleBarAndEditorToolbar(false);
             updateToolbar();
-            hideTabsTitlebar(false);
           }
 
           // Ensure we show it again when the tab changes.
           return () => {
-            hideToolbar(false);
-            hideTabsTitlebar(false);
+            hideTabsTitleBarAndEditorToolbar(false);
           };
         },
-        [updateToolbar, activeTab, hideToolbar, hideTabsTitlebar, isMobile]
+        [updateToolbar, activeTab, hideTabsTitleBarAndEditorToolbar, isMobile]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -660,8 +655,7 @@ export const renderHomePageContainer = (
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
-    hideToolbar={props.hideToolbar}
-    hideTabsTitlebar={props.hideTabsTitlebar}
+    hideTabsTitleBarAndEditorToolbar={props.hideTabsTitleBarAndEditorToolbar}
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}

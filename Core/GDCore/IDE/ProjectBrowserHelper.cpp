@@ -314,6 +314,12 @@ void ProjectBrowserHelper::ExposeProjectObjects(
          eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
       auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
       worker.Launch(eventsBasedObject->GetObjects());
+
+      for (auto &&variantUniquePtr :
+           eventsBasedObject->GetVariants().GetInternalVector()) {
+        auto variant = variantUniquePtr.get();
+        worker.Launch(variant->GetObjects());
+      }
     }
   }
 };

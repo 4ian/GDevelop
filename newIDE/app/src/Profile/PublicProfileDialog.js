@@ -11,6 +11,7 @@ import {
 } from '../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useStableUpToDateCallback } from '../Utils/UseStableUpToDateCallback';
+import { gamesPlatformEmbeddedVersion } from '../MainFrame/EditorContainers/HomePage/PlaySection/GamesPlatformFrame.js';
 
 type Props = {|
   userId: string,
@@ -96,7 +97,7 @@ const PublicProfileDialog = ({
       onRequestClose={onClose}
     >
       <GdGamesFrame
-        path={`/embedded/user/${userId}`}
+        path={`/app-embedded/${gamesPlatformEmbeddedVersion}/user/${userId}`}
         loadErrorMessage={
           <Trans>
             Can't load the profile. Verify your internet connection or try again

@@ -25,7 +25,7 @@ const gdGamesHost = 'https://gd.games';
 // const gdGamesHost = 'http://localhost:4000';
 
 // Increment this when a breaking change is made to the embedded games platform.
-const gamesPlatformEmbeddedVersion = 1;
+export const gamesPlatformEmbeddedVersion = 'v1';
 
 type Props = {|
   loaded: boolean,
@@ -43,17 +43,15 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
 
   const url = new URL(
     gameId.current
-      ? `/embedded/games/${gameId.current}`
+      ? `/app-embedded/${gamesPlatformEmbeddedVersion}/games/${gameId.current}`
       : isMobile
-      ? '/embedded/games/random' // On mobile, go directly to a random game if none is specified.
-      : `/embedded/${paletteType}`, // On desktop, access the homepage.
+      ? // On mobile, go directly to a random game if none is specified.
+        `/app-embedded/${gamesPlatformEmbeddedVersion}/games/random`
+      : // On desktop, access the homepage.
+        `/app-embedded/${gamesPlatformEmbeddedVersion}/${paletteType}`,
     gdGamesHost
   );
   if (gameId.current || isMobile) url.searchParams.set('theme', paletteType);
-  url.searchParams.set(
-    'embeddedVersion',
-    gamesPlatformEmbeddedVersion.toString()
-  );
 
   const src = loaded ? url.toString() : '';
 

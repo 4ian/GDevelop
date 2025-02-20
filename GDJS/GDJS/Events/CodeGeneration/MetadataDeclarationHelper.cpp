@@ -1041,7 +1041,8 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     const int valueParameterIndex,
     std::function<gd::AbstractFunctionMetadata &(
         gd::AbstractFunctionMetadata &instructionOrExpression)>
-        addObjectAndBehaviorParameters) {
+        addObjectAndBehaviorParameters,
+    bool isSharedProperty) {
   auto &propertyType = property.GetType();
 
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
@@ -1058,6 +1059,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
     conditionMetadata.SetFunctionName(getterName);
+    if (!isSharedProperty) {
+      conditionMetadata.SetHidden();
+    }
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
@@ -1075,6 +1079,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     setterActionMetadata
         .AddParameter("yesorno", _("New value to set"), "", false)
         .SetFunctionName(setterName);
+    if (!isSharedProperty) {
+      setterActionMetadata.SetHidden();
+    }
 
     auto &toggleActionMetadata = entityMetadata.AddScopedAction(
         toggleActionName, _("Toggle") + " " + propertyLabel,
@@ -1088,6 +1095,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
     toggleActionMetadata.SetFunctionName(toggleFunctionName);
+    if (!isSharedProperty) {
+      toggleActionMetadata.SetHidden();
+    }
   } else {
     auto typeExtraInfo = GetStringifiedExtraInfo(property);
     auto parameterOptions = gd::ParameterOptions::MakeNewOptions();
@@ -1111,6 +1121,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             parameterOptions)
         .SetFunctionName(setterName)
         .SetGetter(getterName);
+    if (!isSharedProperty) {
+      propertyInstructionMetadata.SetHidden();
+    }
   }
 }
 
@@ -1186,7 +1199,7 @@ void MetadataDeclarationHelper::
         extension, behaviorMetadata, eventsBasedBehavior, *property,
         propertyLabel, expressionName, conditionName, actionName,
         toggleActionName, setterName, getterName, toggleFunctionName, 2,
-        addObjectAndBehaviorParameters);
+        addObjectAndBehaviorParameters, false);
   }
 
   for (auto &property :
@@ -1218,7 +1231,7 @@ void MetadataDeclarationHelper::
         extension, behaviorMetadata, eventsBasedBehavior, *property,
         propertyLabel, expressionName, conditionName, actionName,
         toggleActionName, setterName, getterName, toggleFunctionName, 2,
-        addObjectAndBehaviorParameters);
+        addObjectAndBehaviorParameters, true);
   }
 }
 
@@ -1274,7 +1287,7 @@ void MetadataDeclarationHelper::
     DeclarePropertyInstructionAndExpression(
         extension, objectMetadata, eventsBasedObject, *property, propertyLabel,
         expressionName, conditionName, actionName, toggleActionName, setterName,
-        getterName, toggleFunctionName, 1, addObjectParameter);
+        getterName, toggleFunctionName, 1, addObjectParameter, false);
   }
 }
 

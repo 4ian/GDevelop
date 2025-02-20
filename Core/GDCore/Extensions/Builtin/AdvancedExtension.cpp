@@ -141,7 +141,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     "res/function32.png")
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly()
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -177,7 +178,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition(
@@ -191,7 +193,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "string", gd::ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 }
 
 }  // namespace gd

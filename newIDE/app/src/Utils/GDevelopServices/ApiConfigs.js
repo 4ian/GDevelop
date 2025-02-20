@@ -61,7 +61,8 @@ export const GDevelopReleaseApi = {
 
 export const GDevelopAssetApi = {
   baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/asset'
+    ? // ? 'https://api-dev.gdevelop.io/asset'
+      'http://localhost:3006/dev'
     : 'https://api.gdevelop.io/asset',
 };
 

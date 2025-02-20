@@ -65,21 +65,21 @@ namespace gdjs {
      */
     loadFrom(
       customObjectData: ObjectData & CustomObjectConfiguration,
-      eventsBasedObjectData: EventsBasedObjectData
+      eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
       if (this._isLoaded) {
         this.onDestroyFromScene(this._parent);
       }
 
-      this._setOriginalInnerArea(eventsBasedObjectData);
+      this._setOriginalInnerArea(eventsBasedObjectVariantData);
 
       // Registering objects
       for (
-        let i = 0, len = eventsBasedObjectData.objects.length;
+        let i = 0, len = eventsBasedObjectVariantData.objects.length;
         i < len;
         ++i
       ) {
-        const childObjectData = eventsBasedObjectData.objects[i];
+        const childObjectData = eventsBasedObjectVariantData.objects[i];
         if (customObjectData.childrenContent) {
           this.registerObject({
             ...childObjectData,
@@ -92,14 +92,14 @@ namespace gdjs {
         }
       }
 
-      if (eventsBasedObjectData.layers.length > 0) {
+      if (eventsBasedObjectVariantData.layers.length > 0) {
         // Load layers
         for (
-          let i = 0, len = eventsBasedObjectData.layers.length;
+          let i = 0, len = eventsBasedObjectVariantData.layers.length;
           i < len;
           ++i
         ) {
-          this.addLayer(eventsBasedObjectData.layers[i]);
+          this.addLayer(eventsBasedObjectVariantData.layers[i]);
         }
       } else {
         // Add a default layer
@@ -128,7 +128,7 @@ namespace gdjs {
       }
 
       this.createObjectsFrom(
-        eventsBasedObjectData.instances,
+        eventsBasedObjectVariantData.instances,
         0,
         0,
         0,
@@ -147,7 +147,7 @@ namespace gdjs {
      * `_initialInnerArea` is shared by every instance to save memory.
      */
     private _setOriginalInnerArea(
-      eventsBasedObjectData: EventsBasedObjectData
+      eventsBasedObjectData: EventsBasedObjectVariantData
     ) {
       if (eventsBasedObjectData.instances.length > 0) {
         if (!eventsBasedObjectData._initialInnerArea) {

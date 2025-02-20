@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اَلْعَرَبِيَّةُ",
-    "translationRatio": 0.9487466427931961
+    "translationRatio": 0.9560205908683975
   },
   {
     "languageCode": "az_AZ",
@@ -47,7 +47,7 @@ module.exports = [
     "languageCode": "cs_CZ",
     "languageName": "Czech",
     "languageNativeName": "čeština",
-    "translationRatio": 0.26410026857654434
+    "translationRatio": 0.26454789615040286
   },
   {
     "languageCode": "da_DK",
@@ -173,7 +173,7 @@ module.exports = [
     "languageCode": "ko_KR",
     "languageName": "Korean",
     "languageNativeName": "한국어",
-    "translationRatio": 0.8401969561324978
+    "translationRatio": 0.840420769919427
   },
   {
     "languageCode": "lt_LT",

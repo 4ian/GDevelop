@@ -151,6 +151,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  initialScrollPosition?: number,
 |};
 
 type ComponentProps = {|
@@ -349,6 +350,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   onResourceExternallyChanged = resourceInfo => {
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+  };
+
+  getScrollPosition = (): number => {
+    return this._eventsTree ? this._eventsTree.getScrollPosition() : 0;
   };
 
   updateToolbar() {
@@ -1921,6 +1926,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     key={events.ptr}
                     indentScale={preferences.values.eventsSheetIndentScale}
                     onScroll={this._ensureFocused}
+                    initialScrollPosition={this.props.initialScrollPosition}
                     events={events}
                     project={project}
                     scope={scope}
@@ -2184,6 +2190,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
+  getScrollPosition: () => number,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2192,6 +2199,7 @@ const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
     onResourceExternallyChanged,
+    getScrollPosition,
   }));
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
@@ -2201,6 +2209,9 @@ const EventsSheet = (props, ref) => {
   const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
+  };
+  const getScrollPosition = (): number => {
+    return component.current ? component.current.getScrollPosition() : 0;
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

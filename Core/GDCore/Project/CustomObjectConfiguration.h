@@ -29,9 +29,9 @@ namespace gd {
  * "resource".
  */
 class CustomObjectConfiguration : public gd::ObjectConfiguration {
- public:
-  CustomObjectConfiguration(const Project& project_, const String& type_)
-      : project(&project_), isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(false) {
+public:
+  CustomObjectConfiguration(const Project &project_, const String &type_)
+      : project(&project_) {
     SetType(type_);
   }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;

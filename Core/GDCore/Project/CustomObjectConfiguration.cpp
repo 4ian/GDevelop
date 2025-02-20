@@ -19,6 +19,7 @@ using namespace gd;
 
 void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& objectConfiguration) {
   project = objectConfiguration.project;
+  variantName = objectConfiguration.variantName;
   objectContent = objectConfiguration.objectContent;
   animations = objectConfiguration.animations;
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
@@ -249,9 +250,26 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
-    auto &configuration = GetChildObjectConfiguration(childObject->GetName());
-    configuration.ExposeResources(worker);
+  if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
+    for (auto &childObject : eventsBasedObject.GetObjects().GetObjects()) {
+      auto &configuration = GetChildObjectConfiguration(childObject->GetName());
+      configuration.ExposeResources(worker);
+    }
+  } else {
+    if (variantName.empty() ||
+        !eventsBasedObject.GetVariants().HasVariantNamed(variantName)) {
+      for (auto &childObject :
+           eventsBasedObject.GetDefaultVariant().GetObjects().GetObjects()) {
+        childObject->GetConfiguration().ExposeResources(worker);
+      }
+    } else {
+      for (auto &childObject : eventsBasedObject.GetVariants()
+                                   .GetVariant(variantName)
+                                   .GetObjects()
+                                   .GetObjects()) {
+        childObject->GetConfiguration().ExposeResources(worker);
+      }
+    }
   }
 }
 

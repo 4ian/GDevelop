@@ -66,13 +66,25 @@ const styles = {
 const getVariantName = (
   eventBasedObject: gdEventsBasedObject | null,
   customObjectConfiguration: gdCustomObjectConfiguration
-) =>
+): string =>
   eventBasedObject &&
   eventBasedObject
     .getVariants()
     .hasVariantNamed(customObjectConfiguration.getVariantName())
     ? customObjectConfiguration.getVariantName()
     : '';
+
+const getVariant = (
+  eventBasedObject: gdEventsBasedObject,
+  customObjectConfiguration: gdCustomObjectConfiguration
+): gdEventsBasedObjectVariant => {
+  const variantName = getVariantName(eventBasedObject, customObjectConfiguration);
+  const variants = eventBasedObject.getVariants();
+  return variantName
+        ? variants.getVariant(variantName)
+        : eventBasedObject.getDefaultVariant();
+}
+
 
 type Props = EditorProps;
 
@@ -229,6 +241,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
         project
       );
       newVariant.setName(uniqueNewName);
+      newVariant.setAssetStoreId('');
       customObjectConfiguration.setVariantName(uniqueNewName);
       setNewVariantDialogOpen(false);
       forceUpdate();
@@ -330,6 +343,12 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     <FlatButton
                       label={<Trans>Edit</Trans>}
                       onClick={editVariant}
+                      disabled={
+                        !eventBasedObject || getVariant(
+                          eventBasedObject,
+                          customObjectConfiguration
+                        ).getAssetStoreId() !== ''
+                      }
                     />
                     <FlatButton
                       label={<Trans>Duplicate</Trans>}

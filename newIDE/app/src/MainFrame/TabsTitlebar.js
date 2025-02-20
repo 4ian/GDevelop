@@ -11,13 +11,13 @@ import {
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 
-type Props = {|
-  children: React.Node,
-  toggleProjectManager: () => void,
-|};
-
 const styles = {
-  container: { display: 'flex', flexShrink: 0, alignItems: 'flex-end' },
+  container: {
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'flex-end',
+    position: 'relative', // to ensure it is displayed above any global iframe.
+  },
   menuIcon: {
     marginLeft: 4,
     marginRight: 4,
@@ -28,38 +28,57 @@ const styles = {
   },
 };
 
+type TabsTitlebarProps = {|
+  children: React.Node,
+  toggleProjectManager: () => void,
+|};
+
+export type TabsTitlebarInterface = {|
+  hideTitlebar: (hidden: boolean) => void,
+|};
+
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
-export default function TabsTitlebar({
-  children,
-  toggleProjectManager,
-}: Props) {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
-  React.useEffect(
-    () => {
-      Window.setTitleBarColor(backgroundColor);
-    },
-    [backgroundColor]
-  );
+export default React.forwardRef<TabsTitlebarProps, TabsTitlebarInterface>(
+  function TabsTitlebar(
+    { children, toggleProjectManager }: TabsTitlebarProps,
+    ref
+  ) {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
+    const [titlebarHidden, setTitlebarHidden] = React.useState(false);
 
-  return (
-    <div style={{ ...styles.container, backgroundColor }}>
-      <TitleBarLeftSafeMargins />
-      <IconButton
-        size="small"
-        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
-        id="main-toolbar-project-manager-button"
-        className={DRAGGABLE_PART_CLASS_NAME}
-        style={styles.menuIcon}
-        color="default"
-        onClick={toggleProjectManager}
-      >
-        <MenuIcon />
-      </IconButton>
-      {children}
-      <TitleBarRightSafeMargins />
-    </div>
-  );
-}
+    React.useImperativeHandle(ref, () => ({
+      hideTitlebar: (hidden: boolean) => setTitlebarHidden(hidden),
+    }));
+
+    React.useEffect(
+      () => {
+        Window.setTitleBarColor(backgroundColor);
+      },
+      [backgroundColor]
+    );
+
+    if (titlebarHidden) return null;
+
+    return (
+      <div style={{ ...styles.container, backgroundColor }}>
+        <TitleBarLeftSafeMargins />
+        <IconButton
+          size="small"
+          // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+          id="main-toolbar-project-manager-button"
+          className={DRAGGABLE_PART_CLASS_NAME}
+          style={styles.menuIcon}
+          color="default"
+          onClick={toggleProjectManager}
+        >
+          <MenuIcon />
+        </IconButton>
+        {children}
+        <TitleBarRightSafeMargins />
+      </div>
+    );
+  }
+);

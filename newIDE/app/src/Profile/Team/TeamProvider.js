@@ -42,9 +42,10 @@ const TeamProvider = ({ children }: Props) => {
     null
   );
 
-  const adminUserId = React.useMemo(() => (profile ? profile.id : null), [
-    profile,
-  ]);
+  // We don't use a memo here, otherwise there's a risk of trying to
+  // have an outdated value when the user logs out, ending up
+  // in errors trying to fetch unauthenticated.
+  const adminUserId = profile ? profile.id : null;
 
   React.useEffect(
     () => {
@@ -87,12 +88,16 @@ const TeamProvider = ({ children }: Props) => {
       const fetchGroups = async () => {
         if (!team || !adminUserId) return;
 
-        const teamGroups = await listTeamGroups(
-          getAuthorizationHeader,
-          adminUserId,
-          team.id
-        );
-        setGroups(teamGroups);
+        try {
+          const teamGroups = await listTeamGroups(
+            getAuthorizationHeader,
+            adminUserId,
+            team.id
+          );
+          setGroups(teamGroups);
+        } catch (error) {
+          console.error('An error occurred while fetching groups:', error);
+        }
       };
       fetchGroups();
     },
@@ -103,18 +108,22 @@ const TeamProvider = ({ children }: Props) => {
     async () => {
       if (!team || !adminUserId) return;
 
-      const teamMembers = await listTeamMembers(
-        getAuthorizationHeader,
-        adminUserId,
-        team.id
-      );
-      setMembers(teamMembers);
-      const teamAdmins = await listTeamAdmins(
-        getAuthorizationHeader,
-        adminUserId,
-        team.id
-      );
-      setAdmins(teamAdmins);
+      try {
+        const teamMembers = await listTeamMembers(
+          getAuthorizationHeader,
+          adminUserId,
+          team.id
+        );
+        setMembers(teamMembers);
+        const teamAdmins = await listTeamAdmins(
+          getAuthorizationHeader,
+          adminUserId,
+          team.id
+        );
+        setAdmins(teamAdmins);
+      } catch (error) {
+        console.error('An error occurred while fetching members:', error);
+      }
     },
     [team, getAuthorizationHeader, adminUserId]
   );
@@ -182,12 +191,16 @@ const TeamProvider = ({ children }: Props) => {
     async () => {
       if (!team || !adminUserId) return;
 
-      const teamMemberships = await listTeamMemberships(
-        getAuthorizationHeader,
-        adminUserId,
-        team.id
-      );
-      setMemberships(teamMemberships);
+      try {
+        const teamMemberships = await listTeamMemberships(
+          getAuthorizationHeader,
+          adminUserId,
+          team.id
+        );
+        setMemberships(teamMemberships);
+      } catch (error) {
+        console.error('An error occurred while fetching memberships:', error);
+      }
     },
     [team, getAuthorizationHeader, adminUserId]
   );

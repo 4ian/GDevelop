@@ -26,7 +26,6 @@ import {
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 import Link from '../../UI/Link';
-import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Dislike from '../../UI/CustomSvgIcons/Dislike';
@@ -34,6 +33,7 @@ import Like from '../../UI/CustomSvgIcons/Like';
 import Danger from '../../UI/CustomSvgIcons/Danger';
 import Heart from '../../UI/CustomSvgIcons/Heart';
 import Paper from '../../UI/Paper';
+import PublicProfileContext from '../../Profile/PublicProfileContext';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
@@ -94,11 +94,8 @@ const FeedbackCard = ({
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
-
-  const [
-    openPlayerPublicProfileDialog,
-    setOpenPlayerPublicProfileDialog,
-  ] = React.useState<boolean>(false);
+  const { openUserPublicProfile } = React.useContext(PublicProfileContext);
+  const commenterPlayerId = comment.playerId;
 
   const processComment = async (newProcessed: boolean, i18n: I18nType) => {
     if (!profile) return;
@@ -283,9 +280,11 @@ const FeedbackCard = ({
                       )}
                     </Text>
                   )}
-                  {comment.playerId ? (
+                  {commenterPlayerId ? (
                     <Link
-                      onClick={() => setOpenPlayerPublicProfileDialog(true)}
+                      onClick={() =>
+                        openUserPublicProfile({ userId: commenterPlayerId })
+                      }
                       href="#"
                     >
                       <Text noMargin color="inherit">
@@ -324,12 +323,6 @@ const FeedbackCard = ({
               </Text>
             </Column>
           </Card>
-          {comment.playerId && openPlayerPublicProfileDialog && (
-            <PublicProfileDialog
-              userId={comment.playerId}
-              onClose={() => setOpenPlayerPublicProfileDialog(false)}
-            />
-          )}
         </>
       )}
     </I18n>

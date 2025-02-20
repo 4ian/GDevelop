@@ -756,3 +756,19 @@ export const updateUserCourseProgress = async (
     }
   );
 };
+
+export const generateCustomAuthToken = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    `/user/action/generate-custom-auth-token`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data.customAuthToken;
+};

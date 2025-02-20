@@ -94,6 +94,7 @@ const WrappedHomePage = ({
                 isActive={true}
                 projectItemName={null}
                 setToolbar={() => {}}
+                hideTabsTitleBarAndEditorToolbar={() => {}}
                 canOpen={true}
                 storageProviders={[CloudStorageProvider]}
                 onChooseProject={() => action('onChooseProject')()}

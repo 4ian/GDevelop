@@ -4,6 +4,7 @@ namespace gdjs {
     _fontManager: any;
     _text: PIXI.Text;
     _justCreated: boolean = true;
+    _strokeStyle: PIXI.StrokeStyle = {};
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
@@ -32,8 +33,9 @@ namespace gdjs {
 
     ensureUpToDate() {
       if (this._justCreated) {
-        //Work around a PIXI.js bug:
-        this._text.updateText(false);
+        // TODO PIXI8 Is it still useful?
+        // Work around a PIXI.js bug:
+        // this._text.updateText(false);
 
         //Width seems not to be correct when text is not rendered yet.
         this.updatePosition();
@@ -50,45 +52,41 @@ namespace gdjs {
       style.fontSize = this._object._characterSize;
       style.fontFamily = fontName;
       if (this._object._useGradient) {
-        style.fill = this._getGradientHex();
+        style.fill = this._getFillGradient();
       } else {
         style.fill = this._getColorHex();
-      }
-      if (this._object._gradientType === 'LINEAR_VERTICAL') {
-        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_VERTICAL;
-      } else {
-        style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
       }
       // @ts-ignore
       style.align = this._object._textAlign;
       style.wordWrap = this._object._wrapping;
       style.wordWrapWidth = this._object._wrappingWidth;
       style.breakWords = true;
-      style.stroke = gdjs.rgbToHexNumber(
+      this._strokeStyle.color = gdjs.rgbToHexNumber(
         this._object._outlineColor[0],
         this._object._outlineColor[1],
         this._object._outlineColor[2]
       );
-      style.strokeThickness = this._object._isOutlineEnabled
+      this._strokeStyle.width = this._object._isOutlineEnabled
         ? this._object._outlineThickness
         : 0;
+      // Prevent spikey outlines by adding a miter limit
+      this._strokeStyle.miterLimit = 3;
+      style.stroke = this._strokeStyle;
       style.dropShadow = this._object._shadow;
-      style.dropShadowColor = gdjs.rgbToHexNumber(
+      style.dropShadow.color = gdjs.rgbToHexNumber(
         this._object._shadowColor[0],
         this._object._shadowColor[1],
         this._object._shadowColor[2]
       );
-      style.dropShadowAlpha = this._object._shadowOpacity / 255;
-      style.dropShadowBlur = this._object._shadowBlur;
-      style.dropShadowAngle = gdjs.toRad(this._object._shadowAngle);
-      style.dropShadowDistance = this._object._shadowDistance;
+      style.dropShadow.alpha = this._object._shadowOpacity / 255;
+      style.dropShadow.blur = this._object._shadowBlur;
+      style.dropShadow.angle = gdjs.toRad(this._object._shadowAngle);
+      style.dropShadow.distance = this._object._shadowDistance;
       const extraPaddingForShadow = style.dropShadow
-        ? style.dropShadowDistance + style.dropShadowBlur
+        ? style.dropShadow.distance + style.dropShadow.blur
         : 0;
       style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
 
-      // Prevent spikey outlines by adding a miter limit
-      style.miterLimit = 3;
       this.updatePosition();
 
       // Manually ask the PIXI object to re-render as we changed a style property
@@ -142,8 +140,9 @@ namespace gdjs {
       this._text.text =
         this._object._str.length === 0 ? ' ' : this._object._str;
 
-      //Work around a PIXI.js bug.
-      this._text.updateText(false);
+      // TODO PIXI8 Is it still useful?
+      // Work around a PIXI.js bug.
+      // this._text.updateText(false);
     }
 
     getWidth(): float {
@@ -162,14 +161,19 @@ namespace gdjs {
       );
     }
 
-    _getGradientHex() {
-      const gradient: Array<string> = [];
+    _getFillGradient(): PIXI.FillGradient {
+      // TODO PIXI8 Make sure the size is up to date.
+      const gradient =
+        this._object._gradientType === 'LINEAR_VERTICAL'
+          ? new PIXI.FillGradient(0, 0, 0, this._text.height)
+          : new PIXI.FillGradient(0, 0, this._text.width, 0);
       for (
         let colorIndex = 0;
         colorIndex < this._object._gradient.length;
         colorIndex++
       ) {
-        gradient.push(
+        gradient.addColorStop(
+          colorIndex / this._object._gradient.length,
           '#' +
             gdjs.rgbToHex(
               this._object._gradient[colorIndex][0],

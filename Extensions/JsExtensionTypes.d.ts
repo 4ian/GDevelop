@@ -14,7 +14,7 @@ class RenderedInstance {
   _associatedObjectConfiguration: gd.ObjectConfiguration;
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  _pixiObject: PIXI.DisplayObject | null;
+  _pixiObject: PIXI.Container | null;
   wasUsed: boolean;
 
   /** Set to true when onRemovedFromScene is called. Allows to cancel promises/asynchronous operations (notably: waiting for a resource load). */
@@ -38,7 +38,7 @@ class RenderedInstance {
    */
   update(): void;
 
-  getPixiObject(): PIXI.DisplayObject | null;
+  getPixiObject(): PIXI.Container | null;
 
   getInstance(): gd.InitialInstance;
 
@@ -92,7 +92,7 @@ class Rendered3DInstance {
   _pixiContainer: PIXI.Container;
   _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  _pixiObject: PIXI.DisplayObject | null;
+  _pixiObject: PIXI.Container | null;
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
 
@@ -131,7 +131,7 @@ class Rendered3DInstance {
    */
   update(): void;
 
-  getPixiObject(): PIXI.DisplayObject;
+  getPixiObject(): PIXI.Container;
 
   getThreeObject(): THREE.Object3D;
 

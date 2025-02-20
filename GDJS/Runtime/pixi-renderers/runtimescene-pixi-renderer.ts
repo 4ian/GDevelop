@@ -124,7 +124,7 @@ namespace gdjs {
             if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.
               threeRenderer.resetState();
-              pixiRenderer.reset();
+              pixiRenderer.resetState();
             }
 
             if (isFirstRender) {
@@ -148,7 +148,7 @@ namespace gdjs {
                 runtimeLayerRenderer.getLightingSprite()) ||
               runtimeLayerRenderer.getRendererObject();
 
-            pixiRenderer.render(pixiContainer, { clear: false });
+            pixiRenderer.render({ container: pixiContainer, clear: false });
             this._layerRenderingMetrics.rendered2DLayersCount++;
 
             lastRenderWas3D = false;
@@ -174,7 +174,7 @@ namespace gdjs {
                   if (lastRenderWas3D) {
                     // Ensure the state is clean for PixiJS to render.
                     threeRenderer.resetState();
-                    pixiRenderer.reset();
+                    pixiRenderer.resetState();
                   }
 
                   // Do the rendering of the PixiJS objects of the layer on the render texture.
@@ -198,7 +198,7 @@ namespace gdjs {
               if (!lastRenderWas3D) {
                 // It's important to reset the internal WebGL state of PixiJS, then Three.js
                 // to ensure the 3D rendering is made properly by Three.js
-                pixiRenderer.reset();
+                pixiRenderer.resetState();
                 threeRenderer.resetState();
               }
 
@@ -242,7 +242,7 @@ namespace gdjs {
 
         if (debugContainer) {
           threeRenderer.resetState();
-          pixiRenderer.reset();
+          pixiRenderer.resetState();
           pixiRenderer.render(debugContainer);
           lastRenderWas3D = false;
         }
@@ -250,7 +250,7 @@ namespace gdjs {
         if (!lastRenderWas3D) {
           // Out of caution, reset the WebGL states from PixiJS to start again
           // with a 3D rendering on the next frame.
-          pixiRenderer.reset();
+          pixiRenderer.resetState();
         }
 
         // Uncomment to display some debug metrics from Three.js.
@@ -272,7 +272,8 @@ namespace gdjs {
         // Render all the layers then.
         // TODO: replace by a loop like in 3D?
         pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
-        pixiRenderer.render(this._pixiContainer, {
+        pixiRenderer.render({
+          container: this._pixiContainer,
           clear: this._runtimeScene.getClearCanvas(),
         });
         this._layerRenderingMetrics.rendered2DLayersCount++;
@@ -367,10 +368,11 @@ namespace gdjs {
         return;
       }
       if (!this._profilerText) {
-        this._profilerText = new PIXI.Text(' ', {
-          align: 'left',
-          stroke: '#FFF',
-          strokeThickness: 1,
+        this._profilerText = new PIXI.Text({
+          style: {
+            align: 'left',
+            stroke: { color: '#FFF', width: 1 },
+          },
         });
 
         // Add on top of all layers:

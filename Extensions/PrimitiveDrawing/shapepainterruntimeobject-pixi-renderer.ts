@@ -20,7 +20,10 @@ namespace gdjs {
 
     _antialiasingFilter: null | PIXI.Filter = null;
 
-    private static readonly _positionForTransformation: PIXI.IPointData = {
+    _fillStyle: PIXI.FillStyle = {};
+    _strokeStyle: PIXI.StrokeStyle = {};
+
+    private static readonly _positionForTransformation: PIXI.PointData = {
       x: 0,
       y: 0,
     };
@@ -47,51 +50,55 @@ namespace gdjs {
       this.invalidateBounds();
     }
 
+    private _applyStyle() {
+      this._fillStyle.color = this._object._fillColor;
+      this._fillStyle.alpha = this._object._fillOpacity / 255;
+
+      this._strokeStyle.width = this._object._outlineSize;
+      this._strokeStyle.color = this._object._outlineColor;
+      this._strokeStyle.alpha = this._object._outlineOpacity / 255;
+
+      this._graphics.fill(this._fillStyle);
+      this._graphics.stroke(this._strokeStyle);
+    }
+
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      this._graphics.drawRect(x1, y1, x2 - x1, y2 - y1);
-      this._graphics.endFill();
+      this._graphics.rect(x1, y1, x2 - x1, y2 - y1);
+      this._applyStyle();
       this.invalidateBounds();
     }
 
     drawCircle(x: float, y: float, radius: float) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      this._graphics.drawCircle(x, y, radius);
-      this._graphics.endFill();
+      this._fillStyle.color = this._object._fillColor;
+      this._fillStyle.alpha = this._object._fillOpacity / 255;
+      this._graphics.circle(x, y, radius);
+      this._graphics.fill(this._fillStyle);
       this.invalidateBounds();
     }
 
     drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
       if (y2 === y1) {
-        this._graphics.drawRect(x1, y1 - thickness / 2, x2 - x1, thickness);
+        this._graphics.rect(x1, y1 - thickness / 2, x2 - x1, thickness);
       } else {
         const angle = Math.atan2(y2 - y1, x2 - x1);
         const xIncrement = Math.sin(angle) * thickness;
         const yIncrement = Math.cos(angle) * thickness;
-        this._graphics.drawPolygon(
-          x1 + xIncrement,
-          y1 - yIncrement,
-          x1 - xIncrement,
-          y1 + yIncrement,
-          x2 - xIncrement,
-          y2 + yIncrement,
-          x2 + xIncrement,
-          y2 - yIncrement
-        );
+
+        const workingPoints: Array<number> = gdjs.staticArray(
+          gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
+        ) as Array<number>;
+        workingPoints.length = 8;
+        workingPoints[0] = x1 + xIncrement;
+        workingPoints[1] = y1 - yIncrement;
+        workingPoints[2] = x1 - xIncrement;
+        workingPoints[3] = y1 + yIncrement;
+        workingPoints[4] = x2 - xIncrement;
+        workingPoints[5] = y2 + yIncrement;
+        workingPoints[6] = x2 + xIncrement;
+        workingPoints[7] = y2 - yIncrement;
+        this._graphics.poly(workingPoints);
       }
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -108,13 +115,8 @@ namespace gdjs {
     }
 
     drawEllipse(x1: float, y1: float, width: float, height: float) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      this._graphics.drawEllipse(x1, y1, width / 2, height / 2);
-      this._graphics.endFill();
+      this._graphics.ellipse(x1, y1, width / 2, height / 2);
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -125,14 +127,8 @@ namespace gdjs {
       y2: float,
       radius: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
-      this._graphics.closePath();
-      this._graphics.endFill();
+      this._graphics.roundRect(x1, y1, x2 - x1, y2 - y1, radius);
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -143,15 +139,8 @@ namespace gdjs {
       y2: float,
       fillet: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawFilletRect(x1, y1, x2 - x1, y2 - y1, fillet);
-      this._graphics.closePath();
-      this._graphics.endFill();
+      this._graphics.filletRect(x1, y1, x2 - x1, y2 - y1, fillet);
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -162,15 +151,8 @@ namespace gdjs {
       y2: float,
       chamfer: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawChamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
-      this._graphics.closePath();
-      this._graphics.endFill();
+      this._graphics.chamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -182,22 +164,25 @@ namespace gdjs {
       startArc: float,
       endArc: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawTorus(
+      this._graphics.beginPath();
+      this._graphics.arc(
         x1,
         y1,
-        innerRadius,
         outerRadius,
         startArc ? gdjs.toRad(startArc) : 0,
         endArc ? gdjs.toRad(endArc) : 0
       );
+      // TODO PIXI8 Add a lineTo?
+      this._graphics.arc(
+        x1,
+        y1,
+        innerRadius,
+        startArc ? gdjs.toRad(startArc) : 0,
+        endArc ? gdjs.toRad(endArc) : 0,
+        true
+      );
       this._graphics.closePath();
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -208,21 +193,14 @@ namespace gdjs {
       radius: float,
       rotation: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawRegularPolygon(
+      this._graphics.regularPoly(
         x1,
         y1,
         radius,
         sides,
         rotation ? gdjs.toRad(rotation) : 0
       );
-      this._graphics.closePath();
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -234,13 +212,7 @@ namespace gdjs {
       innerRadius: float,
       rotation: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
-      //@ts-ignore from @pixi/graphics-extras
-      this._graphics.drawStar(
+      this._graphics.star(
         x1,
         y1,
         points,
@@ -248,8 +220,7 @@ namespace gdjs {
         innerRadius ? innerRadius : radius / 2,
         rotation ? gdjs.toRad(rotation) : 0
       );
-      this._graphics.closePath();
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -262,11 +233,7 @@ namespace gdjs {
       anticlockwise: boolean,
       closePath: boolean
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
+      this._graphics.beginPath();
       this._graphics.moveTo(
         x1 + radius * Math.cos(gdjs.toRad(startAngle)),
         y1 + radius * Math.sin(gdjs.toRad(startAngle))
@@ -282,7 +249,7 @@ namespace gdjs {
       if (closePath) {
         this._graphics.closePath();
       }
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -296,14 +263,10 @@ namespace gdjs {
       x2: float,
       y2: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
+      this._graphics.beginPath();
       this._graphics.moveTo(x1, y1);
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, x2, y2);
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -315,27 +278,19 @@ namespace gdjs {
       x2: float,
       y2: float
     ) {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
+      this._graphics.beginPath();
       this._graphics.moveTo(x1, y1);
       this._graphics.quadraticCurveTo(cpX, cpY, x2, y2);
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
     beginFillPath() {
-      this.updateOutline();
-      this._graphics.beginFill(
-        this._object._fillColor,
-        this._object._fillOpacity / 255
-      );
+      this._graphics.beginPath();
     }
 
     endFillPath() {
-      this._graphics.endFill();
+      this._applyStyle();
       this.invalidateBounds();
     }
 
@@ -387,14 +342,6 @@ namespace gdjs {
     closePath() {
       this._graphics.closePath();
       this.invalidateBounds();
-    }
-
-    updateOutline(): void {
-      this._graphics.lineStyle(
-        this._object._outlineSize,
-        this._object._outlineColor,
-        this._object._outlineOpacity / 255
-      );
     }
 
     invalidateBounds() {
@@ -450,7 +397,8 @@ namespace gdjs {
     updateTransformationIfNeeded() {
       if (!this._transformationIsUpToDate) {
         this.updatePositionIfNeeded();
-        this._graphics.updateTransform();
+        // TODO PIXI8 Is it still necessary?
+        // this._graphics.updateTransform();
       }
       this._transformationIsUpToDate = true;
     }
@@ -579,36 +527,34 @@ namespace gdjs {
     }
 
     updateAntialiasing(): void {
-      if (this._object.getAntialiasing() !== 'none') {
-        if (!this._antialiasingFilter) {
-          this._antialiasingFilter = new PIXI.FXAAFilter();
-        }
-
-        const antialiasingFilter = this._antialiasingFilter;
-        antialiasingFilter.enabled = true;
-        antialiasingFilter.multisample =
-          PIXI.MSAA_QUALITY[this._object.getAntialiasing().toUpperCase()] ||
-          PIXI.MSAA_QUALITY.LOW;
-
-        if (!this._graphics.filters) {
-          this._graphics.filters = [];
-        }
-        // Do not apply the filter if it is already present on the object.
-        if (this._graphics.filters.indexOf(antialiasingFilter) === -1) {
-          this._graphics.filters.push(antialiasingFilter);
-        }
-      } else if (this._antialiasingFilter !== null) {
-        if (!this._graphics.filters) {
-          return;
-        }
-        const antialiasingFilterIndex = this._graphics.filters.indexOf(
-          this._antialiasingFilter
-        );
-
-        if (antialiasingFilterIndex !== -1) {
-          this._graphics.filters.splice(antialiasingFilterIndex, 1);
-        }
-      }
+      // TODO PIXI8 Find how to do antialiasing with Pixi 8.
+      // if (this._object.getAntialiasing() !== 'none') {
+      //   if (!this._antialiasingFilter) {
+      //     this._antialiasingFilter = new PIXI.FXAAFilter();
+      //   }
+      //   const antialiasingFilter = this._antialiasingFilter;
+      //   antialiasingFilter.enabled = true;
+      //   antialiasingFilter.multisample =
+      //     PIXI.MSAA_QUALITY[this._object.getAntialiasing().toUpperCase()] ||
+      //     PIXI.MSAA_QUALITY.LOW;
+      //   if (!this._graphics.filters) {
+      //     this._graphics.filters = [];
+      //   }
+      //   // Do not apply the filter if it is already present on the object.
+      //   if (this._graphics.filters.indexOf(antialiasingFilter) === -1) {
+      //     this._graphics.filters.push(antialiasingFilter);
+      //   }
+      // } else if (this._antialiasingFilter !== null) {
+      //   if (!this._graphics.filters) {
+      //     return;
+      //   }
+      //   const antialiasingFilterIndex = this._graphics.filters.indexOf(
+      //     this._antialiasingFilter
+      //   );
+      //   if (antialiasingFilterIndex !== -1) {
+      //     this._graphics.filters.splice(antialiasingFilterIndex, 1);
+      //   }
+      // }
     }
 
     destroy(): void {

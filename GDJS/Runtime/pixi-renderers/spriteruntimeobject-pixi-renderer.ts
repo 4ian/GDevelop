@@ -74,7 +74,9 @@ namespace gdjs {
             Math.abs(scaleY);
         this._sprite.rotation = gdjs.toRad(this._object.angle);
         this._sprite.visible = !this._object.hidden;
-        this._sprite.blendMode = this._object._blendMode;
+        this._sprite.blendMode = gdjs.PixiFiltersTools.getBlendModeName(
+          this._object._blendMode
+        );
         this._sprite.alpha = this._object.opacity / 255;
         this._sprite.scale.x = scaleX;
         this._sprite.scale.y = scaleY;

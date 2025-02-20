@@ -24,10 +24,27 @@ namespace gdjs {
           runtimeObject._bitmapFontResourceName,
           runtimeObject._textureAtlasResourceName
         );
-      this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
-        fontName: bitmapFont.font,
-        fontSize: bitmapFont.size,
-      });
+      if (bitmapFont) {
+        this._pixiObject = new PIXI.BitmapText({
+          text: runtimeObject._text,
+          style: {
+            fontFamily: bitmapFont.fontFamily,
+            fontSize: bitmapFont.fontMetrics.fontSize,
+          },
+        });
+      } else {
+        const defaultBitmapFontName = instanceContainer
+          .getGame()
+          .getBitmapFontManager()
+          .getDefaultBitmapFont();
+        this._pixiObject = new PIXI.BitmapText({
+          text: runtimeObject._text,
+          style: {
+            fontFamily: defaultBitmapFontName,
+            fontSize: 20,
+          },
+        });
+      }
 
       // Set the object on the scene
       instanceContainer
@@ -61,13 +78,17 @@ namespace gdjs {
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(
+          Array.isArray(this._pixiObject.style.fontFamily)
+            ? this._pixiObject.style.fontFamily[0]
+            : this._pixiObject.style.fontFamily
+        );
 
       this._pixiObject.destroy();
     }
 
     getFontSize() {
-      return this._pixiObject.fontSize;
+      return this._pixiObject.style.fontSize;
     }
 
     updateFont(): void {
@@ -86,12 +107,18 @@ namespace gdjs {
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(
+          Array.isArray(this._pixiObject.style.fontFamily)
+            ? this._pixiObject.style.fontFamily[0]
+            : this._pixiObject.style.fontFamily
+        );
 
       // Update the font used by the object:
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
-      this.updatePosition();
+      if (bitmapFont) {
+        this._pixiObject.style.fontFamily = bitmapFont.fontFamily;
+        this._pixiObject.style.fontSize = bitmapFont.fontMetrics.fontSize;
+        this.updatePosition();
+      }
     }
 
     updateTint(): void {
@@ -100,7 +127,6 @@ namespace gdjs {
         this._object._tint[1],
         this._object._tint[2]
       );
-      this._pixiObject.dirty = true;
     }
 
     /**
@@ -131,12 +157,12 @@ namespace gdjs {
 
     updateWrappingWidth(): void {
       if (this._object._wordWrap) {
-        this._pixiObject.maxWidth =
+        this._pixiObject.style.wordWrap = true;
+        this._pixiObject.style.wordWrapWidth =
           this._object._wrappingWidth / this._object._scaleX;
-        this._pixiObject.dirty = true;
       } else {
-        this._pixiObject.maxWidth = 0;
-        this._pixiObject.dirty = true;
+        this._pixiObject.style.wordWrap = false;
+        this._pixiObject.style.wordWrapWidth = 0;
       }
       this.updatePosition();
     }
@@ -166,11 +192,11 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._pixiObject.textWidth * this.getScale();
+      return this._pixiObject.width * this.getScale();
     }
 
     getHeight(): float {
-      return this._pixiObject.textHeight * this.getScale();
+      return this._pixiObject.height * this.getScale();
     }
   }
   export const BitmapTextRuntimeObjectRenderer =

@@ -15,8 +15,8 @@ export declare namespace PixiTileMapHelper {
   function parseAtlas(
     tileMap: TileMapFileContent,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.TextureSource | null,
+    getTexture: (textureName: string) => PIXI.TextureSource
   ): TileTextureCache | null;
   /**
    * Split an atlas image into Pixi textures.
@@ -28,7 +28,7 @@ export declare namespace PixiTileMapHelper {
    * @returns A textures cache.
    */
   function parseSimpleTileMapAtlas(
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource>,
+    atlasTexture: PIXI.TextureSource,
     columnCount: number,
     rowCount: number,
     tileSize: number

@@ -26,7 +26,7 @@ namespace gdjs {
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
 
-    _pixiRenderer: PIXI.Renderer | null = null;
+    _pixiRenderer: PIXI.WebGLRenderer | null = null;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
@@ -88,6 +88,11 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
+      // Handle pixels rounding.
+      if (this._game.getPixelsRounding()) {
+        PIXI.AbstractRenderer.defaultOptions.roundPixels = true;
+      }
+
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
@@ -107,7 +112,8 @@ namespace gdjs {
         // Create a PixiJS renderer that use the same GL context as Three.js
         // so that both can render to the canvas and even have PixiJS rendering
         // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
-        this._pixiRenderer = new PIXI.Renderer({
+        this._pixiRenderer = new PIXI.WebGLRenderer();
+        this._pixiRenderer.init({
           width: this._game.getGameResolutionWidth(),
           height: this._game.getGameResolutionHeight(),
           view: gameCanvas,
@@ -123,19 +129,22 @@ namespace gdjs {
         // Create the renderer and setup the rendering area.
         // "preserveDrawingBuffer: true" is needed to avoid flickering
         // and background issues on some mobile phones (see #585 #572 #566 #463).
-        this._pixiRenderer = PIXI.autoDetectRenderer({
+        this._pixiRenderer = new PIXI.WebGLRenderer();
+        this._pixiRenderer.init({
           width: this._game.getGameResolutionWidth(),
           height: this._game.getGameResolutionHeight(),
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
-        }) as PIXI.Renderer;
+        });
       }
 
+      // TODO PIXI8 Is it still necessary?
       // Deactivating accessibility support in PixiJS renderer, as we want to be in control of this.
       // See https://github.com/pixijs/pixijs/issues/5111#issuecomment-420047824
-      this._pixiRenderer.plugins.accessibility.destroy();
-      delete this._pixiRenderer.plugins.accessibility;
+      this._pixiRenderer.accessibility.destroy();
+      // @ts-ignore
+      delete this._pixiRenderer.accessibility;
     }
 
     /**
@@ -193,11 +202,6 @@ namespace gdjs {
         gameCanvas.style['image-rendering'] = '-webkit-optimize-contrast';
         gameCanvas.style['image-rendering'] = '-webkit-crisp-edges';
         gameCanvas.style['image-rendering'] = 'pixelated';
-      }
-
-      // Handle pixels rounding.
-      if (this._game.getPixelsRounding()) {
-        PIXI.settings.ROUND_PIXELS = true;
       }
 
       // Handle resize: immediately adjust the game canvas (and dom element container)
@@ -998,10 +1002,7 @@ namespace gdjs {
      * @returns true if WebGL is supported
      */
     isWebGLSupported(): boolean {
-      return (
-        !!this._pixiRenderer &&
-        this._pixiRenderer.type === PIXI.RENDERER_TYPE.WEBGL
-      );
+      return !!this._pixiRenderer;
     }
 
     /**

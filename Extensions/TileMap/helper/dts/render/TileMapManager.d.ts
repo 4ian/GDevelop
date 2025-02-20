@@ -67,7 +67,7 @@ export declare class TileMapManager {
       tileSetJsonResourceName: string,
       callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+    getTexture: (textureName: string) => PIXI.TextureSource,
     atlasImageResourceName: string,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
@@ -83,7 +83,7 @@ export declare class TileMapManager {
    * @param callback A function called when the tiles textures are split.
    */
   getOrLoadSimpleTileMapTextureCache(
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+    getTexture: (textureName: string) => PIXI.TextureSource,
     atlasImageResourceName: string,
     tileSize: number,
     columnCount: number,

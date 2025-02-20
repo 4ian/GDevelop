@@ -16,7 +16,7 @@
     "minimist": "^1.2.5",
     "patch-package": "^6.4.7",
     "pixi-spine": "4.0.4",
-    "pixi.js": "7.4.2",
+    "pixi.js": "8.7.3",
     "prettier": "3.4.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",

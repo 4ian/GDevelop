@@ -3248,7 +3248,7 @@ module.exports = {
       }
 
       _updateDefaultTransformation() {
-        if (!this._clonedModel3D || !this._threeModelGroup) {
+        if (!this._clonedModel3D) {
           // Model is not ready - nothing to do.
           return;
         }

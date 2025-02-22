@@ -409,7 +409,11 @@ const GamesPlatformFrameStateProvider = ({
 
   return (
     <GamesPlatformFrameContext.Provider value={gamesPlatformFrameState}>
-      <GamesPlatformFrame initialGameId={lastGameId} loaded={loadIframeInDOM} />
+      <GamesPlatformFrame
+        initialGameId={lastGameId}
+        loaded={loadIframeInDOM}
+        visible={iframeVisible}
+      />
       {children}
     </GamesPlatformFrameContext.Provider>
   );

@@ -7,7 +7,6 @@ import {
   homepageMediumMenuBarWidth,
   homepageMobileMenuHeight,
 } from '../HomePageMenuBar';
-import { SECTION_DESKTOP_SPACING } from '../SectionContainer';
 import Paper from '../../../../UI/Paper';
 
 export const GAMES_PLATFORM_IFRAME_ID = 'games-platform-frame';
@@ -18,6 +17,8 @@ const styles = {
   },
   iframe: {
     border: 0,
+    width: '100%',
+    height: '100%',
   },
 };
 
@@ -75,10 +76,6 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
   const containerWidth = `calc(100% - ${containerLeft}px`;
   const containerHeight = `calc(100% - ${containerTop + containerBottom}px)`;
 
-  const iframeSideMargin = isMobile ? 0 : SECTION_DESKTOP_SPACING;
-  const iframeHeight = 'calc(100% - 4px)';
-  const iframeWidth = `calc(100% - ${2 * iframeSideMargin}px)`;
-
   // We wrap the iframe in a paper, as its content has a transparent background,
   // and we don't want what's behind the iframe to be visible.
   return (
@@ -100,12 +97,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-downloads"
         title="gdgames"
         allowFullScreen
-        style={{
-          ...styles.iframe,
-          height: iframeHeight,
-          width: iframeWidth,
-          margin: `0 ${iframeSideMargin}px`,
-        }}
+        style={styles.iframe}
         onLoad={event => {
           event.currentTarget.focus();
         }}

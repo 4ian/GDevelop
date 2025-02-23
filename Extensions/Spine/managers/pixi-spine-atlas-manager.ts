@@ -106,10 +106,10 @@ namespace gdjs {
      * @param resource The data of resource to load.
      * @param callback The callback to pass atlas to it once it is loaded.
      */
-    load(
+    async load(
       resource: ResourceData,
       callback: SpineAtlasManagerRequestCallback
-    ): void {
+    ): Promise<void> {
       const game = this._resourceLoader.getRuntimeGame();
       const embeddedResourcesNames = game.getEmbeddedResourcesNames(
         resource.name
@@ -120,18 +120,15 @@ namespace gdjs {
           new Error(`${resource.name} do not have image metadata!`)
         );
 
-      const images = embeddedResourcesNames.reduce<{
-        [key: string]: PIXI.Texture;
-      }>((imagesMap, embeddedResourceName) => {
+      const images = {};
+      for (const embeddedResourceName of embeddedResourcesNames) {
         const mappedResourceName = game.resolveEmbeddedResource(
           resource.name,
           embeddedResourceName
         );
-        imagesMap[embeddedResourceName] =
-          this._imageManager.getOrLoadPIXITexture(mappedResourceName);
-
-        return imagesMap;
-      }, {});
+        images[embeddedResourceName] =
+          await this._imageManager.getOrLoadPIXITexture(mappedResourceName);
+      }
       const onLoad = (atlas: pixi_spine.TextureAtlas) => {
         this._loadedSpineAtlases.set(resource, atlas);
         callback(null, atlas);

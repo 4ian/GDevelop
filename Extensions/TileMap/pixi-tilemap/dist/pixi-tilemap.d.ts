@@ -1,34 +1,9 @@
 declare namespace PIXI {
   export namespace tilemap {
     /**
-     * The renderer plugin for canvas. It isn't registered by default.
-     *
-     * ```
-     * import { CanvasTileRenderer } from '@pixi/tilemap';
-     * import { CanvasRenderer } from '@pixi/canvas-core';
-     *
-     * // You must register this yourself (optional). @pixi/tilemap doesn't do it to
-     * // prevent a hard dependency on @pixi/canvas-core.
-     * CanvasTileRenderer.registerExtension();
-     * ```
-     */
-    export class CanvasTileRenderer {
-      /** The renderer */
-      renderer: PIXI.IRenderer;
-      /** The global tile animation state */
-      tileAnim: number[];
-      /** @deprecated */
-      dontUseTransform: boolean;
-      /** @param renderer */
-      constructor(renderer: PIXI.IRenderer);
-      static registerExtension(): void;
-      static getInstance(renderer: any): CanvasTileRenderer;
-    }
-
-    /**
      * A tilemap composite that lazily builds tilesets layered into multiple tilemaps.
      *
-     * The composite tileset is the concatenatation of the individual tilesets used in the tilemaps. You can
+     * The composite tileset is the concatenation of the individual tilesets used in the tilemaps. You can
      * preinitialized it by passing a list of tile textures to the constructor. Otherwise, the composite tilemap
      * is lazily built as you add more tiles with newer tile textures. A new tilemap is created once the last
      * tilemap has reached its limit (as set by {@link CompositeTilemap.texturesPerTilemap texturesPerTilemap}).
@@ -82,7 +57,7 @@ declare namespace PIXI {
      *      globalTilemap.tile('bomb.png', x * 100, y * 100);
      * });
      */
-    class CompositeTilemap extends PIXI.Container {
+    export class CompositeTilemap extends PIXI.Container {
       /** The hard limit on the number of tile textures used in each tilemap. */
       readonly texturesPerTilemap: number;
       /**
@@ -99,14 +74,12 @@ declare namespace PIXI {
       /** The last modified tilemap. */
       protected lastModifiedTilemap: Tilemap;
       private modificationMarker;
-      private shadowColor;
-      private _globalMat;
       /**
        * @param tileset - A list of tile base-textures that will be used to eagerly initialized the layered
        *  tilemaps. This is only an performance optimization, and using {@link CompositeTilemap.tile tile}
        *  will work equivalently.
        */
-      constructor(tileset?: Array<PIXI.BaseTexture>);
+      constructor(tileset?: Array<PIXI.TextureSource>);
       /**
        * This will preinitialize the tilesets of the layered tilemaps.
        *
@@ -115,7 +88,7 @@ declare namespace PIXI {
        *
        * @param tileTextures - The list of tile textures that make up the tileset.
        */
-      tileset(tileTextures: Array<PIXI.BaseTexture>): this;
+      tileset(tileTextures: Array<PIXI.TextureSource>): this;
       /** Clears the tilemap composite. */
       clear(): this;
       /** Changes the rotation of the last added tile. */
@@ -168,10 +141,16 @@ declare namespace PIXI {
           alpha?: number;
         }
       ): this;
-      renderCanvas(renderer: any): void;
-      render(renderer: PIXI.Renderer): void;
-      /* Excluded from this release type: isModified */
-      /* Excluded from this release type: clearModify */
+      /**
+       * @internal
+       * @ignore
+       */
+      isModified(anim: boolean): boolean;
+      /**
+       * @internal
+       * @ignore
+       */
+      clearModify(): void;
       /**
        * @deprecated Since @pixi/tilemap 3.
        * @see CompositeTilemap.tile
@@ -210,7 +189,7 @@ declare namespace PIXI {
        *
        * @deprecated Since @pixi/tilemap 3.
        */
-      setBitmaps: (tileTextures: Array<PIXI.BaseTexture>) => this;
+      setBitmaps: (tileTextures: Array<PIXI.TextureSource>) => this;
       /**
        * @deprecated Since @pixi/tilemap 3.
        * @readonly
@@ -218,69 +197,6 @@ declare namespace PIXI {
        */
       get texPerChild(): number;
     }
-    export { CompositeTilemap as CompositeRectTileLayer };
-    export { CompositeTilemap };
-
-    export const Constant: {
-      /** The default number of textures per tilemap in a tilemap composite. */
-      TEXTURES_PER_TILEMAP: number;
-      /**
-       * The width/height of each texture tile in a {@link TEXTILE_DIMEN}. This is 1024px by default.
-       *
-       * This should fit all tile base-textures; otherwise, {@link TextileResource} may fail to correctly
-       * upload the textures togther in a tiled fashion.
-       */
-      TEXTILE_DIMEN: number;
-      /**
-       * The number of texture tiles per {@link TextileResource}.
-       *
-       * Texture tiling is disabled by default, and so this is set to `1` by default. If it is set to a
-       * higher value, textures will be uploaded together in a tiled fashion.
-       *
-       * Since {@link TextileResource} is a dual-column format, this should be even for packing
-       * efficiency. The optimal value is usually 4.
-       */
-      TEXTILE_UNITS: number;
-      /** The scaling mode of the combined texture tiling. */
-      TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
-      /** This will enable 32-bit index buffers. It's useful when you have more than 16K tiles. */
-      use32bitIndex: boolean;
-      /** Flags whether textiles should be cleared when each tile is uploaded. */
-      DO_CLEAR: boolean;
-      maxTextures: number;
-      boundSize: number;
-      boundCountPerBuffer: number;
-    };
-
-    /* Excluded from this release type: fillSamplers */
-
-    /* Excluded from this release type: generateFragmentSrc */
-
-    export const pixi_tilemap: {
-      CanvasTileRenderer: typeof CanvasTileRenderer;
-      CompositeRectTileLayer: typeof CompositeTilemap;
-      CompositeTilemap: typeof CompositeTilemap;
-      Constant: {
-        TEXTURES_PER_TILEMAP: number;
-        TEXTILE_DIMEN: number;
-        TEXTILE_UNITS: number;
-        TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
-        use32bitIndex: boolean;
-        DO_CLEAR: boolean;
-        maxTextures: number;
-        boundSize: number;
-        boundCountPerBuffer: number;
-      };
-      TextileResource: typeof TextileResource;
-      MultiTextureResource: typeof TextileResource;
-      RectTileLayer: typeof Tilemap;
-      Tilemap: typeof Tilemap;
-      TilemapShader: typeof TilemapShader;
-      TilemapGeometry: typeof TilemapGeometry;
-      RectTileShader: typeof TilemapShader;
-      RectTileGeom: typeof TilemapGeometry;
-      TileRenderer: typeof TileRenderer;
-    };
 
     export const POINT_STRUCT_SIZE: number;
 
@@ -293,79 +209,19 @@ declare namespace PIXI {
     export const settings: {
       /** The default number of textures per tilemap in a tilemap composite. */
       TEXTURES_PER_TILEMAP: number;
-      /**
-       * The width/height of each texture tile in a {@link TEXTILE_DIMEN}. This is 1024px by default.
-       *
-       * This should fit all tile base-textures; otherwise, {@link TextileResource} may fail to correctly
-       * upload the textures togther in a tiled fashion.
-       */
-      TEXTILE_DIMEN: number;
-      /**
-       * The number of texture tiles per {@link TextileResource}.
-       *
-       * Texture tiling is disabled by default, and so this is set to `1` by default. If it is set to a
-       * higher value, textures will be uploaded together in a tiled fashion.
-       *
-       * Since {@link TextileResource} is a dual-column format, this should be even for packing
-       * efficiency. The optimal value is usually 4.
-       */
-      TEXTILE_UNITS: number;
       /** The scaling mode of the combined texture tiling. */
-      TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
+      TEXTILE_SCALE_MODE: PIXI.SCALE_MODE;
       /** This will enable 32-bit index buffers. It's useful when you have more than 16K tiles. */
       use32bitIndex: boolean;
-      /** Flags whether textiles should be cleared when each tile is uploaded. */
-      DO_CLEAR: boolean;
-      maxTextures: number;
-      boundSize: number;
-      boundCountPerBuffer: number;
     };
-
-    export interface TextileOptions {
-      TEXTILE_DIMEN: number;
-      TEXTILE_UNITS: number;
-      DO_CLEAR?: boolean;
-    }
-
-    /**
-     * This texture tiling resource can be used to upload multiple base-textures together.
-     *
-     * This resource combines multiple base-textures into a "textile". They're laid out in
-     * a dual column format, placed in row-order order. The size of each tile is predefined,
-     * and defaults to {@link settings.TEXTILE_DIMEN}. This means that each input base-texture
-     * must is smaller than that along both its width and height.
-     *
-     * @see settings.TEXTILE_UNITS
-     */
-    export class TextileResource extends PIXI.Resource {
-      /** The base-texture that contains all the texture tiles. */
-      baseTexture: PIXI.BaseTexture;
-      private readonly doClear;
-      private readonly tileDimen;
-      private readonly tiles;
-      private _clearBuffer;
-      /**
-       * @param options - This will default to the "settings" exported by @pixi/tilemap.
-       * @param options.TEXTILE_DIMEN - The dimensions of each tile.
-       * @param options.TEXTILE_UNITS - The number of texture tiles.
-       */
-      constructor(options?: TextileOptions);
-      /**
-       * Sets the texture to be uploaded for the given tile.
-       *
-       * @param index - The index of the tile being set.
-       * @param texture - The texture with the base-texture to upload.
-       */
-      tile(index: number, texture: PIXI.BaseTexture): void;
-      /** @override */
-      bind(baseTexture: PIXI.BaseTexture): void;
-      /** @override */
-      upload(
-        renderer: PIXI.Renderer,
-        texture: PIXI.BaseTexture,
-        glTexture: PIXI.GLTexture
-      ): boolean;
-    }
+    export const Constant: {
+      /** The default number of textures per tilemap in a tilemap composite. */
+      TEXTURES_PER_TILEMAP: number;
+      /** The scaling mode of the combined texture tiling. */
+      TEXTILE_SCALE_MODE: PIXI.SCALE_MODE;
+      /** This will enable 32-bit index buffers. It's useful when you have more than 16K tiles. */
+      use32bitIndex: boolean;
+    };
 
     /**
      * A rectangular tilemap implementation that renders a predefined set of tile textures.
@@ -396,9 +252,21 @@ declare namespace PIXI {
      *          .tile('brick_wall.png', 0, 100);
      * });
      */
-    class Tilemap extends PIXI.Container {
+    export class Tilemap extends PIXI.Container {
+      /**
+       * Currently doesnt work.
+       */
       shadowColor: Float32Array;
-      _globalMat: PIXI.Matrix;
+      state: PIXI.State;
+      is_valid: boolean;
+      readonly renderPipeId = 'tilemap';
+      readonly canBundle = true;
+      _instruction: TilemapInstruction;
+      /**
+       * @internal
+       * @ignore
+       */
+      checkValid(): boolean;
       /**
        * The tile animation frame.
        *
@@ -409,11 +277,7 @@ declare namespace PIXI {
        * This is the last uploaded size of the tilemap geometry.
        * @ignore
        */
-      modificationMarker: number;
-      /** @ignore */
-      offsetX: number;
-      /** @ignore */
-      offsetY: number;
+      rects_count: number;
       /** @ignore */
       compositeParent: boolean;
       /**
@@ -422,7 +286,7 @@ declare namespace PIXI {
        * This should not be shuffled after tiles have been added into this tilemap. Usually, only tile textures
        * should be added after tiles have been added into the map.
        */
-      protected tileset: Array<PIXI.BaseTexture>;
+      protected tileset: TileTextureArray;
       /**
        * The local bounds of the tilemap itself. This does not include DisplayObject children.
        */
@@ -435,18 +299,23 @@ declare namespace PIXI {
        * @param tileset - The tileset to use for the tilemap. This can be reset later with {@link Tilemap.setTileset}. The
        *      base-textures in this array must not be duplicated.
        */
-      constructor(tileset: PIXI.BaseTexture | Array<PIXI.BaseTexture>);
+      constructor(tileset: PIXI.TextureSource | Array<PIXI.TextureSource>);
       /**
        * @returns The tileset of this tilemap.
        */
-      getTileset(): Array<PIXI.BaseTexture>;
+      getTileset(): TileTextureArray;
       /**
        * Define the tileset used by the tilemap.
        *
-       * @param tileset - The list of textures to use in the tilemap. If a base-texture (not array) is passed, it will
+       * @param textureOrArray - The list of textures to use in the tilemap. If a base-texture (not array) is passed, it will
        *  be wrapped into an array. This should not contain any duplicates.
        */
-      setTileset(tileset?: PIXI.BaseTexture | Array<PIXI.BaseTexture>): this;
+      setTileset(
+        textureOrArray?:
+          | TileTextureArray
+          | PIXI.TextureSource
+          | Array<PIXI.TextureSource>
+      ): this;
       /**  Clears all the tiles added into this tilemap. */
       clear(): this;
       /**
@@ -474,7 +343,7 @@ declare namespace PIXI {
        * @return This tilemap, good for chaining.
        */
       tile(
-        tileTexture: number | string | PIXI.Texture | PIXI.BaseTexture,
+        tileTexture: number | string | PIXI.Texture | PIXI.TextureSource,
         x: number,
         y: number,
         options?: {
@@ -500,24 +369,29 @@ declare namespace PIXI {
       /** Changes the `animDivisor` value of the last tile. */
       tileAnimDivisor(divisor: number): void;
       tileAlpha(alpha: number): void;
-      renderCanvas: (renderer: any) => void;
-      renderCanvasCore(renderer: any): void;
       private vbId;
-      private vb;
+      vb: TilemapGeometry;
       private vbBuffer;
       private vbArray;
       private vbInts;
       private destroyVb;
-      render(renderer: PIXI.Renderer): void;
-      renderWebGLCore(renderer: PIXI.Renderer, plugin: TileRenderer): void;
-      /* Excluded from this release type: isModified */
-      /* Excluded from this release type: clearModify */
+      updateBuffer(plugin: TilemapPipe): void;
+      /**
+       * @internal
+       * @ignore
+       */
+      isModified(anim: boolean): boolean;
+      /**
+       * This will pull forward the modification marker.
+       *
+       * @internal
+       * @ignore
+       */
+      clearModify(): void;
+      addBounds(bounds: PIXI.Bounds): void;
+      get bounds(): PIXI.Bounds;
       /** @override */
-      protected _calculateBounds(): void;
-      /** @override */
-      getLocalBounds(rect?: PIXI.Rectangle): PIXI.Rectangle;
-      /** @override */
-      destroy(options?: PIXI.IDestroyOptions): void;
+      destroy(options?: PIXI.DestroyOptions): void;
       /**
        * Deprecated signature for {@link Tilemap.tile tile}.
        *
@@ -552,27 +426,54 @@ declare namespace PIXI {
         alpha?: number
       ): this;
     }
-    export { Tilemap as RectTileLayer };
-    export { Tilemap };
 
     export class TilemapGeometry extends PIXI.Geometry {
+      static vertSize: number;
+      static vertPerQuad: number;
+      static stride: number;
+      lastTimeAccess: number;
       vertSize: number;
       vertPerQuad: number;
       stride: number;
-      lastTimeAccess: number;
-      constructor();
-      buf: any;
+      constructor(indexBuffer: PIXI.Buffer);
+      buf: PIXI.Buffer;
     }
 
-    export class TilemapShader extends PIXI.Shader {
-      maxTextures: number;
-      constructor(maxTextures: number);
+    export abstract class TilemapAdaptor {
+      abstract init(): void;
+      abstract execute(meshPipe: TilemapPipe, mesh: Tilemap): void;
+      abstract destroy(): void;
+      pipe_uniforms: PIXI.UniformGroup<{
+        u_proj_trans: {
+          value: PIXI.Matrix;
+          type: 'mat3x3<f32>';
+        };
+        u_anim_frame: {
+          value: Float32Array;
+          type: 'vec2<f32>';
+        };
+      }>;
     }
 
+    export interface TilemapInstruction extends PIXI.Instruction {
+      renderPipeId: 'tilemap';
+      tilemap: Tilemap;
+    }
     /**
      * Rendering helper pipeline for tilemaps. This plugin is registered automatically.
      */
-    export class TileRenderer extends PIXI.ObjectRenderer {
+    export class TilemapPipe
+      implements
+        PIXI.RenderPipe<Tilemap>,
+        PIXI.InstructionPipe<TilemapInstruction>
+    {
+      static extension: {
+        readonly type: readonly [
+          PIXI.ExtensionType.WebGLPipes,
+          PIXI.ExtensionType.WebGPUPipes,
+        ];
+        readonly name: 'tilemap';
+      };
       /** The managing renderer */
       readonly renderer: PIXI.Renderer;
       /** The tile animation frame */
@@ -582,33 +483,77 @@ declare namespace PIXI {
       private indexBuffer;
       /** The shader used to render tilemaps. */
       private shader;
-      /**
-       * {@link TextileResource} instances used to upload textures batched in tiled groups. This is
-       * used only if {@link settings.TEXTURES_PER_TILEMAP} is greater than 1.
-       */
-      private textiles;
-      /** @param renderer - The managing renderer */
-      constructor(renderer: PIXI.Renderer);
-      /**
-       * Binds the tile textures to the renderer, and updates the tilemap shader's `uSamplerSize` uniform.
-       *
-       * If {@link settings.TEXTILE_UNITS}
-       *
-       * @param renderer - The renderer to which the textures are to be bound.
-       * @param textures - The tile textures being bound.
-       */
-      bindTileTextures(
-        renderer: PIXI.Renderer,
-        textures: Array<PIXI.BaseTexture>
-      ): void;
+      private adaptor;
+      constructor(renderer: PIXI.Renderer, adaptor: TilemapAdaptor);
       start(): void;
-      /* Excluded from this release type: createVb */
-      /** @return The {@link TilemapShader} shader that this rendering pipeline is using. */
-      getShader(): TilemapShader;
+      /**
+       * @internal
+       * @ignore
+       */
+      createVb(): TilemapGeometry;
+      /** @return The {@link TilemapGeometry} shader that this rendering pipeline is using. */
+      getShader(): TilemapGeometry;
       destroy(): void;
-      checkIndexBuffer(size: number, _vb?: TilemapGeometry): void;
-      /** Makes textile resources and initializes {@link TileRenderer.textiles}. */
-      private makeTextiles;
+      checkIndexBuffer(size: number): void;
+      destroyRenderable(_renderable: Tilemap): void;
+      addRenderable(
+        tilemap: Tilemap,
+        instructionSet: PIXI.InstructionSet | undefined
+      ): void;
+      updateRenderable(
+        tilemap: Tilemap,
+        _instructionSet?: PIXI.InstructionSet | undefined
+      ): void;
+      validateRenderable(renderable: Tilemap): boolean;
+      execute({ tilemap }: TilemapInstruction): void;
+    }
+
+    export class GlTilemapAdaptor extends TilemapAdaptor {
+      static extension: {
+        readonly type: readonly [PIXI.ExtensionType.WebGLPipesAdaptor];
+        readonly name: 'tilemap';
+      };
+      _shader: PIXI.Shader;
+      max_textures: number;
+      destroy(): void;
+      execute(pipe: TilemapPipe, tilemap: Tilemap): void;
+      init(): void;
+    }
+
+    export class GpuTilemapAdaptor extends TilemapAdaptor {
+      static extension: {
+        readonly type: readonly [PIXI.ExtensionType.WebGPUPipesAdaptor];
+        readonly name: 'tilemap';
+      };
+      _shader: PIXI.Shader;
+      max_textures: number;
+      bind_group: PIXI.BindGroup;
+      destroy(): void;
+      execute(pipe: TilemapPipe, tilemap: Tilemap): void;
+      init(): void;
+    }
+
+    export class TileTextureArray {
+      max_textures: number;
+      constructor(max_textures: number);
+      arr: PIXI.TextureSource[];
+      count: number;
+      dirty: boolean;
+      dirty_gpu: boolean;
+      bind_group: PIXI.BindGroup;
+      bind_group_resources: any;
+      tex_sizes: Float32Array;
+      null_color: Float32Array;
+      tex_buf: PIXI.Buffer;
+      get length(): number;
+      push(tex: PIXI.TextureSource): void;
+      at(ind: number): PIXI.TextureSource<any>;
+      update(): void;
+      markDirty(): void;
+      getBindGroup(): PIXI.BindGroup;
+      static generate_gpu_textures(max_textures: number): string;
+      static generate_gl_textures(max_textures: number): string;
+      static gl_gen_resources(max_textures: number): any;
     }
   }
 }

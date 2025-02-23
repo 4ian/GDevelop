@@ -227,9 +227,7 @@ namespace gdjs {
               );
               return game
                 .getImageManager()
-                .getPIXITexture(
-                  mappedName
-                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
+                .getPIXITexture(mappedName) as unknown as PIXI.TextureSource;
             },
             this._tilemapAtlasImage,
             this._tilemapJsonFile,

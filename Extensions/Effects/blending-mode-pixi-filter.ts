@@ -1,7 +1,7 @@
 namespace gdjs {
   interface BlendingModeFilterNetworkSyncData {
     a: number;
-    bm: number;
+    bm: string;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'BlendingMode',
@@ -20,7 +20,8 @@ namespace gdjs {
         if (parameterName === 'alpha') {
           blendingModeFilter.alpha = value;
         } else if (parameterName === 'blendmode') {
-          blendingModeFilter.blendMode = value;
+          blendingModeFilter.blendMode =
+            gdjs.PixiFiltersTools.getBlendModeName(value);
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
@@ -29,7 +30,9 @@ namespace gdjs {
           return blendingModeFilter.alpha;
         }
         if (parameterName === 'blendmode') {
-          return blendingModeFilter.blendMode;
+          return gdjs.PixiFiltersTools.getBlendModeIndex(
+            blendingModeFilter.blendMode
+          );
         }
         return 0;
       }
@@ -66,6 +69,7 @@ namespace gdjs {
       ) {
         const blendingModeFilter = filter as unknown as PIXI.AlphaFilter;
         blendingModeFilter.alpha = data.a;
+        // @ts-ignore
         blendingModeFilter.blendMode = data.bm;
       }
     })()

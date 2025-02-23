@@ -3,7 +3,7 @@ namespace gdjs {
     b: number;
     q: number;
     ks: number;
-    res: number | null;
+    res: number | 'inherit';
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Blur',

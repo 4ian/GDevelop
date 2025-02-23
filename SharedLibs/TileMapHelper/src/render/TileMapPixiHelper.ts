@@ -23,8 +23,8 @@ export namespace PixiTileMapHelper {
   export function parseAtlas(
     tileMap: TileMapFileContent,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.TextureSource | null,
+    getTexture: (textureName: string) => PIXI.TextureSource
   ): TileTextureCache | null {
     if (tileMap.kind === "ldtk") {
       return LDtkPixiHelper.parseAtlas(
@@ -60,7 +60,7 @@ export namespace PixiTileMapHelper {
    * @returns A textures cache.
    */
   export function parseSimpleTileMapAtlas(
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource>,
+    atlasTexture: PIXI.TextureSource,
     columnCount: number,
     rowCount: number,
     tileSize: number
@@ -75,7 +75,7 @@ export namespace PixiTileMapHelper {
           tileSize
         );
 
-        const texture = new PIXI.Texture(atlasTexture, rect);
+        const texture = new PIXI.Texture({ source: atlasTexture, frame: rect });
 
         textureCache.setTexture(
           // Id of the tile

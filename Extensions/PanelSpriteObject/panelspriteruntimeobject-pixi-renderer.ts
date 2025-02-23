@@ -210,7 +210,7 @@ namespace gdjs {
       this._textureWidth = texture.width;
       this._textureHeight = texture.height;
 
-      function makeInsideTexture(rect) {
+      function makeInsideTexture(rect: PIXI.Rectangle) {
         if (rect.width < 0) {
           rect.width = 0;
         }
@@ -238,108 +238,110 @@ namespace gdjs {
         return rect;
       }
       this._centerSprite.texture.destroy(false);
-      this._centerSprite.texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._centerSprite.texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             obj._lBorder,
             obj._tBorder,
             texture.width - obj._lBorder - obj._rBorder,
             texture.height - obj._tBorder - obj._bBorder
           )
-        )
-      );
+        ),
+      });
 
       //Top, Bottom, Right, Left borders:
       this._borderSprites[0].texture.destroy(false);
-      this._borderSprites[0].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[0].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             texture.width - obj._rBorder,
             obj._tBorder,
             obj._rBorder,
             texture.height - obj._tBorder - obj._bBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[2].texture.destroy(false);
-      this._borderSprites[2].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[2].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             obj._lBorder,
             0,
             texture.width - obj._lBorder - obj._rBorder,
             obj._tBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[4].texture.destroy(false);
-      this._borderSprites[4].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[4].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             0,
             obj._tBorder,
             obj._lBorder,
             texture.height - obj._tBorder - obj._bBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[6].texture.destroy(false);
-      this._borderSprites[6].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[6].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             obj._lBorder,
             texture.height - obj._bBorder,
             texture.width - obj._lBorder - obj._rBorder,
             obj._bBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[1].texture.destroy(false);
-      this._borderSprites[1].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[1].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             texture.width - obj._rBorder,
             0,
             obj._rBorder,
             obj._tBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[3].texture.destroy(false);
-      this._borderSprites[3].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(new PIXI.Rectangle(0, 0, obj._lBorder, obj._tBorder))
-      );
+      this._borderSprites[3].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
+          new PIXI.Rectangle(0, 0, obj._lBorder, obj._tBorder)
+        ),
+      });
       this._borderSprites[5].texture.destroy(false);
-      this._borderSprites[5].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[5].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             0,
             texture.height - obj._bBorder,
             obj._lBorder,
             obj._bBorder
           )
-        )
-      );
+        ),
+      });
       this._borderSprites[7].texture.destroy(false);
-      this._borderSprites[7].texture = new PIXI.Texture(
-        texture,
-        makeInsideTexture(
+      this._borderSprites[7].texture = new PIXI.Texture({
+        source: texture,
+        frame: makeInsideTexture(
           new PIXI.Rectangle(
             texture.width - obj._rBorder,
             texture.height - obj._bBorder,
             obj._rBorder,
             obj._bBorder
           )
-        )
-      );
+        ),
+      });
       this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();

@@ -1,7 +1,7 @@
 // @flow
 import Window from '../Window';
 
-const isDev = Window.isDev();
+const isDev = false;
 
 export const GDevelopGamePreviews = {
   baseUrl: `https://game-previews.gdevelop.io/`,

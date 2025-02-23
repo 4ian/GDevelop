@@ -430,7 +430,9 @@ export const HomePage = React.memo<Props>(
       );
 
       // Ensure the toolbar is up to date when the active tab changes.
-      React.useEffect(
+      // Use a layout effect to ensure titlebar/toolbar are updated at the same time
+      // as the rest of the interface (same React render).
+      React.useLayoutEffect(
         () => {
           // Hide the toolbars when on mobile in the "play" tab.
           if (activeTab === 'play' && isMobile) {

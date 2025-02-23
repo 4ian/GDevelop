@@ -167,7 +167,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
-import TabsTitlebar, { type TabsTitlebarInterface } from './TabsTitlebar';
+import TabsTitlebar from './TabsTitlebar';
 import {
   useStableUpToDateCallback,
   useStableUpToDateRef,
@@ -345,7 +345,10 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
-  const tabsTitlebar = React.useRef<?TabsTitlebarInterface>(null);
+  const [
+    tabsTitleBarAndEditorToolbarHidden,
+    setTabsTitleBarAndEditorToolbarHidden,
+  ] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -1242,14 +1245,6 @@ const MainFrame = (props: Props) => {
 
     toolbar.current.setEditorToolbar(editorToolbar);
   };
-
-  const hideTabsTitleBarAndEditorToolbar = React.useCallback(
-    (hidden: boolean) => {
-      if (tabsTitlebar.current) tabsTitlebar.current.hideTitlebar(hidden);
-      if (toolbar.current) toolbar.current.hideToolbar(hidden);
-    },
-    []
-  );
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
@@ -3681,7 +3676,7 @@ const MainFrame = (props: Props) => {
         />
       </ProjectManagerDrawer>
       <TabsTitlebar
-        ref={tabsTitlebar}
+        hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
       >
         <DraggableEditorTabs
@@ -3701,6 +3696,7 @@ const MainFrame = (props: Props) => {
       </TabsTitlebar>
       <Toolbar
         ref={toolbar}
+        hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
           !['start page', 'debugger', null].includes(
             getCurrentTab(state.editorTabs)
@@ -3767,7 +3763,7 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
-                    hideTabsTitleBarAndEditorToolbar,
+                    hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

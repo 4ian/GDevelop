@@ -30,10 +30,11 @@ export const gamesPlatformEmbeddedVersion = 'v1';
 
 type Props = {|
   loaded: boolean,
+  visible: boolean,
   initialGameId: ?string,
 |};
 
-const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
+const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
@@ -88,6 +89,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded }: Props) => {
         height: containerHeight,
         left: containerLeft,
         top: containerTop,
+        display: visible ? 'block' : 'none',
       }}
     >
       <iframe

@@ -30,55 +30,51 @@ const styles = {
 
 type TabsTitlebarProps = {|
   children: React.Node,
+  hidden: boolean,
   toggleProjectManager: () => void,
-|};
-
-export type TabsTitlebarInterface = {|
-  hideTitlebar: (hidden: boolean) => void,
 |};
 
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
-export default React.forwardRef<TabsTitlebarProps, TabsTitlebarInterface>(
-  function TabsTitlebar(
-    { children, toggleProjectManager }: TabsTitlebarProps,
-    ref
-  ) {
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
-    const [titlebarHidden, setTitlebarHidden] = React.useState(false);
+export default function TabsTitlebar({
+  children,
+  toggleProjectManager,
+  hidden,
+}: TabsTitlebarProps) {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
 
-    React.useImperativeHandle(ref, () => ({
-      hideTitlebar: (hidden: boolean) => setTitlebarHidden(hidden),
-    }));
+  React.useEffect(
+    () => {
+      Window.setTitleBarColor(backgroundColor);
+    },
+    [backgroundColor]
+  );
 
-    React.useEffect(
-      () => {
-        Window.setTitleBarColor(backgroundColor);
-      },
-      [backgroundColor]
-    );
-
-    if (titlebarHidden) return null;
-
-    return (
-      <div style={{ ...styles.container, backgroundColor }}>
-        <TitleBarLeftSafeMargins />
-        <IconButton
-          size="small"
-          // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
-          id="main-toolbar-project-manager-button"
-          className={DRAGGABLE_PART_CLASS_NAME}
-          style={styles.menuIcon}
-          color="default"
-          onClick={toggleProjectManager}
-        >
-          <MenuIcon />
-        </IconButton>
-        {children}
-        <TitleBarRightSafeMargins />
-      </div>
-    );
-  }
-);
+  return (
+    <div
+      style={{
+        ...styles.container,
+        backgroundColor,
+        // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
+        visibility: hidden ? 'hidden' : 'visible',
+      }}
+    >
+      <TitleBarLeftSafeMargins />
+      <IconButton
+        size="small"
+        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+        id="main-toolbar-project-manager-button"
+        className={DRAGGABLE_PART_CLASS_NAME}
+        style={styles.menuIcon}
+        color="default"
+        onClick={toggleProjectManager}
+      >
+        <MenuIcon />
+      </IconButton>
+      {children}
+      <TitleBarRightSafeMargins />
+    </div>
+  );
+}

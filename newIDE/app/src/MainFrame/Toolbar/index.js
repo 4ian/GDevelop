@@ -23,13 +23,13 @@ export type MainFrameToolbarProps = {|
   checkedOutVersionStatus?: ?OpenedVersionStatus,
   onQuitVersionHistory: () => Promise<void>,
   canQuitVersionHistory: boolean,
+  hidden: boolean,
 
   ...PreviewAndShareButtonsProps,
 |};
 
 export type ToolbarInterface = {|
   setEditorToolbar: (React.Node | null) => void,
-  hideToolbar: (hidden: boolean) => void,
 |};
 
 type LeftButtonsToolbarGroupProps = {|
@@ -84,11 +84,9 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
-    const [toolbarHidden, setToolbarHidden] = React.useState(false);
 
     React.useImperativeHandle(ref, () => ({
       setEditorToolbar,
-      hideToolbar: (hidden: boolean) => setToolbarHidden(hidden),
     }));
 
     const borderBottomColor = React.useMemo(
@@ -102,10 +100,8 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       [props.checkedOutVersionStatus, gdevelopTheme]
     );
 
-    if (toolbarHidden) return null;
-
     return (
-      <Toolbar borderBottomColor={borderBottomColor}>
+      <Toolbar borderBottomColor={borderBottomColor} hidden={props.hidden}>
         {props.showProjectButtons ? (
           <>
             <LeftButtonsToolbarGroup

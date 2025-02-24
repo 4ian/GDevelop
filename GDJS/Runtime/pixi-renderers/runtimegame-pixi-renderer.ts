@@ -542,6 +542,23 @@ namespace gdjs {
     }
 
     /**
+     * Translate an event position (mouse or touch) made on the canvas
+     * on the page (or even outside the canvas) to game coordinates.
+     */
+    convertPageToGameCoords(pageX: float, pageY: float) {
+      const canvas = this._gameCanvas;
+      if (!canvas) return [0, 0];
+
+      const pos = [pageX - canvas.offsetLeft, pageY - canvas.offsetTop];
+
+      // Handle the fact that the game is stretched to fill the canvas.
+      pos[0] *= this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pos[1] *=
+        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+      return pos;
+    }
+
+    /**
      * Add the standard events handler.
      *
      * The game canvas must have been initialized before calling this.
@@ -567,8 +584,8 @@ namespace gdjs {
         );
       };
 
-      //Some browsers lacks definition of some variables used to do calculations
-      //in _getEventPosition. They are defined to 0 as they are useless.
+      // Some browsers lacks definition of some variables used to do calculations
+      // in convertPageToGameCoords. They are defined to 0 as they are useless.
 
       (function ensureOffsetsExistence() {
         if (isNaN(canvas.offsetLeft)) {
@@ -672,11 +689,11 @@ namespace gdjs {
         return button;
       }
       canvas.onmousemove = (e) => {
-        const pos = this._getEventPosition(e);
+        const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
       };
       canvas.onmousedown = (e) => {
-        const pos = this._getEventPosition(e);
+        const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
         manager.onMouseButtonPressed(
           convertHtmlMouseButtonToInputManagerMouseButton(e.button)
@@ -751,16 +768,16 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = this._getEventPosition(e.changedTouches[i]);
-              manager.onTouchMove(
-                e.changedTouches[i].identifier,
-                pos[0],
-                pos[1]
+              const touch = e.changedTouches[i];
+              const pos = this.convertPageToGameCoords(
+                touch.pageX,
+                touch.pageY
               );
+              manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               // This works because touch events are sent
               // when they continue outside of the canvas.
               if (manager.isSimulatingMouseWithTouch()) {
-                if (isInsideCanvas(e.changedTouches[i])) {
+                if (isInsideCanvas(touch)) {
                   manager.onMouseEnter();
                 } else {
                   manager.onMouseLeave();
@@ -785,7 +802,11 @@ namespace gdjs {
           e.preventDefault();
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
-              const pos = this._getEventPosition(e.changedTouches[i]);
+              const touch = e.changedTouches[i];
+              const pos = this.convertPageToGameCoords(
+                touch.pageX,
+                touch.pageY
+              );
               manager.onTouchStart(
                 e.changedTouches[i].identifier,
                 pos[0],
@@ -1036,24 +1057,6 @@ namespace gdjs {
       if (this._wasDisposed) {
         throw 'The RuntimeGameRenderer has been disposed and should not be used anymore.';
       }
-    }
-
-    //Translate an event (mouse or touch) made on the canvas on the page to game coordinates.
-    private _getEventPosition(e: MouseEvent | Touch): FloatPoint {
-      const canvas = this._gameCanvas;
-      if (!canvas) return [0, 0];
-
-      const pos: FloatPoint = [
-        e.pageX - canvas.offsetLeft,
-        e.pageY - canvas.offsetTop,
-      ];
-
-      // Handle the fact that the game is stretched to fill the canvas.
-      pos[0] *= this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
-      pos[1] *=
-        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
-
-      return pos;
     }
   }
 

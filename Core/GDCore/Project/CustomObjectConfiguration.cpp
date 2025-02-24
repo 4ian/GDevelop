@@ -19,6 +19,7 @@ using namespace gd;
 
 void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& objectConfiguration) {
   project = objectConfiguration.project;
+  variantName = objectConfiguration.variantName;
   objectContent = objectConfiguration.objectContent;
   animations = objectConfiguration.animations;
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
@@ -165,6 +166,7 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
     animations.SerializeTo(animatableElement);
   }
 
+  element.SetAttribute("variant", variantName);
   if (IsOverridingEventsBasedObjectChildrenConfiguration()) {
     auto &childrenContentElement = element.AddChild("childrenContent");
     for (auto &pair : childObjectConfigurations) {
@@ -184,6 +186,7 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
     animations.UnserializeFrom(animatableElement);
   }
 
+  variantName = element.GetStringAttribute("variant");
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration =
       element.HasChild("childrenContent");
   if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
@@ -247,9 +250,26 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  for (auto& childObject : eventsBasedObject.GetObjects().GetObjects()) {
-    auto &configuration = GetChildObjectConfiguration(childObject->GetName());
-    configuration.ExposeResources(worker);
+  if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
+    for (auto &childObject : eventsBasedObject.GetObjects().GetObjects()) {
+      auto &configuration = GetChildObjectConfiguration(childObject->GetName());
+      configuration.ExposeResources(worker);
+    }
+  } else {
+    if (variantName.empty() ||
+        !eventsBasedObject.GetVariants().HasVariantNamed(variantName)) {
+      for (auto &childObject :
+           eventsBasedObject.GetDefaultVariant().GetObjects().GetObjects()) {
+        childObject->GetConfiguration().ExposeResources(worker);
+      }
+    } else {
+      for (auto &childObject : eventsBasedObject.GetVariants()
+                                   .GetVariant(variantName)
+                                   .GetObjects()
+                                   .GetObjects()) {
+        childObject->GetConfiguration().ExposeResources(worker);
+      }
+    }
   }
 }
 

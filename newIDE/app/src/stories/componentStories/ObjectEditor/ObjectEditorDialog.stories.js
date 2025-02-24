@@ -42,6 +42,9 @@ export const CustomObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
     />
   </DragAndDropContextProvider>
 );
@@ -73,6 +76,9 @@ export const StandardObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
     />
   </DragAndDropContextProvider>
 );

@@ -206,9 +206,16 @@ declare interface SceneAndExtensionsData {
   usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
 }
 
-declare interface EventsBasedObjectData extends InstanceContainerData {
+declare interface EventsBasedObjectData
+  extends EventsBasedObjectVariantData,
+    InstanceContainerData {
   name: string;
   isInnerAreaFollowingParentSize: boolean;
+  variants: Array<EventsBasedObjectVariantData>;
+}
+
+declare interface EventsBasedObjectVariantData extends InstanceContainerData {
+  name: string;
   // The flat representation of defaultSize.
   areaMinX: float;
   areaMinY: float;
@@ -225,6 +232,9 @@ declare interface EventsBasedObjectData extends InstanceContainerData {
     min: [float, float, float];
     max: [float, float, float];
   } | null;
+  instances: InstanceData[];
+  objects: ObjectData[];
+  layers: LayerData[];
 }
 
 declare interface BehaviorSharedData {

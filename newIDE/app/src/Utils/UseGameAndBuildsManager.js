@@ -48,8 +48,8 @@ export type GameManager = {|
 
 export type GameAndBuildsManager = {|
   ...GameManager,
-  builds: ?Array<Build>,
-  refreshBuilds: () => Promise<void>,
+  gameBuilds: ?Array<Build>,
+  refreshGameBuilds: () => Promise<void>,
 |};
 
 type Props = {|
@@ -244,14 +244,20 @@ export const useGameAndBuildsManager = ({
     onGameRegistered,
   });
 
-  const [builds, setBuilds] = React.useState<?Array<Build>>(null);
-  const refreshBuilds = React.useCallback(
+  const { game } = gameManager;
+
+  const [gameBuilds, setGameBuilds] = React.useState<?Array<Build>>(null);
+  const refreshGameBuilds = React.useCallback(
     async () => {
-      if (!profile) return;
+      if (!profile || !game) return;
 
       try {
-        const userBuilds = await getBuilds(getAuthorizationHeader, profile.id);
-        setBuilds(userBuilds);
+        const gameBuilds = await getBuilds(
+          getAuthorizationHeader,
+          profile.id,
+          game.id
+        );
+        setGameBuilds(gameBuilds);
       } catch (error) {
         console.error('Error while loading builds:', error);
         showAlert({
@@ -260,23 +266,23 @@ export const useGameAndBuildsManager = ({
         });
       }
     },
-    [profile, getAuthorizationHeader, showAlert]
+    [profile, getAuthorizationHeader, showAlert, game]
   );
 
   React.useEffect(
     () => {
-      refreshBuilds();
+      refreshGameBuilds();
     },
-    [refreshBuilds]
+    [refreshGameBuilds]
   );
 
   const gameAndBuildsManager: GameAndBuildsManager = React.useMemo(
     () => ({
       ...gameManager,
-      builds,
-      refreshBuilds,
+      gameBuilds,
+      refreshGameBuilds,
     }),
-    [gameManager, refreshBuilds, builds]
+    [gameManager, refreshGameBuilds, gameBuilds]
   );
 
   return gameAndBuildsManager;

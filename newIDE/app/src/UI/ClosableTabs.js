@@ -10,6 +10,8 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
+const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
+
 const styles = {
   tabContentContainer: {
     width: '100%',
@@ -243,6 +245,7 @@ export function ClosableTab({
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,
         }}
+        className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
       >
         <ButtonBase
           onClick={onClick}

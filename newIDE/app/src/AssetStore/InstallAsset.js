@@ -157,11 +157,15 @@ export type InstallAssetArgs = {|
 
 const findVariant = (
   container: gdEventsBasedObjectVariantsContainer,
-  assetStoreId: string
+  assetStoreAssetId: string,
+  assetStoreOriginalName: string
 ): gdEventsBasedObjectVariant | null => {
   for (let index = 0; index < container.getVariantsCount(); index++) {
     const variant = container.getVariantAt(index);
-    if (variant.getAssetStoreId()) {
+    if (
+      variant.getAssetStoreAssetId() === assetStoreAssetId &&
+      variant.getAssetStoreOriginalName() === assetStoreOriginalName
+    ) {
       return variant;
     }
   }
@@ -183,34 +187,86 @@ export const addAssetToProject = async ({
     const type: ?string = objectAsset.object.type;
     if (!type) throw new Error('An object has no type specified');
 
-    let variantName: string | null = null;
-    const serializedVariant = objectAsset.variant;
-    const isCustomObjectWithVariant =
-      serializedVariant && project.hasEventsBasedObject(type);
-    if (isCustomObjectWithVariant && serializedVariant) {
-      const eventsBasedObject = project.getEventsBasedObject(type);
-      const variants = eventsBasedObject.getVariants();
-      variantName = serializedVariant.name;
-      let variant = findVariant(variants, serializedVariant.assetStoreId);
-      if (!variant) {
-        // TODO Forbid name with `::`
-        const uniqueNewName = newNameGenerator(variantName, tentativeNewName =>
-          variants.hasVariantNamed(tentativeNewName)
-        );
-        variant = variants.insertNewVariant(
-          uniqueNewName,
-          variants.getVariantsCount()
-        );
-        variantName = uniqueNewName;
+    const variantRenamings: Array<{
+      objectType: string,
+      oldVariantName: string,
+      newVariantName: string,
+    }> = [];
+    const serializedVariants = objectAsset.variants;
+    if (serializedVariants) {
+      // Install variants
+      for (const {
+        objectType,
+        variant: serializedVariant,
+      } of serializedVariants) {
+        if (project.hasEventsBasedObject(objectType)) {
+          const eventsBasedObject = project.getEventsBasedObject(objectType);
+          const variants = eventsBasedObject.getVariants();
+          let variant = findVariant(variants, asset.id, serializedVariant.name);
+          if (!variant) {
+            // TODO Forbid name with `::`
+            const uniqueNewName = newNameGenerator(
+              serializedVariant.name,
+              tentativeNewName => variants.hasVariantNamed(tentativeNewName)
+            );
+            variant = variants.insertNewVariant(
+              uniqueNewName,
+              variants.getVariantsCount()
+            );
+            const variantName = variant.getName();
+            unserializeFromJSObject(
+              variant,
+              serializedVariant,
+              'unserializeFrom',
+              project
+            );
+            variant.setName(variantName);
+            variant.setAssetStoreAssetId(asset.id);
+            variant.setAssetStoreOriginalName(serializedVariant.name);
+          }
+          if (variant.getName() !== serializedVariant.name) {
+            variantRenamings.push({
+              objectType,
+              oldVariantName: serializedVariant.name,
+              newVariantName: variant.getName(),
+            });
+          }
+        }
       }
-      unserializeFromJSObject(
-        variant,
-        serializedVariant,
-        'unserializeFrom',
-        project
-      );
-      variant.setName(variantName);
-      variant.setAssetStoreId(asset.id);
+      // Update variant names into variants object configurations.
+      for (const {
+        objectType,
+        variant: serializedVariant,
+      } of serializedVariants) {
+        if (project.hasEventsBasedObject(objectType)) {
+          const eventsBasedObject = project.getEventsBasedObject(objectType);
+          const variants = eventsBasedObject.getVariants();
+          let variant = findVariant(variants, asset.id, serializedVariant.name);
+          if (variant) {
+            for (
+              let index = 0;
+              index < variant.getObjects().getObjectsCount();
+              index++
+            ) {
+              const object = variant.getObjects().getObjectAt(index);
+
+              if (project.hasEventsBasedObject(object.getType())) {
+                const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                  object.getConfiguration()
+                );
+                const customObjectVariantRenaming = variantRenamings.find(
+                  renaming => renaming.objectType === object.getType()
+                );
+                if (customObjectVariantRenaming) {
+                  customObjectConfiguration.setVariantName(
+                    customObjectVariantRenaming.newVariantName
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     // Insert the object
@@ -247,19 +303,27 @@ export const addAssetToProject = async ({
       'unserializeFrom',
       project
     );
-
+    // The name was overwritten after unserialization.
+    object.setName(newName);
     object.setAssetStoreId(asset.id);
-    if (isCustomObjectWithVariant && variantName) {
+    if (project.hasEventsBasedObject(object.getType())) {
       const customObjectConfiguration = gd.asCustomObjectConfiguration(
         object.getConfiguration()
       );
-      customObjectConfiguration.setVariantName(variantName);
-      customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
-        false
+      if (customObjectConfiguration.getVariantName()) {
+        customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+          false
+        );
+      }
+      const customObjectVariantRenaming = variantRenamings.find(
+        renaming => renaming.objectType === object.getType()
       );
+      if (customObjectVariantRenaming) {
+        customObjectConfiguration.setVariantName(
+          customObjectVariantRenaming.newVariantName
+        );
+      }
     }
-    // The name was overwritten after unserialization.
-    object.setName(newName);
 
     // Add resources used by the object
     objectAsset.resources.forEach(serializedResource => {

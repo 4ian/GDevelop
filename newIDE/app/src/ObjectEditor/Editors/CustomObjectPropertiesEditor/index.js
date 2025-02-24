@@ -78,13 +78,15 @@ const getVariant = (
   eventBasedObject: gdEventsBasedObject,
   customObjectConfiguration: gdCustomObjectConfiguration
 ): gdEventsBasedObjectVariant => {
-  const variantName = getVariantName(eventBasedObject, customObjectConfiguration);
+  const variantName = getVariantName(
+    eventBasedObject,
+    customObjectConfiguration
+  );
   const variants = eventBasedObject.getVariants();
   return variantName
-        ? variants.getVariant(variantName)
-        : eventBasedObject.getDefaultVariant();
-}
-
+    ? variants.getVariant(variantName)
+    : eventBasedObject.getDefaultVariant();
+};
 
 type Props = EditorProps;
 
@@ -241,7 +243,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
         project
       );
       newVariant.setName(uniqueNewName);
-      newVariant.setAssetStoreId('');
+      newVariant.setAssetStoreAssetId('');
+      newVariant.setAssetStoreOriginalName('');
       customObjectConfiguration.setVariantName(uniqueNewName);
       setNewVariantDialogOpen(false);
       forceUpdate();
@@ -257,6 +260,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
       const variants = eventBasedObject.getVariants();
       const selectedVariantName = customObjectConfiguration.getVariantName();
       if (variants.hasVariantNamed(selectedVariantName)) {
+        // TODO Close the variant tabs before deleting it.
         customObjectConfiguration.setVariantName('');
         variants.removeVariant(selectedVariantName);
         forceUpdate();
@@ -344,10 +348,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       label={<Trans>Edit</Trans>}
                       onClick={editVariant}
                       disabled={
-                        !eventBasedObject || getVariant(
+                        !eventBasedObject ||
+                        getVariant(
                           eventBasedObject,
                           customObjectConfiguration
-                        ).getAssetStoreId() !== ''
+                        ).getAssetStoreAssetId() !== ''
                       }
                     />
                     <FlatButton

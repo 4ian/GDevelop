@@ -178,15 +178,27 @@ public:
   void SetAreaMaxZ(int areaMaxZ_) { areaMaxZ = areaMaxZ_; }
   ///@}
 
-  /** \brief Change the asset store id of the object.
+  /** \brief Change the object asset store id of this variant.
    */
-  void SetAssetStoreId(const gd::String &assetStoreId_) {
-    assetStoreId = assetStoreId_;
+  void SetAssetStoreAssetId(const gd::String &assetStoreId_) {
+    assetStoreAssetId = assetStoreId_;
   };
 
-  /** \brief Return the asset store id of the object.
+  /** \brief Return the object asset store id of this variant.
    */
-  const gd::String &GetAssetStoreId() const { return assetStoreId; };
+  const gd::String &GetAssetStoreAssetId() const { return assetStoreAssetId; };
+
+  /** \brief Change the original name of the variant in the asset.
+   */
+  void SetAssetStoreOriginalName(const gd::String &assetStoreOriginalName_) {
+    assetStoreOriginalName = assetStoreOriginalName_;
+  };
+
+  /** \brief Return the original name of the variant in the asset.
+   */
+  const gd::String &GetAssetStoreOriginalName() const {
+    return assetStoreOriginalName;
+  };
 
   void SerializeTo(SerializerElement &element) const;
 
@@ -206,7 +218,12 @@ private:
   /**
    * The ID of the asset if the object comes from the store.
    */
-  gd::String assetStoreId;
+  gd::String assetStoreAssetId;
+  /**
+   * The original name of the variant in the asset if the object comes from the
+   * store.
+   */
+  gd::String assetStoreOriginalName;
 };
 
 } // namespace gd

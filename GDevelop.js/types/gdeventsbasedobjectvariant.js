@@ -18,8 +18,10 @@ declare class gdEventsBasedObjectVariant {
   setAreaMaxX(value: number): void;
   setAreaMaxY(value: number): void;
   setAreaMaxZ(value: number): void;
-  setAssetStoreId(assetStoreId: string): void;
-  getAssetStoreId(): string;
+  setAssetStoreAssetId(assetStoreAssetId: string): void;
+  getAssetStoreAssetId(): string;
+  setAssetStoreOriginalName(assetStoreOriginalName: string): void;
+  getAssetStoreOriginalName(): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

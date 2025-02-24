@@ -739,7 +739,8 @@ namespace gdjs {
 
       // Touches:
       window.addEventListener(
-        'touchmove', (e) => {
+        'touchmove',
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -772,7 +773,8 @@ namespace gdjs {
         { passive: false }
       );
       window.addEventListener(
-        'touchstart', (e) => {
+        'touchstart',
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -1041,14 +1043,18 @@ namespace gdjs {
       const canvas = this._gameCanvas;
       if (!canvas) return [0, 0];
 
-      const pos: FloatPoint = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
+      const pos: FloatPoint = [
+        e.pageX - canvas.offsetLeft,
+        e.pageY - canvas.offsetTop,
+      ];
 
       // Handle the fact that the game is stretched to fill the canvas.
       pos[0] *= this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
-      pos[1] *= this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+      pos[1] *=
+        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
 
       return pos;
-    };
+    }
   }
 
   //Register the class to let the engine use it.

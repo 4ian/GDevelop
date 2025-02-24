@@ -14,6 +14,7 @@ export const GAMES_PLATFORM_IFRAME_ID = 'games-platform-frame';
 const styles = {
   paper: {
     position: 'absolute',
+    overflow: 'hidden',
   },
   iframe: {
     border: 0,
@@ -67,7 +68,10 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
     [loaded, initialGameId]
   );
 
-  const containerTop = isMobile ? 0 : 37 + 40; // tabs title bar + toolbar
+  const titleBarAndToolbarHeight = isMobile ? 0 : 37 + 40;
+  const containerTop = isMobile
+    ? 0 // Always top of the screen on small screens.
+    : `calc(${titleBarAndToolbarHeight}px + var(--safe-area-inset-top))`;
   const containerBottom = isMobile ? homepageMobileMenuHeight : 0;
   const containerLeft = isMobile
     ? 0
@@ -75,7 +79,8 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
     ? homepageMediumMenuBarWidth
     : homepageDesktopMenuBarWidth;
   const containerWidth = `calc(100% - ${containerLeft}px`;
-  const containerHeight = `calc(100% - ${containerTop + containerBottom}px)`;
+  const containerHeight = `calc(100% - ${titleBarAndToolbarHeight +
+    containerBottom}px - ${isMobile ? '0px' : 'var(--safe-area-inset-top)'})`;
 
   // We wrap the iframe in a paper, as its content has a transparent background,
   // and we don't want what's behind the iframe to be visible.
@@ -95,7 +100,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
       <iframe
         id={GAMES_PLATFORM_IFRAME_ID}
         src={src}
-        allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; keyboard-map *; focus-without-user-activation *; screen-wake-lock; clipboard-read; clipboard-write"
+        allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; keyboard-map *; focus-without-user-activation *; screen-wake-lock; clipboard-read; clipboard-write; web-share"
         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-downloads"
         title="gdgames"
         allowFullScreen

@@ -7,8 +7,6 @@ import optionalRequire from '../Utils/OptionalRequire';
 
 const electron = optionalRequire('electron');
 
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
-
 const titleBarStyles = {
   leftSideArea: {
     alignSelf: 'stretch',
@@ -52,7 +50,6 @@ export const TitleBarLeftSafeMargins = ({
   if (leftSideOffset) {
     return (
       <div
-        className={DRAGGABLE_PART_CLASS_NAME}
         style={{
           ...titleBarStyles.leftSideArea,
           width: leftSideOffset,
@@ -97,7 +94,6 @@ export const TitleBarRightSafeMargins = ({
   // in the title bar.
   return (
     <div
-      className={DRAGGABLE_PART_CLASS_NAME}
       style={{
         ...titleBarStyles.rightSideArea,
         minWidth: rightSideOffset,

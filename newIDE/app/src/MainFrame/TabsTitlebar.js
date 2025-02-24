@@ -9,7 +9,8 @@ import {
   TitleBarRightSafeMargins,
 } from '../UI/TitleBarSafeMargins';
 
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
+const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
+const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
 
 const styles = {
   container: {
@@ -60,13 +61,16 @@ export default function TabsTitlebar({
         // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
         visibility: hidden ? 'hidden' : 'visible',
       }}
+      className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >
       <TitleBarLeftSafeMargins />
       <IconButton
         size="small"
         // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
         id="main-toolbar-project-manager-button"
-        className={DRAGGABLE_PART_CLASS_NAME}
+        // The whole bar is draggable, so prevent the icon to be draggable,
+        // as it can affect the ability to open the menu.
+        className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
         style={styles.menuIcon}
         color="default"
         onClick={toggleProjectManager}

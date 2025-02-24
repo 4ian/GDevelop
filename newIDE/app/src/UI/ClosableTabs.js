@@ -245,6 +245,8 @@ export function ClosableTab({
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,
         }}
+        // A tab lives in the top bar, which has the ability to drag the app window.
+        // Ensure the tab does not have this ability, as it can be dragged itself.
         className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
       >
         <ButtonBase

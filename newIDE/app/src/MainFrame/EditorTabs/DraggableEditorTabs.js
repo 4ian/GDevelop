@@ -85,7 +85,7 @@ export function DraggableEditorTabs({
           // Maximum width of a tab is the width so that all tabs can fit it,
           // unless on a small screen, where we want to avoid compressing tabs too much
           // (and encourage scrolling instead).
-          const minimumMaxWidth = windowSize === 'small' ? 100 : 0;
+          const minimumMaxWidth = windowSize === 'small' ? 100 : 80;
           const maxWidth = Math.max(
             minimumMaxWidth,
             // The home tab is special because it's just an icon.

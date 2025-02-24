@@ -18,7 +18,10 @@ EventsBasedObjectVariant::~EventsBasedObjectVariant() {}
 
 void EventsBasedObjectVariant::SerializeTo(SerializerElement &element) const {
   element.SetAttribute("name", name);
-  element.SetAttribute("assetStoreId", GetAssetStoreId());
+  if (!GetAssetStoreAssetId().empty() && !GetAssetStoreOriginalName().empty()) {
+    element.SetAttribute("assetStoreAssetId", GetAssetStoreAssetId());
+    element.SetAttribute("assetStoreOriginalName", GetAssetStoreOriginalName());
+  }
   element.SetIntAttribute("areaMinX", areaMinX);
   element.SetIntAttribute("areaMinY", areaMinY);
   element.SetIntAttribute("areaMinZ", areaMinZ);
@@ -39,7 +42,8 @@ void EventsBasedObjectVariant::SerializeTo(SerializerElement &element) const {
 void EventsBasedObjectVariant::UnserializeFrom(
     gd::Project &project, const SerializerElement &element) {
   name = element.GetStringAttribute("name");
-  assetStoreId = element.GetStringAttribute("assetStoreId");
+  assetStoreAssetId = element.GetStringAttribute("assetStoreAssetId");
+  assetStoreOriginalName = element.GetStringAttribute("assetStoreOriginalName");
   areaMinX = element.GetIntAttribute("areaMinX", 0);
   areaMinY = element.GetIntAttribute("areaMinY", 0);
   areaMinZ = element.GetIntAttribute("areaMinZ", 0);

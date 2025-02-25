@@ -184,7 +184,6 @@ const GamesPlatformFrameStateProvider = ({
     setNewProjectActions,
   ] = React.useState<?NewProjectActions>(null);
 
-  const userId = profile ? profile.id : null;
   const {
     navigateToRoute,
     routeArguments,

@@ -123,7 +123,8 @@ export type RenderEditorContainerProps = {|
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    i18n: I18nType,
+    isQuickCustomization?: boolean
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,

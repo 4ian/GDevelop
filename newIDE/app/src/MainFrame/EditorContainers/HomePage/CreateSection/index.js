@@ -81,7 +81,8 @@ type Props = {|
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    i18n: I18nType,
+    isQuickCustomization?: boolean
   ) => Promise<void>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -551,7 +552,8 @@ const CreateSection = ({
                         onCreateProjectFromExample(
                           exampleShortHeader,
                           newProjectSetup,
-                          i18n
+                          i18n,
+                          true // isQuickCustomization
                         );
                       }}
                       quickCustomizationRecommendation={

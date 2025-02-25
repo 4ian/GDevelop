@@ -9,6 +9,7 @@ import PublicProfileContext from '../../../../Profile/PublicProfileContext';
 import RouterContext from '../../../RouterContext';
 import { retryIfFailed } from '../../../../Utils/RetryIfFailed';
 import optionalRequire from '../../../../Utils/OptionalRequire';
+import { isNativeMobileApp } from '../../../../Utils/Platform';
 const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its audio as long as the iframe
@@ -46,7 +47,7 @@ let gdevelopGamesMonetization: {|
 let gdevelopGamesMonetizationPromise: Promise<void> | null = null;
 
 const ensureGDevelopGamesMonetizationReady = async () => {
-  if (!!electron) {
+  if (!!electron || isNativeMobileApp()) {
     // Not supported on desktop.
     return;
   }
@@ -84,6 +85,80 @@ const ensureGDevelopGamesMonetizationReady = async () => {
   return gdevelopGamesMonetizationPromise;
 };
 
+/**
+ * Generate a custom token for the user (or `null` if the user is not connected),
+ * and keep it prepared to be sent to the Games Platform frame.
+ * This avoids doing it at the last moment, and create useless wait on the frame side.
+ */
+const useUserCustomToken = (): {|
+  userCustomToken: ?string,
+|} => {
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+  const userId = profile ? profile.id : null;
+
+  const [customTokenUserId, setCustomTokenUserId] = React.useState(null);
+  const [userCustomToken, setUserCustomToken] = React.useState(null);
+  const [lastTokenGenerationTime, setLastTokenGenerationTime] = React.useState(
+    0
+  );
+
+  // Regenerate a token every 30 minutes (expiration is usually 60 minutes, but be safe)
+  // or if the user changed.
+  const hasUserChanged = customTokenUserId !== userId;
+  const shouldRegenerateToken =
+    Date.now() - lastTokenGenerationTime > 1000 * 60 * 30 || hasUserChanged;
+
+  const clearStoredToken = React.useCallback(() => {
+    setUserCustomToken(null);
+    setLastTokenGenerationTime(0);
+    setCustomTokenUserId(null);
+  }, []);
+
+  React.useEffect(
+    () => {
+      if (hasUserChanged) {
+        clearStoredToken();
+        console.info('User has changed, cleared stored user custom token.');
+      }
+    },
+    [hasUserChanged, clearStoredToken]
+  );
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!shouldRegenerateToken) return;
+        if (!userId) {
+          clearStoredToken();
+          return;
+        }
+
+        try {
+          console.info(
+            `Generating a custom token for user ${userId}, for usage in the Games Platform frame...`
+          );
+          const userCustomToken = await retryIfFailed({ times: 2 }, () =>
+            generateCustomAuthToken(getAuthorizationHeader, userId)
+          );
+          setUserCustomToken(userCustomToken);
+          setLastTokenGenerationTime(Date.now());
+          setCustomTokenUserId(userId);
+        } catch (error) {
+          console.error(
+            'Error while generating custom token. User will not be logged in the Games Platform frame.',
+            error
+          );
+        }
+      })();
+    },
+    [shouldRegenerateToken, userId, getAuthorizationHeader, clearStoredToken]
+  );
+
+  return { userCustomToken };
+};
+
 type GamesPlatformFrameStateProviderProps = {|
   children: React.Node,
 |};
@@ -102,7 +177,6 @@ const GamesPlatformFrameStateProvider = ({
     onOpenCreateAccountDialog,
     onOpenProfileDialog,
     profile,
-    getAuthorizationHeader,
   } = React.useContext(AuthenticatedUserContext);
   const [
     newProjectActions,
@@ -310,59 +384,45 @@ const GamesPlatformFrameStateProvider = ({
     [handleIframeMessage]
   );
 
-  const sendTokenToIframeIfConnected = React.useCallback(
+  const { userCustomToken } = useUserCustomToken();
+
+  const sendUserCustomTokenToFrame = React.useCallback(
     async () => {
-      if (iframeLoaded && userId) {
-        // The iframe is loaded and the user is authenticated, so we can
-        // send that information to the iframe to automatically log the user in.
-        // $FlowFixMe - we know it's an iframe.
-        const iframe: ?HTMLIFrameElement = document.getElementById(
-          GAMES_PLATFORM_IFRAME_ID
-        );
-        if (iframe && iframe.contentWindow) {
-          try {
-            const userCustomToken = await generateCustomAuthToken(
-              getAuthorizationHeader,
-              userId
-            );
-            iframe.contentWindow.postMessage(
-              {
-                id: 'connectUserWithCustomToken',
-                token: userCustomToken,
-              },
-              // Specify the target origin to avoid leaking the customToken.
-              // Replace with '*' to test locally.
-              'https://gd.games'
-              // '*'
-            );
-          } catch (error) {
-            console.error(
-              'Error while generating custom token. User will not be logged in in the frame.',
-              error
-            );
-            return;
-          }
-        }
+      if (!iframeLoaded) {
+        return;
       }
-    },
-    [iframeLoaded, userId, getAuthorizationHeader]
-  );
 
-  React.useEffect(
-    () => {
-      sendTokenToIframeIfConnected();
-    },
-    [sendTokenToIframeIfConnected]
-  );
+      // The iframe is loaded:
+      // we can now sent the information that the user is connected,
+      // to automatically log the user in the frame,
+      // or notify it the user is not connected (or just disconnected).
 
-  const notifyIframeUserDisconnected = React.useCallback(
-    () => {
-      if (iframeLoaded && !userId) {
-        // $FlowFixMe - we know it's an iframe.
-        const iframe: ?HTMLIFrameElement = document.getElementById(
-          GAMES_PLATFORM_IFRAME_ID
-        );
-        if (iframe && iframe.contentWindow) {
+      // $FlowFixMe - we know it's an iframe.
+      const iframe: ?HTMLIFrameElement = document.getElementById(
+        GAMES_PLATFORM_IFRAME_ID
+      );
+      if (!iframe || !iframe.contentWindow) {
+        console.error('Iframe not found or not accessible.');
+        return;
+      }
+
+      try {
+        if (userCustomToken) {
+          console.log('Sending user custom token to Games Platform frame...');
+          iframe.contentWindow.postMessage(
+            {
+              id: 'connectUserWithCustomToken',
+              token: userCustomToken,
+            },
+            // Specify the target origin to avoid leaking the customToken.
+            // Replace with '*' to test locally.
+            'https://gd.games'
+            // '*'
+          );
+        } else {
+          console.log(
+            'Notifying the Games Platform frame that the user is not connected (or just disconnected).'
+          );
           iframe.contentWindow.postMessage(
             {
               id: 'disconnectUser',
@@ -371,16 +431,22 @@ const GamesPlatformFrameStateProvider = ({
             '*'
           );
         }
+      } catch (error) {
+        console.error(
+          'Error while sending user custom token. User will not be logged in the Games Platform frame.',
+          error
+        );
+        return;
       }
     },
-    [iframeLoaded, userId]
+    [iframeLoaded, userCustomToken]
   );
 
   React.useEffect(
     () => {
-      notifyIframeUserDisconnected();
+      sendUserCustomTokenToFrame();
     },
-    [notifyIframeUserDisconnected]
+    [sendUserCustomTokenToFrame]
   );
 
   const configureNewProjectActions = React.useCallback(

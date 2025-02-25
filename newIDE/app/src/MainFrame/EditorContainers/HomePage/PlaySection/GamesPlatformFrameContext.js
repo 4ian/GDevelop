@@ -49,7 +49,7 @@ let gdevelopGamesMonetizationPromise: Promise<void> | null = null;
 
 const ensureGDevelopGamesMonetizationReady = async () => {
   if (!!electron || isNativeMobileApp()) {
-    // Not supported on desktop.
+    // Not supported on desktop or mobile.
     return;
   }
   if (gdevelopGamesMonetization) {
@@ -409,7 +409,7 @@ const GamesPlatformFrameStateProvider = ({
 
       try {
         if (userCustomToken) {
-          console.log('Sending user custom token to Games Platform frame...');
+          console.info('Sending user custom token to Games Platform frame...');
           iframe.contentWindow.postMessage(
             {
               id: 'connectUserWithCustomToken',
@@ -420,7 +420,7 @@ const GamesPlatformFrameStateProvider = ({
             Window.isDev() ? '*' : 'https://gd.games'
           );
         } else {
-          console.log(
+          console.info(
             'Notifying the Games Platform frame that the user is not connected (or just disconnected).'
           );
           iframe.contentWindow.postMessage(

@@ -353,9 +353,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const childObjects = variant.getObjects();
     for (let i = 0; i < childObjects.getObjectsCount(); i++) {
       const childObject = childObjects.getObjectAt(i);
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        childObject.getName()
-      );
+      const childObjectConfiguration = variant
+        .getObjects()
+        .getObject(childObject.getName())
+        .getConfiguration();
       const childType = childObjectConfiguration.getType();
       if (
         childType === 'Sprite' ||

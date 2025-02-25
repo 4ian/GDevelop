@@ -26,6 +26,42 @@ const getVariant = (
     : eventBasedObject.getDefaultVariant();
 };
 
+type PropertyMappingRule = {
+  targetChild: string,
+  targetProperty: string,
+  sourceProperty: string,
+};
+
+const getPropertyMappingRules = (
+  eventBasedObject: gdEventsBasedObject
+): Array<PropertyMappingRule> => {
+  const properties = eventBasedObject.getPropertyDescriptors();
+  if (!properties.has('_PropertyMapping')) {
+    return [];
+  }
+  const extraInfos = properties
+    .get('_PropertyMapping')
+    .getExtraInfo()
+    .toJSArray();
+  return extraInfos
+    .map(extraInfo => {
+      const mapping = extraInfo.split('=');
+      if (mapping.length < 2) {
+        return null;
+      }
+      const targetPath = mapping[0].split('.');
+      if (mapping.length < 2) {
+        return null;
+      }
+      return {
+        targetChild: targetPath[0],
+        targetProperty: targetPath[1],
+        sourceProperty: mapping[1],
+      };
+    })
+    .filter(Boolean);
+};
+
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
@@ -39,6 +75,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   layoutedInstances = new Map<number, LayoutedInstance>();
   renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
+  _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
     project: gdProject,
@@ -46,7 +83,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    propertyOverridings: Map<string, string>
   ) {
     super(
       project,
@@ -54,7 +92,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       associatedObjectConfiguration,
       pixiContainer,
       threeGroup,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      propertyOverridings
     );
 
     // Setup the PIXI object:
@@ -83,6 +122,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (!eventBasedObject) {
       return;
     }
+    this._propertyMappingRules = getPropertyMappingRules(eventBasedObject);
     this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     // Functor used to render an instance
@@ -160,9 +200,32 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       if (variant) {
         const childObjects = variant.getObjects();
         if (childObjects.hasObjectNamed(instance.getObjectName())) {
-          childObjectConfiguration = childObjects
-            .getObject(instance.getObjectName())
-            .getConfiguration();
+          const childObject = childObjects.getObject(instance.getObjectName());
+          childObjectConfiguration = childObject.getConfiguration();
+        }
+      }
+      // Apply property mapping rules on the child instance.
+      const childPropertyOverridings = new Map<string, string>();
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        this._associatedObjectConfiguration
+      );
+      for (const propertyMappingRule of this._propertyMappingRules) {
+        if (propertyMappingRule.targetChild !== instance.getObjectName()) {
+          continue;
+        }
+        const sourceValue = this._propertyOverridings.has(
+          propertyMappingRule.sourceProperty
+        )
+          ? this._propertyOverridings.get(propertyMappingRule.sourceProperty)
+          : customObjectConfiguration
+              .getProperties()
+              .get(propertyMappingRule.sourceProperty)
+              .getValue();
+        if (sourceValue !== undefined) {
+          childPropertyOverridings.set(
+            propertyMappingRule.targetProperty,
+            sourceValue
+          );
         }
       }
       //...so let's create a renderer.
@@ -172,7 +235,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
             instance,
             childObjectConfiguration,
             this._pixiObject,
-            this._threeObject
+            this._threeObject,
+            childPropertyOverridings
           )
         : new RenderedUnknownInstance(
             this._project,

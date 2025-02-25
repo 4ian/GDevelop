@@ -10,6 +10,7 @@ import RouterContext from '../../../RouterContext';
 import { retryIfFailed } from '../../../../Utils/RetryIfFailed';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { isNativeMobileApp } from '../../../../Utils/Platform';
+import Window from '../../../../Utils/Window';
 const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its audio as long as the iframe
@@ -415,9 +416,8 @@ const GamesPlatformFrameStateProvider = ({
               token: userCustomToken,
             },
             // Specify the target origin to avoid leaking the customToken.
-            // Replace with '*' to test locally.
-            'https://gd.games'
-            // '*'
+            // Use '*' to test locally.
+            Window.isDev() ? '*' : 'https://gd.games'
           );
         } else {
           console.log(

@@ -446,7 +446,7 @@ namespace gdjs {
             .getRuntimeScene()
             .getGame()
             .getRenderer()
-            .getPIXIRenderer() instanceof PIXI.Renderer
+            .getPIXIRenderer() instanceof PIXI.AbstractRenderer
         ) {
           // TODO Revert from `round` to `ceil` when the issue is fixed in Pixi.
           // Since the upgrade to Pixi 7, sprites are rounded with `round`
@@ -600,7 +600,7 @@ namespace gdjs {
      * @param zOrder The z order of the associated object.
      */
     addRendererObject(pixiChild, zOrder: float): void {
-      const child = pixiChild as PIXI.DisplayObject;
+      const child = pixiChild as PIXI.Container;
       child.zIndex = zOrder || LayerPixiRenderer.zeroZOrderForPixi;
       this._pixiContainer.addChild(child);
     }
@@ -612,7 +612,7 @@ namespace gdjs {
      * @param newZOrder The z order of the associated object.
      */
     changeRendererObjectZOrder(pixiChild, newZOrder: float): void {
-      const child = pixiChild as PIXI.DisplayObject;
+      const child = pixiChild as PIXI.Container;
       child.zIndex = newZOrder;
     }
 
@@ -657,7 +657,7 @@ namespace gdjs {
      * so it can then be consumed by Three.js to render it in 3D.
      */
     private _createPixiRenderTexture(pixiRenderer: PIXI.Renderer | null): void {
-      if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
+      if (!pixiRenderer) {
         return;
       }
       if (this._renderTexture) {
@@ -686,7 +686,7 @@ namespace gdjs {
      * Render the layer of the PixiJS RenderTexture, so that it can be then displayed
      * with a blend mode (for a lighting layer) or consumed by Three.js (for 2D+3D layers).
      */
-    renderOnPixiRenderTexture(pixiRenderer: PIXI.Renderer) {
+    renderOnPixiRenderTexture(pixiRenderer: PIXI.WebGLRenderer) {
       if (!this._renderTexture) {
         return;
       }
@@ -711,15 +711,12 @@ namespace gdjs {
       this._clearColor[3] = this._isLightingLayer ? 1 : 0;
       pixiRenderer.renderTexture.clear(this._clearColor);
 
-      pixiRenderer.render(this._pixiContainer, {
-        renderTexture: this._renderTexture,
+      pixiRenderer.render({
+        container: this._pixiContainer,
+        target: this._renderTexture,
         clear: false,
       });
-      pixiRenderer.renderTexture.bind(
-        oldRenderTexture,
-        oldSourceFrame,
-        undefined
-      );
+      pixiRenderer.texture.bind(oldRenderTexture, oldSourceFrame);
     }
 
     /**
@@ -728,7 +725,7 @@ namespace gdjs {
      */
     updateThreePlaneTextureFromPixiRenderTexture(
       threeRenderer: THREE.WebGLRenderer,
-      pixiRenderer: PIXI.Renderer
+      pixiRenderer: PIXI.WebGLRenderer
     ): void {
       if (!this._threePlaneTexture || !this._renderTexture) {
         return;
@@ -761,7 +758,7 @@ namespace gdjs {
       }
 
       this._lightingSprite = new PIXI.Sprite(this._renderTexture);
-      this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+      this._lightingSprite.blendMode = 'multiply';
       const parentPixiContainer =
         runtimeInstanceContainerRenderer.getRendererObject();
       if (parentPixiContainer) {

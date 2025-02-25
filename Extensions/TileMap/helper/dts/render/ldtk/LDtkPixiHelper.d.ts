@@ -1,7 +1,6 @@
 import { TileTextureCache } from '../TileTextureCache';
 import { LDtkTileMap } from '../../load/ldtk/LDtkFormat';
-type Texture = PIXI.BaseTexture<PIXI.Resource>;
-type TextureLoader = (textureName: string) => PIXI.BaseTexture<PIXI.Resource>;
+type TextureLoader = (textureName: string) => PIXI.TextureSource;
 export declare namespace LDtkPixiHelper {
   /**
    * Split an atlas image into Pixi textures.
@@ -15,7 +14,7 @@ export declare namespace LDtkPixiHelper {
   function parseAtlas(
     tileMap: LDtkTileMap,
     levelIndex: number,
-    atlasTexture: Texture | null,
+    atlasTexture: PIXI.TextureSource | null,
     getTexture: TextureLoader
   ): TileTextureCache | null;
 }

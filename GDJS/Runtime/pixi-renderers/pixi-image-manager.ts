@@ -68,12 +68,19 @@ namespace gdjs {
      */
     constructor(resourceLoader: gdjs.ResourceLoader) {
       this._resourceLoader = resourceLoader;
-      this._invalidTexture = PIXI.Texture.from(
-        'data:image/png;base64,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',
-        { width: 192, height: 192 }
-      );
+      this._invalidTexture = PIXI.Texture.WHITE;
+      PIXI.Assets.load(
+        'data:image/png;base64,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'
+      ).then((texture) => {
+        this._invalidTexture = texture;
+      });
       this._loadedThreeTextures = new Hashtable();
       this._loadedThreeMaterials = new Hashtable();
+      PIXI.loadTextures.config = {
+        preferWorkers: true,
+        preferCreateImageBitmap: true,
+        crossOrigin: 'anonymous',
+      };
     }
 
     getResourceKinds(): ResourceKind[] {
@@ -99,7 +106,7 @@ namespace gdjs {
       if (!existingTexture) {
         return this._invalidTexture;
       }
-      if (!existingTexture.valid) {
+      if (existingTexture.destroyed) {
         logger.error(
           'Texture for ' +
             resourceName +
@@ -119,7 +126,7 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not valid.
      */
-    getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
+    async getOrLoadPIXITexture(resourceName: string): Promise<PIXI.Texture> {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
         logger.warn(
@@ -130,45 +137,50 @@ namespace gdjs {
 
       const existingTexture = this._loadedTextures.get(resource);
       if (existingTexture) {
-        if (existingTexture.valid) {
-          return existingTexture;
-        } else {
+        if (existingTexture.destroyed) {
           logger.error(
             'Texture for ' +
               resourceName +
               ' is not valid anymore (or never was).'
           );
           return this._invalidTexture;
+        } else {
+          return existingTexture;
         }
       }
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
       const url = this._resourceLoader.getFullUrl(file);
-      const texture = PIXI.Texture.from(url, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: this._resourceLoader.checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
-        logFileLoadingError(file, error);
-      });
-      if (!texture) {
-        throw new Error(
-          'Texture loading by PIXI returned nothing for file ' +
-            file +
-            ' behind url ' +
-            url
-        );
-      }
-      applyTextureSettings(texture, resource);
+      PIXI.loadTextures.config = {
+        preferWorkers: true,
+        preferCreateImageBitmap: true,
+        // Note that using `false`
+        // to not having `crossorigin` at all would NOT work because the browser would taint the
+        // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+        crossOrigin: this._resourceLoader.checkIfCredentialsRequired(file)
+          ? 'use-credentials'
+          : 'anonymous',
+      };
+      try {
+        const texture = await PIXI.Assets.load(url);
+        if (!texture) {
+          logger.error(
+            'Texture loading by PIXI returned nothing for file ' +
+              file +
+              ' behind url ' +
+              url
+          );
+          return this._invalidTexture;
+        }
+        applyTextureSettings(texture, resource);
 
-      this._loadedTextures.set(resource, texture);
-      return texture;
+        this._loadedTextures.set(resource, texture);
+        return texture;
+      } catch (error) {
+        logFileLoadingError(file, error);
+        return this._invalidTexture;
+      }
     }
 
     /**
@@ -328,34 +340,21 @@ namespace gdjs {
           // Pixi.Texture.from() does not return a promise, so we need to ensure we look at the 'loaded' event of the baseTexture,
           // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
           // it will fail.
-          await new Promise<void>((resolve, reject) => {
-            const texture = PIXI.Texture.from(
-              this._resourceLoader.getFullUrl(resource.file),
-              {
-                resourceOptions: {
-                  crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                    resource.file
-                  )
-                    ? 'use-credentials'
-                    : 'anonymous',
-                  autoPlay: false,
-                },
-              }
-            ).on('error', (error) => {
-              reject(error);
-            });
-
-            const baseTexture = texture.baseTexture;
-            baseTexture
-              .on('loaded', () => {
-                this._loadedTextures.set(resource, texture);
-                applyTextureSettings(texture, resource);
-                resolve();
-              })
-              .on('error', (error) => {
-                reject(error);
-              });
-          });
+          PIXI.loadTextures.config = {
+            preferWorkers: true,
+            preferCreateImageBitmap: true,
+            crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
+              resource.file
+            )
+              ? 'use-credentials'
+              : 'anonymous',
+          };
+          // TODO PIXI8 autoPlay: false
+          const texture = await PIXI.Assets.load(
+            this._resourceLoader.getFullUrl(resource.file)
+          );
+          this._loadedTextures.set(resource, texture);
+          applyTextureSettings(texture, resource);
         } else {
           // If the file has no extension, PIXI.assets.load cannot find
           // an adequate load parser and does not load the file although
@@ -363,18 +362,17 @@ namespace gdjs {
           // TODO: When PIXI v8+ is used, PIXI.Assets.load can be used because
           // loadParser can be forced in PIXI.Assets.load
           // (see https://github.com/pixijs/pixijs/blob/71ed56c569ebc6b53da19e3c49258a0a84892101/packages/assets/src/loader/Loader.ts#L68)
-          const loadedTexture = PIXI.Texture.from(
-            this._resourceLoader.getFullUrl(resource.file),
-            {
-              resourceOptions: {
-                autoLoad: false,
-                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                )
-                  ? 'use-credentials'
-                  : 'anonymous',
-              },
-            }
+          PIXI.loadTextures.config = {
+            preferWorkers: true,
+            preferCreateImageBitmap: true,
+            crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
+              resource.file
+            )
+              ? 'use-credentials'
+              : 'anonymous',
+          };
+          const loadedTexture = await PIXI.Assets.load(
+            this._resourceLoader.getFullUrl(resource.file)
           );
           await loadedTexture.baseTexture.resource.load();
 

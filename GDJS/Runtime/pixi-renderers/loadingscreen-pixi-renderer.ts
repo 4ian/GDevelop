@@ -18,7 +18,7 @@ namespace gdjs {
       object.alpha = 1;
     }
   };
-  const hasFadedIn = (object: PIXI.DisplayObject | null) => {
+  const hasFadedIn = (object: PIXI.Container | null) => {
     return !object || object.alpha >= 1;
   };
 
@@ -58,16 +58,19 @@ namespace gdjs {
         return;
       }
 
-      const backgroundTexture = imageManager.getOrLoadPIXITexture(
-        loadingScreenData.backgroundImageResourceName
-      );
-      if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {
-        this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
-        this._backgroundSprite.alpha = 0;
-        this._backgroundSprite.anchor.x = 0.5;
-        this._backgroundSprite.anchor.y = 0.5;
-        this._loadingScreenContainer.addChild(this._backgroundSprite);
-      }
+      const backgroundSprite = PIXI.Sprite.from(PIXI.Texture.EMPTY);
+      backgroundSprite.alpha = 0;
+      backgroundSprite.anchor.x = 0.5;
+      backgroundSprite.anchor.y = 0.5;
+      this._loadingScreenContainer.addChild(backgroundSprite);
+      this._backgroundSprite = backgroundSprite;
+      imageManager
+        .getOrLoadPIXITexture(loadingScreenData.backgroundImageResourceName)
+        .then((texture) => {
+          if (texture !== imageManager.getInvalidPIXITexture()) {
+            backgroundSprite.texture = texture;
+          }
+        });
 
       if (loadingScreenData.showGDevelopSplash && isFirstScene) {
         this._gdevelopLogoSprite = PIXI.Sprite.from(gdjs.gdevelopLogo);
@@ -98,7 +101,7 @@ namespace gdjs {
     private _updatePositions() {
       if (!this._pixiRenderer) return;
 
-      if (this._backgroundSprite && this._backgroundSprite.texture.valid) {
+      if (this._backgroundSprite && !this._backgroundSprite.texture.destroyed) {
         this._backgroundSprite.position.x = this._pixiRenderer.width / 2;
         this._backgroundSprite.position.y = this._pixiRenderer.height / 2;
         const scale = Math.max(
@@ -171,7 +174,10 @@ namespace gdjs {
       if (this._state == LoadingScreenState.NOT_STARTED) {
         this._pixiRenderer.background.color =
           this._loadingScreenData.backgroundColor;
-        if (!this._backgroundSprite || this._backgroundSprite.texture.valid) {
+        if (
+          !this._backgroundSprite ||
+          !this._backgroundSprite.texture.destroyed
+        ) {
           this._startLoadingScreen();
         }
         return true;
@@ -242,23 +248,17 @@ namespace gdjs {
         // Display bar with an additional 1% to ensure it's filled at the end.
         const progress = Math.min(1, (this._progressPercent + 1) / 100);
         this._progressBarGraphics.clear();
-        this._progressBarGraphics.lineStyle(lineWidth, color, 1, 0);
-        this._progressBarGraphics.drawRect(
-          progressBarX,
-          progressBarY,
-          progressBarWidth,
-          progressBarHeight
-        );
-
-        this._progressBarGraphics.beginFill(color, 1);
-        this._progressBarGraphics.lineStyle(0, color, 1);
-        this._progressBarGraphics.drawRect(
-          progressBarX + lineWidth,
-          progressBarY + lineWidth,
-          progressBarWidth * progress - lineWidth * 2,
-          progressBarHeight - lineWidth * 2
-        );
-        this._progressBarGraphics.endFill();
+        this._progressBarGraphics
+          .rect(progressBarX, progressBarY, progressBarWidth, progressBarHeight)
+          .stroke({ width: lineWidth, color });
+        this._progressBarGraphics
+          .rect(
+            progressBarX + lineWidth,
+            progressBarY + lineWidth,
+            progressBarWidth * progress - lineWidth * 2,
+            progressBarHeight - lineWidth * 2
+          )
+          .fill(color);
       }
 
       this._pixiRenderer.render(this._loadingScreenContainer);

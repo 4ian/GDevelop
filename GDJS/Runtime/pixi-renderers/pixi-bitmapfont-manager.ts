@@ -25,12 +25,8 @@ namespace gdjs {
     bitmapFont: PIXI.BitmapFont,
     bitmapFontInstallKey: string
   ) => {
-    const defaultName = bitmapFont.font;
     // @ts-ignore - we "hack" into Pixi to change the font name
-    bitmapFont.font = bitmapFontInstallKey;
-    PIXI.BitmapFont.available[bitmapFontInstallKey] = bitmapFont;
-    delete PIXI.BitmapFont.available[defaultName];
-    return PIXI.BitmapFont.available[bitmapFontInstallKey];
+    bitmapFont.fontFamily = bitmapFontInstallKey;
   };
 
   const resourceKinds: Array<ResourceKind> = ['bitmapFont'];
@@ -53,7 +49,7 @@ namespace gdjs {
     private _pixiBitmapFontsToUninstall: string[] = [];
 
     /** Loaded fonts data, indexed by resource name. */
-    private _loadedFontsData = new gdjs.ResourceCache<any>();
+    private _loadedFontsData = new gdjs.ResourceCache<PIXI.BitmapFont>();
 
     private _defaultSlugFontName: string | null = null;
 
@@ -78,35 +74,28 @@ namespace gdjs {
     /**
      * Get the instance of the default `Pixi.BitmapFont`, always available.
      */
-    getDefaultBitmapFont() {
+    getDefaultBitmapFont(): string {
       if (this._defaultSlugFontName !== null) {
-        return PIXI.BitmapFont.available[this._defaultSlugFontName];
+        return defaultBitmapFontKey;
       }
 
-      // Default bitmap font style
-      const fontFamily = 'Arial';
-      const bitmapFontStyle = new PIXI.TextStyle({
-        fontFamily: fontFamily,
-        fontSize: 20,
-        padding: 5,
-        align: 'left',
-        fill: '#ffffff',
-        wordWrap: true,
-        lineHeight: 20,
+      // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
+      PIXI.BitmapFont.install({
+        name: defaultBitmapFontKey,
+        style: {
+          fontFamily: 'Arial',
+          fontSize: 20,
+          padding: 5,
+          align: 'left',
+          fill: '#ffffff',
+          wordWrap: true,
+          lineHeight: 20,
+        },
       });
 
-      // Generate default bitmapFont, and replace the name of PIXI.BitmapFont by a unique name
-      const defaultBitmapFont = patchInstalledBitmapFont(
-        PIXI.BitmapFont.from(fontFamily, bitmapFontStyle, {
-          // All the printable ASCII characters
-          chars: [[' ', '~']],
-        }),
-        defaultBitmapFontKey
-      );
-
       // Define the default name used for the default bitmap font.
-      this._defaultSlugFontName = defaultBitmapFont.font;
-      return defaultBitmapFont;
+      this._defaultSlugFontName = defaultBitmapFontKey;
+      return defaultBitmapFontKey;
     }
 
     /**
@@ -195,29 +184,18 @@ namespace gdjs {
     obtainBitmapFont(
       bitmapFontResourceName: string,
       textureAtlasResourceName: string
-    ): PIXI.BitmapFont {
-      const bitmapFontInstallKey =
-        bitmapFontResourceName + '@' + textureAtlasResourceName;
-
-      if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
-        this._markBitmapFontAsUsed(bitmapFontInstallKey);
-        return PIXI.BitmapFont.available[bitmapFontInstallKey];
-      }
-
-      // The Bitmap Font is not loaded, load it in memory.
-
+    ): PIXI.BitmapFont | null {
       // First get the font data:
-      const fontData = this._loadedFontsData.getFromName(
+      const bitmapFont = this._loadedFontsData.getFromName(
         bitmapFontResourceName
       );
-      if (!fontData) {
+      if (!bitmapFont) {
         logger.warn(
           'Could not find Bitmap Font for resource named "' +
             bitmapFontResourceName +
             '". The default font will be used.'
         );
-        return this.getDefaultBitmapFont();
+        return null;
       }
 
       // Get the texture to be used in the font:
@@ -227,11 +205,9 @@ namespace gdjs {
 
       try {
         // Create and install the Pixi.BitmapFont in memory:
-        const bitmapFont = patchInstalledBitmapFont(
-          PIXI.BitmapFont.install(fontData, texture),
-          bitmapFontInstallKey
-        );
-        this._markBitmapFontAsUsed(bitmapFontInstallKey);
+        // TODO PIXI8 Handle fonts used with different atlas.
+        bitmapFont.pages[0].texture = texture;
+        this._markBitmapFontAsUsed(bitmapFontResourceName);
         return bitmapFont;
       } catch (error) {
         logger.error(
@@ -240,7 +216,7 @@ namespace gdjs {
             '". The default font will be used. Error is: ' +
             error
         );
-        return this.getDefaultBitmapFont();
+        return null;
       }
     }
 
@@ -265,21 +241,20 @@ namespace gdjs {
       }
 
       try {
-        const response = await fetch(
-          this._resourceLoader.getFullUrl(resource.file),
-          {
-            credentials: this._resourceLoader.checkIfCredentialsRequired(
-              resource.file
-            )
-              ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-                // i.e: its gdevelop.io cookie, to be passed.
-                'include'
-              : // For other resources, use "same-origin" as done by default by fetch.
-                'same-origin',
-          }
+        PIXI.loadTextures.config = {
+          preferWorkers: true,
+          preferCreateImageBitmap: true,
+          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
+            resource.file
+          )
+            ? 'use-credentials'
+            : 'anonymous',
+        };
+        const bitmapFont = await PIXI.Assets.load<PIXI.BitmapFont>(
+          this._resourceLoader.getFullUrl(resource.file)
         );
-        const fontData = await response.text();
-        this._loadedFontsData.set(resource, fontData);
+        patchInstalledBitmapFont(bitmapFont, resource.name);
+        this._loadedFontsData.set(resource, bitmapFont);
       } catch (error) {
         logger.error(
           "Can't fetch the bitmap font file " +

@@ -58,7 +58,7 @@ namespace gdjs {
     }
 
     /**
-     * Update the filters applied on a PixiJS DisplayObject.
+     * Update the filters applied on a PixiJS Container.
      * This must be called after the events and before the rendering.
      *
      * This allows effects to be sure that they are up to date and ready
@@ -73,7 +73,7 @@ namespace gdjs {
     }
 
     /**
-     * Add a new effect on a PixiJS DisplayObject, or replace the one
+     * Add a new effect on a PixiJS Container, or replace the one
      * with the same name.
      * @param effectData The effect data
      * @param rendererEffects The renderer effects
@@ -100,7 +100,7 @@ namespace gdjs {
     }
 
     /**
-     * Remove the effect with the specified name from a PixiJS DisplayObject.
+     * Remove the effect with the specified name from a PixiJS Container.
      * @param rendererEffects The collection of PixiJS filters.
      * @param rendererObject The renderer object.
      * @param effectName The name of the effect.
@@ -120,10 +120,10 @@ namespace gdjs {
     }
 
     /**
-     * Remove all effects from a PixiJS DisplayObject.
+     * Remove all effects from a PixiJS Container.
      * @param rendererObject The renderer object.
      */
-    clearEffects(rendererObject: PIXI.DisplayObject): boolean {
+    clearEffects(rendererObject: PIXI.Container): boolean {
       if (rendererObject) {
         rendererObject.filters = [];
       }

@@ -116,9 +116,7 @@ namespace gdjs {
             return this.getInstanceContainer()
               .getGame()
               .getImageManager()
-              .getPIXITexture(
-                textureName
-              ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
+              .getPIXITexture(textureName) as unknown as PIXI.TextureSource;
           },
           this._atlasImage,
           this._tileSize,
@@ -287,9 +285,7 @@ namespace gdjs {
               return this.getInstanceContainer()
                 .getGame()
                 .getImageManager()
-                .getPIXITexture(
-                  textureName
-                ) as unknown as PIXI.BaseTexture<PIXI.Resource>;
+                .getPIXITexture(textureName) as unknown as PIXI.TextureSource;
             },
             this._atlasImage,
             this._tileSize,

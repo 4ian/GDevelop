@@ -5,15 +5,29 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { GamesPlatformFrameContext } from './GamesPlatformFrameContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import PlaceholderError from '../../../../UI/PlaceholderError';
 
 const PlaySection = () => {
-  const { iframeLoaded } = React.useContext(GamesPlatformFrameContext);
+  const {
+    iframeLoaded,
+    iframeErrored,
+    loadIframeOrRemoveTimeout,
+  } = React.useContext(GamesPlatformFrameContext);
 
   // Iframe will be displayed here if loaded.
   return iframeLoaded ? null : (
     <SectionContainer flexBody>
       <SectionRow expand>
-        <PlaceholderLoader />
+        {iframeErrored ? (
+          <PlaceholderError onRetry={loadIframeOrRemoveTimeout}>
+            <Trans>
+              Error while loading the Play section. Verify your internet
+              connection or try again later.
+            </Trans>
+          </PlaceholderError>
+        ) : (
+          <PlaceholderLoader />
+        )}
       </SectionRow>
     </SectionContainer>
   );

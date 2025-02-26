@@ -93,6 +93,41 @@ module.exports = {
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.setTestMode');
 
+    extension
+      .addAction(
+        'PreventAdmobAutoInitialization',
+        _('Prevent Admob auto initialization'),
+        _(
+          'Prevent Admob from initializing automatically. You will need to call InitAdmob manually.\n' +
+            'This is useful if you want to control when the consent dialog will be shown (for example, after the user has accepted your game terms).'
+        ),
+        _('Prevent Admob auto initialization'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.preventAdmobAutoInitialization');
+
+    extension
+      .addAction(
+        'InitializeAdmob',
+        _('Initialize Admob'),
+        _('Manually initialize Admob.'),
+        _(
+          'Initialize Admob manually. This will trigger the consent dialog if needed, and then load the ads.\n' +
+            'Use this action if you have disabled the auto init and want to control when the consent dialog will be shown.'
+        ),
+        _('Initialize Admob'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.initializeAdmob');
+
     // App Open
     extension
       .addCondition(

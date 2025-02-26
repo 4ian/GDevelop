@@ -111,54 +111,84 @@ namespace gdjs {
 
     let npaValue = '0'; // 0 means that the user has consented to personalized ads, 1 means that the user has not consented to personalized ads.
 
-    // Admob initialization listener
-    document.addEventListener(
-      'deviceready',
-      async () => {
-        logger.info('Starting AdMob.');
-        isStarting = true;
+    let setupTimeoutId: NodeJS.Timeout | null = null;
 
-        if (cordova.platformId === 'ios') {
-          /*
+    const askForConsentAndInitializeAdmob = async () => {
+      if (admobStarted) {
+        logger.warn('AdMob is already started.');
+        return;
+      }
+
+      if (isStarting) {
+        logger.warn('AdMob is already starting.');
+        return;
+      }
+
+      logger.info('Starting AdMob.');
+      isStarting = true;
+
+      if (cordova.platformId === 'ios') {
+        /*
             trackingStatus:
             0 = notDetermined
             1 = restricted
             2 = denied
             3 = authorized
           */
-          let trackingStatus = await consent.trackingAuthorizationStatus();
+        let trackingStatus = await consent.trackingAuthorizationStatus();
 
-          // If tracking is not determined, we ask the user for tracking authorization.
-          if (trackingStatus === 0) {
-            trackingStatus = await consent.requestTrackingAuthorization();
-          }
-
-          // If tracking is restricted or denied, we set npaValue to 1.
-          if (trackingStatus === 1 || trackingStatus === 2) {
-            npaValue = '1';
-          }
-
-          // otherwise, we set npaValue to 0.
-          npaValue = '0';
+        // If tracking is not determined, we ask the user for tracking authorization.
+        if (trackingStatus === 0) {
+          trackingStatus = await consent.requestTrackingAuthorization();
         }
 
-        const consentStatus = await consent.getConsentStatus();
-        if (consentStatus === consent.ConsentStatus.Required) {
-          await consent.requestInfoUpdate();
+        // If tracking is restricted or denied, we set npaValue to 1.
+        if (trackingStatus === 1 || trackingStatus === 2) {
+          npaValue = '1';
         }
 
-        await consent.loadAndShowIfRequired();
+        // otherwise, we set npaValue to 0.
+        npaValue = '0';
+      }
 
-        if (await consent.canRequestAds()) {
-          await admob.start();
+      const consentStatus = await consent.getConsentStatus();
+      if (consentStatus === consent.ConsentStatus.Required) {
+        await consent.requestInfoUpdate();
+      }
 
-          logger.info('AdMob successfully started.');
-          isStarting = false;
-          admobStarted = true;
-        }
+      await consent.loadAndShowIfRequired();
+
+      if (await consent.canRequestAds()) {
+        await admob.start();
+
+        logger.info('AdMob successfully started.');
+        isStarting = false;
+        admobStarted = true;
+      }
+    };
+
+    // Admob initialization listener
+    document.addEventListener(
+      'deviceready',
+      async () => {
+        setupTimeoutId = setTimeout(async () => {
+          await askForConsentAndInitializeAdmob();
+          // Wait a bit before starting admob, to avoid the consent appearing too soon.
+        }, 2000);
       },
       false
     );
+
+    export const preventAdmobAutoInitialization = () => {
+      if (setupTimeoutId) {
+        clearTimeout(setupTimeoutId);
+        setupTimeoutId = null;
+      }
+    };
+
+    export const initializeAdmob = async () => {
+      await askForConsentAndInitializeAdmob();
+    };
 
     /**
      * Helper to know if we are on mobile and admob is correctly initialized.

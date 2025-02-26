@@ -585,7 +585,8 @@ const MainFrame = (props: Props) => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
+          ? name.split('::')[2] ||
+            name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'

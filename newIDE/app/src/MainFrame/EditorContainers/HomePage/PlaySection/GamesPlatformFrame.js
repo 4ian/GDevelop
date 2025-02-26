@@ -8,6 +8,7 @@ import {
   homepageMobileMenuHeight,
 } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
+import { isNativeMobileApp } from '../../../../Utils/Platform';
 
 export const GAMES_PLATFORM_IFRAME_ID = 'games-platform-frame';
 
@@ -71,7 +72,9 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
   const titleBarAndToolbarHeight = isMobile ? 0 : 37 + 40;
   const containerTop = isMobile
     ? 0 // Always top of the screen on small screens.
-    : `calc(${titleBarAndToolbarHeight}px + var(--safe-area-inset-top))`;
+    : `calc(${titleBarAndToolbarHeight}px + ${
+        isNativeMobileApp() ? 'var(--safe-area-inset-top)' : '0px'
+      })`;
   const containerBottom = isMobile ? homepageMobileMenuHeight : 0;
   const containerLeft = isMobile
     ? 0
@@ -80,7 +83,9 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
     : homepageDesktopMenuBarWidth;
   const containerWidth = `calc(100% - ${containerLeft}px`;
   const containerHeight = `calc(100% - ${titleBarAndToolbarHeight +
-    containerBottom}px - ${isMobile ? '0px' : 'var(--safe-area-inset-top)'})`;
+    containerBottom}px - ${
+    isMobile || !isNativeMobileApp() ? '0px' : 'var(--safe-area-inset-top)'
+  })`;
 
   // We wrap the iframe in a paper, as its content has a transparent background,
   // and we don't want what's behind the iframe to be visible.

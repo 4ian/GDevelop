@@ -36,10 +36,10 @@ export const styles = {
   },
   drawerTopButtonsContainer: {
     flex: 1,
-    marginTop: 'env(safe-area-inset-top)',
+    marginTop: 'var(--safe-area-inset-top)',
   },
   drawerBottomButtonsContainer: {
-    marginBottom: 'env(safe-area-inset-bottom)',
+    marginBottom: 'var(--safe-area-inset-bottom)',
   },
 };
 

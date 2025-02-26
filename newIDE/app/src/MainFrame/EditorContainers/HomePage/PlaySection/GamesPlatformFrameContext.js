@@ -462,8 +462,8 @@ const GamesPlatformFrameStateProvider = ({
     () => {
       (async () => {
         if (!iframeVisible) return;
-        await delay(6000);
-        // Consider the loading of the iframe as a failure if not completed after 6s.
+        await delay(12000);
+        // Consider the loading of the iframe as a failure if not completed after 12s.
         if (iframeLoadedRef.current) return;
         setIframeErrored(true);
         setIframeVisible(false);

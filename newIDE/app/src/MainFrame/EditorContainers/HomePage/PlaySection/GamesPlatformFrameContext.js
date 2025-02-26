@@ -11,6 +11,7 @@ import { retryIfFailed } from '../../../../Utils/RetryIfFailed';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { isNativeMobileApp } from '../../../../Utils/Platform';
 import Window from '../../../../Utils/Window';
+import { delay } from '../../../../Utils/Delay';
 const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its audio as long as the iframe
@@ -28,6 +29,7 @@ type GamesPlatformFrameState = {|
   loadIframeOrRemoveTimeout: () => void,
   iframeLoaded: boolean,
   iframeVisible: boolean,
+  iframeErrored: boolean,
   configureNewProjectActions: (actions: NewProjectActions) => void,
 |};
 
@@ -37,6 +39,7 @@ export const GamesPlatformFrameContext = React.createContext<GamesPlatformFrameS
     loadIframeOrRemoveTimeout: () => {},
     iframeLoaded: false,
     iframeVisible: false,
+    iframeErrored: false,
     configureNewProjectActions: () => {},
   }
 );
@@ -170,6 +173,8 @@ const GamesPlatformFrameStateProvider = ({
   const [loadIframeInDOM, setLoadIframeInDOM] = React.useState(false);
   const [iframeVisible, setIframeVisible] = React.useState(false);
   const [iframeLoaded, setIframeLoaded] = React.useState(false);
+  const iframeLoadedRef = React.useRef(false);
+  const [iframeErrored, setIframeErrored] = React.useState(false);
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
@@ -255,6 +260,7 @@ const GamesPlatformFrameStateProvider = ({
     // so we assume it's visible right away.
     setLoadIframeInDOM(true);
     setIframeVisible(true);
+    setIframeErrored(false);
   }, []);
 
   const notifyIframeToChangeGame = React.useCallback(
@@ -448,6 +454,29 @@ const GamesPlatformFrameStateProvider = ({
     [sendUserCustomTokenToFrame]
   );
 
+  // Keep the ref updated with the latest value of iframeLoaded.
+  // This is helpful to use it inside effects, which can't access the latest state value.
+  React.useEffect(
+    () => {
+      iframeLoadedRef.current = iframeLoaded;
+    },
+    [iframeLoaded]
+  );
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!iframeVisible) return;
+        await delay(6000);
+        // Consider the loading of the iframe as a failure if not completed after 6s.
+        if (iframeLoadedRef.current) return;
+        setIframeErrored(true);
+        setIframeVisible(false);
+      })();
+    },
+    [iframeVisible]
+  );
+
   const configureNewProjectActions = React.useCallback(
     (actions: NewProjectActions) => {
       setNewProjectActions(actions);
@@ -461,6 +490,7 @@ const GamesPlatformFrameStateProvider = ({
       loadIframeOrRemoveTimeout,
       iframeLoaded,
       iframeVisible,
+      iframeErrored,
       configureNewProjectActions,
     }),
     [
@@ -468,6 +498,7 @@ const GamesPlatformFrameStateProvider = ({
       loadIframeOrRemoveTimeout,
       iframeLoaded,
       iframeVisible,
+      iframeErrored,
       configureNewProjectActions,
     ]
   );

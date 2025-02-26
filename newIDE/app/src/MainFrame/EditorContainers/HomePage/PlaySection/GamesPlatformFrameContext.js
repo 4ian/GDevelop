@@ -12,6 +12,7 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import { isNativeMobileApp } from '../../../../Utils/Platform';
 import Window from '../../../../Utils/Window';
 import { delay } from '../../../../Utils/Delay';
+import { useStableUpToDateRef } from '../../../../Utils/UseStableUpToDateCallback';
 const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its audio as long as the iframe
@@ -173,7 +174,6 @@ const GamesPlatformFrameStateProvider = ({
   const [loadIframeInDOM, setLoadIframeInDOM] = React.useState(false);
   const [iframeVisible, setIframeVisible] = React.useState(false);
   const [iframeLoaded, setIframeLoaded] = React.useState(false);
-  const iframeLoadedRef = React.useRef(false);
   const [iframeErrored, setIframeErrored] = React.useState(false);
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
@@ -454,14 +454,9 @@ const GamesPlatformFrameStateProvider = ({
     [sendUserCustomTokenToFrame]
   );
 
-  // Keep the ref updated with the latest value of iframeLoaded.
-  // This is helpful to use it inside effects, which can't access the latest state value.
-  React.useEffect(
-    () => {
-      iframeLoadedRef.current = iframeLoaded;
-    },
-    [iframeLoaded]
-  );
+  // We store an up-to-date reference to the iframeLoaded state, so that we can
+  // be sure we read the correct value in the effect below.
+  const iframeLoadedRef = useStableUpToDateRef(iframeLoaded);
 
   React.useEffect(
     () => {
@@ -474,7 +469,7 @@ const GamesPlatformFrameStateProvider = ({
         setIframeVisible(false);
       })();
     },
-    [iframeVisible]
+    [iframeVisible, iframeLoadedRef]
   );
 
   const configureNewProjectActions = React.useCallback(

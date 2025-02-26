@@ -38,7 +38,7 @@ module.exports = {
       .setName('Consent Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('cordova-plugin-consent')
-      .setVersion('3.0.0-alpha.8')
+      .setVersion('3.0.0-alpha.9')
       .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
 
     extension

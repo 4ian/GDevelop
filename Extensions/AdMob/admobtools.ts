@@ -1,6 +1,7 @@
 namespace gdjs {
   declare var admob: any;
   declare var cordova: any;
+  declare var consent: any;
 
   export namespace adMob {
     const logger = new gdjs.Logger('AdMob');
@@ -108,22 +109,53 @@ namespace gdjs {
     let rewardedVideoRewardReceived = false; // Becomes true when the video is closed and the reward is received.
     let rewardedVideoErrored = false; // Becomes true when the video fails to load.
 
-    let npaValue = '0'; // TODO: expose an API to change this and also an automatic way using the consent SDK.
+    let npaValue = '0'; // 0 means that the user has consented to personalized ads, 1 means that the user has not consented to personalized ads.
 
     // Admob initialization listener
     document.addEventListener(
       'deviceready',
       async () => {
-        // Obtain user consent ?
-
         logger.info('Starting AdMob.');
         isStarting = true;
 
-        await admob.start();
+        if (cordova.platformId === 'ios') {
+          /*
+            trackingStatus:
+            0 = notDetermined
+            1 = restricted
+            2 = denied
+            3 = authorized
+          */
+          let trackingStatus = await consent.trackingAuthorizationStatus();
 
-        logger.info('AdMob successfully started.');
-        isStarting = false;
-        admobStarted = true;
+          // If tracking is not determined, we ask the user for tracking authorization.
+          if (trackingStatus === 0) {
+            trackingStatus = await consent.requestTrackingAuthorization();
+          }
+
+          // If tracking is restricted or denied, we set npaValue to 1.
+          if (trackingStatus === 1 || trackingStatus === 2) {
+            npaValue = '1';
+          }
+
+          // otherwise, we set npaValue to 0.
+          npaValue = '0';
+        }
+
+        const consentStatus = await consent.getConsentStatus();
+        if (consentStatus === consent.ConsentStatus.Required) {
+          await consent.requestInfoUpdate();
+        }
+
+        await consent.loadAndShowIfRequired();
+
+        if (await consent.canRequestAds()) {
+          await admob.start();
+
+          logger.info('AdMob successfully started.');
+          isStarting = false;
+          admobStarted = true;
+        }
       },
       false
     );
@@ -334,6 +366,7 @@ namespace gdjs {
         position: atTop ? 'top' : 'bottom',
         size: bannerRequestedAdSizeType,
         offset: 0,
+        npa: npaValue,
       });
 
       banner.on('load', () => {

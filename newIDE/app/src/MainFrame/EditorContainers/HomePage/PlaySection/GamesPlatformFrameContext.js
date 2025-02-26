@@ -365,6 +365,16 @@ const GamesPlatformFrameStateProvider = ({
           console.error('Error while sending GGM command:', error);
         }
       }
+      if (event.data.id === 'openExternalUrl') {
+        if (typeof event.data.url !== 'string') {
+          console.warn(
+            'Received an invalid URL to open from the games platform:',
+            event.data
+          );
+          return;
+        }
+        Window.openExternalURL(event.data.url);
+      }
     },
     [
       openUserPublicProfile,

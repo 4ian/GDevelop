@@ -65,7 +65,7 @@ export const styles = {
     flex: 1,
   },
   bottomButtonsContainer: {
-    marginBottom: 'env(safe-area-inset-bottom)',
+    marginBottom: 'var(--safe-area-inset-bottom)',
   },
   mobileButton: {
     padding: iconButtonPadding,

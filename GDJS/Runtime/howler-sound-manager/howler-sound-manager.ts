@@ -511,10 +511,10 @@ namespace gdjs {
      * @param resource
      * @param isMusic
      */
-    private _preloadAudioFile = (
+    private _preloadAudioFile (
       resource: ResourceData,
       isMusic: boolean
-    ): Promise<number> => {
+    ): Promise<number>  {
       const file = resource.file;
       return new Promise((resolve, reject) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;

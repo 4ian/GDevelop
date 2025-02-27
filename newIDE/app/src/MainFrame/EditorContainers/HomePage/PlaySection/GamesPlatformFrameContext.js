@@ -360,7 +360,7 @@ const GamesPlatformFrameStateProvider = ({
           await ensureGDevelopGamesMonetizationReady();
 
           if (gdevelopGamesMonetization)
-            gdevelopGamesMonetization.sendCommand(event.data.command);
+            await gdevelopGamesMonetization.sendCommand(event.data.command);
         } catch (error) {
           console.error('Error while sending GGM command:', error);
         }

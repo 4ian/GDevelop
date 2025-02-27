@@ -440,7 +440,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     );
   });
 
-  it('can generate a "for each child variable" event', function () {
+  it('can generate a "for each child variable" event with undeclared variables', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEachChildVariable',
@@ -482,7 +482,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     );
   });
 
-  it('can generate a nested "for each child variable" event', function () {
+  it('can generate a nested "for each child variable" event with undeclared variables', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEachChildVariable',

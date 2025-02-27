@@ -709,4 +709,185 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         .hasChild('MyChildB')
     ).toBe(false);
   });
+
+  it('can generate a "for each child variable" event with scene variables', function () {
+    scene.getVariables().insertNew('Counter', 0).setValue(0);
+    scene.getVariables().insertNew('child', 0).setValue(0);
+    {
+      const structure = scene.getVariables().insertNew('MyVariable', 0);
+      for (let index = 1; index <= 4; index++) {
+        structure.getChild('Child' + index).setValue(index);
+      }
+    }
+    const runtimeScene = generateAndRunEventsForLayout(
+      [
+        {
+          type: 'BuiltinCommonInstructions::ForEachChildVariable',
+          iterableVariableName: 'MyVariable',
+          valueIteratorVariableName: 'child',
+          keyIteratorVariableName: '',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['Counter', '+', 'child'],
+            },
+          ],
+          events: [],
+        },
+      ],
+      {
+        logCode: true,
+      }
+    );
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      1 + 2 + 3 + 4
+    );
+  });
+
+  it('can generate a "for each child variable" event with local variables', function () {
+    scene.getVariables().insertNew('Counter', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          variables: [
+            {
+              name: 'MyVariable',
+              type: 'structure',
+              children: [
+                { name: 'Child1', type: 'number', value: 1 },
+                { name: 'Child2', type: 'number', value: 2 },
+                { name: 'Child3', type: 'number', value: 3 },
+                { name: 'Child4', type: 'number', value: 4 },
+              ],
+            },
+            { name: 'child', type: 'number', value: 0 },
+          ],
+
+          conditions: [],
+          actions: [],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::ForEachChildVariable',
+              iterableVariableName: 'MyVariable',
+              valueIteratorVariableName: 'child',
+              keyIteratorVariableName: '',
+              conditions: [],
+              actions: [
+                {
+                  type: { value: 'SetNumberVariable' },
+                  parameters: ['Counter', '+', 'child'],
+                },
+              ],
+              events: [],
+            },
+          ],
+        },
+      ],
+      {
+        logCode: true,
+      }
+    );
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      1 + 2 + 3 + 4
+    );
+  });
+
+  it('can generate a nested "for each child variable" event', function () {
+    scene.getVariables().insertNew('Counter', 0).setValue(0);
+    scene.getVariables().insertNew('childA', 0).setValue(0);
+    scene.getVariables().insertNew('childB', 0).setValue(0);
+    {
+      const structure = scene.getVariables().insertNew('MyVariableA', 0);
+      for (let index = 1; index <= 4; index++) {
+        structure.getChild('Child' + index).setValue(index);
+      }
+    }
+    {
+      const structure = scene.getVariables().insertNew('MyVariableB', 0);
+      for (let index = 5; index <= 7; index++) {
+        structure.getChild('Child' + index).setValue(index);
+      }
+    }
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyVariableA',
+        valueIteratorVariableName: 'childA',
+        keyIteratorVariableName: '',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEachChildVariable',
+            iterableVariableName: 'MyVariableB',
+            valueIteratorVariableName: 'childB',
+            keyIteratorVariableName: '',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['Counter', '+', 'childA * childB'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      (1 + 2 + 3 + 4) * (5 + 6 + 7)
+    );
+  });
+
+  it('can generate a "for each child variable" event with objects used in iterable expression', function () {
+    scene.getVariables().insertNew('Counter', 0).setValue(0);
+    scene.getVariables().insertNew('child', 0).setValue(0);
+    {
+      const structure = scene
+        .getVariables()
+        .insertNew('MyVariable', 0)
+        .getChild('Foo');
+      for (let index = 1; index <= 4; index++) {
+        structure.getChild('Child' + index).setValue(index);
+      }
+    }
+    {
+      const object = scene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MyObject', 0);
+      object.getVariables().insertNew('MyObjectVariable', 0).setString('Foo');
+      const instance = scene.getInitialInstances().insertNewInitialInstance();
+      instance.setObjectName('MyObject');
+    }
+    const runtimeScene = generateAndRunEventsForLayout(
+      [
+        {
+          type: 'BuiltinCommonInstructions::ForEachChildVariable',
+          iterableVariableName: 'MyVariable[MyObject.MyObjectVariable]',
+          valueIteratorVariableName: 'child',
+          keyIteratorVariableName: '',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['Counter', '+', 'child'],
+            },
+          ],
+          events: [],
+        },
+      ],
+      {
+        logCode: true,
+      }
+    );
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      1 + 2 + 3 + 4
+    );
+  });
 });

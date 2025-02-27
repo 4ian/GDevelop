@@ -82,6 +82,23 @@ export const isStartingPointExampleShortHeader = (
   return exampleShortHeader.tags.includes('Starting point');
 };
 
+export const isLinkedToStartingPointExampleShortHeader = (
+  allExampleShortHeaders: Array<ExampleShortHeader>,
+  exampleShortHeader: ExampleShortHeader
+): boolean => {
+  const startingPoints = allExampleShortHeaders.filter(
+    isStartingPointExampleShortHeader
+  );
+  return startingPoints.some(startingPoint =>
+    startingPoint.linkedExampleShortHeaders
+      ? startingPoint.linkedExampleShortHeaders.some(
+          linkedExampleShortHeader =>
+            linkedExampleShortHeader.slug === exampleShortHeader.slug
+        )
+      : false
+  );
+};
+
 type Props = {|
   onSelectEmptyProject: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,

@@ -39,6 +39,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
 import AIPromptField from './AIPromptField';
 import EmptyAndStartingPointProjects, {
+  isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
 } from './EmptyAndStartingPointProjects';
 import TextButton from '../UI/TextButton';
@@ -451,22 +452,34 @@ const NewProjectSetupDialog = ({
     [setProjectName, projectNameError]
   );
 
-  // Update project name when the example or private game template changes.
   React.useEffect(
     () => {
       if (
-        emptyProjectSelected ||
-        (selectedExampleShortHeader &&
-          isStartingPointExampleShortHeader(selectedExampleShortHeader))
+        !emptyProjectSelected &&
+        !selectedExampleShortHeader &&
+        !selectedPrivateGameTemplateListingData
       ) {
+        // Reset project name when everything is unselected.
         setProjectName(generateProjectName());
-        return;
       }
-      if (selectedExampleShortHeader) {
+
+      if (
+        selectedExampleShortHeader &&
+        !isStartingPointExampleShortHeader(selectedExampleShortHeader) &&
+        (!exampleShortHeaders ||
+          !isLinkedToStartingPointExampleShortHeader(
+            exampleShortHeaders,
+            selectedExampleShortHeader
+          ))
+      ) {
+        // If it's a template, generate a name based on the template name.
+        // (We don't do it for starting points)
         setProjectName(generateProjectName(selectedExampleShortHeader.name));
         return;
       }
+
       if (selectedPrivateGameTemplateListingData) {
+        // If it's a private game template, generate a name based on the template name.
         setProjectName(
           generateProjectName(selectedPrivateGameTemplateListingData.name)
         );
@@ -477,6 +490,7 @@ const NewProjectSetupDialog = ({
       selectedExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       emptyProjectSelected,
+      exampleShortHeaders,
     ]
   );
 

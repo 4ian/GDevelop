@@ -540,7 +540,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   .FindAndReplace(
                       "$VALUE_ITERATOR_VARIABLE_ACCESSOR",
                       codeGenerator.GenerateAnyOrSceneVariableGetter(
-                                event.GetValueIteratorVariableName(), context))
+                                event.GetValueIteratorVariableName(), parentContext))
                   .FindAndReplace("$VALUE_ITERATOR_REFERENCE",
                                   iteratorReferenceVariableName);
         }
@@ -554,7 +554,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   .FindAndReplace(
                       "$KEY_ITERATOR_VARIABLE_ACCESSOR",
                       codeGenerator.GenerateAnyOrSceneVariableGetter(
-                                event.GetKeyIteratorVariableName(), context))
+                                event.GetKeyIteratorVariableName(), parentContext))
                   .FindAndReplace("$KEY_ITERATOR_REFERENCE",
                                   iteratorReferenceVariableName);
         }
@@ -567,7 +567,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                             iterableReferenceVariableName)
             .FindAndReplace("$ITERABLE_VARIABLE_ACCESSOR",
                             codeGenerator.GenerateAnyOrSceneVariableGetter(
-                                event.GetIterableVariableName(), context));
+                                event.GetIterableVariableName(), parentContext));
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Repeat"].SetCodeGenerator(

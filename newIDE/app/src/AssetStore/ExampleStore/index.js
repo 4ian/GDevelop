@@ -18,7 +18,10 @@ import GridList from '@material-ui/core/GridList';
 import { getExampleAndTemplateTiles } from '../../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 import BackgroundText from '../../UI/BackgroundText';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { isStartingPointExampleShortHeader } from '../../ProjectCreation/EmptyAndStartingPointProjects';
+import {
+  isLinkedToStartingPointExampleShortHeader,
+  isStartingPointExampleShortHeader,
+} from '../../ProjectCreation/EmptyAndStartingPointProjects';
 
 const styles = {
   grid: {
@@ -41,16 +44,14 @@ const gameFilter = (
 };
 
 const noStartingPointFilter = (
-  item: PrivateGameTemplateListingData | ExampleShortHeader
-) => {
-  if (item.previewImageUrls) {
-    // It's an example, filter out the starting points.
-    return !isStartingPointExampleShortHeader(item);
-  }
-
-  // It's a game template, always show.
-  return true;
-};
+  allExampleShortHeaders: ExampleShortHeader[],
+  exampleShortHeader: ExampleShortHeader
+) =>
+  !isStartingPointExampleShortHeader(exampleShortHeader) &&
+  !isLinkedToStartingPointExampleShortHeader(
+    allExampleShortHeaders,
+    exampleShortHeader
+  );
 
 type Props = {|
   onSelectExampleShortHeader: ExampleShortHeader => void,
@@ -78,6 +79,7 @@ const ExampleStore = ({
 }: Props) => {
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
+    exampleShortHeaders: allExampleShortHeaders,
     exampleShortHeadersSearchResults,
     fetchExamplesAndFilters,
     searchText: exampleStoreSearchText,
@@ -148,11 +150,6 @@ const ExampleStore = ({
                 privateGameTemplateListingData =>
                   !onlyShowGames || gameFilter(privateGameTemplateListingData)
               )
-              .filter(
-                privateGameTemplateListingData =>
-                  !hideStartingPoints ||
-                  noStartingPointFilter(privateGameTemplateListingData)
-              )
           : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
           ? exampleShortHeadersSearchResults
@@ -163,8 +160,12 @@ const ExampleStore = ({
               )
               .filter(
                 exampleShortHeader =>
+                  !allExampleShortHeaders ||
                   !hideStartingPoints ||
-                  noStartingPointFilter(exampleShortHeader)
+                  noStartingPointFilter(
+                    allExampleShortHeaders,
+                    exampleShortHeader
+                  )
               )
           : [],
         onSelectPrivateGameTemplateListingData: privateGameTemplateListingData => {
@@ -195,6 +196,7 @@ const ExampleStore = ({
       i18n,
       onlyShowGames,
       hideStartingPoints,
+      allExampleShortHeaders,
     ]
   );
 

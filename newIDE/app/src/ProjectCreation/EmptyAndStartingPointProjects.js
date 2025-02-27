@@ -76,20 +76,27 @@ const EmptyProjectTile = ({
   );
 };
 
-export const getStartingPointExampleShortHeaderTitle = (
-  exampleShortHeader: ExampleShortHeader
-): string => {
-  return exampleShortHeader.name
-    .toLowerCase()
-    .replace('starting', '')
-    .trim()
-    .replace(/^./, str => str.toUpperCase());
-};
-
 export const isStartingPointExampleShortHeader = (
   exampleShortHeader: ExampleShortHeader
 ): boolean => {
   return exampleShortHeader.tags.includes('Starting point');
+};
+
+export const isLinkedToStartingPointExampleShortHeader = (
+  allExampleShortHeaders: Array<ExampleShortHeader>,
+  exampleShortHeader: ExampleShortHeader
+): boolean => {
+  const startingPoints = allExampleShortHeaders.filter(
+    isStartingPointExampleShortHeader
+  );
+  return startingPoints.some(startingPoint =>
+    startingPoint.linkedExampleShortHeaders
+      ? startingPoint.linkedExampleShortHeaders.some(
+          linkedExampleShortHeader =>
+            linkedExampleShortHeader.slug === exampleShortHeader.slug
+        )
+      : false
+  );
 };
 
 type Props = {|
@@ -110,7 +117,7 @@ const EmptyAndStartingPointProjects = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-  const baseExampleShortHeaders = React.useMemo(
+  const startingPointExampleShortHeaders = React.useMemo(
     () => {
       return exampleShortHeaders
         ? exampleShortHeaders.filter(isStartingPointExampleShortHeader)
@@ -134,15 +141,12 @@ const EmptyAndStartingPointProjects = ({
             onSelectEmptyProject={onSelectEmptyProject}
             disabled={disabled}
           />
-          {baseExampleShortHeaders.map(exampleShortHeader => (
+          {startingPointExampleShortHeaders.map(exampleShortHeader => (
             <ExampleTile
               exampleShortHeader={exampleShortHeader}
               onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
               key={exampleShortHeader.name}
               disabled={disabled}
-              customTitle={getStartingPointExampleShortHeaderTitle(
-                exampleShortHeader
-              )}
               centerTitle
             />
           ))}

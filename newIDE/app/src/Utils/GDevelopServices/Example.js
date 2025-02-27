@@ -19,6 +19,7 @@ export type ExampleShortHeader = {|
   gdevelopVersion: string,
   codeSizeLevel: string,
   difficultyLevel?: string,
+  linkedExampleShortHeaders?: Array<{ slug: string, relation: string }>,
 |};
 
 export type Example = {|

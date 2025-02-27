@@ -14,10 +14,6 @@ import Window from '../../Utils/Window';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
-import {
-  isStartingPointExampleShortHeader,
-  getStartingPointExampleShortHeaderTitle,
-} from '../../ProjectCreation/EmptyAndStartingPointProjects';
 const isDev = Window.isDev();
 
 const styles = {
@@ -37,12 +33,6 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
       isDev ? 'http://localhost:3000' : 'https://editor.gdevelop.io'
     }/?create-from-example=${exampleShortHeader.slug}`
   );
-};
-
-const getExampleName = (exampleShortHeader: ExampleShortHeader) => {
-  return isStartingPointExampleShortHeader(exampleShortHeader)
-    ? getStartingPointExampleShortHeaderTitle(exampleShortHeader)
-    : exampleShortHeader.name;
 };
 
 const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
@@ -92,7 +82,7 @@ const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
           </Line>
           <Line noMargin>
             <Text size="block-title" noMargin>
-              {getExampleName(exampleShortHeader)}
+              {exampleShortHeader.name}
             </Text>
           </Line>
           <Text size="body" displayInlineAsSpan>

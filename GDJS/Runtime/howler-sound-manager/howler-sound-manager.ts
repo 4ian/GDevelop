@@ -9,6 +9,14 @@ namespace gdjs {
 
   const resourceKinds: Array<ResourceKind> = ['audio'];
 
+  const HowlParameters: HowlOptions = {
+    preload: true,
+    onplayerror: (_, error) =>
+      logger.error("Can't play an audio file: " + error),
+    onloaderror: (_, error) =>
+      logger.error('Error while loading an audio file: ' + error),
+  };
+
   /**
    * Ensure the volume is between 0 and 1.
    */
@@ -447,14 +455,6 @@ namespace gdjs {
       return resourceKinds;
     }
 
-    static HowlParameters: HowlOptions = {
-      preload: true,
-      onplayerror: (_, error) =>
-        logger.error("Can't play an audio file: " + error),
-      onloaderror: (_, error) =>
-        logger.error('Error while loading an audio file: ' + error),
-    };
-
     /**
      * Ensure rate is in a range valid for Howler.js
      * @return The clamped rate
@@ -519,7 +519,7 @@ namespace gdjs {
       return new Promise((resolve, reject) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;
         container[file] = new Howl(
-          Object.assign({}, HowlerSoundManager.HowlParameters, {
+          Object.assign({}, HowlParameters, {
             src: this._getSoundUrlsFromResource(resource),
             onload: resolve,
             onloaderror: (soundId: number, error?: string) => reject(error),
@@ -597,7 +597,7 @@ namespace gdjs {
               // for a split second before setting its correct volume.
               volume: 0,
             },
-            HowlerSoundManager.HowlParameters
+            HowlParameters
           )
         );
         cacheContainer.set(resource, howl);
@@ -636,7 +636,7 @@ namespace gdjs {
               // for a split second before setting its correct volume.
               volume: 0,
             },
-            HowlerSoundManager.HowlParameters
+            HowlParameters
           )
         )
       );

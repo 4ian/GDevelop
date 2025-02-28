@@ -110,7 +110,7 @@ export type PrimitiveValueField =
       ...ValueFieldCommonProperties,
     |}
   | {|
-      valueType: 'textarea',
+      valueType: 'multilinestring',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
@@ -554,7 +554,7 @@ const CompactPropertiesEditor = ({
             {field.renderIcon(value)}
           </IconButton>
         );
-      } else if (field.valueType === 'textarea') {
+      } else if (field.valueType === 'multilinestring') {
         const { setValue } = field;
         return (
           <CompactTextAreaField

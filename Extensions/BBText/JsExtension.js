@@ -54,7 +54,7 @@ module.exports = {
       objectProperties
         .getOrCreate('text')
         .setValue(objectContent.text)
-        .setType('textarea')
+        .setType('multilinestring')
         .setLabel(_('BBCode text'));
 
       objectProperties

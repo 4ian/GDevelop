@@ -37,7 +37,7 @@ module.exports = {
     extension
       .registerProperty('FirebaseConfig')
       .setLabel(_('Firebase configuration string'))
-      .setType('textarea');
+      .setType('multilinestring');
 
     /* ====== ANALYTICS ====== */
     extension

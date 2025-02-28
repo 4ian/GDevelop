@@ -240,6 +240,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
           onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
+          onDeleteEventsBasedObjectVariant={
+            this.props.onDeleteEventsBasedObjectVariant
+          }
         />
       </div>
     );

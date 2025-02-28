@@ -65,6 +65,11 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};
 
 type InnerDialogProps = {|
@@ -94,6 +99,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
     onOpenEventBasedObjectEditor,
+    onDeleteEventsBasedObjectVariant,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -289,6 +295,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               />
             )}
             onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           />
         </Column>
       ) : null}

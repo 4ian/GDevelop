@@ -108,6 +108,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     renderObjectNameField,
     isChildObject,
     onOpenEventBasedObjectEditor,
+    onDeleteEventsBasedObjectVariant,
   } = props;
 
   const { isMobile } = useResponsiveWindowSize();
@@ -254,19 +255,37 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const deleteVariant = React.useCallback(
     () => {
-      if (!eventBasedObject) {
+      if (!eventBasedObject || !onDeleteEventsBasedObjectVariant) {
         return;
       }
       const variants = eventBasedObject.getVariants();
       const selectedVariantName = customObjectConfiguration.getVariantName();
       if (variants.hasVariantNamed(selectedVariantName)) {
-        // TODO Close the variant tabs before deleting it.
         customObjectConfiguration.setVariantName('');
-        variants.removeVariant(selectedVariantName);
+        const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+          customObjectConfiguration.getType()
+        );
+        if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+          return;
+        }
+        const eventBasedExtension = project.getEventsFunctionsExtension(
+          extensionName
+        );
+        onDeleteEventsBasedObjectVariant(
+          eventBasedExtension,
+          eventBasedObject,
+          variants.getVariant(selectedVariantName)
+        );
         forceUpdate();
       }
     },
-    [customObjectConfiguration, eventBasedObject, forceUpdate]
+    [
+      customObjectConfiguration,
+      eventBasedObject,
+      forceUpdate,
+      onDeleteEventsBasedObjectVariant,
+      project,
+    ]
   );
 
   return (

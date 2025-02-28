@@ -131,6 +131,11 @@ type Props = {|
     variantName: string
   ) => void,
   onExtensionInstalled: (extensionName: string) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -2124,6 +2129,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onExtensionInstalled={this.props.onExtensionInstalled}
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
+                        }
+                        onDeleteEventsBasedObjectVariant={
+                          this.props.onDeleteEventsBasedObjectVariant
                         }
                       />
                     )}

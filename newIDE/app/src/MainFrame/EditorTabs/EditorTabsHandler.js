@@ -374,6 +374,29 @@ export const closeCustomObjectTab = (
   });
 };
 
+export const closeEventsBasedObjectVariantTab = (
+  state: EditorTabsState,
+  eventsFunctionsExtensionName: string,
+  eventsBasedObjectName: string,
+  eventsBasedObjectVariantName: string
+) => {
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof CustomObjectEditorContainer) {
+      return (
+        (!editor.getEventsFunctionsExtensionName() ||
+          editor.getEventsFunctionsExtensionName() !==
+            eventsFunctionsExtensionName) &&
+        (!editor.getEventsBasedObjectName() ||
+          editor.getEventsBasedObjectName() !== eventsBasedObjectName) &&
+        (!editor.getVariantName() ||
+          editor.getVariantName() !== eventsBasedObjectVariantName)
+      );
+    }
+    return true;
+  });
+};
+
 export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension

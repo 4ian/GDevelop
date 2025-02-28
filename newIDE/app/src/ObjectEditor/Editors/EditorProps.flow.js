@@ -42,4 +42,9 @@ export type EditorProps = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onDeleteEventsBasedObjectVariant?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};

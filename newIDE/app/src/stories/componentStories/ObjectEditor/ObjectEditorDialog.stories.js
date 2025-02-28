@@ -46,6 +46,9 @@ export const CustomObject = () => (
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
+      onDeleteEventsBasedObjectVariant={() =>
+        action('Delete event-based object variant')
+      }
     />
   </DragAndDropContextProvider>
 );
@@ -80,6 +83,9 @@ export const StandardObject = () => (
       onExtensionInstalled={action('extension installed')}
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
+      }
+      onDeleteEventsBasedObjectVariant={() =>
+        action('Delete event-based object variant')
       }
     />
   </DragAndDropContextProvider>

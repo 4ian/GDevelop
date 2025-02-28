@@ -38,6 +38,7 @@ import {
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
   closeCustomObjectTab,
+  closeEventsBasedObjectVariantTab,
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
@@ -1557,6 +1558,29 @@ const MainFrame = (props: Props) => {
         state.editorTabs,
         eventsFunctionsExtension.getName(),
         name
+      ),
+    }));
+  };
+
+  const deleteEventsBasedObjectVariant = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ): void => {
+    const variants = eventBasedObject.getVariants();
+    const variantName = variant.getName();
+    if (!variants.hasVariantNamed(variantName)) {
+      return;
+    }
+    variants.removeVariant(variantName);
+
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsBasedObjectVariantTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        eventBasedObject.getName(),
+        variantName
       ),
     }));
   };
@@ -3904,6 +3928,7 @@ const MainFrame = (props: Props) => {
                         ''
                       ),
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                     onExtensionInstalled: onExtensionInstalled,

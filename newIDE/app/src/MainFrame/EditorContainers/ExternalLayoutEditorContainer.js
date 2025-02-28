@@ -266,6 +266,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
             // Nothing to do as events-based objects can't have external layout.
             onEventsBasedObjectChildrenEdited={() => {}}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onDeleteEventsBasedObjectVariant={
+              this.props.onDeleteEventsBasedObjectVariant
+            }
           />
         )}
         {!layout && (

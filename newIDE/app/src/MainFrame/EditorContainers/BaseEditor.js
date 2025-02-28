@@ -154,6 +154,11 @@ export type RenderEditorContainerProps = {|
     variantName: string
   ) => void,
   onExtensionInstalled: (extensionName: string) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

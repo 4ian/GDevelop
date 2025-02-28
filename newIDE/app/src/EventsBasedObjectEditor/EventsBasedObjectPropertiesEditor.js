@@ -735,6 +735,11 @@ export default function EventsBasedObjectPropertiesEditor({
                                           label={t`Leaderboard (text)`}
                                         />
                                         <SelectOption
+                                          key="property-type-text-area"
+                                          value="TextArea"
+                                          label={t`Multiline text`}
+                                        />
+                                        <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
                                           label={t`Resource (JavaScript only)`}
@@ -786,7 +791,8 @@ export default function EventsBasedObjectPropertiesEditor({
                                         </SelectField>
                                       )}
                                       {(property.getType() === 'String' ||
-                                        property.getType() === 'Number') && (
+                                        property.getType() === 'Number' ||
+                                        property.getType() === 'TextArea') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={
@@ -804,6 +810,9 @@ export default function EventsBasedObjectPropertiesEditor({
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
                                           }}
+                                          multiline={
+                                            property.getType() === 'TextArea'
+                                          }
                                           fullWidth
                                         />
                                       )}

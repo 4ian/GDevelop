@@ -755,6 +755,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           label={t`Keyboard key (text)`}
                                         />
                                         <SelectOption
+                                          key="property-type-text-area"
+                                          value="TextArea"
+                                          label={t`Multiline text`}
+                                        />
+                                        <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
                                           label={t`Resource (JavaScript only)`}
@@ -820,8 +825,8 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         property.getType() === 'Number' ||
                                         property.getType() ===
                                           'ObjectAnimationName' ||
-                                        property.getType() ===
-                                          'KeyboardKey') && (
+                                        property.getType() === 'KeyboardKey' ||
+                                        property.getType() === 'TextArea') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={
@@ -839,6 +844,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
                                           }}
+                                          multiline={
+                                            property.getType() === 'TextArea'
+                                          }
                                           fullWidth
                                         />
                                       )}

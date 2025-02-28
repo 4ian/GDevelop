@@ -101,7 +101,7 @@ const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(
   } else if (propertyType == "KeyboardKey") {
     return keyboardKeyValueType;
   }
-  // For "String", "Resource" or default
+  // For "String", "Resource", "TextArea" or default
   return stringValueType;
 };
 

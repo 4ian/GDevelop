@@ -289,7 +289,7 @@ const PropertiesEditor = ({
             />
           </Column>
         );
-      } else if (field.valueType === 'textarea') {
+      } else if (field.valueType === 'multilinestring') {
         const { setValue } = field;
         return (
           <SemiControlledTextField

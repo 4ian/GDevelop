@@ -736,7 +736,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                         />
                                         <SelectOption
                                           key="property-type-text-area"
-                                          value="TextArea"
+                                          value="MultilineString"
                                           label={t`Multiline text`}
                                         />
                                         <SelectOption
@@ -792,7 +792,8 @@ export default function EventsBasedObjectPropertiesEditor({
                                       )}
                                       {(property.getType() === 'String' ||
                                         property.getType() === 'Number' ||
-                                        property.getType() === 'TextArea') && (
+                                        property.getType() ===
+                                          'MultilineString') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={
@@ -811,7 +812,8 @@ export default function EventsBasedObjectPropertiesEditor({
                                               onPropertiesUpdated();
                                           }}
                                           multiline={
-                                            property.getType() === 'TextArea'
+                                            property.getType() ===
+                                            'MultilineString'
                                           }
                                           fullWidth
                                         />

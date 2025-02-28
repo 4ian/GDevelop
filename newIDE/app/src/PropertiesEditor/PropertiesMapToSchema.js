@@ -206,10 +206,10 @@ const createField = (
       getLabel,
       getDescription,
     };
-  } else if (valueType === 'textarea') {
+  } else if (valueType === 'multilinestring') {
     return {
       name,
-      valueType: 'textarea',
+      valueType: 'multilinestring',
       getValue: (instance: Instance): string => {
         return getProperties(instance)
           .get(name)

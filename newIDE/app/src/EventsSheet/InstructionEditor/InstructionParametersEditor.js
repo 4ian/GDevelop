@@ -91,7 +91,7 @@ const isParameterVisible = (
   parameterMetadata: gdParameterMetadata,
   parameterIndex: number,
   objectParameterIndex: number,
-  objectName: string,
+  objectName: ?string,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor
 ) => {
   // Hide parameters that are used only for code generation

@@ -188,7 +188,7 @@ const AssetPackInstallDialog = ({
             );
             if (!isAssetCompatibleWithIde) {
               throw new Error(
-                'Unable to install the asset. Please upgrade the editor to the last version.'
+                'Unable to install the asset. Please upgrade the editor to the latest version.'
               );
             }
 

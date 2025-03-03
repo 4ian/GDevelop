@@ -1,7 +1,7 @@
 // @flow
 import VersionMetadata from './VersionMetadata';
 
-export const getIDEVersion = (): string => '5.5.221'; //VersionMetadata.version;
+export const getIDEVersion = (): string => VersionMetadata.version;
 export const getIDEVersionWithHash = (): string =>
   VersionMetadata.versionWithHash;
 

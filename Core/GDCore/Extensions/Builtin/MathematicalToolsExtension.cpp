@@ -151,7 +151,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("abs",
                      _("Absolute value"),
-                     _("Absolute value"),
+                     _("Return the non-negative value by removing the sign. "
+                       "The absolute value of -8 is 8."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));

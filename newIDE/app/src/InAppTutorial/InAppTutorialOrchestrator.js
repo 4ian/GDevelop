@@ -572,6 +572,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
         stepIndex: number,
         gatherData?: boolean,
       }) => {
+        // At each step start, reset change watching logics.
+        setElementWithValueToWatchIfChanged(null);
+        setElementWithValueToWatchIfEquals(null);
+        setObjectSceneInstancesToWatch(null);
+        setSceneObjectCountToWatch(false);
+        setShouldWatchProjectChanges(false);
+
         if (stepIndex >= stepCount) {
           setDisplayEndDialog(true);
           return;
@@ -848,12 +855,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
         if (!isOnClosableDialog) {
           currentStepFallbackStepIndex.current = currentStepIndex;
         }
-        // At each step start, reset change watching logics.
-        setElementWithValueToWatchIfChanged(null);
-        setElementWithValueToWatchIfEquals(null);
-        setObjectSceneInstancesToWatch(null);
-        setSceneObjectCountToWatch(false);
-        setShouldWatchProjectChanges(false);
         // If index out of bounds, display end dialog.
         if (currentStepIndex >= stepCount) {
           setDisplayEndDialog(true);
@@ -1055,6 +1056,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
     const isTouchScreen = useScreenType() === 'touch';
 
     const renderStepDisplayer = () => {
+      // If the end dialog is displayed, we don't display the step displayer.
+      // (The tutorial is still on the last step, but the user will not interact with it anymore.)
+      if (displayEndDialog) return null;
+
       if (!currentStep) return null;
       const stepTooltip = currentStep.tooltip;
       let formattedTooltip;

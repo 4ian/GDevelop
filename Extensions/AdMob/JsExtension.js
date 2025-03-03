@@ -38,7 +38,7 @@ module.exports = {
       .setName('Consent Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('cordova-plugin-consent')
-      .setVersion('3.0.0-alpha.8')
+      .setVersion('3.0.0-alpha.9')
       .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
 
     extension
@@ -92,6 +92,68 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.setTestMode');
+
+    extension
+      .addAction(
+        'PreventAdmobAutoInitialization',
+        _('Prevent AdMob auto initialization'),
+        _(
+          'Prevent AdMob from initializing automatically. You will need to call "Initialize AdMob" action manually.\n' +
+            'This is useful if you want to control when the consent dialog will be shown (for example, after the user has accepted your game terms).'
+        ),
+        _('Prevent AdMob auto initialization'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.preventAdmobAutoInitialization');
+
+    extension
+      .addAction(
+        'InitializeAdmob',
+        _('Initialize AdMob manually'),
+        _(
+          'Initialize AdMob manually. This will trigger the consent dialog if needed, and then load the ads.\n' +
+            'Use this action if you have disabled the auto init and want to control when the consent dialog will be shown.'
+        ),
+        _('Initialize AdMob'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.initializeAdmob');
+
+    extension
+      .addCondition(
+        'AdmobInitializing',
+        _('AdMob initializing'),
+        _('Check if AdMob is initializing.'),
+        _('AdMob is initializing'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAdmobInitializing');
+
+    extension
+      .addCondition(
+        'AdmobInitialized',
+        _('AdMob initialized'),
+        _('Check if AdMob has been initialized.'),
+        _('AdMob has been initialized'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAdmobInitialized');
 
     // App Open
     extension

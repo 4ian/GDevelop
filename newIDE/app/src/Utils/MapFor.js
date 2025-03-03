@@ -1,6 +1,14 @@
 // @flow
-// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
+// Note: this file does not use export/imports and use Flow comments *and* JS doc to allow its usage
+// from both Flow (in the IDE) and TypeScript (in Node.js).
 
+/**
+ * @template T
+ * @param {number} start
+ * @param {number} end
+ * @param {(i: number) => T} func
+ * @returns {Array<T>}
+ */
 const mapFor = /*:: <T> */ (
   start /*: number */,
   end /*: number */,
@@ -13,6 +21,13 @@ const mapFor = /*:: <T> */ (
   return result;
 };
 
+/**
+ * @template T
+ * @param {number} start
+ * @param {number} end
+ * @param {(i: number) => T} func
+ * @returns {Array<T>}
+ */
 const mapReverseFor = /*:: <T> */ (
   start /*: number */,
   end /*: number */,
@@ -32,6 +47,17 @@ type CppVector<T> = {
 }
 */
 
+/**
+ * @template T
+ * @typedef {{size: () => number, at: (i: number) => T}} CppVector
+ */
+
+/**
+ * @template T, U
+ * @param {CppVector<T>} start
+ * @param {(item: T, i: number) => U} func
+ * @returns {Array<U>}
+ */
 const mapVector = /*:: <T, U> */ (
   cppVector /*: CppVector<T> */,
   func /*: (T, number) => U */

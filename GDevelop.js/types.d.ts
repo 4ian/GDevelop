@@ -115,6 +115,7 @@ export class VectorString extends EmscriptenObject {
   at(index: number): string;
   set(index: number, str: string): void;
   clear(): void;
+  toJSArray(): Array<string>;
 }
 
 export class VectorPlatformExtension extends EmscriptenObject {

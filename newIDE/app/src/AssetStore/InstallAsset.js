@@ -4,7 +4,7 @@ import {
   isPixelArt,
   isPublicAssetResourceUrl,
   extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
-  isCompatibleWithAsset,
+  isCompatibleWithGDevelopVersion,
 } from '../Utils/GDevelopServices/Asset';
 import { getIDEVersion } from '../Version';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -422,7 +422,7 @@ export const checkRequiredExtensionsUpdate = async ({
   const incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader> = [];
   for (const requiredExtensionShortHeader of requiredExtensionShortHeaders) {
     if (
-      isCompatibleWithAsset(
+      isCompatibleWithGDevelopVersion(
         getIDEVersion(),
         requiredExtensionShortHeader.gdevelopVersion
       )

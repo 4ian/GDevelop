@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
-import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
+import { isCompatibleWithGDevelopVersion } from '../../Utils/GDevelopServices/Asset';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
@@ -36,7 +36,7 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
 };
 
 const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
-  const isCompatible = isCompatibleWithAsset(
+  const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
     exampleShortHeader.gdevelopVersion
   );

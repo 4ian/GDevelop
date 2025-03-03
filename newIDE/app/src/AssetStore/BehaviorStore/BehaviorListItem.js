@@ -167,7 +167,7 @@ export const BehaviorListItem = ({
               {!isEngineCompatible && !alreadyAdded && isObjectCompatible && (
                 <Chip
                   size="small"
-                  label={<Trans>Need last GDevelop version</Trans>}
+                  label={<Trans>Need latest GDevelop version</Trans>}
                   color="secondary"
                   variant="outlined"
                 />

@@ -362,8 +362,7 @@ namespace gdjs {
           if (objectsLists.items.hasOwnProperty(name)) {
             const allObjects = objectsContext.getObjects(name);
             const objectsList = objectsLists.items[name];
-            objectsList.length = 0;
-            objectsList.push.apply(objectsList, allObjects);
+            gdjs.copyArray(allObjects, objectsList);
           }
         }
         return true;

@@ -161,6 +161,16 @@ export const useInstallAsset = ({
           project,
         }
       );
+      if (
+        requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders
+          .length > 0
+      ) {
+        showAlert({
+          title: t`Could not install the asset`,
+          message: t`Please upgrade the editor to the last version.`,
+        });
+        return null;
+      }
       const shouldUpdateExtension =
         requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
           0 &&
@@ -331,6 +341,16 @@ function NewObjectDialog({
             project,
           }
         );
+        if (
+          requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders
+            .length > 0
+        ) {
+          showAlert({
+            title: t`Could not install the asset`,
+            message: t`Please upgrade the editor to the last version.`,
+          });
+          return null;
+        }
         const shouldUpdateExtension =
           requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
             0 &&

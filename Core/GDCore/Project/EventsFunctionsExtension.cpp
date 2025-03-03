@@ -47,6 +47,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   previewIconUrl = other.previewIconUrl;
   iconUrl = other.iconUrl;
   helpPath = other.helpPath;
+  gdevelopVersion = other.gdevelopVersion;
   eventsFunctionsContainer = other.eventsFunctionsContainer;
   eventsBasedBehaviors = other.eventsBasedBehaviors;
   eventsBasedObjects = other.eventsBasedObjects;
@@ -81,6 +82,7 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("previewIconUrl", previewIconUrl);
   element.SetAttribute("iconUrl", iconUrl);
   element.SetAttribute("helpPath", helpPath);
+  element.SetAttribute("gdevelopVersion", gdevelopVersion);
   auto& dependenciesElement = element.AddChild("dependencies");
   dependenciesElement.ConsiderAsArray();
   for (auto& dependency : dependencies)
@@ -126,6 +128,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   previewIconUrl = element.GetStringAttribute("previewIconUrl");
   iconUrl = element.GetStringAttribute("iconUrl");
   helpPath = element.GetStringAttribute("helpPath");
+  gdevelopVersion = element.GetStringAttribute("gdevelopVersion");
 
   if (element.HasChild("origin")) {
     gd::String originName =

@@ -38,7 +38,7 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
 const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),
-    exampleShortHeader
+    exampleShortHeader.gdevelopVersion
   );
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 

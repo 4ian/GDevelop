@@ -349,7 +349,7 @@ function NewObjectDialog({
             title: t`Could not install the asset`,
             message: t`Please upgrade the editor to the latest version.`,
           });
-          return null;
+          return;
         }
         const shouldUpdateExtension =
           requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >

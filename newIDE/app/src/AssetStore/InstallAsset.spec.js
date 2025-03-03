@@ -422,6 +422,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [flashExtensionShortHeader],
         missingExtensionShortHeaders: [flashExtensionShortHeader],
         outOfDateExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 
@@ -455,6 +456,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 
@@ -488,6 +490,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 

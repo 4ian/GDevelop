@@ -450,7 +450,6 @@ export const checkRequiredExtensionsUpdate = async ({
     compatibleWithIdeExtensionShortHeaders
   );
 
-  console.log(incompatibleWithIdeExtensionShortHeaders);
   return {
     requiredExtensionShortHeaders,
     missingExtensionShortHeaders,

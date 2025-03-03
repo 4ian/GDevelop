@@ -55,13 +55,6 @@ const elementIdToTooltip = {
   },
 };
 
-const elementIdToShowQuitButton = {
-  '#add-parameter-button': true,
-  '#add-event-primary-button': true,
-  '#input': false,
-  'element-in-list': true,
-};
-
 export const Default = () => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
   const [
@@ -213,7 +206,6 @@ export const Default = () => {
           <InAppTutorialTooltipDisplayer
             anchorElement={elementToHighlight}
             tooltip={elementIdToTooltip[elementToHighlightId]}
-            showQuitButton={elementIdToShowQuitButton[elementToHighlightId]}
             progress={28}
             endTutorial={() => action('end tutorial')()}
             goToNextStep={() => action('go to next step')()}

@@ -205,7 +205,6 @@ type TooltipHeaderProps = {|
   paletteType: 'dark' | 'light',
   progress: number,
   showFoldButton: boolean,
-  showQuitButton: boolean,
   onClickFoldButton: () => void,
   tooltipContent?: string,
   endTutorial: () => void,
@@ -215,7 +214,6 @@ const TooltipHeader = ({
   paletteType,
   progress,
   showFoldButton,
-  showQuitButton,
   onClickFoldButton,
   tooltipContent,
   endTutorial,
@@ -245,10 +243,8 @@ const TooltipHeader = ({
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
-        {tooltipContent || !showQuitButton ? null : (
-          // We hide the quit button:
-          // - When the tooltip is folded, the tooltip content should not be null;
-          // - When requested.
+        {tooltipContent ? null : (
+          // We hide the quit button only when the tooltip is folded, the tooltip content should not be null;
           <ButtonBase disableRipple onClick={endTutorial}>
             <div
               style={{
@@ -293,7 +289,6 @@ const TooltipHeader = ({
 type Props = {|
   anchorElement: HTMLElement,
   tooltip: InAppTutorialFormattedTooltip,
-  showQuitButton: boolean,
   buttonLabel?: string,
   progress: number,
   endTutorial: () => void,
@@ -304,7 +299,6 @@ type Props = {|
 const InAppTutorialTooltipDisplayer = ({
   anchorElement,
   tooltip,
-  showQuitButton,
   buttonLabel,
   progress,
   endTutorial,
@@ -388,7 +382,6 @@ const InAppTutorialTooltipDisplayer = ({
                 paletteType={paletteType}
                 // Display the hide button when standalone only
                 showFoldButton={!!tooltip.standalone}
-                showQuitButton={showQuitButton}
                 progress={progress}
                 tooltipContent={
                   folded ? tooltip.title || tooltip.description : undefined

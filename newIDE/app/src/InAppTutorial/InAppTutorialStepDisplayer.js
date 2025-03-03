@@ -141,13 +141,7 @@ type Props = {|
 |};
 
 function InAppTutorialStepDisplayer({
-  step: {
-    elementToHighlightId,
-    tooltip,
-    nextStepTrigger,
-    isOnClosableDialog,
-    dialog,
-  },
+  step: { elementToHighlightId, tooltip, nextStepTrigger, dialog },
   expectedEditor,
   goToFallbackStep,
   endTutorial,
@@ -328,7 +322,6 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
-          showQuitButton={!isOnClosableDialog}
           anchorElement={anchorElement}
           tooltip={tooltip}
           progress={progress}
@@ -348,7 +341,6 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
-          showQuitButton // Always show the quit button when the user is on the wrong editor
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}

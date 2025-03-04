@@ -19,6 +19,9 @@ import {
 } from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
+import BlockingLayerWithHoles from './BlockingLayerWithHoles';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { instancesEditorId } from '../InstancesEditor';
 
 const styles = {
   avatarContainer: {
@@ -141,7 +144,14 @@ type Props = {|
 |};
 
 function InAppTutorialStepDisplayer({
-  step: { elementToHighlightId, tooltip, nextStepTrigger, dialog },
+  step: {
+    elementToHighlightId,
+    tooltip,
+    nextStepTrigger,
+    dialog,
+    interactsWithCanvas,
+    disableBlockingLayer,
+  },
   expectedEditor,
   goToFallbackStep,
   endTutorial,
@@ -160,6 +170,7 @@ function InAppTutorialStepDisplayer({
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
   );
+  const [blockingLayerHoles, setBlockingLayerHoles] = React.useState([]);
 
   const defineAssistantImage = React.useCallback(node => {
     if (node) {
@@ -313,32 +324,84 @@ function InAppTutorialStepDisplayer({
     [nextStepTrigger, elementWithId]
   );
 
+  const anchorElement = tooltip
+    ? tooltip.standalone
+      ? assistantImage
+      : elementToHighlight || null
+    : null;
+  const activeCanvas = document.querySelector(
+    `#scene-editor[data-active=true] #${instancesEditorId}`
+  );
+
+  const updateBlockingLayerVisibility = React.useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const holes = [];
+      if (
+        anchorElement &&
+        !expectedEditor &&
+        !hideBehindPriorityElement &&
+        !disableBlockingLayer
+      ) {
+        const isIntersecting = entries[0].isIntersecting;
+        if (isIntersecting) {
+          if (elementToHighlight) {
+            holes.push(elementToHighlight);
+          }
+          if (tooltip && tooltip.standalone && assistantImage) {
+            holes.push(assistantImage);
+          }
+          if (interactsWithCanvas && activeCanvas) {
+            holes.push(activeCanvas);
+          }
+        }
+      }
+      setBlockingLayerHoles(holes);
+    },
+    [
+      anchorElement,
+      expectedEditor,
+      hideBehindPriorityElement,
+      activeCanvas,
+      interactsWithCanvas,
+      disableBlockingLayer,
+      elementToHighlight,
+      assistantImage,
+      tooltip,
+    ]
+  );
+
+  useIsElementVisibleInScroll(anchorElement, updateBlockingLayerVisibility);
+
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor && !hideBehindPriorityElement) {
-      const anchorElement = tooltip.standalone
-        ? assistantImage
-        : elementToHighlight || null;
       if (!anchorElement) return null;
+
       return (
-        <InAppTutorialTooltipDisplayer
-          endTutorial={endTutorial}
-          anchorElement={anchorElement}
-          tooltip={tooltip}
-          progress={progress}
-          goToNextStep={goToNextStep}
-          buttonLabel={
-            nextStepTrigger && nextStepTrigger.clickOnTooltipButton
-              ? nextStepTrigger.clickOnTooltipButton
-              : undefined
-          }
-          fillAutomatically={getFillAutomaticallyFunction()}
-        />
+        <>
+          <InAppTutorialTooltipDisplayer
+            endTutorial={endTutorial}
+            anchorElement={anchorElement}
+            tooltip={tooltip}
+            progress={progress}
+            goToNextStep={goToNextStep}
+            buttonLabel={
+              nextStepTrigger && nextStepTrigger.clickOnTooltipButton
+                ? nextStepTrigger.clickOnTooltipButton
+                : undefined
+            }
+            fillAutomatically={getFillAutomaticallyFunction()}
+          />
+          {!!blockingLayerHoles.length && (
+            <BlockingLayerWithHoles elements={blockingLayerHoles} />
+          )}
+        </>
       );
     }
 
     const wrongEditorTooltip = getWrongEditorTooltip(i18n, expectedEditor);
     if (wrongEditorTooltip && assistantImage) {
       return (
+        // No Blocking Layer when on the wrong editor.
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
           anchorElement={assistantImage}

@@ -126,7 +126,10 @@ const InAppTutorialProvider = (props: Props) => {
         tutorialId: inAppTutorial.id,
         initialProjectData: inAppTutorial.initialProjectData || {},
         initialStepIndex: 0,
-        inAppTutorial,
+        inAppTutorial: {
+          ...inAppTutorial,
+          isMiniTutorial: true, // Force to true to avoid saving warning being triggered.
+        },
       });
     },
     [startTutorial]

@@ -428,6 +428,7 @@ type Props = {|
   startStepIndex: number,
   startProjectData: { [key: string]: string },
   i18n: I18nType,
+  quitInAppTutorialDialogOpen: boolean,
   endTutorial: ({|
     shouldCloseProject: boolean,
     shouldWarnAboutUnsavedChanges: boolean,
@@ -462,6 +463,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       startStepIndex,
       startProjectData,
       i18n,
+      quitInAppTutorialDialogOpen,
     },
     ref
   ) => {
@@ -1056,9 +1058,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
     const isTouchScreen = useScreenType() === 'touch';
 
     const renderStepDisplayer = () => {
-      // If the end dialog is displayed, we don't display the step displayer.
-      // (The tutorial is still on the last step, but the user will not interact with it anymore.)
-      if (displayEndDialog) return null;
+      // If the end or quit dialog is displayed, we don't display the step displayer.
+      // The user should not be able to interact with the tutorial anymore, and
+      // we don't want the blocking layer to be visible.
+      if (displayEndDialog || quitInAppTutorialDialogOpen) return null;
 
       if (!currentStep) return null;
       const stepTooltip = currentStep.tooltip;

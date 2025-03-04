@@ -9,7 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
-import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
@@ -22,6 +21,7 @@ import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../UI/TextButton';
+import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -363,7 +363,7 @@ const InAppTutorialTooltipDisplayer = ({
         },
       }}
       style={{
-        zIndex: getDisplayZIndexForHighlighter(anchorElement),
+        zIndex: aboveMaterialUiMaxZIndex,
         maxWidth: 'min(90%, 300px)',
         width: isMobile ? '100%' : undefined,
       }}

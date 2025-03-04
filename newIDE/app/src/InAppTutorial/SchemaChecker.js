@@ -30,6 +30,8 @@ const flowStepKeys = [
   'tooltip',
   'skippable',
   'isOnClosableDialog',
+  'interactsWithCanvas',
+  'disableBlockingLayer',
 ];
 export const checkInAppTutorialFileJsonSchema = (object: Object) => {
   const errors = [];

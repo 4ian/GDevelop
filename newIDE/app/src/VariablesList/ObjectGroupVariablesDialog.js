@@ -33,6 +33,7 @@ type Props = {|
   shouldCreateInitiallySelectedVariable?: boolean,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
+  isListLocked: boolean,
 |};
 
 const ObjectGroupVariablesDialog = ({
@@ -48,6 +49,7 @@ const ObjectGroupVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   onComputeAllVariableNames,
+  isListLocked,
 }: Props) => {
   const groupVariablesContainer = useValueWithInit(
     // The VariablesContainer is returned by value.
@@ -190,6 +192,7 @@ const ObjectGroupVariablesDialog = ({
           onComputeAllVariableNames={onComputeAllVariableNames}
           onVariablesUpdated={notifyOfVariableChange}
           onSelectedVariableChange={onSelectedVariableChange}
+          isListLocked={isListLocked}
         />
       </Column>
     </Dialog>

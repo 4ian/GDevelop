@@ -60,6 +60,18 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onOpenEventBasedObjectEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
+  isBehaviorListLocked: boolean,
+  isVariableListLocked: boolean,
 |};
 
 type InnerDialogProps = {|
@@ -88,6 +100,10 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onOpenEventBasedObjectEditor,
+    onDeleteEventsBasedObjectVariant,
+    isBehaviorListLocked,
+    isVariableListLocked,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -282,6 +298,8 @@ const InnerDialog = (props: InnerDialogProps) => {
                 autoFocus="desktop"
               />
             )}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           />
         </Column>
       ) : null}
@@ -297,6 +315,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          isListLocked={isBehaviorListLocked}
         />
       )}
       {currentTab === 'variables' && (
@@ -323,6 +342,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onVariablesUpdated={notifyOfChange}
+            isListLocked={isVariableListLocked}
           />
         </Column>
       )}

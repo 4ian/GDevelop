@@ -2156,6 +2156,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             shouldCreateInitiallySelectedVariable={
               this.state.editedVariable.shouldCreateVariable
             }
+            isListLocked={false}
           />
         )}
         {this.state.layoutVariablesDialogOpen && (
@@ -2165,6 +2166,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onCancel={() => this.editLayoutVariables(false)}
             onApply={() => this.editLayoutVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            isListLocked={false}
           />
         )}
         {this.state.textEditedEvent && (

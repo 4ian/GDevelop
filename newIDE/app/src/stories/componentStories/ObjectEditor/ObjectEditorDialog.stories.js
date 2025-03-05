@@ -42,6 +42,14 @@ export const CustomObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
+      onDeleteEventsBasedObjectVariant={() =>
+        action('Delete event-based object variant')
+      }
+      isBehaviorListLocked={false}
+      isVariableListLocked={false}
     />
   </DragAndDropContextProvider>
 );
@@ -73,6 +81,14 @@ export const StandardObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
+      onDeleteEventsBasedObjectVariant={() =>
+        action('Delete event-based object variant')
+      }
+      isBehaviorListLocked={false}
+      isVariableListLocked={false}
     />
   </DragAndDropContextProvider>
 );

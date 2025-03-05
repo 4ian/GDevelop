@@ -71,6 +71,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
         onGroupRenamed={onGroupsUpdated}
         canSetAsGlobalGroup={canSetAsGlobalGroup}
         unsavedChanges={unsavedChanges}
+        isListLocked={false}
       />
       {(editedGroup || isCreatingNewGroup) && (
         <ObjectGroupEditorDialog
@@ -101,6 +102,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
             }
           }}
           initialTab={'objects'}
+          isVariableListLocked={false}
         />
       )}
     </React.Fragment>

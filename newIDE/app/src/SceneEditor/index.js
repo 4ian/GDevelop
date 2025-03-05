@@ -86,13 +86,6 @@ const gd: libGDevelop = global.gd;
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
-export type EditorId =
-  | 'objects-list'
-  | 'properties'
-  | 'object-groups-list'
-  | 'instances-list'
-  | 'layers-list';
-
 const styles = {
   container: {
     display: 'flex',

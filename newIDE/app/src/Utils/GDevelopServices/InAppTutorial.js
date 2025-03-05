@@ -134,6 +134,8 @@ export type InAppTutorialFlowStep = {|
   tooltip?: InAppTutorialTooltip,
   skippable?: true,
   isOnClosableDialog?: true,
+  interactsWithCanvas?: true,
+  disableBlockingLayer?: true,
 |};
 
 export type InAppTutorialFlowFormattedStep = {|

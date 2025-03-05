@@ -23,7 +23,7 @@ import InstancesList, {
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
 import Rectangle from '../../Utils/Rectangle';
-import { type EditorId } from '..';
+import { type EditorId } from '../utils';
 import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,

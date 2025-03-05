@@ -8,7 +8,14 @@ import EditIcon from '../../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
 import IconButton from '../../UI/IconButton';
-import { type EditorId } from '..';
+import {
+  OPEN_INSTANCES_PANEL_BUTTON_ID,
+  OPEN_LAYERS_PANEL_BUTTON_ID,
+  OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
+  OPEN_OBJECTS_PANEL_BUTTON_ID,
+  OPEN_PROPERTIES_PANEL_BUTTON_ID,
+  type EditorId,
+} from '../utils';
 import Paper from '../../UI/Paper';
 
 const iconSize = 24;
@@ -41,23 +48,23 @@ type Props = {|
 
 const editors = {
   'objects-list': {
-    buttonId: 'toolbar-open-objects-panel-button',
+    buttonId: OPEN_OBJECTS_PANEL_BUTTON_ID, // ???
     icon: <ObjectIcon fontSize="inherit" />,
   },
   'object-groups-list': {
-    buttonId: 'toolbar-open-object-groups-panel-button',
+    buttonId: OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
     icon: <ObjectGroupIcon fontSize="inherit" />,
   },
   properties: {
-    buttonId: 'toolbar-open-properties-panel-button',
+    buttonId: OPEN_PROPERTIES_PANEL_BUTTON_ID,
     icon: <EditIcon fontSize="inherit" />,
   },
   'instances-list': {
-    buttonId: 'toolbar-open-instances-list-panel-button',
+    buttonId: OPEN_INSTANCES_PANEL_BUTTON_ID,
     icon: <InstancesListIcon fontSize="inherit" />,
   },
   'layers-list': {
-    buttonId: 'toolbar-open-layers-panel-button',
+    buttonId: OPEN_LAYERS_PANEL_BUTTON_ID,
     icon: <LayersIcon fontSize="inherit" />,
   },
 };

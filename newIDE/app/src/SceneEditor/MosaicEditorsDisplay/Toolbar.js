@@ -19,6 +19,13 @@ import TrashIcon from '../../UI/CustomSvgIcons/Trash';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import {
+  OPEN_INSTANCES_PANEL_BUTTON_ID,
+  OPEN_LAYERS_PANEL_BUTTON_ID,
+  OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
+  OPEN_OBJECTS_PANEL_BUTTON_ID,
+  OPEN_PROPERTIES_PANEL_BUTTON_ID,
+} from '../utils';
 
 type Props = {|
   toggleObjectsList: () => void,
@@ -73,7 +80,7 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         <IconButton
           size="small"
           color="default"
-          id="toolbar-open-objects-panel-button"
+          id={OPEN_OBJECTS_PANEL_BUTTON_ID}
           onClick={props.toggleObjectsList}
           selected={props.isObjectsListShown}
           tooltip={
@@ -87,7 +94,7 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         <IconButton
           size="small"
           color="default"
-          id="toolbar-open-object-groups-panel-button"
+          id={OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID}
           onClick={props.toggleObjectGroupsList}
           selected={props.isObjectGroupsListShown}
           tooltip={
@@ -101,7 +108,7 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         <IconButton
           size="small"
           color="default"
-          id="toolbar-open-properties-panel-button"
+          id={OPEN_PROPERTIES_PANEL_BUTTON_ID}
           onClick={props.toggleProperties}
           selected={props.isPropertiesShown}
           tooltip={
@@ -115,7 +122,7 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         <IconButton
           size="small"
           color="default"
-          id="toolbar-open-instances-list-panel-button"
+          id={OPEN_INSTANCES_PANEL_BUTTON_ID}
           onClick={props.toggleInstancesList}
           selected={props.isInstancesListShown}
           tooltip={
@@ -129,7 +136,7 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         <IconButton
           size="small"
           color="default"
-          id="toolbar-open-layers-panel-button"
+          id={OPEN_LAYERS_PANEL_BUTTON_ID}
           onClick={props.toggleLayersList}
           selected={props.isLayersListShown}
           tooltip={

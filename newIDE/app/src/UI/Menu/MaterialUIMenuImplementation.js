@@ -17,6 +17,7 @@ import {
 import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
 const electron = optionalRequire('electron');
 
 const useStyles = makeStyles({
@@ -159,6 +160,9 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
           // When a mouse is used, only the menu, when shown, can receive clicks
           // (not the background, see `popoverStyles.popOverRoot`).
           style: { pointerEvents: 'auto' },
+        }}
+        style={{
+          zIndex: itemAboveBlockingLayerZIndex,
         }}
         getContentAnchorEl={
           // Counterintuitive, but necessary

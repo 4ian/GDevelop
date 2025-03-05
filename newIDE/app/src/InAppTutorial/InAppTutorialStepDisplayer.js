@@ -22,6 +22,7 @@ import InAppTutorialDialog from './InAppTutorialDialog';
 import BlockingLayerWithHoles from './BlockingLayerWithHoles';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { instancesEditorId } from '../InstancesEditor';
+import { swipeableDrawerContainerId } from '../SceneEditor/SwipeableDrawerEditorsDisplay';
 
 const styles = {
   avatarContainer: {
@@ -332,10 +333,13 @@ function InAppTutorialStepDisplayer({
   const activeCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
   );
+  const swipeableDrawerContainer = document.querySelector(
+    `#${swipeableDrawerContainerId}`
+  );
 
   const updateBlockingLayerVisibility = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
-      const holes = [];
+      let holes = [];
       if (
         anchorElement &&
         !expectedEditor &&
@@ -351,10 +355,17 @@ function InAppTutorialStepDisplayer({
             holes.push(assistantImage);
           }
           if (interactsWithCanvas && activeCanvas) {
-            holes.push(activeCanvas);
+            // If the swipeable drawer exists, we are on mobile and as the drawers are on top
+            // of the canvas, let's avoid creating holes as it will produce the opposite effect.
+            if (swipeableDrawerContainer) {
+              holes = [];
+            } else {
+              holes.push(activeCanvas);
+            }
           }
         }
       }
+
       setBlockingLayerHoles(holes);
     },
     [
@@ -367,6 +378,7 @@ function InAppTutorialStepDisplayer({
       elementToHighlight,
       assistantImage,
       tooltip,
+      swipeableDrawerContainer,
     ]
   );
 

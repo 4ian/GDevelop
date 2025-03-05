@@ -29,6 +29,7 @@ type Props = {|
   initialInstances: gdInitialInstancesContainer | null,
   initialTab: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
+  isVariableListLocked: boolean,
 |};
 
 const EditedObjectGroupEditorDialog = ({
@@ -42,6 +43,7 @@ const EditedObjectGroupEditorDialog = ({
   initialInstances,
   initialTab,
   onComputeAllVariableNames,
+  isVariableListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const {
@@ -205,6 +207,7 @@ const EditedObjectGroupEditorDialog = ({
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onVariablesUpdated={notifyOfVariableChange}
+            isListLocked={isVariableListLocked}
           />
         </Column>
       )}

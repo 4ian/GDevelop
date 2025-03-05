@@ -20,6 +20,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   initiallySelectedVariableName?: string,
   onEditObjectVariables: () => void,
+  isListLocked: boolean,
 |};
 
 const ObjectInstanceVariablesDialog = ({
@@ -35,6 +36,7 @@ const ObjectInstanceVariablesDialog = ({
   initiallySelectedVariableName,
   projectScopedContainersAccessor,
   onEditObjectVariables,
+  isListLocked,
 }: Props) => {
   const tabs = React.useMemo(
     () => {
@@ -91,6 +93,7 @@ const ObjectInstanceVariablesDialog = ({
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="instance-variables-dialog"
       onEditObjectVariables={onEditObjectVariables}
+      isListLocked={isListLocked}
     />
   );
 };

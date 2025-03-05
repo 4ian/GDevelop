@@ -2138,6 +2138,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.onDeleteEventsBasedObjectVariant
                         }
                         isBehaviorListLocked={isCustomVariant}
+                        isVariableListLocked={isCustomVariant}
                       />
                     )}
                   </React.Fragment>
@@ -2182,6 +2183,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       editedGroup.getName()
                     );
                   }}
+                  isVariableListLocked={isCustomVariant}
                 />
               )}
               {this.state.setupGridOpen && (
@@ -2218,6 +2220,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
+                    isListLocked={true}
                   />
                 )}
               {!!this.state.layerRemoved &&
@@ -2293,6 +2296,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }
+                  isListLocked={false}
                 />
               )}
               <I18n>

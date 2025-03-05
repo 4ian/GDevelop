@@ -227,6 +227,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
               onComputeAllVariableNames={onComputeAllVariableNames}
               hotReloadPreviewButtonProps={null}
+              isListLocked={false}
             />
           )}
         {editorOpen &&
@@ -246,6 +247,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               initiallySelectedVariableName={editorOpen.variableName}
               shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
               onComputeAllVariableNames={onComputeAllVariableNames}
+              isListLocked={false}
             />
           )}
       </React.Fragment>

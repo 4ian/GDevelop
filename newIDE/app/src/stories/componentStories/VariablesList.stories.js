@@ -24,6 +24,7 @@ export const Default = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -46,6 +47,7 @@ export const Compact = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -69,6 +71,7 @@ export const InstanceWithObjectVariables = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

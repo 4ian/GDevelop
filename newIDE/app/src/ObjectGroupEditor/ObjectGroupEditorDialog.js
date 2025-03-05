@@ -30,6 +30,7 @@ type Props = {|
   bypassedObjectGroupsContainer?: ?gdObjectGroupsContainer,
   initialTab?: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
+  isVariableListLocked: boolean,
 |};
 
 const ObjectGroupEditorDialog = ({
@@ -45,6 +46,7 @@ const ObjectGroupEditorDialog = ({
   bypassedObjectGroupsContainer,
   initialTab,
   onComputeAllVariableNames,
+  isVariableListLocked,
 }: Props) => {
   const [
     editedObjectGroup,
@@ -130,6 +132,7 @@ const ObjectGroupEditorDialog = ({
       initialInstances={initialInstances}
       initialTab={selectedTab}
       onComputeAllVariableNames={onComputeAllVariableNames}
+      isVariableListLocked={isVariableListLocked}
     />
   );
 };

@@ -28,6 +28,7 @@ export const Default = () => (
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
       onExtensionInstalled={action('extension installed')}
+      isListLocked={false}
     />
   </SerializedObjectDisplay>
 );
@@ -43,6 +44,7 @@ export const WithoutAnyBehaviors = () => (
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
       onExtensionInstalled={action('extension installed')}
+      isListLocked={false}
     />
   </SerializedObjectDisplay>
 );

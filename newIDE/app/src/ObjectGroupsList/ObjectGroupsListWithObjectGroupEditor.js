@@ -71,6 +71,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
         onGroupRenamed={onGroupsUpdated}
         canSetAsGlobalGroup={canSetAsGlobalGroup}
         unsavedChanges={unsavedChanges}
+        isListLocked={false}
       />
       {(editedGroup || isCreatingNewGroup) && (
         <ObjectGroupEditorDialog

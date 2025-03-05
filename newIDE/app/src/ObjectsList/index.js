@@ -480,6 +480,7 @@ type Props = {|
   ) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  isListLocked: boolean,
 |};
 
 const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
@@ -514,6 +515,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       getThumbnail,
       unsavedChanges,
       hotReloadPreviewButtonProps,
+      isListLocked,
     }: Props,
     ref
   ) => {
@@ -995,6 +997,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         addFolder,
         forceUpdateList,
         forceUpdate,
+        isListLocked,
       }),
       [
         project,
@@ -1021,6 +1024,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         addFolder,
         forceUpdateList,
         forceUpdate,
+        isListLocked,
       ]
     );
 
@@ -1042,6 +1046,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
+        isListLocked,
       }),
       [
         project,
@@ -1060,6 +1065,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
+        isListLocked,
       ]
     );
 
@@ -1144,6 +1150,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
                 id: 'add-new-object-top-button',
+                enabled: !isListLocked,
               },
               () => [
                 {
@@ -1155,6 +1162,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                         global: false,
                       },
                     ]),
+                  enabled: !isListLocked,
                 },
                 { type: 'separator' },
                 {
@@ -1185,16 +1193,18 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         return treeViewItems;
       },
       [
+        globalObjectsRootFolder,
+        labels.higherScopeObjectsTitle,
+        labels.localScopeObjectsTitle,
+        objectTreeViewItemProps,
+        objectFolderTreeViewItemProps,
+        objectsRootFolder,
+        isListLocked,
         addFolder,
         expandFolders,
-        globalObjectsRootFolder,
-        objectFolderTreeViewItemProps,
-        objectTreeViewItemProps,
-        objectsRootFolder,
         onAddNewObject,
-        onExportAssets,
         selectedObjectFolderOrObjectsWithContext,
-        labels,
+        onExportAssets,
       ]
     );
 
@@ -1222,20 +1232,31 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       () => {
         if (keyboardShortcutsRef.current) {
           keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-            deleteItem(selectedItems[0]);
+            if (!isListLocked) {
+              deleteItem(selectedItems[0]);
+            }
           });
           keyboardShortcutsRef.current.setShortcutCallback(
             'onDuplicate',
             () => {
-              duplicateItem(selectedItems[0]);
+              if (!isListLocked) {
+                duplicateItem(selectedItems[0]);
+              }
             }
           );
           keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-            editName(selectedItems[0].content.getId());
+            if (!isListLocked) {
+              editName(selectedItems[0].content.getId());
+            }
           });
         }
       },
-      [selectedObjectFolderOrObjectsWithContext, editName, selectedItems]
+      [
+        selectedObjectFolderOrObjectsWithContext,
+        editName,
+        selectedItems,
+        isListLocked,
+      ]
     );
 
     const canMoveSelectionTo = React.useCallback(
@@ -1550,6 +1571,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               }
               id="add-new-object-button"
               icon={<Add />}
+              disabled={isListLocked}
             />
           </Column>
         </Line>

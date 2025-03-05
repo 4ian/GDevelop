@@ -207,7 +207,8 @@ const BehaviorConfigurationEditor = React.forwardRef<
                 {
                   label: i18n._(t`Paste`),
                   click: pasteBehaviors,
-                  enabled: canPasteBehaviors,
+                  // TODO Allow to paste behaviors that are already in the list.
+                  enabled: canPasteBehaviors && !isListLocked,
                 },
                 ...(project.hasEventsBasedBehavior(behaviorTypeName)
                   ? [

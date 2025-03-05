@@ -289,6 +289,8 @@ const MosaicEditorsDisplay = React.forwardRef<
               onSelectTileMapTile={props.onSelectTileMapTile}
               lastSelectionType={props.lastSelectionType}
               onExtensionInstalled={props.onExtensionInstalled}
+              isVariableListLocked={isCustomVariant}
+              isBehaviorListLocked={isCustomVariant}
             />
           )}
         </I18n>

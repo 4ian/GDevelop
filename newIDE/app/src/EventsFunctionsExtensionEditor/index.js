@@ -1702,6 +1702,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            isListLocked={false}
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (

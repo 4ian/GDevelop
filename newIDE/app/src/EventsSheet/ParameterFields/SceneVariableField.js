@@ -111,6 +111,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               editorOpen.shouldCreate || false
             }
             hotReloadPreviewButtonProps={null}
+            isListLocked={false}
           />
         )}
         {editorOpen && eventsFunctionsExtension && !layout && (
@@ -123,6 +124,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}
+            isListLocked={false}
           />
         )}
       </React.Fragment>

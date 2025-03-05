@@ -48,6 +48,7 @@ export const CustomObject = () => (
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }
+      isBehaviorListLocked={false}
     />
   </DragAndDropContextProvider>
 );
@@ -85,6 +86,7 @@ export const StandardObject = () => (
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }
+      isBehaviorListLocked={false}
     />
   </DragAndDropContextProvider>
 );

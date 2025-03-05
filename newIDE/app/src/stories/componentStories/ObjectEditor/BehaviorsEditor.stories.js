@@ -27,6 +27,7 @@ export const Default = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      isListLocked={false}
     />
   </SerializedObjectDisplay>
 );
@@ -41,6 +42,7 @@ export const WithoutAnyBehaviors = () => (
       onUpdateBehaviorsSharedData={() => {}}
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
+      isListLocked={false}
     />
   </SerializedObjectDisplay>
 );

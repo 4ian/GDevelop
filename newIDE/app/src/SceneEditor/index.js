@@ -1937,6 +1937,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         </Trans>
       ) : null;
 
+    const isCustomVariant = eventsBasedObject
+      ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+      : false;
+
     return (
       <ResponsiveWindowMeasurer>
         {({ isMobile }) => {
@@ -2137,6 +2141,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onDeleteEventsBasedObjectVariant={
                           this.props.onDeleteEventsBasedObjectVariant
                         }
+                        isBehaviorListLocked={isCustomVariant}
                       />
                     )}
                   </React.Fragment>

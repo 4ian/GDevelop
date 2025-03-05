@@ -253,6 +253,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       ? editorTitleById[selectedEditorId]
       : null;
 
+  const isCustomVariant = eventsBasedObject
+    ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+    : false;
+
   return (
     <FullSizeMeasurer>
       {({ width, height }) => (
@@ -364,6 +368,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       hotReloadPreviewButtonProps={
                         props.hotReloadPreviewButtonProps
                       }
+                      isListLocked={isCustomVariant}
                     />
                   )}
                 </I18n>
@@ -432,6 +437,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.canObjectOrGroupBeGlobal(i18n, groupName)
                       }
                       unsavedChanges={props.unsavedChanges}
+                      isListLocked={isCustomVariant}
                     />
                   )}
                 </I18n>

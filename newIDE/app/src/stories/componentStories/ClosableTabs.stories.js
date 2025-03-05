@@ -312,6 +312,7 @@ export const WithObjectsList = () => (
                   onObjectEdited={() => {}}
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                  isListLocked={false}
                 />
               </TabContentContainer>
             }

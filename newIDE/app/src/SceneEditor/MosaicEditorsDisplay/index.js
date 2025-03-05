@@ -253,6 +253,10 @@ const MosaicEditorsDisplay = React.forwardRef<
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
 
+  const isCustomVariant = eventsBasedObject
+    ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+    : false;
+
   const editors = {
     properties: {
       type: 'secondary',
@@ -416,6 +420,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+              isListLocked={isCustomVariant}
             />
           )}
         </I18n>
@@ -446,6 +451,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.canObjectOrGroupBeGlobal(i18n, groupName)
               }
               unsavedChanges={props.unsavedChanges}
+              isListLocked={isCustomVariant}
             />
           )}
         </I18n>

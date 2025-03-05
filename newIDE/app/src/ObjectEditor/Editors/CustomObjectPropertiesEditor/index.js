@@ -325,9 +325,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     resourceManagementProps={resourceManagementProps}
                   />
                   <Line>
-                  <Column expand noMargin>
-                    <Text size="block-title">Variant</Text>
-                  </Column>
+                    <Column expand noMargin>
+                      <Text size="block-title">Variant</Text>
+                    </Column>
                   </Line>
                   <LineStackLayout>
                     <SelectField

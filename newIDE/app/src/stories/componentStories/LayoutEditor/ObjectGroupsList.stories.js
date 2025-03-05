@@ -35,6 +35,7 @@ export const Default = () => (
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}
           getValidatedObjectOrGroupName={newName => newName}
+          isListLocked={false}
         />
       </div>
     </SerializedObjectDisplay>

@@ -458,6 +458,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                           }
                         }}
                         tooltip={rightButton.label}
+                        disabled={
+                          rightButton.enabled === undefined
+                            ? false
+                            : !rightButton.enabled
+                        }
                       >
                         {rightButton.icon}
                       </IconButton>

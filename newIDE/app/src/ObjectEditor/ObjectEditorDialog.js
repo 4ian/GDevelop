@@ -71,6 +71,7 @@ type Props = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  isBehaviorListLocked: boolean,
 |};
 
 type InnerDialogProps = {|
@@ -102,6 +103,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onExtensionInstalled,
     onOpenEventBasedObjectEditor,
     onDeleteEventsBasedObjectVariant,
+    isBehaviorListLocked,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -317,6 +319,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onExtensionInstalled={onExtensionInstalled}
+          isListLocked={isBehaviorListLocked}
         />
       )}
       {currentTab === 'variables' && (

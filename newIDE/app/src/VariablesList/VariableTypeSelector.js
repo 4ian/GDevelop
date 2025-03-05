@@ -25,6 +25,7 @@ type Props = {|
   readOnlyWithIcon?: boolean,
   id?: string,
   errorMessage: MessageDescriptor | null,
+  disabled?: boolean,
 |};
 
 let options;
@@ -127,6 +128,7 @@ const VariableTypeSelector = React.memo<Props>((props: Props) => {
                 : undefined,
             }}
             id={props.id}
+            disabled={props.disabled}
           >
             {getOptions()}
           </SelectField>

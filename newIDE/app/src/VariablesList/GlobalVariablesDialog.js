@@ -19,6 +19,7 @@ type Props = {|
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const GlobalVariablesDialog = ({
@@ -30,6 +31,7 @@ const GlobalVariablesDialog = ({
   preventRefactoringToDeleteInstructions,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -85,6 +87,7 @@ const GlobalVariablesDialog = ({
         preventRefactoringToDeleteInstructions
       }
       id="global-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

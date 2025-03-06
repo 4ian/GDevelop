@@ -248,6 +248,7 @@ export const sendTutorialOpened = (tutorialName: string) => {
 export const sendInAppTutorialStarted = (metadata: {|
   tutorialId: string,
   scenario: 'startOver' | 'resume' | 'start',
+  isUIRestricted: boolean,
 |}) => {
   recordEvent('in-app-tutorial-started', metadata);
 };

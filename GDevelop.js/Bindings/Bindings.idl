@@ -372,6 +372,10 @@ interface ObjectVariableHelper {
         [Ref] ObjectsContainer globalObjectsContainer,
         [Ref] ObjectsContainer objectsContainer,
         [Const, Ref] ObjectGroup objectGroup);
+    void STATIC_ApplyChangesToVariants(
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString objectName,
+        [Const, Ref] VariablesChangeset changeset);
 };
 
 interface ObjectGroupsContainer {

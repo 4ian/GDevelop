@@ -104,6 +104,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
           }}
           initialTab={'objects'}
           isVariableListLocked={false}
+          isObjectListLocked={false}
         />
       )}
     </React.Fragment>

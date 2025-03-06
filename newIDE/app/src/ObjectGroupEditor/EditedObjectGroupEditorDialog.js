@@ -13,6 +13,7 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
 import useValueWithInit from '../Utils/UseRefInitHook';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -30,6 +31,7 @@ type Props = {|
   initialTab: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
   isVariableListLocked: boolean,
+  isObjectListLocked: boolean,
 |};
 
 const EditedObjectGroupEditorDialog = ({
@@ -44,6 +46,7 @@ const EditedObjectGroupEditorDialog = ({
   initialTab,
   onComputeAllVariableNames,
   isVariableListLocked,
+  isObjectListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const {
@@ -171,17 +174,28 @@ const EditedObjectGroupEditorDialog = ({
         />
       }
     >
-      {currentTab === 'objects' && (
-        <ObjectGroupEditor
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          groupObjectNames={group.getAllObjectsNames().toJSArray()}
-          onObjectAdded={addObject}
-          onObjectRemoved={removeObject}
-        />
-      )}
+      {currentTab === 'objects' &&
+        (isObjectListLocked && group.getAllObjectsNames().size() === 0 ? (
+          <Column noMargin expand justifyContent="center">
+            <Text size="block-title" align="center">
+              {<Trans>Empty group</Trans>}
+            </Text>
+            <Text align="center" noMargin>
+              {<Trans>This object group is empty and locked.</Trans>}
+            </Text>
+          </Column>
+        ) : (
+          <ObjectGroupEditor
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            groupObjectNames={group.getAllObjectsNames().toJSArray()}
+            onObjectAdded={addObject}
+            onObjectRemoved={removeObject}
+            isObjectListLocked={isObjectListLocked}
+          />
+        ))}
       {currentTab === 'variables' && (
         <Column expand noMargin>
           {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (

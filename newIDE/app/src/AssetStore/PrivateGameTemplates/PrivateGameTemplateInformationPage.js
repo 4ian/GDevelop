@@ -136,6 +136,9 @@ const PrivateGameTemplateInformationPage = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
+  const [isPreviewLinkValid, setIsPreviewLinkValid] = React.useState<boolean>(
+    false
+  );
   const {
     receivedGameTemplates,
     profile,
@@ -416,6 +419,25 @@ const PrivateGameTemplateInformationPage = ({
     [gameTemplate, privateGameTemplateListingData, simulateAppStoreProduct]
   );
 
+  React.useEffect(
+    () => {
+      (async () => {
+        if (gameTemplate) {
+          try {
+            const previewLinkResponse = await fetch(
+              gameTemplate.gamePreviewLink
+            );
+            setIsPreviewLinkValid(previewLinkResponse.ok);
+          } catch (error) {
+            console.error('Unable to fetch preview link', error);
+            setIsPreviewLinkValid(false);
+          }
+        }
+      })();
+    },
+    [gameTemplate]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -520,6 +542,7 @@ const PrivateGameTemplateInformationPage = ({
                           />
                         </Line>
                         {!isAlreadyReceived &&
+                        isPreviewLinkValid &&
                         !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
                             <Column noMargin>
                               <RaisedButton

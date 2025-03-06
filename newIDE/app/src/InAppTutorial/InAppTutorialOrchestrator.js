@@ -568,9 +568,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
           tutorialId: tutorialId,
           step: stepIndex,
           isCompleted: stepIndex >= stepCount - 1,
+          isUIRestricted: !!tutorial.shouldRestrictUI,
         });
       },
-      [tutorialId, stepCount]
+      [tutorialId, stepCount, tutorial.shouldRestrictUI]
     );
 
     // Reset current step index on tutorial change.

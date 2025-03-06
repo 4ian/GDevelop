@@ -3359,7 +3359,11 @@ const MainFrame = (props: Props) => {
         initialStepIndex,
         initialProjectData,
       });
-      sendInAppTutorialStarted({ tutorialId, scenario });
+      sendInAppTutorialStarted({
+        tutorialId,
+        scenario,
+        isUIRestricted: !!selectedInAppTutorialShortHeader.shouldRestrictUI,
+      });
       setSelectedInAppTutorialInfo(null);
     },
     [

@@ -65,6 +65,7 @@ const InAppTutorialProvider = (props: Props) => {
         inAppTutorialToLoad = await fetchInAppTutorial(
           inAppTutorialShortHeader
         );
+        // The shouldRestrictUI information is only available in the short header, so we copy it here.
         inAppTutorialToLoad.shouldRestrictUI =
           inAppTutorialShortHeader.shouldRestrictUI;
       }

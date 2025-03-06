@@ -412,13 +412,13 @@ function InAppTutorialStepDisplayer({
     const wrongEditorTooltip = getWrongEditorTooltip(i18n, expectedEditor);
     if (wrongEditorTooltip && assistantImage) {
       return (
-        // No Blocking Layer when on the wrong editor.
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}
           goToNextStep={goToNextStep}
+          // No Blocking Layer when on the wrong editor.
           isBlockingLayerDisplayed={false}
         />
       );

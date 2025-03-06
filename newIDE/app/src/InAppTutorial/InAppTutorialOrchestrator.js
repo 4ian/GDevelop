@@ -1153,6 +1153,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         nextStepTrigger: formattedStepTrigger,
       };
       if (!tutorial.shouldRestrictUI) {
+        // If the backend doesn't specify that the UI should be restricted,
+        // we disable the layer for all steps.
         formattedStep.disableBlockingLayer = true;
       }
       if (currentStep.elementToHighlightId) {

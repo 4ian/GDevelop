@@ -31,6 +31,8 @@ const BlockingLayerWithHoles = ({ elements }: Props) => {
 
   React.useEffect(
     () => {
+      if (!elements.length) return;
+
       // Update hole position on scroll & resize
       window.addEventListener('wheel', updateHoles);
       window.addEventListener('touchmove', updateHoles);
@@ -43,12 +45,14 @@ const BlockingLayerWithHoles = ({ elements }: Props) => {
         window.removeEventListener('resize', updateHoles);
       };
     },
-    [updateHoles]
+    [updateHoles, elements]
   );
 
   // We also update the hole position every second, as the item may keep moving
   // on the deceleration phase of a scroll.
-  useInterval(updateHoles, 1000);
+  useInterval(updateHoles, !!elements.length ? 1000 : null);
+
+  if (!elements.length) return null;
 
   return (
     <div

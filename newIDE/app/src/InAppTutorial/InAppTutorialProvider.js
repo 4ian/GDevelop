@@ -65,6 +65,8 @@ const InAppTutorialProvider = (props: Props) => {
         inAppTutorialToLoad = await fetchInAppTutorial(
           inAppTutorialShortHeader
         );
+        inAppTutorialToLoad.shouldRestrictUI =
+          inAppTutorialShortHeader.shouldRestrictUI;
       }
       setStartStepIndex(initialStepIndex);
       setStartProjectData(initialProjectData);

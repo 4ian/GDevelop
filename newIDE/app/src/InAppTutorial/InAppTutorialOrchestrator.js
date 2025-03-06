@@ -1090,7 +1090,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     useInterval(watchSceneObjects, sceneObjectCountToWatch ? 1000 : null);
     useInterval(
       watchDomForNextStepTrigger,
-      currentStep && currentStep.isTriggerFlickering ? 500 : 1000
+      currentStep && currentStep.isTriggerFlickering ? 500 : null
     );
 
     const isRunningMiniTutorial = tutorial.isMiniTutorial;
@@ -1151,6 +1151,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
         tooltip: formattedTooltip,
         nextStepTrigger: formattedStepTrigger,
       };
+      if (!tutorial.shouldRestrictUI) {
+        formattedStep.disableBlockingLayer = true;
+      }
       if (currentStep.elementToHighlightId) {
         formattedStep.elementToHighlightId = interpolateElementId({
           elementId: currentStep.elementToHighlightId,

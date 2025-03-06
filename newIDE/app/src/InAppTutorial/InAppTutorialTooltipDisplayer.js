@@ -22,6 +22,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../UI/TextButton';
 import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
+import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -294,6 +295,7 @@ type Props = {|
   endTutorial: () => void,
   goToNextStep: () => void,
   fillAutomatically?: () => void,
+  isBlockingLayerDisplayed: boolean,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -304,6 +306,7 @@ const InAppTutorialTooltipDisplayer = ({
   endTutorial,
   goToNextStep,
   fillAutomatically,
+  isBlockingLayerDisplayed,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -363,7 +366,13 @@ const InAppTutorialTooltipDisplayer = ({
         },
       }}
       style={{
-        zIndex: aboveMaterialUiMaxZIndex,
+        // If the blocking layer is displayed, we need to display the tooltip above it,
+        // so it can be interacted with.
+        // Otherwise, we display the tooltip just above the highlighter, to avoid
+        // the tooltip appearing above other elements, like dialogs.
+        zIndex: isBlockingLayerDisplayed
+          ? aboveMaterialUiMaxZIndex
+          : getDisplayZIndexForHighlighter(anchorElement),
         maxWidth: 'min(90%, 300px)',
         width: isMobile ? '100%' : undefined,
       }}

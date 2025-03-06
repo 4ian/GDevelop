@@ -402,10 +402,9 @@ function InAppTutorialStepDisplayer({
                 : undefined
             }
             fillAutomatically={getFillAutomaticallyFunction()}
+            isBlockingLayerDisplayed={!!blockingLayerHoles.length}
           />
-          {!!blockingLayerHoles.length && (
-            <BlockingLayerWithHoles elements={blockingLayerHoles} />
-          )}
+          <BlockingLayerWithHoles elements={blockingLayerHoles} />
         </>
       );
     }
@@ -420,6 +419,7 @@ function InAppTutorialStepDisplayer({
           tooltip={wrongEditorTooltip}
           progress={progress}
           goToNextStep={goToNextStep}
+          isBlockingLayerDisplayed={false}
         />
       );
     }

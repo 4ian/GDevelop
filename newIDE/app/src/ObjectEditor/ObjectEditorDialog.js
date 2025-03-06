@@ -159,6 +159,13 @@ const InnerDialog = (props: InnerDialogProps) => {
       changeset,
       originalSerializedVariables
     );
+    if (eventsBasedObject) {
+      gd.GroupVariableHelper.applyChangesToVariants(
+        eventsBasedObject,
+        object.getName(),
+        changeset
+      );
+    }
     object.clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"

@@ -57,7 +57,10 @@ function AssetSwappingDialog({
 
   React.useEffect(
     () => {
-      sendAssetSwapStart({ originalObjectName: object.getName() });
+      sendAssetSwapStart({
+        originalObjectName: object.getName(),
+        objectType: object.getType(),
+      });
     },
     // Only run once on dialog open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,6 +96,7 @@ function AssetSwappingDialog({
         sendAssetSwapFinished({
           originalObjectName,
           newObjectName: object.getName(),
+          objectType: object.getType(),
         });
 
         onClose({ swappingDone: true });

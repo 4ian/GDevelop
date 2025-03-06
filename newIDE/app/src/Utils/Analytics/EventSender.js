@@ -621,3 +621,26 @@ export const sendInAppTutorialProgress = ({
     nextCheckTimeoutId: setTimeout(() => immediatelyRecordEvent(true), 30000),
   };
 };
+
+export const sendAssetSwapStart = ({
+  originalObjectName,
+}: {
+  originalObjectName: string,
+}) => {
+  recordEvent('asset_swap_start', {
+    originalObjectName,
+  });
+};
+
+export const sendAssetSwapFinished = ({
+  originalObjectName,
+  newObjectName,
+}: {
+  originalObjectName: string,
+  newObjectName: string,
+}) => {
+  recordEvent('asset_swap_finished', {
+    originalObjectName,
+    newObjectName,
+  });
+};

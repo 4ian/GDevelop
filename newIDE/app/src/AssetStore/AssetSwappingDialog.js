@@ -14,6 +14,10 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
+import {
+  sendAssetSwapFinished,
+  sendAssetSwapStart,
+} from '../Utils/Analytics/EventSender';
 
 type Props = {|
   project: gdProject,
@@ -51,6 +55,15 @@ function AssetSwappingDialog({
   });
   const { showAlert } = useAlertDialog();
 
+  React.useEffect(
+    () => {
+      sendAssetSwapStart({ originalObjectName: object.getName() });
+    },
+    // Only run once on dialog open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const installOpenedAsset = React.useCallback(
     async (): Promise<void> => {
       if (!openedAssetShortHeader) return;
@@ -61,6 +74,8 @@ function AssetSwappingDialog({
         if (!installAssetOutput) {
           throw new Error('Failed to install asset');
         }
+
+        const originalObjectName = object.getName();
 
         if (installAssetOutput.createdObjects.length > 0) {
           swapAsset(
@@ -74,6 +89,11 @@ function AssetSwappingDialog({
         for (const createdObject of installAssetOutput.createdObjects) {
           objectsContainer.removeObject(createdObject.getName());
         }
+
+        sendAssetSwapFinished({
+          originalObjectName,
+          newObjectName: object.getName(),
+        });
 
         onClose({ swappingDone: true });
       } catch (err) {

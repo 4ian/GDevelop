@@ -94,3 +94,43 @@ export const StandardObject = () => (
     />
   </DragAndDropContextProvider>
 );
+
+export const LockedStandardObject = () => (
+  <DragAndDropContextProvider>
+    <ObjectEditorDialog
+      open={true}
+      projectScopedContainersAccessor={
+        testProject.testSceneProjectScopedContainersAccessor
+      }
+      object={testProject.panelSpriteObject}
+      onApply={() => action('Apply changes')}
+      onCancel={() => action('Cancel changes')}
+      onRename={() => action('Rename object')}
+      getValidatedObjectOrGroupName={newName => newName}
+      project={testProject.project}
+      layout={testProject.testLayout}
+      eventsFunctionsExtension={null}
+      eventsBasedObject={null}
+      resourceManagementProps={fakeResourceManagementProps}
+      onComputeAllVariableNames={() => []}
+      onUpdateBehaviorsSharedData={() => {}}
+      initialTab={null}
+      hotReloadPreviewButtonProps={{
+        hasPreviewsRunning: false,
+        launchProjectDataOnlyPreview: () => action('Hot-reload'),
+        launchProjectCodeAndDataPreview: action('Hot-reload with code'),
+        launchProjectWithLoadingScreenPreview: () => action('Reload'),
+      }}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onOpenEventBasedObjectEditor={() =>
+        action('Open event-based object editor')
+      }
+      onDeleteEventsBasedObjectVariant={() =>
+        action('Delete event-based object variant')
+      }
+      onExtensionInstalled={action('extension installed')}
+      isBehaviorListLocked={true}
+      isVariableListLocked={true}
+    />
+  </DragAndDropContextProvider>
+);

@@ -30,6 +30,7 @@ type Props = {|
   initialTab?: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
   isVariableListLocked: boolean,
+  isObjectListLocked: boolean,
 |};
 
 const ObjectGroupEditorDialog = ({
@@ -45,6 +46,7 @@ const ObjectGroupEditorDialog = ({
   initialTab,
   onComputeAllVariableNames,
   isVariableListLocked,
+  isObjectListLocked,
 }: Props) => {
   const [
     editedObjectGroup,
@@ -108,7 +110,8 @@ const ObjectGroupEditorDialog = ({
   );
 
   return !editedObjectGroup ||
-    editedObjectGroup.getAllObjectsNames().size() === 0 ? (
+    (editedObjectGroup.getAllObjectsNames().size() === 0 &&
+      !isObjectListLocked) ? (
     <NewObjectGroupEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -130,6 +133,7 @@ const ObjectGroupEditorDialog = ({
       initialTab={selectedTab}
       onComputeAllVariableNames={onComputeAllVariableNames}
       isVariableListLocked={isVariableListLocked}
+      isObjectListLocked={isObjectListLocked}
     />
   );
 };

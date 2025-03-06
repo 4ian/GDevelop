@@ -65,6 +65,9 @@ const InAppTutorialProvider = (props: Props) => {
         inAppTutorialToLoad = await fetchInAppTutorial(
           inAppTutorialShortHeader
         );
+        // The shouldRestrictUI information is only available in the short header, so we copy it here.
+        inAppTutorialToLoad.shouldRestrictUI =
+          inAppTutorialShortHeader.shouldRestrictUI;
       }
       setStartStepIndex(initialStepIndex);
       setStartProjectData(initialProjectData);
@@ -126,7 +129,10 @@ const InAppTutorialProvider = (props: Props) => {
         tutorialId: inAppTutorial.id,
         initialProjectData: inAppTutorial.initialProjectData || {},
         initialStepIndex: 0,
-        inAppTutorial,
+        inAppTutorial: {
+          ...inAppTutorial,
+          isMiniTutorial: true, // Force to true to avoid saving warning being triggered.
+        },
       });
     },
     [startTutorial]

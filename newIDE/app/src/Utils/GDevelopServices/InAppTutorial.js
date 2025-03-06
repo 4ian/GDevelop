@@ -41,6 +41,7 @@ export type InAppTutorialShortHeader = {|
   initialTemplateUrl?: string,
   initialProjectData?: { [key: string]: string },
   isMiniTutorial?: boolean,
+  shouldRestrictUI?: boolean,
 |};
 
 export type EditorIdentifier =
@@ -134,6 +135,8 @@ export type InAppTutorialFlowStep = {|
   tooltip?: InAppTutorialTooltip,
   skippable?: true,
   isOnClosableDialog?: true,
+  interactsWithCanvas?: true,
+  disableBlockingLayer?: true,
 |};
 
 export type InAppTutorialFlowFormattedStep = {|
@@ -151,6 +154,7 @@ export type InAppTutorial = {|
   endDialog: InAppTutorialDialog,
   availableLocales?: Array<string>,
   isMiniTutorial?: boolean,
+  shouldRestrictUI?: boolean,
 |};
 
 export const fetchInAppTutorialShortHeaders = async (): Promise<

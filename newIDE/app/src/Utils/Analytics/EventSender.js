@@ -570,10 +570,12 @@ export const sendInAppTutorialProgress = ({
   step,
   tutorialId,
   isCompleted,
+  isUIRestricted,
 }: {|
   tutorialId: string,
   step: number,
   isCompleted: boolean,
+  isUIRestricted: boolean,
 |}) => {
   const immediatelyRecordEvent = (
     spentMoreThan30SecondsSinceLastStep: ?boolean
@@ -587,6 +589,7 @@ export const sendInAppTutorialProgress = ({
       tutorialId,
       step,
       isCompleted,
+      isUIRestricted,
       spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
     });
   };

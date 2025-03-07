@@ -655,8 +655,8 @@ const canSendPlaySectionOpened = makeCanSendEvent({
   minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
 });
 
-export const sendPlaySectionOpened = (section: string) => {
-  if (!canSendPlaySectionOpened(section)) {
+export const sendPlaySectionOpened = () => {
+  if (!canSendPlaySectionOpened('play-section-opened')) {
     return;
   }
 

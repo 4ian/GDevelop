@@ -41,6 +41,7 @@ type Props = {|
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onUpdateBehaviorsSharedData: () => void,
+  onExtensionInstalled: (extensionName: string) => void,
 
   // For instances:
   instances: Array<gdInitialInstance>,
@@ -81,6 +82,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     resourceManagementProps,
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
+    onExtensionInstalled,
 
     // For instances:
     instances,
@@ -113,6 +115,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           resourceManagementProps={resourceManagementProps}
           eventsFunctionsExtension={eventsFunctionsExtension}
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+          onExtensionInstalled={onExtensionInstalled}
           {...commonProps}
         />
       ) : (

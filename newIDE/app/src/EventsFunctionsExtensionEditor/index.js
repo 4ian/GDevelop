@@ -87,6 +87,7 @@ type Props = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 type State = {|
@@ -1460,6 +1461,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                onExtensionInstalled={this.props.onExtensionInstalled}
               />
             </Background>
           ) : selectedEventsBasedBehavior &&

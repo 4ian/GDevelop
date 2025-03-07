@@ -151,6 +151,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 type ComponentProps = {|
@@ -1783,6 +1784,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   isCondition,
                 });
             }}
+            onExtensionInstalled={this.props.onExtensionInstalled}
           />
         )}
       </I18n>

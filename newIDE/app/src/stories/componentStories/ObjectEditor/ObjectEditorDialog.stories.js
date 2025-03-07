@@ -42,6 +42,7 @@ export const CustomObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onExtensionInstalled={action('extension installed')}
     />
   </DragAndDropContextProvider>
 );
@@ -73,6 +74,7 @@ export const StandardObject = () => (
         launchProjectWithLoadingScreenPreview: () => action('Reload'),
       }}
       openBehaviorEvents={() => action('Open behavior events')}
+      onExtensionInstalled={action('extension installed')}
     />
   </DragAndDropContextProvider>
 );

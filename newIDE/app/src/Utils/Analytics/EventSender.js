@@ -629,7 +629,7 @@ export const sendAssetSwapStart = ({
   originalObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset_swap_start', {
+  recordEvent('asset-swap-start', {
     originalObjectName,
     objectType,
   });
@@ -644,9 +644,13 @@ export const sendAssetSwapFinished = ({
   newObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset_swap_finished', {
+  recordEvent('asset-swap-finished', {
     originalObjectName,
     newObjectName,
     objectType,
   });
+};
+
+export const sendPlaySectionOpened = (section: string) => {
+  recordEvent('play-section-opened');
 };

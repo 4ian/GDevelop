@@ -6,6 +6,7 @@ import { GamesPlatformFrameContext } from './GamesPlatformFrameContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PlaceholderError from '../../../../UI/PlaceholderError';
+import { sendPlaySectionOpened } from '../../../../Utils/Analytics/EventSender';
 
 const PlaySection = () => {
   const {
@@ -13,6 +14,10 @@ const PlaySection = () => {
     iframeErrored,
     loadIframeOrRemoveTimeout,
   } = React.useContext(GamesPlatformFrameContext);
+
+  React.useEffect(() => {
+    sendPlaySectionOpened();
+  }, []);
 
   // Iframe will be displayed here if loaded.
   return iframeLoaded ? null : (

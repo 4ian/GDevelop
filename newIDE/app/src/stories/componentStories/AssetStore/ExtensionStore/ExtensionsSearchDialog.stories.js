@@ -54,6 +54,7 @@ export const Default = () => (
             onClose={action('onClose')}
             onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>
       </EventsFunctionsExtensionsProvider>
@@ -77,6 +78,7 @@ export const WithServerSideError = () => (
             onClose={action('onClose')}
             onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>
       </EventsFunctionsExtensionsProvider>

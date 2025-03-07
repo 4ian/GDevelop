@@ -423,6 +423,7 @@ type Props = {|
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
+  onExtensionInstalled: (extensionName: string) => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
@@ -465,6 +466,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       toggleProjectManager,
       mainMenuCallbacks,
       buildMainMenuProps,
+      onExtensionInstalled,
     },
     ref
   ) => {
@@ -1459,6 +1461,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       onCreateNew={() => {
                         onCreateNewExtension(project, i18n);
                       }}
+                      onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
                   {project &&

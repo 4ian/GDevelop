@@ -1374,6 +1374,19 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const onExtensionInstalled = (extensionName: string) => {
+    // TODO Open the closed tabs back
+    // It would be safer to close the tabs before the extension is installed
+    // but it would make opening them back more complicated.
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsFunctionsExtensionTabs(
+        state.editorTabs,
+        extensionName
+      ),
+    }));
+  };
+
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -3668,6 +3681,7 @@ const MainFrame = (props: Props) => {
               currentProject
             );
           }}
+          onExtensionInstalled={onExtensionInstalled}
           onShareProject={() => openShareDialog()}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

@@ -78,6 +78,7 @@ export const NoProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -146,6 +147,7 @@ export const ProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}

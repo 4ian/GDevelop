@@ -651,6 +651,14 @@ export const sendAssetSwapFinished = ({
   });
 };
 
+const canSendPlaySectionOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
+});
+
 export const sendPlaySectionOpened = (section: string) => {
+  if (!canSendPlaySectionOpened(section)) {
+    return;
+  }
+
   recordEvent('play-section-opened');
 };

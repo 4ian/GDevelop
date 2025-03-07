@@ -624,23 +624,29 @@ export const sendInAppTutorialProgress = ({
 
 export const sendAssetSwapStart = ({
   originalObjectName,
-}: {
+  objectType,
+}: {|
   originalObjectName: string,
-}) => {
+  objectType: string,
+|}) => {
   recordEvent('asset_swap_start', {
     originalObjectName,
+    objectType,
   });
 };
 
 export const sendAssetSwapFinished = ({
   originalObjectName,
   newObjectName,
-}: {
+  objectType,
+}: {|
   originalObjectName: string,
   newObjectName: string,
-}) => {
+  objectType: string,
+|}) => {
   recordEvent('asset_swap_finished', {
     originalObjectName,
     newObjectName,
+    objectType,
   });
 };

@@ -582,7 +582,6 @@ namespace gdjs {
 
       let howl = cacheContainer.get(resource);
       if (!howl) {
-        const fileName = resource ? resource.file : soundName;
         howl = new Howl(
           Object.assign(
             {
@@ -590,7 +589,7 @@ namespace gdjs {
               html5: isMusic,
               xhr: {
                 withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  fileName
+                  resource.file
                 ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume

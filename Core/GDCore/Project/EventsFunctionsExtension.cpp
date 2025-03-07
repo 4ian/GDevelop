@@ -55,7 +55,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   sceneVariables = other.GetSceneVariables();
 }
 
-void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
+void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isExternal) const {
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
@@ -102,8 +102,18 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
       element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
       "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
-  eventsBasedObjects.SerializeElementsTo(
-      "eventsBasedObject", element.AddChild("eventsBasedObjects"));
+  if (isExternal) {
+    auto &eventsBasedObjectElement = element.AddChild("eventsBasedObjects");
+    eventsBasedObjectElement.ConsiderAsArrayOf("eventsBasedObject");
+    for (const auto &eventsBasedObject :
+         eventsBasedObjects.GetInternalVector()) {
+      eventsBasedObject->SerializeToExternal(
+          eventsBasedObjectElement.AddChild("eventsBasedObject"));
+    }
+  } else {
+    eventsBasedObjects.SerializeElementsTo(
+        "eventsBasedObject", element.AddChild("eventsBasedObjects"));
+  }
 }
 
 void EventsFunctionsExtension::UnserializeFrom(

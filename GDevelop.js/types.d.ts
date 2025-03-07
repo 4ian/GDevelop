@@ -2405,6 +2405,7 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
   serializeTo(element: SerializerElement): void;
+  serializeToExternal(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
 }

@@ -341,6 +341,12 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
     defaultVariant.SetAreaMaxZ(areaMaxZ);
   }
   ///@}
+  
+  /**
+   * @brief Serialize the events-based object for an extension in an external file.
+   * Variants are not serialized.
+   */
+  void SerializeToExternal(SerializerElement& element) const;
 
   void SerializeTo(SerializerElement& element) const override;
 

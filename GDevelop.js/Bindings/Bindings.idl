@@ -3299,6 +3299,7 @@ interface EventsFunctionsExtension {
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
     void SerializeTo([Ref] SerializerElement element);
+    void SerializeToExternal([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);

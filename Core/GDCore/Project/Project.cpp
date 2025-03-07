@@ -920,6 +920,7 @@ void Project::UnserializeAndInsertExtensionsFrom(
       "eventsFunctionsExtension");
 
   std::map<gd::String, size_t> extensionNameToElementIndex;
+  std::map<gd::String, gd::SerializerElement> objectTypeToVariantsElement;
 
   // First, only unserialize behaviors and objects names.
   // As event based objects can contains custom behaviors and custom objects,
@@ -938,6 +939,16 @@ void Project::UnserializeAndInsertExtensionsFrom(
             ? GetEventsFunctionsExtension(name)
             : InsertNewEventsFunctionsExtension(
                   name, GetEventsFunctionsExtensionsCount());
+
+    // Backup the events-based object variants
+    for (auto &eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+      gd::SerializerElement variantsElement;
+      eventsBasedObject->GetVariants().SerializeVariantsTo(variantsElement);
+      objectTypeToVariantsElement[gd::PlatformExtension::GetObjectFullType(
+          name, eventsBasedObject->GetName())] = variantsElement;
+    }
+
     eventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
         *this, eventsFunctionsExtensionElement);
   }
@@ -966,6 +977,15 @@ void Project::UnserializeAndInsertExtensionsFrom(
     partiallyLoadedExtension
         ->UnserializeExtensionImplementationFrom(
             *this, eventsFunctionsExtensionElement);
+
+    for (auto &pair : objectTypeToVariantsElement) {
+      auto &objectType = pair.first;
+      auto &variantsElement = pair.second;
+
+      auto &eventsBasedObject = GetEventsBasedObject(objectType);
+      eventsBasedObject.GetVariants().UnserializeVariantsFrom(*this,
+                                                              variantsElement);
+    }
   }
 }
 

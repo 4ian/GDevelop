@@ -629,7 +629,7 @@ export const sendAssetSwapStart = ({
   originalObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset_swap_start', {
+  recordEvent('asset-swap-start', {
     originalObjectName,
     objectType,
   });
@@ -644,9 +644,21 @@ export const sendAssetSwapFinished = ({
   newObjectName: string,
   objectType: string,
 |}) => {
-  recordEvent('asset_swap_finished', {
+  recordEvent('asset-swap-finished', {
     originalObjectName,
     newObjectName,
     objectType,
   });
+};
+
+const canSendPlaySectionOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
+});
+
+export const sendPlaySectionOpened = () => {
+  if (!canSendPlaySectionOpened('play-section-opened')) {
+    return;
+  }
+
+  recordEvent('play-section-opened');
 };

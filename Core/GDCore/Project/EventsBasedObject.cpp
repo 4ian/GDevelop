@@ -22,7 +22,8 @@ EventsBasedObject::EventsBasedObject()
 
 EventsBasedObject::~EventsBasedObject() {}
 
-void EventsBasedObject::SerializeTo(SerializerElement& element) const {
+
+void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
   if (isRenderedIn3D) {
     element.SetBoolAttribute("is3D", true);
@@ -42,7 +43,10 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   // AbstractEventsBasedEntity::SerializeTo must be done after.
   defaultVariant.SerializeTo(element);
   AbstractEventsBasedEntity::SerializeTo(element);
+}
 
+void EventsBasedObject::SerializeTo(SerializerElement& element) const {
+  SerializeToExternal(element);
   variants.SerializeVariantsTo(element.AddChild("variants"));
 }
 
@@ -58,7 +62,9 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   defaultVariant.UnserializeFrom(project, element);
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
 
-  variants.UnserializeVariantsFrom(project, element.GetChild("variants"));
+  if (element.HasChild("variants")) {
+    variants.UnserializeVariantsFrom(project, element.GetChild("variants"));
+  }
 
   if (element.HasChild("isUsingLegacyInstancesRenderer")) {
     isUsingLegacyInstancesRenderer =

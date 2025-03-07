@@ -151,6 +151,7 @@ export type RenderEditorContainerProps = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

@@ -3887,6 +3887,7 @@ const MainFrame = (props: Props) => {
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                   })}
                 </ErrorBoundary>

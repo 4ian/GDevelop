@@ -33,6 +33,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 export default function NewBehaviorDialog({
@@ -43,6 +44,7 @@ export default function NewBehaviorDialog({
   onChoose,
   objectType,
   objectBehaviorsTypes,
+  onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const eventsFunctionsExtensionsState = React.useContext(
@@ -170,6 +172,9 @@ export default function NewBehaviorDialog({
         eventsFunctionsExtensionsState,
         behaviorShortHeader
       );
+      if (wasExtensionInstalled) {
+        onExtensionInstalled(behaviorShortHeader.extensionName);
+      }
       return wasExtensionInstalled;
     } finally {
       setIsInstalling(false);

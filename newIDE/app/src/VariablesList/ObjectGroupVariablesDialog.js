@@ -25,6 +25,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  initialInstances: gdInitialInstancesContainer | null,
   objectGroup: gdObjectGroup,
   onCancel: () => void,
   onApply: (selectedVariableName: string | null) => void,
@@ -40,6 +41,7 @@ const ObjectGroupVariablesDialog = ({
   projectScopedContainersAccessor,
   globalObjectsContainer,
   objectsContainer,
+  initialInstances,
   objectGroup,
   onCancel,
   onApply,
@@ -76,6 +78,11 @@ const ObjectGroupVariablesDialog = ({
           groupVariablesContainer
         )
     );
+    if (!initialInstances) {
+      // This can only happens for legacy function object groups.
+      // In this case, we don't do any refactoring.
+      return;
+    }
 
     const originalSerializedVariables = getOriginalVariablesSerializedElement();
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
@@ -87,6 +94,7 @@ const ObjectGroupVariablesDialog = ({
       project,
       globalObjectsContainer || objectsContainer,
       objectsContainer,
+      initialInstances,
       groupVariablesContainer,
       objectGroup,
       changeset,

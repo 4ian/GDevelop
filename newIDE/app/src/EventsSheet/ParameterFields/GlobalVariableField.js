@@ -81,7 +81,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               setEditorOpen(null);
               if (field.current) field.current.updateAutocompletions();
             }}
-            preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}

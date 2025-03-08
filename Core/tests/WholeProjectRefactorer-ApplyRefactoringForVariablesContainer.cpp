@@ -760,33 +760,33 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     // Check the first layout is updated.
     {
-      REQUIRE(event.GetActions().GetCount() == 19);
+      REQUIRE(event.GetActions().GetCount() == 40);
 
       // clang-format off
-      // All the actions using the removed variables are gone.
-      REQUIRE(event.GetActions()[0].GetParameter(0).GetPlainString() == "1 + MySceneVariable2");
-      REQUIRE(event.GetActions()[1].GetParameter(0).GetPlainString() == "1 + Object2.MyObjectVariable");
-      REQUIRE(event.GetActions()[2].GetParameter(0).GetPlainString() == "1 + Object2.MyObjectStructureVariable.MyChild");
-      REQUIRE(event.GetActions()[3].GetParameter(0).GetPlainString() == "1 + MySceneStructureVariable2.MyChild");
-      REQUIRE(event.GetActions()[4].GetParameter(0).GetPlainString() == "1 + MyGlobalVariable2");
-      REQUIRE(event.GetActions()[5].GetParameter(0).GetPlainString() == "1 + MyGlobalStructureVariable2.MyChild");
-      REQUIRE(event.GetActions()[6].GetParameter(0).GetPlainString() == "1 + MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object2, MyObjectVariable, Object2, MyObjectVariable)");
-      REQUIRE(event.GetActions()[7].GetParameter(0).GetPlainString() == "1 + MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object2, MyObjectStructureVariable.MyChild, Object2, MyObjectStructureVariable.MyChild)");
-      REQUIRE(event.GetActions()[8].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectVariable)");
-      REQUIRE(event.GetActions()[9].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild)");
-      REQUIRE(event.GetActions()[10].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild)");
-      REQUIRE(event.GetActions()[11].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalVariable2)");
-      REQUIRE(event.GetActions()[12].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneVariable2)");
-      REQUIRE(event.GetActions()[13].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(SharedVariableName)");
-      REQUIRE(event.GetActions()[14].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild)");
-      REQUIRE(event.GetActions()[15].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild)");
-      REQUIRE(event.GetActions()[16].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild.GrandChild)");
-      REQUIRE(event.GetActions()[17].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild.GrandChild)");
+      // All the actions using the removed variables are kept.
+      REQUIRE(event.GetActions()[1].GetParameter(0).GetPlainString() == "1 + MySceneVariable2");
+      REQUIRE(event.GetActions()[3].GetParameter(0).GetPlainString() == "1 + Object2.MyObjectVariable");
+      REQUIRE(event.GetActions()[5].GetParameter(0).GetPlainString() == "1 + Object2.MyObjectStructureVariable.MyChild");
+      REQUIRE(event.GetActions()[7].GetParameter(0).GetPlainString() == "1 + MySceneStructureVariable2.MyChild");
+      REQUIRE(event.GetActions()[9].GetParameter(0).GetPlainString() == "1 + MyGlobalVariable2");
+      REQUIRE(event.GetActions()[11].GetParameter(0).GetPlainString() == "1 + MyGlobalStructureVariable2.MyChild");
+      REQUIRE(event.GetActions()[13].GetParameter(0).GetPlainString() == "1 + MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object2, MyObjectVariable, Object2, MyObjectVariable)");
+      REQUIRE(event.GetActions()[15].GetParameter(0).GetPlainString() == "1 + MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(Object2, MyObjectStructureVariable.MyChild, Object2, MyObjectStructureVariable.MyChild)");
+      REQUIRE(event.GetActions()[17].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectVariable)");
+      REQUIRE(event.GetActions()[19].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild)");
+      REQUIRE(event.GetActions()[21].GetParameter(0).GetPlainString() == "1 + Object2.GetObjectVariableAsNumber(MyObjectStructureVariable.MyChild.GrandChild)");
+      REQUIRE(event.GetActions()[23].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalVariable2)");
+      REQUIRE(event.GetActions()[26].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneVariable2)");
+      REQUIRE(event.GetActions()[27].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(SharedVariableName)");
+      REQUIRE(event.GetActions()[29].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild)");
+      REQUIRE(event.GetActions()[31].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild)");
+      REQUIRE(event.GetActions()[33].GetParameter(0).GetPlainString() == "1 + MyExtension::GetGlobalVariableAsNumber(MyGlobalStructureVariable2.MyChild.GrandChild)");
+      REQUIRE(event.GetActions()[35].GetParameter(0).GetPlainString() == "1 + MyExtension::GetVariableAsNumber(MySceneStructureVariable2.MyChild.GrandChild)");
 
-      REQUIRE(event.GetActions()[18].GetParameter(0).GetPlainString() == "MySceneVariable2");
-      REQUIRE(event.GetActions()[18].GetParameter(1).GetPlainString() == "MyGlobalVariable2");
-      REQUIRE(event.GetActions()[18].GetParameter(2).GetPlainString() == "Object2");
-      REQUIRE(event.GetActions()[18].GetParameter(3).GetPlainString() == "MyObjectVariable");
+      REQUIRE(event.GetActions()[39].GetParameter(0).GetPlainString() == "MySceneVariable2");
+      REQUIRE(event.GetActions()[39].GetParameter(1).GetPlainString() == "MyGlobalVariable2");
+      REQUIRE(event.GetActions()[39].GetParameter(2).GetPlainString() == "Object2");
+      REQUIRE(event.GetActions()[39].GetParameter(3).GetPlainString() == "MyObjectVariable");
       // clang-format on
     }
 
@@ -1021,6 +1021,140 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyVariable.MyRenamedChild");
   }
 
+  SECTION("Can rename an object variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyVariable").SetValue(123);
+    auto &instance = scene.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("Object");
+    instance.GetVariables().InsertNew("MyVariable").SetValue(456);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberObjectVariable");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("Object"));
+      action.SetParameter(1, gd::Expression("MyVariable"));
+      action.SetParameter(2, gd::Expression("="));
+      action.SetParameter(3, gd::Expression("Object.MyVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    object.GetVariables().SerializeTo(originalSerializedVariables);
+
+    object.GetVariables().Rename("MyVariable", "MyRenamedVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, object.GetVariables());
+
+    REQUIRE(changeset.oldToNewVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
+
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyRenamedVariable");
+    REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
+            "Object.MyRenamedVariable");
+    REQUIRE(instance.GetVariables().Get("MyRenamedVariable").GetValue() == 456);
+  }
+
+  SECTION("Can delete an object variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    object.GetVariables().InsertNew("MyVariable").SetValue(123);
+    auto &instance = scene.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("Object");
+    instance.GetVariables().InsertNew("MyVariable").SetValue(456);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberObjectVariable");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("Object"));
+      action.SetParameter(1, gd::Expression("MyVariable"));
+      action.SetParameter(2, gd::Expression("="));
+      action.SetParameter(3, gd::Expression("Object.MyVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    object.GetVariables().SerializeTo(originalSerializedVariables);
+
+    object.GetVariables().Remove("MyVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, object.GetVariables());
+    REQUIRE(changeset.removedVariableNames.size() == 1);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
+
+    // Events are untouched
+    REQUIRE(scene.GetEvents().size() == 1);
+    REQUIRE(event.GetActions().size() == 1);
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyVariable");
+    REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
+            "Object.MyVariable");
+    // Instance variables are removed
+    REQUIRE(!instance.GetVariables().Has("MyVariable"));
+  }
+
+  SECTION("Can add an object variable") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &object = scene.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "Object", 0);
+    auto &instance = scene.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("Object");
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    object.GetVariables().SerializeTo(originalSerializedVariables);
+
+    object.GetVariables().InsertNew("MyVariable").SetValue(123);
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, object.GetVariables());
+
+    REQUIRE(changeset.addedVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, object.GetVariables(), changeset, originalSerializedVariables);
+
+    // Instance variables are NOT added
+    REQUIRE(!instance.GetVariables().Has("MyVariable"));
+  }
+
   SECTION("Can rename an object child variable") {
     gd::Project project;
     gd::Platform platform;
@@ -1062,8 +1196,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     REQUIRE(changeset.modifiedVariables.size() == 1);
 
-    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, object.GetVariables(), changeset, originalSerializedVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
             "MyVariable.MyRenamedChild");
@@ -1112,8 +1247,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     REQUIRE(changeset.modifiedVariables.size() == 1);
 
-    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, object.GetVariables(), changeset, originalSerializedVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
             "MyVariable.MyRenamedChild");
@@ -1161,8 +1297,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
 
     REQUIRE(changeset.modifiedVariables.size() == 1);
 
-    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, object.GetVariables(), changeset, originalSerializedVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
             "MyVariable.MyChild.MyRenamedGrandChild");
@@ -1896,8 +2033,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.typeChangedVariableNames.find("MyObjectVariable") !=
             changeset.typeChangedVariableNames.end());
 
-    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, object.GetVariables(), changeset, originalSerializedVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
 
     // Check the the action has changed to follow the variable type.
     REQUIRE(event.GetActions()[0].GetType() == "SetStringObjectVariable");
@@ -1947,8 +2085,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.typeChangedVariableNames.find("MyObjectVariable") !=
             changeset.typeChangedVariableNames.end());
 
-    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
-        project, object.GetVariables(), changeset, originalSerializedVariables);
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), scene.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
 
     // Check the the action has changed to follow the variable type.
     REQUIRE(event.GetActions()[0].GetType() == "SetStringObjectVariable");
@@ -2094,8 +2233,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2140,8 +2280,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2188,8 +2329,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 111);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2236,8 +2378,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 0);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2282,8 +2425,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 0);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 111);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2336,8 +2480,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             originalSerializedVariables, groupVariables);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(newObject.GetVariables().Count() == 2);
     REQUIRE(newObject.GetVariables().Get("MyGroupVariable").GetValue() == 123);
@@ -2390,8 +2535,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables()
                 .Get("MyGroupVariable")
@@ -2448,8 +2594,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables()
                 .Get("MyGroupVariable")
@@ -2506,8 +2653,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables()
                 .Get("MyGroupVariable")
@@ -2579,8 +2727,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.valueChangedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables()
                 .Get("MyGroupVariable")
@@ -2613,6 +2762,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
     group.AddObject("Object");
     group.AddObject("OtherObject");
+    auto &instance = scene.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("Object");
+    instance.GetVariables().InsertNew("MyGroupVariable").SetValue(456);
 
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForProjectAndLayout(project, scene);
@@ -2635,11 +2787,13 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.removedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(!object.GetVariables().Has("MyGroupVariable"));
     REQUIRE(!otherObject.GetVariables().Has("MyGroupVariable"));
+    REQUIRE(!instance.GetVariables().Has("MyGroupVariable"));
   }
 
   SECTION("Can add a group variable") {
@@ -2677,8 +2831,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.addedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Get("MyGroupVariable").GetValue() == 456);
     REQUIRE(otherObject.GetVariables().Get("MyGroupVariable").GetValue() ==
@@ -2722,8 +2877,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.addedVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     // The variable kept its original value.
     REQUIRE(object.GetVariables().Count() == 1);
@@ -2749,6 +2905,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto &group = scene.GetObjects().GetObjectGroups().InsertNew("Group");
     group.AddObject("Object");
     group.AddObject("OtherObject");
+    auto &instance = scene.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("Object");
+    instance.GetVariables().InsertNew("MyGroupVariable").SetValue(456);
 
     gd::StandardEvent &event =
         dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
@@ -2806,8 +2965,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.oldToNewVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(object.GetVariables().Count() == 1);
     REQUIRE(object.GetVariables().Get("MyRenamedGroupVariable").GetValue() == 123);
@@ -2830,6 +2990,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyRenamedGroupVariable");
     REQUIRE(event.GetActions()[2].GetParameter(3).GetPlainString() ==
             "OtherObject.MyRenamedGroupVariable");
+    REQUIRE(instance.GetVariables().Get("MyRenamedGroupVariable").GetValue() == 456);
   }
 
   SECTION("Can rename a group variable when one of the object already has it") {
@@ -2906,8 +3067,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.oldToNewVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
         
     // The variable kept its original value.
     REQUIRE(object.GetVariables().Count() == 1);
@@ -3016,8 +3178,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.modifiedVariables.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
             "MyGroupVariable.MyRenamedChild");
@@ -3086,8 +3249,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(changeset.oldToNewVariableNames.size() == 1);
 
     gd::WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
-        project, project.GetObjects(), scene.GetObjects(), groupVariables,
-        group, changeset, originalSerializedVariables);
+        project, project.GetObjects(), scene.GetObjects(),
+        scene.GetInitialInstances(), groupVariables, group, changeset,
+        originalSerializedVariables);
 
     REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
             "MyGroupVariable");

@@ -26,6 +26,7 @@ type Props = {|
   onCancel: () => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  initialInstances: gdInitialInstancesContainer | null,
   initialTab: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
 |};
@@ -38,6 +39,7 @@ const EditedObjectGroupEditorDialog = ({
   onCancel,
   globalObjectsContainer,
   objectsContainer,
+  initialInstances,
   initialTab,
   onComputeAllVariableNames,
 }: Props) => {
@@ -75,6 +77,11 @@ const EditedObjectGroupEditorDialog = ({
 
   const apply = async () => {
     onApply();
+    if (!initialInstances) {
+      // This can only happens for legacy function object groups.
+      // In this case, we don't do any refactoring.
+      return;
+    }
 
     const originalSerializedVariables = getOriginalVariablesSerializedElement();
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
@@ -86,6 +93,7 @@ const EditedObjectGroupEditorDialog = ({
       project,
       globalObjectsContainer || objectsContainer,
       objectsContainer,
+      initialInstances,
       groupVariablesContainer,
       group,
       changeset,

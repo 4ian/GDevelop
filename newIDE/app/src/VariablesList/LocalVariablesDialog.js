@@ -47,7 +47,6 @@ const LocalVariablesDialog = ({
       title={<Trans>Local variables</Trans>}
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
-      preventRefactoringToDeleteInstructions
       id="local-variables-dialog"
       initiallySelectedVariableName={initiallySelectedVariableName}
       shouldCreateInitiallySelectedVariable={

@@ -8,6 +8,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 
 namespace gd {
+class InitialInstancesContainer;
 class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
@@ -17,6 +18,7 @@ struct VariablesChangeset;
 
 namespace gd {
 
+// TODO Rename this class as it's also used for variants.
 /**
  * Help handling variables of group objects as a whole.
  *
@@ -70,6 +72,17 @@ public:
                         const gd::VariablesContainer &groupVariablesContainer,
                         const gd::ObjectGroup &objectGroup,
                         const gd::VariablesChangeset &changeset);
+
+  static void ApplyChangesToObjectInstances(
+      gd::VariablesContainer &objectVariablesContainer,
+      gd::InitialInstancesContainer &initialInstancesContainer,
+      const gd::String &objectName, const gd::VariablesChangeset &changeset);
+
+private:
+  static void ApplyChangesToVariableContainer(
+      const gd::VariablesContainer &originalVariablesContainer,
+      gd::VariablesContainer &destinationVariablesContainer,
+      const gd::VariablesChangeset &changeset, bool shouldApplyValueChanges);
 };
 
 } // namespace gd

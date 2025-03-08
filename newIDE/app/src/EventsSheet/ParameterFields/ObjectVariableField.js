@@ -116,7 +116,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const canObjectDeclareVariable =
       objectSourceType !== gd.ObjectsContainer.Function;
 
-    const { layout } = scope;
+    const { layout, eventsBasedObject } = scope;
+    const initialInstances =
+      (layout && layout.getInitialInstances()) ||
+      (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
+      null;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
       () =>
         objectName && canObjectDeclareVariable
@@ -218,7 +222,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               open
               onCancel={() => setEditorOpen(null)}
               onApply={onVariableEditorApply}
-              preventRefactoringToDeleteInstructions
               initiallySelectedVariableName={editorOpen.variableName}
               shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
               onComputeAllVariableNames={onComputeAllVariableNames}
@@ -233,6 +236,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               project={project}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               globalObjectsContainer={globalObjectsContainer}
+              initialInstances={initialInstances}
               objectsContainer={objectsContainer}
               objectGroup={objectGroup}
               onCancel={() => setEditorOpen(null)}

@@ -333,6 +333,7 @@ type EventsTreeProps = {|
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
   onScroll?: () => void,
+  initialScrollPosition?: number,
 
   screenType: ScreenType,
   windowSize: WindowSizeType,
@@ -399,6 +400,7 @@ export default class ThemableEventsTree extends Component<
   DropTarget = makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType);
   temporaryUnfoldedNodes: Array<SortableTreeNode>;
   _hoverTimerId: ?TimeoutID;
+  _isForcedToInitialScroll: boolean;
 
   constructor(props: EventsTreeProps) {
     super(props);
@@ -413,6 +415,7 @@ export default class ThemableEventsTree extends Component<
       isScrolledTop: true,
       isScrolledBottom: false,
     };
+    this._isForcedToInitialScroll = !!this.props.initialScrollPosition;
   }
 
   componentDidMount() {
@@ -448,8 +451,12 @@ export default class ThemableEventsTree extends Component<
    */
   onHeightsChanged(cb: ?() => void) {
     this.forceUpdate(() => {
-      if (this._list && this._list.wrappedInstance.current) {
-        this._list.wrappedInstance.current.recomputeRowHeights();
+      const currentList = this._list;
+      if (currentList) {
+        const listWrapper = currentList.wrappedInstance.current;
+        if (listWrapper) {
+          listWrapper.recomputeRowHeights();
+        }
       }
       if (cb) cb();
     });
@@ -482,6 +489,15 @@ export default class ThemableEventsTree extends Component<
         listWrapper && listWrapper.scrollToRow(row);
       }
     }
+  }
+
+  getScrollPosition(): number {
+    const currentList = this._list;
+    if (!currentList) {
+      return 0;
+    }
+    const listWrapper = currentList.wrappedInstance.current;
+    return listWrapper ? listWrapper.Grid.state.scrollTop : 0;
   }
 
   /**
@@ -999,6 +1015,22 @@ export default class ThemableEventsTree extends Component<
     const treeData = this.state.treeData ? [...this.state.treeData] : null;
     const zoomLevel = this.props.fontSize || 14;
 
+    if (this._isForcedToInitialScroll) {
+      if (this.props.searchResults) {
+        this._isForcedToInitialScroll = false;
+      }
+      else {
+        const currentList = this._list;
+        if (currentList) {
+          const listWrapper = currentList.wrappedInstance.current;
+          if (listWrapper && listWrapper.Grid.state.scrollTop !== this.props.initialScrollPosition) {
+            // For some reason the List scroll is reset to 0 twice when the component is mounted.
+            listWrapper.scrollToPosition(this.props.initialScrollPosition);
+          }
+        }
+      }
+    }
+
     return (
       <div
         style={{
@@ -1053,6 +1085,12 @@ export default class ThemableEventsTree extends Component<
           reactVirtualizedListProps={{
             ref: list => (this._list = list),
             onScroll: event => {
+              if (
+                event.scrollTop !== 0 &&
+                event.scrollTop !== this.props.initialScrollPosition
+              ) {
+                this._isForcedToInitialScroll = false;
+              }
               this.props.onScroll && this.props.onScroll();
               this.setState({
                 isScrolledTop: event.scrollTop === 0,

@@ -18,7 +18,7 @@ struct VariablesChangeset;
 
 namespace gd {
 
-// TODO Rename this class as it's also used for variants.
+// TODO Rename this class as it's also used for object instances.
 /**
  * Help handling variables of group objects as a whole.
  *

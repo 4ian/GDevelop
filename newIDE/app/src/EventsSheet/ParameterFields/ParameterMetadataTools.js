@@ -23,7 +23,7 @@ export const getLastObjectParameterValue = ({
   expressionMetadata: ?gdExpressionMetadata,
   expression: ?ExpressionParameters,
   parameterIndex: ?number,
-|}): ?string => {
+|}): string | null => {
   if (parameterIndex === undefined || parameterIndex == null) {
     // No parameter index given: the parameter is not even in a list of parameters
     return null;

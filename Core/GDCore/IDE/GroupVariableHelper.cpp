@@ -6,6 +6,7 @@
 #include "GroupVariableHelper.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -193,4 +194,48 @@ void GroupVariableHelper::ApplyChangesToObjects(
   }
 }
 
+void GroupVariableHelper::ApplyChangesToObjectInstances(
+    gd::VariablesContainer &objectVariablesContainer,
+    gd::InitialInstancesContainer &initialInstancesContainer,
+    const gd::String &objectName, const gd::VariablesChangeset &changeset) {
+  initialInstancesContainer.IterateOverInstances(
+      [&objectVariablesContainer, &objectName,
+       &changeset](gd::InitialInstance &instance) {
+        if (instance.GetObjectName() == objectName) {
+          auto &destinationVariablesContainer = instance.GetVariables();
+          for (const gd::String &variableName :
+               changeset.removedVariableNames) {
+            destinationVariablesContainer.Remove(variableName);
+          }
+          for (const gd::String &variableName : changeset.addedVariableNames) {
+            // Instance variables may already exist with another type.
+            if (destinationVariablesContainer.Has(variableName) &&
+                destinationVariablesContainer.Get(variableName).GetType() !=
+                    objectVariablesContainer.Get(variableName).GetType()) {
+              destinationVariablesContainer.Remove(variableName);
+            }
+          }
+          for (const auto &pair : changeset.oldToNewVariableNames) {
+            const gd::String &oldVariableName = pair.first;
+            const gd::String &newVariableName = pair.second;
+            if (destinationVariablesContainer.Has(newVariableName)) {
+              // It can happens if an instance already had the variable.
+              destinationVariablesContainer.Remove(oldVariableName);
+            } else {
+              destinationVariablesContainer.Rename(oldVariableName,
+                                                   newVariableName);
+            }
+          }
+          // Apply type changes
+          for (const gd::String &variableName :
+               changeset.valueChangedVariableNames) {
+            if (destinationVariablesContainer.Has(variableName) &&
+                destinationVariablesContainer.Get(variableName).GetType() !=
+                    objectVariablesContainer.Get(variableName).GetType()) {
+              destinationVariablesContainer.Remove(variableName);
+            }
+          }
+        }
+      });
+}
 } // namespace gd

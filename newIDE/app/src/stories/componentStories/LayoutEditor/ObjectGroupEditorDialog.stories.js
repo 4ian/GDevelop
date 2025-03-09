@@ -21,6 +21,7 @@ export const Default = () => (
     }
     globalObjectsContainer={testProject.project.getObjects()}
     objectsContainer={testProject.testLayout.getObjects()}
+    initialInstances={testProject.testLayout.getInitialInstances()}
     group={testProject.group2}
     onApply={action('onApply')}
     onCancel={action('onCancel')}
@@ -36,6 +37,7 @@ export const WithLongObjectNames = () => (
     }
     globalObjectsContainer={testProject.project.getObjects()}
     objectsContainer={testProject.testLayout.getObjects()}
+    initialInstances={testProject.testLayout.getInitialInstances()}
     group={testProject.group4WithLongsNames}
     onApply={action('onApply')}
     onCancel={action('onCancel')}
@@ -51,6 +53,7 @@ export const Empty = () => (
     }
     globalObjectsContainer={testProject.project.getObjects()}
     objectsContainer={testProject.testLayout.getObjects()}
+    initialInstances={testProject.testLayout.getInitialInstances()}
     group={null}
     onApply={action('onApply')}
     onCancel={action('onCancel')}

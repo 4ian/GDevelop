@@ -105,7 +105,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             open
             onCancel={() => setEditorOpen(null)}
             onApply={onVariableEditorApply}
-            preventRefactoringToDeleteInstructions
             initiallySelectedVariableName={editorOpen.variableName}
             shouldCreateInitiallySelectedVariable={
               editorOpen.shouldCreate || false

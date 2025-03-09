@@ -2134,6 +2134,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   group={this.state.editedGroup}
                   objectsContainer={this.props.objectsContainer}
                   globalObjectsContainer={this.props.globalObjectsContainer}
+                  initialInstances={this.props.initialInstances}
                   onCancel={this._closeObjectGroupEditorDialog}
                   onApply={this._closeObjectGroupEditorDialog}
                   onObjectGroupAdded={(objectGroup: gdObjectGroup) => {

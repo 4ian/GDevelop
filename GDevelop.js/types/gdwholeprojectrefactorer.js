@@ -2,7 +2,8 @@
 declare class gdWholeProjectRefactorer {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: gdSerializerElement, newVariablesContainer: gdVariablesContainer): gdVariablesChangeset;
   static applyRefactoringForVariablesContainer(project: gdProject, newVariablesContainer: gdVariablesContainer, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
-  static applyRefactoringForGroupVariablesContainer(project: gdProject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, groupVariablesContainer: gdVariablesContainer, objectGroup: gdObjectGroup, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
+  static applyRefactoringForObjectVariablesContainer(project: gdProject, objectVariablesContainer: gdVariablesContainer, initialInstancesContainer: gdInitialInstancesContainer, objectName: string, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: gdProject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, initialInstancesContainer: gdInitialInstancesContainer, groupVariablesContainer: gdVariablesContainer, objectGroup: gdObjectGroup, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
   static renameEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, sourceExtensionName: string): void;

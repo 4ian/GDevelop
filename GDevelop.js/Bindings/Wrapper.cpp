@@ -717,6 +717,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectNameFromFullObjectType GetObjectNameFromFullObjectType
 #define STATIC_ApplyRefactoringForVariablesContainer \
   ApplyRefactoringForVariablesContainer
+  #define STATIC_ApplyRefactoringForObjectVariablesContainer \
+  ApplyRefactoringForObjectVariablesContainer
 #define STATIC_ApplyRefactoringForGroupVariablesContainer \
   ApplyRefactoringForGroupVariablesContainer
 #define STATIC_ComputeChangesetForVariablesContainer \

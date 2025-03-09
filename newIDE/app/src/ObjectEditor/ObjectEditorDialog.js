@@ -120,6 +120,15 @@ const InnerDialog = (props: InnerDialogProps) => {
   const onApply = async () => {
     props.onApply();
 
+    const initialInstances =
+      (layout && layout.getInitialInstances()) ||
+      (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
+      null;
+    if (!initialInstances) {
+      // This can't actually happen.
+      return;
+    }
+
     const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
       'variables'
     );
@@ -135,9 +144,11 @@ const InnerDialog = (props: InnerDialogProps) => {
       changeset.clearRemovedVariables();
     }
 
-    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+    gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
       project,
       object.getVariables(),
+      initialInstances,
+      object.getName(),
       changeset,
       originalSerializedVariables
     );

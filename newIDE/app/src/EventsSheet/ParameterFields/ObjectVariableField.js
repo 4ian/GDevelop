@@ -218,6 +218,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               project={project}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               objectName={objectName}
+              initialInstances={initialInstances}
               variablesContainer={variablesContainers[0]}
               open
               onCancel={() => setEditorOpen(null)}

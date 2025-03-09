@@ -43,7 +43,8 @@ type Props = {|
   onEditObjectVariables?: () => void,
   title: React.Node,
   tabs: Array<TabProps>,
-  areObjectVariables?: boolean,
+  objectName?: ?string,
+  initialInstances?: ?gdInitialInstancesContainer,
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
@@ -70,7 +71,8 @@ const VariablesEditorDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
-  areObjectVariables,
+  objectName,
+  initialInstances,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -155,12 +157,23 @@ const VariablesEditorDialog = ({
             originalContentSerializedElement,
             variablesContainer
           );
-          gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
-            project,
-            variablesContainer,
-            changeset,
-            originalContentSerializedElement
-          );
+          if (objectName && initialInstances) {
+            gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+              project,
+              variablesContainer,
+              initialInstances,
+              objectName,
+              changeset,
+              originalContentSerializedElement
+            );
+          } else {
+            gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+              project,
+              variablesContainer,
+              changeset,
+              originalContentSerializedElement
+            );
+          }
         }
         variablesContainer.clearPersistentUuid();
       }
@@ -175,7 +188,15 @@ const VariablesEditorDialog = ({
         );
       }
     },
-    [tabs, project, getOriginalContentSerializedElements, currentTab, onApply]
+    [
+      getOriginalContentSerializedElements,
+      tabs,
+      objectName,
+      initialInstances,
+      project,
+      currentTab,
+      onApply,
+    ]
   );
 
   return (
@@ -261,7 +282,7 @@ const VariablesEditorDialog = ({
                     projectScopedContainersAccessor
                   }
                   variablesContainer={variablesContainer}
-                  areObjectVariables={areObjectVariables}
+                  areObjectVariables={!!objectName}
                   initiallySelectedVariableName={
                     actualInitiallySelectedVariableName.current
                   }

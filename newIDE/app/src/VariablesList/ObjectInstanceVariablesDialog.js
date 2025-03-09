@@ -80,7 +80,7 @@ const ObjectInstanceVariablesDialog = ({
     <VariablesEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      areObjectVariables
+      objectName={objectInstance.getObjectName()}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

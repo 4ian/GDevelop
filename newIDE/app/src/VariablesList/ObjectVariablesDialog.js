@@ -9,7 +9,8 @@ type Props = {|
   open: boolean,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  objectName?: ?string,
+  objectName: string | null,
+  initialInstances: gdInitialInstancesContainer | null,
   variablesContainer: gdVariablesContainer,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
@@ -22,6 +23,7 @@ type Props = {|
 const ObjectVariablesDialog = ({
   project,
   objectName,
+  initialInstances,
   variablesContainer,
   open,
   onCancel,
@@ -54,7 +56,8 @@ const ObjectVariablesDialog = ({
     <VariablesEditorDialog
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      areObjectVariables
+      objectName={objectName}
+      initialInstances={initialInstances}
       open={open}
       onCancel={onCancel}
       onApply={onApply}

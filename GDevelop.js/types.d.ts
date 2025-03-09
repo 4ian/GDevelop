@@ -384,6 +384,7 @@ export class ObjectGroup extends EmscriptenObject {
 export class GroupVariableHelper extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
+  static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
@@ -768,6 +769,8 @@ export class ObjectJsImplementation extends ObjectConfiguration {
 
 export class CustomObjectConfiguration extends ObjectConfiguration {
   clone(): UniquePtrObjectConfiguration;
+  getVariantName(): string;
+  setVariantName(name: string): void;
   isForcedToOverrideEventsBasedObjectChildrenConfiguration(): boolean;
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(): boolean;
   setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(isOverridingEventsBasedObjectChildrenConfiguration: boolean): void;
@@ -2269,6 +2272,8 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   isInnerAreaFollowingParentSize(): boolean;
   makAsUsingLegacyInstancesRenderer(value: boolean): EventsBasedObject;
   isUsingLegacyInstancesRenderer(): boolean;
+  getDefaultVariant(): EventsBasedObjectVariant;
+  getVariants(): EventsBasedObjectVariantsContainer;
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
@@ -2288,6 +2293,45 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
   static getPropertyToggleActionName(propertyName: string): string;
+}
+
+export class EventsBasedObjectVariant extends EmscriptenObject {
+  constructor();
+  getName(): string;
+  setName(name: string): EventsBasedObjectVariant;
+  getInitialInstances(): InitialInstancesContainer;
+  getLayers(): LayersContainer;
+  getObjects(): ObjectsContainer;
+  getAreaMinX(): number;
+  getAreaMinY(): number;
+  getAreaMinZ(): number;
+  getAreaMaxX(): number;
+  getAreaMaxY(): number;
+  getAreaMaxZ(): number;
+  setAreaMinX(value: number): void;
+  setAreaMinY(value: number): void;
+  setAreaMinZ(value: number): void;
+  setAreaMaxX(value: number): void;
+  setAreaMaxY(value: number): void;
+  setAreaMaxZ(value: number): void;
+  setAssetStoreAssetId(assetStoreAssetId: string): void;
+  getAssetStoreAssetId(): string;
+  setAssetStoreOriginalName(assetStoreOriginalName: string): void;
+  getAssetStoreOriginalName(): string;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
+}
+
+export class EventsBasedObjectVariantsContainer extends EmscriptenObject {
+  insertNewVariant(name: string, pos: number): EventsBasedObjectVariant;
+  insertVariant(variant: EventsBasedObjectVariant, pos: number): EventsBasedObjectVariant;
+  hasVariantNamed(name: string): boolean;
+  getVariant(name: string): EventsBasedObjectVariant;
+  getVariantAt(pos: number): EventsBasedObjectVariant;
+  removeVariant(name: string): void;
+  moveVariant(oldIndex: number, newIndex: number): void;
+  getVariantsCount(): number;
+  getVariantPosition(variant: EventsBasedObjectVariant): number;
 }
 
 export class EventsBasedObjectsList extends EmscriptenObject {
@@ -2360,6 +2404,7 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
   serializeTo(element: SerializerElement): void;
+  serializeToExternal(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
 }

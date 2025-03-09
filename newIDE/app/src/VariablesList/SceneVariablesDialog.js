@@ -20,6 +20,7 @@ type Props = {|
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const SceneVariablesDialog = ({
@@ -32,6 +33,7 @@ const SceneVariablesDialog = ({
   preventRefactoringToDeleteInstructions,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -87,6 +89,7 @@ const SceneVariablesDialog = ({
         preventRefactoringToDeleteInstructions
       }
       id="scene-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

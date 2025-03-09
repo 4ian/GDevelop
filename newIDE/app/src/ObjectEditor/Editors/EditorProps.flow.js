@@ -37,4 +37,14 @@ export type EditorProps = {|
   scrollView?: ScrollViewInterface,
   renderObjectNameField?: () => React.Node,
   isChildObject?: boolean,
+  onOpenEventBasedObjectEditor?: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};

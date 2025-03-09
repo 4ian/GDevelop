@@ -50,6 +50,7 @@ export const Default = () => (
         ) => cb(true)}
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        isListLocked={false}
       />
     </div>
   </DragAndDropContextProvider>
@@ -86,8 +87,45 @@ export const WithSerializedObjectView = () => (
           ) => cb(true)}
           onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          isListLocked={false}
         />
       </div>
     </SerializedObjectDisplay>
+  </DragAndDropContextProvider>
+);
+
+export const Locked = () => (
+  <DragAndDropContextProvider>
+    <div style={{ height: 400 }}>
+      <ObjectsList
+        getThumbnail={() => 'res/unknown32.png'}
+        project={testProject.project}
+        layout={testProject.testLayout}
+        eventsBasedObject={null}
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        globalObjectsContainer={testProject.project.getObjects()}
+        objectsContainer={testProject.testLayout.getObjects()}
+        resourceManagementProps={fakeResourceManagementProps}
+        onEditObject={action('On edit object')}
+        onOpenEventBasedObjectEditor={action('On edit children')}
+        onExportAssets={action('On export assets')}
+        onAddObjectInstance={action('On add instance to the scene')}
+        onObjectCreated={action('On object created')}
+        onObjectEdited={action('On object edited')}
+        selectedObjectFolderOrObjectsWithContext={[]}
+        getValidatedObjectOrGroupName={newName => newName}
+        onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+        onRenameObjectFolderOrObjectWithContextFinish={(
+          objectWithContext,
+          newName,
+          cb
+        ) => cb(true)}
+        onObjectFolderOrObjectWithContextSelected={() => {}}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        isListLocked={true}
+      />
+    </div>
   </DragAndDropContextProvider>
 );

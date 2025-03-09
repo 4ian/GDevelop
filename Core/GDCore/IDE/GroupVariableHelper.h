@@ -12,11 +12,13 @@ class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
 class VariablesContainer;
+class EventsBasedObject;
 struct VariablesChangeset;
 } // namespace gd
 
 namespace gd {
 
+// TODO Rename this class as it's also used for variants.
 /**
  * Help handling variables of group objects as a whole.
  *
@@ -70,6 +72,20 @@ public:
                         const gd::VariablesContainer &groupVariablesContainer,
                         const gd::ObjectGroup &objectGroup,
                         const gd::VariablesChangeset &changeset);
+
+  /**
+   * @brief Apply the changes done on events-based object child to all its
+   * variants.
+   */
+  static void ApplyChangesToVariants(gd::EventsBasedObject &eventsBasedObject,
+                                     const gd::String &objectName,
+                                     const gd::VariablesChangeset &changeset);
+
+private:
+  static void ApplyChangesToVariableContainer(
+      const gd::VariablesContainer &originalVariablesContainer,
+      gd::VariablesContainer &destinationVariablesContainer,
+      const gd::VariablesChangeset &changeset, bool shouldApplyValueChanges);
 };
 
 } // namespace gd

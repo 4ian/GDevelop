@@ -157,7 +157,7 @@ const TopLevelCollapsibleSection = ({
   renderContentAsHiddenWhenFolded?: boolean,
   noContentMargin?: boolean,
   onOpenFullEditor: () => void,
-  onAdd?: () => void,
+  onAdd?: (() => void) | null,
 |}) => (
   <>
     <Separator />
@@ -215,6 +215,9 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onExtensionInstalled: (extensionName: string) => void,
+  isVariableListLocked: boolean,
+  isBehaviorListLocked: boolean,
 |};
 
 export const CompactObjectPropertiesEditor = ({
@@ -232,6 +235,9 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onExtensionInstalled,
+  isVariableListLocked,
+  isBehaviorListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [
@@ -335,6 +341,7 @@ export const CompactObjectPropertiesEditor = ({
     onUpdate: forceUpdate,
     onBehaviorsUpdated: forceUpdate,
     onUpdateBehaviorsSharedData,
+    onExtensionInstalled,
   });
 
   const allVisibleBehaviors = object
@@ -542,7 +549,7 @@ export const CompactObjectPropertiesEditor = ({
             isFolded={isBehaviorsFolded}
             toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
             onOpenFullEditor={() => onEditObject(object, 'behaviors')}
-            onAdd={openNewBehaviorDialog}
+            onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
             renderContent={() => (
               <ColumnStackLayout noMargin>
                 {!allVisibleBehaviors.length && (
@@ -615,12 +622,16 @@ export const CompactObjectPropertiesEditor = ({
             isFolded={isVariablesFolded}
             toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
             onOpenFullEditor={() => onEditObject(object, 'variables')}
-            onAdd={() => {
-              if (variablesListRef.current) {
-                variablesListRef.current.addVariable();
-              }
-              setIsVariablesFolded(false);
-            }}
+            onAdd={
+              isVariableListLocked
+                ? null
+                : () => {
+                    if (variablesListRef.current) {
+                      variablesListRef.current.addVariable();
+                    }
+                    setIsVariablesFolded(false);
+                  }
+            }
             renderContentAsHiddenWhenFolded={
               true /* Allows to keep a ref to the variables list for add button to work. */
             }
@@ -661,6 +672,7 @@ export const CompactObjectPropertiesEditor = ({
                     on this object.
                   </Trans>
                 }
+                isListLocked={isVariableListLocked}
               />
             )}
           />

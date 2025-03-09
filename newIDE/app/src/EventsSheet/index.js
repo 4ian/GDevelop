@@ -151,6 +151,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 type ComponentProps = {|
@@ -1783,6 +1784,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   isCondition,
                 });
             }}
+            onExtensionInstalled={this.props.onExtensionInstalled}
           />
         )}
       </I18n>
@@ -2156,6 +2158,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             shouldCreateInitiallySelectedVariable={
               this.state.editedVariable.shouldCreateVariable
             }
+            isListLocked={false}
           />
         )}
         {this.state.layoutVariablesDialogOpen && (
@@ -2165,6 +2168,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onCancel={() => this.editLayoutVariables(false)}
             onApply={() => this.editLayoutVariables(false)}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            isListLocked={false}
           />
         )}
         {this.state.textEditedEvent && (

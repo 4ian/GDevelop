@@ -25,6 +25,8 @@ export const Default = () => (
     onApply={action('onApply')}
     onCancel={action('onCancel')}
     onObjectGroupAdded={action('onObjectGroupAdded')}
+    isVariableListLocked={false}
+    isObjectListLocked={false}
   />
 );
 
@@ -40,6 +42,8 @@ export const WithLongObjectNames = () => (
     onApply={action('onApply')}
     onCancel={action('onCancel')}
     onObjectGroupAdded={action('onObjectGroupAdded')}
+    isVariableListLocked={false}
+    isObjectListLocked={false}
   />
 );
 
@@ -55,5 +59,7 @@ export const Empty = () => (
     onApply={action('onApply')}
     onCancel={action('onCancel')}
     onObjectGroupAdded={action('onObjectGroupAdded')}
+    isVariableListLocked={false}
+    isObjectListLocked={false}
   />
 );

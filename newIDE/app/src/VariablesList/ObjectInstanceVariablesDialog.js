@@ -25,6 +25,7 @@ type Props = {|
   preventRefactoringToDeleteInstructions?: boolean,
   initiallySelectedVariableName?: string,
   onEditObjectVariables: () => void,
+  isListLocked: boolean,
 |};
 
 const ObjectInstanceVariablesDialog = ({
@@ -41,6 +42,7 @@ const ObjectInstanceVariablesDialog = ({
   initiallySelectedVariableName,
   projectScopedContainersAccessor,
   onEditObjectVariables,
+  isListLocked,
 }: Props) => {
   const tabs = React.useMemo(
     () => {
@@ -100,6 +102,7 @@ const ObjectInstanceVariablesDialog = ({
       }
       id="instance-variables-dialog"
       onEditObjectVariables={onEditObjectVariables}
+      isListLocked={isListLocked}
     />
   );
 };

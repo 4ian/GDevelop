@@ -12,6 +12,7 @@
 #include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -158,38 +159,67 @@ void GroupVariableHelper::ApplyChangesToObjects(
     }
     auto &object = hasObject ? objectsContainer.GetObject(objectName)
                              : globalObjectsContainer.GetObject(objectName);
-    auto &variablesContainer = object.GetVariables();
-    for (const gd::String &variableName : changeset.removedVariableNames) {
-      variablesContainer.Remove(variableName);
+    gd::GroupVariableHelper::ApplyChangesToVariableContainer(
+      groupVariablesContainer, object.GetVariables(), changeset, true);
+  }
+}
+
+void GroupVariableHelper::ApplyChangesToVariants(
+    gd::EventsBasedObject &eventsBasedObject, const gd::String &objectName,
+    const gd::VariablesChangeset &changeset) {
+  auto &defaultVariablesContainer = eventsBasedObject.GetDefaultVariant()
+                                        .GetObjects()
+                                        .GetObject(objectName)
+                                        .GetVariables();
+  for (auto &variant : eventsBasedObject.GetVariants().GetInternalVector()) {
+    if (!variant->GetObjects().HasObjectNamed(objectName)) {
+      continue;
     }
-    for (const gd::String &variableName : changeset.addedVariableNames) {
-      if (variablesContainer.Has(variableName)) {
-        // It can happens if an object already had the variable but it was not
-        // shared by other object of the group.
-        continue;
-      }
-      variablesContainer.Insert(variableName,
-                                groupVariablesContainer.Get(variableName),
-                                variablesContainer.Count());
+    auto &object = variant->GetObjects().GetObject(objectName);
+    gd::GroupVariableHelper::ApplyChangesToVariableContainer(
+        defaultVariablesContainer, object.GetVariables(), changeset, false);
+  }
+}
+
+void GroupVariableHelper::ApplyChangesToVariableContainer(
+    const gd::VariablesContainer &originalVariablesContainer,
+    gd::VariablesContainer &destinationVariablesContainer,
+    const gd::VariablesChangeset &changeset, bool shouldApplyValueChanges) {
+  for (const gd::String &variableName : changeset.removedVariableNames) {
+    destinationVariablesContainer.Remove(variableName);
+  }
+  for (const gd::String &variableName : changeset.addedVariableNames) {
+    if (destinationVariablesContainer.Has(variableName)) {
+      // It can happens if an object already had the variable but it was not
+      // shared by other object of the group.
+      continue;
     }
-    for (const auto &pair : changeset.oldToNewVariableNames) {
-      const gd::String &oldVariableName = pair.first;
-      const gd::String &newVariableName = pair.second;
-      if (variablesContainer.Has(newVariableName)) {
-        // It can happens if an object already had the variable but it was not
-        // shared by other object of the group.
-        variablesContainer.Remove(oldVariableName);
-      } else {
-        variablesContainer.Rename(oldVariableName, newVariableName);
-      }
+    destinationVariablesContainer.Insert(
+        variableName, originalVariablesContainer.Get(variableName),
+        destinationVariablesContainer.Count());
+  }
+  for (const auto &pair : changeset.oldToNewVariableNames) {
+    const gd::String &oldVariableName = pair.first;
+    const gd::String &newVariableName = pair.second;
+    if (destinationVariablesContainer.Has(newVariableName)) {
+      // It can happens if an object already had the variable but it was not
+      // shared by other object of the group.
+      destinationVariablesContainer.Remove(oldVariableName);
+    } else {
+      destinationVariablesContainer.Rename(oldVariableName, newVariableName);
     }
-    // Apply type and value changes
-    for (const gd::String &variableName : changeset.valueChangedVariableNames) {
-      size_t index = variablesContainer.GetPosition(variableName);
-      variablesContainer.Remove(variableName);
-      variablesContainer.Insert(
-          variableName, groupVariablesContainer.Get(variableName), index);
+  }
+  // Apply type and value changes
+  for (const gd::String &variableName : changeset.valueChangedVariableNames) {
+    if (!shouldApplyValueChanges &&
+        destinationVariablesContainer.Get(variableName).GetType() ==
+            originalVariablesContainer.Get(variableName).GetType()) {
+      continue;
     }
+    size_t index = destinationVariablesContainer.GetPosition(variableName);
+    destinationVariablesContainer.Remove(variableName);
+    destinationVariablesContainer.Insert(
+        variableName, originalVariablesContainer.Get(variableName), index);
   }
 }
 

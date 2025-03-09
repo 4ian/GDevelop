@@ -63,6 +63,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    eventsBasedObjectVariant,
     updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
@@ -252,6 +253,10 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
       ? editorTitleById[selectedEditorId]
       : null;
 
+  const isCustomVariant = eventsBasedObject
+    ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+    : false;
+
   return (
     <FullSizeMeasurer>
       {({ width, height }) => (
@@ -267,6 +272,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               project={project}
               layout={layout}
               eventsBasedObject={eventsBasedObject}
+              eventsBasedObjectVariant={eventsBasedObjectVariant}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
               layersContainer={layersContainer}
@@ -362,6 +368,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       hotReloadPreviewButtonProps={
                         props.hotReloadPreviewButtonProps
                       }
+                      isListLocked={isCustomVariant}
                     />
                   )}
                 </I18n>
@@ -397,6 +404,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
                       lastSelectionType={props.lastSelectionType}
+                      onExtensionInstalled={props.onExtensionInstalled}
+                      isVariableListLocked={isCustomVariant}
+                      isBehaviorListLocked={isCustomVariant}
                     />
                   )}
                 </I18n>
@@ -429,6 +439,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.canObjectOrGroupBeGlobal(i18n, groupName)
                       }
                       unsavedChanges={props.unsavedChanges}
+                      isListLocked={isCustomVariant}
                     />
                   )}
                 </I18n>

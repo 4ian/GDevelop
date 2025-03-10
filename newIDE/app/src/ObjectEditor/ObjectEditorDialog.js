@@ -136,14 +136,6 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables,
       object.getVariables()
     );
-    if (changeset.hasRemovedVariables()) {
-      // While we support refactoring that would remove all references (actions, conditions...)
-      // it's both a bit dangerous for the user and we would need to show the user what
-      // will be removed before doing so. For now, just clear the removed variables so they don't
-      // trigger any refactoring.
-      changeset.clearRemovedVariables();
-    }
-
     gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
       project,
       object.getVariables(),

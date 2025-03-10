@@ -334,6 +334,7 @@ namespace gdjs {
       if (!this._action) {
         return true;
       }
+      //If this animation is looping, we dont want it to be able to send "true" as it must be endless.
       return !this._action.isRunning() && !this._action.loop;
     }
 
@@ -372,8 +373,10 @@ namespace gdjs {
       const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
 
-      //We stop action and set enabled to true to fix troubles in animation switching and looping coming from this._action not being reset.
+      //The action must be reset before being reconfigurated with enabled and setLoop to prevent previous action parameters causing problems  
       this._action.stop();
+
+      //This is absolutely required for the good functioning of animation crossfading
       this._action.enabled = true;
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,

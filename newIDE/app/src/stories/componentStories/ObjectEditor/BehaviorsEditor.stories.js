@@ -28,6 +28,7 @@ export const Default = () => (
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
       onExtensionInstalled={action('extension installed')}
+      isListLocked={false}
     />
   </SerializedObjectDisplay>
 );
@@ -43,6 +44,39 @@ export const WithoutAnyBehaviors = () => (
       openBehaviorEvents={() => action('Open behavior events')}
       onBehaviorsUpdated={() => {}}
       onExtensionInstalled={action('extension installed')}
+      isListLocked={false}
+    />
+  </SerializedObjectDisplay>
+);
+
+export const Locked = () => (
+  <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
+    <BehaviorsEditor
+      project={testProject.project}
+      eventsFunctionsExtension={null}
+      object={testProject.spriteObjectWithBehaviors}
+      resourceManagementProps={fakeResourceManagementProps}
+      onUpdateBehaviorsSharedData={() => {}}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onBehaviorsUpdated={() => {}}
+      onExtensionInstalled={action('extension installed')}
+      isListLocked={true}
+    />
+  </SerializedObjectDisplay>
+);
+
+export const LockedWithoutAnyBehaviors = () => (
+  <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
+    <BehaviorsEditor
+      project={testProject.project}
+      eventsFunctionsExtension={null}
+      object={testProject.spriteObjectWithoutBehaviors}
+      resourceManagementProps={fakeResourceManagementProps}
+      onUpdateBehaviorsSharedData={() => {}}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onBehaviorsUpdated={() => {}}
+      onExtensionInstalled={action('extension installed')}
+      isListLocked={true}
     />
   </SerializedObjectDisplay>
 );

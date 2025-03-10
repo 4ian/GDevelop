@@ -725,6 +725,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   ComputeChangesetForVariablesContainer
 #define STATIC_MergeVariableContainers MergeVariableContainers
 #define STATIC_FillAnyVariableBetweenObjects FillAnyVariableBetweenObjects
+#define STATIC_ApplyChangesToVariants ApplyChangesToVariants
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior \
   UpdateExtensionNameInEventsBasedBehavior
@@ -844,6 +845,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define RemoveEventAt RemoveEvent
 #define RemoveAt Remove
 #define GetEventsFunctionAt GetEventsFunction
+#define GetVariantAt GetVariant
 #define GetEffectAt GetEffect
 #define GetParameterAt GetParameter
 

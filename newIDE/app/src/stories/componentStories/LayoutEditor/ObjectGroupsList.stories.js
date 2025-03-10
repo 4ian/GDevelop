@@ -35,6 +35,31 @@ export const Default = () => (
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}
           getValidatedObjectOrGroupName={newName => newName}
+          isListLocked={false}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  </DragAndDropContextProvider>
+);
+
+export const Locked = () => (
+  <DragAndDropContextProvider>
+    <SerializedObjectDisplay object={testProject.testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectGroupsList
+          globalObjectGroups={testProject.project
+            .getObjects()
+            .getObjectGroups()}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
+          objectGroups={testProject.testLayout.getObjects().getObjectGroups()}
+          onCreateGroup={action('onCreateGroup')}
+          onEditGroup={action('onEditGroup')}
+          onRenameGroup={action('onRenameGroup')}
+          onDeleteGroup={action('onDeleteGroup')}
+          getValidatedObjectOrGroupName={newName => newName}
+          isListLocked={true}
         />
       </div>
     </SerializedObjectDisplay>

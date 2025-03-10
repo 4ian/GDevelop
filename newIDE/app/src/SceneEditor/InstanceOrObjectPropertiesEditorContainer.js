@@ -36,12 +36,14 @@ type Props = {|
   i18n: I18nType,
   historyHandler?: HistoryHandler,
   lastSelectionType: 'instance' | 'object',
+  isVariableListLocked: boolean,
 
   // For objects:
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onUpdateBehaviorsSharedData: () => void,
   onExtensionInstalled: (extensionName: string) => void,
+  isBehaviorListLocked: boolean,
 
   // For instances:
   instances: Array<gdInitialInstance>,
@@ -83,6 +85,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
     onExtensionInstalled,
+    isBehaviorListLocked,
 
     // For instances:
     instances,
@@ -116,6 +119,7 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           eventsFunctionsExtension={eventsFunctionsExtension}
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onExtensionInstalled={onExtensionInstalled}
+          isBehaviorListLocked={isBehaviorListLocked}
           {...commonProps}
         />
       ) : (

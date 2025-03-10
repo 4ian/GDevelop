@@ -624,14 +624,16 @@ module.exports = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        propertyOverridings
       ) {
         super(
           project,
           instance,
           associatedObjectConfiguration,
           pixiContainer,
-          pixiResourcesLoader
+          pixiResourcesLoader,
+          propertyOverridings
         );
 
         // We'll track changes of the font to trigger the loading of the new font.
@@ -657,8 +659,9 @@ module.exports = {
 
         // Update the rendered text properties (note: Pixi is only
         // applying changes if there were changed).
-        const rawText = object.content.text;
-        this._pixiObject.text = rawText;
+        this._pixiObject.text = this._propertyOverridings.has('Text')
+          ? this._propertyOverridings.get('Text')
+          : object.content.text;
 
         const align = object.content.align;
         this._pixiObject.align = align;

@@ -13,6 +13,7 @@ type Props = {|
   onCancel: () => void,
   initiallySelectedVariableName: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const LocalVariablesDialog = ({
@@ -24,6 +25,7 @@ const LocalVariablesDialog = ({
   onApply,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const tabs = React.useMemo(
     () => [
@@ -53,6 +55,7 @@ const LocalVariablesDialog = ({
         shouldCreateInitiallySelectedVariable
       }
       hotReloadPreviewButtonProps={null}
+      isListLocked={isListLocked}
     />
   );
 };

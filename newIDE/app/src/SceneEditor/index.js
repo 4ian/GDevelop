@@ -101,6 +101,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
 
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -126,9 +127,15 @@ type Props = {|
   ) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
-    eventsBasedObjectName: string
+    eventsBasedObjectName: string,
+    variantName: string
   ) => void,
   onExtensionInstalled: (extensionName: string) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1557,7 +1564,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   ),
                   gd.PlatformExtension.getObjectNameFromFullObjectType(
                     object.getType()
-                  )
+                  ),
+                  // TODO open the right variant
+                  ''
                 ),
             }
           : null,
@@ -1888,6 +1897,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout,
       eventsFunctionsExtension,
       eventsBasedObject,
+      eventsBasedObjectVariant,
       initialInstances,
       resourceManagementProps,
       isActive,
@@ -1921,6 +1931,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         </Trans>
       ) : null;
 
+    const isCustomVariant = eventsBasedObject
+      ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+      : false;
+
     return (
       <ResponsiveWindowMeasurer>
         {({ isMobile }) => {
@@ -1953,6 +1967,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
                 layersContainer={this.props.layersContainer}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
@@ -2116,6 +2131,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
                         onExtensionInstalled={this.props.onExtensionInstalled}
+                        onOpenEventBasedObjectEditor={
+                          this.props.onOpenEventBasedObjectEditor
+                        }
+                        onDeleteEventsBasedObjectVariant={
+                          this.props.onDeleteEventsBasedObjectVariant
+                        }
+                        isBehaviorListLocked={isCustomVariant}
+                        isVariableListLocked={isCustomVariant}
                       />
                     )}
                   </React.Fragment>
@@ -2160,6 +2183,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       editedGroup.getName()
                     );
                   }}
+                  isVariableListLocked={isCustomVariant}
+                  isObjectListLocked={isCustomVariant}
                 />
               )}
               {this.state.setupGridOpen && (
@@ -2196,6 +2221,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
+                    isListLocked={true}
                   />
                 )}
               {!!this.state.layerRemoved &&
@@ -2242,22 +2268,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                   resourceManagementProps={this.props.resourceManagementProps}
                 />
               )}
-              {this.state.scenePropertiesDialogOpen && eventsBasedObject && (
-                <EventsBasedObjectScenePropertiesDialog
-                  project={project}
-                  eventsBasedObject={eventsBasedObject}
-                  onClose={() => this.openSceneProperties(false)}
-                  onApply={() => this.openSceneProperties(false)}
-                  getContentAABB={
-                    this.editorDisplay
-                      ? this.editorDisplay.instancesHandlers.getContentAABB
-                      : () => null
-                  }
-                  onEventsBasedObjectChildrenEdited={
-                    this.props.onEventsBasedObjectChildrenEdited
-                  }
-                />
-              )}
+              {this.state.scenePropertiesDialogOpen &&
+                eventsBasedObject &&
+                eventsBasedObjectVariant && (
+                  <EventsBasedObjectScenePropertiesDialog
+                    project={project}
+                    eventsBasedObject={eventsBasedObject}
+                    eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    onClose={() => this.openSceneProperties(false)}
+                    onApply={() => this.openSceneProperties(false)}
+                    getContentAABB={
+                      this.editorDisplay
+                        ? this.editorDisplay.instancesHandlers.getContentAABB
+                        : () => null
+                    }
+                    onEventsBasedObjectChildrenEdited={
+                      this.props.onEventsBasedObjectChildrenEdited
+                    }
+                  />
+                )}
               {!!this.state.layoutVariablesDialogOpen && layout && (
                 <SceneVariablesDialog
                   open
@@ -2268,6 +2297,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }
+                  isListLocked={false}
                 />
               )}
               <I18n>

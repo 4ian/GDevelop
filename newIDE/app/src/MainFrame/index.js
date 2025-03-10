@@ -489,8 +489,6 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
-  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
-
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -545,6 +543,11 @@ const MainFrame = (props: Props) => {
     getGameUnverifiedScreenshotUrls,
     getHotReloadPreviewLaunchCaptureOptions,
   } = useCapturesManager({ project: currentProject, gamesList });
+
+  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer({
+    project: currentProject,
+    gamesList,
+  });
 
   /**
    * This reference is useful to get the current opened project,
@@ -1674,9 +1677,7 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
-      const authenticatedPlayer = await getAuthenticatedPlayerForPreview(
-        currentProject
-      );
+      const authenticatedPlayer = await getAuthenticatedPlayerForPreview();
 
       const captureOptions = await createCaptureOptionsForPreview(
         launchCaptureOptions

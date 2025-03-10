@@ -46,7 +46,7 @@
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/GroupVariableHelper.h>
+#include <GDCore/IDE/ObjectVariableHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>

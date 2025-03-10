@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GroupVariableHelper.h"
+#include "ObjectVariableHelper.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -17,7 +17,7 @@
 
 namespace gd {
 
-void GroupVariableHelper::FillAnyVariableBetweenObjects(
+void ObjectVariableHelper::FillAnyVariableBetweenObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::ObjectGroup &objectGroup) {
@@ -66,7 +66,7 @@ void GroupVariableHelper::FillAnyVariableBetweenObjects(
   }
 }
 
-gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
+gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
     const gd::ObjectGroup &objectGroup) {
   gd::VariablesContainer mergedVariablesContainer;
@@ -114,7 +114,7 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
-void GroupVariableHelper::FillMissingGroupVariablesToObjects(
+void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::SerializerElement &originalSerializedVariables) {
@@ -146,7 +146,7 @@ void GroupVariableHelper::FillMissingGroupVariablesToObjects(
 // TODO Handle position changes for group variables.
 // We could try to change the order of object variables in a way that the next
 // call to MergeVariableContainers rebuild them in the same order.
-void GroupVariableHelper::ApplyChangesToObjects(
+void ObjectVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::VariablesContainer &groupVariablesContainer,
@@ -194,7 +194,7 @@ void GroupVariableHelper::ApplyChangesToObjects(
   }
 }
 
-void GroupVariableHelper::ApplyChangesToObjectInstances(
+void ObjectVariableHelper::ApplyChangesToObjectInstances(
     gd::VariablesContainer &objectVariablesContainer,
     gd::InitialInstancesContainer &initialInstancesContainer,
     const gd::String &objectName, const gd::VariablesChangeset &changeset) {

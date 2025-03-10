@@ -11,7 +11,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
-#include "GDCore/IDE/GroupVariableHelper.h"
+#include "GDCore/IDE/ObjectVariableHelper.h"
 #include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/EventBasedObjectBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
@@ -350,7 +350,7 @@ void WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
       project, objectVariablesContainer, changeset,
       originalSerializedVariables);
 
-  gd::GroupVariableHelper::ApplyChangesToObjectInstances(
+  gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
       objectVariablesContainer, initialInstancesContainer, objectName,
       changeset);
 }
@@ -380,7 +380,7 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                              : globalObjectsContainer.GetObject(objectName);
     auto &objectVariablesContainer = object.GetVariables();
 
-    gd::GroupVariableHelper::ApplyChangesToObjectInstances(
+    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
       objectVariablesContainer, initialInstancesContainer, objectName,
       changeset);
 
@@ -399,12 +399,12 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                                                 eventsVariableReplacer);
 
   // Apply changes to objects.
-  gd::GroupVariableHelper::FillMissingGroupVariablesToObjects(
+  gd::ObjectVariableHelper::FillMissingGroupVariablesToObjects(
       globalObjectsContainer,
       objectsContainer,
       objectGroup,
       originalSerializedVariables);
-  gd::GroupVariableHelper::ApplyChangesToObjects(
+  gd::ObjectVariableHelper::ApplyChangesToObjects(
       globalObjectsContainer, objectsContainer, groupVariablesContainer,
       objectGroup, changeset);
 

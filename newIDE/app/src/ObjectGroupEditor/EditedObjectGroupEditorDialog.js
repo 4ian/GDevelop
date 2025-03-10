@@ -60,7 +60,7 @@ const EditedObjectGroupEditorDialog = ({
     // The VariablesContainer is returned by value.
     // Thus, the same instance is reused every time.
     () =>
-      gd.GroupVariableHelper.mergeVariableContainers(
+      gd.ObjectVariableHelper.mergeVariableContainers(
         projectScopedContainersAccessor.get().getObjectsContainersList(),
         group
       )

@@ -18,13 +18,12 @@ struct VariablesChangeset;
 
 namespace gd {
 
-// TODO Rename this class as it's also used for object instances.
 /**
  * Help handling variables of group objects as a whole.
  *
  * This is used by the object group variable editor.
  */
-class GD_CORE_API GroupVariableHelper {
+class GD_CORE_API ObjectVariableHelper {
 public:
   /**
    * Copy every variable from every object of the group to the other objects

@@ -242,6 +242,7 @@ namespace gdjs {
         const variable = this._variables.get(variableName);
         const variableOwner = variable.getPlayerOwnership();
         if (
+          !syncOptions.syncEverythingForWholeGameSaveState &&
           // Variable undefined.
           variable.isUndefinedInContainer() ||
           // Variable marked as not to be synchronized.
@@ -253,6 +254,7 @@ namespace gdjs {
             !isHost) ||
           // Variable is owned by a player but not getting sync data for this player number.
           (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
+
         ) {
           // In those cases, the variable should not be synchronized.
           return;

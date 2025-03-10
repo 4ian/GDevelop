@@ -251,6 +251,64 @@ namespace gdjs {
       this.onModelChanged(objectData);
     }
 
+    saveWholeGame(currentScene : RuntimeScene ): void {
+      const sceneStack = currentScene.getGame()._sceneStack._stack;
+    
+      const allSyncData: any[] = [];
+      allSyncData.push(currentScene.getGame().getNetworkSyncData({syncEverythingForWholeGameSaveState: true}));
+
+      sceneStack.forEach(scene => {
+        allSyncData.push(scene.getNetworkSyncData({syncEverythingForWholeGameSaveState:true}))
+        }
+      );
+      sceneStack.forEach(scene => {
+        const sceneObjects = scene.getAdhocListOfAllInstances();
+        for (const key in sceneObjects) {
+          if (sceneObjects.hasOwnProperty(key)) {
+            const object = sceneObjects[key];
+            if (object.getNetworkSyncData) {
+              const syncData = object.getNetworkSyncData(true);
+              allSyncData.push(syncData);
+            }
+          }
+        }
+      });
+      const syncDataJson = JSON.stringify(allSyncData);
+      this.LoadWholeGame(syncDataJson);
+    }
+    LoadWholeGame(syncDataJson: string): void {
+      this._runtimeScene._destroy();
+      const allSyncData = JSON.parse(syncDataJson);
+      const sceneStack = allSyncData[0].ss;
+      console.log(sceneStack);
+      let sceneIndex = 1;
+      sceneStack.forEach((sceneData: any) => {
+        let scene = sceneStack[sceneIndex];
+        
+        if (!scene) {
+          const sceneAndExtensionData = allSyncData[sceneIndex];
+          scene = new gdjs.RuntimeScene(this._runtimeScene.getGame());
+          scene.loadFromScene(sceneAndExtensionData, {skipCreatingInstances: true});
+          console.log(scene);
+        }
+        scene.updateFromNetworkSyncData();
+        const sceneObjects = scene.getAdhocListOfAllInstances();
+        for (const key in sceneObjects) {
+          if (sceneObjects.hasOwnProperty(key)) {
+            const object = sceneObjects[key];
+              const objectSyncData = sceneData.objects[key];
+              if (objectSyncData) {
+                object.onCreated();
+                object.updateFromNetworkSyncData(objectSyncData);
+              }
+            
+          }
+        }
+    
+        sceneIndex++;
+      });
+    }
+
     _updateModel(objectData: Model3DObjectData) {
       const rotationX = objectData.content.rotationX || 0;
       const rotationY = objectData.content.rotationY || 0;

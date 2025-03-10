@@ -814,6 +814,21 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Crossfade duration (in seconds)'), '', false)
         .setFunctionName('setCrossfadeDuration');
+
+        object
+        .addScopedAction(
+          'SyncAll',
+          _('Set crossfade duration'),
+          _('Set the crossfade duration when switching to a new animation.'),
+          _('Syncall'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        
+        .setFunctionName('saveWholeGame');
+
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();

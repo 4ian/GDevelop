@@ -1360,7 +1360,7 @@ namespace gdjs {
         const extensionVariablesSyncData =
           variables.getNetworkSyncData(syncOptions);
         // If there is no variables to sync, don't include the extension in the sync data.
-        if (extensionVariablesSyncData.length) {
+        if (extensionVariablesSyncData.length && !syncOptions.syncEverythingForWholeGameSaveState) {
           extensionsVariablesSyncData[extensionName] =
             extensionVariablesSyncData;
         }

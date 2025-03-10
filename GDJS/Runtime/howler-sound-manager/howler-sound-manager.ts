@@ -511,10 +511,10 @@ namespace gdjs {
      * @param resource
      * @param isMusic
      */
-    private _preloadAudioFile (
+    private _preloadAudioFile(
       resource: ResourceData,
       isMusic: boolean
-    ): Promise<number>  {
+    ): Promise<number> {
       const file = resource.file;
       return new Promise((resolve, reject) => {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;
@@ -525,9 +525,8 @@ namespace gdjs {
             onloaderror: (soundId: number, error?: string) => reject(error),
             html5: isMusic,
             xhr: {
-              withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                file
-              ),
+              withCredentials:
+                this._resourceLoader.checkIfCredentialsRequired(file),
             },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
@@ -535,7 +534,7 @@ namespace gdjs {
           })
         );
       });
-    };
+    }
 
     /**
      * Store the sound in the specified array, put it at the first index that
@@ -588,9 +587,10 @@ namespace gdjs {
               src: this._getSoundUrlsFromResource(resource),
               html5: isMusic,
               xhr: {
-                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                ),
+                withCredentials:
+                  this._resourceLoader.checkIfCredentialsRequired(
+                    resource.file
+                  ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -627,9 +627,10 @@ namespace gdjs {
               src: this._getSoundUrlsFromResource(resource),
               html5: isMusic,
               xhr: {
-                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                ),
+                withCredentials:
+                  this._resourceLoader.checkIfCredentialsRequired(
+                    resource.file
+                  ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -903,9 +904,8 @@ namespace gdjs {
           const file = resource.file;
           await new Promise((resolve, reject) => {
             const sound = new XMLHttpRequest();
-            sound.withCredentials = this._resourceLoader.checkIfCredentialsRequired(
-              file
-            );
+            sound.withCredentials =
+              this._resourceLoader.checkIfCredentialsRequired(file);
             sound.addEventListener('load', resolve);
             sound.addEventListener('error', (_) =>
               reject('XHR error: ' + file)

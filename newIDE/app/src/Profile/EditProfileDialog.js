@@ -14,6 +14,7 @@ import {
   type UpdateGitHubStarResponse,
   type UpdateTiktokFollowResponse,
   type UpdateTwitterFollowResponse,
+  type UpdateYoutubeSubscriptionResponse,
 } from '../Utils/GDevelopServices/Authentication';
 import {
   communityLinksConfig,
@@ -69,6 +70,9 @@ export type EditProfileDialogProps = {|
   onUpdateTwitterFollow: (
     communityLinks: CommunityLinks
   ) => Promise<UpdateTwitterFollowResponse>,
+  onUpdateYoutubeSubscription: (
+    communityLinks: CommunityLinks
+  ) => Promise<UpdateYoutubeSubscriptionResponse>,
   onDelete: () => Promise<void>,
   actionInProgress: boolean,
   error: ?AuthError,
@@ -252,6 +256,7 @@ const EditProfileDialog = ({
   onUpdateGitHubStar,
   onUpdateTiktokFollow,
   onUpdateTwitterFollow,
+  onUpdateYoutubeSubscription,
   onDelete,
   actionInProgress,
   error,
@@ -554,6 +559,27 @@ const EditProfileDialog = ({
                   <CommunityLinkWithFollow
                     badges={badges}
                     achievements={achievements}
+                    achievementId="youtube-subscription"
+                    value={youtubeUsername}
+                    onChange={setYoutubeUsername}
+                    onUpdateFollow={() =>
+                      onUpdateYoutubeSubscription(updatedCommunityLinks)
+                    }
+                    getMessageFromUpdate={
+                      communityLinksConfig.youtubeUsername.getMessageFromUpdate
+                    }
+                    disabled={actionInProgress}
+                    maxLength={communityLinksConfig.youtubeUsername.maxLength}
+                    prefix={communityLinksConfig.youtubeUsername.prefix}
+                    getRewardMessage={
+                      communityLinksConfig.youtubeUsername.getRewardMessage
+                    }
+                    translatableHintText={t`username`}
+                    icon={communityLinksConfig.youtubeUsername.icon}
+                  />
+                  <CommunityLinkWithFollow
+                    badges={badges}
+                    achievements={achievements}
                     achievementId="tiktok-follow"
                     value={tiktokUsername}
                     onChange={setTiktokUsername}
@@ -596,15 +622,6 @@ const EditProfileDialog = ({
                     translatableHintText={t`username`}
                     onChange={(e, value) => {
                       setFacebookUsername(value);
-                    }}
-                    disabled={actionInProgress}
-                  />
-                  <CommunityLinkLine
-                    id="youtubeUsername"
-                    value={youtubeUsername}
-                    translatableHintText={t`username`}
-                    onChange={(e, value) => {
-                      setYoutubeUsername(value);
                     }}
                     disabled={actionInProgress}
                   />

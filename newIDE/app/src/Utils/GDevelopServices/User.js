@@ -656,8 +656,37 @@ export const communityLinksConfig = {
   },
   youtubeUsername: {
     icon: <YouTube />,
-    prefix: 'https://youtube.com/',
+    prefix: 'https://youtube.com/@',
     maxLength: 100,
+    getMessageFromUpdate: (responseCode: string) => {
+      if (
+        responseCode === 'youtube-subscription/badge-given' ||
+        responseCode === 'youtube-subscription/badge-already-given'
+      ) {
+        return {
+          title: t`You're awesome!`,
+          message: t`Thanks for following GDevelop. We added credits to your account as a thank you gift.`,
+        };
+      } else if (
+        responseCode === 'youtube-subscription/channel-not-subscribed'
+      ) {
+        return {
+          title: t`We could not check your subscription`,
+          message: t`Make sure you subscribed to the GDevelop channel and try again.`,
+        };
+      } else if (responseCode === 'youtube-subscription/user-not-found') {
+        return {
+          title: t`We could not find your user`,
+          message: t`Make sure your username is correct, subscribe to the GDevelop channel and try again.`,
+        };
+      }
+
+      return null;
+    },
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+      !hasBadge
+        ? t`[Subscribe to GDevelop](https://youtube.com/@gdevelopapp) and enter your YouTube username here to get ${rewardValueInCredits} free credits as a thank you!`
+        : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   tiktokUsername: {
     icon: <TikTok />,

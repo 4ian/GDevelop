@@ -310,6 +310,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated,
   onBehaviorsUpdated,
   onUpdateBehaviorsSharedData,
+  onExtensionInstalled,
 }: {
   project: gdProject,
   object: gdObject,
@@ -318,6 +319,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated?: ?() => void,
   onBehaviorsUpdated?: ?() => void,
   onUpdateBehaviorsSharedData: () => void,
+  onExtensionInstalled: (extensionName: string) => void,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -582,6 +584,7 @@ export const useManageObjectBehaviors = ({
       onChoose={addBehavior}
       project={project}
       eventsFunctionsExtension={eventsFunctionsExtension}
+      onExtensionInstalled={onExtensionInstalled}
     />
   );
 
@@ -614,6 +617,7 @@ type Props = {|
     extensionName: string,
     behaviorName: string
   ) => Promise<void>,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -631,6 +635,7 @@ const BehaviorsEditor = (props: Props) => {
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
     openBehaviorEvents,
+    onExtensionInstalled,
   } = props;
   const forceUpdate = useForceUpdate();
 
@@ -657,6 +662,7 @@ const BehaviorsEditor = (props: Props) => {
     onSizeUpdated,
     onBehaviorsUpdated,
     onUpdateBehaviorsSharedData,
+    onExtensionInstalled,
   });
 
   React.useEffect(

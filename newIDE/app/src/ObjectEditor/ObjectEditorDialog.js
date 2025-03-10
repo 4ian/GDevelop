@@ -60,6 +60,7 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 type InnerDialogProps = {|
@@ -88,6 +89,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onExtensionInstalled,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -297,6 +299,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
       {currentTab === 'variables' && (

@@ -43,7 +43,8 @@ type Props = {|
   onEditObjectVariables?: () => void,
   title: React.Node,
   tabs: Array<TabProps>,
-  areObjectVariables?: boolean,
+  objectName?: ?string,
+  initialInstances?: ?gdInitialInstancesContainer,
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
@@ -53,12 +54,6 @@ type Props = {|
 
   helpPagePath: ?string,
   id?: string,
-
-  /**
-   * If set to true, a deleted variable won't trigger a confirmation asking if the
-   * project must be refactored to delete any reference to it.
-   */
-  preventRefactoringToDeleteInstructions?: boolean,
 |};
 
 const VariablesEditorDialog = ({
@@ -70,14 +65,14 @@ const VariablesEditorDialog = ({
   project,
   hotReloadPreviewButtonProps,
   helpPagePath,
-  preventRefactoringToDeleteInstructions,
   id,
   tabs,
   initiallyOpenTabId,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
-  areObjectVariables,
+  objectName,
+  initialInstances,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -162,25 +157,23 @@ const VariablesEditorDialog = ({
             originalContentSerializedElement,
             variablesContainer
           );
-
-          if (
-            preventRefactoringToDeleteInstructions ||
-            // While we support refactoring that would remove all references (actions, conditions...)
-            // it's both a bit dangerous for the user and we would need to show the user what
-            // will be removed before doing so. For now, just clear the removed variables so they don't
-            // trigger any refactoring.
-            true
-          ) {
-            // Clear the removed variables from the changeset, so they do not trigger
-            // deletion of actions/conditions or events using them.
-            changeset.clearRemovedVariables();
+          if (objectName && initialInstances) {
+            gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+              project,
+              variablesContainer,
+              initialInstances,
+              objectName,
+              changeset,
+              originalContentSerializedElement
+            );
+          } else {
+            gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+              project,
+              variablesContainer,
+              changeset,
+              originalContentSerializedElement
+            );
           }
-          gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
-            project,
-            variablesContainer,
-            changeset,
-            originalContentSerializedElement
-          );
         }
         variablesContainer.clearPersistentUuid();
       }
@@ -196,10 +189,11 @@ const VariablesEditorDialog = ({
       }
     },
     [
-      tabs,
-      project,
       getOriginalContentSerializedElements,
-      preventRefactoringToDeleteInstructions,
+      tabs,
+      objectName,
+      initialInstances,
+      project,
       currentTab,
       onApply,
     ]
@@ -288,7 +282,7 @@ const VariablesEditorDialog = ({
                     projectScopedContainersAccessor
                   }
                   variablesContainer={variablesContainer}
-                  areObjectVariables={areObjectVariables}
+                  areObjectVariables={!!objectName}
                   initiallySelectedVariableName={
                     actualInitiallySelectedVariableName.current
                   }

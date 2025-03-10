@@ -73,6 +73,7 @@ class GD_CORE_API EventsVariableReplacer
    */
   const gd::String targetGroupName;
   const VariablesRenamingChangesetNode &variablesRenamingChangesetRoot;
+  // TODO There is no reason de delete events. This dead code should be removed.
   const std::unordered_set<gd::String> &removedVariableNames;
 
   static VariablesContainer nullVariablesContainer;

@@ -3,9 +3,10 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GroupVariableHelper.h"
+#include "ObjectVariableHelper.h"
 
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -16,7 +17,7 @@
 
 namespace gd {
 
-void GroupVariableHelper::FillAnyVariableBetweenObjects(
+void ObjectVariableHelper::FillAnyVariableBetweenObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::ObjectGroup &objectGroup) {
@@ -65,7 +66,7 @@ void GroupVariableHelper::FillAnyVariableBetweenObjects(
   }
 }
 
-gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
+gd::VariablesContainer ObjectVariableHelper::MergeVariableContainers(
     const gd::ObjectsContainersList &objectsContainersList,
     const gd::ObjectGroup &objectGroup) {
   gd::VariablesContainer mergedVariablesContainer;
@@ -113,7 +114,7 @@ gd::VariablesContainer GroupVariableHelper::MergeVariableContainers(
   return mergedVariablesContainer;
 }
 
-void GroupVariableHelper::FillMissingGroupVariablesToObjects(
+void ObjectVariableHelper::FillMissingGroupVariablesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer, const gd::ObjectGroup &objectGroup,
     const gd::SerializerElement &originalSerializedVariables) {
@@ -145,7 +146,7 @@ void GroupVariableHelper::FillMissingGroupVariablesToObjects(
 // TODO Handle position changes for group variables.
 // We could try to change the order of object variables in a way that the next
 // call to MergeVariableContainers rebuild them in the same order.
-void GroupVariableHelper::ApplyChangesToObjects(
+void ObjectVariableHelper::ApplyChangesToObjects(
     gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
     const gd::VariablesContainer &groupVariablesContainer,
@@ -193,4 +194,48 @@ void GroupVariableHelper::ApplyChangesToObjects(
   }
 }
 
+void ObjectVariableHelper::ApplyChangesToObjectInstances(
+    gd::VariablesContainer &objectVariablesContainer,
+    gd::InitialInstancesContainer &initialInstancesContainer,
+    const gd::String &objectName, const gd::VariablesChangeset &changeset) {
+  initialInstancesContainer.IterateOverInstances(
+      [&objectVariablesContainer, &objectName,
+       &changeset](gd::InitialInstance &instance) {
+        if (instance.GetObjectName() == objectName) {
+          auto &destinationVariablesContainer = instance.GetVariables();
+          for (const gd::String &variableName :
+               changeset.removedVariableNames) {
+            destinationVariablesContainer.Remove(variableName);
+          }
+          for (const gd::String &variableName : changeset.addedVariableNames) {
+            // Instance variables may already exist with another type.
+            if (destinationVariablesContainer.Has(variableName) &&
+                destinationVariablesContainer.Get(variableName).GetType() !=
+                    objectVariablesContainer.Get(variableName).GetType()) {
+              destinationVariablesContainer.Remove(variableName);
+            }
+          }
+          for (const auto &pair : changeset.oldToNewVariableNames) {
+            const gd::String &oldVariableName = pair.first;
+            const gd::String &newVariableName = pair.second;
+            if (destinationVariablesContainer.Has(newVariableName)) {
+              // It can happens if an instance already had the variable.
+              destinationVariablesContainer.Remove(oldVariableName);
+            } else {
+              destinationVariablesContainer.Rename(oldVariableName,
+                                                   newVariableName);
+            }
+          }
+          // Apply type changes
+          for (const gd::String &variableName :
+               changeset.valueChangedVariableNames) {
+            if (destinationVariablesContainer.Has(variableName) &&
+                destinationVariablesContainer.Get(variableName).GetType() !=
+                    objectVariablesContainer.Get(variableName).GetType()) {
+              destinationVariablesContainer.Remove(variableName);
+            }
+          }
+        }
+      });
+}
 } // namespace gd

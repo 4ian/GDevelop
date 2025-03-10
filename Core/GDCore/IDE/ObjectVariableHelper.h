@@ -8,6 +8,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 
 namespace gd {
+class InitialInstancesContainer;
 class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
@@ -22,7 +23,7 @@ namespace gd {
  *
  * This is used by the object group variable editor.
  */
-class GD_CORE_API GroupVariableHelper {
+class GD_CORE_API ObjectVariableHelper {
 public:
   /**
    * Copy every variable from every object of the group to the other objects
@@ -70,6 +71,17 @@ public:
                         const gd::VariablesContainer &groupVariablesContainer,
                         const gd::ObjectGroup &objectGroup,
                         const gd::VariablesChangeset &changeset);
+
+  static void ApplyChangesToObjectInstances(
+      gd::VariablesContainer &objectVariablesContainer,
+      gd::InitialInstancesContainer &initialInstancesContainer,
+      const gd::String &objectName, const gd::VariablesChangeset &changeset);
+
+private:
+  static void ApplyChangesToVariableContainer(
+      const gd::VariablesContainer &originalVariablesContainer,
+      gd::VariablesContainer &destinationVariablesContainer,
+      const gd::VariablesChangeset &changeset, bool shouldApplyValueChanges);
 };
 
 } // namespace gd

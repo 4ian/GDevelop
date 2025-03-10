@@ -334,7 +334,6 @@ namespace gdjs {
       if (!this._action) {
         return true;
       }
-
       return !this._action.isRunning() && !this._action.loop;
     }
 

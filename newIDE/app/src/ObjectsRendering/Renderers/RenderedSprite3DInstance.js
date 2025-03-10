@@ -214,6 +214,7 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
       imageName,
       {
         useTransparentTexture: true,
+        vertexColors: false,
       }
     );
     if (this._wasDestroyed) return;

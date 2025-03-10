@@ -62,6 +62,7 @@ namespace gdjs {
         forceBasicMaterial:
           runtimeObject._materialType ===
           gdjs.Cube3DRuntimeObject.MaterialType.Basic,
+        vertexColors: true,
       });
   };
 

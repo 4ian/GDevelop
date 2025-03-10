@@ -567,10 +567,8 @@ export default class PixiResourcesLoader {
     resourceName: string,
     {
       useTransparentTexture,
-      vertexColors,
     }: {|
       useTransparentTexture: boolean,
-      vertexColors: boolean,
     |}
   ): Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
@@ -585,7 +583,7 @@ export default class PixiResourcesLoader {
         map: texture,
         side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
         transparent: useTransparentTexture,
-        vertexColors,
+        vertexColors: true,
       });
 
       return material;

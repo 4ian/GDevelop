@@ -2422,7 +2422,6 @@ module.exports = {
             this._faceResourceNames[faceIndex],
             {
               useTransparentTexture: this._shouldUseTransparentTexture,
-              vertexColors: true,
             }
           );
         };

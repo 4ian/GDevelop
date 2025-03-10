@@ -228,11 +228,15 @@ namespace gdjs {
         useTransparentTexture,
         forceBasicMaterial,
         vertexColors,
-      }: { useTransparentTexture: boolean; forceBasicMaterial: boolean, vertexColors: boolean }
+      }: {
+        useTransparentTexture: boolean;
+        forceBasicMaterial: boolean;
+        vertexColors: boolean;
+      }
     ): THREE.Material {
       const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
         forceBasicMaterial ? 1 : 0
-      }`;
+      }|${vertexColors ? 1 : 0}`;
 
       const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
       if (loadedThreeMaterial) return loadedThreeMaterial;

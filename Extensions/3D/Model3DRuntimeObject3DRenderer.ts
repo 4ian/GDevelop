@@ -334,7 +334,8 @@ namespace gdjs {
       if (!this._action) {
         return true;
       }
-      return !this._action.isRunning();
+
+      return !this._action.isRunning() && !this._action.loop;
     }
 
     animationPaused() {
@@ -371,6 +372,10 @@ namespace gdjs {
       }
       const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
+
+      //We stop action and set enabled to true to fix troubles in animation switching and looping coming from this._action not being reset.
+      this._action.stop();
+      this._action.enabled = true;
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,
         Number.POSITIVE_INFINITY
@@ -378,7 +383,6 @@ namespace gdjs {
       this._action.clampWhenFinished = true;
 
       if (previousAction && previousAction !== this._action) {
-        this._action.enabled = true;
         this._action.crossFadeFrom(
           previousAction,
           this._model3DRuntimeObject._crossfadeDuration,

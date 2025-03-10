@@ -73,31 +73,37 @@ export const useAuthenticatedPlayer = ({
         return tokenFetchingPromise.current;
       }
 
-      try {
-        tokenFetchingPromise.current = retryIfFailed({ times: 2 }, async () => {
-          const newPlayerTokenForGame = await getPlayerToken({
-            getAuthorizationHeader,
-            userId: profile.id,
-            gameId: game.id,
+      const fetchPlayerToken = async (): Promise<?AuthenticatedPlayer> => {
+        try {
+          await retryIfFailed({ times: 2 }, async () => {
+            const newPlayerTokenForGame = await getPlayerToken({
+              getAuthorizationHeader,
+              userId: profile.id,
+              gameId: game.id,
+            });
+            playerTokensForPreview.current[game.id] = newPlayerTokenForGame;
+
+            return {
+              playerId: profile.id,
+              playerUsername: profile.username || 'Player',
+              playerToken: newPlayerTokenForGame,
+            };
           });
-          playerTokensForPreview.current[game.id] = newPlayerTokenForGame;
+        } catch (error) {
+          console.error(
+            'Error while fetching player token for preview:',
+            error
+          );
 
-          return {
-            playerId: profile.id,
-            playerUsername: profile.username || 'Player',
-            playerToken: newPlayerTokenForGame,
-          };
-        });
+          return null;
+        } finally {
+          tokenFetchingPromise.current = null;
+        }
+      };
 
-        const authPlayer = await tokenFetchingPromise.current;
-        return authPlayer;
-      } catch (error) {
-        console.error('Error while fetching player token for preview:', error);
+      tokenFetchingPromise.current = fetchPlayerToken();
 
-        return null;
-      } finally {
-        tokenFetchingPromise.current = null;
-      }
+      return tokenFetchingPromise.current;
     },
     [
       game,

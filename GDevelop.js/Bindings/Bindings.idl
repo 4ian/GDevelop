@@ -378,6 +378,12 @@ interface ObjectVariableHelper {
         [Const, Ref] VariablesChangeset changeset);
 };
 
+interface EventsBasedObjectVariantHelper {
+    void STATIC_ComplyVariantsToEventsBasedObject(
+        [Ref, Const] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
+};
+
 interface ObjectGroupsContainer {
     void ObjectGroupsContainer();
 

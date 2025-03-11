@@ -16,7 +16,9 @@ type Props = {|
   onApply: () => void,
   onClose: () => void,
   getContentAABB: () => Rectangle | null,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 const EventsBasedObjectScenePropertiesDialog = ({
@@ -72,14 +74,14 @@ const EventsBasedObjectScenePropertiesDialog = ({
     const wasRenderedIn3D = eventsBasedObject.isRenderedIn3D();
     if (wasRenderedIn3D !== isRenderedIn3D) {
       eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
-      onEventsBasedObjectChildrenEdited();
+      onEventsBasedObjectChildrenEdited(eventsBasedObject);
     }
     const wasInnerAreaFollowingParentSize = eventsBasedObject.isInnerAreaFollowingParentSize();
     if (wasInnerAreaFollowingParentSize !== isInnerAreaFollowingParentSize) {
       eventsBasedObject.markAsInnerAreaFollowingParentSize(
         isInnerAreaFollowingParentSize
       );
-      onEventsBasedObjectChildrenEdited();
+      onEventsBasedObjectChildrenEdited(eventsBasedObject);
     }
     onApply();
   };

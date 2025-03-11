@@ -1251,6 +1251,7 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
+  // TODO Call this function when an extension is imported
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
     if (!currentProject) return;
@@ -1380,6 +1381,20 @@ const MainFrame = (props: Props) => {
   };
 
   const onExtensionInstalled = (extensionName: string) => {
+    const { currentProject } = state;
+    if (!currentProject) {
+      return;
+    }
+    const eventsBasedObjects = currentProject
+      .getEventsFunctionsExtension(extensionName)
+      .getEventsBasedObjects();
+    for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+      const eventsBasedObject = eventsBasedObjects.getAt(index);
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        currentProject,
+        eventsBasedObject
+      );
+    }
     // TODO Open the closed tabs back
     // It would be safer to close the tabs before the extension is installed
     // but it would make opening them back more complicated.
@@ -2245,7 +2260,16 @@ const MainFrame = (props: Props) => {
   };
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    () => {
+    (eventsBasedObject: gdEventsBasedObject) => {
+      const project = state.currentProject;
+      if (!project) {
+        return;
+      }
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        project,
+        eventsBasedObject
+      );
+
       for (const editor of state.editorTabs.editors) {
         const { editorRef } = editor;
         if (editorRef) {
@@ -2253,7 +2277,7 @@ const MainFrame = (props: Props) => {
         }
       }
     },
-    [state.editorTabs]
+    [state.editorTabs, state.currentProject]
   );
 
   const onSceneObjectEdited = React.useCallback(

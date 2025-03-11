@@ -263,6 +263,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onObjectEdited={objectWithContext =>
               this.props.onSceneObjectEdited(layout, objectWithContext)
             }
+            // It's only used to refresh events-based object variants.
+            onObjectGroupEdited={() => {}}
             // Nothing to do as events-based objects can't have external layout.
             onEventsBasedObjectChildrenEdited={() => {}}
             onExtensionInstalled={this.props.onExtensionInstalled}

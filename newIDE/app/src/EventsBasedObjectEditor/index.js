@@ -23,7 +23,9 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 export default function EventsBasedObjectEditor({
@@ -127,7 +129,7 @@ export default function EventsBasedObjectEditor({
         onCheck={(e, checked) => {
           eventsBasedObject.markAsInnerAreaFollowingParentSize(checked);
           onChange();
-          onEventsBasedObjectChildrenEdited();
+          onEventsBasedObjectChildrenEdited(eventsBasedObject);
         }}
       />
       {isDev && (
@@ -137,7 +139,7 @@ export default function EventsBasedObjectEditor({
           onCheck={(e, checked) => {
             eventsBasedObject.makAsUsingLegacyInstancesRenderer(checked);
             onChange();
-            onEventsBasedObjectChildrenEdited();
+            onEventsBasedObjectChildrenEdited(eventsBasedObject);
           }}
         />
       )}
@@ -147,7 +149,7 @@ export default function EventsBasedObjectEditor({
         onCheck={(e, checked) => {
           eventsBasedObject.setPrivate(checked);
           onChange();
-          onEventsBasedObjectChildrenEdited();
+          onEventsBasedObjectChildrenEdited(eventsBasedObject);
         }}
         tooltipOrHelperText={
           eventsBasedObject.isPrivate() ? (

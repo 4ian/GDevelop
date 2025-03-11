@@ -387,6 +387,10 @@ export class ObjectVariableHelper extends EmscriptenObject {
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
 }
 
+export class EventsBasedObjectVariantHelper extends EmscriptenObject {
+  static complyVariantsToEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject): void;
+}
+
 export class ObjectGroupsContainer extends EmscriptenObject {
   constructor();
   has(name: string): boolean;

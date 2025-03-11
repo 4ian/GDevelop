@@ -174,6 +174,7 @@ void ObjectVariableHelper::ApplyChangesToObjects(
                                 groupVariablesContainer.Get(variableName),
                                 variablesContainer.Count());
     }
+    // TODO Check what happens if 2 variables exchange their names.
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;
       const gd::String &newVariableName = pair.second;
@@ -216,6 +217,7 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
               destinationVariablesContainer.Remove(variableName);
             }
           }
+          // TODO Check what happens if 2 variables exchange their names.
           for (const auto &pair : changeset.oldToNewVariableNames) {
             const gd::String &oldVariableName = pair.first;
             const gd::String &newVariableName = pair.second;
@@ -267,6 +269,7 @@ void ObjectVariableHelper::ApplyChangesToVariants(
                                 defaultVariablesContainer.Get(variableName),
                                 variablesContainer.Count());
     }
+    // TODO Check what happens if 2 variables exchange their names.
     for (const auto &pair : changeset.oldToNewVariableNames) {
       const gd::String &oldVariableName = pair.first;
       const gd::String &newVariableName = pair.second;

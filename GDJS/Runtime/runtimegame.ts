@@ -1367,7 +1367,7 @@ namespace gdjs {
       });
       syncData.extVar = extensionsVariablesSyncData;
 
-      if (
+      if (!syncOptions.syncEverythingForWholeGameSaveState &&
         (!syncData.var || syncData.var.length === 0) &&
         !syncData.ss &&
         (!syncData.extVar || Object.keys(syncData.extVar).length === 0)

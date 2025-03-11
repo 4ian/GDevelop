@@ -95,7 +95,7 @@ namespace gdjs {
      * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
      */
     _centerPoint: FloatPoint3D | null;
-
+    _allSyncData: string;
     _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
@@ -126,6 +126,7 @@ namespace gdjs {
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
+      this._allSyncData = "";
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -251,34 +252,43 @@ namespace gdjs {
       this.onModelChanged(objectData);
     }
 
-    saveWholeGame(currentScene : RuntimeScene ): void {
-      const sceneStack = currentScene.getGame()._sceneStack._stack;
-    
-      const allSyncData: any[] = [];
-      allSyncData.push(currentScene.getGame().getNetworkSyncData({syncEverythingForWholeGameSaveState: true}));
-
-      sceneStack.forEach(scene => {
-        allSyncData.push(scene.getNetworkSyncData({syncEverythingForWholeGameSaveState:true}))
-        }
-      );
-      sceneStack.forEach(scene => {
-        const sceneObjects = scene.getAdhocListOfAllInstances();
-        for (const key in sceneObjects) {
-          if (sceneObjects.hasOwnProperty(key)) {
-            const object = sceneObjects[key];
-            if (object.getNetworkSyncData) {
-              const syncData = object.getNetworkSyncData(true);
-              allSyncData.push(syncData);
-            }
-          }
-        }
-      });
-      const syncDataJson = JSON.stringify(allSyncData);
-      this.LoadWholeGame(syncDataJson);
+    a(currentScene : RuntimeScene) : void
+    {
+      console.log("pomme");
     }
-    LoadWholeGame(syncDataJson: string): void {
+
+    saveWholeGame(currentScene : RuntimeScene ): void {
+      console.log("là on est bons");
+    
+      // let allSyncData: { gameNetworkSyncData: GameNetworkSyncData } = { gameNetworkSyncData: {} as GameNetworkSyncData };
+      // const gameData = currentScene.getGame().getNetworkSyncData({syncEverythingForWholeGameSaveState: true});
+      // if(gameData)
+      // {
+      //   allSyncData.gameNetworkSyncData = gameData;
+      // }
+      // this._allSyncData = JSON.stringify(allSyncData);
+      // sceneStack.forEach(scene => {
+      //   allSyncData.push(scene.getNetworkSyncData({syncEverythingForWholeGameSaveState:true}))
+      //   }
+      // );
+      // sceneStack.forEach(scene => {
+      //   const sceneObjects = scene.getAdhocListOfAllInstances();
+      //   for (const key in sceneObjects) {
+      //     if (sceneObjects.hasOwnProperty(key)) {
+      //       const object = sceneObjects[key];
+      //       if (object.getNetworkSyncData) {
+      //         const syncData = object.getNetworkSyncData(true);
+      //         allSyncData.push(syncData);
+      //       }
+      //     }
+      //   }
+      // });
+      // const syncDataJson = JSON.stringify(allSyncData);
+      // this.LoadWholeGame(syncDataJson);
+    }
+    loadWholeGame(): void {
       this._runtimeScene._destroy();
-      const allSyncData = JSON.parse(syncDataJson);
+      const allSyncData = JSON.parse(this._allSyncData);
       const sceneStack = allSyncData[0].ss;
       console.log(sceneStack);
       let sceneIndex = 1;

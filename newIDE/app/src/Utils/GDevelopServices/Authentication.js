@@ -134,6 +134,14 @@ export type UpdateTwitterFollowResponse = {|
     | 'twitter-follow/user-not-found',
 |};
 
+export type UpdateYoutubeSubscriptionResponse = {|
+  +code:
+    | 'youtube-subscription/badge-already-given'
+    | 'youtube-subscription/badge-given'
+    | 'youtube-subscription/channel-not-subscribed'
+    | 'youtube-subscription/user-not-found',
+|};
+
 export type IdentityProvider = 'google' | 'apple' | 'github';
 
 export default class Authentication {
@@ -489,6 +497,31 @@ export default class Authentication {
     const authorizationHeader = await getAuthorizationHeader();
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-twitter-follow`,
+      {},
+      {
+        params: { userId: uid },
+        headers: { Authorization: authorizationHeader },
+      }
+    );
+
+    return response.data;
+  };
+
+  updateYoutubeSubscription = async (
+    getAuthorizationHeader: () => Promise<string>
+  ): Promise<UpdateYoutubeSubscriptionResponse> => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to update youtube subscription while not authenticated.'
+      );
+    const { uid } = currentUser;
+
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.post(
+      `${
+        GDevelopUserApi.baseUrl
+      }/user/${uid}/action/update-youtube-subscription`,
       {},
       {
         params: { userId: uid },

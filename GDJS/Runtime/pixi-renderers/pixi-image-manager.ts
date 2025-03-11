@@ -227,11 +227,16 @@ namespace gdjs {
       {
         useTransparentTexture,
         forceBasicMaterial,
-      }: { useTransparentTexture: boolean; forceBasicMaterial: boolean }
+        vertexColors,
+      }: {
+        useTransparentTexture: boolean;
+        forceBasicMaterial: boolean;
+        vertexColors: boolean;
+      }
     ): THREE.Material {
       const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
         forceBasicMaterial ? 1 : 0
-      }`;
+      }|${vertexColors ? 1 : 0}`;
 
       const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
       if (loadedThreeMaterial) return loadedThreeMaterial;
@@ -241,14 +246,14 @@ namespace gdjs {
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
-            vertexColors: true,
+            vertexColors,
           })
         : new THREE.MeshStandardMaterial({
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
             transparent: useTransparentTexture,
             metalness: 0,
-            vertexColors: true,
+            vertexColors,
           });
       this._loadedThreeMaterials.put(cacheKey, material);
       return material;

@@ -248,6 +248,7 @@ export const sendTutorialOpened = (tutorialName: string) => {
 export const sendInAppTutorialStarted = (metadata: {|
   tutorialId: string,
   scenario: 'startOver' | 'resume' | 'start',
+  isUIRestricted: boolean,
 |}) => {
   recordEvent('in-app-tutorial-started', metadata);
 };
@@ -570,10 +571,12 @@ export const sendInAppTutorialProgress = ({
   step,
   tutorialId,
   isCompleted,
+  isUIRestricted,
 }: {|
   tutorialId: string,
   step: number,
   isCompleted: boolean,
+  isUIRestricted: boolean,
 |}) => {
   const immediatelyRecordEvent = (
     spentMoreThan30SecondsSinceLastStep: ?boolean
@@ -587,6 +590,7 @@ export const sendInAppTutorialProgress = ({
       tutorialId,
       step,
       isCompleted,
+      isUIRestricted,
       spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
     });
   };
@@ -616,4 +620,45 @@ export const sendInAppTutorialProgress = ({
     lastStep: lastFiredEvent.lastStep,
     nextCheckTimeoutId: setTimeout(() => immediatelyRecordEvent(true), 30000),
   };
+};
+
+export const sendAssetSwapStart = ({
+  originalObjectName,
+  objectType,
+}: {|
+  originalObjectName: string,
+  objectType: string,
+|}) => {
+  recordEvent('asset-swap-start', {
+    originalObjectName,
+    objectType,
+  });
+};
+
+export const sendAssetSwapFinished = ({
+  originalObjectName,
+  newObjectName,
+  objectType,
+}: {|
+  originalObjectName: string,
+  newObjectName: string,
+  objectType: string,
+|}) => {
+  recordEvent('asset-swap-finished', {
+    originalObjectName,
+    newObjectName,
+    objectType,
+  });
+};
+
+const canSendPlaySectionOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
+});
+
+export const sendPlaySectionOpened = () => {
+  if (!canSendPlaySectionOpened('play-section-opened')) {
+    return;
+  }
+
+  recordEvent('play-section-opened');
 };

@@ -4,6 +4,12 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 
 // Types definitions used in this script:
 
+/** @typedef {import('../../../../GDevelop.js/types').PlatformExtension} PlatformExtension */
+/** @typedef {import('../../../../GDevelop.js/types').MapStringExpressionMetadata} MapStringExpressionMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').ExpressionMetadata} ExpressionMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').ObjectMetadata} ObjectMetadata */
+/** @typedef {import('../../../../GDevelop.js/types').BehaviorMetadata} BehaviorMetadata */
+
 /**
  * @typedef {Object} RawText A text to be shown on a page
  * @prop {string} text The text to render (in Markdown/Dokuwiki syntax)
@@ -17,7 +23,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 
 /**
  * @typedef {Object} ObjectReference
- * @prop {any} objectMetadata The object.
+ * @prop {ObjectMetadata} objectMetadata The object.
  * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the object actions.
  * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the object conditions.
  * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the object expressions.
@@ -25,7 +31,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 
 /**
  * @typedef {Object} BehaviorReference
- * @prop {any} behaviorMetadata The behavior.
+ * @prop {BehaviorMetadata} behaviorMetadata The behavior.
  * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the behavior actions.
  * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the behavior conditions.
  * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the behavior expressions.
@@ -33,7 +39,7 @@ const { generateReadMoreLink } = require('./WikiHelpLink');
 
 /**
  * @typedef {Object} ExtensionReference
- * @prop {any} extension The extension.
+ * @prop {PlatformExtension} extension The extension.
  * @prop {Array<ReferenceText>} freeExpressionsReferenceTexts Reference texts for free expressions.
  * @prop {Array<ReferenceText>} freeActionsReferenceTexts Reference texts for free actions.
  * @prop {Array<ReferenceText>} freeConditionsReferenceTexts Reference texts for free conditions.
@@ -252,7 +258,10 @@ const generateInstructionReferenceRowsText = ({
   };
 };
 
-/** @returns {ReferenceText} */
+/**
+ * @param {{ expressionType: string, expressionMetadata: ExpressionMetadata, objectMetadata?: ObjectMetadata, behaviorMetadata?: BehaviorMetadata }} options
+ * @returns {ReferenceText}
+ */
 const generateExpressionReferenceRowsText = ({
   expressionType,
   expressionMetadata,
@@ -261,11 +270,13 @@ const generateExpressionReferenceRowsText = ({
 }) => {
   let parameterRows = [];
   let parameterStrings = [];
-  mapFor(0, expressionMetadata.getParameters(), index => {
+  mapFor(0, expressionMetadata.getParameters().getParametersCount(), index => {
     if ((!!objectMetadata && index < 1) || (!!behaviorMetadata && index < 2)) {
       return; // Skip the first (or first twos) parameters by convention.
     }
-    const parameterMetadata = expressionMetadata.getParameter(index);
+    const parameterMetadata = expressionMetadata
+      .getParameters()
+      .getParameterAt(index);
     if (parameterMetadata.isCodeOnly()) return;
 
     const sanitizedDescription = sanitizeExpressionDescription(
@@ -345,7 +356,7 @@ const generateInstructionsReferenceRowsTexts = ({
 };
 
 /**
- * @param {{ expressionsMetadata?: any, objectMetadata?: any, behaviorMetadata?: any }} metadata
+ * @param {{ expressionsMetadata: MapStringExpressionMetadata, objectMetadata?: ObjectMetadata, behaviorMetadata?: BehaviorMetadata }} options
  * @returns {Array<ReferenceText>}
  */
 const generateExpressionsReferenceRowsTexts = ({
@@ -387,7 +398,7 @@ const sortReferenceTexts = (referenceText1, referenceText2) => {
 };
 
 /**
- * @type {any} platformExtension
+ * @param {PlatformExtension} extension
  * @returns {ExtensionReference}
  */
 const generateExtensionReference = extension => {
@@ -401,42 +412,44 @@ const generateExtensionReference = extension => {
 
   // Object expressions
   /** @type {Array<ObjectReference>} */
-  let objectReferences = objectTypes.map(objectType => {
-    const objectMetadata = extension.getObjectMetadata(objectType);
-    if (objectMetadata.isPrivate()) {
-      return null;
-    }
-    const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
-      areConditions: false,
-      instructionsMetadata: extension.getAllActionsForObject(objectType),
-      objectMetadata,
-    });
-    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
-      areConditions: true,
-      instructionsMetadata: extension.getAllConditionsForObject(objectType),
-      objectMetadata,
-    });
-    const expressionsReferenceTexts = [
-      ...generateExpressionsReferenceRowsTexts({
-        expressionsMetadata: extension.getAllExpressionsForObject(objectType),
+  let objectReferences = objectTypes
+    .map(objectType => {
+      const objectMetadata = extension.getObjectMetadata(objectType);
+      if (objectMetadata.isPrivate()) {
+        return null;
+      }
+      const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+        areConditions: false,
+        instructionsMetadata: extension.getAllActionsForObject(objectType),
         objectMetadata,
-      }),
-      ...generateExpressionsReferenceRowsTexts({
-        expressionsMetadata: extension.getAllStrExpressionsForObject(
-          objectType
-        ),
+      });
+      const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+        areConditions: true,
+        instructionsMetadata: extension.getAllConditionsForObject(objectType),
         objectMetadata,
-      }),
-    ];
-    expressionsReferenceTexts.sort(sortReferenceTexts);
+      });
+      const expressionsReferenceTexts = [
+        ...generateExpressionsReferenceRowsTexts({
+          expressionsMetadata: extension.getAllExpressionsForObject(objectType),
+          objectMetadata,
+        }),
+        ...generateExpressionsReferenceRowsTexts({
+          expressionsMetadata: extension.getAllStrExpressionsForObject(
+            objectType
+          ),
+          objectMetadata,
+        }),
+      ];
+      expressionsReferenceTexts.sort(sortReferenceTexts);
 
-    return {
-      objectMetadata,
-      actionsReferenceTexts,
-      conditionsReferenceTexts,
-      expressionsReferenceTexts,
-    };
-  }).filter(Boolean);
+      return {
+        objectMetadata,
+        actionsReferenceTexts,
+        conditionsReferenceTexts,
+        expressionsReferenceTexts,
+      };
+    })
+    .filter(Boolean);
 
   // Behavior expressions
   /** @type {Array<BehaviorReference>} */

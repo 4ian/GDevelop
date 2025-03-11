@@ -86,13 +86,6 @@ const gd: libGDevelop = global.gd;
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
-export type EditorId =
-  | 'objects-list'
-  | 'properties'
-  | 'object-groups-list'
-  | 'instances-list'
-  | 'layers-list';
-
 const styles = {
   container: {
     display: 'flex',
@@ -135,6 +128,7 @@ type Props = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -2060,6 +2054,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 isActive={isActive}
                 onOpenedEditorsChanged={this.updateToolbar}
                 lastSelectionType={this.state.lastSelectionType}
+                onExtensionInstalled={this.props.onExtensionInstalled}
               />
               <I18n>
                 {({ i18n }) => (
@@ -2120,6 +2115,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.updateBehaviorsSharedData()
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
+                        onExtensionInstalled={this.props.onExtensionInstalled}
                       />
                     )}
                   </React.Fragment>
@@ -2141,6 +2137,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   group={this.state.editedGroup}
                   objectsContainer={this.props.objectsContainer}
                   globalObjectsContainer={this.props.globalObjectsContainer}
+                  initialInstances={this.props.initialInstances}
                   onCancel={this._closeObjectGroupEditorDialog}
                   onApply={this._closeObjectGroupEditorDialog}
                   onObjectGroupAdded={(objectGroup: gdObjectGroup) => {

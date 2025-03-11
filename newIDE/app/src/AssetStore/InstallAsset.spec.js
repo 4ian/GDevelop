@@ -422,6 +422,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [flashExtensionShortHeader],
         missingExtensionShortHeaders: [flashExtensionShortHeader],
         outOfDateExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 
@@ -455,6 +456,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 
@@ -488,6 +490,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
 
@@ -650,6 +653,7 @@ describe('InstallAsset', () => {
               },
             ],
             outOfDateExtensionShortHeaders: [],
+            incompatibleWithIdeExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -681,6 +685,7 @@ describe('InstallAsset', () => {
             requiredExtensionShortHeaders: [flashExtensionShortHeader],
             missingExtensionShortHeaders: [flashExtensionShortHeader],
             outOfDateExtensionShortHeaders: [],
+            incompatibleWithIdeExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -717,6 +722,7 @@ describe('InstallAsset', () => {
           ],
           missingExtensionShortHeaders: [],
           outOfDateExtensionShortHeaders: [],
+          incompatibleWithIdeExtensionShortHeaders: [],
         },
         shouldUpdateExtension: true,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,

@@ -97,7 +97,7 @@ module.exports = {
         objectProperties
           .getOrCreate('text')
           .setValue(objectContent.text)
-          .setType('textarea')
+          .setType('multilinestring')
           .setLabel('Text');
 
         return objectProperties;

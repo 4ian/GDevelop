@@ -42,6 +42,9 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     const gd::NamedPropertyDescriptor &property, const gd::String &objectType,
     bool isBehavior, bool isSharedProperties) {
   auto &propertyName = property.GetName();
+  const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
+          property.GetType()));
   auto &functionsContainer = eventsBasedEntity.GetEventsFunctions();
   gd::String capitalizedName = CapitalizeFirstLetter(property.GetName());
   gd::String setterName = "Set" + capitalizedName;
@@ -59,9 +62,9 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       property.GetLabel().empty() ? property.GetName() : property.GetLabel();
 
   gd::String descriptionSubject =
-      (property.GetType() == "Boolean" ? "if " : "the ") +
+      (primitiveType == "boolean" ? "if " : "the ") +
       UnCapitalizeFirstLetter(propertyLabel) +
-      (isSharedProperties || property.GetType() == "Boolean"
+      (isSharedProperties || primitiveType == "boolean"
            ? "."
            : " of the object.") +
       (property.GetDescription().empty() ? ""
@@ -71,19 +74,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
              "objects using the behavior."
            : "");
 
-  gd::String propertyGetterName =
-      (isSharedProperties ? "SharedProperty" : "Property") + property.GetName();
-  gd::String getterType =
-      gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-          extension.GetName(), eventsBasedEntity.GetName(), propertyGetterName);
-  gd::String setterType =
-      gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-          extension.GetName(), eventsBasedEntity.GetName(),
-          "Set" + propertyGetterName);
-
   gd::String getterName = capitalizedName;
-  gd::String numberOrString =
-      property.GetType() == "Number" ? "Number" : "String";
 
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
     auto &getter = functionsContainer.InsertNewEventsFunction(
@@ -99,7 +90,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
         .SetName(legacyExpressionType)
         .SetExtraInfo(GetStringifiedExtraInfo(property));
     getter.SetFullName(propertyLabel).SetGroup(functionGroupName);
-    if (property.GetType() == "Boolean") {
+    if (primitiveType == "boolean") {
       getter.SetFunctionType(gd::EventsFunction::Condition)
           .SetDescription("Check " + descriptionSubject)
           .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel));
@@ -112,13 +103,12 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     auto &event =
         dynamic_cast<gd::StandardEvent &>(getter.GetEvents().InsertNewEvent(
             project, "BuiltinCommonInstructions::Standard", 0));
-    if (property.GetType() == "Boolean") {
+    if (primitiveType == "boolean") {
       gd::Instruction condition;
-      condition.SetType(getterType);
-      condition.AddParameter("Object");
-      if (isBehavior) {
-        condition.AddParameter("Behavior");
-      }
+      condition.SetType("BooleanVariable");
+      condition.AddParameter(propertyName);
+      condition.AddParameter("True");
+      condition.AddParameter("");
       event.GetConditions().Insert(condition, 0);
 
       gd::Instruction action;
@@ -127,6 +117,8 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       event.GetActions().Insert(action, 0);
     } else {
       gd::Instruction action;
+      gd::String numberOrString =
+          primitiveType == "number" ? "Number" : "String";
       action.SetType("SetReturn" + numberOrString);
       action.AddParameter(property.GetName());
       event.GetActions().Insert(action, 0);
@@ -136,7 +128,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   if (!functionsContainer.HasEventsFunctionNamed(setterName)) {
     auto &setter = functionsContainer.InsertNewEventsFunction(
         setterName, functionsContainer.GetEventsFunctionsCount());
-    if (property.GetType() == "Boolean") {
+    if (primitiveType == "boolean") {
       setter.SetFunctionType(gd::EventsFunction::Action)
           .SetFullName(propertyLabel)
           .SetGroup(functionGroupName)
@@ -177,26 +169,24 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       setter.SetGetterName(getterName);
     }
 
-    if (property.GetType() == "Boolean") {
+    if (primitiveType == "boolean") {
       {
         auto &event =
             dynamic_cast<gd::StandardEvent &>(setter.GetEvents().InsertNewEvent(
                 project, "BuiltinCommonInstructions::Standard", 0));
 
         gd::Instruction condition;
-        condition.SetType("GetArgumentAsBoolean");
-        condition.AddParameter("\"Value\"");
+        condition.SetType("BooleanVariable");
+        condition.AddParameter("Value");
+        condition.AddParameter("True");
+        condition.AddParameter("");
         event.GetConditions().Insert(condition, 0);
 
         gd::Instruction action;
-        action.SetType(setterType);
-        action.AddParameter("Object");
-        if (isBehavior) {
-          action.AddParameter("Behavior");
-          action.AddParameter("yes");
-        } else {
-          action.AddParameter("yes");
-        }
+        action.SetType("SetBooleanVariable");
+        action.AddParameter(propertyName);
+        action.AddParameter("True");
+        action.AddParameter("");
         event.GetActions().Insert(action, 0);
       }
       {
@@ -205,20 +195,17 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
                 project, "BuiltinCommonInstructions::Standard", 0));
 
         gd::Instruction condition;
-        condition.SetType("GetArgumentAsBoolean");
-        condition.AddParameter("\"Value\"");
-        condition.SetInverted(true);
+        condition.SetType("BooleanVariable");
+        condition.AddParameter("Value");
+        condition.AddParameter("False");
+        condition.AddParameter("");
         event.GetConditions().Insert(condition, 0);
 
         gd::Instruction action;
-        action.SetType(setterType);
-        action.AddParameter("Object");
-        if (isBehavior) {
-          action.AddParameter("Behavior");
-          action.AddParameter("no");
-        } else {
-          action.AddParameter("no");
-        }
+        action.SetType("SetBooleanVariable");
+        action.AddParameter(propertyName);
+        action.AddParameter("False");
+        action.AddParameter("");
         event.GetActions().Insert(action, 0);
       }
     } else {
@@ -227,16 +214,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
               project, "BuiltinCommonInstructions::Standard", 0));
 
       gd::Instruction action;
-      action.SetType(setterType);
-      action.AddParameter("Object");
-      if (isBehavior) {
-        action.AddParameter("Behavior");
-        action.AddParameter("=");
-        action.AddParameter("Value");
-      } else {
-        action.AddParameter("=");
-        action.AddParameter("Value");
-      }
+      action.SetType(primitiveType == "number" ? "SetNumberVariable"
+                                               : "SetStringVariable");
+      action.AddParameter(propertyName);
+      action.AddParameter("=");
+      action.AddParameter("Value");
       event.GetActions().Insert(action, 0);
     }
   }

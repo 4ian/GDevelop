@@ -15,6 +15,8 @@ import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
+import semverSatisfies from 'semver/functions/satisfies';
+import { getIDEVersion } from '../../Version';
 
 const gd: libGDevelop = global.gd;
 
@@ -66,6 +68,11 @@ export const BehaviorListItem = ({
         objectBehaviorsTypes.includes(requiredBehaviorType)
       );
     });
+  const isEngineCompatible =
+    !behaviorShortHeader.gdevelopVersion ||
+    semverSatisfies(getIDEVersion(), behaviorShortHeader.gdevelopVersion, {
+      includePrerelease: true,
+    });
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -89,7 +96,7 @@ export const BehaviorListItem = ({
     );
   };
 
-  const isEnabled = !alreadyAdded && isObjectCompatible;
+  const isEnabled = !alreadyAdded && isObjectCompatible && isEngineCompatible;
 
   const chooseBehavior = React.useCallback(
     () => {
@@ -103,6 +110,7 @@ export const BehaviorListItem = ({
   const hasChip =
     alreadyAdded ||
     !isObjectCompatible ||
+    !isEngineCompatible ||
     behaviorShortHeader.tier === 'community' ||
     (behaviorShortHeader.isDeprecated || false);
   const hasInfoButton = behaviorShortHeader.authors || false;
@@ -152,6 +160,14 @@ export const BehaviorListItem = ({
                 <Chip
                   size="small"
                   label={<Trans>Incompatible with the object</Trans>}
+                  color="secondary"
+                  variant="outlined"
+                />
+              )}
+              {!isEngineCompatible && !alreadyAdded && isObjectCompatible && (
+                <Chip
+                  size="small"
+                  label={<Trans>Need latest GDevelop version</Trans>}
                   color="secondary"
                   variant="outlined"
                 />

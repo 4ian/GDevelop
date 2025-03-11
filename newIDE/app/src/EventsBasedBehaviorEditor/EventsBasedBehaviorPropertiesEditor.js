@@ -755,6 +755,11 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                           label={t`Keyboard key (text)`}
                                         />
                                         <SelectOption
+                                          key="property-type-text-area"
+                                          value="MultilineString"
+                                          label={t`Multiline text`}
+                                        />
+                                        <SelectOption
                                           key="property-type-resource"
                                           value="Resource"
                                           label={t`Resource (JavaScript only)`}
@@ -820,8 +825,9 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                         property.getType() === 'Number' ||
                                         property.getType() ===
                                           'ObjectAnimationName' ||
+                                        property.getType() === 'KeyboardKey' ||
                                         property.getType() ===
-                                          'KeyboardKey') && (
+                                          'MultilineString') && (
                                         <SemiControlledTextField
                                           commitOnBlur
                                           floatingLabelText={
@@ -839,6 +845,10 @@ export default function EventsBasedBehaviorPropertiesEditor({
                                             onPropertiesUpdated &&
                                               onPropertiesUpdated();
                                           }}
+                                          multiline={
+                                            property.getType() ===
+                                            'MultilineString'
+                                          }
                                           fullWidth
                                         />
                                       )}

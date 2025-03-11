@@ -25,7 +25,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
-  onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
+  onExtensionInstalled: (extensionName: string) => void,
   onCreateNew?: () => void,
 |};
 
@@ -61,26 +61,29 @@ const ExtensionsSearchDialog = ({
   ) => {
     setIsInstalling(true);
     try {
-      let wasExtensionInstalledOrImported;
+      let installedOrImportedExtensionName: string | null = null;
       if (!!extensionShortHeader) {
         onInstallExtension(extensionShortHeader);
-        wasExtensionInstalledOrImported = await installDisplayedExtension(
+        const wasExtensionInstalledOrImported = await installDisplayedExtension(
           i18n,
           project,
           eventsFunctionsExtensionsState,
           extensionShortHeader
         );
+        installedOrImportedExtensionName = wasExtensionInstalledOrImported
+          ? extensionShortHeader.name
+          : null;
       } else {
-        wasExtensionInstalledOrImported = await importExtension(
+        installedOrImportedExtensionName = await importExtension(
           i18n,
           eventsFunctionsExtensionsState,
           project
         );
       }
 
-      if (wasExtensionInstalledOrImported) {
+      if (installedOrImportedExtensionName) {
         setExtensionWasInstalled(true);
-        if (onExtensionInstalled) onExtensionInstalled();
+        onExtensionInstalled(installedOrImportedExtensionName);
         return true;
       }
 

@@ -9,7 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
-import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
@@ -22,6 +21,8 @@ import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../UI/TextButton';
+import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
+import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -205,7 +206,6 @@ type TooltipHeaderProps = {|
   paletteType: 'dark' | 'light',
   progress: number,
   showFoldButton: boolean,
-  showQuitButton: boolean,
   onClickFoldButton: () => void,
   tooltipContent?: string,
   endTutorial: () => void,
@@ -215,7 +215,6 @@ const TooltipHeader = ({
   paletteType,
   progress,
   showFoldButton,
-  showQuitButton,
   onClickFoldButton,
   tooltipContent,
   endTutorial,
@@ -245,10 +244,8 @@ const TooltipHeader = ({
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
-        {tooltipContent || !showQuitButton ? null : (
-          // We hide the quit button:
-          // - When the tooltip is folded, the tooltip content should not be null;
-          // - When requested.
+        {tooltipContent ? null : (
+          // We hide the quit button only when the tooltip is folded, the tooltip content should not be null;
           <ButtonBase disableRipple onClick={endTutorial}>
             <div
               style={{
@@ -293,23 +290,23 @@ const TooltipHeader = ({
 type Props = {|
   anchorElement: HTMLElement,
   tooltip: InAppTutorialFormattedTooltip,
-  showQuitButton: boolean,
   buttonLabel?: string,
   progress: number,
   endTutorial: () => void,
   goToNextStep: () => void,
   fillAutomatically?: () => void,
+  isBlockingLayerDisplayed: boolean,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
   anchorElement,
   tooltip,
-  showQuitButton,
   buttonLabel,
   progress,
   endTutorial,
   goToNextStep,
   fillAutomatically,
+  isBlockingLayerDisplayed,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -369,7 +366,13 @@ const InAppTutorialTooltipDisplayer = ({
         },
       }}
       style={{
-        zIndex: getDisplayZIndexForHighlighter(anchorElement),
+        // If the blocking layer is displayed, we need to display the tooltip above it,
+        // so it can be interacted with.
+        // Otherwise, we display the tooltip just above the highlighter, to avoid
+        // the tooltip appearing above other elements, like dialogs.
+        zIndex: isBlockingLayerDisplayed
+          ? aboveMaterialUiMaxZIndex
+          : getDisplayZIndexForHighlighter(anchorElement),
         maxWidth: 'min(90%, 300px)',
         width: isMobile ? '100%' : undefined,
       }}
@@ -388,7 +391,6 @@ const InAppTutorialTooltipDisplayer = ({
                 paletteType={paletteType}
                 // Display the hide button when standalone only
                 showFoldButton={!!tooltip.standalone}
-                showQuitButton={showQuitButton}
                 progress={progress}
                 tooltipContent={
                   folded ? tooltip.title || tooltip.description : undefined

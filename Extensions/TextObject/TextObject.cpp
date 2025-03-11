@@ -119,7 +119,7 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
 
   objectProperties["text"]
       .SetValue(text)
-      .SetType("textarea")
+      .SetType("multilinestring")
       .SetLabel(_("Text"));
 
   objectProperties["characterSize"]

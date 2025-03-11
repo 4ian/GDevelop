@@ -37,6 +37,7 @@ export const DefaultNoScope = () => (
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onExtensionInstalled={action('extension installed')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -67,6 +68,7 @@ export const EmptyNoScope = () => (
         onBeginCreateEventsFunction={action('begin create events function')}
         isActive={true}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onExtensionInstalled={action('extension installed')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

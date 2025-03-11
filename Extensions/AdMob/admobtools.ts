@@ -1,6 +1,7 @@
 namespace gdjs {
   declare var admob: any;
   declare var cordova: any;
+  declare var consent: any;
 
   export namespace adMob {
     const logger = new gdjs.Logger('AdMob');
@@ -108,25 +109,118 @@ namespace gdjs {
     let rewardedVideoRewardReceived = false; // Becomes true when the video is closed and the reward is received.
     let rewardedVideoErrored = false; // Becomes true when the video fails to load.
 
-    let npaValue = '0'; // TODO: expose an API to change this and also an automatic way using the consent SDK.
+    let npaValue = '0'; // 0 means that the user has consented to personalized ads, 1 means that the user has not consented to personalized ads.
+
+    let setupTimeoutId: NodeJS.Timeout | null = null;
+
+    const askForConsentAndInitializeAdmob = async () => {
+      if (admobStarted) {
+        logger.warn('AdMob is already started.');
+        return;
+      }
+
+      if (isStarting) {
+        logger.warn('AdMob is already starting.');
+        return;
+      }
+
+      try {
+        logger.info('Starting AdMob.');
+        isStarting = true;
+
+        if (cordova.platformId === 'ios') {
+          try {
+            /*
+            trackingStatus:
+            0 = notDetermined
+            1 = restricted
+            2 = denied
+            3 = authorized
+          */
+            let trackingStatus = await consent.trackingAuthorizationStatus();
+
+            // If tracking is not determined, we ask the user for tracking authorization.
+            if (trackingStatus === 0) {
+              trackingStatus = await consent.requestTrackingAuthorization();
+            }
+
+            // If tracking is restricted or denied, we set npaValue to 1.
+            if (trackingStatus === 1 || trackingStatus === 2) {
+              npaValue = '1';
+            }
+
+            // otherwise, we set npaValue to 0.
+            npaValue = '0';
+          } catch (error) {
+            logger.error(
+              'Error while asking for tracking authorization, continuing:',
+              error
+            );
+          }
+        }
+
+        try {
+          // ConsentStatus:
+          // Unknown = 0,
+          // Required = 1,
+          // NotRequired = 2,
+          // Obtained = 3,
+          const consentStatus = await consent.getConsentStatus();
+          if (consentStatus === consent.ConsentStatus.Required) {
+            await consent.requestInfoUpdate();
+          }
+          await consent.loadAndShowIfRequired();
+        } catch (error) {
+          logger.error('Error while asking for consent, continuing:', error);
+        }
+
+        // We should be looking at canRequestAds to know if we can request ads or not.
+        // But as we want to be able to test ads in debug or if the consent didn't work,
+        // we ignore this value for now.
+        // const canRequestAds = await consent.canRequestAds();
+        if (true) {
+          await admob.start();
+
+          logger.info('AdMob successfully started.');
+          isStarting = false;
+          admobStarted = true;
+        }
+      } catch (error) {
+        logger.error('Error while starting AdMob:', error);
+        isStarting = false;
+        admobStarted = false;
+      }
+    };
 
     // Admob initialization listener
     document.addEventListener(
       'deviceready',
       async () => {
-        // Obtain user consent ?
-
-        logger.info('Starting AdMob.');
         isStarting = true;
-
-        await admob.start();
-
-        logger.info('AdMob successfully started.');
-        isStarting = false;
-        admobStarted = true;
+        setupTimeoutId = setTimeout(async () => {
+          isStarting = false; // Reset to false, as it will be set to true in askForConsentAndInitializeAdmob.
+          await askForConsentAndInitializeAdmob();
+          // Wait a bit before starting admob, to avoid the consent appearing too soon.
+        }, 2000);
       },
       false
     );
+
+    export const preventAdmobAutoInitialization = () => {
+      if (setupTimeoutId) {
+        isStarting = false;
+        clearTimeout(setupTimeoutId);
+        setupTimeoutId = null;
+      }
+    };
+
+    export const initializeAdmob = async () => {
+      preventAdmobAutoInitialization();
+      await askForConsentAndInitializeAdmob();
+    };
+
+    export const isAdmobInitialized = () => admobStarted;
+    export const isAdmobInitializing = () => isStarting;
 
     /**
      * Helper to know if we are on mobile and admob is correctly initialized.
@@ -334,6 +428,7 @@ namespace gdjs {
         position: atTop ? 'top' : 'bottom',
         size: bannerRequestedAdSizeType,
         offset: 0,
+        npa: npaValue,
       });
 
       banner.on('load', () => {

@@ -1,9 +1,9 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 214,
+    "build": 225,
     "major": 5,
-    "minor": 4,
+    "minor": 5,
     "revision": 0
   },
   "properties": {
@@ -18,7 +18,6 @@
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "templateSlug": "",
-    "useExternalSourceFiles": false,
     "version": "1.0.0",
     "name": "Capabilities",
     "description": "",
@@ -65,7 +64,6 @@
   "resources": {
     "resources": [
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_1.png",
         "kind": "image",
         "metadata": "",
@@ -78,7 +76,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_10.png",
         "kind": "image",
         "metadata": "",
@@ -91,7 +88,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_11.png",
         "kind": "image",
         "metadata": "",
@@ -104,7 +100,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_12.png",
         "kind": "image",
         "metadata": "",
@@ -117,7 +112,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_2.png",
         "kind": "image",
         "metadata": "",
@@ -130,7 +124,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_3.png",
         "kind": "image",
         "metadata": "",
@@ -143,7 +136,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_4.png",
         "kind": "image",
         "metadata": "",
@@ -156,7 +148,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_5.png",
         "kind": "image",
         "metadata": "",
@@ -169,7 +160,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_6.png",
         "kind": "image",
         "metadata": "",
@@ -182,7 +172,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_7.png",
         "kind": "image",
         "metadata": "",
@@ -195,7 +184,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_8.png",
         "kind": "image",
         "metadata": "",
@@ -208,7 +196,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Climb_9.png",
         "kind": "image",
         "metadata": "",
@@ -221,7 +208,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Fall.png",
         "kind": "image",
         "metadata": "",
@@ -234,7 +220,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Idle_1.png",
         "kind": "image",
         "metadata": "",
@@ -247,7 +232,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Idle_2.png",
         "kind": "image",
         "metadata": "",
@@ -260,7 +244,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Idle_3.png",
         "kind": "image",
         "metadata": "",
@@ -273,7 +256,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Idle_4.png",
         "kind": "image",
         "metadata": "",
@@ -286,7 +268,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Jump.png",
         "kind": "image",
         "metadata": "",
@@ -299,7 +280,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_1.png",
         "kind": "image",
         "metadata": "",
@@ -312,7 +292,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_10.png",
         "kind": "image",
         "metadata": "",
@@ -325,7 +304,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_11.png",
         "kind": "image",
         "metadata": "",
@@ -338,7 +316,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_12.png",
         "kind": "image",
         "metadata": "",
@@ -351,7 +328,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_13.png",
         "kind": "image",
         "metadata": "",
@@ -364,7 +340,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_14.png",
         "kind": "image",
         "metadata": "",
@@ -377,7 +352,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_15.png",
         "kind": "image",
         "metadata": "",
@@ -390,7 +364,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_16.png",
         "kind": "image",
         "metadata": "",
@@ -403,7 +376,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_17.png",
         "kind": "image",
         "metadata": "",
@@ -416,7 +388,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_18.png",
         "kind": "image",
         "metadata": "",
@@ -429,7 +400,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_19.png",
         "kind": "image",
         "metadata": "",
@@ -442,7 +412,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_2.png",
         "kind": "image",
         "metadata": "",
@@ -455,7 +424,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_3.png",
         "kind": "image",
         "metadata": "",
@@ -468,7 +436,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_4.png",
         "kind": "image",
         "metadata": "",
@@ -481,7 +448,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_5.png",
         "kind": "image",
         "metadata": "",
@@ -494,7 +460,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_6.png",
         "kind": "image",
         "metadata": "",
@@ -507,7 +472,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_7.png",
         "kind": "image",
         "metadata": "",
@@ -520,7 +484,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_8.png",
         "kind": "image",
         "metadata": "",
@@ -533,7 +496,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Red hero_Run_9.png",
         "kind": "image",
         "metadata": "",
@@ -546,7 +508,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Yellow Button_Hovered.png",
         "kind": "image",
         "metadata": "",
@@ -559,7 +520,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Yellow Button_Idle.png",
         "kind": "image",
         "metadata": "",
@@ -572,7 +532,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Yellow Button_Pressed.png",
         "kind": "image",
         "metadata": "",
@@ -585,7 +544,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Square White Slider Border.png",
         "kind": "image",
         "metadata": "",
@@ -598,7 +556,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Square White Slider Fill Bar.png",
         "kind": "image",
         "metadata": "",
@@ -611,7 +568,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Square White Slider Thumb.png",
         "kind": "image",
         "metadata": "",
@@ -624,7 +580,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Square White Toggle_Off.png",
         "kind": "image",
         "metadata": "",
@@ -637,7 +592,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/Square White Toggle_On.png",
         "kind": "image",
         "metadata": "",
@@ -661,7 +615,6 @@
         }
       },
       {
-        "alwaysLoaded": false,
         "file": "assets/spineboy.png",
         "kind": "image",
         "metadata": "",
@@ -714,7 +667,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.3,
         "snap": true,
-        "zoomFactor": 0.6244537826599995,
+        "zoomFactor": 0.7619362677197604,
         "windowMask": false
       },
       "objectsGroups": [
@@ -813,8 +766,8 @@
           "layer": "",
           "name": "RunButton",
           "persistentUuid": "5a70bcef-c178-41ff-9f42-f33c800cb0ab",
-          "width": 192,
-          "x": 704,
+          "width": 160,
+          "x": 448,
           "y": 160,
           "zOrder": 4,
           "numberProperties": [],
@@ -829,9 +782,9 @@
           "layer": "",
           "name": "JumpButton",
           "persistentUuid": "49c5136b-8337-491e-8d1a-e9224e5c43cb",
-          "width": 192,
-          "x": 704,
-          "y": 32,
+          "width": 160,
+          "x": 640,
+          "y": 160,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -875,7 +828,7 @@
           "name": "AnimationNameLabel",
           "persistentUuid": "0b811528-3468-4117-8b48-eb29487e4ca0",
           "width": 0,
-          "x": 928,
+          "x": 832,
           "y": 32,
           "zOrder": 8,
           "numberProperties": [],
@@ -890,7 +843,7 @@
           "name": "AnimationIndexLabel",
           "persistentUuid": "fced97ce-6615-4967-822e-e64b7dd3842f",
           "width": 0,
-          "x": 928,
+          "x": 832,
           "y": 96,
           "zOrder": 9,
           "numberProperties": [],
@@ -905,7 +858,7 @@
           "name": "PausedLabel",
           "persistentUuid": "3dd5a6f8-b883-4cec-9c05-1a3c8930285f",
           "width": 0,
-          "x": 928,
+          "x": 832,
           "y": 160,
           "zOrder": 11,
           "numberProperties": [],
@@ -920,7 +873,7 @@
           "name": "EndedLabel",
           "persistentUuid": "d376ebad-fb69-4deb-85b4-f08070040853",
           "width": 0,
-          "x": 928,
+          "x": 832,
           "y": 224,
           "zOrder": 13,
           "numberProperties": [],
@@ -1375,8 +1328,8 @@
           "name": "RestartButton",
           "persistentUuid": "6e9e70e1-0c2a-4fe2-b563-2c62fdbeeb33",
           "width": 96,
-          "x": 576,
-          "y": 160,
+          "x": 704,
+          "y": 32,
           "zOrder": 45,
           "numberProperties": [],
           "stringProperties": [],
@@ -1405,7 +1358,13 @@
               "booleanParameters": {}
             }
           ],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "AnimationTest",
+              "type": "Test::AnimationTest",
+              "Animatable": "Animation"
+            }
+          ],
           "animations": [
             {
               "name": "Idle",
@@ -5038,9 +4997,16 @@
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "AnimationTest",
+              "type": "Test::AnimationTest",
+              "Animatable": "Animation"
+            }
+          ],
           "content": {
             "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
             "depth": 78,
             "height": 78,
             "keepAspectRatio": true,
@@ -5194,7 +5160,13 @@
               "booleanParameters": {}
             }
           ],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "name": "AnimationTest",
+              "type": "Test::AnimationTest",
+              "Animatable": "Animation"
+            }
+          ],
           "content": {
             "scale": 0.125,
             "spineResourceName": "assets\\spineboy.json",
@@ -5786,18 +5758,7 @@
             },
             {
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
-                  },
-                  "parameters": [
-                    "RedHero",
-                    "Animation"
-                  ]
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {
@@ -5806,52 +5767,9 @@
                   "parameters": [
                     "PausedLabel",
                     "=",
-                    "\"Paused: false\""
+                    "\"Paused: \" + RedHero.AnimationTest::AnimationPaused() + \", \" + Spine.AnimationTest::AnimationPaused() + \", \" + FemalWitch.AnimationTest::AnimationPaused()"
                   ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
-                  },
-                  "parameters": [
-                    "RedHero",
-                    "Animation"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "PausedLabel",
-                    "=",
-                    "\"Paused: true\""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": true,
-                    "value": "AnimatableCapability::AnimatableBehavior::HasAnimationEnded"
-                  },
-                  "parameters": [
-                    "RedHero",
-                    "Animation"
-                  ]
-                }
-              ],
-              "actions": [
+                },
                 {
                   "type": {
                     "value": "TextObject::String"
@@ -5859,33 +5777,7 @@
                   "parameters": [
                     "EndedLabel",
                     "=",
-                    "\"Ended: false\""
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "value": "AnimatableCapability::AnimatableBehavior::HasAnimationEnded"
-                  },
-                  "parameters": [
-                    "RedHero",
-                    "Animation"
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "EndedLabel",
-                    "=",
-                    "\"Ended: true\""
+                    "\"Ended: \" + RedHero.AnimationTest::AnimationFinished() + \", \" + Spine.AnimationTest::AnimationFinished() + \", \" + FemalWitch.AnimationTest::AnimationFinished()"
                   ]
                 }
               ]
@@ -6902,6 +6794,10 @@
           "type": "AnimatableCapability::AnimatableBehavior"
         },
         {
+          "name": "AnimationTest",
+          "type": "Test::AnimationTest"
+        },
+        {
           "name": "Effect",
           "type": "EffectCapability::EffectBehavior"
         },
@@ -7228,6 +7124,7 @@
           "behaviors": [],
           "content": {
             "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0,
             "depth": 78,
             "height": 78,
             "keepAspectRatio": true,
@@ -9488,6 +9385,7 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "Toggle switch",
+      "gdevelopVersion": "",
       "helpPath": "/objects/toggle-switch",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIzLDIzSDljLTMuOSwwLTctMy4xLTctN3YwYzAtMy45LDMuMS03LDctN2gxNGMzLjksMCw3LDMuMSw3LDd2MEMzMCwxOS45LDI2LjksMjMsMjMsMjN6Ii8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI5IiBjeT0iMTYiIHI9IjQiLz4NCjwvc3ZnPg0K",
       "name": "SpriteToggleSwitch",
@@ -12256,6 +12154,7 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "Slider",
+      "gdevelopVersion": "",
       "helpPath": "/objects/slider",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSI3IiByPSIzIi8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMyIgeTE9IjciIHgyPSIyMCIgeTI9IjciLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjciIHgyPSIyNiIgeTI9IjciLz4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjEyIiBjeT0iMTYiIHI9IjMiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIzIiB5MT0iMTYiIHgyPSI5IiB5Mj0iMTYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjE2IiB4Mj0iMTUiIHkyPSIxNiIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjMiIGN5PSIyNSIgcj0iMyIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjMiIHkxPSIyNSIgeDI9IjIwIiB5Mj0iMjUiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIyOSIgeTE9IjI1IiB4Mj0iMjYiIHkyPSIyNSIvPg0KPC9zdmc+DQo=",
       "name": "PanelSpriteSlider",
@@ -16106,6 +16005,7 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "Panel sprite button",
+      "gdevelopVersion": "",
       "helpPath": "/objects/button",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI5LDIzSDNjLTEuMSwwLTItMC45LTItMlYxMWMwLTEuMSwwLjktMiwyLTJoMjZjMS4xLDAsMiwwLjksMiwydjEwQzMxLDIyLjEsMzAuMSwyMywyOSwyM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMywxOUwxMywxOWMtMS4xLDAtMi0wLjktMi0ydi0yYzAtMS4xLDAuOS0yLDItMmgwYzEuMSwwLDIsMC45LDIsMnYyQzE1LDE4LjEsMTQuMSwxOSwxMywxOXoiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxOCIgeTE9IjEzIiB4Mj0iMTgiIHkyPSIxOSIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjIxIiB5MT0iMTMiIHgyPSIxOCIgeTI9IjE3Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjEiIHkxPSIxOSIgeDI9IjE5IiB5Mj0iMTYiLz4NCjwvc3ZnPg0K",
       "name": "PanelSpriteButton",
@@ -18835,8 +18735,178 @@
           "instances": []
         }
       ]
+    },
+    {
+      "author": "",
+      "category": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "gdevelopVersion": "",
+      "helpPath": "",
+      "iconUrl": "",
+      "name": "Test",
+      "previewIconUrl": "",
+      "shortDescription": "",
+      "version": "",
+      "description": "",
+      "tags": [],
+      "authorIds": [],
+      "dependencies": [],
+      "globalVariables": [],
+      "sceneVariables": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "",
+          "fullName": "",
+          "name": "AnimationTest",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "fullName": "Animation finished as text",
+              "functionType": "StringExpression",
+              "name": "AnimationFinished",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "\"false\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "AnimatableCapability::AnimatableBehavior::HasAnimationEnded"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Animatable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "\"true\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Test::AnimationTest",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "fullName": "Animation paused as text",
+              "functionType": "StringExpression",
+              "name": "AnimationPaused",
+              "sentence": "",
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "\"false\""
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Animatable"
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "value": "SetReturnString"
+                      },
+                      "parameters": [
+                        "\"true\""
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "expressionType": {
+                "type": "string"
+              },
+              "parameters": [
+                {
+                  "description": "Object",
+                  "name": "Object",
+                  "type": "object"
+                },
+                {
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "supplementaryInformation": "Test::AnimationTest",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "Animatable capability",
+              "description": "",
+              "group": "",
+              "extraInformation": [
+                "AnimatableCapability::AnimatableBehavior"
+              ],
+              "name": "Animatable"
+            }
+          ],
+          "sharedPropertyDescriptors": []
+        }
+      ],
+      "eventsBasedObjects": []
     }
   ],
-  "externalLayouts": [],
-  "externalSourceFiles": []
+  "externalLayouts": []
 }

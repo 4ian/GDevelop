@@ -79,6 +79,7 @@ const extraClassAttributes = {
     'static Hidden = 2;',
   ],
   ObjectJsImplementation: ['content: Record<string, any>;'],
+  VectorString: ['toJSArray(): Array<string>;'],
 };
 
 const PrimitiveTypes = new Map([

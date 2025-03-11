@@ -160,6 +160,7 @@ namespace gdjs {
       return this._imageManager.getThreeMaterial(imageName, {
         useTransparentTexture: true,
         forceBasicMaterial: true,
+        vertexColors: false,
       });
     }
 

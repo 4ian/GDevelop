@@ -4,7 +4,9 @@ import {
   isPixelArt,
   isPublicAssetResourceUrl,
   extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
+  isCompatibleWithGDevelopVersion,
 } from '../Utils/GDevelopServices/Asset';
+import { getIDEVersion } from '../Version';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import flatten from 'lodash/flatten';
@@ -273,6 +275,7 @@ export type RequiredExtensionInstallation = {|
   requiredExtensionShortHeaders: Array<ExtensionShortHeader>,
   missingExtensionShortHeaders: Array<ExtensionShortHeader>,
   outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
+  incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader>,
 |};
 
 export type InstallRequiredExtensionsArgs = {|
@@ -390,6 +393,7 @@ export const checkRequiredExtensionsUpdate = async ({
       requiredExtensionShortHeaders: [],
       missingExtensionShortHeaders: [],
       outOfDateExtensionShortHeaders: [],
+      incompatibleWithIdeExtensionShortHeaders: [],
     };
   }
 
@@ -414,7 +418,24 @@ export const checkRequiredExtensionsUpdate = async ({
     }
   );
 
-  const outOfDateExtensionShortHeaders = requiredExtensionShortHeaders.filter(
+  const compatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader> = [];
+  const incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader> = [];
+  for (const requiredExtensionShortHeader of requiredExtensionShortHeaders) {
+    if (
+      isCompatibleWithGDevelopVersion(
+        getIDEVersion(),
+        requiredExtensionShortHeader.gdevelopVersion
+      )
+    ) {
+      compatibleWithIdeExtensionShortHeaders.push(requiredExtensionShortHeader);
+    } else {
+      incompatibleWithIdeExtensionShortHeaders.push(
+        requiredExtensionShortHeader
+      );
+    }
+  }
+
+  const outOfDateExtensionShortHeaders = compatibleWithIdeExtensionShortHeaders.filter(
     requiredExtensionShortHeader =>
       project.hasEventsFunctionsExtensionNamed(
         requiredExtensionShortHeader.name
@@ -426,13 +447,14 @@ export const checkRequiredExtensionsUpdate = async ({
 
   const missingExtensionShortHeaders = filterMissingExtensions(
     gd,
-    requiredExtensionShortHeaders
+    compatibleWithIdeExtensionShortHeaders
   );
 
   return {
     requiredExtensionShortHeaders,
     missingExtensionShortHeaders,
     outOfDateExtensionShortHeaders,
+    incompatibleWithIdeExtensionShortHeaders,
   };
 };
 

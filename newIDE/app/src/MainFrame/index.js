@@ -489,8 +489,6 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
-  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
-
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -545,6 +543,11 @@ const MainFrame = (props: Props) => {
     getGameUnverifiedScreenshotUrls,
     getHotReloadPreviewLaunchCaptureOptions,
   } = useCapturesManager({ project: currentProject, gamesList });
+
+  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer({
+    project: currentProject,
+    gamesList,
+  });
 
   /**
    * This reference is useful to get the current opened project,
@@ -1374,6 +1377,19 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const onExtensionInstalled = (extensionName: string) => {
+    // TODO Open the closed tabs back
+    // It would be safer to close the tabs before the extension is installed
+    // but it would make opening them back more complicated.
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsFunctionsExtensionTabs(
+        state.editorTabs,
+        extensionName
+      ),
+    }));
+  };
+
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -1661,9 +1677,7 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
-      const authenticatedPlayer = await getAuthenticatedPlayerForPreview(
-        currentProject
-      );
+      const authenticatedPlayer = await getAuthenticatedPlayerForPreview();
 
       const captureOptions = await createCaptureOptionsForPreview(
         launchCaptureOptions
@@ -3359,7 +3373,11 @@ const MainFrame = (props: Props) => {
         initialStepIndex,
         initialProjectData,
       });
-      sendInAppTutorialStarted({ tutorialId, scenario });
+      sendInAppTutorialStarted({
+        tutorialId,
+        scenario,
+        isUIRestricted: !!selectedInAppTutorialShortHeader.shouldRestrictUI,
+      });
       setSelectedInAppTutorialInfo(null);
     },
     [
@@ -3664,6 +3682,7 @@ const MainFrame = (props: Props) => {
               currentProject
             );
           }}
+          onExtensionInstalled={onExtensionInstalled}
           onShareProject={() => openShareDialog()}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
@@ -3869,6 +3888,7 @@ const MainFrame = (props: Props) => {
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                   })}
                 </ErrorBoundary>
@@ -4065,6 +4085,7 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
+          quitInAppTutorialDialogOpen={quitInAppTutorialDialogOpen}
           i18n={props.i18n}
           endTutorial={({
             shouldCloseProject,

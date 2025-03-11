@@ -300,7 +300,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       objectProperties
         .getOrCreate('text')
         .setValue(objectContent.text)
-        .setType('textarea')
+        .setType('multilinestring')
         .setLabel('Text');
 
       return objectProperties;

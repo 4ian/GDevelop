@@ -241,12 +241,12 @@ export const doesAssetPackContainAudio = (
 /**
  * Check if the IDE version, passed as argument, satisfy the version required by the asset.
  */
-export const isCompatibleWithAsset = (
+export const isCompatibleWithGDevelopVersion = (
   ideVersion: string,
-  assetHeader: { gdevelopVersion: string }
+  assetRequiredGDevelopVersion: ?string
 ) =>
-  assetHeader.gdevelopVersion
-    ? semverSatisfies(ideVersion, assetHeader.gdevelopVersion, {
+  assetRequiredGDevelopVersion
+    ? semverSatisfies(ideVersion, assetRequiredGDevelopVersion, {
         includePrerelease: true,
       })
     : true;

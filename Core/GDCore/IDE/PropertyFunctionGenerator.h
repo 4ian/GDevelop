@@ -3,8 +3,7 @@
  * Copyright 2008-2022 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_PROPERTYFUNCTIONGENERATOR_H
-#define GDCORE_PROPERTYFUNCTIONGENERATOR_H
+#pragma once
 
 namespace gd {
 class String;
@@ -73,5 +72,3 @@ class GD_CORE_API PropertyFunctionGenerator {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_PROPERTYFUNCTIONGENERATOR_H

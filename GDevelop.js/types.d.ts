@@ -115,6 +115,7 @@ export class VectorString extends EmscriptenObject {
   at(index: number): string;
   set(index: number, str: string): void;
   clear(): void;
+  toJSArray(): Array<string>;
 }
 
 export class VectorPlatformExtension extends EmscriptenObject {
@@ -380,7 +381,7 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class GroupVariableHelper extends EmscriptenObject {
+export class ObjectVariableHelper extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
 }
@@ -1923,7 +1924,8 @@ export class VariablesChangeset extends EmscriptenObject {
 export class WholeProjectRefactorer extends EmscriptenObject {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
   static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
-  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForObjectVariablesContainer(project: Project, objectVariablesContainer: VariablesContainer, initialInstancesContainer: InitialInstancesContainer, objectName: string, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, initialInstancesContainer: InitialInstancesContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceExtensionName: string): void;

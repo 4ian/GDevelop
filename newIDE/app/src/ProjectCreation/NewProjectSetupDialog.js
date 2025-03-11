@@ -39,6 +39,7 @@ import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
 import AIPromptField from './AIPromptField';
 import EmptyAndStartingPointProjects, {
+  isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
 } from './EmptyAndStartingPointProjects';
 import TextButton from '../UI/TextButton';
@@ -55,6 +56,7 @@ import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTempla
 import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper';
 import { useOnlineStatus } from '../Utils/OnlineStatus';
 import PrivateGameTemplateOwnedInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateOwnedInformationPage';
+import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -141,6 +143,7 @@ const NewProjectSetupDialog = ({
     emptyProjectSelected,
     setEmptyProjectSelected,
   ] = React.useState<boolean>(false);
+  const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const isOnHomePage =
     !selectedExampleShortHeader &&
     !selectedPrivateGameTemplateListingData &&
@@ -252,6 +255,83 @@ const NewProjectSetupDialog = ({
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
   const isLoading = isGeneratingProject || isProjectOpening;
+
+  const linkedExampleShortHeaders: {
+    exampleShortHeader: ExampleShortHeader,
+    relation: string,
+  }[] = React.useMemo(
+    () => {
+      if (
+        !exampleShortHeaders ||
+        !selectedExampleShortHeader ||
+        !selectedExampleShortHeader.linkedExampleShortHeaders
+      )
+        return [];
+
+      return selectedExampleShortHeader.linkedExampleShortHeaders
+        .map(({ slug, relation }) => {
+          const linkedExampleShortHeader = exampleShortHeaders.find(
+            exampleShortHeader => exampleShortHeader.slug === slug
+          );
+          if (linkedExampleShortHeader) {
+            return {
+              exampleShortHeader: linkedExampleShortHeader,
+              relation,
+            };
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+    },
+    [exampleShortHeaders, selectedExampleShortHeader]
+  );
+  const linkedPixelArtExampleShortHeader = React.useMemo(
+    () => {
+      const pixelArtLinkedItem = linkedExampleShortHeaders.find(
+        ({ relation }) => relation === 'pixel-art-version'
+      );
+      return pixelArtLinkedItem ? pixelArtLinkedItem.exampleShortHeader : null;
+    },
+    [linkedExampleShortHeaders]
+  );
+  const linkedNonPixelArtExampleShortHeader = React.useMemo(
+    () => {
+      const nonPixelArtLinkedItem = linkedExampleShortHeaders.find(
+        ({ relation }) => relation === 'non-pixel-art-version'
+      );
+      return nonPixelArtLinkedItem
+        ? nonPixelArtLinkedItem.exampleShortHeader
+        : null;
+    },
+    [linkedExampleShortHeaders]
+  );
+
+  const onCheckOptimizeForPixelArt = React.useCallback(
+    (e, checked) => {
+      if (!!linkedNonPixelArtExampleShortHeader && !checked) {
+        // If trying to uncheck the optimization for pixel art, on a template
+        // which has a non-pixel art version, then update the selected template.
+        onSelectExampleShortHeader(linkedNonPixelArtExampleShortHeader);
+        return;
+      }
+      if (!!linkedPixelArtExampleShortHeader && checked) {
+        // If trying to check the optimization for pixel art, on a template
+        // which has a pixel art version, then update the selected template.
+        onSelectExampleShortHeader(linkedPixelArtExampleShortHeader);
+        return;
+      }
+
+      // Otherwise, just update the optimization for pixel art.
+      setOptimizeForPixelArt(checked);
+    },
+    [
+      setOptimizeForPixelArt,
+      onSelectExampleShortHeader,
+      linkedPixelArtExampleShortHeader,
+      linkedNonPixelArtExampleShortHeader,
+    ]
+  );
 
   const selectedGameTemplatePurchaseUsageType = React.useMemo(
     () =>
@@ -372,22 +452,34 @@ const NewProjectSetupDialog = ({
     [setProjectName, projectNameError]
   );
 
-  // Update project name when the example or private game template changes.
   React.useEffect(
     () => {
       if (
-        emptyProjectSelected ||
-        (selectedExampleShortHeader &&
-          isStartingPointExampleShortHeader(selectedExampleShortHeader))
+        !emptyProjectSelected &&
+        !selectedExampleShortHeader &&
+        !selectedPrivateGameTemplateListingData
       ) {
+        // Reset project name when everything is unselected.
         setProjectName(generateProjectName());
-        return;
       }
-      if (selectedExampleShortHeader) {
+
+      if (
+        selectedExampleShortHeader &&
+        !isStartingPointExampleShortHeader(selectedExampleShortHeader) &&
+        (!exampleShortHeaders ||
+          !isLinkedToStartingPointExampleShortHeader(
+            exampleShortHeaders,
+            selectedExampleShortHeader
+          ))
+      ) {
+        // If it's a template, generate a name based on the template name.
+        // (We don't do it for starting points)
         setProjectName(generateProjectName(selectedExampleShortHeader.name));
         return;
       }
+
       if (selectedPrivateGameTemplateListingData) {
+        // If it's a private game template, generate a name based on the template name.
         setProjectName(
           generateProjectName(selectedPrivateGameTemplateListingData.name)
         );
@@ -398,6 +490,7 @@ const NewProjectSetupDialog = ({
       selectedExampleShortHeader,
       selectedPrivateGameTemplateListingData,
       emptyProjectSelected,
+      exampleShortHeaders,
     ]
   );
 
@@ -642,13 +735,16 @@ const NewProjectSetupDialog = ({
                     setSaveAsLocation,
                     newProjectsDefaultFolder,
                   })}
-                {emptyProjectSelected && (
+                {(emptyProjectSelected ||
+                  !!linkedPixelArtExampleShortHeader ||
+                  !!linkedNonPixelArtExampleShortHeader) && (
                   <Checkbox
-                    checked={optimizeForPixelArt}
+                    checked={
+                      optimizeForPixelArt ||
+                      !!linkedNonPixelArtExampleShortHeader
+                    }
                     label={<Trans>Optimize for Pixel Art</Trans>}
-                    onCheck={(e, checked) => {
-                      setOptimizeForPixelArt(checked);
-                    }}
+                    onCheck={onCheckOptimizeForPixelArt}
                     disabled={isLoading}
                   />
                 )}

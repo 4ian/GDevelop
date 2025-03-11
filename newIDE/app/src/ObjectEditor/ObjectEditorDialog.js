@@ -60,6 +60,7 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 type InnerDialogProps = {|
@@ -88,6 +89,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
+    onExtensionInstalled,
   } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     initialTab || 'properties'
@@ -120,6 +122,15 @@ const InnerDialog = (props: InnerDialogProps) => {
   const onApply = async () => {
     props.onApply();
 
+    const initialInstances =
+      (layout && layout.getInitialInstances()) ||
+      (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
+      null;
+    if (!initialInstances) {
+      // This can't actually happen.
+      return;
+    }
+
     const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
       'variables'
     );
@@ -127,17 +138,11 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables,
       object.getVariables()
     );
-    if (changeset.hasRemovedVariables()) {
-      // While we support refactoring that would remove all references (actions, conditions...)
-      // it's both a bit dangerous for the user and we would need to show the user what
-      // will be removed before doing so. For now, just clear the removed variables so they don't
-      // trigger any refactoring.
-      changeset.clearRemovedVariables();
-    }
-
-    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+    gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
       project,
       object.getVariables(),
+      initialInstances,
+      object.getName(),
       changeset,
       originalSerializedVariables
     );
@@ -297,6 +302,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
       {currentTab === 'variables' && (

@@ -135,6 +135,19 @@ class GD_CORE_API EventsFunctionsExtension {
   }
 
   /**
+   * \brief Get the GDevelop version required by this extension.
+   */
+  const gd::String& GetGDevelopVersion() const { return gdevelopVersion; };
+
+  /**
+   * \brief Set the GDevelop version required by this extension.
+   */
+  EventsFunctionsExtension& SetGDevelopVersion(const gd::String& gdevelopVersion_) {
+    gdevelopVersion = gdevelopVersion_;
+    return *this;
+  }
+
+  /**
    * \brief Return a reference to the list of the events based behaviors.
    */
   gd::SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
@@ -385,6 +398,7 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::String iconUrl;
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).
+  gd::String gdevelopVersion;
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
   gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;

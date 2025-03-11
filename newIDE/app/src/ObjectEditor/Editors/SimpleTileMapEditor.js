@@ -163,12 +163,10 @@ const SimpleTileMapEditor = ({
         height: e.currentTarget.naturalHeight,
       };
       setLoadedAtlasImageDimensions(newDimensions);
-      if (previousAtlasImageResourceName.current === atlasResourceName) {
-        // The resource did not change, do nothing.
-        return;
-      }
       previousAtlasImageResourceName.current = atlasResourceName;
-
+      // Recompute tile set even if resource name did not change, because the file behind
+      // the resource could have changed (external change). When the file is changed, the
+      // resources loader detects it and the atlas image is re-loaded, hence this callback.
       recomputeTileSet(newDimensions, tileSize);
     },
     [tileSize, recomputeTileSet]

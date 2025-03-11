@@ -2057,6 +2057,7 @@ namespace gdjs {
         this._behaviors.push(newRuntimeBehavior);
       }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
+      newRuntimeBehavior.onCreated();
       return true;
     }
 

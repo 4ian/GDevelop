@@ -31,6 +31,8 @@ import AuthenticatedUserContext, {
 } from '../Profile/AuthenticatedUserContext';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { TOOLBAR_COMMON_FORMATTED_BUTTON_IDS } from '../SceneEditor/utils';
 
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',
@@ -139,10 +141,13 @@ const interpolateExpectedEditor = (
   };
 };
 
-const interpolateEditorTabActiveTrigger = (
+const interpolateEditorTabActiveTrigger = ({
+  trigger,
+  data,
+}: {|
   trigger: string,
-  data: { [key: string]: string }
-): string => {
+  data: { [key: string]: string },
+|}): string => {
   const [sceneKey, editorType] = trigger.split(':');
   if (!editorType) {
     throw new Error(`There might be missing a ":" in the trigger ${trigger}`);
@@ -189,10 +194,15 @@ export const getEditorTabSelector = ({
   }"]${sceneNameFilter}`;
 };
 
-const interpolateElementId = (
+const interpolateElementId = ({
+  elementId,
+  data,
+  isMobile,
+}: {|
   elementId: string,
-  data: { [key: string]: string }
-): string => {
+  data: {| [key: string]: string |},
+  isMobile: boolean,
+|}): string => {
   if (
     elementId.startsWith(selectorInterpolationProjectDataAccessors.editorTab)
   ) {
@@ -241,6 +251,13 @@ const interpolateElementId = (
     }"]`;
   }
 
+  // If mobile, and looking at the toolbar, as there can be multiple in the DOM,
+  // we need to restrict the query to the active scene editor.
+  // (On Desktop, the toolbar is outside of the scene editor)
+  if (isMobile && TOOLBAR_COMMON_FORMATTED_BUTTON_IDS.includes(elementId)) {
+    return `#scene-editor[data-active=true] ${elementId}`;
+  }
+
   return elementId;
 };
 
@@ -271,29 +288,45 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
   }
 };
 
-const isDomBasedTriggerComplete = (
+const isDomBasedTriggerComplete = ({
+  trigger,
+  data,
+  isMobile,
+}: {|
   trigger?: ?InAppTutorialFlowStepTrigger,
-  data: { [key: string]: string }
-): boolean => {
+  data: { [key: string]: string },
+  isMobile: boolean,
+|}): boolean => {
   if (!trigger) return false;
   if (
     trigger.presenceOfElement &&
     document.querySelector(
-      interpolateElementId(trigger.presenceOfElement, data)
+      interpolateElementId({
+        elementId: trigger.presenceOfElement,
+        data,
+        isMobile,
+      })
     )
   ) {
     return true;
   } else if (
     trigger.absenceOfElement &&
     !document.querySelector(
-      interpolateElementId(trigger.absenceOfElement, data)
+      interpolateElementId({
+        elementId: trigger.absenceOfElement,
+        data,
+        isMobile,
+      })
     )
   ) {
     return true;
   } else if (
     trigger.editorIsActive &&
     document.querySelector(
-      interpolateEditorTabActiveTrigger(trigger.editorIsActive, data)
+      interpolateEditorTabActiveTrigger({
+        trigger: trigger.editorIsActive,
+        data,
+      })
     )
   ) {
     return true;
@@ -428,6 +461,7 @@ type Props = {|
   startStepIndex: number,
   startProjectData: { [key: string]: string },
   i18n: I18nType,
+  quitInAppTutorialDialogOpen: boolean,
   endTutorial: ({|
     shouldCloseProject: boolean,
     shouldWarnAboutUnsavedChanges: boolean,
@@ -462,10 +496,12 @@ const InAppTutorialOrchestrator = React.forwardRef<
       startStepIndex,
       startProjectData,
       i18n,
+      quitInAppTutorialDialogOpen,
     },
     ref
   ) => {
     const forceUpdate = useForceUpdate();
+    const { isMobile } = useResponsiveWindowSize();
     const [
       wrongEditorInfoOpen,
       setWrongEditorInfoOpen,
@@ -532,9 +568,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
           tutorialId: tutorialId,
           step: stepIndex,
           isCompleted: stepIndex >= stepCount - 1,
+          isUIRestricted: !!tutorial.shouldRestrictUI,
         });
       },
-      [tutorialId, stepCount]
+      [tutorialId, stepCount, tutorial.shouldRestrictUI]
     );
 
     // Reset current step index on tutorial change.
@@ -585,10 +622,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
             flow[nextStepIndex] &&
             (flow[nextStepIndex].deprecated ||
               (flow[nextStepIndex].skippable &&
-                isDomBasedTriggerComplete(
-                  flow[nextStepIndex].nextStepTrigger,
-                  data
-                )))
+                isDomBasedTriggerComplete({
+                  trigger: flow[nextStepIndex].nextStepTrigger,
+                  data,
+                  isMobile,
+                })))
           )
             nextStepIndex += 1;
           else break;
@@ -606,7 +644,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
         changeStep(nextStepIndex);
       },
-      [flow, changeStep, stepCount, data, project, currentStepIndex]
+      [flow, changeStep, stepCount, data, project, currentStepIndex, isMobile]
     );
 
     // Compute phases start positions on flow change.
@@ -692,10 +730,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
           stepIndex >= currentStepIndex;
           stepIndex--
         ) {
-          const isThisStepAlreadyDone = isDomBasedTriggerComplete(
-            flow[stepIndex].nextStepTrigger,
-            data
-          );
+          const isThisStepAlreadyDone = isDomBasedTriggerComplete({
+            trigger: flow[stepIndex].nextStepTrigger,
+            data,
+            isMobile,
+          });
           if (isThisStepAlreadyDone) {
             shouldGoToStepAtIndex = stepIndex + 1;
             break;
@@ -711,7 +750,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
             // Find the first shortcut in the list that can be triggered.
             // TODO: Add support for all triggers types
             if (
-              isDomBasedTriggerComplete(shortcutStep.trigger, data) ||
+              isDomBasedTriggerComplete({
+                trigger: shortcutStep.trigger,
+                data,
+                isMobile,
+              }) ||
               (shortcutStep.trigger &&
                 shortcutStep.trigger.objectAddedInLayout &&
                 hasCurrentSceneObjectsCountIncreased())
@@ -741,6 +784,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         data,
         flow,
         hasCurrentSceneObjectsCountIncreased,
+        isMobile,
       ]
     );
 
@@ -1055,6 +1099,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
     const isTouchScreen = useScreenType() === 'touch';
 
     const renderStepDisplayer = () => {
+      // If the end or quit dialog is displayed, we don't display the step displayer.
+      // The user should not be able to interact with the tutorial anymore, and
+      // we don't want the blocking layer to be visible.
+      if (displayEndDialog || quitInAppTutorialDialogOpen) return null;
+
       if (!currentStep) return null;
       const stepTooltip = currentStep.tooltip;
       let formattedTooltip;
@@ -1103,11 +1152,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
         tooltip: formattedTooltip,
         nextStepTrigger: formattedStepTrigger,
       };
+      if (!tutorial.shouldRestrictUI) {
+        // If the backend doesn't specify that the UI should be restricted,
+        // we disable the layer for all steps.
+        formattedStep.disableBlockingLayer = true;
+      }
       if (currentStep.elementToHighlightId) {
-        formattedStep.elementToHighlightId = interpolateElementId(
-          currentStep.elementToHighlightId,
-          data
-        );
+        formattedStep.elementToHighlightId = interpolateElementId({
+          elementId: currentStep.elementToHighlightId,
+          data,
+          isMobile,
+        });
       }
 
       let currentPhaseIndex = 0;
@@ -1122,6 +1177,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           })
           .indexOf(true);
       }
+
       return (
         <InAppTutorialStepDisplayer
           step={formattedStep}

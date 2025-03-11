@@ -289,7 +289,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition("VarSceneTxt",
@@ -302,7 +303,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition(
@@ -316,7 +318,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition("VariableChildExists",
@@ -331,6 +334,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Name of the child"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -346,6 +350,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Name of the child"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -372,6 +377,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -386,6 +392,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -400,7 +407,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddCondition("VarGlobalDef",
@@ -426,7 +434,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Variable"))
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction("ModVarSceneTxt",
@@ -439,7 +448,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Variable"))
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction(
@@ -452,7 +462,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction("ToggleSceneVariableAsBoolean",
@@ -465,7 +476,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/conditions/var24.png",
                  "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction("ModVarGlobal",
@@ -479,6 +491,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -493,6 +506,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -506,7 +520,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("New Value:"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction("ToggleGlobalVariableAsBoolean",
@@ -519,7 +534,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/conditions/var24.png",
                  "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction(
@@ -534,7 +550,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Child's name"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction(
@@ -549,7 +566,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Child's name"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .MarkAsAdvanced()
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction("VariableClearChildren",
@@ -563,6 +581,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Structure or array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -577,6 +596,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Structure or array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -595,6 +615,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "end of the array."))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -610,6 +631,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Text to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -624,6 +646,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("expression", _("Number to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -638,6 +661,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("trueorfalse", _("Boolean to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -654,6 +678,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("expression", _("Index to remove"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -670,6 +695,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -682,7 +708,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -694,7 +721,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddStrExpression(
@@ -706,7 +734,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -718,7 +747,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddAction(
@@ -736,6 +766,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "end of the array."))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -752,6 +783,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("expression", _("Index to remove"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -767,6 +799,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("string", _("Text to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -781,6 +814,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("expression", _("Number to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -795,6 +829,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("trueorfalse", _("Boolean to add"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -811,6 +846,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "number", ParameterOptions::MakeNewOptions())
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
       .SetRelevantForFunctionEventsOnly()
+      .SetHidden()
       .MarkAsAdvanced();
 
   extension
@@ -822,7 +858,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression("GlobalVariableFirstNumber",
@@ -833,7 +870,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddStrExpression(
@@ -845,7 +883,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -856,7 +895,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           _("External variables ❯ Global variables ❯ Arrays and structures"),
           "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression("GlobalVariableChildCount",
@@ -867,7 +907,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Array or structure variable"))
       .SetHelpPath("/all-features/variables/structures-and-arrays/")
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression("VariableChildCount",
@@ -886,7 +927,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("External variables ❯ Scene variables"),
                      "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddStrExpression("VariableString",
@@ -895,7 +937,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("External variables ❯ Scene variables"),
                         "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddExpression("GlobalVariable",
@@ -904,7 +947,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("External variables ❯ Global variables"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Name of the global variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 
   extension
       .AddStrExpression("GlobalVariableString",
@@ -913,7 +957,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("External variables ❯ Global variables"),
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly()
+      .SetHidden();
 }
 
 }  // namespace gd

@@ -491,6 +491,52 @@ namespace gdjs {
     };
 
     /**
+     * @param resource
+     * @returns Resource files
+     */
+    private _getSoundUrlsFromResource(resource: ResourceData): string[] {
+      return [this._resourceLoader.getFullUrl(resource.file)];
+    }
+
+    /**
+     * @param resource
+     * @returns Resource file
+     */
+    private _getDefaultSoundUrl(resource: ResourceData): string {
+      return this._resourceLoader.getFullUrl(resource.file);
+    }
+
+    /**
+     * Preload audio file
+     * @param resource
+     * @param isMusic
+     */
+    private _preloadAudioFile(
+      resource: ResourceData,
+      isMusic: boolean
+    ): Promise<number> {
+      const file = resource.file;
+      return new Promise((resolve, reject) => {
+        const container = isMusic ? this._loadedMusics : this._loadedSounds;
+        container[file] = new Howl(
+          Object.assign({}, HowlParameters, {
+            src: this._getSoundUrlsFromResource(resource),
+            onload: resolve,
+            onloaderror: (soundId: number, error?: string) => reject(error),
+            html5: isMusic,
+            xhr: {
+              withCredentials:
+                this._resourceLoader.checkIfCredentialsRequired(file),
+            },
+            // Cache the sound with no volume. This avoids a bug where it plays at full volume
+            // for a split second before setting its correct volume.
+            volume: 0,
+          })
+        );
+      });
+    }
+
+    /**
      * Store the sound in the specified array, put it at the first index that
      * is free, or add it at the end if no element is free
      * ("free" means that the gdjs.HowlerSound can be destroyed).
@@ -535,15 +581,16 @@ namespace gdjs {
 
       let howl = cacheContainer.get(resource);
       if (!howl) {
-        const fileName = resource ? resource.file : soundName;
         howl = new Howl(
           Object.assign(
             {
-              src: [this._resourceLoader.getFullUrl(fileName)],
+              src: this._getSoundUrlsFromResource(resource),
               html5: isMusic,
               xhr: {
                 withCredentials:
-                  this._resourceLoader.checkIfCredentialsRequired(fileName),
+                  this._resourceLoader.checkIfCredentialsRequired(
+                    resource.file
+                  ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -577,7 +624,7 @@ namespace gdjs {
         new Howl(
           Object.assign(
             {
-              src: [this._resourceLoader.getFullUrl(resource.file)],
+              src: this._getSoundUrlsFromResource(resource),
               html5: isMusic,
               xhr: {
                 withCredentials:
@@ -825,34 +872,9 @@ namespace gdjs {
         this._availableResources[resource.name] = resource;
       }
 
-      const preloadAudioFile = (
-        file: string,
-        isMusic: boolean
-      ): Promise<number> => {
-        return new Promise((resolve, reject) => {
-          const container = isMusic ? this._loadedMusics : this._loadedSounds;
-          container[file] = new Howl(
-            Object.assign({}, HowlParameters, {
-              src: [this._resourceLoader.getFullUrl(file)],
-              onload: resolve,
-              onloaderror: (soundId: number, error?: string) => reject(error),
-              html5: isMusic,
-              xhr: {
-                withCredentials:
-                  this._resourceLoader.checkIfCredentialsRequired(file),
-              },
-              // Cache the sound with no volume. This avoids a bug where it plays at full volume
-              // for a split second before setting its correct volume.
-              volume: 0,
-            })
-          );
-        });
-      };
-
-      const file = resource.file;
       if (resource.preloadAsMusic) {
         try {
-          await preloadAudioFile(file, /* isMusic= */ true);
+          await this._preloadAudioFile(resource, /* isMusic= */ true);
         } catch (error) {
           logger.warn(
             'There was an error while preloading an audio file: ' + error
@@ -862,7 +884,7 @@ namespace gdjs {
 
       if (resource.preloadAsSound) {
         try {
-          await preloadAudioFile(file, /* isMusic= */ false);
+          await this._preloadAudioFile(resource, /* isMusic= */ false);
         } catch (error) {
           logger.warn(
             'There was an error while preloading an audio file: ' + error
@@ -879,6 +901,7 @@ namespace gdjs {
       ) {
         // preloading as sound already does a XHR request, hence "else if"
         try {
+          const file = resource.file;
           await new Promise((resolve, reject) => {
             const sound = new XMLHttpRequest();
             sound.withCredentials =
@@ -890,7 +913,7 @@ namespace gdjs {
             sound.addEventListener('abort', (_) =>
               reject('XHR abort: ' + file)
             );
-            sound.open('GET', this._resourceLoader.getFullUrl(file));
+            sound.open('GET', this._getDefaultSoundUrl(resource));
             sound.send();
           });
         } catch (error) {

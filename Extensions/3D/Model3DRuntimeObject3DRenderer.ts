@@ -372,7 +372,7 @@ namespace gdjs {
       const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
 
-      // The action must be reset before being reconfigurated with enabled and setLoop to prevent previous action parameters causing problems
+      // The action must be reset before being reconfigured with setLoop to prevent previous action parameters causing problems
       // such as animations not playing (not sure to which extends it can cause problems nor the origin of these problems)  
       this._action.reset();
       this._action.setLoop(

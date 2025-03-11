@@ -126,6 +126,12 @@ const ProfileDetails = ({
     (achievements &&
       achievements.find(achievement => achievement.id === 'twitter-follow')) ||
     null;
+  const youtubeSubscriptionAchievement =
+    (achievements &&
+      achievements.find(
+        achievement => achievement.id === 'youtube-subscription'
+      )) ||
+    null;
 
   const [
     discordUsernameSyncStatus,
@@ -308,6 +314,23 @@ const ProfileDetails = ({
                       icon: communityLinksConfig.twitterUsername.icon,
                     },
                     {
+                      text: !youtubeUsername ? (
+                        <MarkdownText
+                          translatableSource={communityLinksConfig.youtubeUsername.getRewardMessage(
+                            false,
+                            youtubeSubscriptionAchievement &&
+                              youtubeSubscriptionAchievement.rewardValueInCredits
+                              ? youtubeSubscriptionAchievement.rewardValueInCredits.toString()
+                              : '-'
+                          )}
+                        />
+                      ) : (
+                        youtubeUsername
+                      ),
+                      isNotFilled: !youtubeUsername,
+                      icon: communityLinksConfig.youtubeUsername.icon,
+                    },
+                    {
                       text: !tiktokUsername ? (
                         <MarkdownText
                           translatableSource={communityLinksConfig.tiktokUsername.getRewardMessage(
@@ -335,10 +358,6 @@ const ProfileDetails = ({
                     {
                       text: facebookUsername,
                       icon: communityLinksConfig.facebookUsername.icon,
-                    },
-                    {
-                      text: youtubeUsername,
-                      icon: communityLinksConfig.youtubeUsername.icon,
                     },
                     {
                       text: instagramUsername,

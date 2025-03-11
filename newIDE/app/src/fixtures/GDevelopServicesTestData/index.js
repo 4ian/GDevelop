@@ -857,6 +857,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onResetPassword: async () => {},
   onEditProfile: async () => {},
   onOpenLoginDialog: () => {},
+  onOpenProfileDialog: () => {},
   onOpenEditProfileDialog: () => {},
   onOpenChangeEmailDialog: () => {},
   onOpenCreateAccountDialog: () => {},

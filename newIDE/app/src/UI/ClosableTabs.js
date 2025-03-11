@@ -10,6 +10,8 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import Cross from './CustomSvgIcons/Cross';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
+const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
+
 const styles = {
   tabContentContainer: {
     width: '100%',
@@ -42,6 +44,7 @@ const styles = {
 
 type TabContentContainerProps = {|
   active: boolean,
+  removePointerEvents?: boolean,
   children: React.Node,
 |};
 
@@ -66,6 +69,7 @@ export class TabContentContainer extends React.Component<TabContentContainerProp
         style={{
           ...styles.tabContentContainer,
           ...(active ? undefined : { display: 'none' }),
+          pointerEvents: this.props.removePointerEvents ? 'none' : undefined,
         }}
       >
         {children}
@@ -241,6 +245,9 @@ export function ClosableTab({
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,
         }}
+        // A tab lives in the top bar, which has the ability to drag the app window.
+        // Ensure the tab does not have this ability, as it can be dragged itself.
+        className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
       >
         <ButtonBase
           onClick={onClick}

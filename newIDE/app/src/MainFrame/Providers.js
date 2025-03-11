@@ -2,7 +2,7 @@
 import * as React from 'react';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
-import PublicProfileProvider from '../Profile/PublicProfileProvider';
+import { PublicProfileProvider } from '../Profile/PublicProfileContext';
 import Authentication from '../Utils/GDevelopServices/Authentication';
 import PreferencesProvider from './Preferences/PreferencesProvider';
 import PreferencesContext from './Preferences/PreferencesContext';
@@ -41,6 +41,7 @@ import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
 import { CourseChapterStoreStateProvider } from '../Course/CourseChapterStoreContext';
+import GamesPlatformFrameStateProvider from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
 
 type Props = {|
   authentication: Authentication,
@@ -114,9 +115,13 @@ const Providers = ({
                                                               <TutorialStateProvider>
                                                                 <AnnouncementsFeedStateProvider>
                                                                   <PrivateAssetsAuthorizationProvider>
-                                                                    {children({
-                                                                      i18n,
-                                                                    })}
+                                                                    <GamesPlatformFrameStateProvider>
+                                                                      {children(
+                                                                        {
+                                                                          i18n,
+                                                                        }
+                                                                      )}
+                                                                    </GamesPlatformFrameStateProvider>
                                                                   </PrivateAssetsAuthorizationProvider>
                                                                 </AnnouncementsFeedStateProvider>
                                                               </TutorialStateProvider>

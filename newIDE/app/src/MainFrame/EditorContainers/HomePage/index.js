@@ -44,6 +44,7 @@ import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
+import { GamesPlatformFrameContext } from './PlaySection/GamesPlatformFrameContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -109,6 +110,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
   storageProviders: Array<StorageProvider>,
 
   // Games
@@ -182,6 +184,7 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         onCreateProjectFromExample,
         setToolbar,
+        hideTabsTitleBarAndEditorToolbar,
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
@@ -205,6 +208,10 @@ export const HomePage = React.memo<Props>(
         onOpenLoginDialog,
         limits,
       } = authenticatedUser;
+      const {
+        startTimeoutToUnloadIframe,
+        loadIframeOrRemoveTimeout,
+      } = React.useContext(GamesPlatformFrameContext);
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -423,11 +430,24 @@ export const HomePage = React.memo<Props>(
       );
 
       // Ensure the toolbar is up to date when the active tab changes.
-      React.useEffect(
+      // Use a layout effect to ensure titlebar/toolbar are updated at the same time
+      // as the rest of the interface (same React render).
+      React.useLayoutEffect(
         () => {
-          updateToolbar();
+          // Hide the toolbars when on mobile in the "play" tab.
+          if (activeTab === 'play' && isMobile) {
+            hideTabsTitleBarAndEditorToolbar(true);
+          } else {
+            hideTabsTitleBarAndEditorToolbar(false);
+            updateToolbar();
+          }
+
+          // Ensure we show it again when the tab changes.
+          return () => {
+            hideTabsTitleBarAndEditorToolbar(false);
+          };
         },
-        [updateToolbar]
+        [updateToolbar, activeTab, hideTabsTitleBarAndEditorToolbar, isMobile]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -473,6 +493,35 @@ export const HomePage = React.memo<Props>(
         },
         // Reset flag that prevents multiple send of the same event on user change.
         [authenticated]
+      );
+
+      // As the homepage is never unmounted, we need to ensure the games platform
+      // iframe is unloaded & loaded from here,
+      // allowing to handle when the user navigates to another tab.
+      React.useEffect(
+        () => {
+          if (!isActive) {
+            // This happens when the user navigates to another tab. (ex: Scene or Events)
+            startTimeoutToUnloadIframe();
+            return;
+          }
+
+          if (activeTab === 'play') {
+            // This happens when the user navigates to the "Play" tab,
+            // - From another Home Tab.
+            // - From another tab (ex: Scene or Events).
+            loadIframeOrRemoveTimeout();
+          } else {
+            // This happens when the user navigates to another Home Tab.
+            startTimeoutToUnloadIframe();
+          }
+        },
+        [
+          isActive,
+          startTimeoutToUnloadIframe,
+          loadIframeOrRemoveTimeout,
+          activeTab,
+        ]
       );
 
       return (
@@ -608,6 +657,7 @@ export const renderHomePageContainer = (
     isActive={props.isActive}
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
+    hideTabsTitleBarAndEditorToolbar={props.hideTabsTitleBarAndEditorToolbar}
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}

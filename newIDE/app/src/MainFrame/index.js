@@ -18,7 +18,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
-import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { TabContentContainer } from '../UI/ClosableTabs';
@@ -198,6 +197,8 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
+import { GamesPlatformFrameContext } from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
+import PublicProfileContext from '../Profile/PublicProfileContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -344,6 +345,10 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
+  const [
+    tabsTitleBarAndEditorToolbarHidden,
+    setTabsTitleBarAndEditorToolbarHidden,
+  ] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -377,7 +382,6 @@ const MainFrame = (props: Props) => {
     false
   );
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
-  const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
     openPreferencesDialog,
@@ -527,6 +531,10 @@ const MainFrame = (props: Props) => {
       ? currentProject.isFolderProject()
       : false,
   });
+
+  const { iframeVisible: gamesPlatformIframeVisible } = React.useContext(
+    GamesPlatformFrameContext
+  );
 
   const gamesList = useGamesList();
 
@@ -1099,7 +1107,7 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
-          sealUnsavedChanges({ setCheckpointTime: true });
+          sealUnsavedChanges();
           serializedProject.delete();
         }
       } catch (error) {
@@ -2705,7 +2713,7 @@ const MainFrame = (props: Props) => {
           return;
         }
 
-        sealUnsavedChanges({ setCheckpointTime: true });
+        sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
         setCloudProjectRecoveryOpenedVersionId(null);
@@ -2950,7 +2958,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          sealUnsavedChanges({ setCheckpointTime: true });
+          sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
@@ -3109,7 +3117,7 @@ const MainFrame = (props: Props) => {
 
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
-    openProfileDialog,
+    openProfileDialog: authenticatedUser.onOpenProfileDialog,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -3123,7 +3131,7 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (fileMetadataNewAttributes) {
-        sealUnsavedChanges({ setCheckpointTime: true });
+        sealUnsavedChanges();
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }
@@ -3412,6 +3420,13 @@ const MainFrame = (props: Props) => {
     }
   }, []);
 
+  const {
+    configureNewProjectActions: configureNewProjectActionsForGamesPlatformFrame,
+  } = React.useContext(GamesPlatformFrameContext);
+  const {
+    configureNewProjectActions: configureNewProjectActionsForProfile,
+  } = React.useContext(PublicProfileContext);
+
   React.useEffect(
     () => {
       openHomePage();
@@ -3479,6 +3494,13 @@ const MainFrame = (props: Props) => {
                 fileMetadataAndStorageProviderName
               );
           }
+
+          configureNewProjectActionsForGamesPlatformFrame({
+            fetchAndOpenNewProjectSetupDialogForExample,
+          });
+          configureNewProjectActionsForProfile({
+            fetchAndOpenNewProjectSetupDialogForExample,
+          });
         })
         .catch(() => {
           /* Ignore errors */
@@ -3522,7 +3544,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: authenticatedUser.onOpenProfileDialog,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3573,7 +3595,7 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: authenticatedUser.onOpenProfileDialog,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3653,7 +3675,10 @@ const MainFrame = (props: Props) => {
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>
-      <TabsTitlebar toggleProjectManager={toggleProjectManager}>
+      <TabsTitlebar
+        hidden={tabsTitleBarAndEditorToolbarHidden}
+        toggleProjectManager={toggleProjectManager}
+      >
         <DraggableEditorTabs
           hideLabels={false}
           editorTabs={state.editorTabs}
@@ -3671,6 +3696,7 @@ const MainFrame = (props: Props) => {
       </TabsTitlebar>
       <Toolbar
         ref={toolbar}
+        hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
           !['start page', 'debugger', null].includes(
             getCurrentTab(state.editorTabs)
@@ -3716,7 +3742,13 @@ const MainFrame = (props: Props) => {
           const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
 
           return (
-            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+            <TabContentContainer
+              key={editorTab.key}
+              active={isCurrentTab}
+              // Deactivate pointer events when the play tab is active, so the iframe
+              // can be interacted with.
+              removePointerEvents={gamesPlatformIframeVisible}
+            >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
@@ -3731,6 +3763,7 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
+                    hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,
@@ -3789,7 +3822,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,
-                    onOpenProfile: () => openProfileDialog(true),
+                    onOpenProfile: authenticatedUser.onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3908,14 +3941,6 @@ const MainFrame = (props: Props) => {
             onResourceChosen([]);
           }}
           options={chooseResourceOptions}
-        />
-      )}
-      {profileDialogOpen && (
-        <ProfileDialog
-          open
-          onClose={() => {
-            openProfileDialog(false);
-          }}
         />
       )}
       {renderNewProjectDialog()}

@@ -36,6 +36,12 @@ html {
   app-region: drag;
 }
 
+/* The part of the window which should not be drag'n'dropped on desktop (Electron and installed PWA). */
+.title-bar-non-draggable-part {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
 /* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */
 .safe-area-aware-container {
   padding-top: env(safe-area-inset-top);

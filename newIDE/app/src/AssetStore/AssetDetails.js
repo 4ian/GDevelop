@@ -40,9 +40,9 @@ import {
 } from '../Utils/GDevelopServices/User';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
-import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { AssetPreviewImage } from './AssetPreviewImage';
+import PublicProfileContext from '../Profile/PublicProfileContext';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -129,10 +129,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
       UserPublicProfile[]
     >([]);
-    const [
-      selectedAuthorPublicProfile,
-      setSelectedAuthorPublicProfile,
-    ] = React.useState<?UserPublicProfile>(null);
+    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -317,7 +314,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                             key={userPublicProfile.id}
                             href="#"
                             onClick={() =>
-                              setSelectedAuthorPublicProfile(userPublicProfile)
+                              openUserPublicProfile({
+                                userId: userPublicProfile.id,
+                                callbacks: {
+                                  onAssetPackOpen: onPrivateAssetPackSelection,
+                                  onGameTemplateOpen: onPrivateGameTemplateSelection,
+                                },
+                              })
                             }
                           >
                             {username}
@@ -540,20 +543,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               />
             </Line>
           </Column>
-          {selectedAuthorPublicProfile && (
-            <PublicProfileDialog
-              userId={selectedAuthorPublicProfile.id}
-              onClose={() => setSelectedAuthorPublicProfile(null)}
-              onAssetPackOpen={assetPack => {
-                onPrivateAssetPackSelection(assetPack);
-                setSelectedAuthorPublicProfile(null);
-              }}
-              onGameTemplateOpen={gameTemplate => {
-                onPrivateGameTemplateSelection(gameTemplate);
-                setSelectedAuthorPublicProfile(null);
-              }}
-            />
-          )}
         </Column>
       </ScrollView>
     );

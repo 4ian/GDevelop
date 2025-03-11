@@ -204,7 +204,7 @@ export default class ExportLauncher extends Component<Props, State> {
           setTimeout(() => {
             this.setState({ build });
             authenticatedUser.onRefreshLimits();
-            this.props.gameAndBuildsManager.refreshBuilds();
+            this.props.gameAndBuildsManager.refreshGameBuilds();
           }, 3000);
         }
       },
@@ -347,7 +347,7 @@ export default class ExportLauncher extends Component<Props, State> {
         // When the build is started, update the game because the build may be linked to it.
         this.props.gameAndBuildsManager.refreshGame();
         // Also refresh the builds list, as the new build will be considered as a pending build.
-        this.props.gameAndBuildsManager.refreshBuilds();
+        this.props.gameAndBuildsManager.refreshGameBuilds();
       }
       setStep('done');
       this.setState({
@@ -416,11 +416,11 @@ export default class ExportLauncher extends Component<Props, State> {
     );
 
     const hasBuildsCurrentlyRunning = () => {
-      if (!gameAndBuildsManager.builds) return false;
+      if (!gameAndBuildsManager.gameBuilds) return false;
 
       // We check pending builds that are not more than 10 minutes old,
       // to avoid counting builds that may be stuck.
-      return !!gameAndBuildsManager.builds.filter(
+      return !!gameAndBuildsManager.gameBuilds.filter(
         build =>
           build.status === 'pending' &&
           build.type === exportPipeline.onlineBuildType &&

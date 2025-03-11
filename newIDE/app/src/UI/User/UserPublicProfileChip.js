@@ -34,7 +34,9 @@ export const UserPublicProfileChip = ({
       variant={variant}
       label={user.username}
       key={user.username}
-      onClick={isClickable ? () => openUserPublicProfile(user.id) : null}
+      onClick={
+        isClickable ? () => openUserPublicProfile({ userId: user.id }) : null
+      }
       disableAutoTranslate
     />
   );

@@ -9,7 +9,7 @@ import {
 } from '../../../../fixtures/GDevelopServicesTestData';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
-import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
+import { PublicProfileProvider } from '../../../../Profile/PublicProfileContext';
 import { AssetStoreNavigatorStateProvider } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {

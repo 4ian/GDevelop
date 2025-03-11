@@ -174,6 +174,14 @@ namespace gdjs {
         const newRuntimeGameOptions: RuntimeGameOptions =
           gdjs.runtimeGameOptions;
 
+        if (gdjs.inAppTutorialMessage) {
+          gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
+            this._runtimeGame,
+            newRuntimeGameOptions.inAppTutorialMessageInPreview,
+            newRuntimeGameOptions.inAppTutorialMessagePositionInPreview || ''
+          );
+        }
+
         const newScriptFiles =
           newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
         const projectDataOnlyExport =

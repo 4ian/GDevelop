@@ -42,7 +42,6 @@ import {
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
 import Link from '../UI/Link';
-import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Window from '../Utils/Window';
 import Breadcrumbs from '../UI/Breadcrumbs';
 import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
@@ -52,6 +51,7 @@ import FlatButton from '../UI/FlatButton';
 import HelpIcon from '../UI/HelpIcon';
 import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
 import { getUserProductPurchaseUsageType } from './ProductPageHelper';
+import PublicProfileContext from '../Profile/PublicProfileContext';
 
 const ASSETS_DISPLAY_LIMIT = 60;
 
@@ -299,10 +299,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       authorPublicProfile,
       setAuthorPublicProfile,
     ] = React.useState<?UserPublicProfile>(null);
-    const [
-      openAuthorPublicProfileDialog,
-      setOpenAuthorPublicProfileDialog,
-    ] = React.useState<boolean>(false);
+    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
     const [
       isNavigatingInsideFolder,
       setIsNavigatingInsideFolder,
@@ -855,7 +852,19 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                   <Text displayInlineAsSpan size="sub-title">
                     <Trans>by</Trans>{' '}
                     <Link
-                      onClick={() => setOpenAuthorPublicProfileDialog(true)}
+                      onClick={() =>
+                        openUserPublicProfile({
+                          userId: authorPublicProfile.id,
+                          callbacks: {
+                            onAssetPackOpen: onPrivateAssetPackSelection
+                              ? onPrivateAssetPackSelection
+                              : undefined,
+                            onGameTemplateOpen: onPrivateGameTemplateSelection
+                              ? onPrivateGameTemplateSelection
+                              : undefined,
+                          },
+                        })
+                      }
                       href="#"
                     >
                       {authorPublicProfile.username || ''}
@@ -976,26 +985,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             // It's not an audio pack.
             !isAssetPackAudioOnly(openedAssetPack)) &&
           noResultComponent}
-        {onPrivateAssetPackSelection &&
-          onPrivateGameTemplateSelection &&
-          openAuthorPublicProfileDialog &&
-          authorPublicProfile && (
-            <PublicProfileDialog
-              userId={authorPublicProfile.id}
-              onClose={() => setOpenAuthorPublicProfileDialog(false)}
-              onAssetPackOpen={assetPackListingData => {
-                onPrivateAssetPackSelection(assetPackListingData);
-                setOpenAuthorPublicProfileDialog(false);
-                setAuthorPublicProfile(null);
-              }}
-              onGameTemplateOpen={gameTemplateListingData => {
-                onPrivateGameTemplateSelection(gameTemplateListingData);
-                setOpenAuthorPublicProfileDialog(false);
-                setAuthorPublicProfile(null);
-              }}
-            />
-          )}
-
         {currentPage &&
           assetShortHeaders &&
           assetShortHeaders.length > getPageBreakAssetUpperIndex(0) && (

@@ -29,19 +29,16 @@ const OnlineWebExportFlow = ({
 }: OnlineWebExportFlowProps) => {
   const {
     game,
-    builds,
+    gameBuilds,
     refreshGame,
     setGame,
     gameAvailabilityError,
   } = gameAndBuildsManager;
   const isGameOwnedByCurrentUser =
     !gameAvailabilityError || gameAvailabilityError !== 'not-owned';
-  const hasGameExistingWebBuilds =
-    game && builds
-      ? !!builds.filter(
-          build => build.gameId === game.id && build.type === 'web-build'
-        ).length
-      : false;
+  const hasGameExistingWebBuilds = gameBuilds
+    ? !!gameBuilds.filter(build => build.type === 'web-build').length
+    : false;
   const isPublishedOnGdGames = !!game && !!game.publicWebBuildId;
 
   const [

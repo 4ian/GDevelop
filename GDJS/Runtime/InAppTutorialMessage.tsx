@@ -78,44 +78,52 @@ namespace gdjs {
     const containerId = 'in-app-tutorial-container';
 
     let _container: HTMLElement | null = null;
+    let _styleSheet: HTMLStyleElement | null = null;
+    let _areFontsLoaded = false;
 
-    const _loadFonts = () => {
-      new FontFace(
-        'Fira Sans',
-        "url(https://fonts.gstatic.com/s/firasans/v17/va9E4kDNxMZdWfMOD5Vvl4jLazX3dA.woff2) format('woff2')",
-        {
-          variant: 'normal',
-          weight: 'normal',
-          unicodeRange:
-            'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
-          display: 'swap',
-        }
-      )
-        .load()
-        .then((fontFace) => document.fonts.add(fontFace));
-      new FontFace(
-        'Fira Sans',
-        "url(https://fonts.gstatic.com/s/firasans/v17/va9B4kDNxMZdWfMOD5VnLK3eRhf6Xl7Glw.woff2) format('woff2')",
-        {
-          variant: 'normal',
-          weight: 'bold',
-          unicodeRange:
-            'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
-          display: 'swap',
-        }
-      )
-        .load()
-        .then((fontFace) => document.fonts.add(fontFace));
+    const _loadFonts = async () => {
+      if (_areFontsLoaded) return;
+
+      const fontFaces = await Promise.all([
+        new FontFace(
+          'Fira Sans',
+          "url(https://fonts.gstatic.com/s/firasans/v17/va9E4kDNxMZdWfMOD5Vvl4jLazX3dA.woff2) format('woff2')",
+          {
+            variant: 'normal',
+            weight: 'normal',
+            unicodeRange:
+              'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
+            display: 'swap',
+          }
+        ).load(),
+        new FontFace(
+          'Fira Sans',
+          "url(https://fonts.gstatic.com/s/firasans/v17/va9B4kDNxMZdWfMOD5VnLK3eRhf6Xl7Glw.woff2) format('woff2')",
+          {
+            variant: 'normal',
+            weight: 'bold',
+            unicodeRange:
+              'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD',
+            display: 'swap',
+          }
+        ).load(),
+      ]);
+      fontFaces.forEach((fontFace) => {
+        document.fonts.add(fontFace);
+      });
+      _areFontsLoaded = true;
     };
 
-    const _loadStyles = () => {
-      const adhocStyle = document.createElement('style');
-      adhocStyle.textContent = `
+    const _loadStyleSheet = () => {
+      if (_styleSheet) return;
+
+      _styleSheet = document.createElement('style');
+      _styleSheet.textContent = `
         #${containerId} p {
           margin-block: 0; /* To remove any browser built-in style */
         }
       `;
-      document.head.appendChild(adhocStyle);
+      document.head.appendChild(_styleSheet);
     };
 
     const getDomElementContainer = (
@@ -132,18 +140,7 @@ namespace gdjs {
       return domElementContainer;
     };
 
-    export const displayInAppTutorialMessage = (
-      runtimeGame: gdjs.RuntimeGame,
-      message: string,
-      position: string
-    ) => {
-      const domElementContainer = getDomElementContainer(runtimeGame);
-      if (!domElementContainer) {
-        return;
-      }
-
-      if (_container) return;
-
+    const _getPositioningStyle = (position: string) => {
       const leftOrRight = position.toLowerCase().includes('right')
         ? 'right'
         : 'left';
@@ -177,12 +174,38 @@ namespace gdjs {
         messageContainerPositionStyle.transform =
           'translateY(calc(-100% - 10px))';
       }
+      return { containerPositionStyle, messageContainerPositionStyle };
+    };
+
+    export const displayInAppTutorialMessage = (
+      runtimeGame: gdjs.RuntimeGame,
+      /**
+       * When undefined, removes the current message.
+       */
+      message: string | undefined,
+      position: string
+    ) => {
+      const domElementContainer = getDomElementContainer(runtimeGame);
+      if (!domElementContainer) {
+        return;
+      }
+
+      if (_container) {
+        domElementContainer.removeChild(_container);
+        _container = null;
+        if (!message) return;
+      }
 
       const messageContent = document.createElement('div');
       messageContent.innerHTML = nmd(message);
 
+      const {
+        containerPositionStyle,
+        messageContainerPositionStyle,
+      } = _getPositioningStyle(position);
+
       _loadFonts();
-      _loadStyles();
+      _loadStyleSheet();
       _container = (
         <div
           id={containerId}

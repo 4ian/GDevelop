@@ -3,28 +3,28 @@ namespace gdjs {
   export interface Cube3DObjectData extends Object3DData {
     /** The base parameters of the Cube3D object */
     content: Object3DDataContent & {
-      enableTextureTransparency: boolean;
-      facesOrientation: 'Y' | 'Z';
+      enableTextureTransparency: boolean | undefined;
+      facesOrientation: 'Y' | 'Z' | undefined;
       frontFaceResourceName: string;
       backFaceResourceName: string;
-      backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
+      backFaceUpThroughWhichAxisRotation: 'X' | 'Y' | undefined;
       leftFaceResourceName: string;
       rightFaceResourceName: string;
       topFaceResourceName: string;
       bottomFaceResourceName: string;
-      frontFaceResourceRepeat: boolean;
-      backFaceResourceRepeat: boolean;
-      leftFaceResourceRepeat: boolean;
-      rightFaceResourceRepeat: boolean;
-      topFaceResourceRepeat: boolean;
-      bottomFaceResourceRepeat: boolean;
+      frontFaceResourceRepeat: boolean | undefined;
+      backFaceResourceRepeat: boolean | undefined;
+      leftFaceResourceRepeat: boolean | undefined;
+      rightFaceResourceRepeat: boolean | undefined;
+      topFaceResourceRepeat: boolean | undefined;
+      bottomFaceResourceRepeat: boolean | undefined;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
-      tint: string;
+      tint: string | undefined;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
@@ -308,7 +308,7 @@ namespace gdjs {
         );
       }
       if (oldObjectData.content.tint !== newObjectData.content.tint) {
-        this.setColor(newObjectData.content.tint);
+        this.setColor(newObjectData.content.tint || '255;255;255');
       }
 
       if (
@@ -362,7 +362,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'front',
-          newObjectData.content.frontFaceResourceRepeat
+          newObjectData.content.frontFaceResourceRepeat || false
         );
       }
       if (
@@ -371,7 +371,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'back',
-          newObjectData.content.backFaceResourceRepeat
+          newObjectData.content.backFaceResourceRepeat || false
         );
       }
       if (
@@ -380,7 +380,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'left',
-          newObjectData.content.leftFaceResourceRepeat
+          newObjectData.content.leftFaceResourceRepeat || false
         );
       }
       if (
@@ -389,7 +389,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'right',
-          newObjectData.content.rightFaceResourceRepeat
+          newObjectData.content.rightFaceResourceRepeat || false
         );
       }
       if (
@@ -398,7 +398,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'top',
-          newObjectData.content.topFaceResourceRepeat
+          newObjectData.content.topFaceResourceRepeat || false
         );
       }
       if (
@@ -407,7 +407,7 @@ namespace gdjs {
       ) {
         this.setRepeatTextureOnFace(
           'bottom',
-          newObjectData.content.bottomFaceResourceRepeat
+          newObjectData.content.bottomFaceResourceRepeat || false
         );
       }
       if (
@@ -415,14 +415,14 @@ namespace gdjs {
         newObjectData.content.backFaceUpThroughWhichAxisRotation
       ) {
         this.setBackFaceUpThroughWhichAxisRotation(
-          newObjectData.content.backFaceUpThroughWhichAxisRotation
+          newObjectData.content.backFaceUpThroughWhichAxisRotation || 'X'
         );
       }
       if (
         oldObjectData.content.facesOrientation !==
         newObjectData.content.facesOrientation
       ) {
-        this.setFacesOrientation(newObjectData.content.facesOrientation);
+        this.setFacesOrientation(newObjectData.content.facesOrientation || 'Y');
       }
       if (
         oldObjectData.content.materialType !==

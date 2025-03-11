@@ -371,6 +371,10 @@ namespace gdjs {
       }
       const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
+
+      // The action must be reset before being reconfigured with setLoop to prevent previous action parameters causing problems
+      // such as animations not playing (not sure to which extends it can cause problems nor the origin of these problems)
+      this._action.reset();
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,
         Number.POSITIVE_INFINITY
@@ -378,7 +382,6 @@ namespace gdjs {
       this._action.clampWhenFinished = true;
 
       if (previousAction && previousAction !== this._action) {
-        this._action.enabled = true;
         this._action.crossFadeFrom(
           previousAction,
           this._model3DRuntimeObject._crossfadeDuration,

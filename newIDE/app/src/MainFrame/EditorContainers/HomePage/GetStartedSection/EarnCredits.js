@@ -134,7 +134,7 @@ const allBadgesInfo: BadgeInfo[] = [
   {
     id: 'youtube-subscription',
     label: <Trans>Subscribe</Trans>,
-    linkUrl: 'https://x.com/GDevelopApp',
+    linkUrl: 'https://youtube.com/GDevelopApp',
     type: 'badge',
   },
 ];

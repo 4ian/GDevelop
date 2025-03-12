@@ -130,6 +130,10 @@ type Props = {|
   ) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
@@ -1572,17 +1576,20 @@ export default class SceneEditor extends React.Component<Props, State> {
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit children`),
-              click: () =>
-                this.props.onOpenEventBasedObjectEditor(
+              click: () => {
+                const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                  object.getConfiguration()
+                );
+                this.props.onOpenEventBasedObjectVariantEditor(
                   gd.PlatformExtension.getExtensionFromFullObjectType(
                     object.getType()
                   ),
                   gd.PlatformExtension.getObjectNameFromFullObjectType(
                     object.getType()
                   ),
-                  // TODO open the right variant
-                  ''
-                ),
+                  customObjectConfiguration.getVariantName()
+                );
+              },
             }
           : null,
         { type: 'separator' },
@@ -2024,6 +2031,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onOpenEventBasedObjectEditor={
                   this.props.onOpenEventBasedObjectEditor
                 }
+                onOpenEventBasedObjectVariantEditor={
+                  this.props.onOpenEventBasedObjectVariantEditor
+                }
                 onRenameObjectFolderOrObjectWithContextFinish={
                   this._onRenameObjectFolderOrObjectWithContextFinish
                 }
@@ -2148,6 +2158,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onExtensionInstalled={this.props.onExtensionInstalled}
                         onOpenEventBasedObjectEditor={
                           this.props.onOpenEventBasedObjectEditor
+                        }
+                        onOpenEventBasedObjectVariantEditor={
+                          this.props.onOpenEventBasedObjectVariantEditor
                         }
                         onDeleteEventsBasedObjectVariant={
                           this.props.onDeleteEventsBasedObjectVariant

@@ -36,6 +36,7 @@ export const Default = () => (
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onOpenEventBasedObjectEditor={action('On edit children')}
+        onOpenEventBasedObjectVariantEditor={action('On edit variant')}
         onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
@@ -73,6 +74,7 @@ export const WithSerializedObjectView = () => (
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
           onOpenEventBasedObjectEditor={action('On edit children')}
+          onOpenEventBasedObjectVariantEditor={action('On edit variant')}
           onExportAssets={action('On export assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
@@ -110,6 +112,7 @@ export const Locked = () => (
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
         onOpenEventBasedObjectEditor={action('On edit children')}
+        onOpenEventBasedObjectVariantEditor={action('On edit variant')}
         onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}

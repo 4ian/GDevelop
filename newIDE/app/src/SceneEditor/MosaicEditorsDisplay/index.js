@@ -399,6 +399,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               onEditObject={props.onEditObject}
               onOpenEventBasedObjectEditor={props.onOpenEventBasedObjectEditor}
+              onOpenEventBasedObjectVariantEditor={
+                props.onOpenEventBasedObjectVariantEditor
+              }
               onExportAssets={props.onExportAssets}
               onDeleteObjects={(objectWithContext, cb) =>
                 props.onDeleteObjects(i18n, objectWithContext, cb)

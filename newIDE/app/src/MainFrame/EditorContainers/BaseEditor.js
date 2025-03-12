@@ -152,6 +152,10 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
   ) => void,

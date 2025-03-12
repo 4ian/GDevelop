@@ -63,6 +63,10 @@ type Props = {|
   onExtensionInstalled: (extensionName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
@@ -103,6 +107,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onComputeAllVariableNames,
     onExtensionInstalled,
     onOpenEventBasedObjectEditor,
+    onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
     isBehaviorListLocked,
     isVariableListLocked,
@@ -311,6 +316,9 @@ const InnerDialog = (props: InnerDialogProps) => {
               />
             )}
             onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
             onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           />
         </Column>

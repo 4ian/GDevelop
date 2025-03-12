@@ -42,6 +42,10 @@ export type ObjectTreeViewItemCallbacks = {|
   onAddObjectInstance: (objectName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
@@ -281,7 +285,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       swapObjectAsset,
       canSetAsGlobalObject,
       setAsGlobalObject,
-      onOpenEventBasedObjectEditor,
+      onOpenEventBasedObjectVariantEditor,
       selectObjectFolderOrObjectWithContext,
       addFolder,
       isListLocked,
@@ -366,17 +370,20 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       project.hasEventsBasedObject(object.getType())
         ? {
             label: i18n._(t`Edit children`),
-            click: () =>
-              onOpenEventBasedObjectEditor(
+            click: () => {
+              const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                object.getConfiguration()
+              );
+              onOpenEventBasedObjectVariantEditor(
                 gd.PlatformExtension.getExtensionFromFullObjectType(
                   object.getType()
                 ),
                 gd.PlatformExtension.getObjectNameFromFullObjectType(
                   object.getType()
                 ),
-                // TODO open the right variant
-                ''
-              ),
+                customObjectConfiguration.getVariantName()
+              );
+            },
           }
         : null,
       { type: 'separator' },

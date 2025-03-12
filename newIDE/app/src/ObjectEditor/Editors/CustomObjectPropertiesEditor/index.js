@@ -13,7 +13,6 @@ import { Column, Line } from '../../../UI/Grid';
 import { getExtraObjectsInformation } from '../../../Hints';
 import { getObjectTutorialIds } from '../../../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../../../UI/AlertMessage';
-import { ColumnStackLayout } from '../../../UI/Layout';
 import DismissableTutorialMessage from '../../../Hints/DismissableTutorialMessage';
 import { mapFor } from '../../../Utils/MapFor';
 import ObjectsEditorService from '../../ObjectsEditorService';
@@ -42,9 +41,15 @@ import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
-import { ResponsiveLineStackLayout, LineStackLayout } from '../../../UI/Layout';
+import {
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+  ColumnStackLayout,
+} from '../../../UI/Layout';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
+import Edit from '../../../UI/CustomSvgIcons/ShareExternal';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import RestoreIcon from '../../../UI/CustomSvgIcons/Restore';
@@ -107,7 +112,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     unsavedChanges,
     renderObjectNameField,
     isChildObject,
-    onOpenEventBasedObjectEditor,
+    onOpenEventBasedObjectVariantEditor,
     onDeleteEventsBasedObjectVariant,
   } = props;
 
@@ -204,8 +209,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const editVariant = React.useCallback(
     () => {
-      onOpenEventBasedObjectEditor &&
-        onOpenEventBasedObjectEditor(
+      onOpenEventBasedObjectVariantEditor &&
+        onOpenEventBasedObjectVariantEditor(
           gd.PlatformExtension.getExtensionFromFullObjectType(
             customObjectConfiguration.getType()
           ),
@@ -215,7 +220,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
           customObjectConfiguration.getVariantName()
         );
     },
-    [customObjectConfiguration, onOpenEventBasedObjectEditor]
+    [customObjectConfiguration, onOpenEventBasedObjectVariantEditor]
   );
 
   const duplicateVariant = React.useCallback(
@@ -329,7 +334,31 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       <Text size="block-title">Variant</Text>
                     </Column>
                   </Line>
-                  <LineStackLayout>
+                  <ColumnStackLayout expand noMargin>
+                    <LineStackLayout>
+                      <FlatButton
+                        label={<Trans>Edit</Trans>}
+                        leftIcon={<Edit />}
+                        onClick={editVariant}
+                        disabled={
+                          !eventBasedObject ||
+                          getVariant(
+                            eventBasedObject,
+                            customObjectConfiguration
+                          ).getAssetStoreAssetId() !== ''
+                        }
+                      />
+                      <FlatButton
+                        label={<Trans>Duplicate</Trans>}
+                        leftIcon={<Add />}
+                        onClick={() => setNewVariantDialogOpen(true)}
+                      />
+                      <FlatButton
+                        label={<Trans>Delete</Trans>}
+                        leftIcon={<Trash />}
+                        onClick={deleteVariant}
+                      />
+                    </LineStackLayout>
                     <SelectField
                       floatingLabelText={<Trans>Variant</Trans>}
                       value={getVariantName(
@@ -340,7 +369,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         customObjectConfiguration.setVariantName(value);
                         forceUpdate();
                       }}
-                      fullWidth
                     >
                       <SelectOption
                         key="default-variant"
@@ -368,26 +396,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           }
                         )}
                     </SelectField>
-                    <FlatButton
-                      label={<Trans>Edit</Trans>}
-                      onClick={editVariant}
-                      disabled={
-                        !eventBasedObject ||
-                        getVariant(
-                          eventBasedObject,
-                          customObjectConfiguration
-                        ).getAssetStoreAssetId() !== ''
-                      }
-                    />
-                    <FlatButton
-                      label={<Trans>Duplicate</Trans>}
-                      onClick={() => setNewVariantDialogOpen(true)}
-                    />
-                    <FlatButton
-                      label={<Trans>Delete</Trans>}
-                      onClick={deleteVariant}
-                    />
-                  </LineStackLayout>
+                  </ColumnStackLayout>
 
                   {!getVariantName(
                     eventBasedObject,

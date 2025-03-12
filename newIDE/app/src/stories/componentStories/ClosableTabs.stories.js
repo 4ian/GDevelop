@@ -298,6 +298,9 @@ export const WithObjectsList = () => (
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onOpenEventBasedObjectEditor={action('On edit children')}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'On edit variant'
+                  )}
                   onExportAssets={action('On export assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}

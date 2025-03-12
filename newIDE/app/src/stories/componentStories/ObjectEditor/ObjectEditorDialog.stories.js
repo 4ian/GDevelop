@@ -46,6 +46,9 @@ export const CustomObject = () => (
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
+      onOpenEventBasedObjectVariantEditor={action(
+        'Open event-based object variant editor'
+      )}
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }
@@ -86,6 +89,9 @@ export const StandardObject = () => (
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
+      onOpenEventBasedObjectVariantEditor={action(
+        'Open event-based object variant editor'
+      )}
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }
@@ -125,6 +131,9 @@ export const LockedStandardObject = () => (
       onOpenEventBasedObjectEditor={() =>
         action('Open event-based object editor')
       }
+      onOpenEventBasedObjectVariantEditor={action(
+        'Open event-based object variant editor'
+      )}
       onDeleteEventsBasedObjectVariant={() =>
         action('Delete event-based object variant')
       }

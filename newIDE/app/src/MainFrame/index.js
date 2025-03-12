@@ -2225,16 +2225,43 @@ const MainFrame = (props: Props) => {
 
   const onOpenEventBasedObjectEditor = (
     extensionName: string,
-    eventsBasedObjectName: string,
-    variantName: string
+    eventsBasedObjectName: string
   ) => {
-    if (!currentProject) return;
+    if (
+      !currentProject ||
+      !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      return;
+    }
     openEventsFunctionsExtension(
       extensionName,
       null,
       null,
       eventsBasedObjectName
     );
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+      extensionName
+    );
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+      return;
+    }
+    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+
+    // Trigger reloading of extensions as an extension was modified (or even added)
+    // to create the custom object.
+    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+      currentProject
+    );
+  };
+
+  const onOpenEventBasedObjectVariantEditor = (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => {
+    if (!currentProject) return;
     if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
       return;
     }
@@ -3949,10 +3976,10 @@ const MainFrame = (props: Props) => {
                     ) =>
                       onOpenEventBasedObjectEditor(
                         extensionName,
-                        eventsBasedObjectName,
-                        ''
+                        eventsBasedObjectName
                       ),
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
                     onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,

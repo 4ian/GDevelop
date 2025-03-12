@@ -462,6 +462,10 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
+    eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
@@ -505,6 +509,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
       onEditObject,
       onOpenEventBasedObjectEditor,
+      onOpenEventBasedObjectVariantEditor,
       onExportAssets,
       onObjectCreated,
       onObjectEdited,
@@ -985,6 +990,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onAddObjectInstance,
         initialInstances,
         onOpenEventBasedObjectEditor,
+        onOpenEventBasedObjectVariantEditor,
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
@@ -1012,6 +1018,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onAddObjectInstance,
         initialInstances,
         onOpenEventBasedObjectEditor,
+        onOpenEventBasedObjectVariantEditor,
         getValidatedObjectOrGroupName,
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,

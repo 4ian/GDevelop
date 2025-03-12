@@ -1092,14 +1092,21 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     auto &variant = eventsBasedObject.GetVariants().InsertVariant(
         eventsBasedObject.GetDefaultVariant(), 0);
     gd::InitialInstance *variantInstance = nullptr;
-    eventsBasedObject.GetInitialInstances().IterateOverInstances(
+    variant.GetInitialInstances().IterateOverInstances(
         [&variantInstance](gd::InitialInstance &instance) {
           variantInstance = &instance;
+          return true;
         });
+    variant.GetObjects()
+        .GetObject("MyObject")
+        .GetVariables()
+        .Get("MyVariable")
+        .SetValue(111);
+    variantInstance->GetVariables().Get("MyVariable").SetValue(222);
 
     auto &objectFunction =
-        eventsBasedObject.GetEventsFunctions().GetEventsFunction(
-            "MyObjectEventsFunction");
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
     gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
         objectFunction.GetEvents().InsertNewEvent(
             project, "BuiltinCommonInstructions::Standard"));
@@ -1144,11 +1151,11 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                 .GetObject("MyChildObject")
                 .GetVariables()
                 .Get("MyRenamedVariable")
-                .GetValue() == 456);
+                .GetValue() == 111);
     REQUIRE(variantInstance != nullptr);
     REQUIRE(
         variantInstance->GetVariables().Get("MyRenamedVariable").GetValue() ==
-        456);
+        222);
   }
 
   SECTION("Can delete an object variable") {

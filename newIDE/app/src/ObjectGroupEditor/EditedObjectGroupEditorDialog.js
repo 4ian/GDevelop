@@ -104,6 +104,7 @@ const EditedObjectGroupEditorDialog = ({
       changeset,
       originalSerializedVariables
     );
+    // TODO Apply the changes on variants when it's done on an events-based object.
     groupVariablesContainer.clearPersistentUuid();
   };
 

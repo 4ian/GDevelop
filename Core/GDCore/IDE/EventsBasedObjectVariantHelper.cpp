@@ -106,7 +106,7 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
           [&objectName,
            &defaultVariables](gd::InitialInstance &initialInstance) {
             if (initialInstance.GetObjectName() != objectName) {
-              return;
+              return false;
             }
             auto &instanceVariables = initialInstance.GetVariables();
             for (size_t instanceVariableIndex = 0;
@@ -120,6 +120,7 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
                 instanceVariableIndex--;
               }
             }
+            return false;
           });
     }
     auto &defaultObjectGroups =

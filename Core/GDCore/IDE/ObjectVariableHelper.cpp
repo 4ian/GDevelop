@@ -239,6 +239,7 @@ void ObjectVariableHelper::ApplyChangesToObjectInstances(
             }
           }
         }
+        return false;
       });
 }
 

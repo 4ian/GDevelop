@@ -150,7 +150,7 @@ TEST_CASE("ObjectContainersList (GetTypeOfObject)", "[common]") {
     gd::Object &object1 = layout.GetObjects().InsertNewObject(
         project, "MyExtension::Sprite", "MyObject1", 0);
     gd::Object &object2 = layout.GetObjects().InsertNewObject(
-        project, "FakeObjectWithDefaultBehavior", "MyObject2", 0);
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject2", 0);
 
     auto &group = layout.GetObjects().GetObjectGroups().InsertNew("MyGroup", 0);
     group.AddObject(object1.GetName());

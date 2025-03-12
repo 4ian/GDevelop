@@ -294,6 +294,10 @@ void ObjectVariableHelper::ApplyChangesToVariants(
             variableName, defaultVariablesContainer.Get(variableName), index);
       }
     }
+
+    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+        variablesContainer, variant->GetInitialInstances(), objectName,
+        changeset);
   }
 }
 

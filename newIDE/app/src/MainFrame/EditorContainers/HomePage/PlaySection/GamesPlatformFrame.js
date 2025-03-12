@@ -8,6 +8,7 @@ import {
   homepageMobileMenuHeight,
 } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
+import { useSoftKeyboardBottomOffset } from '../../../../UI/MobileSoftKeyboard';
 
 export const GAMES_PLATFORM_IFRAME_ID = 'games-platform-frame';
 
@@ -36,9 +37,11 @@ type Props = {|
 |};
 
 const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
+  const iframeRef = React.useRef<?HTMLIFrameElement>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   // Use a ref to store the initial game id, as we don't want to trigger a re-render
   // when the game id changes.
@@ -66,6 +69,20 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
       }
     },
     [loaded, initialGameId]
+  );
+
+  React.useEffect(
+    () => {
+      if (!iframeRef.current) return;
+      iframeRef.current.contentWindow.postMessage(
+        {
+          type: 'keyboardOffset',
+          value: softKeyboardBottomOffset - homepageMobileMenuHeight,
+        },
+        '*'
+      );
+    },
+    [softKeyboardBottomOffset]
   );
 
   const titleBarAndToolbarHeight = isMobile ? 0 : 37 + 40;
@@ -98,6 +115,7 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
       }}
     >
       <iframe
+        ref={iframeRef}
         id={GAMES_PLATFORM_IFRAME_ID}
         src={src}
         allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; keyboard-map *; focus-without-user-activation *; screen-wake-lock; clipboard-read; clipboard-write; web-share"

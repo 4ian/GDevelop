@@ -65,8 +65,6 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     auto &eventsBasedObject = SetupEventsBasedObject(project);
     auto &variant = eventsBasedObject.GetVariants().InsertVariant(
         eventsBasedObject.GetDefaultVariant(), 0);
-    gd::InitialInstance *variantInstance = GetFirstInstanceOf(
-        "MyChildObject", eventsBasedObject.GetInitialInstances());
 
     // Do the changes and launch the refactoring.
     eventsBasedObject.GetObjects().InsertNewObject(
@@ -78,8 +76,8 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
         project, eventsBasedObject);
 
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
-    REQUIRE(variant.GetObjects().HasObjectNamed("MyOtherObject2"));
-    REQUIRE(variant.GetObjects().HasObjectNamed("MyOtherObject3"));
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject2"));
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject3"));
   }
 
   SECTION("Can remove missing objects") {
@@ -95,8 +93,8 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
 
     auto &variant = eventsBasedObject.GetVariants().InsertVariant(
         eventsBasedObject.GetDefaultVariant(), 0);
-    gd::InitialInstance *variantInstance = GetFirstInstanceOf(
-        "MyChildObject", eventsBasedObject.GetInitialInstances());
+    variant.GetInitialInstances().InsertNewInitialInstance().SetObjectName("MyChildObject2");
+    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("MyChildObject2") == true);
 
     // Do the changes and launch the refactoring.
     eventsBasedObject.GetObjects().RemoveObject("MyChildObject2");
@@ -108,6 +106,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject2") == false);
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject3") == false);
+    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("MyChildObject2") == false);
   }
 
   SECTION("Can change object type") {
@@ -117,12 +116,9 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     auto &eventsBasedObject = SetupEventsBasedObject(project);
     auto &variant = eventsBasedObject.GetVariants().InsertVariant(
         eventsBasedObject.GetDefaultVariant(), 0);
-    gd::InitialInstance *variantInstance = GetFirstInstanceOf(
-        "MyChildObject", eventsBasedObject.GetInitialInstances());
 
     // Do the changes and launch the refactoring.
     eventsBasedObject.GetObjects().RemoveObject("MyChildObject");
-    std::cout << "InsertNewObject" << std::endl;
     eventsBasedObject.GetObjects().InsertNewObject(
         project, "MyExtension::FakeObjectWithDefaultBehavior", "MyChildObject",
         0);
@@ -133,6 +129,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
     REQUIRE(variant.GetObjects().GetObject("MyChildObject").GetType() ==
             "MyExtension::FakeObjectWithDefaultBehavior");
+    REQUIRE(variant.GetInitialInstances().GetInstancesCount() == 1);
   }
 
   SECTION("Can add missing behaviors") {
@@ -144,7 +141,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
         eventsBasedObject.GetDefaultVariant(), 0);
 
     // Do the changes and launch the refactoring.
-    auto &object = eventsBasedObject.GetObjects().GetObject("MyObject");
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior2");
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior3");
 
@@ -164,7 +161,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsBasedObject = SetupEventsBasedObject(project);
 
-    auto &object = eventsBasedObject.GetObjects().GetObject("MyObject");
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior2");
     object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior3");
 
@@ -195,7 +192,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
         eventsBasedObject.GetDefaultVariant(), 0);
 
     // Do the changes and launch the refactoring.
-    auto &object = eventsBasedObject.GetObjects().GetObject("MyObject");
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
     object.RemoveBehavior("MyBehavior");
     object.AddNewBehavior(project, "MyExtension::MyOtherBehavior",
                           "MyBehavior");

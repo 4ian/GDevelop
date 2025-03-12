@@ -31,6 +31,9 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
          it != objects.GetObjects().end(); ++it) {
       const auto &objectName = it->get()->GetName();
       if (!defaultObjects.HasObjectNamed(objectName)) {
+        variant->GetInitialInstances().RemoveInitialInstancesOfObject(
+            objectName);
+        // Do it in last because it unalloc objectName.
         objects.RemoveObject(objectName);
         --it;
       }
@@ -117,7 +120,6 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
 
               if (!defaultVariables.Has(variableName)) {
                 instanceVariables.Remove(variableName);
-                instanceVariableIndex--;
               }
             }
             return false;

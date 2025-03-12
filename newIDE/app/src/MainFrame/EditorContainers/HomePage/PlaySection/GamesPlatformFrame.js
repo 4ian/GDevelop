@@ -74,15 +74,19 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
   React.useEffect(
     () => {
       if (!iframeRef.current) return;
+      let offset = 0;
+      if (loaded) {
+        offset = softKeyboardBottomOffset - homepageMobileMenuHeight;
+      }
       iframeRef.current.contentWindow.postMessage(
         {
-          type: 'keyboardOffset',
-          value: softKeyboardBottomOffset - homepageMobileMenuHeight,
+          type: 'setKeyboardOffset',
+          value: offset,
         },
         '*'
       );
     },
-    [softKeyboardBottomOffset]
+    [softKeyboardBottomOffset, loaded]
   );
 
   const titleBarAndToolbarHeight = isMobile ? 0 : 37 + 40;

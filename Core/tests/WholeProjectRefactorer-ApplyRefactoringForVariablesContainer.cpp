@@ -1097,8 +1097,9 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
           variantInstance = &instance;
           return true;
         });
+    REQUIRE(variantInstance != nullptr);
     variant.GetObjects()
-        .GetObject("MyObject")
+        .GetObject("MyChildObject")
         .GetVariables()
         .Get("MyVariable")
         .SetValue(111);
@@ -1144,15 +1145,21 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
             "MyRenamedVariable");
     REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
             "MyChildObject.MyRenamedVariable");
-    REQUIRE(instance.GetVariables().Get("MyRenamedVariable").GetValue() == 456);
 
     REQUIRE(eventsBasedObject.GetObjects().HasObjectNamed("MyChildObject"));
     REQUIRE(eventsBasedObject.GetObjects()
                 .GetObject("MyChildObject")
                 .GetVariables()
                 .Get("MyRenamedVariable")
+                .GetValue() == 123);
+    REQUIRE(instance.GetVariables().Get("MyRenamedVariable").GetValue() == 456);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    REQUIRE(variant.GetObjects()
+                .GetObject("MyChildObject")
+                .GetVariables()
+                .Get("MyRenamedVariable")
                 .GetValue() == 111);
-    REQUIRE(variantInstance != nullptr);
     REQUIRE(
         variantInstance->GetVariables().Get("MyRenamedVariable").GetValue() ==
         222);

@@ -1,0 +1,53 @@
+@keyframes container-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@keyframes content-appear {
+  0% {
+    opacity: 0;
+  }
+  /* Start after the bubble container. */
+  37% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes thinking-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  /* Start after the bubble container and when the bubble content is almost finished animating. */
+  60% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.chatBubbleContainer {
+  display: flex;
+  animation: container-appear 0.3s;
+}
+
+.chatBubbleContent {
+  display: flex;
+  animation: content-appear 0.8s;
+}
+
+.thinkingText {
+  animation: thinking-appear 1s;
+}

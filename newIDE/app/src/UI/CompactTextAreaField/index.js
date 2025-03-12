@@ -20,7 +20,7 @@ const styles = {
 };
 
 export type CompactTextAreaFieldProps = {|
-  label: string,
+  label?: string,
   markdownDescription?: ?string,
   value: string,
   onChange: (newValue: string) => void,
@@ -39,6 +39,7 @@ export type CompactTextAreaFieldProps = {|
   disabled?: boolean,
   errored?: boolean,
   placeholder?: string,
+  rows?: number,
 |};
 
 export const CompactTextAreaField = ({
@@ -50,6 +51,7 @@ export const CompactTextAreaField = ({
   disabled,
   errored,
   placeholder,
+  rows,
 }: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
@@ -99,7 +101,7 @@ export const CompactTextAreaField = ({
           value={value === null ? '' : value}
           onChange={e => onChange(e.currentTarget.value)}
           placeholder={placeholder}
-          rows={3}
+          rows={rows || 3}
         />
       </div>
     </label>

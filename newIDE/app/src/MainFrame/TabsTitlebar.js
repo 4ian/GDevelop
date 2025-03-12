@@ -13,6 +13,7 @@ import { type EditorTab } from './EditorTabs/EditorTabsHandler';
 import { getTabId } from './EditorTabs/DraggableEditorTabs';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
+import RaisedButton from '../UI/RaisedButton';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -32,12 +33,19 @@ const styles = {
     width: 34,
     height: 34,
   },
+  askAiContainer: {
+    marginBottom: 4,
+    marginRight: 2,
+    marginLeft: 2,
+  },
 };
 
 type TabsTitlebarProps = {|
   hidden: boolean,
   toggleProjectManager: () => void,
   renderTabs: (onHoverEditorTab: (?EditorTab) => void) => React.Node,
+  hasAskAiOpened: boolean,
+  onOpenAskAi: () => void,
 |};
 
 /**
@@ -47,6 +55,8 @@ export default function TabsTitlebar({
   toggleProjectManager,
   hidden,
   renderTabs,
+  hasAskAiOpened,
+  onOpenAskAi,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -134,6 +144,15 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {renderTabs(onHoverEditorTab)}
+      {hasAskAiOpened ? null : (
+        <div style={styles.askAiContainer}>
+          <RaisedButton
+            color="primary"
+            label="✨ Ask AI"
+            onClick={onOpenAskAi}
+          />
+        </div>
+      )}
       <TitleBarRightSafeMargins />
       {tooltipData && (
         <TabsTitlebarTooltip

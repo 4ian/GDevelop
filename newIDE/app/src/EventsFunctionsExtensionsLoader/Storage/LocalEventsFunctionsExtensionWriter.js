@@ -56,7 +56,10 @@ export default class LocalEventsFunctionsExtensionWriter {
     extension: gdEventsFunctionsExtension,
     filepath: string
   ): Promise<void> => {
-    const serializedObject = serializeToJSObject(extension);
+    const serializedObject = serializeToJSObject(
+      extension,
+      'serializeToExternal'
+    );
     return writeJSONFile(serializedObject, filepath).catch(err => {
       console.error('Unable to write the events function extension:', err);
       throw err;

@@ -11,15 +11,19 @@ import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant,
   project: gdProject,
   onApply: () => void,
   onClose: () => void,
   getContentAABB: () => Rectangle | null,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 const EventsBasedObjectScenePropertiesDialog = ({
   eventsBasedObject,
+  eventsBasedObjectVariant,
   project,
   onApply,
   onClose,
@@ -27,22 +31,22 @@ const EventsBasedObjectScenePropertiesDialog = ({
   onEventsBasedObjectChildrenEdited,
 }: Props) => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
-    eventsBasedObject.getAreaMinX()
+    eventsBasedObjectVariant.getAreaMinX()
   );
   const [areaMinY, setAreaMinY] = React.useState<number>(
-    eventsBasedObject.getAreaMinY()
+    eventsBasedObjectVariant.getAreaMinY()
   );
   const [areaMinZ, setAreaMinZ] = React.useState<number>(
-    eventsBasedObject.getAreaMinZ()
+    eventsBasedObjectVariant.getAreaMinZ()
   );
   const [areaMaxX, setAreaMaxX] = React.useState<number>(
-    eventsBasedObject.getAreaMaxX()
+    eventsBasedObjectVariant.getAreaMaxX()
   );
   const [areaMaxY, setAreaMaxY] = React.useState<number>(
-    eventsBasedObject.getAreaMaxY()
+    eventsBasedObjectVariant.getAreaMaxY()
   );
   const [areaMaxZ, setAreaMaxZ] = React.useState<number>(
-    eventsBasedObject.getAreaMaxZ()
+    eventsBasedObjectVariant.getAreaMaxZ()
   );
   const [isRenderedIn3D, setRenderedIn3D] = React.useState<boolean>(
     eventsBasedObject.isRenderedIn3D()
@@ -56,28 +60,28 @@ const EventsBasedObjectScenePropertiesDialog = ({
 
   const onSubmit = () => {
     if (areaMinX < areaMaxX) {
-      eventsBasedObject.setAreaMinX(areaMinX);
-      eventsBasedObject.setAreaMaxX(areaMaxX);
+      eventsBasedObjectVariant.setAreaMinX(areaMinX);
+      eventsBasedObjectVariant.setAreaMaxX(areaMaxX);
     }
     if (areaMinY < areaMaxY) {
-      eventsBasedObject.setAreaMinY(areaMinY);
-      eventsBasedObject.setAreaMaxY(areaMaxY);
+      eventsBasedObjectVariant.setAreaMinY(areaMinY);
+      eventsBasedObjectVariant.setAreaMaxY(areaMaxY);
     }
     if (areaMinZ < areaMaxZ) {
-      eventsBasedObject.setAreaMinZ(areaMinZ);
-      eventsBasedObject.setAreaMaxZ(areaMaxZ);
+      eventsBasedObjectVariant.setAreaMinZ(areaMinZ);
+      eventsBasedObjectVariant.setAreaMaxZ(areaMaxZ);
     }
     const wasRenderedIn3D = eventsBasedObject.isRenderedIn3D();
     if (wasRenderedIn3D !== isRenderedIn3D) {
       eventsBasedObject.markAsRenderedIn3D(isRenderedIn3D);
-      onEventsBasedObjectChildrenEdited();
+      onEventsBasedObjectChildrenEdited(eventsBasedObject);
     }
     const wasInnerAreaFollowingParentSize = eventsBasedObject.isInnerAreaFollowingParentSize();
     if (wasInnerAreaFollowingParentSize !== isInnerAreaFollowingParentSize) {
       eventsBasedObject.markAsInnerAreaFollowingParentSize(
         isInnerAreaFollowingParentSize
       );
-      onEventsBasedObjectChildrenEdited();
+      onEventsBasedObjectChildrenEdited(eventsBasedObject);
     }
     onApply();
   };
@@ -117,7 +121,10 @@ const EventsBasedObjectScenePropertiesDialog = ({
     <Dialog
       title={
         <Trans>
-          {eventsBasedObject.getFullName() || eventsBasedObject.getName()}{' '}
+          {(eventsBasedObject.getFullName() || eventsBasedObject.getName()) +
+            ' (' +
+            eventsBasedObjectVariant.getName() +
+            ')'}{' '}
           properties
         </Trans>
       }

@@ -13,6 +13,7 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import VariablesList from '../VariablesList/VariablesList';
 import HelpButton from '../UI/HelpButton';
 import useValueWithInit from '../Utils/UseRefInitHook';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -29,6 +30,8 @@ type Props = {|
   initialInstances: gdInitialInstancesContainer | null,
   initialTab: ?ObjectGroupEditorTab,
   onComputeAllVariableNames?: () => Array<string>,
+  isVariableListLocked: boolean,
+  isObjectListLocked: boolean,
 |};
 
 const EditedObjectGroupEditorDialog = ({
@@ -42,6 +45,8 @@ const EditedObjectGroupEditorDialog = ({
   initialInstances,
   initialTab,
   onComputeAllVariableNames,
+  isVariableListLocked,
+  isObjectListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const {
@@ -99,6 +104,16 @@ const EditedObjectGroupEditorDialog = ({
       changeset,
       originalSerializedVariables
     );
+    const { eventsBasedObject } = projectScopedContainersAccessor._scope;
+    if (eventsBasedObject) {
+      for (const objectName of group.getAllObjectsNames().toJSArray()) {
+        gd.ObjectVariableHelper.applyChangesToVariants(
+          eventsBasedObject,
+          objectName,
+          changeset
+        );
+      }
+    }
     groupVariablesContainer.clearPersistentUuid();
   };
 
@@ -169,17 +184,28 @@ const EditedObjectGroupEditorDialog = ({
         />
       }
     >
-      {currentTab === 'objects' && (
-        <ObjectGroupEditor
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          groupObjectNames={group.getAllObjectsNames().toJSArray()}
-          onObjectAdded={addObject}
-          onObjectRemoved={removeObject}
-        />
-      )}
+      {currentTab === 'objects' &&
+        (isObjectListLocked && group.getAllObjectsNames().size() === 0 ? (
+          <Column noMargin expand justifyContent="center">
+            <Text size="block-title" align="center">
+              {<Trans>Empty group</Trans>}
+            </Text>
+            <Text align="center" noMargin>
+              {<Trans>This object group is empty and locked.</Trans>}
+            </Text>
+          </Column>
+        ) : (
+          <ObjectGroupEditor
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            groupObjectNames={group.getAllObjectsNames().toJSArray()}
+            onObjectAdded={addObject}
+            onObjectRemoved={removeObject}
+            isObjectListLocked={isObjectListLocked}
+          />
+        ))}
       {currentTab === 'variables' && (
         <Column expand noMargin>
           {groupVariablesContainer.count() > 0 && DismissableTutorialMessage && (
@@ -205,6 +231,7 @@ const EditedObjectGroupEditorDialog = ({
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onVariablesUpdated={notifyOfVariableChange}
+            isListLocked={isVariableListLocked}
           />
         </Column>
       )}

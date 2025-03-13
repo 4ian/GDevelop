@@ -44,6 +44,11 @@ export type ObjectTreeViewItemCallbacks = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
   onRenameObjectFolderOrObjectWithContextFinish: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
@@ -82,6 +87,7 @@ export type ObjectTreeViewItemProps = {|
   addFolder: (items: Array<ObjectFolderOrObjectWithContext>) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
+  isListLocked: boolean,
 |};
 
 export const addSerializedObjectToObjectsContainer = ({
@@ -279,9 +285,10 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       swapObjectAsset,
       canSetAsGlobalObject,
       setAsGlobalObject,
-      onOpenEventBasedObjectEditor,
+      onOpenEventBasedObjectVariantEditor,
       selectObjectFolderOrObjectWithContext,
       addFolder,
+      isListLocked,
     } = this.props;
 
     const container = this._isGlobal
@@ -312,29 +319,33 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Cut`),
         click: () => this.cut(),
+        enabled: !isListLocked,
       },
       {
         label: this._getPasteLabel(i18n, {
           isGlobalObject: this._isGlobal,
           isFolder: false,
         }),
-        enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND),
+        enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND) && !isListLocked,
         click: () => this.paste(),
       },
       {
         label: i18n._(t`Duplicate`),
         click: () => this.duplicate(),
         accelerator: 'CmdOrCtrl+D',
+        enabled: !isListLocked,
       },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
+        enabled: !isListLocked,
       },
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
+        enabled: !isListLocked,
       },
       { type: 'separator' },
       {
@@ -359,15 +370,20 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       project.hasEventsBasedObject(object.getType())
         ? {
             label: i18n._(t`Edit children`),
-            click: () =>
-              onOpenEventBasedObjectEditor(
+            click: () => {
+              const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                object.getConfiguration()
+              );
+              onOpenEventBasedObjectVariantEditor(
                 gd.PlatformExtension.getExtensionFromFullObjectType(
                   object.getType()
                 ),
                 gd.PlatformExtension.getObjectNameFromFullObjectType(
                   object.getType()
-                )
-              ),
+                ),
+                customObjectConfiguration.getVariantName()
+              );
+            },
           }
         : null,
       { type: 'separator' },
@@ -383,46 +399,51 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       { type: 'separator' },
       globalObjectsContainer && {
         label: i18n._(t`Set as global object`),
-        enabled: !this._isGlobal,
+        enabled: !this._isGlobal && !isListLocked,
         click: () => {
           selectObjectFolderOrObjectWithContext(null);
           setAsGlobalObject({ i18n, objectFolderOrObject: this.object });
         },
         visible: canSetAsGlobalObject !== false,
       },
-      {
-        label: i18n._('Move to folder'),
-        submenu: [
-          ...folderAndPathsInContainer.map(({ folder, path }) => ({
-            label: path,
-            enabled: folder !== this.object.getParent(),
-            click: () => {
-              this.object
-                .getParent()
-                .moveObjectFolderOrObjectToAnotherFolder(
-                  this.object,
-                  folder,
-                  0
-                );
-              onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
-                objectFolderOrObject: folder,
-                global: this._isGlobal,
-              });
-            },
-          })),
-          { type: 'separator' },
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () =>
-              addFolder([
-                {
-                  objectFolderOrObject: this.object.getParent(),
-                  global: this._isGlobal,
+      isListLocked
+        ? {
+            label: i18n._('Move to folder'),
+            enabled: false,
+          }
+        : {
+            label: i18n._('Move to folder'),
+            submenu: [
+              ...folderAndPathsInContainer.map(({ folder, path }) => ({
+                label: path,
+                enabled: folder !== this.object.getParent(),
+                click: () => {
+                  this.object
+                    .getParent()
+                    .moveObjectFolderOrObjectToAnotherFolder(
+                      this.object,
+                      folder,
+                      0
+                    );
+                  onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
+                    objectFolderOrObject: folder,
+                    global: this._isGlobal,
+                  });
                 },
-              ]),
+              })),
+              { type: 'separator' },
+              {
+                label: i18n._(t`Create new folder...`),
+                click: () =>
+                  addFolder([
+                    {
+                      objectFolderOrObject: this.object.getParent(),
+                      global: this._isGlobal,
+                    },
+                  ]),
+              },
+            ],
           },
-        ],
-      },
       { type: 'separator' },
       {
         label: i18n._(t`Add instance to the scene`),

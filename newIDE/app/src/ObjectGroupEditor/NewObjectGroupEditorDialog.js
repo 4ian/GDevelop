@@ -134,6 +134,7 @@ const NewObjectGroupEditorDialog = ({
         groupObjectNames={groupObjectNames}
         onObjectAdded={addObject}
         onObjectRemoved={removeObject}
+        isObjectListLocked={false}
       />
     </Dialog>
   );

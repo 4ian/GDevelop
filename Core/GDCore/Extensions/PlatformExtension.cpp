@@ -18,8 +18,8 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd {
@@ -200,11 +200,11 @@ PlatformExtension::AddExpressionAndConditionAndAction(
                           group,
                           icon)
           : AddStrExpression(name,
-                              fullname,
-                              expressionDescriptionTemplate.FindAndReplace(
-                                  "<subject>", descriptionSubject),
-                              group,
-                              icon);
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);
@@ -244,12 +244,10 @@ gd::ObjectMetadata& PlatformExtension::AddEventsBasedObject(
     const gd::String& description,
     const gd::String& icon24x24) {
   gd::String nameWithNamespace = GetNameSpace() + name;
-  objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
-                                                   nameWithNamespace,
-                                                   fullname,
-                                                   description,
-                                                   icon24x24)
-                                        .SetHelpPath(GetHelpPath());
+  objectsInfos[nameWithNamespace] =
+      ObjectMetadata(
+          GetNameSpace(), nameWithNamespace, fullname, description, icon24x24)
+          .SetHelpPath(GetHelpPath());
   return objectsInfos[nameWithNamespace];
 }
 
@@ -353,8 +351,7 @@ gd::BehaviorMetadata& PlatformExtension::GetBehaviorMetadata(
   return badBehaviorMetadata;
 }
 
-bool PlatformExtension::HasBehavior(
-    const gd::String& behaviorType) const {
+bool PlatformExtension::HasBehavior(const gd::String& behaviorType) const {
   return behaviorsInfo.find(behaviorType) != behaviorsInfo.end();
 }
 
@@ -386,7 +383,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
   auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
   if (copiedAction == actionsInfos.end()) {
     gd::LogError("Could not find an action with name " +
-                   copiedNameWithNamespace + " to copy.");
+                 copiedNameWithNamespace + " to copy.");
   } else {
     actionsInfos[newNameWithNamespace] = copiedAction->second;
   }
@@ -406,7 +403,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
   auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
   if (copiedCondition == conditionsInfos.end()) {
     gd::LogError("Could not find a condition with name " +
-                   copiedNameWithNamespace + " to copy.");
+                 copiedNameWithNamespace + " to copy.");
   } else {
     conditionsInfos[newNameWithNamespace] = copiedCondition->second;
   }
@@ -423,7 +420,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
   auto copiedExpression = expressionsInfos.find(copiedNameWithNamespace);
   if (copiedExpression == expressionsInfos.end()) {
     gd::LogError("Could not find an expression with name " +
-                   copiedNameWithNamespace + " to copy.");
+                 copiedNameWithNamespace + " to copy.");
   } else {
     expressionsInfos[newNameWithNamespace] = copiedExpression->second;
   }
@@ -440,7 +437,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedStrExpression(
   auto copiedExpression = strExpressionsInfos.find(copiedNameWithNamespace);
   if (copiedExpression == strExpressionsInfos.end()) {
     gd::LogError("Could not find a string expression with name " +
-                   copiedNameWithNamespace + " to copy.");
+                 copiedNameWithNamespace + " to copy.");
   } else {
     strExpressionsInfos[newNameWithNamespace] = copiedExpression->second;
   }
@@ -468,7 +465,8 @@ PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
 }
 
-const std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() const {
+const std::vector<gd::DependencyMetadata>&
+PlatformExtension::GetAllDependencies() const {
   return extensionDependenciesMetadata;
 }
 
@@ -476,7 +474,8 @@ std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
   return extensionDependenciesMetadata;
 }
 
-const std::vector<gd::SourceFileMetadata>& PlatformExtension::GetAllSourceFiles() const {
+const std::vector<gd::SourceFileMetadata>&
+PlatformExtension::GetAllSourceFiles() const {
   return extensionSourceFilesMetadata;
 }
 
@@ -613,37 +612,6 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
   }
 
   nameSpace = nameSpace_ + GetNamespaceSeparator();
-}
-
-std::vector<gd::String> PlatformExtension::GetBuiltinExtensionsNames() {
-  std::vector<gd::String> builtinExtensions;
-  builtinExtensions.push_back("Sprite");
-  builtinExtensions.push_back("BuiltinObject");
-  builtinExtensions.push_back("BuiltinAudio");
-  builtinExtensions.push_back("BuiltinMouse");
-  builtinExtensions.push_back("BuiltinKeyboard");
-  builtinExtensions.push_back("BuiltinJoystick");
-  builtinExtensions.push_back("BuiltinTime");
-  builtinExtensions.push_back("BuiltinFile");
-  builtinExtensions.push_back("BuiltinVariables");
-  builtinExtensions.push_back("BuiltinCamera");
-  builtinExtensions.push_back("BuiltinWindow");
-  builtinExtensions.push_back("BuiltinNetwork");
-  builtinExtensions.push_back("BuiltinScene");
-  builtinExtensions.push_back("BuiltinAdvanced");
-  builtinExtensions.push_back("BuiltinCommonConversions");
-  builtinExtensions.push_back("BuiltinStringInstructions");
-  builtinExtensions.push_back("BuiltinMathematicalTools");
-  builtinExtensions.push_back("BuiltinExternalLayouts");
-  builtinExtensions.push_back("BuiltinCommonInstructions");
-
-  return builtinExtensions;
-}
-
-bool PlatformExtension::IsBuiltin() const {
-  std::vector<gd::String> builtinExtensions = GetBuiltinExtensionsNames();
-  return std::find(builtinExtensions.begin(), builtinExtensions.end(), name) !=
-         builtinExtensions.end();
 }
 
 void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
@@ -791,41 +759,42 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
   }
 }
 
-gd::String
-PlatformExtension::GetEventsFunctionFullType(const gd::String &extensionName,
-                                             const gd::String &functionName) {
-  const auto &separator = GetNamespaceSeparator();
+gd::String PlatformExtension::GetEventsFunctionFullType(
+    const gd::String& extensionName, const gd::String& functionName) {
+  const auto& separator = GetNamespaceSeparator();
   return extensionName + separator + functionName;
 }
 
 gd::String PlatformExtension::GetBehaviorEventsFunctionFullType(
-    const gd::String &extensionName, const gd::String &behaviorName,
-    const gd::String &functionName) {
-  const auto &separator = GetNamespaceSeparator();
+    const gd::String& extensionName,
+    const gd::String& behaviorName,
+    const gd::String& functionName) {
+  const auto& separator = GetNamespaceSeparator();
   return extensionName + separator + behaviorName + separator + functionName;
 }
 
-gd::String
-PlatformExtension::GetBehaviorFullType(const gd::String &extensionName,
-                                       const gd::String &behaviorName) {
-  const auto &separator = GetNamespaceSeparator();
+gd::String PlatformExtension::GetBehaviorFullType(
+    const gd::String& extensionName, const gd::String& behaviorName) {
+  const auto& separator = GetNamespaceSeparator();
   return extensionName + separator + behaviorName;
 }
 
 gd::String PlatformExtension::GetObjectEventsFunctionFullType(
-    const gd::String &extensionName, const gd::String &objectName,
-    const gd::String &functionName) {
-  const auto &separator = GetNamespaceSeparator();
+    const gd::String& extensionName,
+    const gd::String& objectName,
+    const gd::String& functionName) {
+  const auto& separator = GetNamespaceSeparator();
   return extensionName + separator + objectName + separator + functionName;
 }
 
-gd::String PlatformExtension::GetObjectFullType(const gd::String &extensionName,
-                                                const gd::String &objectName) {
-  const auto &separator = GetNamespaceSeparator();
+gd::String PlatformExtension::GetObjectFullType(const gd::String& extensionName,
+                                                const gd::String& objectName) {
+  const auto& separator = GetNamespaceSeparator();
   return extensionName + separator + objectName;
 }
 
-gd::String PlatformExtension::GetExtensionFromFullObjectType(const gd::String& type) {
+gd::String PlatformExtension::GetExtensionFromFullObjectType(
+    const gd::String& type) {
   const auto separatorIndex =
       type.find(PlatformExtension::GetNamespaceSeparator());
   if (separatorIndex == std::string::npos) {
@@ -834,7 +803,8 @@ gd::String PlatformExtension::GetExtensionFromFullObjectType(const gd::String& t
   return type.substr(0, separatorIndex);
 }
 
-gd::String PlatformExtension::GetObjectNameFromFullObjectType(const gd::String& type) {
+gd::String PlatformExtension::GetObjectNameFromFullObjectType(
+    const gd::String& type) {
   const auto separatorIndex =
       type.find(PlatformExtension::GetNamespaceSeparator());
   if (separatorIndex == std::string::npos) {

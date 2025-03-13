@@ -2238,7 +2238,6 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
     [Const, Ref] DOMString GetIconUrl();
-    boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
     [Ref] InstructionMetadata AddDuplicatedAction(

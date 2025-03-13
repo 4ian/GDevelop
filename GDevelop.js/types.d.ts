@@ -1701,7 +1701,6 @@ export class PlatformExtension extends EmscriptenObject {
   getLicense(): string;
   getHelpPath(): string;
   getIconUrl(): string;
-  isBuiltin(): boolean;
   getNameSpace(): string;
   addDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
   addDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;

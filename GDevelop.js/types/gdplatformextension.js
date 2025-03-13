@@ -28,7 +28,6 @@ declare class gdPlatformExtension {
   getLicense(): string;
   getHelpPath(): string;
   getIconUrl(): string;
-  isBuiltin(): boolean;
   getNameSpace(): string;
   addDuplicatedAction(newActionName: string, copiedActionName: string): gdInstructionMetadata;
   addDuplicatedCondition(newConditionName: string, copiedConditionName: string): gdInstructionMetadata;

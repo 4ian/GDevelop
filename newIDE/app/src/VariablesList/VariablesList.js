@@ -1858,7 +1858,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
       addVariable,
     }));
 
-    // TODO Allow to past child-variables even when the variable list is locked.
+    // TODO Allow to past child-variables of existing object variables even when the variable list is locked.
     const toolbar = (
       <VariablesListToolbar
         isNarrow={isNarrow}

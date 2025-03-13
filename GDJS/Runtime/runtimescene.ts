@@ -124,7 +124,10 @@ namespace gdjs {
      * @param sceneAndExtensionsData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
      */
-    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null, options?: {skipCreatingInstances?: boolean}) {
+    loadFromScene(
+      sceneAndExtensionsData: SceneAndExtensionsData | null,
+      options?: { skipCreatingInstances?: boolean }
+    ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
@@ -182,15 +185,15 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      if(!options || !options.skipCreatingInstances)
-      this.createObjectsFrom(
-        sceneData.instances,
-        0,
-        0,
-        0,
-        /*trackByPersistentUuid=*/
-        true
-      );
+      if (!options || !options.skipCreatingInstances)
+        this.createObjectsFrom(
+          sceneData.instances,
+          0,
+          0,
+          0,
+          /*trackByPersistentUuid=*/
+          true
+        );
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
@@ -813,7 +816,10 @@ namespace gdjs {
         const extensionVariablesSyncData =
           variables.getNetworkSyncData(syncOptions);
         // If there is no variables to sync, don't include the extension in the sync data.
-        if (extensionVariablesSyncData && !syncOptions.syncEverythingForWholeGameSaveState) {
+        if (
+          extensionVariablesSyncData &&
+          !syncOptions.syncEverythingForWholeGameSaveState
+        ) {
           extensionsVariablesSyncData[extensionName] =
             extensionVariablesSyncData;
         }
@@ -841,7 +847,6 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
-      
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var);
       }
@@ -861,7 +866,6 @@ namespace gdjs {
         }
       }
     }
-  
 
     getOrCreateNetworkId(): string {
       if (!this.networkId) {

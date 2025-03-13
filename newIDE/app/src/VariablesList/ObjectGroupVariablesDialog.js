@@ -102,7 +102,16 @@ const ObjectGroupVariablesDialog = ({
       changeset,
       originalSerializedVariables
     );
-    // TODO Apply the changes on variants when it's done on an events-based object.
+    const { eventsBasedObject } = projectScopedContainersAccessor._scope;
+    if (eventsBasedObject) {
+      for (const objectName of objectGroup.getAllObjectsNames().toJSArray()) {
+        gd.ObjectVariableHelper.applyChangesToVariants(
+          eventsBasedObject,
+          objectName,
+          changeset
+        );
+      }
+    }
     groupVariablesContainer.clearPersistentUuid();
   };
 

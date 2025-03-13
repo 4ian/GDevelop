@@ -50,7 +50,17 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
         objects.AddMissingObjectsInRootFolder();
         continue;
       }
+      // Change object types
       auto &object = objects.GetObject(objectName);
+      if (object.GetType() != defaultObject->GetType()) {
+        // Keep a copy of the old object.
+        auto oldObject = objects.GetObject(objectName);
+        objects.RemoveObject(objectName);
+        objects.InsertObject(*defaultObject,
+                             defaultObjects.GetObjectPosition(objectName));
+        object.CopyWithoutConfiguration(oldObject);
+        objects.AddMissingObjectsInRootFolder();
+      }
 
       // Copy missing behaviors
       auto &behaviors = object.GetAllBehaviorContents();
@@ -95,6 +105,10 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
           variables.Insert(variableName, defaultVariable, defaultVariableIndex);
         } else {
           variables.Move(variableIndex, defaultVariableIndex);
+        }
+        if (variables.Get(variableName).GetType() != defaultVariable.GetType()) {
+          variables.Remove(variableName);
+          variables.Insert(variableName, defaultVariable, defaultVariableIndex);
         }
       }
       // Remove extra variables

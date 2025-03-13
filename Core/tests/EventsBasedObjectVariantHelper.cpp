@@ -53,7 +53,11 @@ gd::EventsBasedObject &SetupEventsBasedObject(gd::Project &project) {
   auto &instance =
       eventsBasedObject.GetInitialInstances().InsertNewInitialInstance();
   instance.SetObjectName("MyChildObject");
-  instance.GetVariables().InsertNew("MyVariable").SetValue(456);
+  instance.GetVariables().InsertNew("MyVariable").SetValue(111);
+  auto &objectGroup =
+      eventsBasedObject.GetObjects().GetObjectGroups().InsertNew(
+          "MyObjectGroup");
+  objectGroup.AddObject("MyChildObject");
   return eventsBasedObject;
 }
 
@@ -80,7 +84,7 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject3"));
   }
 
-  SECTION("Can remove missing objects") {
+  SECTION("Can remove objects") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -93,8 +97,10 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
 
     auto &variant = eventsBasedObject.GetVariants().InsertVariant(
         eventsBasedObject.GetDefaultVariant(), 0);
-    variant.GetInitialInstances().InsertNewInitialInstance().SetObjectName("MyChildObject2");
-    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("MyChildObject2") == true);
+    variant.GetInitialInstances().InsertNewInitialInstance().SetObjectName(
+        "MyChildObject2");
+    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject(
+                "MyChildObject2") == true);
 
     // Do the changes and launch the refactoring.
     eventsBasedObject.GetObjects().RemoveObject("MyChildObject2");
@@ -106,7 +112,8 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject2") == false);
     REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject3") == false);
-    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("MyChildObject2") == false);
+    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject(
+                "MyChildObject2") == false);
   }
 
   SECTION("Can change object type") {
@@ -130,6 +137,127 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variant.GetObjects().GetObject("MyChildObject").GetType() ==
             "MyExtension::FakeObjectWithDefaultBehavior");
     REQUIRE(variant.GetInitialInstances().GetInstancesCount() == 1);
+  }
+
+  SECTION("Can add missing object groups") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    eventsBasedObject.GetObjects().GetObjectGroups().InsertNew("MyObjectGroup2",
+                                                               0);
+    eventsBasedObject.GetObjects()
+        .GetObjectGroups()
+        .InsertNew("MyObjectGroup3", 0)
+        .AddObject("MyChildObject");
+
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    auto &variantObjectGroups = variant.GetObjects().GetObjectGroups();
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup"));
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup2"));
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup3"));
+    REQUIRE(
+        variantObjectGroups.Get("MyObjectGroup").GetAllObjectsNames().size() ==
+        1);
+    REQUIRE(
+        variantObjectGroups.Get("MyObjectGroup2").GetAllObjectsNames().size() ==
+        0);
+    REQUIRE(
+        variantObjectGroups.Get("MyObjectGroup3").GetAllObjectsNames().size() ==
+        1);
+  }
+
+  SECTION("Can remove object groups") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+
+    // Do the changes and launch the refactoring.
+    eventsBasedObject.GetObjects().GetObjectGroups().InsertNew("MyObjectGroup2",
+                                                               0);
+    eventsBasedObject.GetObjects().GetObjectGroups().InsertNew("MyObjectGroup3",
+                                                               0);
+
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    eventsBasedObject.GetObjects().GetObjectGroups().Remove("MyObjectGroup2");
+    eventsBasedObject.GetObjects().GetObjectGroups().Remove("MyObjectGroup3");
+
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    auto &variantObjectGroups = variant.GetObjects().GetObjectGroups();
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup"));
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup2") == false);
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup3") == false);
+  }
+
+  SECTION("Can add objects to groups") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChildObject2", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChildObject3", 0);
+
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    auto &objectGroup =
+        eventsBasedObject.GetObjects().GetObjectGroups().Get("MyObjectGroup");
+    objectGroup.AddObject("MyChildObject2");
+    objectGroup.AddObject("MyChildObject3");
+
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    auto &variantObjectGroups = variant.GetObjects().GetObjectGroups();
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup"));
+    REQUIRE(
+        variantObjectGroups.Get("MyObjectGroup").GetAllObjectsNames().size() ==
+        3);
+  }
+
+  SECTION("Can remove objects from groups") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChildObject2", 0);
+    eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChildObject3", 0);
+    auto &objectGroup =
+        eventsBasedObject.GetObjects().GetObjectGroups().Get("MyObjectGroup");
+    objectGroup.AddObject("MyChildObject2");
+    objectGroup.AddObject("MyChildObject3");
+
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    objectGroup.RemoveObject("MyChildObject2");
+    objectGroup.RemoveObject("MyChildObject3");
+
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    auto &variantObjectGroups = variant.GetObjects().GetObjectGroups();
+    REQUIRE(variantObjectGroups.Has("MyObjectGroup"));
+    REQUIRE(
+        variantObjectGroups.Get("MyObjectGroup").GetAllObjectsNames().size() ==
+        1);
   }
 
   SECTION("Can add missing behaviors") {
@@ -205,5 +333,190 @@ TEST_CASE("EventsBasedObjectVariantHelper", "[common]") {
     REQUIRE(variantObject.HasBehaviorNamed("MyBehavior"));
     REQUIRE(variantObject.GetBehavior("MyBehavior").GetTypeName() ==
             "MyExtension::MyOtherBehavior");
+  }
+
+  SECTION("Can add missing variables") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
+    object.GetVariables().InsertNew("MyVariable2", 1).SetValue(456);
+    object.GetVariables().InsertNew("MyVariable3", 2).SetValue(789);
+
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    auto &variantObject = variant.GetObjects().GetObject("MyChildObject");
+    REQUIRE(variantObject.GetVariables().Get("MyVariable").GetValue() == 123);
+    REQUIRE(variantObject.GetVariables().Get("MyVariable2").GetValue() == 456);
+    REQUIRE(variantObject.GetVariables().Get("MyVariable3").GetValue() == 789);
+    {
+      auto *objectInstance =
+          GetFirstInstanceOf("MyChildObject", variant.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable"));
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable2") == false);
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable3") == false);
+    }
+  }
+
+  SECTION("Can keep variable value") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().Get("MyVariable").SetValue(456);
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    auto &variantObject = variant.GetObjects().GetObject("MyChildObject");
+    REQUIRE(variantObject.GetVariables().Get("MyVariable").GetValue() == 123);
+    {
+      auto *objectInstance =
+          GetFirstInstanceOf("MyChildObject", variant.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      REQUIRE(objectInstance->GetVariables().Get("MyVariable").GetValue() ==
+              111);
+    }
+  }
+
+  SECTION("Must not propagate instance variable value changes") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    {
+      auto *objectInstance = GetFirstInstanceOf(
+          "MyChildObject", eventsBasedObject.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      objectInstance->GetVariables().Get("MyVariable").SetValue(222);
+    }
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    {
+      auto *objectInstance =
+          GetFirstInstanceOf("MyChildObject", variant.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      REQUIRE(objectInstance->GetVariables().Get("MyVariable").GetValue() ==
+              111);
+    }
+  }
+
+  SECTION("Can move variables") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
+    object.GetVariables().InsertNew("MyVariable2", 1).SetValue(456);
+    object.GetVariables().InsertNew("MyVariable3", 2).SetValue(789);
+    {
+      auto *objectInstance = GetFirstInstanceOf(
+          "MyChildObject", eventsBasedObject.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      objectInstance->GetVariables().Get("MyVariable2").SetValue(222);
+      objectInstance->GetVariables().Get("MyVariable3").SetValue(333);
+    }
+
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().Move(2, 0);
+    object.GetVariables().Get("MyVariable").SetValue(111);
+    object.GetVariables().Get("MyVariable2").SetValue(222);
+    object.GetVariables().Get("MyVariable3").SetValue(333);
+    REQUIRE(object.GetVariables().GetNameAt(0) == "MyVariable3");
+    REQUIRE(object.GetVariables().GetNameAt(1) == "MyVariable");
+    REQUIRE(object.GetVariables().GetNameAt(2) == "MyVariable2");
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    auto &variantObject = variant.GetObjects().GetObject("MyChildObject");
+    REQUIRE(variantObject.GetVariables().Get("MyVariable").GetValue() == 123);
+    REQUIRE(variantObject.GetVariables().Get("MyVariable2").GetValue() == 456);
+    REQUIRE(variantObject.GetVariables().Get("MyVariable3").GetValue() == 789);
+    REQUIRE(variantObject.GetVariables().GetNameAt(0) == "MyVariable3");
+    REQUIRE(variantObject.GetVariables().GetNameAt(1) == "MyVariable");
+    REQUIRE(variantObject.GetVariables().GetNameAt(2) == "MyVariable2");
+  }
+
+  SECTION("Can remove variables") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
+    object.GetVariables().InsertNew("MyVariable2", 1).SetValue(456);
+    object.GetVariables().InsertNew("MyVariable3", 2).SetValue(789);
+    {
+      auto *objectInstance = GetFirstInstanceOf(
+          "MyChildObject", eventsBasedObject.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      objectInstance->GetVariables().Get("MyVariable2").SetValue(222);
+      objectInstance->GetVariables().Get("MyVariable3").SetValue(333);
+    }
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().Remove("MyVariable2");
+    object.GetVariables().Remove("MyVariable3");
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    auto &variantObject = variant.GetObjects().GetObject("MyChildObject");
+    REQUIRE(variantObject.GetVariables().Has("MyVariable"));
+    REQUIRE(variantObject.GetVariables().Has("MyVariable2") == false);
+    REQUIRE(variantObject.GetVariables().Has("MyVariable3") == false);
+    {
+      auto *objectInstance =
+          GetFirstInstanceOf("MyChildObject", variant.GetInitialInstances());
+      REQUIRE(objectInstance != nullptr);
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable"));
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable2") == false);
+      REQUIRE(objectInstance->GetVariables().Has("MyVariable3") == false);
+    }
+  }
+
+  SECTION("Can change variable type") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsBasedObject = SetupEventsBasedObject(project);
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+    auto &object = eventsBasedObject.GetObjects().GetObject("MyChildObject");
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().Get("MyVariable").SetString("abc");
+    gd::EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
+        project, eventsBasedObject);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    auto &variantObject = variant.GetObjects().GetObject("MyChildObject");
+    REQUIRE(variantObject.GetVariables().Get("MyVariable").GetString() ==
+            "abc");
+    REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("MyVariable") ==
+            false);
   }
 }

@@ -41,11 +41,13 @@
 .chatBubbleContainer {
   display: flex;
   animation: container-appear 0.3s;
+  min-width: 0; /** Prevents horizontal overflow */
 }
 
 .chatBubbleContent {
   display: flex;
   animation: content-appear 0.8s;
+  min-width: 0; /** Prevents horizontal overflow */
 }
 
 .thinkingText {

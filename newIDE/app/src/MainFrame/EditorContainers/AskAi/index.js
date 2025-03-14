@@ -3,7 +3,6 @@ import * as React from 'react';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import Paper from '../../../UI/Paper';
-import { Line } from '../../../UI/Grid';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addUserMessageToAiRequest,
@@ -13,6 +12,8 @@ import {
 } from '../../../Utils/GDevelopServices/Generation';
 import { delay } from '../../../Utils/Delay';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { Toolbar } from './Toolbar';
 
 type Props = {|
   isActive: boolean,
@@ -25,6 +26,18 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
+    minWidth: 0,
+  },
+  chatContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    minHeight: 0,
+    minWidth: 0,
   },
 };
 
@@ -44,14 +57,31 @@ const noop = () => {};
 export const AskAi = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
     ({ isActive, setToolbar }: Props, ref) => {
+      const [
+        selectedAiRequest,
+        setSelectedAiRequest,
+      ] = React.useState<AiRequest | null>(null);
+
+      const onStartNewChat = React.useCallback(() => {
+        setSelectedAiRequest(null);
+      }, []);
+
+      const canStartNewChat = !!selectedAiRequest;
       const updateToolbar = React.useCallback(
         () => {
           if (setToolbar) {
-            setToolbar(null);
+            setToolbar(
+              <Toolbar
+                onStartNewChat={onStartNewChat}
+                canStartNewChat={canStartNewChat}
+              />
+            );
           }
         },
-        [setToolbar]
+        [setToolbar, onStartNewChat, canStartNewChat]
       );
+
+      React.useEffect(updateToolbar, [updateToolbar]);
 
       React.useImperativeHandle(ref, () => ({
         getProject: noop,
@@ -60,11 +90,6 @@ export const AskAi = React.memo<Props>(
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
       }));
-
-      const [
-        selectedAiRequest,
-        setSelectedAiRequest,
-      ] = React.useState<AiRequest | null>(null);
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
         null
@@ -136,16 +161,28 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
+      const { windowSize } = useResponsiveWindowSize();
+
       return (
         <Paper square background="dark" style={styles.paper}>
-          <Line expand useFullHeight>
+          <div
+            style={{
+              ...styles.chatContainer,
+              width:
+                windowSize === 'small'
+                  ? '100%'
+                  : windowSize === 'medium'
+                  ? '600px'
+                  : '800px',
+            }}
+          >
             <AiRequestChat
               ref={aiRequestChatRef}
               aiRequest={selectedAiRequest}
               onSendUserRequest={sendUserRequest}
               isLaunchingAiRequest={isLaunchingAiRequest}
             />
-          </Line>
+          </div>
         </Paper>
       );
     }

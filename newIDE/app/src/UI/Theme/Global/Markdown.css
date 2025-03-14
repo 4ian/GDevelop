@@ -5,6 +5,8 @@
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.01em;
+  min-width: 0; /** Prevents horizontal overflow */
+  word-break: break-word; /* Prevent horizontal overflow for long lines */
 }
 
 .gd-markdown.text-ellipsis {
@@ -38,6 +40,11 @@
 .gd-markdown a {
   color: var(--markdown-link-color);
   cursor: pointer;
+}
+
+.gd-markdown pre {
+  overflow-x: scroll; /* Prevent horizontal overflow for long code blocks */
+  white-space: pre-wrap; /* Wrap long lines */
 }
 
 .gd-markdown code {

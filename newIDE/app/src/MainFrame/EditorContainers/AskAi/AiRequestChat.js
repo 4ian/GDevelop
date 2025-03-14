@@ -9,7 +9,7 @@ import { CompactTextAreaField } from '../../../UI/CompactTextAreaField';
 import { Column, Line } from '../../../UI/Grid';
 import LeftLoader from '../../../UI/LeftLoader';
 import Paper from '../../../UI/Paper';
-import { MarkdownText } from '../../../UI/MarkdownText';
+import { ChatMarkdownText } from './ChatMarkdownText';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import AlertMessage from '../../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
@@ -106,15 +106,19 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }
 
     return (
-      <ColumnStackLayout expand alignItems="stretch" justifyContent="stretch">
+      <ColumnStackLayout
+        expand
+        alignItems="stretch"
+        justifyContent="stretch"
+        useFullHeight
+      >
         <ScrollView ref={scrollViewRef}>
           {aiRequest.output.flatMap((message, messageIndex) => {
             if (message.role === 'user') {
               return [
                 <Line key={messageIndex} justifyContent="flex-end">
                   <ChatBubble role="user">
-                    <MarkdownText
-                      allowParagraphs
+                    <ChatMarkdownText
                       source={message.content
                         .map(messageContent => messageContent.text)
                         .join('\n')}
@@ -125,17 +129,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             }
             if (message.role === 'assistant') {
               return [
-                ...message.content.map(
-                  (messageContent, messageContentIndex) => {
+                ...message.content
+                  .map((messageContent, messageContentIndex) => {
                     const key = `messageIndex${messageIndex}-${messageContentIndex}`;
                     if (messageContent.type === 'output_text') {
                       return (
                         <Line key={key} justifyContent="flex-start">
                           <ChatBubble role="assistant">
-                            <MarkdownText
-                              allowParagraphs
-                              source={messageContent.text}
-                            />
+                            <ChatMarkdownText source={messageContent.text} />
                           </ChatBubble>
                         </Line>
                       );
@@ -144,23 +145,21 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       return (
                         <Line key={key} justifyContent="flex-start">
                           <ChatBubble role="assistant">
-                            <MarkdownText
-                              allowParagraphs
+                            <ChatMarkdownText
                               source={messageContent.summary.text}
                             />
                           </ChatBubble>
                         </Line>
                       );
                     }
-
                     return null;
-                  }
-                ),
-              ].filter(Boolean);
+                  })
+                  .filter(Boolean),
+              ];
             }
 
-            return null;
-          }).filter(Boolean)}
+            return [];
+          })}
 
           {aiRequest.status === 'error' ? (
             <Line justifyContent="flex-start">

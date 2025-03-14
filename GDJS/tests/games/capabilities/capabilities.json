@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 225,
+    "build": 226,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -3277,8 +3277,8 @@
             "BarRightPadding": 6,
             "BarBottomPadding": 6,
             "LabelMargin": 6,
-            "MinValue": 0.25,
-            "MaxValue": 4,
+            "MinValue": -2,
+            "MaxValue": 2,
             "InitialValue": 1,
             "StepSize": 0.125
           },
@@ -5006,7 +5006,7 @@
           ],
           "content": {
             "centerLocation": "ModelOrigin",
-            "crossfadeDuration": 0,
+            "crossfadeDuration": 0.5,
             "depth": 78,
             "height": 78,
             "keepAspectRatio": true,

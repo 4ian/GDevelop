@@ -33,6 +33,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    width: 'min(100%, 800px)',
     marginLeft: 10,
     marginRight: 10,
     marginBottom: 10,
@@ -161,21 +162,9 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
-      const { windowSize } = useResponsiveWindowSize();
-
       return (
         <Paper square background="dark" style={styles.paper}>
-          <div
-            style={{
-              ...styles.chatContainer,
-              width:
-                windowSize === 'small'
-                  ? '100%'
-                  : windowSize === 'medium'
-                  ? '600px'
-                  : '800px',
-            }}
-          >
+          <div style={styles.chatContainer}>
             <AiRequestChat
               ref={aiRequestChatRef}
               aiRequest={selectedAiRequest}

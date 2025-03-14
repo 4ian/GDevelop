@@ -1,4 +1,13 @@
-@keyframes container-appear {
+@keyframes new-chat-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes chat-bubble-appear {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -38,9 +47,22 @@
   }
 }
 
+.newChatContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+
+  animation: new-chat-appear 0.5s;
+}
+
 .chatBubbleContainer {
   display: flex;
-  animation: container-appear 0.3s;
+  animation: chat-bubble-appear 0.3s;
   min-width: 0; /** Prevents horizontal overflow */
 }
 

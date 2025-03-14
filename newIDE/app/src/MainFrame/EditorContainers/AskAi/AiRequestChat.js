@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { ColumnStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
@@ -13,6 +16,8 @@ import { ChatMarkdownText } from './ChatMarkdownText';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import AlertMessage from '../../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
+import RobotIcon from '../../../ProjectCreation/RobotIcon';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {
   aiRequest: AiRequest | null,
@@ -67,9 +72,23 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       },
     }));
 
+    const { isMobile } = useResponsiveWindowSize();
+
     if (!aiRequest) {
+      const disclaimer = (
+        <Text size="body2" color="secondary">
+          <Trans>
+            The AI will answer according to your game project. Be precise in
+            your question and always verify AI answers before applying them.
+          </Trans>
+        </Text>
+      );
+
       return (
-        <ColumnStackLayout expand alignItems="stretch" justifyContent="center">
+        <div className={classes.newChatContainer}>
+          <Line noMargin justifyContent="center">
+            <RobotIcon rotating size={40} />
+          </Line>
           <Column noMargin alignItems="center">
             <Text size="bold-title">
               <Trans>What do you want to make?</Trans>
@@ -83,25 +102,31 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               placeholder="How to add a leaderboard to my game?"
               rows={5}
             />
-            <Text size="body2" color="secondary">
-              <Trans>
-                The AI will answer according to your game project. Be precise in
-                your question and always verify AI answers before applying them.
-              </Trans>
-            </Text>
           </Column>
-          <Column noMargin alignItems="flex-end">
-            <LeftLoader isLoading={isLaunchingAiRequest}>
-              <RaisedButton
-                color="primary"
-                label={<Trans>Send</Trans>}
-                onClick={() => {
-                  onSendUserRequest(userRequestText);
-                }}
-              />
-            </LeftLoader>
-          </Column>
-        </ColumnStackLayout>
+          <Line noMargin>
+            <ResponsiveLineStackLayout
+              noMargin
+              alignItems="flex-start"
+              justifyContent="flex-start"
+            >
+              {!isMobile && disclaimer}
+              <Line noMargin justifyContent="flex-end">
+                <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                  <RaisedButton
+                    color="primary"
+                    label={<Trans>Send</Trans>}
+                    style={{ flexShrink: 0 }}
+                    disabled={isLaunchingAiRequest}
+                    onClick={() => {
+                      onSendUserRequest(userRequestText);
+                    }}
+                  />
+                </LeftLoader>
+              </Line>
+              {isMobile && disclaimer}
+            </ResponsiveLineStackLayout>
+          </Line>
+        </div>
       );
     }
 

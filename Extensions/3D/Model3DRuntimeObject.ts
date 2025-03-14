@@ -285,7 +285,7 @@ namespace gdjs {
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const elapsedTime = this.getElapsedTime() / 1000;
-      this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
+      this._renderer.updateAnimation(elapsedTime);
     }
 
     /**
@@ -383,6 +383,7 @@ namespace gdjs {
 
     setAnimationSpeedScale(ratio: float): void {
       this._animationSpeedScale = ratio;
+      this._renderer.setAnimationTimeScale(ratio);
     }
 
     getAnimationElapsedTime(): float {

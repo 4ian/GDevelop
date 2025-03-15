@@ -12,8 +12,8 @@ import {
 } from '../../../Utils/GDevelopServices/Generation';
 import { delay } from '../../../Utils/Delay';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { Toolbar } from './Toolbar';
+import { getSimplifiedProjectJson } from '../../../Utils/SimplifiedProjectJson';
 
 type Props = {|
   isActive: boolean,
@@ -57,7 +57,7 @@ const noop = () => {};
 
 export const AskAi = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
-    ({ isActive, setToolbar }: Props, ref) => {
+    ({ isActive, setToolbar, project }: Props, ref) => {
       const [
         selectedAiRequest,
         setSelectedAiRequest,
@@ -116,6 +116,10 @@ export const AskAi = React.memo<Props>(
             return;
           }
 
+          const simplifiedProjectJson = project
+            ? JSON.stringify(getSimplifiedProjectJson(project))
+            : null;
+
           try {
             setIsLaunchingAiRequest(true);
 
@@ -127,10 +131,12 @@ export const AskAi = React.memo<Props>(
                     aiRequestId: selectedAiRequestId,
                     userId: profile.id,
                     userRequest: userRequestText,
+                    simplifiedProjectJson,
                   })
                 : await createAiRequest(getAuthorizationHeader, {
                     userRequest: userRequestText,
                     userId: profile.id,
+                    simplifiedProjectJson,
                   });
             } finally {
               setIsLaunchingAiRequest(false);
@@ -159,6 +165,7 @@ export const AskAi = React.memo<Props>(
           profile,
           onOpenCreateAccountDialog,
           selectedAiRequestId,
+          project,
         ]
       );
 

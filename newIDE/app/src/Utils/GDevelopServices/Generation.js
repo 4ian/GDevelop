@@ -208,115 +208,16 @@ export const getAiRequests = async (
   return response.data;
 };
 
-const gameProjectJson = `
-{
-  globalObjects: [
-    {
-      name: "MyGlobalObject",
-      type: "Sprite",
-      behaviors: [],
-  },
-  ],
-  scenes: [
-    {
-      name: "Main menu",
-      variables: [],
-      objects: [
-        {
-          name: "Background",
-          objectType: "TiledSpriteObject::TiledSprite",
-          behaviors: [],
-          variables: [],
-        },
-        {
-          name: "Title",
-          objectType: "Text",
-          behaviors: [],
-          variables: [],
-        },
-        {
-          name: "Play",
-          objectType: "PanelSpriteButton::PanelSpriteButton",
-          behaviors: [],
-          variables: [],
-        },
-        {
-          name: "Quit",
-          objectType: "PanelSpriteButton::PanelSpriteButton",
-          behaviors: [],
-          variables: [],
-        },
-      ],
-    },
-    {
-      name: "Game level",
-      variables: [],
-      objects: [
-        {
-          name: "Player",
-          objectType: "Sprite",
-          behaviors: [{
-            name: "MyHealth",
-            behaviorType: "Health::Health"
-          }, {
-            name: "PlatformBehavior",
-            behaviorType: "PlatformBehavior::PlatformerObjectBehavior"
-          }],
-          variables: [],
-        },
-        {
-          name: "Enemy",
-          objectType: "Sprite",
-          behaviors: [{
-            name: "Health",
-            behaviorType: "Health::Health"
-          }],
-          variables: [],
-        },
-        {
-          name: "Quit",
-          objectType: "PanelSpriteButton::PanelSpriteButton",
-          behaviors: [],
-          variables: [],
-        },
-        {
-          name: "JumpBtn",
-          objectType: "PanelSpriteButton::PanelSpriteButton",
-          behaviors: [],
-          variables: [],
-        },
-        {
-          name: "Platform",
-          objectType: "TiledSpriteObject::TiledSprite",
-          behaviors: [{
-            name: "PlatformBehavior",
-            behaviorType: "PlatformBehavior::PlatformBehavior"
-          }],
-          variables: [],
-        },
-        {
-          name: "MovingPlatform",
-          objectType: "TiledSpriteObject::TiledSprite",
-          behaviors: [{
-            name: "PlatformBehavior",
-            behaviorType: "PlatformBehavior::PlatformBehavior"
-          }],
-          variables: [],
-        },
-      ],
-    }
-  ]
-}
-`;
-
 export const createAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
     userRequest,
+    simplifiedProjectJson,
   }: {|
     userId: string,
     userRequest: string,
+    simplifiedProjectJson: string | null,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -324,7 +225,7 @@ export const createAiRequest = async (
     `${GDevelopGenerationApi.baseUrl}/ai-request`,
     {
       userRequest,
-      gameProjectJson,
+      gameProjectJson: simplifiedProjectJson,
     },
     {
       params: {
@@ -344,10 +245,12 @@ export const addUserMessageToAiRequest = async (
     userId,
     aiRequestId,
     userRequest,
+    simplifiedProjectJson,
   }: {|
     userId: string,
     aiRequestId: string,
     userRequest: string,
+    simplifiedProjectJson: string | null,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -357,7 +260,7 @@ export const addUserMessageToAiRequest = async (
     }/ai-request/${aiRequestId}/action/add-user-message`,
     {
       userRequest,
-      gameProjectJson,
+      gameProjectJson: simplifiedProjectJson,
     },
     {
       params: {

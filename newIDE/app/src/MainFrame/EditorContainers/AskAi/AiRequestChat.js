@@ -121,7 +121,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const subscriptionBanner =
       quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
         <GetSubscriptionCard
-          subscriptionDialogOpeningReason={'TODO'}
+          subscriptionDialogOpeningReason={
+            increaseQuotaOffering === 'subscribe'
+              ? 'AI requests (subscribe)'
+              : 'AI requests (upgrade)'
+          }
           label={
             increaseQuotaOffering === 'subscribe' ? (
               <Trans>Get GDevelop premium</Trans>
@@ -150,12 +154,20 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         </GetSubscriptionCard>
       ) : null;
 
+    const errorOrQuotaOrCreditsExplanation = (
+      <Text size="body2" color={lastSendError ? 'error' : 'secondary'}>
+        {lastSendError ? (
+          <Trans>
+            An error happened when sending your request, please try again.
+          </Trans>
+        ) : (
+          quotaOrCreditsExplanation
+        )}
+      </Text>
+    );
+
     if (!aiRequest) {
-      const disclaimer = quotaOrCreditsExplanation ? (
-        <Text size="body2" color="secondary">
-          {quotaOrCreditsExplanation}
-        </Text>
-      ) : (
+      const disclaimer = errorOrQuotaOrCreditsExplanation || (
         <Text size="body2" color="secondary">
           <Trans>
             The AI will answer according to your game project. Always verify AI
@@ -304,11 +316,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             justifyContent="space-between"
             expand
           >
-            {!isMobile && (
-              <Text size="body2" color="secondary">
-                {quotaOrCreditsExplanation}
-              </Text>
-            )}
+            {!isMobile && errorOrQuotaOrCreditsExplanation}
             <Line noMargin justifyContent="flex-end">
               <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
                 <RaisedButton
@@ -321,11 +329,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 />
               </LeftLoader>
             </Line>
-            {isMobile && (
-              <Text size="body2" color="secondary">
-                {quotaOrCreditsExplanation}
-              </Text>
-            )}
+            {isMobile && errorOrQuotaOrCreditsExplanation}
           </ResponsiveLineStackLayout>
         </Column>
       </ColumnStackLayout>

@@ -2454,6 +2454,144 @@ module.exports = {
         .setGetter('getMaxFallingSpeed');
     }
 
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'physics3D') {
+          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          return true;
+        }
+        return false;
+      };
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('physics3D')
+          .setValue(behaviorContent.getChild('physics3D').getStringValue())
+          .setType('Behavior')
+          .setLabel('3D physics')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .addExtraInfo('Physics3D::Physics3DBehavior');
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('physics3D').setStringValue('');
+      };
+
+      const aut = extension
+        .addBehavior(
+          'PhysicsVehicle3D',
+          _('3D physics vehicle'),
+          'PhysicsVehicle3D',
+          _('Jump and run on platforms.'),
+          '',
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'PhysicsVehicle3D',
+          //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .addIncludeFile(
+          'Extensions/Physics3DBehavior/PhysicsVehicle3DRuntimeBehavior.js'
+        );
+
+      aut
+        .addScopedAction(
+          'SimulateForwardKey',
+          _('Simulate move forward key press'),
+          _('Simulate a press of the move forward key.'),
+          _('Simulate pressing Forward key for _PARAM0_'),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateForwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateBackwardKey',
+          _('Simulate move backward key press'),
+          _('Simulate a press of the move backward key.'),
+          _('Simulate pressing Backward key for _PARAM0_'),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateBackwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateRightKey',
+          _('Simulate move right key press'),
+          _('Simulate a press of the move right key.'),
+          _('Simulate pressing Right key for _PARAM0_'),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateRightKey');
+
+      aut
+        .addScopedAction(
+          'SimulateLeftKey',
+          _('Simulate move left key press'),
+          _('Simulate a press of the move left key.'),
+          _('Simulate pressing Left key for _PARAM0_'),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateLeftKey');
+
+      aut
+        .addScopedAction(
+          'SimulateHandBreakKey',
+          _('Simulate hand break key press'),
+          _('Simulate a press of the hand break key.'),
+          _('Simulate pressing hand break key for _PARAM0_'),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateHandBreakKey');
+
+      aut
+        .addScopedAction(
+          'SimulateStick',
+          _('Simulate stick control'),
+          _('Simulate a stick control.'),
+          _(
+            'Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force'
+          ),
+          _('Character controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('expression', _('Stick angle (in degrees)'))
+        .addParameter('expression', _('Stick force (between 0 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateStick');
+    }
+
     extension
       .addCondition(
         'IsObjectOnGivenFloor',

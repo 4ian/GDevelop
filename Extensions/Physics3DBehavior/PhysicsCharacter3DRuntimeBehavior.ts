@@ -1,11 +1,5 @@
 /// <reference path="./jolt-physics.d.ts" />
 
-namespace Jolt {
-  export interface Body {
-    gdjsAssociatedCharacterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior | null;
-  }
-}
-
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
     fwa: float;
@@ -625,7 +619,7 @@ namespace gdjs {
       this._wasRightKeyPressed = this._hasPressedRightKey;
       this._wasLeftKeyPressed = this._hasPressedLeftKey;
       this._wasJumpKeyPressed = this._hasPressedJumpKey;
-      this._wasStickUsed = this._hasPressedJumpKey;
+      this._wasStickUsed = this._hasUsedStick;
 
       if (!this._dontClearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;

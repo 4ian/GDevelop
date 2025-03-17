@@ -1,0 +1,33 @@
+.conceptLink {
+  color: var(--theme-link-color);
+  font-weight: 400;
+  align-items: baseline;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.conceptLink div {
+  transform: translateY(3px);
+}
+
+/* Override some of the markdown styling: */
+.chatMarkdown :not(pre) code {
+  font-size: 14px;
+  font-family: var(--gdevelop-modern-font-family);
+
+  color: var(--event-sheet-instruction-parameter-number-color);
+}
+
+.chatMarkdown pre code {
+  font-size: 13px;
+  font-family: var(--gdevelop-modern-font-family);
+}
+
+.chatMarkdown pre {
+  background-color: var(--theme-surface-canvas-background-color);
+  padding: 8px;
+  border-radius: 4px;
+}

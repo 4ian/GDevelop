@@ -214,10 +214,12 @@ export const createAiRequest = async (
     userId,
     userRequest,
     simplifiedProjectJson,
+    payWithCredits,
   }: {|
     userId: string,
     userRequest: string,
     simplifiedProjectJson: string | null,
+    payWithCredits: boolean,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -226,6 +228,7 @@ export const createAiRequest = async (
     {
       userRequest,
       gameProjectJson: simplifiedProjectJson,
+      payWithCredits,
     },
     {
       params: {
@@ -246,11 +249,13 @@ export const addUserMessageToAiRequest = async (
     aiRequestId,
     userRequest,
     simplifiedProjectJson,
+    payWithCredits,
   }: {|
     userId: string,
     aiRequestId: string,
     userRequest: string,
     simplifiedProjectJson: string | null,
+    payWithCredits: boolean,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -261,6 +266,7 @@ export const addUserMessageToAiRequest = async (
     {
       userRequest,
       gameProjectJson: simplifiedProjectJson,
+      payWithCredits,
     },
     {
       params: {

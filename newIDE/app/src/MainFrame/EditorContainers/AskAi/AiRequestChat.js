@@ -18,11 +18,23 @@ import AlertMessage from '../../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../../ProjectCreation/RobotIcon';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import GetSubscriptionCard from '../../../Profile/Subscription/GetSubscriptionCard';
+import { type Quota } from '../../../Utils/GDevelopServices/Usage';
 
 type Props = {
   aiRequest: AiRequest | null,
+
   isLaunchingAiRequest: boolean,
   onSendUserRequest: string => Promise<void>,
+
+  // Error that occurred while sending the last request.
+  lastSendError: ?Error,
+
+  // Quota available for using the feature.
+  quota: Quota | null,
+  increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
+  aiRequestPriceInCredits: number | null,
+  availableCredits: number,
 };
 
 export type AiRequestChatInterface = {|
@@ -57,7 +69,19 @@ const ChatBubble = ({ children, role }: ChatBubbleProps) => {
 };
 
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
-  ({ aiRequest, isLaunchingAiRequest, onSendUserRequest }: Props, ref) => {
+  (
+    {
+      aiRequest,
+      isLaunchingAiRequest,
+      onSendUserRequest,
+      quota,
+      increaseQuotaOffering,
+      lastSendError,
+      aiRequestPriceInCredits,
+      availableCredits,
+    }: Props,
+    ref
+  ) => {
     const [userRequestText, setUserRequestText] = React.useState('');
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
 
@@ -74,12 +98,68 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const { isMobile } = useResponsiveWindowSize();
 
+    const quotaOrCreditsExplanation = !quota ? null /* User is probably not even logged in. */ : !quota.limitReached ? (
+      quota.current <= 1 || increaseQuotaOffering === 'subscribe' ? null : (
+        <Trans>
+          You still have {quota.max - quota.current} free questions thanks to
+          your membership.
+        </Trans>
+      )
+    ) : aiRequestPriceInCredits ? (
+      availableCredits ? (
+        <Trans>
+          Use an AI request for <b>{aiRequestPriceInCredits} credits</b> – you
+          have {availableCredits} credits.
+        </Trans>
+      ) : (
+        <Trans>
+          Use an AI request for <b>{aiRequestPriceInCredits} credits.</b>
+        </Trans>
+      )
+    ) : null;
+
+    const subscriptionBanner =
+      quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
+        <GetSubscriptionCard
+          subscriptionDialogOpeningReason={'TODO'}
+          label={
+            increaseQuotaOffering === 'subscribe' ? (
+              <Trans>Get GDevelop premium</Trans>
+            ) : (
+              <Trans>Upgrade</Trans>
+            )
+          }
+          recommendedPlanIdIfNoSubscription="gdevelop_gold"
+        >
+          <Line>
+            <Column noMargin>
+              <Text noMargin>
+                {increaseQuotaOffering === 'subscribe' ? (
+                  <Trans>
+                    Get more free AI requests with a GDevelop premium plan.
+                  </Trans>
+                ) : (
+                  <Trans>
+                    Upgrade to another premium plan to get more free AI
+                    requests.
+                  </Trans>
+                )}
+              </Text>
+            </Column>
+          </Line>
+        </GetSubscriptionCard>
+      ) : null;
+
     if (!aiRequest) {
-      const disclaimer = (
+      const disclaimer = quotaOrCreditsExplanation ? (
+        <Text size="body2" color="secondary">
+          {quotaOrCreditsExplanation}
+        </Text>
+      ) : (
         <Text size="body2" color="secondary">
           <Trans>
-            The AI will answer according to your game project. Be precise in
-            your question and always verify AI answers before applying them.
+            The AI will answer according to your game project. Always verify AI
+            answers before applying them.
           </Trans>
         </Text>
       );
@@ -107,7 +187,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             <ResponsiveLineStackLayout
               noMargin
               alignItems="flex-start"
-              justifyContent="flex-start"
+              justifyContent="space-between"
+              expand
             >
               {!isMobile && disclaimer}
               <Line noMargin justifyContent="flex-end">
@@ -126,6 +207,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               {isMobile && disclaimer}
             </ResponsiveLineStackLayout>
           </Line>
+          {subscriptionBanner}
         </div>
       );
     }
@@ -207,6 +289,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Line>
           ) : null}
         </ScrollView>
+        {subscriptionBanner}
         <CompactTextAreaField
           value={userRequestText}
           disabled={isLaunchingAiRequest}
@@ -215,16 +298,35 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           rows={2}
         />
         <Column noMargin alignItems="flex-end">
-          <LeftLoader isLoading={isLaunchingAiRequest}>
-            <RaisedButton
-              color="primary"
-              disabled={aiRequest.status === 'working'}
-              label={<Trans>Send</Trans>}
-              onClick={() => {
-                onSendUserRequest(userRequestText);
-              }}
-            />
-          </LeftLoader>
+          <ResponsiveLineStackLayout
+            noMargin
+            alignItems="flex-start"
+            justifyContent="space-between"
+            expand
+          >
+            {!isMobile && (
+              <Text size="body2" color="secondary">
+                {quotaOrCreditsExplanation}
+              </Text>
+            )}
+            <Line noMargin justifyContent="flex-end">
+              <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                <RaisedButton
+                  color="primary"
+                  disabled={aiRequest.status === 'working'}
+                  label={<Trans>Send</Trans>}
+                  onClick={() => {
+                    onSendUserRequest(userRequestText);
+                  }}
+                />
+              </LeftLoader>
+            </Line>
+            {isMobile && (
+              <Text size="body2" color="secondary">
+                {quotaOrCreditsExplanation}
+              </Text>
+            )}
+          </ResponsiveLineStackLayout>
         </Column>
       </ColumnStackLayout>
     );

@@ -52,6 +52,7 @@
   -webkit-user-select: text;
   user-select: text;
   cursor: text;
+  font-size: 13px;
 }
 
 .gd-markdown img {

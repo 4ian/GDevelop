@@ -14,6 +14,12 @@ import { delay } from '../../../Utils/Delay';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { getSimplifiedProjectJson } from '../../../Utils/SimplifiedProjectJson';
+import {
+  canUpgradeSubscription,
+  hasValidSubscriptionPlan,
+} from '../../../Utils/GDevelopServices/Usage';
+import { retryIfFailed } from '../../../Utils/RetryIfFailed';
+import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 type Props = {|
   isActive: boolean,
@@ -62,6 +68,7 @@ export const AskAi = React.memo<Props>(
         selectedAiRequest,
         setSelectedAiRequest,
       ] = React.useState<AiRequest | null>(null);
+      const [lastError, setLastError] = React.useState<Error | null>(null);
 
       const onStartNewChat = React.useCallback(() => {
         setSelectedAiRequest(null);
@@ -100,11 +107,39 @@ export const AskAi = React.memo<Props>(
         false
       );
 
+      const { openCreditsPackageDialog } = React.useContext(
+        CreditsPackageStoreContext
+      );
+
       const {
         profile,
         getAuthorizationHeader,
         onOpenCreateAccountDialog,
+        limits,
+        onRefreshLimits,
+        subscription,
       } = React.useContext(AuthenticatedUserContext);
+
+      const availableCredits = limits ? limits.credits.userBalance.amount : 0;
+      const quota =
+        (limits && limits.quotas && limits.quotas['ai-request']) || null;
+      const aiRequestPriceInCredits =
+        (limits &&
+          limits.credits &&
+          limits.credits.prices['ai-request'] &&
+          limits.credits.prices['ai-request'].priceInCredits) ||
+        null;
+
+      // Refresh limits when navigating ot this tab, as we want to be sure
+      // we display the proper quota and credits information for the user.
+      React.useEffect(
+        () => {
+          if (isActive) {
+            onRefreshLimits();
+          }
+        },
+        [isActive, onRefreshLimits]
+      );
 
       const selectedAiRequestId = selectedAiRequest
         ? selectedAiRequest.id
@@ -116,12 +151,24 @@ export const AskAi = React.memo<Props>(
             return;
           }
 
+          let payWithCredits = false;
+          if (quota && quota.limitReached && aiRequestPriceInCredits) {
+            payWithCredits = true;
+            if (availableCredits < aiRequestPriceInCredits) {
+              openCreditsPackageDialog({
+                missingCredits: aiRequestPriceInCredits - availableCredits,
+              });
+              return;
+            }
+          }
+
           const simplifiedProjectJson = project
             ? JSON.stringify(getSimplifiedProjectJson(project))
             : null;
 
           try {
             setIsLaunchingAiRequest(true);
+            setLastError(null);
 
             let aiRequest;
             try {
@@ -132,11 +179,13 @@ export const AskAi = React.memo<Props>(
                     userId: profile.id,
                     userRequest: userRequestText,
                     simplifiedProjectJson,
+                    payWithCredits,
                   })
                 : await createAiRequest(getAuthorizationHeader, {
                     userRequest: userRequestText,
                     userId: profile.id,
                     simplifiedProjectJson,
+                    payWithCredits,
                   });
             } finally {
               setIsLaunchingAiRequest(false);
@@ -156,16 +205,30 @@ export const AskAi = React.memo<Props>(
               setSelectedAiRequest(aiRequest);
             }
           } catch (error) {
-            // TODO: store and display error.
-            console.log(error);
+            setLastError(error);
+          }
+
+          // Refresh the user limits, to ensure quota and credits information
+          // is up-to-date after an AI request.
+          await delay(500);
+          try {
+            await retryIfFailed({ times: 2 }, onRefreshLimits);
+          } catch (error) {
+            // Ignore limits refresh error.
           }
         },
         [
-          getAuthorizationHeader,
           profile,
-          onOpenCreateAccountDialog,
-          selectedAiRequestId,
+          quota,
+          limits,
+          aiRequestPriceInCredits,
           project,
+          onOpenCreateAccountDialog,
+          availableCredits,
+          openCreditsPackageDialog,
+          selectedAiRequestId,
+          getAuthorizationHeader,
+          onRefreshLimits,
         ]
       );
 
@@ -177,6 +240,17 @@ export const AskAi = React.memo<Props>(
               aiRequest={selectedAiRequest}
               onSendUserRequest={sendUserRequest}
               isLaunchingAiRequest={isLaunchingAiRequest}
+              lastSendError={lastError}
+              quota={quota}
+              increaseQuotaOffering={
+                !hasValidSubscriptionPlan(subscription)
+                  ? 'subscribe'
+                  : canUpgradeSubscription(subscription)
+                  ? 'upgrade'
+                  : 'none'
+              }
+              aiRequestPriceInCredits={aiRequestPriceInCredits}
+              availableCredits={availableCredits}
             />
           </div>
         </Paper>

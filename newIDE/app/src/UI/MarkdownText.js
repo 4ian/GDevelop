@@ -7,8 +7,6 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import classNames from 'classnames';
 import Window from '../Utils/Window';
 
-const gd: libGDevelop = global.gd;
-
 // Sensible defaults for react-markdown
 const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
@@ -17,25 +15,7 @@ const makeMarkdownCustomComponents = (
 ) => ({
   // Ensure link are opened in a new page
   a: props =>
-    props.href && props.href.startsWith('action:') ? (
-      <span
-        style={{
-          textDecorationWidth: 'thick',
-          textDecorationStyle: 'solid',
-          textDecorationColor: 'blue',
-          color: 'blue',
-        }}
-        href={'#'}
-        onClick={event => {
-          event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
-        }}
-      >
-        {gd.MetadataProvider.getActionMetadata(
-          gd.JsPlatform.get(),
-          props.href.replace('action:', '')
-        ).getFullName()}
-      </span>
-    ) : props.href ? (
+    props.href ? (
       <a
         href={props.href}
         target="_blank"

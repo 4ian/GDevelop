@@ -10,6 +10,8 @@ import { useRefWithInit } from '../../../Utils/UseRefInitHook';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { IconContainer } from '../../../UI/IconContainer';
+import { mapFor } from '../../../Utils/MapFor';
+import classes from './ChatMarkdownText.module.css';
 
 const gd: libGDevelop = global.gd;
 
@@ -27,24 +29,16 @@ type ConceptLinkProps = {|
 const ConceptLink = ({ conceptMetadata }: ConceptLinkProps) => {
   return (
     <span
-      style={{
-        fontWeight: 600,
-        alignItems: 'baseline',
-        cursor: 'pointer',
-        display: 'inline-flex',
-        gap: 4,
-      }}
+      className={classes.conceptLink}
       href={'#'}
       onClick={event => {
         event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
         Window.openExternalURL(getHelpLink(conceptMetadata.helpPath));
       }}
     >
-      <IconContainer
-        alt={conceptMetadata.name}
-        src={conceptMetadata.iconSrc}
-        size={16}
-      />
+      {conceptMetadata.iconSrc && (
+        <IconContainer alt="" src={conceptMetadata.iconSrc} size={16} />
+      )}
       {conceptMetadata.name}
     </span>
   );
@@ -196,6 +190,50 @@ const useGetConceptMetadata = () => {
       };
     });
   }).current;
+  const getExtensionMetadata = useRefWithInit(() => {
+    return memoize((type: string) => {
+      const platform = gd.JsPlatform.get();
+      const platformExtensions = platform.getAllPlatformExtensions();
+
+      const platformExtension =
+        mapFor(0, platformExtensions.size(), i => {
+          const extension = platformExtensions.at(i);
+          if (extension.getName() === type) {
+            return extension;
+          }
+
+          return null;
+        }).filter(Boolean)[0] || null;
+
+      if (platformExtension) {
+        return {
+          name: platformExtension.getFullName(),
+          description: platformExtension.getDescription(),
+          iconSrc: platformExtension.getIconUrl(),
+          helpPath: platformExtension.getHelpPath(),
+        };
+      }
+
+      const extensionName = type;
+      const extensionShortHeader = extensionShortHeadersByName[extensionName];
+      if (extensionShortHeader) {
+        return {
+          name: extensionShortHeader.fullName,
+          description: extensionShortHeader.shortDescription,
+          iconSrc: extensionShortHeader.previewIconUrl,
+          helpPath: 'TODO',
+          // TODO: add support for finding real object name, description and icon in the short headers.
+        };
+      }
+
+      return {
+        name: type,
+        description: '',
+        iconSrc: '',
+        helpPath: '',
+      };
+    });
+  }).current;
 
   return {
     getConceptMetadataFromHref: React.useCallback(
@@ -212,6 +250,9 @@ const useGetConceptMetadata = () => {
         if (href.startsWith('behavior_type:')) {
           return getBehaviorMetadata(href.replace('behavior_type:', ''));
         }
+        if (href.startsWith('extension:')) {
+          return getExtensionMetadata(href.replace('extension:', ''));
+        }
 
         return null;
       },
@@ -220,6 +261,7 @@ const useGetConceptMetadata = () => {
         getBehaviorMetadata,
         getConditionMetadata,
         getObjectMetadata,
+        getExtensionMetadata,
       ]
     ),
   };
@@ -292,6 +334,7 @@ export const ChatMarkdownText = (props: Props) => {
 
   const className = classNames({
     'gd-markdown': true,
+    [classes.chatMarkdown]: true,
   });
 
   return <span className={className}>{markdownElement}</span>;

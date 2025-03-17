@@ -203,7 +203,9 @@ const GamesPlatformFrameStateProvider = ({
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
-  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset({
+    useCumulatedValue: false,
+  });
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

@@ -29,6 +29,25 @@ export const NewAiRequest = () => (
   </FixedHeightFlexContainer>
 );
 
+export const NewAiRequestAlreadyUsedOneInThePast = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={null}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: false,
+        current: 1,
+        max: 2,
+      }}
+      increaseQuotaOffering="upgrade"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={400}
+    />
+  </FixedHeightFlexContainer>
+);
+
 export const ErrorLaunchingNewAiRequest = () => (
   <FixedHeightFlexContainer height={500}>
     <AiRequestChat
@@ -215,6 +234,34 @@ export const ReadyAiRequest = () => (
         max: 2,
       }}
       increaseQuotaOffering="subscribe"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={400}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={{
+        createdAt: '',
+        updatedAt: '',
+        id: 'fake-working-new-ai-request',
+        status: 'ready',
+        userId: 'fake-user-id',
+        gameProjectJson: 'FAKE DATA',
+        output: fakeOutputWithAiResponses,
+        error: null,
+      }}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: false,
+        current: 1,
+        max: 30,
+      }}
+      increaseQuotaOffering="upgrade"
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}

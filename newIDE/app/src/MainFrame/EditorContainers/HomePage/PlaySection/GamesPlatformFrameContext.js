@@ -13,6 +13,8 @@ import { isNativeMobileApp } from '../../../../Utils/Platform';
 import Window from '../../../../Utils/Window';
 import { delay } from '../../../../Utils/Delay';
 import { useStableUpToDateRef } from '../../../../Utils/UseStableUpToDateCallback';
+import { useSoftKeyboardBottomOffset } from '../../../../UI/MobileSoftKeyboard';
+import { homepageMobileMenuHeight } from '../HomePageMenuBar';
 const electron = optionalRequire('electron');
 
 // If the iframe is displaying a game, it will continue playing its audio as long as the iframe
@@ -164,6 +166,29 @@ const useUserCustomToken = (): {|
   return { userCustomToken };
 };
 
+const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
+  // $FlowFixMe - we know it's an iframe.
+  const iframe: ?HTMLIFrameElement = document.getElementById(
+    GAMES_PLATFORM_IFRAME_ID
+  );
+  if (!iframe || !iframe.contentWindow) {
+    return;
+  }
+
+  try {
+    iframe.contentWindow.postMessage(
+      {
+        type: 'setKeyboardOffset',
+        value: offset,
+      },
+      '*'
+    );
+  } catch (error) {
+    console.error('Error while sending keyboard offset to frame.', error);
+    return;
+  }
+};
+
 type GamesPlatformFrameStateProviderProps = {|
   children: React.Node,
 |};
@@ -178,6 +203,9 @@ const GamesPlatformFrameStateProvider = ({
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset({
+    useCumulatedValue: false,
+  });
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
@@ -462,6 +490,18 @@ const GamesPlatformFrameStateProvider = ({
       sendUserCustomTokenToFrame();
     },
     [sendUserCustomTokenToFrame]
+  );
+
+  React.useEffect(
+    () => {
+      if (!iframeLoaded) {
+        return;
+      }
+      const offset = softKeyboardBottomOffset - homepageMobileMenuHeight;
+      sendSoftKeyboardOffsetToFrame(offset);
+    },
+    // Send keyboard offset to iframe every time it changes.
+    [iframeLoaded, softKeyboardBottomOffset]
   );
 
   // We store an up-to-date reference to the iframeLoaded state, so that we can

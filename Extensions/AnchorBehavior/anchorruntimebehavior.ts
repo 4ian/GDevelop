@@ -387,16 +387,16 @@ namespace gdjs {
             );
           }
         }
-        this._oldDrawableX = this.owner.getDrawableX();
-        this._oldDrawableY = this.owner.getDrawableY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
-
-        this._parentOldMinX = instanceContainer.getUnrotatedViewportMinX();
-        this._parentOldMinY = instanceContainer.getUnrotatedViewportMinY();
-        this._parentOldMaxX = instanceContainer.getUnrotatedViewportMaxX();
-        this._parentOldMaxY = instanceContainer.getUnrotatedViewportMaxY();
       }
+      this._oldDrawableX = this.owner.getDrawableX();
+      this._oldDrawableY = this.owner.getDrawableY();
+      this._oldWidth = this.owner.getWidth();
+      this._oldHeight = this.owner.getHeight();
+
+      this._parentOldMinX = instanceContainer.getUnrotatedViewportMinX();
+      this._parentOldMinY = instanceContainer.getUnrotatedViewportMinY();
+      this._parentOldMaxX = instanceContainer.getUnrotatedViewportMaxX();
+      this._parentOldMaxY = instanceContainer.getUnrotatedViewportMaxY();
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}

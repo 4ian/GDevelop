@@ -33,9 +33,10 @@ type DraggableEditorTabsProps = {|
   onCloseAll: () => void,
   onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
+  onHoverTab: (editor: ?EditorTab) => void,
 |};
 
-const getTabId = (editorTab: EditorTab) =>
+export const getTabId = (editorTab: EditorTab) =>
   `tab-${editorTab.key.replace(/\s/g, '-')}`;
 
 const homeTabApproximateWidth = 35;
@@ -49,6 +50,7 @@ export function DraggableEditorTabs({
   onCloseAll,
   onTabActivated,
   onDropTab,
+  onHoverTab,
 }: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
 
@@ -108,6 +110,7 @@ export function DraggableEditorTabs({
               onClose={() => onCloseTab(editorTab)}
               onCloseOthers={() => onCloseOtherTabs(editorTab)}
               onCloseAll={onCloseAll}
+              onHover={(enter: boolean) => onHoverTab(enter ? editorTab : null)}
               onActivated={() => onTabActivated(editorTab)}
               closable={editorTab.closable}
               onBeginDrag={() => {
@@ -152,6 +155,7 @@ export function DraggableClosableTab({
   onActivated,
   onBeginDrag,
   onDrop,
+  onHover,
   maxWidth,
 }: DraggableClosableTabProps) {
   return (
@@ -190,6 +194,7 @@ export function DraggableClosableTab({
                   renderCustomIcon={renderCustomIcon}
                   closable={closable}
                   onClick={onClick}
+                  onHover={onHover}
                   onActivated={onActivated}
                   maxWidth={maxWidth}
                   key={id}

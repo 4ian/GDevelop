@@ -377,30 +377,35 @@ namespace gdjs {
       // );
 
       console.log(
-        vec3ToString(
-          this._vehicleController
-            .GetConstraint()
-            .GetWheel(0)
-            .GetContactPosition()
-        ),
-        vec3ToString(
-          this._vehicleController
-            .GetConstraint()
-            .GetWheel(1)
-            .GetContactPosition()
-        ),
-        vec3ToString(
-          this._vehicleController
-            .GetConstraint()
-            .GetWheel(2)
-            .GetContactPosition()
-        ),
-        vec3ToString(
-          this._vehicleController
-            .GetConstraint()
-            .GetWheel(3)
-            .GetContactPosition()
-        )
+        [
+          "Car center",
+          vec3ToString(carBody.GetPosition()),
+          "Wheels",
+          vec3ToString(
+            this._vehicleController
+              .GetConstraint()
+              .GetWheel(0)
+              .GetContactPosition()
+          ),
+          vec3ToString(
+            this._vehicleController
+              .GetConstraint()
+              .GetWheel(1)
+              .GetContactPosition()
+          ),
+          vec3ToString(
+            this._vehicleController
+              .GetConstraint()
+              .GetWheel(2)
+              .GetContactPosition()
+          ),
+          vec3ToString(
+            this._vehicleController
+              .GetConstraint()
+              .GetWheel(3)
+              .GetContactPosition()
+          ),
+        ].join('\n')
       );
 
       // console.log(forward, right, brake, handBrake);
@@ -672,15 +677,16 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { owner3D, _sharedData } = this.vehicleBehavior;
 
-        // TODO Use OffsetCenterOfMassShapeSettings to allow to set a custom center of mass in createShape.
-        const shape = behavior.createShape();
-
-        const wheelOffsetX =
+        const halfVehicleWidth =
           (owner3D.getWidth() / 2) * _sharedData.worldInvScale;
-        const wheelOffsetY =
+        const halfVehicleHeight =
           (owner3D.getHeight() / 2) * _sharedData.worldInvScale;
-        const wheelOffsetZ =
+        const halfVehicleDepth =
           (owner3D.getDepth() / 2) * _sharedData.worldInvScale;
+
+        const wheelOffsetX = halfVehicleWidth;
+        const wheelOffsetY = halfVehicleHeight;
+        const wheelOffsetZ = halfVehicleDepth;
         const wheelRadius = wheelOffsetZ;
         const wheelWidth = wheelOffsetZ / 3;
         const suspensionMinLength = wheelOffsetZ / 4;
@@ -696,13 +702,24 @@ namespace gdjs {
         const BL_WHEEL = 2;
         const BR_WHEEL = 3;
 
-        const vehicleMass = 1500.0;
-        const maxEngineTorque = 500.0;
-        const clutchStrength = 10.0;
+        const vehicleMass = 1500;
+        const maxEngineTorque = 500;
+        const clutchStrength = 10;
+
+        // TODO Use OffsetCenterOfMassShapeSettings to allow to set a custom center of mass in createShape.
+        //const carShape = behavior.createShape();
+
+        const carShapeSettings = new Jolt.OffsetCenterOfMassShapeSettings(
+          new Jolt.Vec3(0, 0, -halfVehicleDepth),
+          new Jolt.BoxShapeSettings(
+            new Jolt.Vec3(halfVehicleWidth, halfVehicleHeight, halfVehicleDepth)
+          )
+        );
+        const carShape = carShapeSettings.Create().Get();
 
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
-          shape,
+          carShape,
           this.vehicleBehavior.getPhysicsPosition(
             _sharedData.getRVec3(0, 0, 0)
           ),
@@ -723,7 +740,7 @@ namespace gdjs {
         // Create vehicle constraint
         const vehicle = new Jolt.VehicleConstraintSettings();
         vehicle.mUp = new Jolt.Vec3(0, 0, 1);
-        vehicle.mForward = new Jolt.Vec3(0, 0, 1);
+        vehicle.mForward = new Jolt.Vec3(1, 0, 0);
         vehicle.mMaxPitchRollAngle = gdjs.toRad(60.0);
         vehicle.mWheels.clear();
         const mWheels: Array<Jolt.WheelSettingsWV> = [];

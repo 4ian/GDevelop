@@ -220,13 +220,14 @@ export default function TabsTitlebar({
       if (editorTab) {
         const element = document.getElementById(getTabId(editorTab));
         if (element) {
-          if (tooltipData) {
-            setTooltipData({ editorTab, element });
-          } else {
-            tooltipTimeoutId.current = setTimeout(() => {
+          tooltipTimeoutId.current = setTimeout(
+            () => {
               setTooltipData({ editorTab, element });
-            }, 500);
-          }
+            },
+            // If the tooltip is already displayed, quickly change to the new tab
+            // but not too quick because the display might look flickering.
+            tooltipData ? 100 : 500
+          );
         }
       } else {
         tooltipTimeoutId.current = setTimeout(() => {

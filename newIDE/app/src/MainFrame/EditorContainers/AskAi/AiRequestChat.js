@@ -188,6 +188,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           </Column>
           <Column noMargin alignItems="stretch" justifyContent="stretch">
             <CompactTextAreaField
+              maxLength={6000}
               value={userRequestText}
               disabled={isLaunchingAiRequest}
               onChange={userRequestText => setUserRequestText(userRequestText)}
@@ -303,6 +304,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         </ScrollView>
         {subscriptionBanner}
         <CompactTextAreaField
+          maxLength={6000}
           value={userRequestText}
           disabled={isLaunchingAiRequest}
           onChange={userRequestText => setUserRequestText(userRequestText)}

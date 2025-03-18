@@ -40,6 +40,7 @@ export type CompactTextAreaFieldProps = {|
   errored?: boolean,
   placeholder?: string,
   rows?: number,
+  maxLength?: number,
 |};
 
 export const CompactTextAreaField = ({
@@ -52,6 +53,7 @@ export const CompactTextAreaField = ({
   errored,
   placeholder,
   rows,
+  maxLength,
 }: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
@@ -102,6 +104,7 @@ export const CompactTextAreaField = ({
           onChange={e => onChange(e.currentTarget.value)}
           placeholder={placeholder}
           rows={rows || 3}
+          maxLength={maxLength}
         />
       </div>
     </label>

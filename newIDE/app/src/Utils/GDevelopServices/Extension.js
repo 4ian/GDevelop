@@ -24,19 +24,52 @@ export type ExtensionRegistryItemHeader = {|
   previewIconUrl: string,
 |};
 
-export type ExtensionShortHeader = {|
+export type EventsFunctionInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  functionType:
+    | 'StringExpression'
+    | 'Expression'
+    | 'Action'
+    | 'Condition'
+    | 'ExpressionAndCondition'
+    | 'ActionWithOperator',
+  name: string,
+};
+
+export type EventsBasedBehaviorInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  name: string,
+  objectType: string,
+  eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
+};
+
+export type EventsBasedObjectInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  name: string,
+  defaultName: string,
+  eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
+};
+
+export type ExtensionShortHeader = {
   ...ExtensionRegistryItemHeader,
   shortDescription: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
-|};
 
-export type ExtensionHeader = {|
+  eventsBasedBehaviors?: Array<EventsBasedBehaviorInsideExtensionShortHeader>,
+  eventsFunctions?: Array<EventsFunctionInsideExtensionShortHeader>,
+  eventsBasedObjects?: Array<EventsBasedObjectInsideExtensionShortHeader>,
+};
+
+export type ExtensionHeader = {
   ...ExtensionShortHeader,
   helpPath: string,
   description: string,
   iconUrl: string,
-|};
+};
 
 export type BehaviorShortHeader = {|
   ...ExtensionRegistryItemHeader,

@@ -14,8 +14,41 @@ export default {
 export const Default = () => (
   <MarkdownText
     allowParagraphs
-    source={
-      '# Title 1\n## Title 2\n### Title 3\n#### Title 4\n\nThis is some text that can contain [links](https://gdevelop.io), ~~strike through text~~, **bold** and *italic* words.\n\nBut also tables:\n\n|Hello|world|!|\n|-|:-:|-:|\n|Hi|silly|you|\n\nAnd code also: `ToString(5)`'
-    }
+    source={`# Title 1
+## Title 2
+### Title 3
+#### Title 4
+
+This is some text that can contain [links](https://gdevelop.io), ~~strike through text~~, **bold** and *italic* words.
+
+But also tables:
+
+|Hello|world|!|
+|-|:-:|-:|
+|Hi|silly|you|
+
+And code also: \`ToString(5)\`
+
+And unordered lists too:
+
+- First item
+
+  Other text under the item
+
+- Second item
+
+  - Sub item
+
+But ordered lists as well:
+
+1. First chapter
+
+   Other text under the item
+
+1. Second chapter
+
+   1. First sub item
+   1. Second sub item
+`}
   />
 );

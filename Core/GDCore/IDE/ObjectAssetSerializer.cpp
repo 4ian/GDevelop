@@ -17,6 +17,7 @@
 #include "GDCore/IDE/Project/ResourcesRenamer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/CustomBehavior.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -75,6 +76,16 @@ void ObjectAssetSerializer::SerializeTo(
 
   cleanObject->SerializeTo(objectAssetElement.AddChild("object"));
 
+  if (project.HasEventsBasedObject(object.GetType())) {
+    SerializerElement &variantsElement =
+        objectAssetElement.AddChild("variants");
+    variantsElement.ConsiderAsArrayOf("variant");
+
+    std::unordered_set<gd::String> alreadyUsedVariantIdentifiers;
+    gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
+        project, object, variantsElement, alreadyUsedVariantIdentifiers);
+  }
+
   SerializerElement &resourcesElement =
       objectAssetElement.AddChild("resources");
   resourcesElement.ConsiderAsArrayOf("resource");
@@ -107,5 +118,47 @@ void ObjectAssetSerializer::SerializeTo(
   SerializerElement &customizationElement =
       objectAssetElement.AddChild("customization");
   customizationElement.ConsiderAsArrayOf("empty");
+}
+
+void ObjectAssetSerializer::SerializeUsedVariantsTo(
+    gd::Project &project, const gd::Object &object,
+    SerializerElement &variantsElement,
+    std::unordered_set<gd::String> &alreadyUsedVariantIdentifiers) {
+
+  if (!project.HasEventsBasedObject(object.GetType())) {
+    return;
+  }
+  const auto *customObjectConfiguration =
+      dynamic_cast<const gd::CustomObjectConfiguration *>(
+          &object.GetConfiguration());
+  if (customObjectConfiguration
+          ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
+      customObjectConfiguration
+          ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration()) {
+    return;
+  }
+  const auto &variantName = customObjectConfiguration->GetVariantName();
+  const auto &variantIdentifier =
+      object.GetType() + gd::PlatformExtension::GetNamespaceSeparator() +
+      variantName;
+  auto insertResult = alreadyUsedVariantIdentifiers.insert(variantIdentifier);
+  if (insertResult.second) {
+    const auto &eventsBasedObject =
+        project.GetEventsBasedObject(object.GetType());
+    const auto &variants = eventsBasedObject.GetVariants();
+    const auto &variant = variants.HasVariantNamed(variantName)
+                              ? variants.GetVariant(variantName)
+                              : eventsBasedObject.GetDefaultVariant();
+
+    SerializerElement &pairElement = variantsElement.AddChild("variant");
+    pairElement.SetAttribute("objectType", object.GetType());
+    SerializerElement &variantElement = pairElement.AddChild("variant");
+    variant.SerializeTo(variantElement);
+    // TODO Recursivity
+    for (auto &object : variant.GetObjects().GetObjects()) {
+      gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
+          project, *object, variantsElement, alreadyUsedVariantIdentifiers);
+    }
+  }
 }
 } // namespace gd

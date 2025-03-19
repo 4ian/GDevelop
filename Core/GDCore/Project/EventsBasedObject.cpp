@@ -60,6 +60,7 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
       element.GetBoolAttribute("isInnerAreaFollowingParentSize", false);
 
   defaultVariant.UnserializeFrom(project, element);
+  defaultVariant.SetName("");
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
 
   if (element.HasChild("variants")) {

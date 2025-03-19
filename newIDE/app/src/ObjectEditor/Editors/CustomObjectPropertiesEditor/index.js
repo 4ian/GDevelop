@@ -429,11 +429,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         </Line>
                       ) : (
                         <>
-                          {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
-                            <Line alignItems="center">
-                              <Column expand noMargin>
-                                <Text size="block-title">Children objects</Text>
-                              </Column>
+                          <Line alignItems="center">
+                            <Column expand noMargin>
+                              <Text size="block-title">Children objects</Text>
+                            </Column>
+                            {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                               <Column alignItems="right">
                                 <FlatButton
                                   leftIcon={<RestoreIcon style={styles.icon} />}
@@ -454,8 +454,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                   }}
                                 />
                               </Column>
-                            </Line>
-                          )}
+                            )}
+                          </Line>
                           {mapFor(
                             0,
                             eventBasedObject.getObjects().getObjectsCount(),

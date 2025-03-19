@@ -147,7 +147,7 @@ const ExtensionInstallDialog = ({
       }
       Window.openExternalURL(
         `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
-          `?assignees=&labels=&template=bug-report.md&title=[${
+          `?assignees=&labels=&template=bug-report.yml&title=[${
             extensionShortHeader.name
           }] Issue short description`
       );

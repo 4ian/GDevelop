@@ -68,6 +68,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   Physics2, you can't mix the behaviors).`,
     };
   }
+  if (type.indexOf('TextEntryObject::') === 0) {
+    return {
+      kind: 'warning',
+      message: t`This action is deprecated and should not be used anymore. Instead, use the "Text input" object.`,
+    };
+  }
   if (type.startsWith('BoundingBox')) {
     return {
       kind: 'info',

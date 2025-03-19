@@ -1072,6 +1072,99 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(instance.GetVariables().Get("MyRenamedVariable").GetValue() == 456);
   }
 
+  SECTION("Can rename an object variable (in events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    auto &object = eventsBasedObject.GetObjects().InsertNewObject(
+        project, "MyExtension::Sprite", "MyChildObject", 0);
+    object.GetVariables().InsertNew("MyVariable").SetValue(123);
+    auto &instance =
+        eventsBasedObject.GetInitialInstances().InsertNewInitialInstance();
+    instance.SetObjectName("MyChildObject");
+    instance.GetVariables().InsertNew("MyVariable").SetValue(456);
+
+    auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+        eventsBasedObject.GetDefaultVariant(), 0);
+    gd::InitialInstance *variantInstance = nullptr;
+    variant.GetInitialInstances().IterateOverInstances(
+        [&variantInstance](gd::InitialInstance &instance) {
+          variantInstance = &instance;
+          return true;
+        });
+    REQUIRE(variantInstance != nullptr);
+    variant.GetObjects()
+        .GetObject("MyChildObject")
+        .GetVariables()
+        .Get("MyVariable")
+        .SetValue(111);
+    variantInstance->GetVariables().Get("MyVariable").SetValue(222);
+
+    auto &objectFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+        objectFunction.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberObjectVariable");
+      action.SetParametersCount(4);
+      action.SetParameter(0, gd::Expression("MyChildObject"));
+      action.SetParameter(1, gd::Expression("MyVariable"));
+      action.SetParameter(2, gd::Expression("="));
+      action.SetParameter(3, gd::Expression("MyChildObject.MyVariable"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    object.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    object.GetVariables().SerializeTo(originalSerializedVariables);
+
+    object.GetVariables().Rename("MyVariable", "MyRenamedVariable");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, object.GetVariables());
+
+    REQUIRE(changeset.oldToNewVariableNames.size() == 1);
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+        project, object.GetVariables(), eventsBasedObject.GetInitialInstances(),
+        object.GetName(), changeset, originalSerializedVariables);
+    gd::ObjectVariableHelper::ApplyChangesToVariants(
+        eventsBasedObject, "MyChildObject", changeset);
+
+    REQUIRE(event.GetActions()[0].GetParameter(1).GetPlainString() ==
+            "MyRenamedVariable");
+    REQUIRE(event.GetActions()[0].GetParameter(3).GetPlainString() ==
+            "MyChildObject.MyRenamedVariable");
+
+    REQUIRE(eventsBasedObject.GetObjects().HasObjectNamed("MyChildObject"));
+    REQUIRE(eventsBasedObject.GetObjects()
+                .GetObject("MyChildObject")
+                .GetVariables()
+                .Get("MyRenamedVariable")
+                .GetValue() == 123);
+    REQUIRE(instance.GetVariables().Get("MyRenamedVariable").GetValue() == 456);
+
+    REQUIRE(variant.GetObjects().HasObjectNamed("MyChildObject"));
+    REQUIRE(variant.GetObjects()
+                .GetObject("MyChildObject")
+                .GetVariables()
+                .Get("MyRenamedVariable")
+                .GetValue() == 111);
+    REQUIRE(
+        variantInstance->GetVariables().Get("MyRenamedVariable").GetValue() ==
+        222);
+  }
+
   SECTION("Can delete an object variable") {
     gd::Project project;
     gd::Platform platform;

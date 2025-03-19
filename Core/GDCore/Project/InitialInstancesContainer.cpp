@@ -42,8 +42,13 @@ void InitialInstancesContainer::IterateOverInstances(
 }
 
 void InitialInstancesContainer::IterateOverInstances(
-  const std::function< void(gd::InitialInstance &) >& func) {
-  for (auto& instance : initialInstances) func(instance);
+  const std::function< bool(gd::InitialInstance &) >& func) {
+  for (auto& instance : initialInstances) {
+    bool shouldStop = func(instance);
+    if (shouldStop) {
+      return;
+    }
+  }
 }
 
 void InitialInstancesContainer::IterateOverInstancesWithZOrdering(

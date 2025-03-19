@@ -8,6 +8,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 
 namespace gd {
+class EventsBasedObject;
 class InitialInstancesContainer;
 class ObjectsContainersList;
 class ObjectsContainer;
@@ -53,7 +54,7 @@ public:
    * Objects can be added during the group edition and may not necessarily have
    * all the variables initially shared by the group.
    *
-   * \see gd::GroupVariableHelper::MergeVariableContainers
+   * \see gd::ObjectVariableHelper::MergeVariableContainers
    */
   static void FillMissingGroupVariablesToObjects(
       gd::ObjectsContainer &globalObjectsContainer,
@@ -72,16 +73,21 @@ public:
                         const gd::ObjectGroup &objectGroup,
                         const gd::VariablesChangeset &changeset);
 
+  /**
+   * @brief Apply the changes done on an object to all its instances.
+   */
   static void ApplyChangesToObjectInstances(
       gd::VariablesContainer &objectVariablesContainer,
       gd::InitialInstancesContainer &initialInstancesContainer,
       const gd::String &objectName, const gd::VariablesChangeset &changeset);
 
-private:
-  static void ApplyChangesToVariableContainer(
-      const gd::VariablesContainer &originalVariablesContainer,
-      gd::VariablesContainer &destinationVariablesContainer,
-      const gd::VariablesChangeset &changeset, bool shouldApplyValueChanges);
+  /**
+   * @brief Apply the changes done on events-based object child to all its
+   * variants.
+   */
+  static void ApplyChangesToVariants(gd::EventsBasedObject &eventsBasedObject,
+                                     const gd::String &objectName,
+                                     const gd::VariablesChangeset &changeset);
 };
 
 } // namespace gd

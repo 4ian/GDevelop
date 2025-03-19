@@ -41,6 +41,11 @@ Object::Object(const gd::String& name_,
 }
 
 void Object::Init(const gd::Object& object) {
+  CopyWithoutConfiguration(object);
+  configuration = object.configuration->Clone();
+}
+
+void Object::CopyWithoutConfiguration(const gd::Object& object) {
   persistentUuid = object.persistentUuid;
   name = object.name;
   assetStoreId = object.assetStoreId;
@@ -51,8 +56,6 @@ void Object::Init(const gd::Object& object) {
   for (auto& it : object.behaviors) {
     behaviors[it.first] = gd::make_unique<gd::Behavior>(*it.second);
   }
-
-  configuration = object.configuration->Clone();
 }
 
 gd::ObjectConfiguration& Object::GetConfiguration() { return *configuration; }

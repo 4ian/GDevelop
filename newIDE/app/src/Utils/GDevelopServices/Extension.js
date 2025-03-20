@@ -131,10 +131,10 @@ export type BehaviorsRegistry = {
  * The ExtensionHeader returned by the API, with tags being a string
  * (which is kept in the API for compatibility with older GDevelop versions).
  */
-type ExtensionHeaderWithTagsAsString = {|
+type ExtensionHeaderWithTagsAsString = {
   ...ExtensionHeader,
   tags: string,
-|};
+};
 
 /**
  * The SerializedExtension returned by the API, with tags being a string

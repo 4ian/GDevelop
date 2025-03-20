@@ -31,7 +31,7 @@ const fakeOutputWithAiResponses = [
         type: 'output_text',
         status: 'completed',
         text:
-          'Creating a leaderboard for player best scores in GDevelop is straightforward. Here\'s how you can do it:\n\n1. First, you need to use the Leaderboard extension to handle saving and retrieving scores.',
+          "Creating a leaderboard for player best scores in GDevelop is straightforward. Here's how you can do it:\n\n1. First, you need to use the Leaderboard extension to handle saving and retrieving scores.",
         annotations: [],
       },
     ],
@@ -59,7 +59,8 @@ const fakeOutputWithDifferentUserRequest = [
       {
         type: 'output_text',
         status: 'completed',
-        text: 'Creating a GTA-style game is complex but doable in GDevelop. You\'ll need to implement several core systems...',
+        text:
+          "Creating a GTA-style game is complex but doable in GDevelop. You'll need to implement several core systems...",
         annotations: [],
       },
     ],

@@ -97,6 +97,18 @@ export default function TabsTitlebar({
     [isTouchscreen, tooltipData]
   );
 
+  React.useEffect(
+    () => {
+      return () => {
+        if (tooltipTimeoutId.current) {
+          clearTimeout(tooltipTimeoutId.current);
+        }
+      };
+    },
+    // Clear timeout if necessary when unmounting.
+    []
+  );
+
   return (
     <div
       style={{

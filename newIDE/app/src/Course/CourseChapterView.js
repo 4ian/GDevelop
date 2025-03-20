@@ -8,7 +8,6 @@ import Text from '../UI/Text';
 import {
   ColumnStackLayout,
   LineStackLayout,
-  ResponsiveLineStackLayout,
 } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import RaisedButton from '../UI/RaisedButton';
@@ -23,14 +22,9 @@ import Cloud from '../UI/CustomSvgIcons/Cloud';
 import CourseChapterTaskItem from './CourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
-import GoldCompact from '../Profile/Subscription/Icons/GoldCompact';
-import Coin from '../Credits/Icons/Coin';
-import Lock from '../UI/CustomSvgIcons/Lock';
 import { rankLabel } from '../Utils/Ordinal';
 import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
-import Window from '../Utils/Window';
-import PasswordPromptDialog from '../AssetStore/PasswordPromptDialog';
+import LockedCourseChapterPreview from './LockedCourseChapterPreview';
 
 const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
@@ -80,13 +74,6 @@ const styles = {
     flex: 1,
     minWidth: 0,
   },
-  lockedChapterTextContainer: {
-    // Similar to Line component but without the minWidth:0 that somehow
-    // prevents container to wrap when overflowing.
-    display: 'flex',
-    flex: 1,
-    minHeight: 0,
-  },
   videoContainer: {
     flex: 2,
     minWidth: 300,
@@ -94,33 +81,9 @@ const styles = {
     position: 'relative',
   },
   videoIFrame: { flex: 1, aspectRatio: '16 / 9' },
-  videoThumbnail: {
-    flex: 1,
-    aspectRatio: '16 / 9',
-    objectFit: 'cover',
-    width: '100%',
-    borderRadius: 4,
-  },
-  lockerImage: { height: 60, width: 60 },
-  lockedOverlay: {
-    position: 'absolute',
-    background: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 4,
-    inset: 0,
-    height: `100%`,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: 'white', // Force text/icon color since it's on a dark overlay.
-  },
   sideBar: { padding: 16, display: 'flex' },
 };
 
-const LockedOverlay = () => (
-  <div style={styles.lockedOverlay}>
-    <Lock style={styles.lockerImage} />
-  </div>
-);
 
 type Props = {|
   chapterIndex: number,
@@ -149,17 +112,9 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     },
     ref
   ) => {
-    const { openSubscriptionDialog } = React.useContext(
-      SubscriptionSuggestionContext
-    );
     const {
       values: { language },
     } = React.useContext(PreferencesContext);
-    const [
-      displayPasswordPrompt,
-      setDisplayPasswordPrompt,
-    ] = React.useState<boolean>(false);
-    const [password, setPassword] = React.useState<string>('');
     const userLanguage2LetterCode = language.split('_')[0];
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
@@ -170,31 +125,7 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
       ? completion.completedTasks >= completion.tasks
       : false;
     const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
-    const [isPurchasing, setIsPurchasing] = React.useState<boolean>(false);
 
-    const onClickBuyWithCredits = React.useCallback(
-      async () => {
-        if (!courseChapter.isLocked) return;
-
-        setDisplayPasswordPrompt(false);
-        setIsPurchasing(true);
-        try {
-          await onBuyWithCredits(courseChapter, password);
-        } finally {
-          setIsPurchasing(false);
-        }
-      },
-      [courseChapter, onBuyWithCredits, password]
-    );
-
-    const onWillBuyWithCredits = React.useCallback(
-      async () => {
-        // Password is required in dev environment only so that one cannot freely claim asset packs.
-        if (Window.isDev()) setDisplayPasswordPrompt(true);
-        else onClickBuyWithCredits();
-      },
-      [onClickBuyWithCredits]
-    );
 
     return (
       <ColumnStackLayout expand noMargin>
@@ -243,74 +174,10 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           ) : null}
         </div>
         {courseChapter.isLocked ? (
-          <div style={styles.videoAndMaterialsContainer}>
-            {youtubeVideoId && (
-              <div
-                style={{
-                  ...styles.videoContainer,
-                  maxWidth: windowSize === 'xlarge' ? 960 : 640,
-                }}
-              >
-                <img
-                  alt={`Video for lesson ${courseChapter.title}`}
-                  style={styles.videoThumbnail}
-                  src={`https://i.ytimg.com/vi/${youtubeVideoId}/sddefault.jpg`}
-                />
-                <LockedOverlay />
-              </div>
-            )}
-            <div style={styles.lockedChapterTextContainer}>
-              <Paper background="medium" style={styles.sideBar}>
-                <ColumnStackLayout noMargin justifyContent="center">
-                  <Text noMargin size="sub-title">
-                    <Trans>Unlock this lesson to finish the course</Trans>
-                  </Text>
-                  <Text noMargin>
-                    <Trans>
-                      Use your GDevelop credits to purchase lessons in this
-                      course; or get a subscription to get them for free.
-                    </Trans>
-                  </Text>
-                  <ResponsiveLineStackLayout
-                    noMargin
-                    noColumnMargin
-                    forceMobileLayout={
-                      windowSize === 'small' || windowSize === 'medium'
-                    }
-                  >
-                    <RaisedButton
-                      primary
-                      fullWidth
-                      icon={<GoldCompact fontSize="small" />}
-                      disabled={isPurchasing}
-                      label={<Trans>Get a subscription</Trans>}
-                      onClick={() =>
-                        openSubscriptionDialog({
-                          analyticsMetadata: {
-                            reason: 'Unlock course chapter',
-                            recommendedPlanId: 'gdevelop_silver',
-                          },
-                        })
-                      }
-                    />
-                    {courseChapter.priceInCredits && (
-                      <FlatButton
-                        fullWidth
-                        leftIcon={<Coin fontSize="small" />}
-                        disabled={isPurchasing}
-                        label={
-                          <Trans>
-                            Pay {courseChapter.priceInCredits} credits
-                          </Trans>
-                        }
-                        onClick={onWillBuyWithCredits}
-                      />
-                    )}
-                  </ResponsiveLineStackLayout>
-                </ColumnStackLayout>
-              </Paper>
-            </div>
-          </div>
+          <LockedCourseChapterPreview
+            onBuyWithCredits={onBuyWithCredits}
+            courseChapter={courseChapter}
+          />
         ) : (
           <div style={styles.videoAndMaterialsContainer}>
             {youtubeVideoId && (
@@ -410,14 +277,6 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               }
             />
           ))}
-        {displayPasswordPrompt && (
-          <PasswordPromptDialog
-            onApply={onClickBuyWithCredits}
-            onClose={() => setDisplayPasswordPrompt(false)}
-            passwordValue={password}
-            setPasswordValue={setPassword}
-          />
-        )}
       </ColumnStackLayout>
     );
   }

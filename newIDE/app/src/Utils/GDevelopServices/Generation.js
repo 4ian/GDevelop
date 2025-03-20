@@ -279,3 +279,38 @@ export const addUserMessageToAiRequest = async (
   );
   return response.data;
 };
+
+export const sendAiRequestFeedback = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    messageIndex,
+    feedback,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    messageIndex: number,
+    feedback: 'like' | 'dislike',
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopGenerationApi.baseUrl
+    }/ai-request/${aiRequestId}/action/set-feedback`,
+    {
+      messageIndex,
+      feedback,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};

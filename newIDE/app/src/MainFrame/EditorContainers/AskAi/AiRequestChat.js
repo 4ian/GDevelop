@@ -5,7 +5,7 @@ import {
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import Text from '../../../UI/Text';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../../UI/RaisedButton';
 import { CompactTextAreaField } from '../../../UI/CompactTextAreaField';
@@ -20,12 +20,21 @@ import RobotIcon from '../../../ProjectCreation/RobotIcon';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import GetSubscriptionCard from '../../../Profile/Subscription/GetSubscriptionCard';
 import { type Quota } from '../../../Utils/GDevelopServices/Usage';
+import IconButton from '../../../UI/IconButton';
+import Like from '../../../UI/CustomSvgIcons/Like';
+import Dislike from '../../../UI/CustomSvgIcons/Dislike';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 
 type Props = {
   aiRequest: AiRequest | null,
 
   isLaunchingAiRequest: boolean,
   onSendUserRequest: string => Promise<void>,
+  onSendFeedback: (
+    aiRequestId: string,
+    messageIndex: number,
+    feedback: 'like' | 'dislike'
+  ) => Promise<void>,
 
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
@@ -52,10 +61,11 @@ const styles = {
 
 type ChatBubbleProps = {|
   children: React.Node,
+  feedbackButtons?: React.Node,
   role: 'assistant' | 'user',
 |};
 
-const ChatBubble = ({ children, role }: ChatBubbleProps) => {
+const ChatBubble = ({ children, feedbackButtons, role }: ChatBubbleProps) => {
   return (
     <div className={classes.chatBubbleContainer}>
       <Paper
@@ -63,6 +73,7 @@ const ChatBubble = ({ children, role }: ChatBubbleProps) => {
         style={styles.chatBubble}
       >
         <div className={classes.chatBubbleContent}>{children}</div>
+        {feedbackButtons}
       </Paper>
     </div>
   );
@@ -74,6 +85,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequest,
       isLaunchingAiRequest,
       onSendUserRequest,
+      onSendFeedback,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -84,6 +96,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   ) => {
     const [userRequestText, setUserRequestText] = React.useState('');
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
+    const theme = React.useContext(GDevelopThemeContext);
 
     React.useImperativeHandle(ref, () => ({
       resetUserInput: () => {
@@ -253,9 +267,66 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   .map((messageContent, messageContentIndex) => {
                     const key = `messageIndex${messageIndex}-${messageContentIndex}`;
                     if (messageContent.type === 'output_text') {
+                      const feedbackKey = `${messageIndex}-${messageContentIndex}`;
+                      const currentFeedback = messageFeedbacks[feedbackKey];
+
                       return (
                         <Line key={key} justifyContent="flex-start">
-                          <ChatBubble role="assistant">
+                          <ChatBubble
+                            role="assistant"
+                            feedbackButtons={
+                              <div className={classes.feedbackButtonsContainer}>
+                                <IconButton
+                                  size="small"
+                                  tooltip={t`This was helpful`}
+                                  onClick={() => {
+                                    setMessageFeedbacks({
+                                      ...messageFeedbacks,
+                                      [feedbackKey]: 'like',
+                                    });
+                                    onSendFeedback(
+                                      aiRequest.id,
+                                      messageIndex,
+                                      'like'
+                                    );
+                                  }}
+                                >
+                                  <Like
+                                    fontSize="small"
+                                    htmlColor={
+                                      currentFeedback === 'like'
+                                        ? theme.message.valid
+                                        : undefined
+                                    }
+                                  />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  tooltip={t`This needs improvement`}
+                                  onClick={() => {
+                                    setMessageFeedbacks({
+                                      ...messageFeedbacks,
+                                      [feedbackKey]: 'dislike',
+                                    });
+                                    onSendFeedback(
+                                      aiRequest.id,
+                                      messageIndex,
+                                      'dislike'
+                                    );
+                                  }}
+                                >
+                                  <Dislike
+                                    fontSize="small"
+                                    htmlColor={
+                                      currentFeedback === 'dislike'
+                                        ? theme.message.warning
+                                        : undefined
+                                    }
+                                  />
+                                </IconButton>
+                              </div>
+                            }
+                          >
                             <ChatMarkdownText source={messageContent.text} />
                           </ChatBubble>
                         </Line>

@@ -8,6 +8,7 @@ import {
   addUserMessageToAiRequest,
   createAiRequest,
   getAiRequest,
+  sendAiRequestFeedback,
   type AiRequest,
 } from '../../../Utils/GDevelopServices/Generation';
 import { delay } from '../../../Utils/Delay';
@@ -242,6 +243,25 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
+      const onSendFeedback = React.useCallback(
+        async (aiRequestId, messageIndex, feedback) => {
+          if (!profile) return;
+          try {
+            await retryIfFailed({ times: 2 }, () =>
+              sendAiRequestFeedback(getAuthorizationHeader, {
+                userId: profile.id,
+                aiRequestId,
+                messageIndex,
+                feedback,
+              })
+            );
+          } catch (error) {
+            console.error('Error sending feedback: ', error);
+          }
+        },
+        [getAuthorizationHeader, profile]
+      );
+
       return (
         <>
           <Paper square background="dark" style={styles.paper}>
@@ -262,6 +282,7 @@ export const AskAi = React.memo<Props>(
                 }
                 aiRequestPriceInCredits={aiRequestPriceInCredits}
                 availableCredits={availableCredits}
+                onSendFeedback={onSendFeedback}
               />
             </div>
           </Paper>

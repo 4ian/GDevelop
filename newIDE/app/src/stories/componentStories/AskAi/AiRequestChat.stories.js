@@ -25,6 +25,7 @@ export const NewAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -44,6 +45,7 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -63,6 +65,7 @@ export const ErrorLaunchingNewAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={new Error('Fake error while sending request')}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -82,6 +85,7 @@ export const NewAiRequestQuotaLimitReached = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -101,6 +105,7 @@ export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -120,6 +125,7 @@ export const LaunchingNewAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -163,6 +169,7 @@ export const ErroredNewAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -191,6 +198,7 @@ export const WorkingNewAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -237,6 +245,7 @@ export const ReadyAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -265,6 +274,7 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -293,6 +303,7 @@ export const ErrorLaunchingFollowupAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={new Error('fake error while sending request')}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -321,6 +332,7 @@ export const LaunchingFollowupAiRequest = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -349,6 +361,7 @@ export const QuotaLimitReached = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -377,6 +390,7 @@ export const QuotaLimitReachedAndUpgrade = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -405,6 +419,7 @@ export const QuotaLimitReachedAndNoUpgrade = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={400}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );
@@ -432,6 +447,7 @@ export const QuotaLimitReachedAndNoCredits = () => (
       aiRequestPriceInCredits={5}
       lastSendError={null}
       availableCredits={0}
+      onSendFeedback={async () => {}}
     />
   </FixedHeightFlexContainer>
 );

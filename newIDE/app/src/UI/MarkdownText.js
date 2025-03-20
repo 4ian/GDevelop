@@ -32,6 +32,11 @@ const makeMarkdownCustomComponents = (
     ),
   // Add paragraphs only if we explicitly opt in.
   p: props => {
+    // Hack to make sure an indent is added to isolated piece of markdown
+    // that starts with a tab character. Used for the premium courses that include
+    // list items with a long indented text separated by an image.
+    const shouldFakeListItem =
+      props.children && props.children[0] && props.children[0][0] === '\t';
     if (
       withTextEllipsis &&
       !(
@@ -44,7 +49,15 @@ const makeMarkdownCustomComponents = (
       return null;
     }
     return isStandaloneText || allowParagraphs ? (
-      <p>{props.children}</p>
+      shouldFakeListItem ? (
+        <ul className="faked-list-item">
+          <li>
+            <p>{props.children}</p>
+          </li>
+        </ul>
+      ) : (
+        <p>{props.children}</p>
+      )
     ) : (
       props.children
     );

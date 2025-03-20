@@ -170,7 +170,7 @@ export const useGetConceptMetadata = () => {
           name: eventsFunction.fullName,
           description: eventsFunction.description,
           iconSrc: extensionShortHeader.previewIconUrl,
-          helpPath: 'TODO',
+          helpPath: extensionShortHeader.helpPath,
         };
       }
 
@@ -201,7 +201,7 @@ export const useGetConceptMetadata = () => {
           name: eventsFunction.fullName,
           description: eventsFunction.description,
           iconSrc: extensionShortHeader.previewIconUrl,
-          helpPath: 'TODO',
+          helpPath: extensionShortHeader.helpPath,
         };
       }
 
@@ -232,7 +232,7 @@ export const useGetConceptMetadata = () => {
           name: eventsBasedObject.fullName,
           description: eventsBasedObject.description,
           iconSrc: extensionShortHeader.previewIconUrl,
-          helpPath: 'TODO',
+          helpPath: extensionShortHeader.helpPath,
         };
       }
 
@@ -266,7 +266,7 @@ export const useGetConceptMetadata = () => {
           name: eventsBasedBehavior.fullName,
           description: eventsBasedBehavior.description,
           iconSrc: extensionShortHeader.previewIconUrl,
-          helpPath: 'TODO',
+          helpPath: extensionShortHeader.helpPath,
         };
       }
 
@@ -295,7 +295,7 @@ export const useGetConceptMetadata = () => {
           name: extensionShortHeader.fullName,
           description: extensionShortHeader.shortDescription,
           iconSrc: extensionShortHeader.previewIconUrl,
-          helpPath: 'TODO',
+          helpPath: extensionShortHeader.helpPath,
         };
       }
 

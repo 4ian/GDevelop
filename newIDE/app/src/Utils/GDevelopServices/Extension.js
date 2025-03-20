@@ -62,11 +62,12 @@ export type ExtensionShortHeader = {
   eventsBasedBehaviors?: Array<EventsBasedBehaviorInsideExtensionShortHeader>,
   eventsFunctions?: Array<EventsFunctionInsideExtensionShortHeader>,
   eventsBasedObjects?: Array<EventsBasedObjectInsideExtensionShortHeader>,
+
+  helpPath: string,
 };
 
 export type ExtensionHeader = {
   ...ExtensionShortHeader,
-  helpPath: string,
   description: string,
   iconUrl: string,
 };

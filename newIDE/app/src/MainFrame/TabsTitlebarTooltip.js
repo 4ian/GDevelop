@@ -83,9 +83,13 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
   const title = editorKindToLabel[editorTabMetadata.editorKind];
   let subtitle = null;
   if (
-    ['layout', 'layout events', 'events functions extension'].includes(
-      editorTabMetadata.editorKind
-    )
+    [
+      'layout',
+      'layout events',
+      'external layout',
+      'external events',
+      'events functions extension',
+    ].includes(editorTabMetadata.editorKind)
   ) {
     subtitle = editorTabMetadata.projectItemName;
   } else if (

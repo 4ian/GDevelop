@@ -330,7 +330,7 @@ const CourseSection = ({
                       style={styles.desktopTableOfContent}
                     >
                       <Text noMargin size="sub-title">
-                        Chapters
+                        <Trans>Chapters</Trans>
                       </Text>
                       {courseCompletion !== null && (
                         <Line noMargin>

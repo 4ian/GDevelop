@@ -3697,22 +3697,24 @@ const MainFrame = (props: Props) => {
       <TabsTitlebar
         hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
-      >
-        <DraggableEditorTabs
-          hideLabels={false}
-          editorTabs={state.editorTabs}
-          onClickTab={(id: number) => _onChangeEditorTab(id)}
-          onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-          onCloseOtherTabs={(editorTab: EditorTab) =>
-            _onCloseOtherEditorTabs(editorTab)
-          }
-          onCloseAll={_onCloseAllEditorTabs}
-          onTabActivated={(editorTab: EditorTab) =>
-            _onEditorTabActivated(editorTab)
-          }
-          onDropTab={onDropEditorTab}
-        />
-      </TabsTitlebar>
+        renderTabs={onHoverEditorTab => (
+          <DraggableEditorTabs
+            hideLabels={false}
+            editorTabs={state.editorTabs}
+            onClickTab={(id: number) => _onChangeEditorTab(id)}
+            onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
+            onCloseOtherTabs={(editorTab: EditorTab) =>
+              _onCloseOtherEditorTabs(editorTab)
+            }
+            onCloseAll={_onCloseAllEditorTabs}
+            onTabActivated={(editorTab: EditorTab) =>
+              _onEditorTabActivated(editorTab)
+            }
+            onDropTab={onDropEditorTab}
+            onHoverTab={onHoverEditorTab}
+          />
+        )}
+      />
       <Toolbar
         ref={toolbar}
         hidden={tabsTitleBarAndEditorToolbarHidden}

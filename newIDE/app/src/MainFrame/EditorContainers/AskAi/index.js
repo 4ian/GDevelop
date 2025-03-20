@@ -13,6 +13,7 @@ import {
 import { delay } from '../../../Utils/Delay';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
+import { AskAiHistory } from './AskAiHistory';
 import { getSimplifiedProjectJson } from '../../../Utils/SimplifiedProjectJson';
 import {
   canUpgradeSubscription,
@@ -69,9 +70,18 @@ export const AskAi = React.memo<Props>(
         setSelectedAiRequest,
       ] = React.useState<AiRequest | null>(null);
       const [lastError, setLastError] = React.useState<Error | null>(null);
+      const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
 
       const onStartNewChat = React.useCallback(() => {
         setSelectedAiRequest(null);
+      }, []);
+
+      const onOpenHistory = React.useCallback(() => {
+        setIsHistoryOpen(true);
+      }, []);
+
+      const onCloseHistory = React.useCallback(() => {
+        setIsHistoryOpen(false);
       }, []);
 
       const canStartNewChat = !!selectedAiRequest;
@@ -82,11 +92,12 @@ export const AskAi = React.memo<Props>(
               <Toolbar
                 onStartNewChat={onStartNewChat}
                 canStartNewChat={canStartNewChat}
+                onOpenHistory={onOpenHistory}
               />
             );
           }
         },
-        [setToolbar, onStartNewChat, canStartNewChat]
+        [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -220,7 +231,6 @@ export const AskAi = React.memo<Props>(
         [
           profile,
           quota,
-          limits,
           aiRequestPriceInCredits,
           project,
           onOpenCreateAccountDialog,
@@ -233,27 +243,35 @@ export const AskAi = React.memo<Props>(
       );
 
       return (
-        <Paper square background="dark" style={styles.paper}>
-          <div style={styles.chatContainer}>
-            <AiRequestChat
-              ref={aiRequestChatRef}
-              aiRequest={selectedAiRequest}
-              onSendUserRequest={sendUserRequest}
-              isLaunchingAiRequest={isLaunchingAiRequest}
-              lastSendError={lastError}
-              quota={quota}
-              increaseQuotaOffering={
-                !hasValidSubscriptionPlan(subscription)
-                  ? 'subscribe'
-                  : canUpgradeSubscription(subscription)
-                  ? 'upgrade'
-                  : 'none'
-              }
-              aiRequestPriceInCredits={aiRequestPriceInCredits}
-              availableCredits={availableCredits}
-            />
-          </div>
-        </Paper>
+        <>
+          <Paper square background="dark" style={styles.paper}>
+            <div style={styles.chatContainer}>
+              <AiRequestChat
+                ref={aiRequestChatRef}
+                aiRequest={selectedAiRequest}
+                onSendUserRequest={sendUserRequest}
+                isLaunchingAiRequest={isLaunchingAiRequest}
+                lastSendError={lastError}
+                quota={quota}
+                increaseQuotaOffering={
+                  !hasValidSubscriptionPlan(subscription)
+                    ? 'subscribe'
+                    : canUpgradeSubscription(subscription)
+                    ? 'upgrade'
+                    : 'none'
+                }
+                aiRequestPriceInCredits={aiRequestPriceInCredits}
+                availableCredits={availableCredits}
+              />
+            </div>
+          </Paper>
+          <AskAiHistory
+            open={isHistoryOpen}
+            onClose={onCloseHistory}
+            onSelectAiRequest={setSelectedAiRequest}
+            selectedAiRequestId={selectedAiRequestId}
+          />
+        </>
       );
     }
   ),

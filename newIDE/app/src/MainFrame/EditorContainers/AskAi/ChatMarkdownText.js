@@ -7,7 +7,11 @@ import classNames from 'classnames';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import classes from './ChatMarkdownText.module.css';
-import { type ConceptMetadata, ConceptLink, useGetConceptMetadata } from './ConceptLink';
+import {
+  type ConceptMetadata,
+  ConceptLink,
+  useGetConceptMetadata,
+} from './ConceptLink';
 
 type ChatLinkProps = {
   node?: { properties?: { href?: string } },

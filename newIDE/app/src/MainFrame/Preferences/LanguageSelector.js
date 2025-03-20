@@ -7,6 +7,7 @@ import { Column } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
 import LocalesMetadata from '../../locales/LocalesMetadata';
+import ExtensionLocalesMetadata from '../../locales/ExtensionLocalesMetadata';
 import Text from '../../UI/Text';
 import Link from '../../UI/Link';
 import { LineStackLayout } from '../../UI/Layout';
@@ -23,7 +24,27 @@ const displayLocaleMetadata = localeMetadata => {
   return true;
 };
 
-const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata);
+const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata).map(
+  localeMetadata => {
+    const extensionLocaleMetadata = ExtensionLocalesMetadata.find(
+      extensionLocaleMetadata =>
+        extensionLocaleMetadata.languageCode === localeMetadata.languageCode
+    );
+    const editorTranslationRatio = localeMetadata.translationRatio || 0;
+    // We do a simple 50/50 split between the main GDevelop locales and the extension locales.
+    // This is not perfect, but gives a rough idea of the translation progress.
+    const translationRatioExtension = extensionLocaleMetadata
+      ? extensionLocaleMetadata.translationRatio
+      : 0;
+
+    const translationRatio =
+      (editorTranslationRatio + translationRatioExtension) / 2;
+    return {
+      ...localeMetadata,
+      translationRatio,
+    };
+  }
+);
 const goodProgressLocales = localesToDisplay.filter(
   localeMetadata => localeMetadata.translationRatio > 0.5
 );

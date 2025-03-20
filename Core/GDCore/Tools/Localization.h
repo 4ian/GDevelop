@@ -8,10 +8,10 @@
 
 /** @file
  * Provide a way to mark strings to be translated.
- * 
+ *
  * Strings to be translated in GDevelop Core codebase
  * are marked with the underscore macro, for example: _("Hello World").
- * 
+ *
  * The macro is then defined to be using the translation function
  * of the underlying platform (Emscripten for GDevelop 5).
  */
@@ -26,8 +26,10 @@
 #endif
 
 namespace gd {
+gd::String GetTranslation(const gd::String& str);
+
 gd::String GetTranslation(const char* str);
-}
+}  // namespace gd
 
 #define _(s) gd::GetTranslation(u8##s)
 

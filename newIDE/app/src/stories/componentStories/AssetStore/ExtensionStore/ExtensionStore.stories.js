@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../../../PaperDecorator';
@@ -43,16 +44,20 @@ const apiDataFakeExtensions = {
 };
 
 export const Default = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ExtensionStoreStateProvider>
-      <ExtensionStore
-        project={testProject.project}
-        isInstalling={false}
-        onInstall={action('onInstall')}
-        showOnlyWithBehaviors={false}
-      />
-    </ExtensionStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <I18n>
+    {({ i18n }) => (
+      <FixedHeightFlexContainer height={400}>
+        <ExtensionStoreStateProvider i18n={i18n}>
+          <ExtensionStore
+            project={testProject.project}
+            isInstalling={false}
+            onInstall={action('onInstall')}
+            showOnlyWithBehaviors={false}
+          />
+        </ExtensionStoreStateProvider>
+      </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 Default.parameters = apiDataFakeExtensions;
 
@@ -67,9 +72,31 @@ export const WithCommunityExtensions = () => {
   };
 
   return (
-    <PreferencesContext.Provider value={preferences}>
+    <I18n>
+      {({ i18n }) => (
+        <PreferencesContext.Provider value={preferences}>
+          <FixedHeightFlexContainer height={400}>
+            <ExtensionStoreStateProvider i18n={i18n}>
+              <ExtensionStore
+                project={testProject.project}
+                isInstalling={false}
+                onInstall={action('onInstall')}
+                showOnlyWithBehaviors={false}
+              />
+            </ExtensionStoreStateProvider>
+          </FixedHeightFlexContainer>
+        </PreferencesContext.Provider>
+      )}
+    </I18n>
+  );
+};
+WithCommunityExtensions.parameters = apiDataFakeExtensions;
+
+export const WithServerSideErrors = () => (
+  <I18n>
+    {({ i18n }) => (
       <FixedHeightFlexContainer height={400}>
-        <ExtensionStoreStateProvider>
+        <ExtensionStoreStateProvider i18n={i18n}>
           <ExtensionStore
             project={testProject.project}
             isInstalling={false}
@@ -78,63 +105,64 @@ export const WithCommunityExtensions = () => {
           />
         </ExtensionStoreStateProvider>
       </FixedHeightFlexContainer>
-    </PreferencesContext.Provider>
-  );
-};
-WithCommunityExtensions.parameters = apiDataFakeExtensions;
-
-export const WithServerSideErrors = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ExtensionStoreStateProvider>
-      <ExtensionStore
-        project={testProject.project}
-        isInstalling={false}
-        onInstall={action('onInstall')}
-        showOnlyWithBehaviors={false}
-      />
-    </ExtensionStoreStateProvider>
-  </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 WithServerSideErrors.parameters = apiDataServerSideError;
 
 export const ShowingAnAlreadyInstalledExtension = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ExtensionStoreStateProvider defaultSearchText="Fake installed">
-      <ExtensionStore
-        project={testProject.project}
-        isInstalling={false}
-        onInstall={action('onInstall')}
-        showOnlyWithBehaviors={false}
-      />
-    </ExtensionStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <I18n>
+    {({ i18n }) => (
+      <FixedHeightFlexContainer height={400}>
+        <ExtensionStoreStateProvider
+          i18n={i18n}
+          defaultSearchText="Fake installed"
+        >
+          <ExtensionStore
+            project={testProject.project}
+            isInstalling={false}
+            onInstall={action('onInstall')}
+            showOnlyWithBehaviors={false}
+          />
+        </ExtensionStoreStateProvider>
+      </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 ShowingAnAlreadyInstalledExtension.parameters = apiDataFakeExtensions;
 
 export const ExtensionBeingInstalled = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ExtensionStoreStateProvider>
-      <ExtensionStore
-        project={testProject.project}
-        isInstalling={true}
-        onInstall={action('onInstall')}
-        showOnlyWithBehaviors={false}
-      />
-    </ExtensionStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <I18n>
+    {({ i18n }) => (
+      <FixedHeightFlexContainer height={400}>
+        <ExtensionStoreStateProvider i18n={i18n}>
+          <ExtensionStore
+            project={testProject.project}
+            isInstalling={true}
+            onInstall={action('onInstall')}
+            showOnlyWithBehaviors={false}
+          />
+        </ExtensionStoreStateProvider>
+      </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 ExtensionBeingInstalled.parameters = apiDataFakeExtensions;
 
 export const OnlyWithBehaviors = () => (
-  <FixedHeightFlexContainer height={400}>
-    <ExtensionStoreStateProvider>
-      <ExtensionStore
-        project={testProject.project}
-        isInstalling={false}
-        onInstall={action('onInstall')}
-        showOnlyWithBehaviors={true}
-      />
-    </ExtensionStoreStateProvider>
-  </FixedHeightFlexContainer>
+  <I18n>
+    {({ i18n }) => (
+      <FixedHeightFlexContainer height={400}>
+        <ExtensionStoreStateProvider i18n={i18n}>
+          <ExtensionStore
+            project={testProject.project}
+            isInstalling={false}
+            onInstall={action('onInstall')}
+            showOnlyWithBehaviors={true}
+          />
+        </ExtensionStoreStateProvider>
+      </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 OnlyWithBehaviors.parameters = apiDataFakeExtensions;

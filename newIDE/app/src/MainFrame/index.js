@@ -46,6 +46,7 @@ import {
   notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
   getCustomObjectEditor,
+  hasEditorTabOpenedWithKey,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -55,6 +56,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
+import { renderAskAiContainer } from './EditorContainers/AskAi';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
@@ -198,6 +200,7 @@ import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import { GamesPlatformFrameContext } from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
+import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -216,6 +219,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'ask-ai': renderAskAiContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -578,6 +582,8 @@ const MainFrame = (props: Props) => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'ask-ai'
+          ? i18n._(t`Ask AI`)
           : kind === 'start page'
           ? undefined
           : kind === 'debugger'
@@ -635,7 +641,9 @@ const MainFrame = (props: Props) => {
         ) : kind === 'events functions extension' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
-        ) : null;
+        ) : (
+          <RobotIcon size={16} />
+        );
 
       const closable = kind !== 'start page';
       const extraEditorProps =
@@ -1962,6 +1970,19 @@ const MainFrame = (props: Props) => {
         editorTabs: openEditorTab(
           state.editorTabs,
           getEditorOpeningOptions({ kind: 'start page', name: '' })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
+  const openAskAi = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
         ),
       }));
     },
@@ -3623,6 +3644,7 @@ const MainFrame = (props: Props) => {
     !!state.currentProject &&
     !isSavingProject &&
     (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
+  const hasAskAiOpened = hasEditorTabOpenedWithKey(state.editorTabs, 'ask-ai');
 
   return (
     <div
@@ -3697,6 +3719,8 @@ const MainFrame = (props: Props) => {
       <TabsTitlebar
         hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
+        hasAskAiOpened={hasAskAiOpened}
+        onOpenAskAi={openAskAi}
       >
         <DraggableEditorTabs
           hideLabels={false}
@@ -3717,7 +3741,7 @@ const MainFrame = (props: Props) => {
         ref={toolbar}
         hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
-          !['start page', 'debugger', null].includes(
+          !['start page', 'debugger', 'ask-ai', null].includes(
             getCurrentTab(state.editorTabs)
               ? getCurrentTab(state.editorTabs).key
               : null

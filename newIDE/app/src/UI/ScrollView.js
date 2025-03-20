@@ -21,6 +21,10 @@ type Props = {|
   onScroll?: ({ remainingScreensToBottom: number }) => void,
 |};
 
+export type ScrollBehaviorOptions = {|
+  behavior: 'smooth',
+|};
+
 export type ScrollViewInterface = {|
   getScrollPosition: () => number,
   scrollTo: (
@@ -28,7 +32,7 @@ export type ScrollViewInterface = {|
   ) => void,
   scrollToPosition: (number: number) => void,
   scrollBy: (deltaY: number) => void,
-  scrollToBottom: () => void,
+  scrollToBottom: (options?: ScrollBehaviorOptions) => void,
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
@@ -88,11 +92,14 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       /**
        * Scroll the view to the bottom.
        */
-      scrollToBottom: () => {
+      scrollToBottom: (options?: ScrollBehaviorOptions) => {
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
-        scrollViewElement.scrollTop = scrollViewElement.scrollHeight;
+        scrollViewElement.scrollTo({
+          top: scrollViewElement.scrollHeight,
+          behavior: options ? options.behavior : undefined,
+        });
       },
     }));
 

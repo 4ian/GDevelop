@@ -373,6 +373,7 @@ describe('InstallAsset', () => {
     previewIconUrl: '',
     eventsBasedBehaviorsCount: 0,
     eventsFunctionsCount: 0,
+    helpPath: '',
   };
 
   // TODO Find a way to test this

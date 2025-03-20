@@ -9,7 +9,6 @@ export const iconWithBackgroundStyle = {
 
 const styles = {
   iconBackground: {
-    flex: 0,
     display: 'flex',
     justifyContent: 'center',
   },

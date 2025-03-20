@@ -8,6 +8,8 @@ import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,
 } from '../UI/TitleBarSafeMargins';
+import RaisedButton from '../UI/RaisedButton';
+import { Column } from '../UI/Grid';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -27,12 +29,19 @@ const styles = {
     width: 34,
     height: 34,
   },
+  askAiContainer: {
+    marginBottom: 4,
+    marginRight: 2,
+    marginLeft: 2,
+  },
 };
 
 type TabsTitlebarProps = {|
   children: React.Node,
   hidden: boolean,
   toggleProjectManager: () => void,
+  hasAskAiOpened: boolean,
+  onOpenAskAi: () => void,
 |};
 
 /**
@@ -42,6 +51,8 @@ export default function TabsTitlebar({
   children,
   toggleProjectManager,
   hidden,
+  hasAskAiOpened,
+  onOpenAskAi,
 }: TabsTitlebarProps) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
@@ -78,6 +89,15 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {children}
+      {hasAskAiOpened ? null : (
+        <div style={styles.askAiContainer}>
+          <RaisedButton
+            color="primary"
+            label="✨ Ask AI"
+            onClick={onOpenAskAi}
+          />
+        </div>
+      )}
       <TitleBarRightSafeMargins />
     </div>
   );

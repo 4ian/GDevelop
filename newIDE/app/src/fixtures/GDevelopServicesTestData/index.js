@@ -1576,6 +1576,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+  helpPath: '',
 };
 
 export const fireBulletExtensionHeader: ExtensionHeader = {
@@ -1625,6 +1626,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+  helpPath: '',
 };
 
 export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
@@ -1642,6 +1644,7 @@ export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
   previewIconUrl: '',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+  helpPath: '',
 };
 
 export const buttonV2ExtensionShortHeader: ExtensionShortHeader = {
@@ -1667,6 +1670,7 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+  helpPath: '',
 };
 
 export const communityTierExtensionHeader: ExtensionHeader = {

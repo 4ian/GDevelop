@@ -37,7 +37,7 @@ const styles = {
 
 type Props = {|
   icon?: React.Node,
-  title: string,
+  title: React.Node,
   onClose: () => void,
   id: string,
 |};
@@ -66,7 +66,7 @@ const DrawerTopBar = (props: Props) => {
                 {props.icon}
               </IconButton>
             )}
-            {props.title.length > 30 ? (
+            {typeof props.title === 'string' && props.title.length > 30 ? (
               <Tooltip
                 title={props.title}
                 placement="bottom"

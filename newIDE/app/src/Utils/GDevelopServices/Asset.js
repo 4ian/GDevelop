@@ -186,7 +186,7 @@ export type CourseChapterTask = {|
   answer?: { text?: string, imageUrls?: string[] },
 |};
 
-export type UnlockedCourseChapter = {|
+export type UnlockedVideoBasedCourseChapter = {|
   id: string,
   title: string,
   shortTitle?: string,
@@ -196,6 +196,20 @@ export type UnlockedCourseChapter = {|
   templateUrl: string,
   tasks: Array<CourseChapterTask>,
 |};
+
+export type UnlockedTextBasedCourseChapter = {|
+  id: string,
+  title: string,
+  shortTitle?: string,
+  isLocked?: false,
+  isFree?: boolean,
+  templateUrls: string[],
+  items: Array<
+    | {| type: 'image', url: string, caption?: string |}
+    | {| type: 'text', text: string |}
+  >,
+|};
+
 export type LockedCourseChapter = {|
   id: string,
   title: string,
@@ -207,7 +221,18 @@ export type LockedCourseChapter = {|
   productId: string,
 |};
 
-export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
+export type VideoBasedCourseChapter =
+  | LockedCourseChapter
+  | UnlockedVideoBasedCourseChapter;
+
+export type TextBasedCourseChapter =
+  | LockedCourseChapter
+  | UnlockedTextBasedCourseChapter;
+
+export type CourseChapter =
+  | LockedCourseChapter
+  | UnlockedVideoBasedCourseChapter
+  | UnlockedTextBasedCourseChapter;
 
 export type Course = {|
   id: string,

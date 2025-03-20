@@ -180,9 +180,7 @@ const CoursePreviewBanner = ({
         .map((_, index) => {
           const chapter = courseChapters[index];
           if (!chapter) return false;
-          const chapterCompletion = getCourseChapterCompletion(
-            courseChapters[index].id
-          );
+          const chapterCompletion = getCourseChapterCompletion(chapter.id);
           if (!chapterCompletion) return false;
           return chapterCompletion.completedTasks >= chapterCompletion.tasks;
         });

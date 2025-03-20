@@ -1,18 +1,18 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import type { CourseChapter } from '../../../Utils/GDevelopServices/Asset';
-import CourseChapterView from '../../../Course/CourseChapterView';
+import type { VideoBasedCourseChapter } from '../../../Utils/GDevelopServices/Asset';
+import VideoBasedCourseChapterView from '../../../Course/VideoBasedCourseChapterView';
 
 import paperDecorator from '../../PaperDecorator';
 
 export default {
-  title: 'Course/CourseChapterView',
-  component: CourseChapterView,
+  title: 'Course/VideoBasedCourseChapterView',
+  component: VideoBasedCourseChapterView,
   decorators: [paperDecorator],
 };
 
-const courseChapter: CourseChapter = {
+const courseChapter: VideoBasedCourseChapter = {
   id: 'objects',
   title: 'Chapter 2 - Build A Scene With Objects',
   tasks: [
@@ -150,7 +150,7 @@ const courseChapter: CourseChapter = {
 
 export const Default = () => {
   return (
-    <CourseChapterView
+    <VideoBasedCourseChapterView
       courseChapter={courseChapter}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
@@ -164,7 +164,7 @@ export const Default = () => {
 
 export const Locked = () => {
   return (
-    <CourseChapterView
+    <VideoBasedCourseChapterView
       courseChapter={{
         id: 'objects',
         title: 'Chapter 2 - Build A Scene With Objects',

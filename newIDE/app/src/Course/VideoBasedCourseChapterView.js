@@ -3,16 +3,15 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import type { CourseChapter } from '../Utils/GDevelopServices/Asset';
+import type {
+  VideoBasedCourseChapter,
+  CourseChapter,
+} from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-} from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import RaisedButton from '../UI/RaisedButton';
 import { Line, Spacer } from '../UI/Grid';
-import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Divider from '@material-ui/core/Divider';
 import FlatButton from '../UI/FlatButton';
@@ -25,6 +24,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { rankLabel } from '../Utils/Ordinal';
 import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
 import LockedCourseChapterPreview from './LockedCourseChapterPreview';
+import CourseChapterTitle from './CourseChapterTitle';
 
 const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
@@ -55,15 +55,6 @@ const styles = {
     flexDirection: 'column',
     zIndex: 2,
   },
-  titleContainer: {
-    flex: 1,
-    display: 'flex',
-  },
-  statusContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 4,
-  },
   videoAndMaterialsContainer: {
     display: 'flex',
     marginTop: 8,
@@ -84,10 +75,9 @@ const styles = {
   sideBar: { padding: 16, display: 'flex' },
 };
 
-
 type Props = {|
   chapterIndex: number,
-  courseChapter: CourseChapter,
+  courseChapter: VideoBasedCourseChapter,
   onOpenTemplate: () => void,
   onCompleteTask: (
     chapterId: string,
@@ -99,7 +89,7 @@ type Props = {|
   onBuyWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
-const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,
@@ -117,62 +107,17 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     } = React.useContext(PreferencesContext);
     const userLanguage2LetterCode = language.split('_')[0];
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
-    const isMobilePortrait = isMobile && !isLandscape;
+    const { windowSize } = useResponsiveWindowSize();
     const [openTasks, setOpenTasks] = React.useState<boolean>(false);
-    const completion = getChapterCompletion(courseChapter.id);
-    const isFinished = completion
-      ? completion.completedTasks >= completion.tasks
-      : false;
     const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
-
 
     return (
       <ColumnStackLayout expand noMargin>
-        <div
-          ref={ref}
-          style={{
-            ...styles.titleContainer,
-            flexDirection: isMobilePortrait ? 'column-reverse' : 'row',
-            alignItems: isMobilePortrait ? 'flex-start' : 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <LineStackLayout noMargin alignItems="center" expand>
-            <Text size="title">
-              {chapterIndex + 1}. {courseChapter.title}
-            </Text>
-            {isFinished && !isMobilePortrait && (
-              <div
-                style={{
-                  display: 'flex',
-                  color: gdevelopTheme.statusIndicator.success,
-                }}
-              >
-                <CheckCircle />
-              </div>
-            )}
-          </LineStackLayout>
-          {isFinished ? (
-            <div
-              style={{
-                ...styles.statusContainer,
-                color: gdevelopTheme.statusIndicator.success,
-              }}
-            >
-              {isMobilePortrait && <CheckCircle />}
-              <Text color="inherit" noMargin>
-                <Trans>Finished</Trans>
-              </Text>
-            </div>
-          ) : completion ? (
-            <Text color="secondary" noMargin>
-              <Trans>
-                {completion.completedTasks} of {completion.tasks} completed
-              </Trans>
-            </Text>
-          ) : null}
-        </div>
+        <CourseChapterTitle
+          chapterIndex={chapterIndex}
+          courseChapter={courseChapter}
+          getChapterCompletion={getChapterCompletion}
+        />
         {courseChapter.isLocked ? (
           <LockedCourseChapterPreview
             onBuyWithCredits={onBuyWithCredits}
@@ -282,4 +227,4 @@ const CourseChapterView = React.forwardRef<Props, HTMLDivElement>(
   }
 );
 
-export default CourseChapterView;
+export default VideoBasedCourseChapterView;

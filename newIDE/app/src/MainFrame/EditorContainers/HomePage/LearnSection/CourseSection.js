@@ -8,7 +8,7 @@ import {
   type Course,
 } from '../../../../Utils/GDevelopServices/Asset';
 import SectionContainer from '../SectionContainer';
-import CourseChapterView from '../../../../Course/CourseChapterView';
+import VideoBasedCourseChapterView from '../../../../Course/VideoBasedCourseChapterView';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
@@ -299,7 +299,7 @@ const CourseSection = ({
                   </Line>
                 )}
                 {courseChapters.map((chapter, index) => (
-                  <CourseChapterView
+                  <VideoBasedCourseChapterView
                     chapterIndex={index}
                     courseChapter={chapter}
                     onOpenTemplate={() => {

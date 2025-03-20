@@ -2,11 +2,11 @@
 
 // TODO Remove
 const vec3ToString = (vec3: Jolt.RVec3) =>
-  Math.round(vec3.GetX() * 100) +
+  vec3.GetX().toFixed(3) +
   ' ' +
-  Math.round(vec3.GetY() * 100) +
+  vec3.GetY().toFixed(3) +
   ' ' +
-  Math.round(vec3.GetZ() * 100);
+  vec3.GetZ().toFixed(3);
 
 namespace gdjs {
   interface PhysicsVehicle3DNetworkSyncDataType {
@@ -329,13 +329,13 @@ namespace gdjs {
       forward = this._hasPressedForwardKey
         ? 1.0
         : this._hasPressedBackwardKey
-        ? -1.0
-        : 0.0;
+          ? -1.0
+          : 0.0;
       right = this._hasPressedRightKey
         ? 1.0
         : this._hasPressedLeftKey
-        ? -1.0
-        : 0.0;
+          ? -1.0
+          : 0.0;
 
       if (this.previousForward < 0 !== forward < 0) {
         const velocity = carBody
@@ -378,9 +378,21 @@ namespace gdjs {
 
       console.log(
         [
-          "Car center",
+          'Car center',
           vec3ToString(carBody.GetPosition()),
-          "Wheels",
+          'Mass center',
+          vec3ToString(carBody.GetCenterOfMassPosition()),
+          'Mass',
+          1 / carBody.GetMotionProperties().GetInverseMass(),
+          'Speed',
+          (carBody
+            .GetRotation()
+            .InverseRotate(carBody.GetLinearVelocity())
+            .GetX() *
+            60 *
+            60) /
+            1000,
+          'Wheels',
           vec3ToString(
             this._vehicleController
               .GetConstraint()
@@ -410,7 +422,7 @@ namespace gdjs {
 
       // console.log(forward, right, brake, handBrake);
 
-      this._vehicleController.SetDriverInput(forward, right, brake, handBrake);
+      this._vehicleController.SetDriverInput(forward, -right, brake, handBrake);
       if (
         right !== 0.0 ||
         forward !== 0.0 ||
@@ -675,24 +687,23 @@ namespace gdjs {
           return null;
         }
         const { behavior } = physics3D;
-        const { owner3D, _sharedData } = this.vehicleBehavior;
+        const { _sharedData } = this.vehicleBehavior;
 
-        const halfVehicleWidth =
-          (owner3D.getWidth() / 2) * _sharedData.worldInvScale;
-        const halfVehicleHeight =
-          (owner3D.getHeight() / 2) * _sharedData.worldInvScale;
-        const halfVehicleDepth =
-          (owner3D.getDepth() / 2) * _sharedData.worldInvScale;
+        const halfVehicleWidth = behavior._shapeHalfWidth;
+        const halfVehicleHeight = behavior._shapeHalfHeight;
+        const halfVehicleDepth = behavior._shapeHalfDepth;
+
+        console.log(halfVehicleWidth, halfVehicleHeight, halfVehicleDepth);
 
         const wheelOffsetX = halfVehicleWidth;
         const wheelOffsetY = halfVehicleHeight;
-        const wheelOffsetZ = halfVehicleDepth;
-        const wheelRadius = wheelOffsetZ;
-        const wheelWidth = wheelOffsetZ / 3;
-        const suspensionMinLength = wheelOffsetZ / 4;
-        const suspensionMaxLength = 2 * suspensionMinLength;
+        const wheelOffsetZ = 0;
+        const wheelRadius = halfVehicleDepth;
+        const wheelWidth = halfVehicleDepth / 3;
+        const suspensionMinLength = wheelRadius;
+        const suspensionMaxLength = 1.5 * suspensionMinLength;
         const maxSteerAngle = gdjs.toRad(30);
-        const fourWheelDrive = true;
+        const fourWheelDrive = false;
         const frontBackLimitedSlipRatio = 1.4;
         const leftRightLimitedSlipRatio = 1.4;
         const antiRollbar = true;
@@ -706,16 +717,7 @@ namespace gdjs {
         const maxEngineTorque = 500;
         const clutchStrength = 10;
 
-        // TODO Use OffsetCenterOfMassShapeSettings to allow to set a custom center of mass in createShape.
-        //const carShape = behavior.createShape();
-
-        const carShapeSettings = new Jolt.OffsetCenterOfMassShapeSettings(
-          new Jolt.Vec3(0, 0, -halfVehicleDepth),
-          new Jolt.BoxShapeSettings(
-            new Jolt.Vec3(halfVehicleWidth, halfVehicleHeight, halfVehicleDepth)
-          )
-        );
-        const carShape = carShapeSettings.Create().Get();
+        const carShape = behavior.createShape();
 
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
@@ -790,10 +792,18 @@ namespace gdjs {
         mWheels.forEach((wheelS) => {
           wheelS.mWheelUp = new Jolt.Vec3(0, 0, 1);
           wheelS.mWheelForward = new Jolt.Vec3(1, 0, 0);
+          wheelS.mSuspensionDirection = new Jolt.Vec3(0, 0, -1);
+          wheelS.mSteeringAxis = new Jolt.Vec3(0, 0, 1);
           wheelS.mRadius = wheelRadius;
           wheelS.mWidth = wheelWidth;
           wheelS.mSuspensionMinLength = suspensionMinLength;
           wheelS.mSuspensionMaxLength = suspensionMaxLength;
+          // wheelS.mLongitudinalFriction.Clear();
+          // wheelS.mLongitudinalFriction.AddPoint(0, 1);
+          // wheelS.mLongitudinalFriction.AddPoint(1, 1);
+          // wheelS.mLateralFriction.Clear();
+          // wheelS.mLateralFriction.AddPoint(0, 1.2);
+          // wheelS.mLateralFriction.AddPoint(90, 1.2);
         });
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
@@ -856,8 +866,8 @@ namespace gdjs {
         //     behavior.getBodyLayer(),
         //     0.05,
         //   )
-        // ); 
-        
+        // );
+
         constraint.ResetGravityOverride();
         _sharedData.physicsSystem.AddConstraint(constraint);
         this.vehicleBehavior._vehicleController = Jolt.castObject(

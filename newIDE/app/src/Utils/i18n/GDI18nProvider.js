@@ -45,10 +45,17 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     }
 
     try {
-      const editorCatalog = await import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
-      `../../locales/${language.replace('-', '_')}/messages`);
-      const extensionCatalog = await import(/* webpackMode: "lazy", webpackChunkName: "extension-locales-[request]" */
-      `../../locales/${language.replace('-', '_')}/extension-messages`);
+      const [editorCatalog, extensionCatalog] = await Promise.all([
+        import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
+        `../../locales/${language.replace(
+          '-',
+          '_'
+        )}/messages` /* webpackMode: "lazy", webpackChunkName: "extension-locales-[request]" */),
+        import(`../../locales/${language.replace(
+          '-',
+          '_'
+        )}/extension-messages`),
+      ]);
       const catalog = {
         languageData: editorCatalog.languageData,
         messages: {

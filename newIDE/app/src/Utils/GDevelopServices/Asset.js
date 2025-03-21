@@ -227,7 +227,7 @@ export type UnlockedTextBasedCourseChapter = {|
   shortTitle?: string,
   isLocked?: false,
   isFree?: boolean,
-  templateUrls: string[],
+  templates: Array<{| url: string, title?: string | null |}>,
   items: Array<
     | TextBasedCourseChapterTextItem
     | TextBasedCourseChapterImageItem

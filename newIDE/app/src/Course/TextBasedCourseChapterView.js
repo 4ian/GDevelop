@@ -53,7 +53,6 @@ type Props = {|
   onBuyWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
-
 const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
   (
     {
@@ -79,7 +78,7 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
             onBuyWithCredits={onBuyWithCredits}
             courseChapter={courseChapter}
           />
-        ) : (
+        ) : courseChapter.templates.length > 0 ? (
           <div style={styles.videoAndMaterialsContainer}>
             <ColumnStackLayout noMargin>
               <Text size="sub-title" noMargin>
@@ -87,30 +86,35 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               </Text>
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin>
-                  <Line noMargin>
-                    <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
-                    &nbsp;
-                    <Text noMargin>
-                      <Trans>Chapter</Trans>
-                    </Text>
-                    &nbsp;-&nbsp;
-                    <Text noMargin>
-                      <Trans>Template</Trans>
-                    </Text>
-                  </Line>
-                  <Line noMargin>
-                    <RaisedButton
-                      primary
-                      icon={<Cloud fontSize="small" />}
-                      label={<Trans>Open template</Trans>}
-                      onClick={onOpenTemplate}
-                    />
-                  </Line>
+                  {courseChapter.templates.map(template => (
+                    <Line noMargin alignItems="center">
+                      <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
+                      &nbsp;
+                      <Text noMargin>
+                        <Trans>Chapter</Trans>
+                      </Text>
+                      &nbsp;-&nbsp;
+                      {template.title && (
+                        <Text noMargin>{template.title}&nbsp;</Text>
+                      )}
+                      <Text noMargin>
+                        <Trans>Template</Trans>
+                      </Text>
+                      <Column>
+                        <RaisedButton
+                          primary
+                          icon={<Cloud fontSize="small" />}
+                          label={<Trans>Open template</Trans>}
+                          onClick={onOpenTemplate}
+                        />
+                      </Column>
+                    </Line>
+                  ))}
                 </ColumnStackLayout>
               </Paper>
             </ColumnStackLayout>
           </div>
-        )}
+        ) : null}
 
         <Column>
           {!courseChapter.isLocked && (

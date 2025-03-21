@@ -50,52 +50,52 @@ const TextBasedCourseChapterTaskItem = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
-    <ColumnStackLayout noMargin>
-      <ColumnStackLayout noMargin>
-        <div
-          style={{
-            ...styles.stickyTitle,
-            backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
-          }}
-        >
-          <Divider />
-          <Spacer />
-          <Line alignItems="center" justifyContent="space-between" noMargin>
-            <Text size="block-title">{task.title}</Text>
-            <FlatButton
-              primary
-              label={
-                isOpen ? <Trans>Close task</Trans> : <Trans>Open task</Trans>
-              }
-              leftIcon={
-                isOpen ? (
-                  <ChevronArrowBottom style={styles.icon} />
-                ) : (
-                  <ChevronArrowRight style={styles.icon} />
-                )
-              }
-              onClick={() => setIsOpen(!isOpen)}
-            />
-          </Line>
-          <Spacer />
-          <Divider />
-        </div>
-      </ColumnStackLayout>
-      {isOpen && (
-        <LineStackLayout alignItems="flex-start" noMargin>
+    <Line>
+      <ColumnStackLayout noMargin expand>
+        <ColumnStackLayout noMargin>
           <div
             style={{
-              ...styles.checkboxContainer,
-              paddingLeft: isMobile && !isLandscape ? 0 : 20,
+              ...styles.stickyTitle,
+              backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
             }}
           >
-            <Checkbox
-              checked={isComplete}
-              onCheck={() => onComplete(!isComplete)}
-              style={{ margin: 0 }}
-            />
+            <Divider />
+            <Spacer />
+            <Line alignItems="center" justifyContent="space-between" noMargin>
+              <Text size="block-title">{task.title}</Text>
+              <FlatButton
+                primary
+                label={
+                  isOpen ? <Trans>Close task</Trans> : <Trans>Open task</Trans>
+                }
+                leftIcon={
+                  isOpen ? (
+                    <ChevronArrowBottom style={styles.icon} />
+                  ) : (
+                    <ChevronArrowRight style={styles.icon} />
+                  )
+                }
+                onClick={() => setIsOpen(!isOpen)}
+              />
+            </Line>
+            <Spacer />
+            <Divider />
           </div>
-          <Line>
+        </ColumnStackLayout>
+        {isOpen && (
+          <LineStackLayout alignItems="flex-start" noMargin>
+            <div
+              style={{
+                ...styles.checkboxContainer,
+                paddingLeft: isMobile && !isLandscape ? 0 : 20,
+              }}
+            >
+              <Checkbox
+                checked={isComplete}
+                onCheck={() => onComplete(!isComplete)}
+                style={{ margin: 0 }}
+              />
+            </div>
             <ColumnStackLayout expand noMargin noOverflowParent>
               <TextBasedCourseChapterItems items={task.items} />
               {isOpen && task.answer && (
@@ -113,10 +113,10 @@ const TextBasedCourseChapterTaskItem = ({
                 </Accordion>
               )}
             </ColumnStackLayout>
-          </Line>
-        </LineStackLayout>
-      )}
-    </ColumnStackLayout>
+          </LineStackLayout>
+        )}
+      </ColumnStackLayout>
+    </Line>
   );
 };
 

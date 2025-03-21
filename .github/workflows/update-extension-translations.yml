@@ -6,12 +6,9 @@ name: Update extension translations
 on:
   push:
     branches:
-      - extensions-translated
+      - master
     tags-ignore:
       - "**" # Don't run on new tags
-  # schedule:
-  #   # Every day at midnight
-  #   - cron: "0 0 * * *"
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
 jobs:

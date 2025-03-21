@@ -177,13 +177,6 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       renderImage: props => <TilemapPlatformer {...props} />,
     },
     {
-      id: COOP_PLATFORMER_ID,
-      title: t`Co-op Multiplayer`,
-      description: t`Transform this platformer into a co-op game, where two players can play together.`,
-      durationInMinutes: 3,
-      renderImage: props => <CoopPlatformer {...props} />,
-    },
-    {
       id: FIRE_A_BULLET_ID,
       title: t`Fire a Bullet`,
       description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.`,
@@ -203,6 +196,13 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       description: t`Transform this Plinko game with collectibles that multiply your score.`,
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
+    },
+    {
+      id: COOP_PLATFORMER_ID,
+      title: t`Co-op Multiplayer`,
+      description: t`Transform this platformer into a co-op game, where two players can play together.`,
+      durationInMinutes: 3,
+      renderImage: props => <CoopPlatformer {...props} />,
     },
   ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 

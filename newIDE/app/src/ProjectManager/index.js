@@ -702,7 +702,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [editName, onProjectItemModified, scrollToItem]
     );
 
-    const { extensionShortHeadersByName } = React.useContext(
+    const { translatedExtensionShortHeadersByName } = React.useContext(
       ExtensionStoreContext
     );
 
@@ -718,7 +718,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         }
         const originIdentifier = eventsFunctionsExtension.getOriginIdentifier();
         const extensionShortHeader =
-          extensionShortHeadersByName[originIdentifier];
+          translatedExtensionShortHeadersByName[originIdentifier];
         if (!extensionShortHeader) {
           console.warn(
             `This extension was downloaded from the store but its reference ${originIdentifier} couldn't be found in the store. Opening the extension in the editor...`
@@ -729,7 +729,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         setOpenedExtensionShortHeader(extensionShortHeader);
         setOpenedExtensionName(name);
       },
-      [extensionShortHeadersByName, onOpenEventsFunctionsExtension]
+      [translatedExtensionShortHeadersByName, onOpenEventsFunctionsExtension]
     );
 
     const addExternalEvents = React.useCallback(

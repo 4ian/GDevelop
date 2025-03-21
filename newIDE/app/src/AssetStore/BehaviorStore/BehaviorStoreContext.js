@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type FiltersState, useFilters } from '../../UI/Search/FiltersChooser';
 import {
   getBehaviorsRegistry,
@@ -51,7 +52,7 @@ type BehaviorStoreState = {|
   setInstalledBehaviorMetadataList: (
     installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>
   ) => void,
-  behaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
+  translatedBehaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
   filtersState: FiltersState,
 |};
 
@@ -67,7 +68,7 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   chosenCategory: '',
   setChosenCategory: () => {},
   setInstalledBehaviorMetadataList: () => {},
-  behaviorShortHeadersByType: {},
+  translatedBehaviorShortHeadersByType: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -79,11 +80,13 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
 
 type BehaviorStoreStateProviderProps = {|
   children: React.Node,
+  i18n: I18nType,
   defaultSearchText?: string,
 |};
 
 export const BehaviorStoreStateProvider = ({
   children,
+  i18n,
   defaultSearchText,
 }: BehaviorStoreStateProviderProps) => {
   const [
@@ -91,17 +94,18 @@ export const BehaviorStoreStateProvider = ({
     setInstalledBehaviorMetadataList,
   ] = React.useState<Array<SearchableBehaviorMetadata>>([]);
   const [
-    behaviorShortHeadersByType,
-    setBehaviorShortHeadersByType,
+    translatedBehaviorShortHeadersByType,
+    setTranslatedBehaviorShortHeadersByType,
   ] = React.useState<{
     [string]: BehaviorShortHeader,
   }>({});
 
   const preferences = React.useContext(PreferencesContext);
-  const { showCommunityExtensions } = preferences.values;
+  const { showCommunityExtensions, language } = preferences.values;
   const [firstBehaviorIds, setFirstBehaviorIds] = React.useState<Array<string>>(
     []
   );
+  const [loadedLanguage, setLoadedLanguage] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -115,20 +119,34 @@ export const BehaviorStoreStateProvider = ({
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (Object.keys(behaviorShortHeadersByType).length || isLoading.current)
+      if (
+        (Object.keys(translatedBehaviorShortHeadersByType).length &&
+          loadedLanguage === language) ||
+        isLoading.current
+      )
         return;
 
       (async () => {
         setError(null);
+        // Reset the search text to avoid showing the previous search results
+        // in case they were on a different language.
+        setSearchText(emptySearchText);
         isLoading.current = true;
 
         try {
           const behaviorsRegistry: BehaviorsRegistry = await getBehaviorsRegistry();
           const behaviorShortHeaders = behaviorsRegistry.headers;
 
-          const behaviorShortHeadersByType = {};
-          behaviorShortHeaders.forEach(behavior => {
-            behaviorShortHeadersByType[behavior.type] = behavior;
+          const translatedBehaviorShortHeadersByType = {};
+          behaviorShortHeaders.forEach(behaviorShortHeader => {
+            const translatedBehaviorShortHeader: BehaviorShortHeader = {
+              ...behaviorShortHeader,
+              fullName: i18n._(behaviorShortHeader.fullName),
+              description: i18n._(behaviorShortHeader.description),
+            };
+            translatedBehaviorShortHeadersByType[
+              behaviorShortHeader.type
+            ] = translatedBehaviorShortHeader;
           });
 
           console.info(
@@ -136,7 +154,10 @@ export const BehaviorStoreStateProvider = ({
               behaviorShortHeaders ? behaviorShortHeaders.length : 0
             } behaviors from the extension store.`
           );
-          setBehaviorShortHeadersByType(behaviorShortHeadersByType);
+          setTranslatedBehaviorShortHeadersByType(
+            translatedBehaviorShortHeadersByType
+          );
+          setLoadedLanguage(language);
           setFirstBehaviorIds(
             behaviorsRegistry.views.default.firstIds.map(
               ({ extensionName, behaviorName }) =>
@@ -157,14 +178,24 @@ export const BehaviorStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [behaviorShortHeadersByType, isLoading]
+    [
+      translatedBehaviorShortHeadersByType,
+      isLoading,
+      i18n,
+      language,
+      loadedLanguage,
+    ]
   );
 
   React.useEffect(
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (Object.keys(behaviorShortHeadersByType).length || isLoading.current)
+      if (
+        (Object.keys(translatedBehaviorShortHeadersByType).length &&
+          loadedLanguage === language) ||
+        isLoading.current
+      )
         return;
 
       const timeoutId = setTimeout(() => {
@@ -173,46 +204,53 @@ export const BehaviorStoreStateProvider = ({
       }, BEHAVIORS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchBehaviors, behaviorShortHeadersByType, isLoading]
+    [
+      fetchBehaviors,
+      translatedBehaviorShortHeadersByType,
+      isLoading,
+      language,
+      loadedLanguage,
+    ]
   );
 
-  const allBehaviors = React.useMemo(
+  const allTranslatedBehaviors = React.useMemo(
     () => {
-      const allBehaviors: {
+      const allTranslatedBehaviors: {
         [name: string]: BehaviorShortHeader | SearchableBehaviorMetadata,
       } = {};
-      for (const type in behaviorShortHeadersByType) {
-        allBehaviors[type] = behaviorShortHeadersByType[type];
+      for (const type in translatedBehaviorShortHeadersByType) {
+        allTranslatedBehaviors[type] =
+          translatedBehaviorShortHeadersByType[type];
       }
       for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
-        allBehaviors[
+        allTranslatedBehaviors[
           installedBehaviorMetadata.type
         ] = installedBehaviorMetadata;
       }
-      return allBehaviors;
+      return allTranslatedBehaviors;
     },
-    [installedBehaviorMetadataList, behaviorShortHeadersByType]
+    [installedBehaviorMetadataList, translatedBehaviorShortHeadersByType]
   );
 
   const allCategories = React.useMemo(
     () => {
       const categoriesSet = new Set();
-      for (const type in allBehaviors) {
-        categoriesSet.add(allBehaviors[type].category);
+      for (const type in allTranslatedBehaviors) {
+        categoriesSet.add(allTranslatedBehaviors[type].category);
       }
       const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
         tag1.toLowerCase().localeCompare(tag2.toLowerCase())
       );
       return sortedCategories;
     },
-    [allBehaviors]
+    [allTranslatedBehaviors]
   );
 
   const filters = React.useMemo(
     () => {
       const tagsSet = new Set();
-      for (const type in allBehaviors) {
-        const behavior = allBehaviors[type];
+      for (const type in allTranslatedBehaviors) {
+        const behavior = allTranslatedBehaviors[type];
         behavior.tags.forEach(tag => {
           if (
             showCommunityExtensions ||
@@ -232,7 +270,7 @@ export const BehaviorStoreStateProvider = ({
         tagsTree: [],
       };
     },
-    [allBehaviors, showCommunityExtensions]
+    [allTranslatedBehaviors, showCommunityExtensions]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
@@ -245,7 +283,7 @@ export const BehaviorStoreStateProvider = ({
 
   const searchResults: ?Array<
     SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
-  > = useSearchStructuredItem(allBehaviors, {
+  > = useSearchStructuredItem(allTranslatedBehaviors, {
     searchText,
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
@@ -268,7 +306,7 @@ export const BehaviorStoreStateProvider = ({
       searchText,
       setSearchText,
       setInstalledBehaviorMetadataList,
-      behaviorShortHeadersByType,
+      translatedBehaviorShortHeadersByType,
       filtersState,
     }),
     [
@@ -280,7 +318,7 @@ export const BehaviorStoreStateProvider = ({
       setChosenCategory,
       searchText,
       setInstalledBehaviorMetadataList,
-      behaviorShortHeadersByType,
+      translatedBehaviorShortHeadersByType,
       filtersState,
       fetchBehaviors,
     ]

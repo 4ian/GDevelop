@@ -329,8 +329,7 @@ private:
 
   static gd::String UncapitalizeFirstLetter(const gd::String &string);
 
-  static const gd::String &
-  GetFullName(const gd::EventsFunction &eventsFunction);
+  static gd::String GetFullName(const gd::EventsFunction &eventsFunction);
   static gd::String GetDefaultSentence(const gd::EventsFunction &eventsFunction,
                                        const int firstParameterIndex,
                                        const int parameterIndexOffset);

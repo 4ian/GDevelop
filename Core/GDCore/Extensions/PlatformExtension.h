@@ -13,11 +13,11 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
-#include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionOrExpressionGroupMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/SourceFileMetadata.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
@@ -441,12 +441,6 @@ class GD_CORE_API PlatformExtension {
   bool IsDeprecated() const { return deprecated; }
 
   /**
-   * \brief Return true if the extension is a standard extension that cannot be
-   * deactivated
-   */
-  bool IsBuiltin() const;
-
-  /**
    * \brief Get the namespace of the extension.
    * \note The namespace is simply the name of the extension concatenated with
    * "::" at the end.
@@ -639,12 +633,6 @@ class GD_CORE_API PlatformExtension {
     return instructionOrExpressionGroupMetadata;
   }
   ///@}
-
-  /**
-   * \brief Return the name of all the extensions which are considered provided
-   * by platforms.
-   */
-  static std::vector<gd::String> GetBuiltinExtensionsNames();
 
   /**
    * \brief Get the string used to separate the name of the

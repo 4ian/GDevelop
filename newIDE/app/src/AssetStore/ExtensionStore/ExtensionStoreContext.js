@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type FiltersState, useFilters } from '../../UI/Search/FiltersChooser';
 import {
   getExtensionsRegistry,
@@ -29,7 +30,9 @@ type ExtensionStoreState = {|
   allCategories: string[],
   chosenCategory: string,
   setChosenCategory: string => void,
-  extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
+  translatedExtensionShortHeadersByName: {
+    [name: string]: ExtensionShortHeader,
+  },
   filtersState: FiltersState,
   hasExtensionNamed: (extensionName: string) => boolean,
 |};
@@ -45,7 +48,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   // '' means all categories.
   chosenCategory: '',
   setChosenCategory: () => {},
-  extensionShortHeadersByName: {},
+  translatedExtensionShortHeadersByName: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -58,24 +61,27 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
+  i18n: I18nType,
   defaultSearchText?: string,
 |};
 
 export const ExtensionStoreStateProvider = ({
   children,
+  i18n,
   defaultSearchText,
 }: ExtensionStoreStateProviderProps) => {
   const [
-    extensionShortHeadersByName,
-    setExtensionShortHeadersByName,
+    translatedExtensionShortHeadersByName,
+    setTranslatedExtensionShortHeadersByName,
   ] = React.useState<{
     [string]: ExtensionShortHeader,
   }>({});
   const preferences = React.useContext(PreferencesContext);
-  const { showCommunityExtensions } = preferences.values;
+  const { showCommunityExtensions, language } = preferences.values;
   const [firstExtensionIds, setFirstExtensionIds] = React.useState<
     Array<string>
   >([]);
+  const [loadedLanguage, setLoadedLanguage] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -88,21 +94,35 @@ export const ExtensionStoreStateProvider = ({
   const fetchExtensionsAndFilters = React.useCallback(
     () => {
       // Don't attempt to load again resources and filters if they
-      // were loaded already.
-      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+      // are loading or were loaded already in the current language.
+      if (
+        (Object.keys(translatedExtensionShortHeadersByName).length &&
+          loadedLanguage === language) ||
+        isLoading.current
+      )
         return;
 
       (async () => {
         setError(null);
+        // Reset the search text to avoid showing the previous search results
+        // in case they were on a different language.
+        setSearchText(emptySearchText);
         isLoading.current = true;
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
           const { headers } = extensionRegistry;
 
-          const extensionShortHeadersByName = {};
-          headers.forEach(extension => {
-            extensionShortHeadersByName[extension.name] = extension;
+          const translatedExtensionShortHeadersByName = {};
+          headers.forEach(extensionShortHeader => {
+            const translatedExtensionShortHeader: ExtensionShortHeader = {
+              ...extensionShortHeader,
+              fullName: i18n._(extensionShortHeader.fullName),
+              shortDescription: i18n._(extensionShortHeader.shortDescription),
+            };
+            translatedExtensionShortHeadersByName[
+              extensionShortHeader.name
+            ] = translatedExtensionShortHeader;
           });
 
           console.info(
@@ -110,7 +130,10 @@ export const ExtensionStoreStateProvider = ({
               headers ? headers.length : 0
             } extensions from the extension store.`
           );
-          setExtensionShortHeadersByName(extensionShortHeadersByName);
+          setTranslatedExtensionShortHeadersByName(
+            translatedExtensionShortHeadersByName
+          );
+          setLoadedLanguage(language);
           setFirstExtensionIds(extensionRegistry.views.default.firstIds);
         } catch (error) {
           console.error(
@@ -123,14 +146,24 @@ export const ExtensionStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [extensionShortHeadersByName, isLoading]
+    [
+      translatedExtensionShortHeadersByName,
+      isLoading,
+      i18n,
+      language,
+      loadedLanguage,
+    ]
   );
 
   React.useEffect(
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+      if (
+        (Object.keys(translatedExtensionShortHeadersByName).length &&
+          loadedLanguage === language) ||
+        isLoading.current
+      )
         return;
 
       const timeoutId = setTimeout(() => {
@@ -139,28 +172,36 @@ export const ExtensionStoreStateProvider = ({
       }, EXTENSIONS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
+    [
+      fetchExtensionsAndFilters,
+      translatedExtensionShortHeadersByName,
+      isLoading,
+      language,
+      loadedLanguage,
+    ]
   );
 
   const allCategories = React.useMemo(
     () => {
       const categoriesSet = new Set();
-      for (const name in extensionShortHeadersByName) {
-        categoriesSet.add(extensionShortHeadersByName[name].category);
+      for (const name in translatedExtensionShortHeadersByName) {
+        categoriesSet.add(translatedExtensionShortHeadersByName[name].category);
       }
       const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
         tag1.toLowerCase().localeCompare(tag2.toLowerCase())
       );
       return sortedCategories;
     },
-    [extensionShortHeadersByName]
+    [translatedExtensionShortHeadersByName]
   );
 
   const filters = React.useMemo(
     () => {
       const tagsSet = new Set();
-      for (const name in extensionShortHeadersByName) {
-        extensionShortHeadersByName[name].tags.forEach(tag => tagsSet.add(tag));
+      for (const name in translatedExtensionShortHeadersByName) {
+        translatedExtensionShortHeadersByName[name].tags.forEach(tag =>
+          tagsSet.add(tag)
+        );
       }
       const sortedTags = [...tagsSet].sort((tag1, tag2) =>
         tag1.toLowerCase().localeCompare(tag2.toLowerCase())
@@ -171,12 +212,12 @@ export const ExtensionStoreStateProvider = ({
         tagsTree: [],
       };
     },
-    [extensionShortHeadersByName]
+    [translatedExtensionShortHeadersByName]
   );
 
   const searchResults: ?Array<
     SearchResult<ExtensionShortHeader>
-  > = useSearchStructuredItem(extensionShortHeadersByName, {
+  > = useSearchStructuredItem(translatedExtensionShortHeadersByName, {
     searchText,
     chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
@@ -189,9 +230,9 @@ export const ExtensionStoreStateProvider = ({
 
   const hasExtensionNamed = React.useCallback(
     (extensionName: string) => {
-      return !!extensionShortHeadersByName[extensionName];
+      return !!translatedExtensionShortHeadersByName[extensionName];
     },
-    [extensionShortHeadersByName]
+    [translatedExtensionShortHeadersByName]
   );
 
   const extensionStoreState = React.useMemo(
@@ -205,7 +246,7 @@ export const ExtensionStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
-      extensionShortHeadersByName,
+      translatedExtensionShortHeadersByName,
       filtersState,
       hasExtensionNamed,
     }),
@@ -217,7 +258,7 @@ export const ExtensionStoreStateProvider = ({
       chosenCategory,
       setChosenCategory,
       searchText,
-      extensionShortHeadersByName,
+      translatedExtensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
       hasExtensionNamed,

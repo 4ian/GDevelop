@@ -45,6 +45,10 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
+    _steerAngleMax = 40;
+    private _steerAngularVelocity: float = 45;
+    private _currentSteerRatio: float = 0;
+
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
     private _hasPressedRightKey: boolean = false;
@@ -252,6 +256,24 @@ namespace gdjs {
           ? -1.0
           : 0.0;
 
+      if (!this._hasPressedLeftKey && !this._hasPressedRightKey) {
+        this._currentSteerRatio = 0;
+      }
+      if (this._hasPressedLeftKey) {
+        // Avoid to much latency when changing of direction
+        this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
+        this._currentSteerRatio -=
+          (this._steerAngularVelocity * timeDelta) / this._steerAngleMax;
+        this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
+      }
+      if (this._hasPressedRightKey) {
+        // Avoid to much latency when changing of direction
+        this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
+        this._currentSteerRatio +=
+          (this._steerAngularVelocity * timeDelta) / this._steerAngleMax;
+        this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
+      }
+
       if (this.previousForward < 0 !== forward < 0) {
         const velocity = carBody
           .GetRotation()
@@ -333,13 +355,24 @@ namespace gdjs {
           wheels[1].mLongitudinalSlip,
           wheels[2].mLongitudinalSlip,
           wheels[3].mLongitudinalSlip,
+
+          'Steer angle',
+          gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
           ,
         ].join('\n')
       );
 
       // console.log(forward, right, brake, handBrake);
 
-      this._vehicleController.SetDriverInput(forward, -right, brake, handBrake);
+      this._vehicleController.SetDriverInput(
+        forward,
+        -this._currentSteerRatio,
+        brake,
+        handBrake
+      );
       if (
         right !== 0.0 ||
         forward !== 0.0 ||
@@ -469,7 +502,6 @@ namespace gdjs {
         const wheelWidth = halfVehicleDepth / 3;
         const suspensionMinLength = wheelRadius;
         const suspensionMaxLength = 1.5 * suspensionMinLength;
-        const maxSteerAngle = gdjs.toRad(40);
         const fourWheelDrive = false;
         const frontBackLimitedSlipRatio = 1.4;
         const leftRightLimitedSlipRatio = 1.4;
@@ -520,7 +552,7 @@ namespace gdjs {
             -wheelOffsetY,
             -wheelOffsetZ
           );
-          fl.mMaxSteerAngle = maxSteerAngle;
+          fl.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
           fl.mMaxHandBrakeTorque = 0.0;
           vehicle.mWheels.push_back(fl);
           mWheels.push(fl);
@@ -531,7 +563,7 @@ namespace gdjs {
             wheelOffsetY,
             -wheelOffsetZ
           );
-          fr.mMaxSteerAngle = maxSteerAngle;
+          fr.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
           fr.mMaxHandBrakeTorque = 0.0; // Front wheel doesn't have hand brake
           vehicle.mWheels.push_back(fr);
           mWheels.push(fr);

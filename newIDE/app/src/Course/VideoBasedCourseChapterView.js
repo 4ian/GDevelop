@@ -18,7 +18,7 @@ import FlatButton from '../UI/FlatButton';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cloud from '../UI/CustomSvgIcons/Cloud';
-import CourseChapterTaskItem from './CourseChapterTaskItem';
+import VideoBasedCourseChapterTaskItem from './VideoBasedCourseChapterTaskItem';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { rankLabel } from '../Utils/Ordinal';
@@ -212,7 +212,7 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
         )}
         {!courseChapter.isLocked &&
           courseChapter.tasks.map((item, taskIndex) => (
-            <CourseChapterTaskItem
+            <VideoBasedCourseChapterTaskItem
               courseChapterTask={item}
               key={taskIndex.toString()}
               isOpen={openTasks}

@@ -1,0 +1,1554 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Piskel</title>
+  <meta name="description" content="">
+  <meta name="author" content="Julian Descottes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div
+    id="loading-mask"
+    style="
+    position:fixed;
+    top:0;right:0;bottom:0;left:0;
+    background:black;
+    opacity:1;
+    text-align:center;
+    z-index : 20000;
+    transition:opacity 0.5s;
+    color:white;">
+      <span style="top:45%">Loading Piskel ...</span>
+  </div>
+  <style type="text/css">
+  #main-wrapper {
+    margin-top: 40px;
+  }
+
+  .fake-piskelapp-header {
+    position: relative;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    font-size: 24px;
+    background: black;
+    color: gold;
+    z-index: 100;
+  }
+
+  .piskel-name.piskel-name-saving {
+    color: red;
+  }
+
+  .new-piskel-desktop {
+    position: absolute;
+
+    display: flex;
+    top: 7px;
+    right: 7px;
+
+    height: 26px;
+    width: 26px;
+
+    border-radius: 3px;
+    font-size: 22px;
+    color: black;
+    background: gold;
+    text-decoration: none;
+
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+<div class="fake-piskelapp-header">
+  <a
+    href="index.html"
+    target="_blank"
+    class="new-piskel-desktop button button-primary"
+    title="Create a new sprite"
+    rel="tooltip"
+    data-placement="left"
+    >+</a>
+  <span class="piskel-name"></span>
+</div>
+
+  <!-- the comment below indicates the beginning of markup reused by the editor integrated in piskelapp.com -->
+  <!-- do not delete, do not move :) -->
+  <!--body-main-start-->
+  <div id="main-wrapper" class="main-wrapper">
+    <div class="sticky-section left-sticky-section" id="tool-section">
+  <div class="sticky-section-wrap">
+    <div class="vertical-centerer">
+      <div class="pen-size-container size-picker-container" title="Pen size<br/>from 1 to 4 pixels" rel="tooltip" data-placement="top">
+        <div class="pen-size-option size-picker-option" data-size="1"></div>
+        <div class="pen-size-option size-picker-option" data-size="2"></div>
+        <div class="pen-size-option size-picker-option" data-size="3"></div>
+        <div class="pen-size-option size-picker-option" data-size="4"></div>
+      </div>
+      <ul id="tools-container" class="tools-wrapper">
+        <!-- Drawing tools will be inserted here -->
+      </ul>
+      <div class="palette-wrapper">
+        <div
+          class="tool-icon tool-color-picker"
+          data-initial-title="Primary - left mouse button"
+          rel="tooltip"
+          data-placement="right"
+        >
+          <input id="color-picker" class="color" type="text"/>
+        </div>
+        <div
+          class="tool-icon tool-color-picker"
+          data-initial-title="Secondary - right mouse button"
+          rel="tooltip"
+          data-placement="right"
+        >
+          <input id="secondary-color-picker" class="secondary-color-picker color" type="text" />
+        </div>
+        <div
+          class="swap-colors-button icon-common-swapcolors-arrow-grey"
+          title="Swap colors (X)"
+          rel="tooltip"
+          data-placement="right"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+
+  <!-- Drawing tool icon-button -->
+  <script type="text/template" id="drawingTool-item-template">
+    <li rel="tooltip" data-placement="{{tooltipposition}}" class="{{cssclass}}" data-tool-id="{{toolid}}" title="{{title}}"></li>
+  </script>
+</div>
+
+
+    <div id="column-wrapper" class="column-wrapper">
+      <div class='column left-column'>
+        <div id="preview-list-wrapper" class="preview-list-wrapper">
+  <div id="preview-list-scroller" class="preview-list-scroller">
+    <ul class="preview-list" id="preview-list"></ul>
+  </div>
+  <div class="top-overflow"></div>
+  <div class="bottom-overflow"></div>
+</div>
+      </div>
+
+      <div class='column main-column'>
+        <div id="drawing-canvas-container" class="drawing-canvas-container canvas-container">
+          <div class="canvas-background"></div>
+        </div>
+      </div>
+
+      <div class="column right-column">
+        <div id="animated-preview-container" class="preview-container">
+  <div class="canvas-container-wrapper minimap-container">
+    <div class="preview-contextual-actions">
+      <div class="preview-drop-down">
+        <div class="preview-disable-overlay" rel="tooltip" data-placement="left"></div>
+        <div class="preview-contextual-action  original-size-button" rel="tooltip" data-placement="left">1x</div>
+        <div class="preview-contextual-action  best-size-button" rel="tooltip" data-placement="left"></div>
+        <div class="preview-contextual-action  full-size-button" rel="tooltip" data-placement="left">Full</div>
+      </div>
+      <div class="preview-contextual-action  toggle-grid-button  icon-minimap-grid-white"
+        title="Toggle grid" rel="tooltip" data-placement="bottom"></div>
+      <div class="preview-contextual-action  open-popup-preview-button  icon-minimap-popup-preview-arrow-white"
+           title="Open preview in popup" rel="tooltip" data-placement="bottom"></div>
+    </div>
+
+    <div id="animated-preview-canvas-container" class="canvas-container">
+      <div class="canvas-background"></div>
+    </div>
+  </div>
+  <div>
+    <div rel="tooltip"
+         data-placement="bottom"
+         class="piskel-icon-onion preview-toggle-onion-skin"></div>
+    <span id="display-fps" class="display-fps"></span>
+    <input id="preview-fps" class="range-fps" type="range" min="0" max="24"/>
+  </div>
+  <div>
+  </div>
+</div>
+        <div class="toolbox-container layers-list-container">
+  <h3 class="toolbox-title layers-title">Layers
+    <div rel="tooltip"
+         data-placement="left"
+         class="layers-toggle-preview piskel-icon-eye"></div>
+  </h3>
+  <div class="toolbox-buttons">
+    <button data-action="add"
+      class="button layers-button piskel-icon-plus"
+      rel="tooltip" data-placement="top" ></button>
+
+    <button data-action="up"
+      class="button layers-button piskel-icon-arrow-up-fat"
+      title="Move layer up" rel="tooltip" data-placement="top" ></button>
+
+    <button data-action="down"
+      class="button layers-button piskel-icon-arrow-down-fat"
+      title="Move layer down" rel="tooltip" data-placement="top" ></button>
+
+    <button data-action="edit"
+      class="button layers-button piskel-icon-pencil"
+      title="Edit layer name" rel="tooltip" data-placement="top"></button>
+
+    <button data-action="merge"
+      class="button layers-button piskel-icon-merge"
+      title="Merge with layer below" rel="tooltip" data-placement="top" ></button>
+
+    <button data-action="delete"
+      class="button layers-button piskel-icon-close"
+      title="Delete selected layer" rel="tooltip" data-placement="top" ></button>
+
+  </div>
+
+  <ul class="layers-list"></ul>
+
+  <script type="text/template" id="layer-item-template">
+    <li class="layer-item {{isselected:current-layer-item}}"
+        data-layer-index="{{layerindex}}">
+        <span class="layer-name" data-placement="top">{{layername}}</span>
+        <span class="layer-item-opacity"
+              title="Layer opacity ({{opacity}})" rel="tooltip" data-placement="top">
+            &#945;
+        </span>
+    </li>
+  </script>
+    
+  <script type="text/template" id="layer-name-input-template">
+    <input class="textfield layer-name-input" type="text" autocomplete="off" value="{{layername}}" />
+  </script>
+</div>
+
+        <div class="toolbox-container transformations-container">
+  <h3 class="toolbox-title transformations-title">
+    Transform
+    <span
+      class="transformations-show-more-link piskel-icon-plus"
+      title="View more tools"
+      rel="tooltip" data-placement="top"
+    ></span>
+  </h3>
+  <ul class="tools-wrapper"></ul>
+</div>
+        <div class="toolbox-container palettes-list-container">
+  <h3 class="toolbox-title palettes-title">Palettes</h3>
+  <div class="toolbox-buttons">
+    <button
+      class="button palettes-list-button create-palette-button piskel-icon-plus" data-action="add"
+      title="Create a new palette" rel="tooltip" data-placement="top" ></button>
+    <select class="button palettes-list-select"></select>
+    <button
+      class="button palettes-list-button edit-palette-button  piskel-icon-pencil" data-action="edit"
+      title="Manage this palette" rel="tooltip" data-placement="top"></button>
+  </div>
+  <div class="palettes-list-colors"></div>
+  <script type="text/template" id="palette-color-template">
+    <div class="palettes-list-color"
+         data-color="{{color}}"
+         data-color-index="{{index}}"
+         title="{{title}}">
+      <div data-color="{{color}}" style="background:{{color}}"></div>
+    </div>
+  </script>
+
+  <script type="text/template" id="palettes-list-no-colors-partial">
+    <div class="palettes-list-no-colors">
+      No color in this palette…
+    </div>
+  </script>
+
+</div>
+
+
+
+        <div class="pull-bottom cursor-coordinates"></div>
+      </div>
+    </div>
+
+    <div id="application-action-section" data-pskl-controller="settings" class="sticky-section right-sticky-section">
+      <div class="sticky-section-wrap">
+        <div class="vertical-centerer">
+  <div
+    data-setting="user"
+    class="tool-icon icon-settings-gear-white"
+    title="<span class='highlight'>PREFERENCES</span></br>"
+    rel="tooltip" data-placement="left">
+  </div>
+
+  <div
+    data-setting="resize"
+    class="tool-icon  icon-settings-resize-white"
+    title="<span class='highlight'>RESIZE</span></br>Resize the drawing area"
+    rel="tooltip" data-placement="left">
+  </div>
+
+  <div
+    data-setting="save"
+    class="tool-icon  icon-settings-save-white"
+    title="<span class='highlight'>SAVE</span></br>Save to your gallery, save locally<br/>or export as a file"
+    rel="tooltip" data-placement="left" >
+  </div>
+
+  <div
+    data-setting="export"
+    class="tool-icon  icon-settings-export-white"
+    title="<span class='highlight'>EXPORT</span></br>Export as Image, as Spritesheet<br/>or as Animated GIF"
+    rel="tooltip" data-placement="left">
+  </div>
+
+  <div
+    data-setting="import"
+    class="tool-icon  icon-settings-open-folder-white"
+    title="<span class='highlight'>IMPORT</span></br>Import an existing image,<br/>an animated GIF or a .piskel file"
+    rel="tooltip" data-placement="left">
+  </div>
+
+</div>
+        <div class="drawer vertical-centerer">
+          <div class="drawer-content" id="drawer-container">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dialog-container-wrapper">
+    <div id="dialog-container">
+    </div>
+  </div>
+
+  <div style="display:none">
+  <script type="text/template" id="progress-bar-template">
+    <div class="progress-bar-container">
+      <div class="progress-bar-name">{{name}}</div>
+      <div class="progress-bar-item progress-bar"></div>
+      <div class="progress-bar-item progress-bar-status">{{status}}%</div>
+    </div>
+  </script>
+
+  <!-- Tooltip container -->
+  <script type="text/template" id="tooltip-container-template">
+    <div class='tooltip-container'>
+      <div>{{helptext}} <span class='tooltip-shortcut'>{{shortcut}}</span></div>
+      {{!descriptors!}}
+    </div>
+  </script>
+
+  <!-- Tooltip description with modifier -->
+  <script type="text/template" id="tooltip-modifier-descriptor-template">
+    <div class='tooltip-descriptor'>
+      <span class='tooltip-descriptor-button'>{{key}}</span>
+      {{description}}
+    </div>
+  </script>
+
+  <!-- Simple tooltip description -->
+  <script type="text/template" id="tooltip-simple-descriptor-template">
+    <div class='tooltip-descriptor'>
+      {{description}}
+    </div>
+  </script>
+</div>
+  <div style="display:none">
+  <script type="text/template" id="data-uri-export-partial">
+    <style>
+      html, body {
+        margin: 0;
+      }
+
+      body {
+        background: #444;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: monospace;
+      }
+
+      #image-wrapper {
+        flex-grow: 1;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      img {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEXf39////8zI3BgAAAAHklEQVR4AWNghAIGCMDgjwgFCDDSw2M0PSCD0fQAACRcAgF4ciGUAAAAAElFTkSuQmCC') repeat;
+      }
+
+      #bottom-wrapper {
+        width: 600px;
+        height: 300px;
+        margin-top: 20px;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      textarea {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        border-style: none;
+
+        background: black;
+        color: gold;
+        font-family: monospace;
+      }
+
+      span {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+        padding: 5px;
+        color: white;
+        background-color: #444;
+      }
+    </style>
+    <body>
+      <div id="image-wrapper">
+        <img src="{{src}}" alt="Exported image as data-uri">
+      </div>
+      <div id="bottom-wrapper">
+        <textarea spellcheck="false" onclick="this.select()">{{src}}</textarea>
+        <span>Data-uri for the exported framesheet</span>
+      </div>
+    </body>
+  </script>
+</div>
+
+  <div style="display:none">
+  <script type="text/template" id="popup-preview-partial">
+    <style>
+      body,
+      .popup-container ,
+      .preview-container,
+      .background-image-frame-container {
+        width : 100%;
+        height : 100%;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      .popup-container {
+        position: absolute;
+        background : #333;
+      }
+
+      .preview-container {
+        position: relative;
+      }
+
+      .background-image-frame-container {
+        position: relative;
+        background-repeat : no-repeat;
+      }
+
+      .canvas-container .canvas-background {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+
+      .light-picker-background,
+      .light-canvas-background .canvas-background {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEXf39////8zI3BgAAAAHklEQVR4AWNghAIGCMDgjwgFCDDSw2M0PSCD0fQAACRcAgF4ciGUAAAAAElFTkSuQmCC') repeat;
+      }
+
+      .medium-picker-background,
+      .medium-canvas-background .canvas-background {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEW6urr///82MBGFAAAAHUlEQVR4AWOAAUYoQOePEAUj3v9oYDQ9gMBoegAAJFwCAbLaTIMAAAAASUVORK5CYII=') repeat;
+      }
+
+      .lowcont-medium-picker-background,
+      .lowcont-medium-canvas-background .canvas-background {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEXV1dXb29tFGkCIAAAAHklEQVR4AWNghAIGCMDgjwgFCDDSw2M0PSCD0fQAACRcAgF4ciGUAAAAAElFTkSuQmCC ') repeat;
+      }
+
+      .lowcont-dark-picker-background,
+      .lowcont-dark-canvas-background .canvas-background {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEVMTExVVVUnhsEkAAAAHUlEQVR4AWOAAUYoQOePEAUj3v9oYDQ9gMBoegAAJFwCAbLaTIMAAAAASUVORK5CYII=') repeat;
+      }
+    </style>
+    <div class="popup-container  lowcont-dark-canvas-background ">
+      <div class="preview-container  canvas-container">
+        <div class="canvas-background"></div>
+      </div>
+    </div>
+  </script>
+</div>
+
+  <span class="cheatsheet-link icon-common-keyboard-gold"
+        rel="tooltip" data-placement="right" title="Keyboard shortcuts">&nbsp;</span>
+  <div class="performance-link icon-common-warning-red"
+       rel="tooltip" data-placement="left" title="Performance problem detected, learn more.">&nbsp;</div>
+
+  <!-- dialogs partials -->
+  <script type="text/template" id="templates/dialogs/browse-backups.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      Browse backups
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-content backups-wizard-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="backups-select-session">
+<div class="backups-step-container">
+  <div class="backups-step-content">
+    <div class="browse-backups-disclaimer">
+      <div class="backups-icon icon-common-backup-white">&nbsp;</div>
+      <div class="browse-backups-disclaimer-content">
+        <!-- Keep in sync with MAX_SESSIONS in BackupService.js -->
+        If you forgot to save your work or if Piskel crashed, try to restore one of the automatically backed up sessions below (up to 10 sessions).
+        <br/>
+        <br/>
+        Backups may be erased without notice, so try to save your work to a file or to your gallery as soon as you can.
+      </div>
+    </div>
+    <div class="session-list">
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="session-list-empty">
+<div class="centered-message session-list-empty">No session found ...</div>
+</script>
+
+<script type="text/template" id="session-list-error">
+<div class="centered-message session-list-error">Could not load backup sessions, something went wrong.</div>
+</script>
+
+<script type="text/template" id="session-list-item">
+<div class="session-item">
+  <div class="session-details">
+    <span class="session-details-title">{{name}} {{description}}</span>
+    <span class="session-details-info">Session recorded {{date}}</span>
+    <span class="session-details-info">{{count}} saved</span>
+  </div>
+  <div class="session-actions">
+    <button class="button" data-session-id="{{id}}" data-action="delete">Delete</button>
+    <button class="button button-primary" data-session-id="{{id}}" data-action="view">View</button>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="backups-session-details">
+<div class="backups-step-container">
+  <div class="backups-step-content">
+    <div class="snapshot-list"></div>
+  </div>
+  <div class="backups-step-actions">
+    <button class="button back-button">back</button>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="snapshot-list-empty">
+<div class="centered-message snapshot-list-empty">No snapshot found ...</div>
+</script>
+
+<script type="text/template" id="snapshot-list-error">
+<div class="centered-message snapshot-list-error">Could not load snapshots, something went wrong.</div>
+</script>
+
+<script type="text/template" id="snapshot-list-item">
+<div class="snapshot-item" data-snapshot-id={{id}}>
+  <div class="snapshot-preview lowcont-dark-picker-background"></div>
+  <div class="snapshot-details">
+    <span class="snapshot-details-title">{{name}} {{description}}</span>
+    <span class="snapshot-details-info">Snapshot recorded {{date}}</span>
+    <span class="snapshot-details-info">{{frames}}, size {{resolution}}, {{fps}}fps</span>
+  </div>
+  <div class="snapshot-actions">
+    <button class="button button-primary" data-action="load" data-snapshot-id="{{id}}">Load</button>
+  </div>
+</div>
+</script>
+  <script type="text/template" id="templates/dialogs/browse-local.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      Browse Local Piskels
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-content" style="padding:10px 20px; font-size:1.5em; overflow: auto;">
+      <table class="local-piskel-list">
+        <thead>
+          <tr class="local-piskel-list-head">
+            <td class="local-piskel-name">Name</td>
+            <td class="local-piskel-save-date">Date</td>
+            <td colspan=2>Actions</td>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="local-storage-item-template">
+  <tr class="local-piskel-item">
+    <td class="local-piskel-name">{{name}}</td>
+    <td class="local-piskel-save-date">{{date}}</td>
+    <td><button type="button" data-action="load" data-name="{{name}}" class="button button-primary local-piskel-load-button">Load</button></td>
+    <td><button type="button" data-action="delete" data-name="{{name}}" class="button local-piskel-delete-button">Delete</button></td>
+  </tr>
+</script>
+  <script type="text/template" id="templates/dialogs/cheatsheet.html">
+  <div id="cheatsheetContainer" class="dialog-wrapper">
+    <h3 class="dialog-head">
+      <span class="dialog-title">Keyboard shortcuts</span>
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="cheatsheet-container dialog-content">
+      <div class="cheatsheet-section">
+        <h3 class="cheatsheet-title">Tool shortcuts</h3>
+        <ul class="cheatsheet-tool-shortcuts"></ul>
+      </div>
+      <div class="cheatsheet-section">
+        <h3 class="cheatsheet-title">Misc shortcuts</h3>
+        <ul class="cheatsheet-misc-shortcuts"></ul>
+      </div>
+      <div class="cheatsheet-boxes">
+        <div class="cheatsheet-section">
+          <h3 class="cheatsheet-title">Selection shortcuts</h3>
+          <ul class="cheatsheet-selection-shortcuts"></ul>
+        </div>
+        <div class="cheatsheet-section">
+          <h3 class="cheatsheet-title">Color shortcuts</h3>
+          <ul class="cheatsheet-color-shortcuts"></ul>
+        </div>
+        <div class="cheatsheet-section">
+          <h3 class="cheatsheet-title">Storage shortcuts</h3>
+          <ul class="cheatsheet-storage-shortcuts"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="cheatsheet-actions">
+      <span class="cheatsheet-helptext" rel="tooltip" data-placement="top" title="!!!Set in CheatsheetController!!!"><b>Customize shortcuts ?</b></span>
+      <button type="button" name="cheatsheet-restore-defaults" data-action="restore-defaults" class="button cheatsheet-button cheatsheet-restore-defaults">Restore default shortcuts</button>
+    </div>
+
+    <!-- Event trap to capture keyboard remaps -->
+    <div style="position:relative; overflow:hidden; width:1px; height:1px;">
+      <input type="text" id="cheatsheetEventTrap" style="position:absolute; top:-1000px;" />
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="cheatsheet-shortcut-template">
+  <li class="cheatsheet-shortcut {{className}}" data-shortcut-id="{{id}}">
+    <div class="cheatsheet-icon {{icon}}"></div>
+    <span class="cheatsheet-key" rel="tooltip" data-placement="top" title="{{title}}">{{!key!}}</span>
+    <span class="cheatsheet-description">{{description}}</span>
+  </li>
+</script>
+  <script type="text/template" id="templates/dialogs/create-palette.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      <span class="dialog-title">Create palette</span>
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-create-palette" style="font-size:1.3em">
+        <div class="create-palette-section form-section">
+          <span class="create-palette-name-label">Name</span>
+          <input type="text" class="textfield create-palette-name-input" name="palette-name" placeholder="palette name ..."/>
+          <div class="create-palette-import-section">
+            <button
+              type="button"
+              rel="tooltip" data-placement="right" title="Import palette from an existing Image or from a palette file"
+              class="button  button-primary create-palette-import-button">Import from file</button>
+            <button
+              type="button"
+              rel="tooltip" data-placement="right" title="Download the palette as a GPL file"
+              class="button  button-primary create-palette-download-button">Download as file</button>
+            <input style="display:none"
+              class="create-palette-import-input"
+              type="file" value="file" accept="*"/>
+          </div>
+        </div>
+        <div class="colors-container">
+          <ul class="colors-list"></ul>
+          <div class="color-picker-container">
+            <div class="color-picker-spectrum"></div>
+            <div class="color-picker-input">
+              <input type="text"  data-model="hex" data-dimension="*" class="textfield  uppercase" value="#000000" />
+            </div>
+            <div class="color-picker-slider">
+              <span>H</span>
+              <input type="range" data-model="hsv" data-dimension="h" value="0" min="0" max="359" tabindex="-1"/>
+              <input type="text"  data-model="hsv" data-dimension="h" class="textfield" value="0" />
+            </div>
+            <div class="color-picker-slider">
+              <span>S</span>
+              <input type="range" data-model="hsv" data-dimension="s" value="0" min="0" max="100" tabindex="-1"/>
+              <input type="text"  data-model="hsv" data-dimension="s" class="textfield" value="0" />
+            </div>
+            <div class="color-picker-slider">
+              <span>V</span>
+              <input type="range" data-model="hsv" data-dimension="v" value="0" min="0" max="100" tabindex="-1"/>
+              <input type="text"  data-model="hsv" data-dimension="v" class="textfield" value="0" />
+            </div>
+            <br/>
+            <div class="color-picker-slider">
+              <span>R</span>
+              <input type="range" data-model="rgb" data-dimension="r" value="0" min="0" max="255" tabindex="-1"/>
+              <input type="text"  data-model="rgb" data-dimension="r" class="textfield" value="0" />
+            </div>
+            <div class="color-picker-slider">
+              <span>G</span>
+              <input type="range" data-model="rgb" data-dimension="g" value="0" min="0" max="255" tabindex="-1"/>
+              <input type="text"  data-model="rgb" data-dimension="g" class="textfield" value="0" />
+            </div>
+            <div class="color-picker-slider">
+              <span>B</span>
+              <input type="range" data-model="rgb" data-dimension="b" value="0" min="0" max="255" tabindex="-1"/>
+              <input type="text"  data-model="rgb" data-dimension="b" class="textfield" value="0" />
+            </div>
+            <div class="color-preview"></div>
+          </div>
+        </div>
+        <div class="create-palette-actions">
+          <button type="button" name="create-palette-cancel" data-action="cancel" class="button create-palette-cancel">Cancel</button>
+          <button type="button" name="create-palette-delete" data-action="delete" class="button button-primary create-palette-delete">Delete</button>
+          <!-- <button type="button" name="create-palette-clone" class="button button-primary create-palette-clone">Save as new</button> -->
+          <button type="button" name="create-palette-submit" data-action="submit" class="button button-primary create-palette-submit">Save</button>
+        </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="create-palette-color-template">
+  <li
+    class="create-palette-color {{:selected}} {{:light-color}}"
+    style="background:{{color}}"
+    data-palette-index="{{index}}"
+    data-palette-color="{{color}}">
+    <div class="create-palette-remove-color">X</div>
+  </li>
+</script>
+  <script type="text/template" id="templates/dialogs/import.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      Import and Merge
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-content import-wizard-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="import-image-import">
+<div class="import-step-container import-image-container">
+  <form action="" method="POST" name="import-image-form">
+    <div class="import-section">
+      <span class="dialog-section-title">Name :</span><span class="import-image-file-name"></span>
+    </div>
+    <div class="import-section">
+      <div class="import-section-preview"></div>
+    </div>
+    <div class="import-section">
+      <label class="dialog-section-radio-label">
+        <input class="dialog-section-radio" name="import-type" value="single" type="radio" checked="checked">
+        Import as single image
+      </label>
+    </div>
+    <div class="import-section import-subsection">
+      <span class="dialog-section-title">Resize to</span>
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="resize-width"/>x
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="resize-height"/>
+    </div>
+    <div class="import-section import-subsection">
+      <span class="import-section-title">Smooth resize</span>
+      <input type="checkbox" class="checkbox-fix" checked="checked" name="smooth-resize-checkbox" value="1"/>
+    </div>
+    <div class="import-section">
+      <label class="dialog-section-radio-label">
+        <input class="dialog-section-radio" name="import-type" value="sheet" type="radio">
+        Import as spritesheet
+      </label>
+    </div>
+    <div class="import-section import-subsection">
+      <span class="dialog-section-title">Frame size</span>
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="frame-size-x"/>x
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="frame-size-y"/>
+    </div>
+    <div class="import-section import-subsection">
+      <span class="dialog-section-title">Offset</span>
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="frame-offset-x"/>x
+      <input type="text" class="textfield import-size-field" autocomplete="off" name="frame-offset-y"/>
+    </div>
+  </form>
+  <div class="import-step-buttons">
+    <button class="import-back-button button">back</button>
+    <button class="import-next-button button button-primary">next</button>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="import-select-mode">
+<div class="import-step-container">
+  <div class="import-info">
+    <div class="import-preview"></div>
+    <div class="import-meta"></div>
+  </div>
+
+  <div class="import-step-content">
+    <div class="import-mode">
+      <div class="import-mode-title">How do you want to import the new content?</div>
+      <div class="import-mode-section">
+        <span class="import-mode-section-description">Combine with your sprite</span>
+        <button class="import-mode-merge-button button-primary button">Combine</button>
+      </div>
+      <div class="import-mode-section">
+        <span class="import-mode-section-description">Replace your sprite</span>
+        <button class="import-mode-replace-button button-primary button">Replace</button>
+      </div>
+    </div>
+
+    <div class="import-step-buttons">
+      <button class="import-back-button button">back</button>
+      <button style="display: none" class="import-next-button button button-primary">next</button>
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="import-meta-content">
+  <div class="import-name">
+    <span class="import-meta-label">Name</span>
+    <span class="import-meta-value" title="{{name}}">{{name}}</span>
+  </div>
+  <div class="import-dimensions">
+    <span class="import-meta-label">Dimensions</span>
+    <span class="import-meta-value">{{dimensions}}</span>
+  </div>
+  <div class="import-frames">
+    <span class="import-meta-label">Frames</span>
+    <span class="import-meta-value">{{frames}}</span>
+  </div>
+  <div class="import-layers">
+    <span class="import-meta-label">Layers</span>
+    <span class="import-meta-value">{{layers}}</span>
+  </div>
+</script>
+
+<script type="text/template" id="import-adjust-size">
+<div class="import-step-container">
+
+  <div class="import-info">
+    <div class="import-preview"></div>
+    <div class="import-meta"></div>
+  </div>
+
+  <div class="import-step-content">
+    <div class="import-resize-info"></div>
+    <div class="import-resize-anchor import-resize-section">
+      <div class="import-resize-anchor-info"></div>
+      <div class="import-resize-anchor-container"></div>
+    </div>
+    <div class="import-step-buttons">
+      <button class="import-back-button button">back</button>
+      <button class="import-next-button button button-primary">next</button>
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="import-resize-bigger-partial">
+<div class="import-resize-bigger">
+  <div class="import-resize-section">
+    The imported image is bigger than the current sprite.
+  </div>
+  <div class="import-resize-section">
+    <label class="import-resize-option">
+      <input type="radio" name="resize-mode" id="resize-option-expand" value="expand" {{expandChecked}}/>
+      <span>Expand canvas to {{newSize}}</span>
+    </label>
+    <label class="import-resize-option">
+      <input type="radio" name="resize-mode" id="resize-option-keep" value="keep" {{keepChecked}}/>
+      <span>Keep canvas size at {{size}}</span>
+    </label>
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="import-resize-smaller-partial">
+<div class="import-resize-smaller">
+  <div class="import-resize-section">
+    The image being imported is smaller ({{newSize}}) than the canvas size ({{size}}).
+  </div>
+</div>
+</script>
+
+<script type="text/template" id="import-insert-location">
+<div class="import-step-container">
+  <div class="import-info">
+    <div class="import-preview"></div>
+    <div class="import-meta"></div>
+  </div>
+
+  <div class="import-step-content">
+    <div>Select the insertion frame:</div>
+    <div class="insert-frame-preview"></div>
+    <div class="insert-mode-container">
+      <div class="insert-mode-option-label">
+        Insert imported frames:
+      </div>
+      <label class="insert-mode-option">
+        <input type="radio" name="insert-mode" id="insert-mode-add" value="add" checked="checked"/>
+        <span>as new frames</span>
+      </label>
+      <label class="insert-mode-option">
+        <input type="radio" name="insert-mode" id="insert-mode-insert" value="insert"/>
+        <span>in existing frames</span>
+      </label>
+    </div>
+    <div class="import-step-buttons">
+      <button class="import-back-button button">back</button>
+      <button class="import-next-button button button-primary">import</button>
+    </div>
+  </div>
+</div>
+</script>
+
+  <script type="text/template" id="templates/dialogs/performance-info.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      Performance issues
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-performance-info-body">
+      <p>The current sprite may exceed the recommendations for Piskel.</p>
+      <p>You can ignore this warning and continue working with your sprite but you might experience the following issues:</p>
+      <ul>
+        <li>saving failures</li>
+        <li>slowdowns</li>
+        <li>crashes</li>
+      </ul>
+      <p>If you ignore this warning, please save often!</p>
+      <p>To fix the issue, try adjusting your sprite settings:</p>
+       <ul>
+        <li>sprite resolution <sup title="recommended: lower than 512x512" rel="tooltip" data-placement="top">?</sup></li>
+        <li>number of layers <sup title="recommended: less than 10" rel="tooltip" data-placement="top">?</sup></li>
+        <li>number of frames <sup title="recommended: less than 50" rel="tooltip" data-placement="top">?</sup></li>
+        <li>number of colors <sup title="recommended: less than 256" rel="tooltip" data-placement="top">?</sup></li>
+      </ul>
+      <p>We strive to improve Piskel, its performance and stability, but this is a personal project with limited time and resources.
+         We prefer to warn you early rather than having you lose your work.</p>
+      <p>Feedback welcome at <a href="https://github.com/piskelapp/piskel" target="_blank">https://github.com/piskelapp/piskel</a></p>
+      <p>
+        <div class="warning-icon icon-common-warning-red">&nbsp;</div>
+        <div class="warning-icon-info">This icon will remain on the bottom-right of the application until the performance issue is fixed. You can click on it at anytime to display this information again.</div>
+      </p>
+    </div>
+  </div>
+</script>
+  <script type="text/template" id="templates/dialogs/unsupported-browser.html">
+  <div class="dialog-wrapper">
+    <h3 class="dialog-head">
+      Browser not supported
+      <span class="dialog-close">X</span>
+    </h3>
+    <div class="dialog-content">
+      <p>Your current browser (<span id="current-user-agent"></span>) is not supported.</p>
+      <p>Piskel is currently tested for:</p>
+      <ul class="supported-browser-list">
+        <li>Google Chrome <a href="https://www.google.com/chrome/browser/desktop/" target="_blank">https://www.google.com/chrome/browser/desktop/</a></li>
+        <li>Mozilla Firefox <a href="https://www.mozilla.org/en-US/firefox/" target="_blank">https://www.mozilla.org/en-US/firefox/</a></li>
+        <li>Microsoft Edge <a href="https://www.microsoft.com/en-us/windows/microsoft-edge" target="_blank">https://www.microsoft.com/en-us/windows/microsoft-edge</a></li>
+      </ul>
+      <p>This browser has not been tested with Piskel, you might experience unknown bugs and crashes if you decide to continue.</p>
+    </div>
+  </div>
+</script>
+
+  <!-- settings-panel partials -->
+  <script type="text/html" id="templates/settings/preferences.html">
+  <div class="settings-section settings-section-preferences">
+    <div class="settings-title">Settings</div>
+    <div class="tab-list">
+      <div class="tab-item" data-tab-id="misc">Misc</div>
+      <div class="tab-item" data-tab-id="grid">Grid</div>
+      <div class="tab-item" data-tab-id="tile">Tile mode</div>
+    </div>
+    <div class="tab-content"></div>
+    <div class="settings-version-info">
+      Piskel
+      <span rel="tooltip" data-placement="bottom" title="View release notes">
+        <a  class="settings-version" target="_blank"
+            href="https://github.com/piskelapp/piskel/releases/tag/v0.16.0-SNAPSHOT">v0.16.0-SNAPSHOT</a>
+      </span>
+    </div>
+  </div>
+
+</script>
+
+  <script type="text/html" id="templates/settings/preferences/grid.html">
+  <div class="preferences-panel-grid">
+    <div class="settings-item">
+      <label>
+        Enable grid
+        <input type="checkbox" value="1" class="enable-grid-checkbox" name="enable-grid-checkbox"/>
+      </label>
+    </div>
+    <div class="settings-item settings-item-grid-size">
+      <label>Grid size</label>
+      <div class="grid-size-container size-picker-container">
+        <div class="size-picker-option"
+          title="1px" rel="tooltip" data-placement="top" data-size="1"></div>
+        <div class="size-picker-option"
+          title="2px" rel="tooltip" data-placement="top" data-size="2"></div>
+        <div class="size-picker-option"
+          title="3px" rel="tooltip" data-placement="top" data-size="3"></div>
+        <div class="size-picker-option"
+          title="4px" rel="tooltip" data-placement="top" data-size="4"></div>
+      </div>
+    </div>
+    <div class="settings-item settings-item-grid-spacing">
+      <label>Grid spacing</label>
+      <div class="grid-spacing-container size-picker-container">
+        <div class="size-picker-option"
+          title="1px" rel="tooltip" data-placement="top" data-size="1"></div>
+        <div class="size-picker-option"
+          title="2px" rel="tooltip" data-placement="top" data-size="2"></div>
+        <div class="size-picker-option"
+          title="4px" rel="tooltip" data-placement="top" data-size="4"></div>
+        <div class="size-picker-option"
+          title="8px" rel="tooltip" data-placement="top" data-size="8"></div>
+        <div class="size-picker-option"
+          title="16px" rel="tooltip" data-placement="top" data-size="16"></div>
+        <div class="size-picker-option"
+          title="32px" rel="tooltip" data-placement="top" data-size="32"></div>
+        <div class="size-picker-option"
+          title="64px" rel="tooltip" data-placement="top" data-size="64"></div>
+      </div>
+    </div>
+    <div class="settings-item settings-item-grid-color">
+      <label>Grid color</label>
+      <div class="grid-colors-list"></div>
+      <script type="text/template" id="color-list-item-template">
+        <div class="grid-colors-item {{:selected}}"
+             data-color="{{color}}"
+             style="background:{{background}}"
+             title="{{title}}">
+        </div>
+      </script>
+    </div>
+  </div>
+</script>
+
+  <script type="text/html" id="templates/settings/preferences/misc.html">
+  <div class="preferences-panel-misc">
+    <div class="settings-item">
+      <label>Background</label>
+      <div class="background-picker-wrapper">
+        <div class="background-picker light-picker-background" data-background="light-canvas-background"
+              rel="tooltip" data-placement="bottom" title="light / high contrast">
+        </div>
+        <div class="background-picker medium-picker-background" data-background="medium-canvas-background"
+              rel="tooltip" data-placement="bottom" title="medium / high contrast">
+        </div>
+        <div class="background-picker lowcont-medium-picker-background" data-background="lowcont-medium-canvas-background"
+              rel="tooltip" data-placement="bottom" title="medium / low contrast">
+        </div>
+        <div class="background-picker lowcont-dark-picker-background" data-background="lowcont-dark-canvas-background"
+              rel="tooltip" data-placement="bottom" title="dark / low contrast">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <label>Layer opacity</label>
+      <input type="range" class="settings-opacity-input layer-opacity-input" name="layer-opacity" min="0"  max="1" step="0.05"/>
+      <span class="settings-opacity-text layer-opacity-text"></span>
+    </div>
+
+    <div class="settings-item">
+      <label>Maximum FPS</label>
+      <input type="text" class="textfield  textfield-small  max-fps-input" autocomplete="off" name="max-fps"/>
+    </div>
+
+    <div class="settings-item">
+      <label for="color-format">Color format</label>
+      <select id="color-format" class="color-format-select">
+        <option value="hex">Hex</option>
+        <option value="rgb">RGB</option>
+      </select>
+    </div>
+  </div>
+</script>
+  <script type="text/html" id="templates/settings/preferences/tile.html">
+  <div class="preferences-panel-tile">
+    <div class="settings-item">
+      <label>
+        Enable tile mode
+        <input type="checkbox" value="1" class="tile-mode-checkbox" name="tile-mode-checkbox"/>
+      </label>
+    </div>
+
+    <div class="settings-item">
+      <label>Mask opacity</label>
+      <input type="range" min="0" max="0.5" step="0.01"
+        class="settings-opacity-input tile-mask-opacity-input" name="tile-mask-opacity"/>
+      <span class="settings-opacity-text tile-mask-opacity-text"></span>
+    </div>
+  </div>
+</script>
+  <script type="text/html" id="templates/settings/resize.html">
+  <div class="settings-section settings-section-resize">
+    <!-- RESIZE DRAWING SECTION -->
+    <div class="settings-title">
+      Resize
+    </div>
+    <div class="settings-item  resize-canvas">
+      <form action="" method="POST" name="resize-canvas-form">
+        <div class="resize-section">
+          <span  class="resize-section-title">Width</span>
+          <input type="text" class="textfield resize-size-field" autocomplete="off" name="resize-width"/>
+          <span>px</span>
+        </div>
+        <div class="resize-section">
+          <span  class="resize-section-title">Height</span>
+          <input type="text" class="textfield resize-size-field" autocomplete="off" name="resize-height"/>
+          <span>px</span>
+        </div>
+        <div class="resize-section">
+          <label class="checkbox-container">
+            <input type="checkbox" class="resize-ratio-checkbox checkbox-fix" value="true"/>
+            <span>Maintain aspect ratio</span>
+          </label>
+        </div>
+        <div class="resize-section">
+          <label class="checkbox-container">
+            <input type="checkbox" class="resize-content-checkbox checkbox-fix" value="true"/>
+            <span>Resize canvas content</span>
+          </label>
+        </div>
+        <div class="resize-section">
+          <span  class="resize-section-title">Anchor</span>
+          <div class="resize-anchor-container"></div>
+        </div>
+        <input type="submit" class="button button-primary resize-button" value="Resize" />
+      </form>
+    </div>
+    <!-- DEFAULT SIZE SECTION -->
+    <div class="settings-title">
+      Default size
+    </div>
+    <div class="settings-item  settings-default-size">
+      <form action="" method="POST" name="default-size-form">
+        <div class="resize-section">
+          <span  class="resize-section-title">Width</span>
+          <input type="text" class="textfield resize-size-field" autocomplete="off" name="default-width"/>
+          <span>px</span>
+        </div>
+        <div class="resize-section">
+          <span  class="resize-section-title">Height</span>
+          <input type="text" class="textfield resize-size-field" autocomplete="off" name="default-height"/>
+          <span>px</span>
+        </div>
+        <input type="submit" class="button button-primary default-size-button" value="Set default" />
+      </form>
+    </div>
+  </div>
+</script>
+
+  <script type="text/template" id="templates/settings/save.html">
+  <div class="settings-section settings-section-save">
+    <form action="" method="POST" class="save-form" name="save-form">
+      <div class="settings-title">Sprite Information</div>
+      <div class="settings-item">
+        <div class="settings-form-section" style="overflow:hidden">
+          <label class="row" style="line-height:20px;">Title : </label>
+          <input id="save-name" type="text" class="save-field textfield" autocomplete="off" />
+        </div>
+        <div class="settings-form-section">
+          <label class="row" style="line-height:20px;">Description : </label>
+          <textarea id="save-description" class="save-field textfield"></textarea>
+        </div>
+        <div class="settings-form-section  save-public-section">
+          <label class="row">
+            Public : <input type="checkbox" value="1" name="save-public-checkbox"/>
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+</script>
+
+<!-- save-gallery-partial -->
+<script type="text/template" id="save-gallery-partial">
+  <div class="settings-title">Save online</div>
+  <div class="settings-item">
+    <input type="button" class="button button-primary" id="save-gallery-button" value="Save to your gallery" />
+    <div class="save-status save-online-status">Your piskel will be stored online in your gallery.</div>
+  </div>
+</script>
+
+<script type="text/template" id="save-gallery-warning-partial">
+  <div class="save-status-warning-icon icon-common-warning-red">&nbsp;</div>
+  <div class="save-status-warning-text">Saving to the gallery might fail due to the sprite size.</div>
+</script>
+
+<!-- save-gallery-unavailable-partial -->
+<script type="text/template" id="save-gallery-unavailable-partial">
+  <div class="settings-title">Save online</div>
+  <div class="settings-item">
+    <div class="save-status">Login to <a href="https://www.piskelapp.com" target="_blank">piskelapp.com</a> to save and share your sprites online.</div>
+  </div>
+</script>
+
+<!-- save-localstorage-partial -->
+<script type="text/template" id="save-localstorage-partial">
+  <div class="settings-title">Save offline in Browser</div>
+  <div class="settings-item">
+    <input type="button" class="button button-primary" id="save-localstorage-button" value="Save in Browser" />
+    <div class="save-status">Your piskel will be saved locally and will only be accessible from this browser.</div>
+  </div>
+</script>
+
+<!-- save-desktop-partial -->
+<script type="text/template" id="save-desktop-partial">
+  <div class="settings-title">Save as File</div>
+  <div class="settings-item">
+    <input type="button" class="button button-primary" id="save-desktop-button" value="Save" />
+    <input type="button" class="button button-primary" id="save-desktop-as-new-button" value="Save as ..." />
+    <div class="save-status">Your sprite will be saved as a .piskel file.</div>
+  </div>
+</script>
+
+<!-- save-file-download-partial -->
+<script type="text/template" id="save-file-download-partial">
+  <div class="settings-title">Save offline as File</div>
+  <div class="settings-item">
+    <input type="button" class="button button-primary" id="save-file-download-button" value="Save as .piskel" />
+    <div class="save-status">Your sprite will be downloaded as a .piskel file.</div>
+  </div>
+</script>
+  <script type="text/template" id="templates/settings/import.html">
+  <div class="settings-section settings-section-import">
+    <div class="settings-title">
+      Load from Browser
+    </div>
+    <div class="settings-item">
+      <span>Load a <span class="import-highlight">local piskel</span> saved in this Browser</span>
+      <div class="import-section">
+        <button type="button" class="button  button-primary browse-local-button">Browse local saves</button>
+      </div>
+    </div>
+    <div class="settings-title">
+      Load .piskel file
+    </div>
+    <div class="settings-item">
+      <span>Load a <span class="import-highlight">.piskel</span> file from your computer</span>
+
+      <div class="import-section">
+        <button type="button" class="button  button-primary open-piskel-button">Browse .piskel files</button>
+        <span class="file-input-open-piskel-status"></span>
+        <input style="display:none"
+          type="file" name="open-piskel-input"
+          value="file" accept=".piskel"/>
+      </div>
+    </div>
+    <div class="settings-title">
+      Import From Picture
+    </div>
+    <div class="settings-item">
+      <div style="margin-top:5px;margin-bottom:5px;">Supports <span class="import-highlight">PNG, JPG, BMP, Animated GIF</span></div>
+      <div class="import-section">
+        <button type="button" class="button  button-primary file-input-button">Browse images</button>
+        <input style="display:none"
+          type="file" name="file-upload-input"
+          value="file" accept="image/*"/>
+      </div>
+    </div>
+    <div class="settings-title">
+      Recover recent sessions
+    </div>
+    <div class="settings-item">
+      Browse backups of previous sessions.
+      <div style="margin-top:10px;">
+        <button type="button" class="button button-primary browse-backups-button">Browse backups</button>
+      </div>
+    </div>
+  </div>
+</script>
+  <script type="text/html" id="templates/settings/export.html">
+  <div class="settings-section settings-section-export">
+    <div class="settings-title">Export</div>
+    <div class="settings-item export-scale" title="Scale the animation for export"
+        rel="tooltip"
+        data-placement="top">
+      <label for="scale-input">Scale</label>
+      <input type="range" class="scale-input" name="scale-input" min="1"  max="32" step="1"/>
+      <span class="scale-text"></span>
+    </div>
+    <div class="settings-item export-resize">
+      <span class="resize-label">Resolution</span>
+      <input type="text" class="textfield  resize-field  resize-width" autocomplete="off" name="resize-width"/>
+      <div class="resize-label">x</div>
+      <input type="text" class="textfield  resize-field  resize-height" autocomplete="off" name="resize-height"/>
+    </div>
+    <div class="export-tabs tab-list">
+      <div class="export-tab tab-item" data-tab-id="gif">GIF</div>
+      <div class="export-tab tab-item" data-tab-id="png">PNG</div>
+      <div class="export-tab tab-item" data-tab-id="zip">Zip</div>
+      <div class="export-tab tab-item" data-tab-id="misc">Others</div>
+    </div>
+    <div class="export-panel tab-content"></div>
+  </div>
+</script>
+
+  <script type="text/html" id="templates/settings/export/png.html">
+  <div class="export-panel-png">
+    <div class="export-panel-header export-info">Export your animation as a PNG spritesheet containing all frames.</div>
+    <div class="export-panel-section  png-export-layout-section">
+      <div class="highlight" style="padding-bottom: 5px;">Spritesheet layout options:</div>
+      <div style="display: flex; line-height: 20px;">
+        <div style="flex: 1;">
+          <span>Columns</span>
+          <input type="number" min="1" class="textfield" id="png-export-columns" name="png-export-columns">
+        </div>
+        <div style="flex: 1;">
+          <span>Rows</span>
+          <input readonly="true" class="textfield" id="png-export-rows" name="png-export-rows">
+        </div>
+      </div>
+    </div>
+    <div class="export-panel-section">
+      <div style="padding-bottom: 5px">
+        <span class="highlight export-panel-row">Spritesheet file export: </span>
+      </div>
+      <div class="export-panel-row">
+        <button type="button" class="button button-primary png-download-button">Download</button>
+        <span class="png-export-dimension-info export-info"></span>
+      </div>
+    </div>
+    <div class="export-panel-section">
+      <div style="padding-bottom: 5px">
+        <span class="highlight export-panel-row">Spritesheet data-uri export: </span>
+      </div>
+      <div class="export-panel-row">
+        <button type="button" style="white-space: nowrap;" class="button button-primary datauri-open-button">Open</button>
+        <span class="export-info">Open the spritesheet as a data-uri</span>
+      </div>
+    </div>
+
+    <div class="export-panel-section">
+      <div style="padding-bottom: 5px">
+        <span class="highlight export-panel-row">PixiJS Movie export: </span>
+      </div>
+      <div class="checkbox-container" style="margin: 5px 0;">
+        <input id="png-pixi-inline-image" class="png-pixi-inline-image-checkbox checkbox-fix" type="checkbox" />
+        <label for="png-pixi-inline-image">Inline spritesheet as data-uri</label>
+      </div>
+      <div class="export-panel-row">
+        <button type="button" class="button button-primary png-pixi-download-button"/>Download</button>
+        <span class="export-info">Spritesheet with JSON metadata</span>
+      </div>
+    </div>
+
+    <div class="export-panel-section">
+      <div style="padding-bottom: 5px">
+        <span class="highlight">Selected frame export:</span>
+      </div>
+      <div class="export-panel-row">
+        <button type="button" class="button button-primary selected-frame-download-button"/>Download</button>
+        <span class="export-info">Single frame as a PNG file</span>
+      </div>
+    </div>
+
+  </div>
+</script>
+
+  <script type="text/html" id="templates/settings/export/gif.html">
+  <div class="export-panel-gif">
+    <div class="export-panel-header export-info">
+      Convert your sprite to an animated GIF.
+    </div>
+    <div class="gif-export-warning">
+      <div class="gif-export-warning-icon icon-common-warning-red">&nbsp;</div>
+      <div class="gif-export-warning-message">
+        Too many colors: can not preserve original colors or transparency.
+      </div>
+    </div>
+    <div class="export-panel-section export-panel-row">
+      <input id="gif-repeat-checkbox" class="gif-repeat-checkbox checkbox-fix" type="checkbox" />
+      <label for="gif-repeat-checkbox"
+             title="Uncheck to play the animation only one time."
+             rel="tooltip"
+             data-placement="top">Loop repeatedly</label>
+    </div>
+    <div class="export-panel-section export-panel-row">
+      <button type="button" class="button button-primary gif-download-button">Download</button>
+      <div class="export-info">Download as an animated GIF.</div>
+    </div>
+    <div class="export-panel-section export-panel-row">
+      <button type="button" class="button button-primary gif-upload-button">Upload</button>
+      <div class="export-info">Upload as an animated GIF to a public URL.</div>
+    </div>
+    <div class="gif-upload">
+      <div class="gif-export-preview"></div>
+      <div class="gif-upload-status"></div>
+    </div>
+  </div>
+</script>
+  <script type="text/html" id="templates/settings/export/zip.html">
+  <div class="export-panel-zip">
+    <div class="export-panel-header export-info">ZIP archive containing one PNG for each frame. File names will start with the prefix below.</div>
+    <div class="export-panel-section">
+      <div style="display: flex; line-height: 23px;">
+        <label style="flex-shrink: 0; padding-right:5px;">Prefix</label>
+        <input type="text" style="flex: 1;" class="zip-prefix-name textfield"
+               autocomplete="off" placeholder="PNG file prefix ...">
+      </div>
+      <div class="checkbox-container" style="margin: 5px 0;">
+        <input id="zip-split-layers" class="zip-split-layers-checkbox checkbox-fix" type="checkbox" />
+        <label for="zip-split-layers">Split by layers</label>
+      </div>
+      <div class="checkbox-container use-layer-names-container" style="margin: 5px 0;">
+        <input id="zip-use-layer-names" class="zip-use-layer-names-checkbox checkbox-fix" type="checkbox" />
+        <label for="zip-use-layer-names">Index by layer names</label>
+      </div>
+      <button type="button" class="button button-primary zip-generate-button"/>Download ZIP</button>
+    </div>
+  </div>
+</script>
+
+  <script type="text/html" id="templates/settings/export/misc.html">
+  <div class="export-panel-misc">
+    <div class="export-panel-header export-info">
+      Less usual export formats. Feedback and improvements welcome.
+    </div>
+    <div class="export-panel-section">
+      <div style="padding-bottom: 5px">
+        <span class="highlight">Export as C File: </span>
+        <span class="export-info">
+          C file with frame rendered as array.
+        </span>
+      </div>
+      <button type="button" class="button button-primary c-download-button">Download C file</button>
+    </div>
+  </div>
+</script>
+
+  <script type="text/javascript">
+    (function () {
+
+  /**
+   * See @Gruntfile.js => after build, -2019-11-18-02-27 is replaced by the build version
+   */
+  var version = '-2019-11-18-02-27';
+  var versionHasNotBeenReplaced = version.indexOf('@@') === 0;
+  if (versionHasNotBeenReplaced)  {
+    version = '';
+  }
+
+  if (!window.piskelReadyCallbacks) {
+    window.piskelReadyCallbacks = [];
+  }
+
+  window._onPiskelReady = function () {
+    var loadingMask = document.getElementById('loading-mask');
+    loadingMask.style.opacity = 0;
+    window.setTimeout(function () {loadingMask.parentNode.removeChild(loadingMask);}, 600);
+    pskl.app.init();
+    pskl._releaseVersion = '0.16.0-SNAPSHOT';
+    // cleanup
+    delete window.pskl_exports;
+    delete window.loadDebugScripts;
+    delete window.done;
+
+    // Run Piskel ready callbacks
+    for (var i = 0; i < window.piskelReadyCallbacks.length; i++) {
+      window.piskelReadyCallbacks[i]();
+    }
+  };
+
+  var prefixPath = function (path) {
+    if (window.pskl && window.pskl.appEngineToken_) {
+      return '../' + path;
+    } else {
+      return path;
+    }
+  };
+
+  var loadScript = function (src, callback) {
+    src = prefixPath(src);
+    var script = window.document.createElement('script');
+    script.setAttribute('src',src);
+    script.setAttribute('onload',callback);
+    window.document.body.appendChild(script);
+  };
+
+  var loadStyle = function (src) {
+    src = prefixPath(src);
+    var link = document.createElement('link');
+    link.setAttribute('href', src);
+    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('type', 'text/css');
+    document.head.appendChild(link);
+  };
+
+  if (window.location.href.indexOf('debug') != -1) {
+    window.pskl_exports = {};
+    var scriptIndex = 0;
+    window.loadNextScript = function () {
+      if (scriptIndex == window.pskl_exports.scripts.length) {
+        window._onPiskelReady();
+      } else {
+        loadScript(window.pskl_exports.scripts[scriptIndex], 'loadNextScript()');
+        scriptIndex ++;
+      }
+    };
+    loadScript('piskel-script-list.js', 'loadNextScript()');
+
+    var styles;
+    window.loadStyles = function () {
+      styles = window.pskl_exports.styles;
+      for (var i = 0 ; i < styles.length ; i++) {
+        loadStyle(styles[i]);
+      }
+    };
+
+    window.reloadStyles = function () {
+      for (var i = 0 ; i < styles.length ; i++) {
+        document.querySelector('link[href="' + styles[i] + '"]').remove();
+        loadStyle(styles[i]);
+      }
+    };
+
+    loadScript('piskel-style-list.js', 'loadStyles()');
+  } else {
+    var script;
+    if (window.location.href.indexOf('pack') != -1) {
+      script = 'js/piskel-packaged' + version + '.js';
+    } else {
+      script = 'js/piskel-packaged-min' + version + '.js';
+    }
+
+    loadStyle('css/piskel-style-packaged' + version + '.css');
+    loadScript(script, '_onPiskelReady()');
+  }
+})();
+  </script>
+  <!--body-main-end-->
+  <!-- the comment above indicates the end of the markup reused by the editor integrated in piskelapp.com -->
+  <!-- do not delete, do not move :) -->
+
+</body>
+</html>

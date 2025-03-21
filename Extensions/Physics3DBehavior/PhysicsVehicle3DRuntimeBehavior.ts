@@ -376,6 +376,15 @@ namespace gdjs {
       //   this._vehicleController.GetConstraint().GetWheel(3).GetAngularVelocity()
       // );
 
+      const wheels: Array<Jolt.WheelWV> = [];
+      for (let index = 0; index < 4; index++) {
+        wheels.push(
+          Jolt.castObject(
+            this._vehicleController.GetConstraint().GetWheel(index),
+            Jolt.WheelWV
+          )
+        );
+      }
       console.log(
         [
           'Car center',
@@ -393,30 +402,23 @@ namespace gdjs {
             60) /
             1000,
           'Wheels',
-          vec3ToString(
-            this._vehicleController
-              .GetConstraint()
-              .GetWheel(0)
-              .GetContactPosition()
-          ),
-          vec3ToString(
-            this._vehicleController
-              .GetConstraint()
-              .GetWheel(1)
-              .GetContactPosition()
-          ),
-          vec3ToString(
-            this._vehicleController
-              .GetConstraint()
-              .GetWheel(2)
-              .GetContactPosition()
-          ),
-          vec3ToString(
-            this._vehicleController
-              .GetConstraint()
-              .GetWheel(3)
-              .GetContactPosition()
-          ),
+          vec3ToString(wheels[0].GetContactPosition()),
+          vec3ToString(wheels[1].GetContactPosition()),
+          vec3ToString(wheels[2].GetContactPosition()),
+          vec3ToString(wheels[3].GetContactPosition()),
+
+          'Speed',
+          wheels[0].GetAngularVelocity(),
+          wheels[1].GetAngularVelocity(),
+          wheels[2].GetAngularVelocity(),
+          wheels[3].GetAngularVelocity(),
+
+          'Slip',
+          wheels[0].mLongitudinalSlip,
+          wheels[1].mLongitudinalSlip,
+          wheels[2].mLongitudinalSlip,
+          wheels[3].mLongitudinalSlip,
+          ,
         ].join('\n')
       );
 
@@ -431,6 +433,7 @@ namespace gdjs {
       ) {
         this._sharedData.bodyInterface.ActivateBody(carBody.GetID());
       }
+      //this._vehicleController.GetEngine().SetCurrentRPM(100000);
 
       this._wasForwardKeyPressed = this._hasPressedForwardKey;
       this._wasBackwardKeyPressed = this._hasPressedBackwardKey;
@@ -702,7 +705,7 @@ namespace gdjs {
         const wheelWidth = halfVehicleDepth / 3;
         const suspensionMinLength = wheelRadius;
         const suspensionMaxLength = 1.5 * suspensionMinLength;
-        const maxSteerAngle = gdjs.toRad(30);
+        const maxSteerAngle = gdjs.toRad(40);
         const fourWheelDrive = false;
         const frontBackLimitedSlipRatio = 1.4;
         const leftRightLimitedSlipRatio = 1.4;
@@ -714,7 +717,7 @@ namespace gdjs {
         const BR_WHEEL = 3;
 
         const vehicleMass = 1500;
-        const maxEngineTorque = 500;
+        const maxEngineTorque = 4000;
         const clutchStrength = 10;
 
         const carShape = behavior.createShape();
@@ -808,7 +811,17 @@ namespace gdjs {
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
         controllerSettings.mEngine.mMaxTorque = maxEngineTorque;
+        controllerSettings.mEngine.mMaxRPM = 10000000;
+        controllerSettings.mEngine.mInertia = 0.01;
+        controllerSettings.mEngine.mNormalizedTorque.Clear();
+        controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
+        controllerSettings.mEngine.mNormalizedTorque.AddPoint(1, 1);
         controllerSettings.mTransmission.mClutchStrength = clutchStrength;
+        controllerSettings.mTransmission.mGearRatios.clear();
+        controllerSettings.mTransmission.mGearRatios.push_back(1);
+        controllerSettings.mTransmission.mReverseGearRatios.clear();
+        controllerSettings.mTransmission.mReverseGearRatios.push_back(-1);
+
         vehicle.mController = controllerSettings;
 
         // Front differential

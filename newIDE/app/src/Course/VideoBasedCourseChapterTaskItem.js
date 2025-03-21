@@ -28,7 +28,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const CourseChapterTaskItem = ({
+const VideoBasedCourseChapterTaskItem = ({
   courseChapterTask,
   isOpen,
   isComplete,
@@ -138,4 +138,4 @@ const CourseChapterTaskItem = ({
   );
 };
 
-export default CourseChapterTaskItem;
+export default VideoBasedCourseChapterTaskItem;

@@ -57,10 +57,12 @@ const CustomTooltip = ({
   payload,
   label,
   customStyle,
+  decimals = 2,
 }: {|
   payload: ?Array<any>,
   label: string,
   customStyle: Object,
+  decimals?: number,
 |}) =>
   payload ? (
     <Paper style={customStyle} background="light">
@@ -79,7 +81,9 @@ const CustomTooltip = ({
               index
             ) => (
               <Text noMargin key={index}>{`${name}: ${
-                Number.isInteger(value) ? value.toString() : value.toFixed(2)
+                Number.isInteger(value)
+                  ? value.toString()
+                  : value.toFixed(decimals)
               }${unit ? ` ${unit}` : ''}`}</Text>
             )
           )}
@@ -384,6 +388,56 @@ export const PlayersDurationPerDayChart = ({
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
           unit={' %'}
+        />
+        <Tooltip
+          content={props =>
+            CustomTooltip({
+              ...props,
+              customStyle: styles.tooltipContent,
+            })
+          }
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
+
+export const GameAdEarningsChart = ({
+  i18n,
+  chartData,
+  height,
+  fontSize,
+}: ChartProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const styles = getChartsStyleFromTheme(gdevelopTheme);
+
+  return (
+    <ResponsiveContainer width={chartWidth} height={height} debounce={1}>
+      <AreaChart data={chartData.adsEarnings} margin={chartMargins}>
+        <Area
+          name={i18n._(t`USD`)}
+          type="monotone"
+          dataKey="accumulatedEarningsInUSDs"
+          stroke={gdevelopTheme.chart.dataColor1}
+          fill={gdevelopTheme.chart.dataColor1}
+          fillOpacity={0.25}
+          yAxisId={0}
+        />
+        <CartesianGrid
+          stroke={gdevelopTheme.chart.gridColor}
+          strokeDasharray="3 3"
+        />
+        <XAxis
+          dataKey="date"
+          stroke={gdevelopTheme.chart.textColor}
+          style={styles.tickLabel}
+          tick={{ fontSize: fontSize === 'small' ? 12 : 16 }}
+        />
+        <YAxis
+          dataKey="accumulatedEarningsInUSDs"
+          stroke={gdevelopTheme.chart.textColor}
+          style={styles.tickLabel}
+          tick={{ fontSize: fontSize === 'small' ? 12 : 16 }}
         />
         <Tooltip
           content={props =>

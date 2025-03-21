@@ -3,12 +3,12 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import type { CourseChapter } from '../Utils/GDevelopServices/Asset';
+import type {
+  CourseChapter,
+  LockedCourseChapter,
+} from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
-import {
-  ColumnStackLayout,
-  ResponsiveLineStackLayout,
-} from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
@@ -91,18 +91,12 @@ const LockedOverlay = () => (
 );
 
 type Props = {|
-  courseChapter: CourseChapter,
+  courseChapter: LockedCourseChapter,
   onBuyWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
 const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
-  (
-    {
-      courseChapter,
-      onBuyWithCredits,
-    },
-    ref
-  ) => {
+  ({ courseChapter, onBuyWithCredits }, ref) => {
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
@@ -112,7 +106,9 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
     ] = React.useState<boolean>(false);
     const { windowSize } = useResponsiveWindowSize();
     const [password, setPassword] = React.useState<string>('');
-    const youtubeVideoId = getYoutubeVideoIdFromUrl(courseChapter.videoUrl);
+    const youtubeVideoId = courseChapter.videoUrl
+      ? getYoutubeVideoIdFromUrl(courseChapter.videoUrl)
+      : null;
     const [isPurchasing, setIsPurchasing] = React.useState<boolean>(false);
 
     const onClickBuyWithCredits = React.useCallback(

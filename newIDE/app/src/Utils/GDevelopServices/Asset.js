@@ -197,6 +197,30 @@ export type UnlockedVideoBasedCourseChapter = {|
   tasks: Array<CourseChapterTask>,
 |};
 
+export type TextBasedCourseChapterTextItem = {|
+  type: 'text',
+  text: string,
+|};
+
+export type TextBasedCourseChapterImageItem = {|
+  type: 'image',
+  url: string,
+  caption?: string,
+|};
+
+export type TextBasedCourseChapterTaskItem = {|
+  type: 'task',
+  title: string,
+  items: Array<
+    TextBasedCourseChapterTextItem | TextBasedCourseChapterImageItem
+  >,
+  answer?: {
+    items: Array<
+      TextBasedCourseChapterTextItem | TextBasedCourseChapterImageItem
+    >,
+  },
+|};
+
 export type UnlockedTextBasedCourseChapter = {|
   id: string,
   title: string,
@@ -205,8 +229,9 @@ export type UnlockedTextBasedCourseChapter = {|
   isFree?: boolean,
   templateUrls: string[],
   items: Array<
-    | {| type: 'image', url: string, caption?: string |}
-    | {| type: 'text', text: string |}
+    | TextBasedCourseChapterTextItem
+    | TextBasedCourseChapterImageItem
+    | TextBasedCourseChapterTaskItem
   >,
 |};
 
@@ -214,7 +239,7 @@ export type LockedCourseChapter = {|
   id: string,
   title: string,
   shortTitle?: string,
-  videoUrl: string,
+  videoUrl?: string,
   isLocked: true,
   isFree?: boolean,
   priceInCredits?: number,

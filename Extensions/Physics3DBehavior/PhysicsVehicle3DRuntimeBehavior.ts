@@ -10,11 +10,6 @@ const vec3ToString = (vec3: Jolt.RVec3) =>
 
 namespace gdjs {
   interface PhysicsVehicle3DNetworkSyncDataType {
-    fws: float;
-    sws: float;
-    fs: float;
-    js: float;
-    cj: boolean;
     lek: boolean;
     rik: boolean;
     upk: boolean;
@@ -23,8 +18,6 @@ namespace gdjs {
     us: boolean;
     sa: float;
     sf: float;
-    tscjs: float;
-    jkhsjs: boolean;
   }
 
   export interface PhysicsVehicle3DNetworkSyncData
@@ -52,13 +45,6 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
-    private _forwardAcceleration: float;
-    private _forwardDeceleration: float;
-    private _forwardSpeedMax: float;
-    private _sidewaysAcceleration: float;
-    private _sidewaysDeceleration: float;
-    private _sidewaysSpeedMax: float;
-
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
     private _hasPressedRightKey: boolean = false;
@@ -67,14 +53,6 @@ namespace gdjs {
     private _hasUsedStick: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
-    private _currentForwardSpeed: float = 0;
-    private _currentSidewaysSpeed: float = 0;
-    private _currentFallSpeed: float = 0;
-    private _canJump: boolean = false;
-    private _currentJumpSpeed: float = 0;
-    private _timeSinceCurrentJumpStart: float = 0;
-    private _jumpKeyHeldSinceJumpStart: boolean = false;
-    private _hasReallyMoved: boolean = false;
 
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
@@ -91,11 +69,6 @@ namespace gdjs {
     // movement of the object, even if the inputs are not updated every frame.
     private _dontClearInputsBetweenFrames: boolean = false;
 
-    /**
-     * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
-     */
-    private static readonly epsilon = 2 ** -20;
-
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -108,13 +81,6 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
-
-      this._forwardAcceleration = behaviorData.forwardAcceleration;
-      this._forwardDeceleration = behaviorData.forwardDeceleration;
-      this._forwardSpeedMax = behaviorData.forwardSpeedMax;
-      this._sidewaysAcceleration = behaviorData.sidewaysAcceleration;
-      this._sidewaysDeceleration = behaviorData.sidewaysDeceleration;
-      this._sidewaysSpeedMax = behaviorData.sidewaysSpeedMax;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -152,38 +118,6 @@ namespace gdjs {
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (
-        oldBehaviorData.forwardAcceleration !==
-        newBehaviorData.forwardAcceleration
-      ) {
-        this.setForwardAcceleration(newBehaviorData.forwardAcceleration);
-      }
-      if (
-        oldBehaviorData.forwardDeceleration !==
-        newBehaviorData.forwardDeceleration
-      ) {
-        this.setForwardDeceleration(newBehaviorData.forwardDeceleration);
-      }
-      if (oldBehaviorData.forwardSpeedMax !== newBehaviorData.forwardSpeedMax) {
-        this.setForwardSpeedMax(newBehaviorData.forwardSpeedMax);
-      }
-      if (
-        oldBehaviorData.sidewaysAcceleration !==
-        newBehaviorData.sidewaysAcceleration
-      ) {
-        this.setSidewaysAcceleration(newBehaviorData.sidewaysAcceleration);
-      }
-      if (
-        oldBehaviorData.sidewaysDeceleration !==
-        newBehaviorData.sidewaysDeceleration
-      ) {
-        this.setSidewaysDeceleration(newBehaviorData.sidewaysDeceleration);
-      }
-      if (
-        oldBehaviorData.sidewaysSpeedMax !== newBehaviorData.sidewaysSpeedMax
-      ) {
-        this.setSidewaysSpeedMax(newBehaviorData.sidewaysSpeedMax);
-      }
       return true;
     }
 
@@ -195,11 +129,6 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         props: {
-          fws: this._currentForwardSpeed,
-          sws: this._currentSidewaysSpeed,
-          fs: this._currentFallSpeed,
-          js: this._currentJumpSpeed,
-          cj: this._canJump,
           lek: this._wasLeftKeyPressed,
           rik: this._wasRightKeyPressed,
           upk: this._wasForwardKeyPressed,
@@ -208,8 +137,6 @@ namespace gdjs {
           us: this._wasStickUsed,
           sa: this._stickAngle,
           sf: this._stickForce,
-          tscjs: this._timeSinceCurrentJumpStart,
-          jkhsjs: this._jumpKeyHeldSinceJumpStart,
         },
       };
     }
@@ -220,11 +147,6 @@ namespace gdjs {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
-      this._currentForwardSpeed = behaviorSpecificProps.fws;
-      this._currentSidewaysSpeed = behaviorSpecificProps.sws;
-      this._currentFallSpeed = behaviorSpecificProps.fs;
-      this._currentJumpSpeed = behaviorSpecificProps.js;
-      this._canJump = behaviorSpecificProps.cj;
       this._hasPressedForwardKey = behaviorSpecificProps.upk;
       this._hasPressedBackwardKey = behaviorSpecificProps.dok;
       this._hasPressedLeftKey = behaviorSpecificProps.lek;
@@ -233,8 +155,6 @@ namespace gdjs {
       this._hasUsedStick = behaviorSpecificProps.us;
       this._stickAngle = behaviorSpecificProps.sa;
       this._stickForce = behaviorSpecificProps.sf;
-      this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
-      this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
@@ -315,11 +235,6 @@ namespace gdjs {
       if (!carBody) {
         return;
       }
-
-      const oldX = carBody.GetPosition().GetX();
-      const oldY = carBody.GetPosition().GetY();
-      const oldZ = carBody.GetPosition().GetZ();
-      //console.log(oldX, oldY, oldZ);
 
       let forward = 0.0,
         right = 0.0,
@@ -450,148 +365,11 @@ namespace gdjs {
         this._hasPressedHandBreakKey = false;
         this._hasUsedStick = false;
       }
-
-      // TODO
-      this._hasReallyMoved =
-        Math.abs(carBody.GetPosition().GetX() - oldX) >
-          PhysicsVehicle3DRuntimeBehavior.epsilon ||
-        Math.abs(carBody.GetPosition().GetY() - oldY) >
-          PhysicsVehicle3DRuntimeBehavior.epsilon ||
-        Math.abs(carBody.GetPosition().GetZ() - oldZ) >
-          PhysicsVehicle3DRuntimeBehavior.epsilon;
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onObjectHotReloaded() {}
-
-    /**
-     * Get the forward acceleration value of the Character.
-     * @returns The current acceleration.
-     */
-    getForwardAcceleration(): float {
-      return this._forwardAcceleration;
-    }
-
-    /**
-     * Set the forward acceleration of the Character.
-     * @param forwardAcceleration The new acceleration.
-     */
-    setForwardAcceleration(forwardAcceleration: float): void {
-      this._forwardAcceleration = forwardAcceleration;
-    }
-
-    /**
-     * Get the forward deceleration of the Character.
-     * @returns The current deceleration.
-     */
-    getForwardDeceleration(): float {
-      return this._forwardDeceleration;
-    }
-
-    /**
-     * Set the forward deceleration of the Character.
-     * @param forwardDeceleration The new deceleration.
-     */
-    setForwardDeceleration(forwardDeceleration: float): void {
-      this._forwardDeceleration = forwardDeceleration;
-    }
-
-    /**
-     * Get the forward maximum speed of the Character.
-     * @returns The maximum speed.
-     */
-    getForwardSpeedMax(): float {
-      return this._forwardSpeedMax;
-    }
-
-    /**
-     * Set the forward maximum speed of the Character.
-     * @param forwardSpeedMax The new maximum speed.
-     */
-    setForwardSpeedMax(forwardSpeedMax: float): void {
-      this._forwardSpeedMax = forwardSpeedMax;
-    }
-
-    /**
-     * Get the sideways acceleration value of the Character.
-     * @returns The current acceleration.
-     */
-    getSidewaysAcceleration(): float {
-      return this._sidewaysAcceleration;
-    }
-
-    /**
-     * Set the sideways acceleration of the Character.
-     * @param sidewaysAcceleration The new acceleration.
-     */
-    setSidewaysAcceleration(sidewaysAcceleration: float): void {
-      this._sidewaysAcceleration = sidewaysAcceleration;
-    }
-
-    /**
-     * Get the sideways deceleration of the Character.
-     * @returns The current deceleration.
-     */
-    getSidewaysDeceleration(): float {
-      return this._sidewaysDeceleration;
-    }
-
-    /**
-     * Set the sideways deceleration of the Character.
-     * @param sidewaysDeceleration The new deceleration.
-     */
-    setSidewaysDeceleration(sidewaysDeceleration: float): void {
-      this._sidewaysDeceleration = sidewaysDeceleration;
-    }
-
-    /**
-     * Get the sideways maximum speed of the Character.
-     * @returns The maximum speed.
-     */
-    getSidewaysSpeedMax(): float {
-      return this._sidewaysSpeedMax;
-    }
-
-    /**
-     * Set the sideways maximum speed of the Character.
-     * @param sidewaysSpeedMax The new maximum speed.
-     */
-    setSidewaysSpeedMax(sidewaysSpeedMax: float): void {
-      this._sidewaysSpeedMax = sidewaysSpeedMax;
-    }
-
-    /**
-     * Get the current speed of the Character.
-     * @returns The current speed.
-     */
-    getCurrentForwardSpeed(): float {
-      return this._currentForwardSpeed;
-    }
-
-    /**
-     * Set the current speed of the Character.
-     * @param currentForwardSpeed The current speed.
-     */
-    setCurrentForwardSpeed(currentForwardSpeed: float): void {
-      this._currentForwardSpeed = currentForwardSpeed;
-    }
-
-    /**
-     * Get the current speed of the Character.
-     * @returns The current speed.
-     */
-    getCurrentSidewaysSpeed(): float {
-      return this._currentSidewaysSpeed;
-    }
-
-    /**
-     * Set the current speed of the Character.
-     * @param currentSidewaysSpeed The current speed.
-     */
-    setCurrentSidewaysSpeed(currentSidewaysSpeed: float): void {
-      this._currentSidewaysSpeed = currentSidewaysSpeed;
-    }
 
     simulateForwardKey(): void {
       this._hasPressedForwardKey = true;
@@ -649,20 +427,6 @@ namespace gdjs {
 
     getStickForce(): float {
       return this._wasStickUsed ? this._stickForce : 0;
-    }
-
-    /**
-     * Check if the Character is moving.
-     * @returns Returns true if it is moving and false if not.
-     */
-    isMovingEvenALittle(): boolean {
-      return (
-        (this._hasReallyMoved &&
-          (this._currentForwardSpeed !== 0 ||
-            this._currentSidewaysSpeed !== 0)) ||
-        this._currentJumpSpeed !== 0 ||
-        this._currentFallSpeed !== 0
-      );
     }
   }
 

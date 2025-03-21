@@ -45,8 +45,8 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
-    _steerAngleMax = 40;
-    private _steerAngularVelocity: float = 45;
+    _steerAngleMax = 30;
+    private _steerAngularVelocity: float = 30;
     private _currentSteerRatio: float = 0;
 
     private _hasPressedForwardKey: boolean = false;
@@ -513,7 +513,7 @@ namespace gdjs {
         const BR_WHEEL = 3;
 
         const vehicleMass = 1500;
-        const maxEngineTorque = 4000;
+        const maxEngineTorque = 3000;
         const clutchStrength = 10;
 
         const carShape = behavior.createShape();
@@ -607,7 +607,7 @@ namespace gdjs {
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
         controllerSettings.mEngine.mMaxTorque = maxEngineTorque;
-        controllerSettings.mEngine.mMaxRPM = 10000000;
+        controllerSettings.mEngine.mMaxRPM = 1000;
         controllerSettings.mEngine.mInertia = 0.01;
         controllerSettings.mEngine.mNormalizedTorque.Clear();
         controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
@@ -677,7 +677,8 @@ namespace gdjs {
         //   )
         // );
 
-        constraint.ResetGravityOverride();
+        //constraint.ResetGravityOverride();
+        constraint.OverrideGravity(new Jolt.Vec3(0, 0, -9.8 * 4));
         _sharedData.physicsSystem.AddConstraint(constraint);
         this.vehicleBehavior._vehicleController = Jolt.castObject(
           constraint.GetController(),

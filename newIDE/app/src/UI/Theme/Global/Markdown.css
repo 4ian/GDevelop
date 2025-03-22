@@ -38,6 +38,8 @@
 
 .gd-markdown ul {
   word-break: break-word;
+  margin-block-start: 8px;
+  margin-block-end: 8px;
 }
 
 .gd-markdown blockquote {

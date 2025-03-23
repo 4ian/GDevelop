@@ -141,7 +141,7 @@ namespace gdjs {
     _originalHeight: float;
     _resizeMode: 'adaptWidth' | 'adaptHeight' | string;
     _adaptGameResolutionAtRuntime: boolean;
-    _scaleMode: 'linear' | 'nearest';
+    _scaleMode: ScaleMode;
     _pixelsRounding: boolean;
     _antialiasingMode: 'none' | 'MSAA';
     _isAntialisingEnabledOnMobile: boolean;
@@ -158,6 +158,11 @@ namespace gdjs {
      * When set to true, the scenes are notified that game resolution size changed.
      */
     _notifyScenesForGameResolutionResize: boolean = false;
+    /**
+     * When set to true, the scenes are notified that game zoom factor changed.
+     */
+    _notifyScenesForGameZoomFactorChange: boolean = false;
+    _zoomFactor: number = 1;
 
     /**
      * When paused, the game won't step and will be freezed. Useful for debugging.
@@ -551,19 +556,39 @@ namespace gdjs {
     }
 
     /**
-     * Get the game resolution (the size at which the game is played and rendered) width.
+     * Get the game resolution width for events.
      * @returns The game resolution width, in pixels.
      */
     getGameResolutionWidth(): float {
+      return this._gameResolutionWidth / this._zoomFactor;
+    }
+
+    /**
+     * Get the game resolution height for events.
+     * @returns The game resolution height, in pixels.
+     */
+    getGameResolutionHeight(): float {
+      return this._gameResolutionHeight / this._zoomFactor;
+    }
+
+    /**
+     * Get the game resolution width (the size at which the game is rendered).
+     * @returns The game resolution width, in pixels.
+     */
+    getRenderingResolutionWidth(): float {
       return this._gameResolutionWidth;
     }
 
     /**
-     * Get the game resolution (the size at which the game is played and rendered) height.
+     * Get the game resolution height (the size at which the game is rendered).
      * @returns The game resolution height, in pixels.
      */
-    getGameResolutionHeight(): float {
+    getRenderingResolutionHeight(): float {
       return this._gameResolutionHeight;
+    }
+
+    getZoomFactor() {
+      return this._zoomFactor;
     }
 
     /**
@@ -577,17 +602,16 @@ namespace gdjs {
 
       this._gameResolutionWidth = width;
       this._gameResolutionHeight = height;
-      if (this._adaptGameResolutionAtRuntime) {
-        if (
-          gdjs.RuntimeGameRenderer &&
-          gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
-          gdjs.RuntimeGameRenderer.getWindowInnerHeight
-        ) {
-          const windowInnerWidth =
-            gdjs.RuntimeGameRenderer.getWindowInnerWidth();
-          const windowInnerHeight =
-            gdjs.RuntimeGameRenderer.getWindowInnerHeight();
+      if (
+        gdjs.RuntimeGameRenderer &&
+        gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
+        gdjs.RuntimeGameRenderer.getWindowInnerHeight
+      ) {
+        const windowInnerWidth = gdjs.RuntimeGameRenderer.getWindowInnerWidth();
+        const windowInnerHeight =
+          gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
+        if (this._adaptGameResolutionAtRuntime) {
           // Enlarge either the width or the eight to fill the inner window space.
           if (this._resizeMode === 'adaptWidth') {
             this._gameResolutionWidth =
@@ -612,6 +636,28 @@ namespace gdjs {
               );
               this._gameResolutionHeight = this._originalHeight;
             }
+          }
+        }
+        if (this._scaleMode === 'magnified') {
+          const pixelSize = Math.max(
+            1,
+            Math.floor(
+              this._zoomFactor *
+                Math.min(
+                  windowInnerWidth / this._gameResolutionWidth,
+                  windowInnerHeight / this._gameResolutionHeight
+                )
+            )
+          );
+          this._gameResolutionWidth = Math.round(
+            (this._gameResolutionWidth * pixelSize) / this._zoomFactor
+          );
+          this._gameResolutionHeight = Math.round(
+            (this._gameResolutionHeight * pixelSize) / this._zoomFactor
+          );
+          if (this._zoomFactor !== pixelSize) {
+            this._zoomFactor = pixelSize;
+            this._notifyScenesForGameZoomFactorChange = true;
           }
         }
       }
@@ -682,9 +728,9 @@ namespace gdjs {
     }
 
     /**
-     * Return the scale mode of the game ("linear" or "nearest").
+     * Return the scale mode of the game ("linear", "magnified" or "nearest").
      */
-    getScaleMode(): 'linear' | 'nearest' {
+    getScaleMode(): ScaleMode {
       return this._scaleMode;
     }
 
@@ -961,6 +1007,10 @@ namespace gdjs {
             if (this._notifyScenesForGameResolutionResize) {
               this._sceneStack.onGameResolutionResized();
               this._notifyScenesForGameResolutionResize = false;
+            }
+            if (this._notifyScenesForGameZoomFactorChange) {
+              this._sceneStack.onGameZoomFactorChanged();
+              this._notifyScenesForGameZoomFactorChange = false;
             }
 
             // Render and step the scene.

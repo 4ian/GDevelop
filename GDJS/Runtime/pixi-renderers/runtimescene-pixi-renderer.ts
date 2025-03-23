@@ -47,9 +47,9 @@ namespace gdjs {
       // TODO (3D): should this be done for each individual layer?
       // Especially if we remove _pixiContainer entirely.
       this._pixiContainer.scale.x =
-        pixiRenderer.width / runtimeGame.getGameResolutionWidth();
+        pixiRenderer.width / runtimeGame.getRenderingResolutionWidth();
       this._pixiContainer.scale.y =
-        pixiRenderer.height / runtimeGame.getGameResolutionHeight();
+        pixiRenderer.height / runtimeGame.getRenderingResolutionHeight();
 
       for (const runtimeLayer of this._runtimeScene._orderedLayers) {
         runtimeLayer.getRenderer().onGameResolutionResized();

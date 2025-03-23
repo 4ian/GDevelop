@@ -548,6 +548,15 @@ namespace gdjs {
     }
 
     /**
+     * Called when the game zoom factor is changed to adapt to a new resolution.
+     */
+    onGameZoomFactorChanged(): void {
+      for (const instance of this.getAdhocListOfAllInstances()) {
+        instance.onGameZoomFactorChanged();
+      }
+    }
+
+    /**
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {

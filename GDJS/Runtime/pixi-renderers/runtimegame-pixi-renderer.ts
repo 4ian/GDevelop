@@ -100,16 +100,16 @@ namespace gdjs {
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
+          this._game.getRenderingResolutionWidth(),
+          this._game.getRenderingResolutionHeight()
         );
 
         // Create a PixiJS renderer that use the same GL context as Three.js
         // so that both can render to the canvas and even have PixiJS rendering
         // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
         this._pixiRenderer = new PIXI.Renderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
+          width: this._game.getRenderingResolutionWidth(),
+          height: this._game.getRenderingResolutionHeight(),
           view: gameCanvas,
           // @ts-ignore - reuse the context from Three.js.
           context: this._threeRenderer.getContext(),
@@ -124,8 +124,8 @@ namespace gdjs {
         // "preserveDrawingBuffer: true" is needed to avoid flickering
         // and background issues on some mobile phones (see #585 #572 #566 #463).
         this._pixiRenderer = PIXI.autoDetectRenderer({
-          width: this._game.getGameResolutionWidth(),
-          height: this._game.getGameResolutionHeight(),
+          width: this._game.getRenderingResolutionWidth(),
+          height: this._game.getRenderingResolutionHeight(),
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
@@ -272,20 +272,20 @@ namespace gdjs {
       // There is no "smart" resizing to be done here: the rendering of the game
       // should be done with the size set on the game.
       if (
-        this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
-        this._pixiRenderer.height !== this._game.getGameResolutionHeight()
+        this._pixiRenderer.width !== this._game.getRenderingResolutionWidth() ||
+        this._pixiRenderer.height !== this._game.getRenderingResolutionHeight()
       ) {
         // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
         // to enable a mode where pixi always fills the whole screen.
         this._pixiRenderer.resize(
-          this._game.getGameResolutionWidth(),
-          this._game.getGameResolutionHeight()
+          this._game.getRenderingResolutionWidth(),
+          this._game.getRenderingResolutionHeight()
         );
 
         if (this._threeRenderer) {
           this._threeRenderer.setSize(
-            this._game.getGameResolutionWidth(),
-            this._game.getGameResolutionHeight()
+            this._game.getRenderingResolutionWidth(),
+            this._game.getRenderingResolutionHeight()
           );
         }
       }
@@ -295,8 +295,8 @@ namespace gdjs {
       // only, so won't create visual artifacts during the rendering.
       const isFullPage =
         this._forceFullscreen || this._isFullPage || this._isFullscreen;
-      let canvasWidth = this._game.getGameResolutionWidth();
-      let canvasHeight = this._game.getGameResolutionHeight();
+      let canvasWidth = this._game.getRenderingResolutionWidth();
+      let canvasHeight = this._game.getRenderingResolutionHeight();
       let maxWidth = window.innerWidth - this._marginLeft - this._marginRight;
       let maxHeight = window.innerHeight - this._marginTop - this._marginBottom;
       if (maxWidth < 0) {
@@ -523,10 +523,10 @@ namespace gdjs {
       // Handle the fact that the game is stretched to fill the canvas.
       pageCoords[0] =
         (canvasCoords[0] * this._canvasWidth) /
-        this._game.getGameResolutionWidth();
+        this._game.getRenderingResolutionWidth();
       pageCoords[1] =
         (canvasCoords[1] * this._canvasHeight) /
-        this._game.getGameResolutionHeight();
+        this._game.getRenderingResolutionHeight();
 
       return pageCoords;
     }

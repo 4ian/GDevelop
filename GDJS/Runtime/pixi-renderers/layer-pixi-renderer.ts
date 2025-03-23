@@ -262,8 +262,8 @@ namespace gdjs {
             if (game.getAntialiasingMode() !== 'none') {
               this._threeEffectComposer.addPass(
                 new THREE_ADDONS.SMAAPass(
-                  game.getGameResolutionWidth(),
-                  game.getGameResolutionHeight()
+                  game.getRenderingResolutionWidth(),
+                  game.getRenderingResolutionHeight()
                 )
               );
             }
@@ -393,7 +393,7 @@ namespace gdjs {
      */
     updatePosition(): void {
       const angle = -gdjs.toRad(this._layer.getCameraRotation());
-      const zoomFactor = this._layer.getCameraZoom();
+      const zoomFactor = this._layer.getCameraRenderingZoom();
       this._pixiContainer.rotation = angle;
       this._pixiContainer.scale.x = zoomFactor;
       this._pixiContainer.scale.y = zoomFactor;
@@ -501,8 +501,8 @@ namespace gdjs {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
         this._threeEffectComposer.setSize(
-          game.getGameResolutionWidth(),
-          game.getGameResolutionHeight()
+          game.getRenderingResolutionWidth(),
+          game.getRenderingResolutionHeight()
         );
       }
     }

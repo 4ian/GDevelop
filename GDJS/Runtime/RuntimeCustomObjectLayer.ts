@@ -54,6 +54,10 @@ namespace gdjs {
       return 1;
     }
 
+    override getCameraRenderingZoom(cameraId?: integer): float {
+      return 1;
+    }
+
     override setCameraZ(z: float, fov: float, cameraId?: integer): void {}
 
     override getCameraZ(fov: float | null, cameraId?: integer): float {

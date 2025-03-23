@@ -45,6 +45,7 @@ namespace gdjs {
 
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
+    _cachedGameZoomFactor: float;
 
     /**
      * A network ID associated to the scene to be used
@@ -69,10 +70,13 @@ namespace gdjs {
       this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
       this._cachedGameResolutionWidth = runtimeGame
-        ? runtimeGame.getGameResolutionWidth()
+        ? runtimeGame.getRenderingResolutionWidth()
         : 0;
       this._cachedGameResolutionHeight = runtimeGame
-        ? runtimeGame.getGameResolutionHeight()
+        ? runtimeGame.getRenderingResolutionHeight()
+        : 0;
+      this._cachedGameZoomFactor = runtimeGame
+        ? runtimeGame.getZoomFactor()
         : 0;
 
       this._renderer = new gdjs.RuntimeSceneRenderer(
@@ -99,13 +103,18 @@ namespace gdjs {
      * See gdjs.RuntimeGame.startGameLoop in particular.
      */
     onGameResolutionResized() {
-      const oldGameResolutionOriginX = this.getViewportOriginX();
-      const oldGameResolutionOriginY = this.getViewportOriginY();
+      const oldGameResolutionOriginX =
+        this.getViewportOriginX() / this._cachedGameZoomFactor;
+      const oldGameResolutionOriginY =
+        this.getViewportOriginY() / this._cachedGameZoomFactor;
       this._cachedGameResolutionWidth = this._runtimeGame
-        ? this._runtimeGame.getGameResolutionWidth()
+        ? this._runtimeGame.getRenderingResolutionWidth()
         : 0;
       this._cachedGameResolutionHeight = this._runtimeGame
-        ? this._runtimeGame.getGameResolutionHeight()
+        ? this._runtimeGame.getRenderingResolutionHeight()
+        : 0;
+      this._cachedGameZoomFactor = this._runtimeGame
+        ? this._runtimeGame.getZoomFactor()
         : 0;
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {

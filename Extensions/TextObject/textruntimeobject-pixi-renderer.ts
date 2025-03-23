@@ -4,6 +4,7 @@ namespace gdjs {
     _fontManager: any;
     _text: PIXI.Text;
     _justCreated: boolean = true;
+    _upscaleRatio: float = 1;
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
@@ -47,7 +48,7 @@ namespace gdjs {
       const style = this._text.style;
       style.fontStyle = this._object._italic ? 'italic' : 'normal';
       style.fontWeight = this._object._bold ? 'bold' : 'normal';
-      style.fontSize = this._object._characterSize;
+      style.fontSize = this._object._characterSize * this._upscaleRatio;
       style.fontFamily = fontName;
       if (this._object._useGradient) {
         style.fill = this._getGradientHex();
@@ -62,7 +63,7 @@ namespace gdjs {
       // @ts-ignore
       style.align = this._object._textAlign;
       style.wordWrap = this._object._wrapping;
-      style.wordWrapWidth = this._object._wrappingWidth;
+      style.wordWrapWidth = this._object._wrappingWidth * this._upscaleRatio;
       style.breakWords = true;
       style.stroke = gdjs.rgbToHexNumber(
         this._object._outlineColor[0],
@@ -70,7 +71,7 @@ namespace gdjs {
         this._object._outlineColor[2]
       );
       style.strokeThickness = this._object._isOutlineEnabled
-        ? this._object._outlineThickness
+        ? this._object._outlineThickness * this._upscaleRatio
         : 0;
       style.dropShadow = this._object._shadow;
       style.dropShadowColor = gdjs.rgbToHexNumber(
@@ -79,13 +80,16 @@ namespace gdjs {
         this._object._shadowColor[2]
       );
       style.dropShadowAlpha = this._object._shadowOpacity / 255;
-      style.dropShadowBlur = this._object._shadowBlur;
+      style.dropShadowBlur = this._object._shadowBlur * this._upscaleRatio;
       style.dropShadowAngle = gdjs.toRad(this._object._shadowAngle);
-      style.dropShadowDistance = this._object._shadowDistance;
+      style.dropShadowDistance =
+        this._object._shadowDistance * this._upscaleRatio;
       const extraPaddingForShadow = style.dropShadow
-        ? style.dropShadowDistance + style.dropShadowBlur
+        ? this._object._shadowDistance + this._object._shadowBlur
         : 0;
-      style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
+      style.padding =
+        Math.ceil(this._object._padding + extraPaddingForShadow) *
+        this._upscaleRatio;
 
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;
@@ -117,7 +121,6 @@ namespace gdjs {
         this._text.position.x = this._object.x + this._text.width / 2;
         this._text.anchor.x = 0.5;
       }
-      this._text.position.y = this._object.y + this._text.height / 2;
 
       const alignmentY =
         this._object._verticalTextAlignment === 'bottom'
@@ -182,17 +185,28 @@ namespace gdjs {
     }
 
     /**
+     * Set the text object scale.
+     * @param upscaleRatio The new scale for the text object.
+     */
+    setUpscaleRatio(upscaleRatio: float): void {
+      this._upscaleRatio = upscaleRatio;
+      this._text.scale.x = this._object.getScaleX() / this._upscaleRatio;
+      this._text.scale.y = this._object.getScaleY() / this._upscaleRatio;
+      this.updateStyle();
+    }
+
+    /**
      * Get x-scale of the text.
      */
     getScaleX(): float {
-      return this._text.scale.x;
+      return this._object.getScaleX();
     }
 
     /**
      * Get y-scale of the text.
      */
     getScaleY(): float {
-      return this._text.scale.y;
+      return this._object.getScaleY();
     }
 
     /**
@@ -200,8 +214,8 @@ namespace gdjs {
      * @param newScale The new scale for the text object.
      */
     setScale(newScale: float): void {
-      this._text.scale.x = newScale;
-      this._text.scale.y = newScale;
+      this._text.scale.x = newScale / this._upscaleRatio;
+      this._text.scale.y = newScale / this._upscaleRatio;
     }
 
     /**
@@ -209,7 +223,7 @@ namespace gdjs {
      * @param newScale The new x-scale for the text object.
      */
     setScaleX(newScale: float): void {
-      this._text.scale.x = newScale;
+      this._text.scale.x = newScale / this._upscaleRatio;
     }
 
     /**
@@ -217,7 +231,7 @@ namespace gdjs {
      * @param newScale The new y-scale for the text object.
      */
     setScaleY(newScale: float): void {
-      this._text.scale.y = newScale;
+      this._text.scale.y = newScale / this._upscaleRatio;
     }
 
     destroy() {

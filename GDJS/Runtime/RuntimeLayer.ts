@@ -272,6 +272,8 @@ namespace gdjs {
      */
     abstract getCameraZoom(cameraId?: integer): float;
 
+    abstract getCameraRenderingZoom(cameraId?: integer): float;
+
     /**
      * Set the camera center Z position.
      *

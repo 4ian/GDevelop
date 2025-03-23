@@ -1259,6 +1259,8 @@ export class SharedPtrSerializerElement extends EmscriptenObject {
 export class Serializer extends EmscriptenObject {
   static toJSON(element: SerializerElement): string;
   static fromJSON(json: string): SerializerElement;
+  static fromJSObject(object: Object): gdSerializerElement;
+  static toJSObject(element: gdSerializerElement): any;
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {

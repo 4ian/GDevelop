@@ -12,6 +12,7 @@ import {
 } from '../../../Utils/GDevelopServices/Extension';
 import { mapFor } from '../../../Utils/MapFor';
 import classes from './ChatMarkdownText.module.css';
+import classNames from 'classnames';
 
 const gd: libGDevelop = global.gd;
 
@@ -31,9 +32,13 @@ type ConceptLinkProps = {|
  */
 export const ConceptLink = ({ conceptMetadata }: ConceptLinkProps) => {
   const helpLink = getHelpLink(conceptMetadata.helpPath);
+
   return (
-    <span
-      className={classes.conceptLink}
+    <a
+      className={classNames({
+        [classes.conceptLink]: true,
+        [classes.noValidLink]: !helpLink,
+      })}
       href={helpLink}
       onClick={event => {
         event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
@@ -44,7 +49,7 @@ export const ConceptLink = ({ conceptMetadata }: ConceptLinkProps) => {
         <IconContainer alt="" src={conceptMetadata.iconSrc} size={16} />
       )}
       {conceptMetadata.name}
-    </span>
+    </a>
   );
 };
 

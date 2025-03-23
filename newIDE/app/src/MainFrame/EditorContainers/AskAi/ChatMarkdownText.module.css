@@ -1,4 +1,4 @@
-.conceptLink {
+a.conceptLink {
   color: var(--theme-link-color);
   font-weight: 400;
   align-items: baseline;
@@ -7,6 +7,11 @@
   gap: 4px;
   text-decoration: underline;
   text-decoration-style: dotted;
+}
+
+a.noValidLink {
+  cursor: default;
+  text-decoration: none;
 }
 
 .conceptLink div {

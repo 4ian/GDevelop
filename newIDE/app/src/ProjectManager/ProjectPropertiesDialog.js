@@ -753,7 +753,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                 />
-                {scaleMode === 'nearest' && (
+                {(scaleMode === 'nearest' || scaleMode === 'magnified') && (
                   <DismissableAlertMessage
                     identifier="use-non-smoothed-textures"
                     kind="info"

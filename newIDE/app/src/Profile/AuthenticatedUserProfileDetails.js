@@ -32,11 +32,6 @@ const AuthenticatedUserProfileDetails = ({
     [authenticatedUser]
   );
 
-  const hideSocials =
-    !!authenticatedUser.limits &&
-    !!authenticatedUser.limits.capabilities.classrooms &&
-    authenticatedUser.limits.capabilities.classrooms.hideSocials;
-
   return firebaseUser && profile ? (
     <ColumnStackLayout noMargin>
       {firebaseUser && !firebaseUser.emailVerified && (
@@ -57,17 +52,9 @@ const AuthenticatedUserProfileDetails = ({
         </AlertMessage>
       )}
       <ProfileDetails
-        // The firebase user is the source of truth for the emails.
-        profile={
-          authenticatedUser.profile
-            ? { ...authenticatedUser.profile, email: firebaseUser.email }
-            : null
-        }
-        subscription={authenticatedUser.subscription}
-        achievements={authenticatedUser.achievements}
+        authenticatedUser={authenticatedUser}
         onOpenChangeEmailDialog={onOpenChangeEmailDialog}
         onOpenEditProfileDialog={onOpenEditProfileDialog}
-        hideSocials={hideSocials}
       />
     </ColumnStackLayout>
   ) : (

@@ -370,7 +370,7 @@ export const EventFunctionExtensionItem = ({
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 
-  const { extensionShortHeadersByName } = React.useContext(
+  const { translatedExtensionShortHeadersByName } = React.useContext(
     ExtensionStoreContext
   );
 
@@ -393,7 +393,7 @@ export const EventFunctionExtensionItem = ({
       }
       primaryText={name}
       editingName={isEditingName}
-      onEdit={() => onEdit(extensionShortHeadersByName)}
+      onEdit={() => onEdit(translatedExtensionShortHeadersByName)}
       onDelete={onDelete}
       addLabel={t`Add a New Extension`}
       onAdd={onAdd}

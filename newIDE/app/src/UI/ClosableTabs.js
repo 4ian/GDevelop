@@ -140,6 +140,7 @@ export type ClosableTabProps = {|
   onCloseAll: () => void,
   onClick: () => void,
   onActivated: () => void,
+  onHover: boolean => void,
   maxWidth: number,
 |};
 
@@ -156,6 +157,7 @@ export function ClosableTab({
   closable,
   onClick,
   onActivated,
+  onHover,
   maxWidth,
 }: ClosableTabProps) {
   React.useEffect(
@@ -248,6 +250,8 @@ export function ClosableTab({
         // A tab lives in the top bar, which has the ability to drag the app window.
         // Ensure the tab does not have this ability, as it can be dragged itself.
         className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        onMouseEnter={() => onHover(true)}
+        onMouseLeave={() => onHover(false)}
       >
         <ButtonBase
           onClick={onClick}
@@ -281,7 +285,6 @@ export function ClosableTab({
                   ...styles.tabLabel,
                   maxWidth: labelMaxWidth,
                 }}
-                title={label}
               >
                 {label}
               </span>

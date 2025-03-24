@@ -31,6 +31,9 @@ const defaultProps: EditProfileDialogProps = {
   onUpdateTwitterFollow: async () => ({
     code: 'twitter-follow/badge-already-given',
   }),
+  onUpdateYoutubeSubscription: async () => ({
+    code: 'youtube-subscription/badge-already-given',
+  }),
   achievements: fakeAchievements,
   badges: [
     {

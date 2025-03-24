@@ -36,6 +36,7 @@ export const ThreeTabs = () => (
                 <>
                   <ClosableTab
                     onActivated={action('Tab 1 activated')}
+                    onHover={action('onHover')}
                     closable={false}
                     active={value === 0}
                     onClick={() => onChange(0)}
@@ -48,6 +49,7 @@ export const ThreeTabs = () => (
                   />
                   <ClosableTab
                     onActivated={action('Tab 2 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 1}
                     onClick={() => onChange(1)}
@@ -60,6 +62,7 @@ export const ThreeTabs = () => (
                   />
                   <ClosableTab
                     onActivated={action('Tab 3 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 2}
                     onClick={() => onChange(2)}
@@ -119,6 +122,7 @@ export const LongLabels = () => (
                 <>
                   <ClosableTab
                     onActivated={action('Tab 1 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 0}
                     label="Tab 1 with a very very long label"
@@ -131,6 +135,7 @@ export const LongLabels = () => (
                   />
                   <ClosableTab
                     onActivated={action('Tab 2 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 1}
                     onClick={() => onChange(1)}
@@ -143,6 +148,7 @@ export const LongLabels = () => (
                   />
                   <ClosableTab
                     onActivated={action('Tab 3 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 2}
                     onClick={() => onChange(2)}
@@ -155,6 +161,7 @@ export const LongLabels = () => (
                   />
                   <ClosableTab
                     onActivated={action('Tab 4 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 3}
                     onClick={() => onChange(3)}
@@ -232,6 +239,7 @@ export const WithObjectsList = () => (
                 renderTabs={({ containerWidth }) => [
                   <ClosableTab
                     onActivated={action('Tab 1 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 0}
                     label="Tab 1"
@@ -244,6 +252,7 @@ export const WithObjectsList = () => (
                   />,
                   <ClosableTab
                     onActivated={action('Tab 2 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 1}
                     label="Tab 2"
@@ -256,6 +265,7 @@ export const WithObjectsList = () => (
                   />,
                   <ClosableTab
                     onActivated={action('Tab 3 activated')}
+                    onHover={action('onHover')}
                     closable
                     active={value === 2}
                     label="Tab 3"

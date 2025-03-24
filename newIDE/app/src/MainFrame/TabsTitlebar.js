@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -8,6 +9,10 @@ import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,
 } from '../UI/TitleBarSafeMargins';
+import { type EditorTab } from './EditorTabs/EditorTabsHandler';
+import { getTabId } from './EditorTabs/DraggableEditorTabs';
+import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import TabsTitlebarTooltip from './TabsTitlebarTooltip';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -30,27 +35,78 @@ const styles = {
 };
 
 type TabsTitlebarProps = {|
-  children: React.Node,
   hidden: boolean,
   toggleProjectManager: () => void,
+  renderTabs: (onHoverEditorTab: (?EditorTab) => void) => React.Node,
 |};
 
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
 export default function TabsTitlebar({
-  children,
   toggleProjectManager,
   hidden,
+  renderTabs,
 }: TabsTitlebarProps) {
+  const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
+  const [tooltipData, setTooltipData] = React.useState<?{|
+    element: HTMLElement,
+    editorTab: EditorTab,
+  |}>(null);
+  const tooltipTimeoutId = React.useRef<?TimeoutID>(null);
 
   React.useEffect(
     () => {
       Window.setTitleBarColor(backgroundColor);
     },
     [backgroundColor]
+  );
+
+  const onHoverEditorTab = React.useCallback(
+    (editorTab: ?EditorTab) => {
+      if (isTouchscreen) {
+        setTooltipData(null);
+        return;
+      }
+
+      if (tooltipTimeoutId.current) {
+        clearTimeout(tooltipTimeoutId.current);
+        tooltipTimeoutId.current = null;
+      }
+
+      if (editorTab) {
+        const element = document.getElementById(getTabId(editorTab));
+        if (element) {
+          tooltipTimeoutId.current = setTimeout(
+            () => {
+              setTooltipData({ editorTab, element });
+            },
+            // If the tooltip is already displayed, quickly change to the new tab
+            // but not too quick because the display might look flickering.
+            tooltipData ? 100 : 500
+          );
+        }
+      } else {
+        tooltipTimeoutId.current = setTimeout(() => {
+          setTooltipData(null);
+        }, 50);
+      }
+    },
+    [isTouchscreen, tooltipData]
+  );
+
+  React.useEffect(
+    () => {
+      return () => {
+        if (tooltipTimeoutId.current) {
+          clearTimeout(tooltipTimeoutId.current);
+        }
+      };
+    },
+    // Clear timeout if necessary when unmounting.
+    []
   );
 
   return (
@@ -77,8 +133,14 @@ export default function TabsTitlebar({
       >
         <MenuIcon />
       </IconButton>
-      {children}
+      {renderTabs(onHoverEditorTab)}
       <TitleBarRightSafeMargins />
+      {tooltipData && (
+        <TabsTitlebarTooltip
+          anchorElement={tooltipData.element}
+          editorTab={tooltipData.editorTab}
+        />
+      )}
     </div>
   );
 }

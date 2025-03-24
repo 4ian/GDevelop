@@ -101,6 +101,7 @@ export default function NewBehaviorDialog({
               eventsFunctionsExtension
             )
           : [];
+
       return behaviorMetadataList
         .filter(behavior => !behavior.behaviorMetadata.isHidden())
         .map(behavior => ({

@@ -110,8 +110,12 @@ const Providers = ({
                                                     <CourseChapterStoreStateProvider>
                                                       <ProductLicenseStoreStateProvider>
                                                         <MarketingPlansStoreStateProvider>
-                                                          <ExtensionStoreStateProvider>
-                                                            <BehaviorStoreStateProvider>
+                                                          <ExtensionStoreStateProvider
+                                                            i18n={i18n}
+                                                          >
+                                                            <BehaviorStoreStateProvider
+                                                              i18n={i18n}
+                                                            >
                                                               <TutorialStateProvider>
                                                                 <AnnouncementsFeedStateProvider>
                                                                   <PrivateAssetsAuthorizationProvider>

@@ -23,6 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
+    _isLoadingRequested: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -457,7 +458,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.endFrame();
       }
-      return !!this.getRequestedChange();
+      return !!this.getRequestedChange() || this._isLoadingRequested;
     }
 
     /**
@@ -752,6 +753,10 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
+    requestLoad(): void {
+      this._isLoadingRequested = true;
+    }
+
     /**
      * Get the profiler associated with the scene, or null if none.
      */
@@ -846,9 +851,12 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: LayoutNetworkSyncData,
+      options?: { skipMultiplayerInstructions?: boolean }
+    ) {
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
       if (syncData.extVar) {
         for (const extensionName in syncData.extVar) {

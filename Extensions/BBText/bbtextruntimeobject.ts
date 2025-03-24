@@ -162,9 +162,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: BBTextObjectNetworkSyncData
+      networkSyncData: BBTextObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (this._text !== undefined) {
         this.setBBText(networkSyncData.text);
       }

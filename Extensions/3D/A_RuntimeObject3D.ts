@@ -127,8 +127,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: Object3DNetworkSyncData) {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: Object3DNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
       if (networkSyncData.w !== undefined) this.setWidth(networkSyncData.w);
       if (networkSyncData.h !== undefined) this.setHeight(networkSyncData.h);

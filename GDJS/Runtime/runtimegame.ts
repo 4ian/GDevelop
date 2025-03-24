@@ -1383,10 +1383,13 @@ namespace gdjs {
       return syncData;
     }
 
-    updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+    updateFromNetworkSyncData(
+      syncData: GameNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ) {
       this._throwIfDisposed();
       if (syncData.var) {
-        this._variables.updateFromNetworkSyncData(syncData.var);
+        this._variables.updateFromNetworkSyncData(syncData.var, options);
       }
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);

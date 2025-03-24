@@ -448,9 +448,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Cube3DObjectNetworkSyncData
+      networkSyncData: Cube3DObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;

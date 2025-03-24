@@ -19,6 +19,8 @@ namespace gdjs {
           const sceneDatas = scene.getNetworkSyncData({
             syncEverythingForWholeGameSaveState: true,
           });
+          scene._variablesByExtensionName;
+
           if (sceneDatas) {
             allSyncData.layoutNetworkSyncDatas[index] = {
               sceneData: {} as LayoutNetworkSyncData,
@@ -32,57 +34,23 @@ namespace gdjs {
                 const syncData = object.getNetworkSyncData(true);
                 allSyncData.layoutNetworkSyncDatas[index].objectDatas[
                   object.name
-                ] = [];
-                allSyncData.layoutNetworkSyncDatas[index].objectDatas[
-                  object.name
-                ].push(syncData);
+                ] = syncData;
               }
             }
           }
         });
       }
       const syncDataJson = JSON.stringify(allSyncData);
+      localStorage.setItem('save', syncDataJson);
       fs.writeFile('UsersData.json', syncDataJson, (error) => {
         if (error) {
-          console.log(error);
+          console.error(error);
         }
       });
-      console.log(syncDataJson);
-      // this.LoadWholeGame(syncDataJson);
     };
 
-    export const loadWholeGame = function () {
-      this._runtimeScene._destroy();
-      const allSyncData = JSON.parse(this._allSyncData);
-      const sceneStack = allSyncData[0].ss;
-      console.log(sceneStack);
-      let sceneIndex = 1;
-      sceneStack.forEach((sceneData: any) => {
-        let scene = sceneStack[sceneIndex];
-
-        if (!scene) {
-          const sceneAndExtensionData = allSyncData[sceneIndex];
-          scene = new gdjs.RuntimeScene(this._runtimeScene.getGame());
-          scene.loadFromScene(sceneAndExtensionData, {
-            skipCreatingInstances: true,
-          });
-          console.log(scene);
-        }
-        scene.updateFromNetworkSyncData();
-        const sceneObjects = scene.getAdhocListOfAllInstances();
-        for (const key in sceneObjects) {
-          if (sceneObjects.hasOwnProperty(key)) {
-            const object = sceneObjects[key];
-            const objectSyncData = sceneData.objects[key];
-            if (objectSyncData) {
-              object.onCreated();
-              object.updateFromNetworkSyncData(objectSyncData);
-            }
-          }
-        }
-
-        sceneIndex++;
-      });
+    export const loadWholeGame = function (currentScene: RuntimeScene) {
+      currentScene.requestLoad();
     };
   }
 }

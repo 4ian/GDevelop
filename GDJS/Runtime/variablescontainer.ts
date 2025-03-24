@@ -242,9 +242,9 @@ namespace gdjs {
         const variable = this._variables.get(variableName);
         const variableOwner = variable.getPlayerOwnership();
         if (
-          !syncOptions.syncEverythingForWholeGameSaveState &&
-          // Variable undefined.
-          variable.isUndefinedInContainer() ||
+          (!syncOptions.syncEverythingForWholeGameSaveState &&
+            // Variable undefined.
+            variable.isUndefinedInContainer()) ||
           // Variable marked as not to be synchronized.
           variableOwner === null ||
           // Getting sync data for a specific player:
@@ -254,7 +254,6 @@ namespace gdjs {
             !isHost) ||
           // Variable is owned by a player but not getting sync data for this player number.
           (variableOwner !== 0 && syncedPlayerNumber !== variableOwner)
-
         ) {
           // In those cases, the variable should not be synchronized.
           return;
@@ -354,7 +353,10 @@ namespace gdjs {
       return undefined;
     }
 
-    updateFromNetworkSyncData(networkSyncData: VariableNetworkSyncData[]) {
+    updateFromNetworkSyncData(
+      networkSyncData: VariableNetworkSyncData[],
+      options?: { skipMultiplayerInstructions?: boolean }
+    ) {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
         const variableSyncData = networkSyncData[j];
@@ -372,20 +374,23 @@ namespace gdjs {
         // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
         //   ownership and then update the variable.
         const syncedVariableOwner = variableSyncData.owner;
-        const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
-        const currentVariableOwner = variable.getPlayerOwnership();
-        if (currentPlayerNumber === currentVariableOwner) {
-          console.info(
-            `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
-          );
-          return;
-        }
+        if (!options) {
+          const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
-        if (syncedVariableOwner !== currentVariableOwner) {
-          console.info(
-            `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
-          );
-          variable.setPlayerOwnership(syncedVariableOwner);
+          const currentVariableOwner = variable.getPlayerOwnership();
+          if (currentPlayerNumber === currentVariableOwner) {
+            console.info(
+              `Variable ${variableName} is owned by us ${gdjs.multiplayer.playerNumber}, ignoring update message from ${syncedVariableOwner}.`
+            );
+            return;
+          }
+
+          if (syncedVariableOwner !== currentVariableOwner) {
+            console.info(
+              `Variable ${variableName} is owned by ${currentVariableOwner} on our game, changing ownership to ${syncedVariableOwner} as part of the update event.`
+            );
+            variable.setPlayerOwnership(syncedVariableOwner);
+          }
         }
 
         variable.reinitialize(variableData);

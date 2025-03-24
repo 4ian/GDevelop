@@ -214,9 +214,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Model3DObjectNetworkSyncData
+      networkSyncData: Model3DObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;

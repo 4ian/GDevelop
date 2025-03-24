@@ -208,9 +208,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TilemapCollisionMaskNetworkSyncData
+      networkSyncData: TilemapCollisionMaskNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.tmjf !== undefined) {
         this.setTilemapJsonFile(networkSyncData.tmjf);

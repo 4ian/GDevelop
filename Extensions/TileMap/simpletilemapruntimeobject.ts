@@ -176,9 +176,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: SimpleTileMapNetworkSyncData
+      networkSyncData: SimpleTileMapNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (
         networkSyncData.op !== undefined &&

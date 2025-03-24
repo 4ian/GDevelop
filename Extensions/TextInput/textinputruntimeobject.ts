@@ -278,8 +278,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: TextInputNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: TextInputNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (syncData.opa !== undefined) this.setOpacity(syncData.opa);
       if (syncData.wid !== undefined) this.setWidth(syncData.wid);

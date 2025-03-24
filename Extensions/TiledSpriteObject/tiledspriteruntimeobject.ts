@@ -93,9 +93,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TiledSpriteNetworkSyncData
+      networkSyncData: TiledSpriteNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       // Texture is not synchronized, see if this is asked or not.
 

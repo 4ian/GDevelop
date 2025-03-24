@@ -243,9 +243,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TextObjectNetworkSyncData
+      networkSyncData: TextObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.str !== undefined) {
         this.setText(networkSyncData.str);
       }

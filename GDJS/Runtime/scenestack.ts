@@ -70,6 +70,44 @@ namespace gdjs {
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
+
+        const allSyncData: GameSaveState = JSON.parse(
+          localStorage.getItem('save') as string
+        );
+
+        if (currentScene._isLoadingRequested && allSyncData) {
+          currentScene
+            .getGame()
+            .updateFromNetworkSyncData(allSyncData.gameNetworkSyncData, {
+              skipMultiplayerInstructions: true,
+            });
+          currentScene
+            .getGame()
+            .getSceneStack()
+            .applyUpdateFromNetworkSyncDataIfAny({
+              skipCreatingInstances: true,
+            });
+          const sceneStack = currentScene.getGame().getSceneStack()._stack;
+          sceneStack.forEach((scene, index) => {
+            scene.updateFromNetworkSyncData(
+              allSyncData.layoutNetworkSyncDatas[index].sceneData,
+              { skipMultiplayerInstructions: true }
+            );
+
+            const objectDatas =
+              allSyncData.layoutNetworkSyncDatas[index].objectDatas;
+            for (const name in objectDatas) {
+              const object = scene.createObject(name);
+              const objectNetworkSyncData = objectDatas[name];
+              if (object) {
+                object?.updateFromNetworkSyncData(objectNetworkSyncData, {
+                  skipMultiplayerInstructions: true,
+                });
+              }
+            }
+            currentScene._isLoadingRequested = false;
+          });
+        }
       }
 
       return true;
@@ -119,7 +157,8 @@ namespace gdjs {
      */
     push(
       newSceneName: string,
-      externalLayoutName?: string
+      externalLayoutName?: string,
+      options?: { skipCreatingInstances: boolean }
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -132,12 +171,12 @@ namespace gdjs {
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
       if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(newSceneName, externalLayoutName);
+        return this._loadNewScene(newSceneName, externalLayoutName, options);
       }
 
       this._isNextLayoutLoading = true;
       this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName);
+        this._loadNewScene(newSceneName, undefined, options);
         this._isNextLayoutLoading = false;
       });
       return null;
@@ -145,14 +184,15 @@ namespace gdjs {
 
     private _loadNewScene(
       newSceneName: string,
-      externalLayoutName?: string
+      externalLayoutName?: string,
+      options?: { skipCreatingInstances: boolean }
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
-
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
-        this._runtimeGame.getSceneAndExtensionsData(newSceneName)
+        this._runtimeGame.getSceneAndExtensionsData(newSceneName),
+        options
       );
       this._wasFirstSceneLoaded = true;
 
@@ -160,7 +200,7 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (externalLayoutData) {
+        if (externalLayoutData && !options?.skipCreatingInstances) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -179,8 +219,13 @@ namespace gdjs {
      * Start the specified scene, replacing the one currently being played.
      * If `clear` is set to true, all running scenes are also removed from the stack of scenes.
      */
-    replace(newSceneName: string, clear?: boolean): gdjs.RuntimeScene | null {
+    replace(
+      newSceneName: string,
+      clear?: boolean,
+      options?: { skipCreatingInstances }
+    ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+
       if (!!clear) {
         // Unload all the scenes
         while (this._stack.length !== 0) {
@@ -198,7 +243,7 @@ namespace gdjs {
           }
         }
       }
-      return this.push(newSceneName);
+      return this.push(newSceneName, undefined, options);
     }
 
     /**
@@ -259,7 +304,9 @@ namespace gdjs {
       this._sceneStackSyncDataToApply = sceneStackSyncData;
     }
 
-    applyUpdateFromNetworkSyncDataIfAny(): boolean {
+    applyUpdateFromNetworkSyncDataIfAny(options?: {
+      skipCreatingInstances: boolean;
+    }): boolean {
       this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
       let hasMadeChangeToStack = false;
@@ -267,6 +314,23 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
+      if (options?.skipCreatingInstances) {
+        while (this._stack.length !== 0) {
+          let scene = this._stack.pop();
+          if (scene) {
+            scene.unloadScene();
+          }
+        }
+        for (let i = 0; i < sceneStackSyncData.length; ++i) {
+          const sceneSyncData = sceneStackSyncData[i];
+          const newScene = this.push(sceneSyncData.name, undefined, options);
+          if (newScene) {
+            newScene.networkId = sceneSyncData.networkId;
+          }
+        }
+        hasMadeChangeToStack = true;
+        return hasMadeChangeToStack;
+      }
       // If this method is called, we are a client.
       // We trust the host to be the source of truth for the scene stack.
       // So we loop through the scenes in the stack given by the host and either:
@@ -276,12 +340,13 @@ namespace gdjs {
       for (let i = 0; i < sceneStackSyncData.length; ++i) {
         const sceneSyncData = sceneStackSyncData[i];
         const sceneAtThisPositionInOurStack = this._stack[i];
+
         if (!sceneAtThisPositionInOurStack) {
           debugLogger.info(
             `Scene at position ${i} with name ${sceneSyncData.name} is missing from the stack, adding it.`
           );
           // We have fewer scenes in the stack than the host, let's add the scene.
-          const newScene = this.push(sceneSyncData.name);
+          const newScene = this.push(sceneSyncData.name, undefined, options);
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
           }
@@ -298,9 +363,11 @@ namespace gdjs {
           );
           // The scene does not correspond to the scene at this position in our stack
           // Let's unload everything after this position to recreate the stack.
+
           const newScene = this.replace(
             sceneSyncData.name,
-            true // Clear the stack
+            true, // Clear the stack
+            options
           );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;
@@ -343,7 +410,8 @@ namespace gdjs {
           // We need to replace it with a new scene
           const newScene = this.replace(
             sceneSyncData.name,
-            false // Don't clear the stack
+            false, // Don't clear the stack
+            options
           );
           if (newScene) {
             newScene.networkId = sceneSyncData.networkId;

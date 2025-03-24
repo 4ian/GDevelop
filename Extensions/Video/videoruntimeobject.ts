@@ -114,8 +114,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: VideoNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: VideoNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (this._opacity !== undefined && this._opacity && syncData.op) {
         this.setOpacity(syncData.op);

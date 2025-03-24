@@ -547,7 +547,6 @@ namespace gdjs {
       return this._allInstancesList;
     }
 
-    
     /**
      * Update the objects before launching the events.
      */
@@ -621,8 +620,6 @@ namespace gdjs {
       }
       return this._instances.get(name);
     }
-
-  
 
     /**
      * Create a new object from its name. The object is also added to the instances

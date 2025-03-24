@@ -401,7 +401,7 @@ const PublishHome = ({
               label={getSectionLabel({ section: 'browser' })}
               icon={getSectionIcon({ section: 'browser' })}
               description={
-                <Trans>Gaming portals (Itch.io, Poki, Facebook...)</Trans>
+                <Trans>Gaming portals (Itch.io, Poki, CrazyGames...)</Trans>
               }
               onClick={() => onChooseSection('browser')}
               disabled={allExportersRequireOnline && !isOnline}

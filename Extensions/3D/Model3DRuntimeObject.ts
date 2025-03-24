@@ -95,7 +95,6 @@ namespace gdjs {
      * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
      */
     _centerPoint: FloatPoint3D | null;
-    _allSyncData: string;
     _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
@@ -126,7 +125,6 @@ namespace gdjs {
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
-      this._allSyncData = '';
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();

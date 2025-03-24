@@ -41,13 +41,13 @@ module.exports = [
     "languageCode": "ca_ES",
     "languageName": "Catalan",
     "languageNativeName": "Català",
-    "translationRatio": 0
+    "translationRatio": 0.9946559786239145
   },
   {
     "languageCode": "cs_CZ",
     "languageName": "Czech",
     "languageNativeName": "čeština",
-    "translationRatio": 0
+    "translationRatio": 0.988810955243821
   },
   {
     "languageCode": "da_DK",
@@ -65,7 +65,7 @@ module.exports = [
     "languageCode": "el_GR",
     "languageName": "Greek",
     "languageNativeName": "Ελληνικά",
-    "translationRatio": 0
+    "translationRatio": 0.9709418837675351
   },
   {
     "languageCode": "en",
@@ -77,7 +77,7 @@ module.exports = [
     "languageCode": "eo_UY",
     "languageName": "Esperanto",
     "languageNativeName": "Esperanto",
-    "translationRatio": 0
+    "translationRatio": 0.9973279893119572
   },
   {
     "languageCode": "es_ES",
@@ -89,7 +89,7 @@ module.exports = [
     "languageCode": "fa_IR",
     "languageName": "Persian",
     "languageNativeName": "فارسی",
-    "translationRatio": 0
+    "translationRatio": 0.9924849699398798
   },
   {
     "languageCode": "fi_FI",
@@ -101,7 +101,7 @@ module.exports = [
     "languageCode": "fil_PH",
     "languageName": "Filipino",
     "languageNativeName": "Mga Filipino",
-    "translationRatio": 0
+    "translationRatio": 0.9769539078156313
   },
   {
     "languageCode": "fr_FR",
@@ -131,13 +131,13 @@ module.exports = [
     "languageCode": "hu_HU",
     "languageName": "Hungarian",
     "languageNativeName": "magyar",
-    "translationRatio": 0
+    "translationRatio": 0.9941549766199065
   },
   {
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0
+    "translationRatio": 0.9911489645958584
   },
   {
     "languageCode": "ig_NG",
@@ -155,7 +155,7 @@ module.exports = [
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.5930193720774883
+    "translationRatio": 0.9946559786239145
   },
   {
     "languageCode": "ka_GE",
@@ -179,7 +179,7 @@ module.exports = [
     "languageCode": "lt_LT",
     "languageName": "Lithuanian",
     "languageNativeName": "lietuvių kalba",
-    "translationRatio": 0
+    "translationRatio": 0.9181696726786908
   },
   {
     "languageCode": "lv_LV",
@@ -215,7 +215,7 @@ module.exports = [
     "languageCode": "no_NO",
     "languageName": "Norwegian",
     "languageNativeName": "Norsk",
-    "translationRatio": 0
+    "translationRatio": 0.9939879759519038
   },
   {
     "languageCode": "pl_PL",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "si_LK",
     "languageName": "Sinhala",
     "languageNativeName": "සිංහල",
-    "translationRatio": 0
+    "translationRatio": 0.3016032064128257
   },
   {
     "languageCode": "sk_SK",
@@ -263,7 +263,7 @@ module.exports = [
     "languageCode": "sl_SI",
     "languageName": "Slovenian",
     "languageNativeName": "slovenščina",
-    "translationRatio": 0
+    "translationRatio": 0.9944889779559118
   },
   {
     "languageCode": "sq_AL",
@@ -281,7 +281,7 @@ module.exports = [
     "languageCode": "sr_SP",
     "languageName": "Serbian",
     "languageNativeName": "српски језик",
-    "translationRatio": 0
+    "translationRatio": 0.9976619906479626
   },
   {
     "languageCode": "sv_SE",
@@ -299,7 +299,7 @@ module.exports = [
     "languageCode": "th_TH",
     "languageName": "Thai",
     "languageNativeName": "ไทย",
-    "translationRatio": 0
+    "translationRatio": 0.9534068136272545
   },
   {
     "languageCode": "tr_TR",
@@ -329,13 +329,13 @@ module.exports = [
     "languageCode": "vi_VN",
     "languageName": "Vietnamese",
     "languageNativeName": "Tiếng Việt",
-    "translationRatio": 0
+    "translationRatio": 0.9959919839679359
   },
   {
     "languageCode": "yo_NG",
     "languageName": "Yoruba",
     "languageNativeName": "Yorùbá",
-    "translationRatio": 0
+    "translationRatio": 0.9802939211756847
   },
   {
     "languageCode": "zh_CN",

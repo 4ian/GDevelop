@@ -70,10 +70,10 @@ namespace gdjs {
       this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
       this._cachedGameResolutionWidth = runtimeGame
-        ? runtimeGame.getRenderingResolutionWidth()
+        ? runtimeGame.getGameResolutionWidth()
         : 0;
       this._cachedGameResolutionHeight = runtimeGame
-        ? runtimeGame.getRenderingResolutionHeight()
+        ? runtimeGame.getGameResolutionHeight()
         : 0;
       this._cachedGameZoomFactor = runtimeGame
         ? runtimeGame.getZoomFactor()
@@ -103,15 +103,13 @@ namespace gdjs {
      * See gdjs.RuntimeGame.startGameLoop in particular.
      */
     onGameResolutionResized() {
-      const oldGameResolutionOriginX =
-        this.getViewportOriginX() / this._cachedGameZoomFactor;
-      const oldGameResolutionOriginY =
-        this.getViewportOriginY() / this._cachedGameZoomFactor;
+      const oldGameResolutionOriginX = this.getViewportOriginX();
+      const oldGameResolutionOriginY = this.getViewportOriginY();
       this._cachedGameResolutionWidth = this._runtimeGame
-        ? this._runtimeGame.getRenderingResolutionWidth()
+        ? this._runtimeGame.getGameResolutionWidth()
         : 0;
       this._cachedGameResolutionHeight = this._runtimeGame
-        ? this._runtimeGame.getRenderingResolutionHeight()
+        ? this._runtimeGame.getGameResolutionHeight()
         : 0;
       this._cachedGameZoomFactor = this._runtimeGame
         ? this._runtimeGame.getZoomFactor()

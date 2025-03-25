@@ -81,13 +81,10 @@ namespace gdjs {
         Math.abs(this._cameraY - oldGameResolutionOriginY) < 1 &&
         this._zoomFactor === 1
       ) {
-        const gameZoomFactor = this.getRuntimeScene().getGame().getZoomFactor();
         this._cameraX +=
-          this._runtimeScene.getViewportOriginX() / gameZoomFactor -
-          oldGameResolutionOriginX;
+          this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
         this._cameraY +=
-          this._runtimeScene.getViewportOriginY() / gameZoomFactor -
-          oldGameResolutionOriginY;
+          this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
       }
 
       this._renderer.updatePosition();
@@ -148,9 +145,7 @@ namespace gdjs {
      * @return The width of the camera
      */
     override getCameraWidth(cameraId?: integer): float {
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      return this.getWidth() / zoomFactor;
+      return this.getWidth() / this._zoomFactor;
     }
 
     /**
@@ -161,9 +156,7 @@ namespace gdjs {
      * @return The height of the camera
      */
     override getCameraHeight(cameraId?: integer): float {
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      return this.getHeight() / zoomFactor;
+      return this.getHeight() / this._zoomFactor;
     }
 
     /**
@@ -186,12 +179,6 @@ namespace gdjs {
      */
     override getCameraZoom(cameraId?: integer): float {
       return this._zoomFactor;
-    }
-
-    override getCameraRenderingZoom(cameraId?: integer): float {
-      return (
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor()
-      );
     }
 
     /**
@@ -296,10 +283,8 @@ namespace gdjs {
 
       x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       y -= this.getRuntimeScene()._cachedGameResolutionHeight / 2;
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      x /= Math.abs(zoomFactor);
-      y /= Math.abs(zoomFactor);
+      x /= Math.abs(this._zoomFactor);
+      y /= Math.abs(this._zoomFactor);
 
       // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
       const angleInRadians = (this._cameraRotation / 180) * Math.PI;
@@ -335,10 +320,8 @@ namespace gdjs {
     ): FloatPoint {
       x -= this._runtimeScene.getViewportOriginX();
       y -= this._runtimeScene.getViewportOriginY();
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      x /= Math.abs(zoomFactor);
-      y /= Math.abs(zoomFactor);
+      x /= Math.abs(this._zoomFactor);
+      y /= Math.abs(this._zoomFactor);
 
       // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
       const angleInRadians = (this._cameraRotation / 180) * Math.PI;
@@ -384,10 +367,8 @@ namespace gdjs {
       const sinValue = Math.sin(-angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      x *= Math.abs(zoomFactor);
-      y *= Math.abs(zoomFactor);
+      x *= Math.abs(this._zoomFactor);
+      y *= Math.abs(this._zoomFactor);
       position[0] = x + this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       position[1] = y + this.getRuntimeScene()._cachedGameResolutionHeight / 2;
 
@@ -423,10 +404,8 @@ namespace gdjs {
       const sinValue = Math.sin(-angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      const zoomFactor =
-        this._zoomFactor * this.getRuntimeScene().getGame().getZoomFactor();
-      x *= Math.abs(zoomFactor);
-      y *= Math.abs(zoomFactor);
+      x *= Math.abs(this._zoomFactor);
+      y *= Math.abs(this._zoomFactor);
       x += this._runtimeScene.getViewportOriginX();
       y += this._runtimeScene.getViewportOriginY();
 

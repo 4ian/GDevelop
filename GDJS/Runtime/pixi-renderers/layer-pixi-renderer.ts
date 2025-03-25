@@ -304,9 +304,12 @@ namespace gdjs {
 
             this._threePlaneTexture = texture;
             this._threePlaneTexture.generateMipmaps = false;
+            const scaleMode = this._layer
+              .getRuntimeScene()
+              .getGame()
+              .getScaleMode();
             const filter =
-              this._layer.getRuntimeScene().getGame().getScaleMode() ===
-              'nearest'
+              scaleMode === 'nearest' || scaleMode === 'magnified'
                 ? THREE.NearestFilter
                 : THREE.LinearFilter;
             this._threePlaneTexture.minFilter = filter;
@@ -393,7 +396,7 @@ namespace gdjs {
      */
     updatePosition(): void {
       const angle = -gdjs.toRad(this._layer.getCameraRotation());
-      const zoomFactor = this._layer.getCameraRenderingZoom();
+      const zoomFactor = this._layer.getCameraZoom();
       this._pixiContainer.rotation = angle;
       this._pixiContainer.scale.x = zoomFactor;
       this._pixiContainer.scale.y = zoomFactor;

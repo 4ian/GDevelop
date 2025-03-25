@@ -638,10 +638,14 @@ namespace gdjs {
             }
           }
         }
-        if (this._scaleMode === 'magnified') {
+        if (
+          this._scaleMode === 'magnified' &&
+          this._gameResolutionWidth > 0 &&
+          this._gameResolutionHeight > 0
+        ) {
           const pixelSize = Math.max(
             1,
-            Math.floor(
+            Math.ceil(
               this._zoomFactor *
                 Math.min(
                   windowInnerWidth / this._gameResolutionWidth,
@@ -655,7 +659,7 @@ namespace gdjs {
           this._gameResolutionHeight = Math.round(
             (this._gameResolutionHeight * pixelSize) / this._zoomFactor
           );
-          if (this._zoomFactor !== pixelSize) {
+          if (this._zoomFactor !== pixelSize && pixelSize >= 1) {
             this._zoomFactor = pixelSize;
             this._notifyScenesForGameZoomFactorChange = true;
           }

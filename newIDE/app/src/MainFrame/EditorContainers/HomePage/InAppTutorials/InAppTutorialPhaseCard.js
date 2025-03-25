@@ -10,22 +10,24 @@ import { CardWidget } from '../CardWidget';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
-import { Trans } from '@lingui/macro';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { Trans } from '@lingui/macro';
+
+const getImageSize = ({ isMobile }: { isMobile: boolean }) =>
+  isMobile ? 90 : 130;
 
 const styles = {
   cardTextContainer: {
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-    padding: '10px 10px 20px 10px',
+    padding: '10px 10px 15px 10px',
   },
-  image: { height: 130, width: 130 },
   lockerImage: { height: 80, width: 80 },
   imageContainer: {
     width: '100%',
-    height: 130,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -46,6 +48,7 @@ type Props = {|
   disabled?: boolean,
   title: MessageDescriptor,
   description: MessageDescriptor,
+  shortDescription: MessageDescriptor,
   durationInMinutes?: number,
   keyPoints?: Array<MessageDescriptor>,
   onClick: () => void,
@@ -62,6 +65,7 @@ const InAppTutorialPhaseCard = ({
   disabled,
   title,
   description,
+  shortDescription,
   durationInMinutes,
   keyPoints,
   onClick,
@@ -70,6 +74,9 @@ const InAppTutorialPhaseCard = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const shouldTextBeDisabled = loading || disabled || locked;
+  const { isMobile } = useResponsiveWindowSize();
+  const imageSize = getImageSize({ isMobile });
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -82,6 +89,7 @@ const InAppTutorialPhaseCard = ({
             <div
               style={{
                 ...styles.imageContainer,
+                height: imageSize,
                 backgroundColor: locked
                   ? gdevelopTheme.paper.backgroundColor.light
                   : disabled
@@ -95,7 +103,11 @@ const InAppTutorialPhaseCard = ({
                 <Lock style={styles.lockerImage} />
               ) : (
                 renderImage({
-                  style: { ...styles.image, opacity: disabled ? 0.6 : 1 },
+                  style: {
+                    height: imageSize,
+                    width: imageSize,
+                    opacity: disabled ? 0.6 : 1,
+                  },
                 })
               )}
             </div>
@@ -111,12 +123,26 @@ const InAppTutorialPhaseCard = ({
                 useFullHeight
               >
                 {progress && progress > 0 ? (
-                  <LineStackLayout alignItems="center" noMargin>
-                    <Text displayInlineAsSpan noMargin size="body2">
-                      {progress}%
-                    </Text>
-                    <ColoredLinearProgress value={progress} />
-                  </LineStackLayout>
+                  progress !== 100 ? (
+                    <LineStackLayout alignItems="center" noMargin>
+                      <Text displayInlineAsSpan noMargin size="body2">
+                        {progress}%
+                      </Text>
+                      <ColoredLinearProgress value={progress} />
+                    </LineStackLayout>
+                  ) : (
+                    <Line noMargin justifyContent="center">
+                      <Chip
+                        size="small"
+                        label={<Trans>Finished</Trans>}
+                        style={{
+                          backgroundColor:
+                            gdevelopTheme.statusIndicator.success,
+                          color: '#111111',
+                        }}
+                      />
+                    </Line>
+                  )
                 ) : durationInMinutes ? (
                   <Line noMargin justifyContent="center">
                     <Chip
@@ -147,7 +173,7 @@ const InAppTutorialPhaseCard = ({
                   style={getTextStyle(shouldTextBeDisabled)}
                   color="secondary"
                 >
-                  {i18n._(description)}
+                  {isMobile ? i18n._(shortDescription) : i18n._(description)}
                 </Text>
                 {keyPoints && <Divider />}
                 {keyPoints && (

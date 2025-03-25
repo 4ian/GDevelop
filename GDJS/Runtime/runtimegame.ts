@@ -641,7 +641,10 @@ namespace gdjs {
         if (
           this._scaleMode === 'magnified' &&
           this._gameResolutionWidth > 0 &&
-          this._gameResolutionHeight > 0
+          this._gameResolutionHeight > 0 &&
+          // Fall back on linear if magnified is used on a high resolution game.
+          this._originalWidth <= 960 &&
+          this._originalHeight <= 540
         ) {
           const pixelSize = Math.max(
             1,

@@ -45,7 +45,6 @@ namespace gdjs {
 
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
-    _cachedGameZoomFactor: float;
 
     /**
      * A network ID associated to the scene to be used
@@ -74,9 +73,6 @@ namespace gdjs {
         : 0;
       this._cachedGameResolutionHeight = runtimeGame
         ? runtimeGame.getGameResolutionHeight()
-        : 0;
-      this._cachedGameZoomFactor = runtimeGame
-        ? runtimeGame.getZoomFactor()
         : 0;
 
       this._renderer = new gdjs.RuntimeSceneRenderer(
@@ -110,9 +106,6 @@ namespace gdjs {
         : 0;
       this._cachedGameResolutionHeight = this._runtimeGame
         ? this._runtimeGame.getGameResolutionHeight()
-        : 0;
-      this._cachedGameZoomFactor = this._runtimeGame
-        ? this._runtimeGame.getZoomFactor()
         : 0;
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {

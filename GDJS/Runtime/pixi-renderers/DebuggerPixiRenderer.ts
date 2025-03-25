@@ -47,7 +47,7 @@ namespace gdjs {
         // Add on top of all layers:
         this._debugDrawContainer.addChild(this._debugDraw);
         if (pixiContainer) {
-          pixiContainer.addChild(this._debugDrawContainer);
+          //pixiContainer.addChild(this._debugDrawContainer);
         }
       }
       const debugDraw = this._debugDraw;
@@ -112,7 +112,8 @@ namespace gdjs {
         const polygon: float[] = [];
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          this.applyLayerTransformation(
+            layer,
             aabb.min[0],
             aabb.min[1],
             0,
@@ -121,7 +122,8 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          this.applyLayerTransformation(
+            layer,
             aabb.max[0],
             aabb.min[1],
             0,
@@ -130,7 +132,8 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          this.applyLayerTransformation(
+            layer,
             aabb.max[0],
             aabb.max[1],
             0,
@@ -139,7 +142,8 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          this.applyLayerTransformation(
+            layer,
             aabb.min[0],
             aabb.max[1],
             0,
@@ -185,7 +189,8 @@ namespace gdjs {
           // as this is for debug draw.
           const polygon: float[] = [];
           hitboxes[j].vertices.forEach((point) => {
-            point = layer.applyLayerTransformation(
+            point = this.applyLayerTransformation(
+              layer,
               point[0],
               point[1],
               0,
@@ -205,7 +210,8 @@ namespace gdjs {
         debugDraw.fill.alpha = 0.3;
 
         // Draw Center point
-        const centerPoint = layer.applyLayerTransformation(
+        const centerPoint = this.applyLayerTransformation(
+          layer,
           object.getCenterXInScene(),
           object.getCenterYInScene(),
           0,
@@ -221,7 +227,8 @@ namespace gdjs {
         );
 
         // Draw position point
-        const positionPoint = layer.applyLayerTransformation(
+        const positionPoint = this.applyLayerTransformation(
+          layer,
           object.getX(),
           object.getY(),
           0,
@@ -245,7 +252,8 @@ namespace gdjs {
             Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
             Math.abs(originPoint[1] - positionPoint[1]) >= 1
           ) {
-            originPoint = layer.applyLayerTransformation(
+            originPoint = this.applyLayerTransformation(
+              layer,
               originPoint[0],
               originPoint[1],
               0,
@@ -270,7 +278,8 @@ namespace gdjs {
           for (const customPointName in animationFrame.points.items) {
             let customPoint = object.getPointPosition(customPointName);
 
-            customPoint = layer.applyLayerTransformation(
+            customPoint = this.applyLayerTransformation(
+              layer,
               customPoint[0],
               customPoint[1],
               0,
@@ -301,6 +310,30 @@ namespace gdjs {
       }
 
       debugDraw.endFill();
+    }
+
+    private applyLayerTransformation(
+      layer: gdjs.RuntimeLayer,
+      x: float,
+      y: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
+      layer.applyLayerTransformation(
+        x,
+        y,
+        cameraId,
+        result
+      );
+      const gamePixiContainer = this._instanceContainer
+      .getRenderer()
+      .getRendererObject();
+      if (!gamePixiContainer) {
+        return result;
+      }
+      result[0] *= gamePixiContainer.scale.x;
+      result[1] *= gamePixiContainer.scale.y;
+      return result;
     }
 
     clearDebugDraw(): void {

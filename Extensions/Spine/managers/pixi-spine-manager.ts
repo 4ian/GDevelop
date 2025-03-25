@@ -126,5 +126,19 @@ namespace gdjs {
     dispose(): void {
       this._loadedSpines.clear();
     }
+
+    /**
+     * To be called when the scene is disposed.
+     * Clear the Spine skeleton data loaded in this manager.
+     * @param resourcesList The list of specific resources
+     */
+    disposeByResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedSpine = this._loadedSpines.get(resourceData);
+        if (loadedSpine) {
+          this._loadedSpines.delete(resourceData);
+        }
+      });
+    }
   }
 }

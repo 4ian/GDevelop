@@ -21,7 +21,7 @@ module.exports = {
       .setExtensionInformation(
         'Physics3D',
         _('3D physics engine'),
-        "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
+        "The 3D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for almost all 3D games.",
         'Florian Rival',
         'MIT'
       )
@@ -481,7 +481,9 @@ module.exports = {
           'Physics3DBehavior',
           _('3D physics engine'),
           'Physics3D',
-          _('Simulate realistic object physics with gravity, forces, etc.'),
+          _(
+            'Simulate realistic 3D physics for this object including gravity, forces, collisions, etc.'
+          ),
           '',
           'JsPlatform/Extensions/physics3d.svg',
           'Physics3DBehavior',

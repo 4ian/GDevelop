@@ -20,8 +20,8 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Physics2',
-        _('Physics Engine 2.0'),
-        "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
+        _('2D Physics Engine'),
+        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.",
         'Florian Rival, Franco Maciel',
         'MIT'
       )
@@ -515,10 +515,10 @@ module.exports = {
       // extension
       .addBehavior(
         'Physics2Behavior',
-        _('Physics Engine 2.0'),
+        _('2D Physics Engine'),
         'Physics2',
         _(
-          'Simulate realistic object physics with gravity, forces, joints, etc.'
+          'Simulate realistic 2D physics for the object including gravity, forces, collisions, and joints.'
         ),
         '',
         'res/physics32.png',

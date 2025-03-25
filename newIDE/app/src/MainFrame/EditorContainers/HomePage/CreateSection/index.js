@@ -458,6 +458,7 @@ const CreateSection = ({
                 )
               : undefined
           }
+          showUrgentAnnouncements
         >
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (

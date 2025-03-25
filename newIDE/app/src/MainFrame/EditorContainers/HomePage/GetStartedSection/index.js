@@ -130,11 +130,6 @@ const GetStartedSection = ({
     [authenticatedUser.authenticated]
   );
 
-  const shouldDisplayAnnouncements =
-    !authenticatedUser.limits ||
-    !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
-
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&
     // Do not display loader if the user is already seeing the recommendations.
@@ -248,10 +243,7 @@ const GetStartedSection = ({
   if (step === 'recommendations') {
     return (
       <>
-        <SectionContainer
-          flexBody
-          showUrgentAnnouncements={shouldDisplayAnnouncements}
-        >
+        <SectionContainer flexBody showUrgentAnnouncements>
           <RecommendationList
             authenticatedUser={authenticatedUser}
             selectInAppTutorial={selectInAppTutorial}

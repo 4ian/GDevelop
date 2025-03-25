@@ -839,6 +839,7 @@ namespace gdjs {
     /**
      * Load all assets needed to display the scene, displaying progress in
      * renderer.
+     * This method is used for scenes which was unloaded assets
      */
     async loadSceneAssetsBySceneName(
       sceneName: string,

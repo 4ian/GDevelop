@@ -23,7 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
-    _requestedClearParam: boolean = false;
+    _unloadAssetsOnSceneExit: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -142,6 +142,7 @@ namespace gdjs {
         this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
+      this._unloadAssetsOnSceneExit = sceneData.unloadSceneAssets;
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -323,7 +324,7 @@ namespace gdjs {
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;
 
-      if (this._requestedClearParam) {
+      if (this._unloadAssetsOnSceneExit) {
         this._runtimeGame.getResourceLoader().disposeScene(this._name);
       }
     }
@@ -584,10 +585,10 @@ namespace gdjs {
     }
 
     /**
-     * Get requestedClearParam if need to unload resources of scene
+     * Get _unloadAssetsOnSceneExit state if need to unload resources of scene
      */
-    getRequestedClearResourcesParam(): boolean {
-      return this._requestedClearParam;
+    getUnloadAssetsOnSceneExit(): boolean {
+      return this._unloadAssetsOnSceneExit;
     }
 
     /**
@@ -754,18 +755,10 @@ namespace gdjs {
      * thanks to getRequestedChange and getRequestedScene methods.
      * @param change One of RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
      * @param sceneName The name of the new scene to launch, if applicable.
-     * @param clearSceneResources Boolean param for clearing all resources of the previous scene if true
      */
-    requestChange(
-      change: SceneChangeRequest,
-      sceneName?: string,
-      clearSceneResources?: boolean
-    ) {
+    requestChange(change: SceneChangeRequest, sceneName?: string) {
       this._requestedChange = change;
-      if (sceneName) {
-        this._requestedScene = sceneName;
-        this._requestedClearParam = !!clearSceneResources;
-      }
+      if (sceneName) this._requestedScene = sceneName;
     }
 
     /**

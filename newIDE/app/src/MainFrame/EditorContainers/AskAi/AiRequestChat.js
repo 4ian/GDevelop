@@ -25,6 +25,9 @@ import Like from '../../../UI/CustomSvgIcons/Like';
 import Dislike from '../../../UI/CustomSvgIcons/Dislike';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 
+const TOO_MANY_MESSAGES_WARNING_COUNT = 9;
+const TOO_MANY_MESSAGES_ERROR_COUNT = 14;
+
 type Props = {
   aiRequest: AiRequest | null,
 
@@ -373,7 +376,23 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Line>
           ) : null}
         </ScrollView>
-        {subscriptionBanner}
+        {aiRequest.output.length >= TOO_MANY_MESSAGES_WARNING_COUNT ? (
+          <AlertMessage
+            kind={
+              aiRequest.output.length >= TOO_MANY_MESSAGES_ERROR_COUNT
+                ? 'error'
+                : 'warning'
+            }
+          >
+            <Trans>
+              The chat is becoming long - consider creating a new chat to ask
+              other questions. The AI will better analyze your game and request
+              in a new chat.
+            </Trans>
+          </AlertMessage>
+        ) : (
+          subscriptionBanner
+        )}
         <CompactTextAreaField
           maxLength={6000}
           value={userRequestText}

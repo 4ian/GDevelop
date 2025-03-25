@@ -221,6 +221,40 @@ const fakeOutputWithAiResponses = [
   },
 ];
 
+const fakeOutputWithMoreAiResponses = [
+  ...fakeOutputWithUserRequestOnly,
+  ...new Array(10).fill({
+    type: 'message',
+    status: 'completed',
+    role: 'assistant',
+    content: [
+      {
+        type: 'output_text',
+        status: 'completed',
+        text: 'Some **answer** from the AI. Lorem ipsum AI.',
+        annotations: [],
+      },
+    ],
+  }),
+];
+
+const fakeOutputWithEvenMoreAiResponses = [
+  ...fakeOutputWithUserRequestOnly,
+  ...new Array(15).fill({
+    type: 'message',
+    status: 'completed',
+    role: 'assistant',
+    content: [
+      {
+        type: 'output_text',
+        status: 'completed',
+        text: 'Some **answer** from the AI. Lorem ipsum AI.',
+        annotations: [],
+      },
+    ],
+  }),
+];
+
 export const ReadyAiRequest = () => (
   <FixedHeightFlexContainer height={500}>
     <AiRequestChat
@@ -232,6 +266,64 @@ export const ReadyAiRequest = () => (
         userId: 'fake-user-id',
         gameProjectJson: 'FAKE DATA',
         output: fakeOutputWithAiResponses,
+        error: null,
+      }}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: false,
+        current: 1,
+        max: 2,
+      }}
+      increaseQuotaOffering="subscribe"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={400}
+      onSendFeedback={async () => {}}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const ReadyAiRequestWithMoreMessages = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={{
+        createdAt: '',
+        updatedAt: '',
+        id: 'fake-working-new-ai-request',
+        status: 'ready',
+        userId: 'fake-user-id',
+        gameProjectJson: 'FAKE DATA',
+        output: fakeOutputWithMoreAiResponses,
+        error: null,
+      }}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: false,
+        current: 1,
+        max: 2,
+      }}
+      increaseQuotaOffering="subscribe"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={400}
+      onSendFeedback={async () => {}}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const ReadyAiRequestWithEvenMoreMessages = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={{
+        createdAt: '',
+        updatedAt: '',
+        id: 'fake-working-new-ai-request',
+        status: 'ready',
+        userId: 'fake-user-id',
+        gameProjectJson: 'FAKE DATA',
+        output: fakeOutputWithEvenMoreAiResponses,
         error: null,
       }}
       onSendUserRequest={async () => {}}

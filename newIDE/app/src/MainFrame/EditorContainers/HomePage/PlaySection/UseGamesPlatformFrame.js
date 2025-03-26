@@ -21,32 +21,6 @@ const electron = optionalRequire('electron');
 // exists, even if it's not visible. So we don't keep it alive for too long.
 const TIMEOUT_TO_UNLOAD_IFRAME_IN_MS = 2000;
 
-type NewProjectActions = {|
-  fetchAndOpenNewProjectSetupDialogForExample: (
-    exampleSlug: string
-  ) => Promise<void>,
-|};
-
-type GamesPlatformFrameState = {|
-  startTimeoutToUnloadIframe: () => void,
-  loadIframeOrRemoveTimeout: () => void,
-  iframeLoaded: boolean,
-  iframeVisible: boolean,
-  iframeErrored: boolean,
-  configureNewProjectActions: (actions: NewProjectActions) => void,
-|};
-
-export const GamesPlatformFrameContext = React.createContext<GamesPlatformFrameState>(
-  {
-    startTimeoutToUnloadIframe: () => {},
-    loadIframeOrRemoveTimeout: () => {},
-    iframeLoaded: false,
-    iframeVisible: false,
-    iframeErrored: false,
-    configureNewProjectActions: () => {},
-  }
-);
-
 let gdevelopGamesMonetization: {|
   initialize: (rootElement: HTMLElement) => Promise<void>,
   sendCommand: (command: any) => Promise<void>,
@@ -189,13 +163,24 @@ const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
   }
 };
 
-type GamesPlatformFrameStateProviderProps = {|
-  children: React.Node,
+export type GamesPlatformFrameTools = {|
+  startTimeoutToUnloadIframe: () => void,
+  loadIframeOrRemoveTimeout: () => void,
+  iframeLoaded: boolean,
+  iframeVisible: boolean,
+  iframeErrored: boolean,
+  renderGamesPlatformFrame: () => React.Node,
 |};
 
-const GamesPlatformFrameStateProvider = ({
-  children,
-}: GamesPlatformFrameStateProviderProps) => {
+type UseGamesPlatformFrameProps = {|
+  fetchAndOpenNewProjectSetupDialogForExample: string => Promise<void>,
+  onOpenProfileDialog: () => void,
+|};
+
+const UseGamesPlatformFrame = ({
+  fetchAndOpenNewProjectSetupDialogForExample,
+  onOpenProfileDialog,
+}: UseGamesPlatformFrameProps): GamesPlatformFrameTools => {
   const [loadIframeInDOM, setLoadIframeInDOM] = React.useState(false);
   const [iframeVisible, setIframeVisible] = React.useState(false);
   const [iframeLoaded, setIframeLoaded] = React.useState(false);
@@ -209,13 +194,8 @@ const GamesPlatformFrameStateProvider = ({
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
-    onOpenProfileDialog,
     profile,
   } = React.useContext(AuthenticatedUserContext);
-  const [
-    newProjectActions,
-    setNewProjectActions,
-  ] = React.useState<?NewProjectActions>(null);
 
   const {
     navigateToRoute,
@@ -243,13 +223,9 @@ const GamesPlatformFrameStateProvider = ({
 
   const onOpenExample = React.useCallback(
     async (exampleSlug: string) => {
-      if (newProjectActions) {
-        await newProjectActions.fetchAndOpenNewProjectSetupDialogForExample(
-          exampleSlug
-        );
-      }
+      await fetchAndOpenNewProjectSetupDialogForExample(exampleSlug);
     },
-    [newProjectActions]
+    [fetchAndOpenNewProjectSetupDialogForExample]
   );
 
   const startTimeoutToUnloadIframe = React.useCallback(
@@ -522,21 +498,25 @@ const GamesPlatformFrameStateProvider = ({
     [iframeVisible, iframeLoadedRef]
   );
 
-  const configureNewProjectActions = React.useCallback(
-    (actions: NewProjectActions) => {
-      setNewProjectActions(actions);
-    },
-    [setNewProjectActions]
+  const renderGamesPlatformFrame = React.useCallback(
+    () => (
+      <GamesPlatformFrame
+        initialGameId={lastGameId}
+        loaded={loadIframeInDOM}
+        visible={iframeVisible}
+      />
+    ),
+    [lastGameId, loadIframeInDOM, iframeVisible]
   );
 
-  const gamesPlatformFrameState = React.useMemo(
+  const gamesPlatformFrameTools = React.useMemo(
     () => ({
       startTimeoutToUnloadIframe,
       loadIframeOrRemoveTimeout,
       iframeLoaded,
       iframeVisible,
       iframeErrored,
-      configureNewProjectActions,
+      renderGamesPlatformFrame,
     }),
     [
       startTimeoutToUnloadIframe,
@@ -544,20 +524,11 @@ const GamesPlatformFrameStateProvider = ({
       iframeLoaded,
       iframeVisible,
       iframeErrored,
-      configureNewProjectActions,
+      renderGamesPlatformFrame,
     ]
   );
 
-  return (
-    <GamesPlatformFrameContext.Provider value={gamesPlatformFrameState}>
-      <GamesPlatformFrame
-        initialGameId={lastGameId}
-        loaded={loadIframeInDOM}
-        visible={iframeVisible}
-      />
-      {children}
-    </GamesPlatformFrameContext.Provider>
-  );
+  return gamesPlatformFrameTools;
 };
 
-export default GamesPlatformFrameStateProvider;
+export default UseGamesPlatformFrame;

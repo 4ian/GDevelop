@@ -15,6 +15,7 @@ import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type CourseChapter } from '../../Utils/GDevelopServices/Asset';
 import { type GamesList } from '../../GameDashboard/UseGamesList';
+import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 
 export type EditorContainerExtraProps = {|
@@ -99,6 +100,9 @@ export type RenderEditorContainerProps = {|
 
   // Games
   gamesList: GamesList,
+
+  // Games Platform
+  gamesPlatformFrameTools: GamesPlatformFrameTools,
 
   // Other dialogs opening:
   onSelectExampleShortHeader: ExampleShortHeader => void,

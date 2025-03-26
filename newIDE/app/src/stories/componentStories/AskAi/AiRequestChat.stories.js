@@ -26,6 +26,7 @@ export const NewAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -46,6 +47,7 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -66,6 +68,7 @@ export const ErrorLaunchingNewAiRequest = () => (
       lastSendError={new Error('Fake error while sending request')}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -86,6 +89,7 @@ export const NewAiRequestQuotaLimitReached = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -106,6 +110,7 @@ export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -126,6 +131,7 @@ export const LaunchingNewAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -170,6 +176,7 @@ export const ErroredNewAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -199,6 +206,7 @@ export const WorkingNewAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -280,6 +288,7 @@ export const ReadyAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -309,6 +318,7 @@ export const ReadyAiRequestWithMoreMessages = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -338,6 +348,7 @@ export const ReadyAiRequestWithEvenMoreMessages = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -367,6 +378,7 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -396,6 +408,7 @@ export const ErrorLaunchingFollowupAiRequest = () => (
       lastSendError={new Error('fake error while sending request')}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -425,6 +438,7 @@ export const LaunchingFollowupAiRequest = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -454,6 +468,7 @@ export const QuotaLimitReached = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -483,6 +498,7 @@ export const QuotaLimitReachedAndUpgrade = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -512,6 +528,7 @@ export const QuotaLimitReachedAndNoUpgrade = () => (
       lastSendError={null}
       availableCredits={400}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );
@@ -540,6 +557,7 @@ export const QuotaLimitReachedAndNoCredits = () => (
       lastSendError={null}
       availableCredits={0}
       onSendFeedback={async () => {}}
+      hasOpenedProject={false}
     />
   </FixedHeightFlexContainer>
 );

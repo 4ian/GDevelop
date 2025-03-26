@@ -24,6 +24,7 @@ import IconButton from '../../../UI/IconButton';
 import Like from '../../../UI/CustomSvgIcons/Like';
 import Dislike from '../../../UI/CustomSvgIcons/Dislike';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
 
 const TOO_MANY_MESSAGES_WARNING_COUNT = 9;
 const TOO_MANY_MESSAGES_ERROR_COUNT = 14;
@@ -38,6 +39,7 @@ type Props = {
     messageIndex: number,
     feedback: 'like' | 'dislike'
   ) => Promise<void>,
+  hasOpenedProject: boolean,
 
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
@@ -94,6 +96,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       lastSendError,
       aiRequestPriceInCredits,
       availableCredits,
+      hasOpenedProject,
     }: Props,
     ref
   ) => {
@@ -101,6 +104,25 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
     const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
     const theme = React.useContext(GDevelopThemeContext);
+    const [newChatPlaceholder] = React.useState(() => {
+      const newChatPlaceholders: Array<MessageDescriptor> = [
+        t`How to add a leaderboard?`,
+        t`How to display the health of my player?`,
+        t`How to add an explosion when an enemy is destroyed?`,
+        t`How to create a main menu for my game?`,
+        ...(hasOpenedProject
+          ? [
+              t`What would you add to my game?`,
+              t`How to make my game more fun?`,
+              t`What is a good GDevelop feature I could use in my game?`,
+            ]
+          : []),
+      ];
+
+      return newChatPlaceholders[
+        Math.floor(Math.random() * newChatPlaceholders.length)
+      ];
+    });
 
     React.useImperativeHandle(ref, () => ({
       resetUserInput: () => {
@@ -209,7 +231,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               value={userRequestText}
               disabled={isLaunchingAiRequest}
               onChange={userRequestText => setUserRequestText(userRequestText)}
-              placeholder="How to add a leaderboard to my game?"
+              placeholder={newChatPlaceholder}
               rows={5}
             />
           </Column>
@@ -398,7 +420,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           value={userRequestText}
           disabled={isLaunchingAiRequest}
           onChange={userRequestText => setUserRequestText(userRequestText)}
-          placeholder="Ask a follow up question"
+          placeholder={t`Ask a follow up question`}
           rows={2}
         />
         <Column noMargin alignItems="flex-end">

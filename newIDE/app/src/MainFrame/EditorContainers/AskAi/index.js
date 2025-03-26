@@ -283,6 +283,7 @@ export const AskAi = React.memo<Props>(
                 aiRequestPriceInCredits={aiRequestPriceInCredits}
                 availableCredits={availableCredits}
                 onSendFeedback={onSendFeedback}
+                hasOpenedProject={!!project}
               />
             </div>
           </Paper>

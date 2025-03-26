@@ -41,9 +41,7 @@ import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
 import ChangeEmailDialog from './ChangeEmailDialog';
 import EmailVerificationDialog from './EmailVerificationDialog';
-import PreferencesContext, {
-  type PreferencesValues,
-} from '../MainFrame/Preferences/PreferencesContext';
+import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import {
   listUserCloudProjects,
   type CloudProjectWithUserAccessInfo,
@@ -63,16 +61,15 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 import { listNotifications } from '../Utils/GDevelopServices/Notification';
-import ProfileDialog from './ProfileDialog';
 
 type Props = {|
   authentication: Authentication,
+  preferencesValues: PreferencesValues,
   children: React.Node,
 |};
 
 type State = {|
   authenticatedUser: AuthenticatedUser,
-  profileDialogOpen: boolean,
   loginDialogOpen: boolean,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
@@ -109,7 +106,6 @@ export default class AuthenticatedUserProvider extends React.Component<
 > {
   state = {
     authenticatedUser: initialAuthenticatedUser,
-    profileDialogOpen: false,
     loginDialogOpen: false,
     createAccountDialogOpen: false,
     loginInProgress: false,
@@ -215,7 +211,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         onOpenEditProfileDialog: () => this.openEditProfileDialog(true),
         onOpenChangeEmailDialog: () => this.openChangeEmailDialog(true),
         onOpenCreateAccountDialog: () => this.openCreateAccountDialog(true),
-        onOpenProfileDialog: () => this.openProfileDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
@@ -1349,12 +1344,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  openProfileDialog = (open: boolean = true) => {
-    this.setState({
-      profileDialogOpen: open,
-    });
-  };
-
   openChangeEmailDialog = (open: boolean = true) => {
     this.setState({
       changeEmailDialogOpen: open,
@@ -1484,132 +1473,125 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   render() {
     return (
-      <PreferencesContext.Consumer>
-        {({ values: preferences }) => (
-          <React.Fragment>
-            <AuthenticatedUserContext.Provider
-              value={this.state.authenticatedUser}
-            >
-              {this.props.children}
-            </AuthenticatedUserContext.Provider>
-            {this.state.profileDialogOpen && (
-              <ProfileDialog
-                onClose={() => this.openProfileDialog(false)}
-                authenticatedUser={this.state.authenticatedUser}
-              />
-            )}
-            {this.state.loginDialogOpen && (
-              <LoginDialog
-                onClose={() => {
-                  this._cancelLoginOrSignUp();
-                  this.openLoginDialog(false);
-                }}
-                onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
-                onLogin={this._doLogin}
-                onLogout={this._doLogout}
-                onLoginWithProvider={this._doLoginWithProvider}
-                loginInProgress={this.state.loginInProgress}
-                error={this.state.apiCallError}
-                onForgotPassword={this._doForgotPassword}
-              />
-            )}
-            {this.state.authenticatedUser.profile &&
-              this.state.editProfileDialogOpen && (
-                <EditProfileDialog
-                  profile={this.state.authenticatedUser.profile}
-                  achievements={this.state.authenticatedUser.achievements}
-                  limits={this.state.authenticatedUser.limits}
-                  badges={this.state.authenticatedUser.badges}
-                  subscription={this.state.authenticatedUser.subscription}
-                  onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={async form => {
-                    try {
-                      await this._doEdit(form, preferences);
-                      this.openEditProfileDialog(false);
-                    } catch (error) {
-                      // Ignore errors, we will let the user retry in their profile.
-                    }
-                  }}
-                  onUpdateGitHubStar={githubUsername =>
-                    this._onUpdateGithubStar(githubUsername, preferences)
-                  }
-                  onUpdateTiktokFollow={communityLinks =>
-                    this._onUpdateTiktokFollow(communityLinks, preferences)
-                  }
-                  onUpdateTwitterFollow={communityLinks =>
-                    this._onUpdateTwitterFollow(communityLinks, preferences)
-                  }
-                  onUpdateYoutubeSubscription={communityLinks =>
-                    this._onUpdateYoutubeSubscription(
-                      communityLinks,
-                      preferences
-                    )
-                  }
-                  onDelete={this._doDeleteAccount}
-                  actionInProgress={
-                    this.state.editInProgress || this.state.deleteInProgress
-                  }
-                  error={this.state.apiCallError}
-                />
-              )}
-            {this.state.authenticatedUser.firebaseUser &&
-              this.state.changeEmailDialogOpen && (
-                <ChangeEmailDialog
-                  firebaseUser={this.state.authenticatedUser.firebaseUser}
-                  onClose={() => this.openChangeEmailDialog(false)}
-                  onChangeEmail={this._doChangeEmail}
-                  changeEmailInProgress={this.state.changeEmailInProgress}
-                  error={this.state.apiCallError}
-                />
-              )}
-            {this.state.createAccountDialogOpen && (
-              <CreateAccountDialog
-                onClose={() => {
-                  this._cancelLoginOrSignUp();
-                  this.openCreateAccountDialog(false);
-                }}
-                onGoToLogin={() => this.openLoginDialog(true)}
-                onCreateAccount={form =>
-                  this._doCreateAccount(form, preferences)
-                }
-                onLoginWithProvider={this._doLoginWithProvider}
-                createAccountInProgress={this.state.createAccountInProgress}
-                error={this.state.apiCallError}
-              />
-            )}
-            {this.state.emailVerificationDialogOpen && (
-              <EmailVerificationDialog
-                authenticatedUser={this.state.authenticatedUser}
-                onClose={() => {
-                  this.openEmailVerificationDialog({
-                    open: false,
-                  });
-                  this.state.authenticatedUser
-                    .onRefreshFirebaseProfile()
-                    .catch(() => {
-                      // Ignore any error, we can't do much.
-                    });
-                }}
-                {...this.state.emailVerificationDialogProps}
-                onSendEmail={this._doSendEmailVerification}
-              />
-            )}
-            <Snackbar
-              open={!!this.state.userSnackbarMessage}
-              autoHideDuration={3000}
-              onClose={() => this.showUserSnackbar({ message: null })}
-              ContentProps={{
-                'aria-describedby': 'snackbar-message',
-              }}
-              message={
-                <span id="snackbar-message">
-                  {this.state.userSnackbarMessage}
-                </span>
-              }
-            />
-          </React.Fragment>
+      <AuthenticatedUserContext.Provider value={this.state.authenticatedUser}>
+        {this.props.children}
+        {this.state.loginDialogOpen && (
+          <LoginDialog
+            onClose={() => {
+              this._cancelLoginOrSignUp();
+              this.openLoginDialog(false);
+            }}
+            onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
+            onLogin={this._doLogin}
+            onLogout={this._doLogout}
+            onLoginWithProvider={this._doLoginWithProvider}
+            loginInProgress={this.state.loginInProgress}
+            error={this.state.apiCallError}
+            onForgotPassword={this._doForgotPassword}
+          />
         )}
-      </PreferencesContext.Consumer>
+        {this.state.authenticatedUser.profile &&
+          this.state.editProfileDialogOpen && (
+            <EditProfileDialog
+              profile={this.state.authenticatedUser.profile}
+              achievements={this.state.authenticatedUser.achievements}
+              limits={this.state.authenticatedUser.limits}
+              badges={this.state.authenticatedUser.badges}
+              subscription={this.state.authenticatedUser.subscription}
+              onClose={() => this.openEditProfileDialog(false)}
+              onEdit={async form => {
+                try {
+                  await this._doEdit(form, this.props.preferencesValues);
+                  this.openEditProfileDialog(false);
+                } catch (error) {
+                  // Ignore errors, we will let the user retry in their profile.
+                }
+              }}
+              onUpdateGitHubStar={githubUsername =>
+                this._onUpdateGithubStar(
+                  githubUsername,
+                  this.props.preferencesValues
+                )
+              }
+              onUpdateTiktokFollow={communityLinks =>
+                this._onUpdateTiktokFollow(
+                  communityLinks,
+                  this.props.preferencesValues
+                )
+              }
+              onUpdateTwitterFollow={communityLinks =>
+                this._onUpdateTwitterFollow(
+                  communityLinks,
+                  this.props.preferencesValues
+                )
+              }
+              onUpdateYoutubeSubscription={communityLinks =>
+                this._onUpdateYoutubeSubscription(
+                  communityLinks,
+                  this.props.preferencesValues
+                )
+              }
+              onDelete={this._doDeleteAccount}
+              actionInProgress={
+                this.state.editInProgress || this.state.deleteInProgress
+              }
+              error={this.state.apiCallError}
+            />
+          )}
+        {this.state.authenticatedUser.firebaseUser &&
+          this.state.changeEmailDialogOpen && (
+            <ChangeEmailDialog
+              firebaseUser={this.state.authenticatedUser.firebaseUser}
+              onClose={() => this.openChangeEmailDialog(false)}
+              onChangeEmail={this._doChangeEmail}
+              changeEmailInProgress={this.state.changeEmailInProgress}
+              error={this.state.apiCallError}
+            />
+          )}
+        {this.state.createAccountDialogOpen && (
+          <CreateAccountDialog
+            onClose={() => {
+              this._cancelLoginOrSignUp();
+              this.openCreateAccountDialog(false);
+            }}
+            onGoToLogin={() => this.openLoginDialog(true)}
+            onCreateAccount={form =>
+              this._doCreateAccount(form, this.props.preferencesValues)
+            }
+            onLoginWithProvider={this._doLoginWithProvider}
+            createAccountInProgress={this.state.createAccountInProgress}
+            error={this.state.apiCallError}
+          />
+        )}
+        {this.state.emailVerificationDialogOpen && (
+          <EmailVerificationDialog
+            authenticatedUser={this.state.authenticatedUser}
+            onClose={() => {
+              this.openEmailVerificationDialog({
+                open: false,
+              });
+              this.state.authenticatedUser
+                .onRefreshFirebaseProfile()
+                .catch(() => {
+                  // Ignore any error, we can't do much.
+                });
+            }}
+            {...this.state.emailVerificationDialogProps}
+            onSendEmail={this._doSendEmailVerification}
+          />
+        )}
+        <Snackbar
+          open={!!this.state.userSnackbarMessage}
+          autoHideDuration={3000}
+          onClose={() => this.showUserSnackbar({ message: null })}
+          ContentProps={{
+            'aria-describedby': 'snackbar-message',
+          }}
+          message={
+            <span id="snackbar-message">{this.state.userSnackbarMessage}</span>
+          }
+        />
+      </AuthenticatedUserContext.Provider>
     );
   }
 }

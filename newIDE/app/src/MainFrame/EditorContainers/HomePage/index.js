@@ -42,9 +42,9 @@ import useEducationForm from './UseEducationForm';
 import { type NewProjectSetup } from '../../../ProjectCreation/NewProjectSetupDialog';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import { type GamesList } from '../../../GameDashboard/UseGamesList';
+import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
-import { GamesPlatformFrameContext } from './PlaySection/GamesPlatformFrameContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -115,6 +115,9 @@ type Props = {|
 
   // Games
   gamesList: GamesList,
+
+  // Games platform
+  gamesPlatformFrameTools: GamesPlatformFrameTools,
 
   // Project opening
   canOpen: boolean,
@@ -199,6 +202,7 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromTutorial,
         onOpenTemplateFromCourseChapter,
         gamesList,
+        gamesPlatformFrameTools,
       }: Props,
       ref
     ) => {
@@ -212,7 +216,7 @@ export const HomePage = React.memo<Props>(
       const {
         startTimeoutToUnloadIframe,
         loadIframeOrRemoveTimeout,
-      } = React.useContext(GamesPlatformFrameContext);
+      } = gamesPlatformFrameTools;
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
@@ -595,7 +599,11 @@ export const HomePage = React.memo<Props>(
                       }
                     />
                   )}
-                  {activeTab === 'play' && <PlaySection />}
+                  {activeTab === 'play' && (
+                    <PlaySection
+                      gamesPlatformFrameTools={gamesPlatformFrameTools}
+                    />
+                  )}
                   {activeTab === 'shop' && (
                     <StoreSection
                       project={project}
@@ -688,5 +696,6 @@ export const renderHomePageContainer = (
     canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
+    gamesPlatformFrameTools={props.gamesPlatformFrameTools}
   />
 );

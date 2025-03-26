@@ -41,7 +41,6 @@ import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
 import { CourseChapterStoreStateProvider } from '../Course/CourseChapterStoreContext';
-import GamesPlatformFrameStateProvider from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
 
 type Props = {|
   authentication: Authentication,
@@ -83,6 +82,7 @@ const Providers = ({
                         <AlertProvider>
                           <AuthenticatedUserProvider
                             authentication={authentication}
+                            preferencesValues={values}
                           >
                             <PublicProfileProvider>
                               <I18n update>
@@ -119,13 +119,9 @@ const Providers = ({
                                                               <TutorialStateProvider>
                                                                 <AnnouncementsFeedStateProvider>
                                                                   <PrivateAssetsAuthorizationProvider>
-                                                                    <GamesPlatformFrameStateProvider>
-                                                                      {children(
-                                                                        {
-                                                                          i18n,
-                                                                        }
-                                                                      )}
-                                                                    </GamesPlatformFrameStateProvider>
+                                                                    {children({
+                                                                      i18n,
+                                                                    })}
                                                                   </PrivateAssetsAuthorizationProvider>
                                                                 </AnnouncementsFeedStateProvider>
                                                               </TutorialStateProvider>

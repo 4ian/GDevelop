@@ -18,6 +18,7 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
+import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { TabContentContainer } from '../UI/ClosableTabs';
@@ -197,8 +198,8 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
-import { GamesPlatformFrameContext } from './EditorContainers/HomePage/PlaySection/GamesPlatformFrameContext';
 import PublicProfileContext from '../Profile/PublicProfileContext';
+import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -382,6 +383,7 @@ const MainFrame = (props: Props) => {
     false
   );
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
+  const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
     openPreferencesDialog,
@@ -529,10 +531,6 @@ const MainFrame = (props: Props) => {
       ? currentProject.isFolderProject()
       : false,
   });
-
-  const { iframeVisible: gamesPlatformIframeVisible } = React.useContext(
-    GamesPlatformFrameContext
-  );
 
   const gamesList = useGamesList();
 
@@ -1233,6 +1231,18 @@ const MainFrame = (props: Props) => {
     createProjectFromPrivateGameTemplate,
     createProjectFromAIGeneration,
     storageProviders: props.storageProviders,
+  });
+
+  const onOpenProfileDialog = React.useCallback(
+    () => {
+      openProfileDialog(true);
+    },
+    [openProfileDialog]
+  );
+
+  const gamesPlatformFrameTools = useGamesPlatformFrame({
+    fetchAndOpenNewProjectSetupDialogForExample,
+    onOpenProfileDialog,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -3135,7 +3145,7 @@ const MainFrame = (props: Props) => {
 
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
-    openProfileDialog: authenticatedUser.onOpenProfileDialog,
+    openProfileDialog: onOpenProfileDialog,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -3443,9 +3453,6 @@ const MainFrame = (props: Props) => {
   }, []);
 
   const {
-    configureNewProjectActions: configureNewProjectActionsForGamesPlatformFrame,
-  } = React.useContext(GamesPlatformFrameContext);
-  const {
     configureNewProjectActions: configureNewProjectActionsForProfile,
   } = React.useContext(PublicProfileContext);
 
@@ -3517,9 +3524,6 @@ const MainFrame = (props: Props) => {
               );
           }
 
-          configureNewProjectActionsForGamesPlatformFrame({
-            fetchAndOpenNewProjectSetupDialogForExample,
-          });
           configureNewProjectActionsForProfile({
             fetchAndOpenNewProjectSetupDialogForExample,
           });
@@ -3566,7 +3570,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
-    onOpenProfile: authenticatedUser.onOpenProfileDialog,
+    onOpenProfile: onOpenProfileDialog,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3617,7 +3621,7 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: authenticatedUser.onOpenProfileDialog,
+    onOpenProfile: onOpenProfileDialog,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3757,6 +3761,9 @@ const MainFrame = (props: Props) => {
         onQuitVersionHistory={onQuitVersionHistory}
         canQuitVersionHistory={!isSavingProject}
       />
+      {// Render games platform frame before the editors, so the editor have priority
+      // in what to display (ex: Loader of play section)
+      gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
         gameId={
           state.currentProject ? state.currentProject.getProjectUuid() : ''
@@ -3772,7 +3779,7 @@ const MainFrame = (props: Props) => {
               active={isCurrentTab}
               // Deactivate pointer events when the play tab is active, so the iframe
               // can be interacted with.
-              removePointerEvents={gamesPlatformIframeVisible}
+              removePointerEvents={gamesPlatformFrameTools.iframeVisible}
             >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
@@ -3847,7 +3854,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,
-                    onOpenProfile: authenticatedUser.onOpenProfileDialog,
+                    onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3896,6 +3903,7 @@ const MainFrame = (props: Props) => {
                     onSceneObjectEdited: onSceneObjectEdited,
                     onExtensionInstalled: onExtensionInstalled,
                     gamesList,
+                    gamesPlatformFrameTools,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -3967,6 +3975,18 @@ const MainFrame = (props: Props) => {
             onResourceChosen([]);
           }}
           options={chooseResourceOptions}
+        />
+      )}
+      {profileDialogOpen && (
+        // ProfileDialog is dependent on multiple contexts,
+        // which are dependent of AuthenticatedUserContext.
+        // So it cannot be moved inside the AuthenticatedUserProvider,
+        // otherwise, those contexts would not be correctly mounted,
+        // as they are defined after the AuthenticatedUserProvider in Providers.js.
+        <ProfileDialog
+          onClose={() => {
+            openProfileDialog(false);
+          }}
         />
       )}
       {renderNewProjectDialog()}

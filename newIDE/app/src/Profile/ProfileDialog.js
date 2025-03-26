@@ -10,7 +10,7 @@ import HelpButton from '../UI/HelpButton';
 import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import UserAchievements from './Achievement/UserAchievements';
-import { type AuthenticatedUser } from './AuthenticatedUserContext';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -25,11 +25,11 @@ import Link from '../UI/Link';
 import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 
 type Props = {|
-  authenticatedUser: AuthenticatedUser,
   onClose: () => void,
 |};
 
-const ProfileDialog = ({ onClose, authenticatedUser }: Props) => {
+const ProfileDialog = ({ onClose }: Props) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
   const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({

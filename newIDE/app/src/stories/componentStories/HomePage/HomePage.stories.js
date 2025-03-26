@@ -138,6 +138,14 @@ const WrappedHomePage = ({
                   onGameUpdated: () => {},
                   markGameAsSavedIfRelevant: async () => {},
                 }}
+                gamesPlatformFrameTools={{
+                  startTimeoutToUnloadIframe: () => {},
+                  loadIframeOrRemoveTimeout: () => {},
+                  iframeLoaded: false,
+                  iframeVisible: false,
+                  iframeErrored: false,
+                  renderGamesPlatformFrame: () => null,
+                }}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

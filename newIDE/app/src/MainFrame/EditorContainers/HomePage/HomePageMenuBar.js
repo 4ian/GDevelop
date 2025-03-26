@@ -151,10 +151,10 @@ const HomePageMenuBar = ({
                       ? { color: gdevelopTheme.text.color.secondary }
                       : {}),
                   }}
+                  key={id}
                 >
                   <IconButton
                     color="inherit"
-                    key={id}
                     disableRipple
                     disableFocusRipple
                     disableHover

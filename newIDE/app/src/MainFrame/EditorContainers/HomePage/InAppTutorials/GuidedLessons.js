@@ -131,12 +131,14 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       id: KNIGHT_PLATFORMER_IN_APP_TUTORIAL_ID,
       title: t`Platformer`,
       description: t`Make a knight jump and run in this platformer game.`,
+      shortDescription: t`Make a knight jump and run.`,
       durationInMinutes: 1,
       renderImage: props => <Platformer {...props} />,
     },
     {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
       title: t`Background and cameras`,
+      shortDescription: t`Follow a character with scrolling background.`,
       description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
       durationInMinutes: 2,
       renderImage: props => <Parallax {...props} />,
@@ -144,6 +146,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: TOP_DOWN_RPG_MOVEMENT_ID,
       title: t`Top-Down RPG Pixel Perfect`,
+      shortDescription: t`Move like in retro Pokemon games.`,
       description: t`Make a character move like in a retro Pokemon game.`,
       durationInMinutes: 2,
       renderImage: props => <TopDownRPGMovement {...props} />,
@@ -151,6 +154,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: JOYSTICK_IN_APP_TUTORIAL_ID,
       title: t`Joystick controls`,
+      shortDescription: t`Control a spaceship with a joystick.`,
       description: t`Control your spaceship with a joystick, while avoiding asteroids.`,
       durationInMinutes: 1,
       renderImage: props => <Joystick {...props} />,
@@ -158,6 +162,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: OBJECT_3D_IN_APP_TUTORIAL_ID,
       title: t`3D platforms`,
+      shortDescription: t`Place 3D platforms in a 2D game.`,
       description: t`Place 3D platforms in this 2D platformer, creating a path to the end.`,
       durationInMinutes: 2,
       renderImage: props => <Object3D {...props} />,
@@ -165,6 +170,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
       title: t`Health bar`,
+      shortDescription: t`Add a health bar for handle damage.`,
       description: t`Add a health bar to this jumping character, losing health when hitting spikes.`,
       durationInMinutes: 2,
       renderImage: props => <HealthBar {...props} />,
@@ -172,34 +178,39 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     {
       id: TILEMAP_PLATFORMER_ID,
       title: t`Paint a Level with Tiles`,
+      shortDescription: t`Build dynamic levels with tiles.`,
       description: t`Use a Tilemap to build a level and change it dynamically during the game.`,
-      durationInMinutes: 1,
+      durationInMinutes: 2,
       renderImage: props => <TilemapPlatformer {...props} />,
-    },
-    {
-      id: COOP_PLATFORMER_ID,
-      title: t`Co-op Multiplayer`,
-      description: t`Transform this platformer into a co-op game, where two players can play together.`,
-      durationInMinutes: 3,
-      renderImage: props => <CoopPlatformer {...props} />,
     },
     {
       id: FIRE_A_BULLET_ID,
       title: t`Fire a Bullet`,
+      shortDescription: t`Fire bullets in an Asteroids game.`,
       description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.`,
-      durationInMinutes: 3,
+      durationInMinutes: 2,
       renderImage: props => <FireABullet {...props} />,
     },
     {
       id: TIMER_IN_APP_TUTORIAL_ID,
       title: t`Time score`,
+      shortDescription: t`Add a time attack mode.`,
       description: t`Add a time attack mode, where you have to reach the end as fast as possible.`,
       durationInMinutes: 2,
       renderImage: props => <Timer {...props} />,
     },
     {
+      id: COOP_PLATFORMER_ID,
+      title: t`Co-op Multiplayer`,
+      shortDescription: t`Transform a game into a multiplayer experience.`,
+      description: t`Transform this platformer into a co-op game, where two players can play together.`,
+      durationInMinutes: 3,
+      renderImage: props => <CoopPlatformer {...props} />,
+    },
+    {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
       title: t`Score multiplier`,
+      shortDescription: t`Multiply scores with collectibles.`,
       description: t`Transform this Plinko game with collectibles that multiply your score.`,
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
@@ -241,6 +252,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
                   <InAppTutorialPhaseCard
                     title={item.title}
                     description={item.description}
+                    shortDescription={item.shortDescription}
                     durationInMinutes={item.durationInMinutes}
                     renderImage={item.renderImage}
                     progress={getTutorialPartProgress({ tutorialId: item.id })}

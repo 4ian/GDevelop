@@ -14,6 +14,7 @@ import { getTabId } from './EditorTabs/DraggableEditorTabs';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
 import RaisedButton from '../UI/RaisedButton';
+import RobotIcon from '../ProjectCreation/RobotIcon';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -147,8 +148,9 @@ export default function TabsTitlebar({
       {hasAskAiOpened ? null : (
         <div style={styles.askAiContainer}>
           <RaisedButton
+            icon={<RobotIcon size={16} />}
             color="primary"
-            label="✨ Ask AI"
+            label={'Ask AI'}
             onClick={onOpenAskAi}
           />
         </div>

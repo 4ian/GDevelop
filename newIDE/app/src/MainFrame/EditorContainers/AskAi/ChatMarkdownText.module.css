@@ -3,8 +3,7 @@ a.conceptLink {
   font-weight: 400;
   align-items: baseline;
   cursor: pointer;
-  display: inline-flex;
-  gap: 4px;
+  display: inline;
   text-decoration: underline;
   text-decoration-style: dotted;
 }
@@ -14,8 +13,14 @@ a.noValidLink {
   text-decoration: none;
 }
 
-.conceptLink div {
-  transform: translateY(3px);
+.conceptLink span {
+  margin-right: 4px;
+  position: relative;
+  top: 3px;
+}
+
+.chatMarkdown * {
+  user-select: text;
 }
 
 /* Override some of the markdown styling: */

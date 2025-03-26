@@ -177,7 +177,7 @@ type UseGamesPlatformFrameProps = {|
   onOpenProfileDialog: () => void,
 |};
 
-const UseGamesPlatformFrame = ({
+const useGamesPlatformFrame = ({
   fetchAndOpenNewProjectSetupDialogForExample,
   onOpenProfileDialog,
 }: UseGamesPlatformFrameProps): GamesPlatformFrameTools => {
@@ -531,4 +531,4 @@ const UseGamesPlatformFrame = ({
   return gamesPlatformFrameTools;
 };
 
-export default UseGamesPlatformFrame;
+export { useGamesPlatformFrame };

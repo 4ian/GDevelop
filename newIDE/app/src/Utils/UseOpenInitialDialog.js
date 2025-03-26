@@ -7,7 +7,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
-  openProfileDialog: boolean => void,
+  openProfileDialog: () => void,
 |};
 
 /**
@@ -50,7 +50,7 @@ const useOpenInitialDialog = ({
           // to make sure the most relevant dialog is opened.
           const signupTimeoutId = setTimeout(() => {
             if (authenticated) {
-              openProfileDialog(true);
+              openProfileDialog();
             } else {
               onOpenCreateAccountDialog();
             }

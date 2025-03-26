@@ -199,7 +199,7 @@ import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import PublicProfileContext from '../Profile/PublicProfileContext';
-import UseGamesPlatformFrame from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
+import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1233,9 +1233,16 @@ const MainFrame = (props: Props) => {
     storageProviders: props.storageProviders,
   });
 
-  const gamesPlatformFrameTools = UseGamesPlatformFrame({
+  const onOpenProfileDialog = React.useCallback(
+    () => {
+      openProfileDialog(true);
+    },
+    [openProfileDialog]
+  );
+
+  const gamesPlatformFrameTools = useGamesPlatformFrame({
     fetchAndOpenNewProjectSetupDialogForExample,
-    onOpenProfileDialog: () => openProfileDialog(true),
+    onOpenProfileDialog,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -3138,7 +3145,7 @@ const MainFrame = (props: Props) => {
 
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
-    openProfileDialog: () => openProfileDialog(true),
+    openProfileDialog: onOpenProfileDialog,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -3563,7 +3570,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: onOpenProfileDialog,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3614,7 +3621,7 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: onOpenProfileDialog,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3847,7 +3854,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,
-                    onOpenProfile: () => openProfileDialog(true),
+                    onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),

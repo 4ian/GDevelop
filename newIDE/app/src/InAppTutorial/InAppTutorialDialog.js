@@ -15,7 +15,7 @@ import { Line } from '../UI/Grid';
 
 type Props = {|
   dialogContent: InAppTutorialDialogType,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   goToNextStep?: () => void,
   isLastStep?: boolean,
 |};
@@ -33,7 +33,7 @@ function InAppTutorialDialog({
 }: Props) {
   const onApply = () => {
     if (isLastStep) {
-      endTutorial();
+      endTutorial({ reason: 'completed' });
     } else if (goToNextStep) {
       goToNextStep();
     }

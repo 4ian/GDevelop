@@ -3728,24 +3728,24 @@ const MainFrame = (props: Props) => {
       <TabsTitlebar
         hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
-        renderTabs={(onEditorTabHovered, onEditorTabClosed) => (
+        renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
           <DraggableEditorTabs
             hideLabels={false}
             editorTabs={state.editorTabs}
             onClickTab={(id: number) => _onChangeEditorTab(id)}
             onCloseTab={(editorTab: EditorTab) => {
-              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosed();
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
               _onCloseEditorTab(editorTab);
             }}
             onCloseOtherTabs={(editorTab: EditorTab) => {
-              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosed();
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
               _onCloseOtherEditorTabs(editorTab);
             }}
             onCloseAll={() => {
-              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosed();
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
               _onCloseAllEditorTabs();
             }}
             onTabActivated={(editorTab: EditorTab) =>

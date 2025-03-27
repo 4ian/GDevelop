@@ -47,7 +47,7 @@ type TabsTitlebarProps = {|
   toggleProjectManager: () => void,
   renderTabs: (
     onEditorTabHovered: (?EditorTab) => void,
-    onEditorTabClosed: () => void
+    onEditorTabClosing: () => void
   ) => React.Node,
   hasAskAiOpened: boolean,
   onOpenAskAi: () => void,
@@ -113,7 +113,7 @@ export default function TabsTitlebar({
     [isTouchscreen, tooltipData]
   );
 
-  const onEditorTabClosed = React.useCallback(() => {
+  const onEditorTabClosing = React.useCallback(() => {
     // Always clear the tooltip when a tab is closed,
     // as they are multiple actions that can be done to
     // close it, it's safer (close all, close others, close one).
@@ -160,7 +160,7 @@ export default function TabsTitlebar({
       >
         <MenuIcon />
       </IconButton>
-      {renderTabs(onEditorTabHovered, onEditorTabClosed)}
+      {renderTabs(onEditorTabHovered, onEditorTabClosing)}
       {!preferences.values.showAiAskButtonInTitleBar ||
       hasAskAiOpened ? null : (
         <div style={styles.askAiContainer}>

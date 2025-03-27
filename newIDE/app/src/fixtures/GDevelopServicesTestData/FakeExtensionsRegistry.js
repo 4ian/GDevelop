@@ -32,6 +32,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'this-is-a-fake-id',
@@ -73,6 +74,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'this-is-a-fake-id',
@@ -115,6 +117,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Applications and Programming/Applications and Programming_sitemap_map_ux_application.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -146,6 +149,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/format-vertical-align-center.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 14,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'I0kdjvsICFML0APq45CZjZ6PyEQ2',
@@ -178,6 +182,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
@@ -210,6 +215,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/code-array.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 31,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -241,6 +247,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/typewriter.svg',
       eventsBasedBehaviorsCount: 3,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
@@ -271,6 +278,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/keyboard-backspace.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 4,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -302,6 +310,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/hexadecimal.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 2,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'onPsboRtDkUHNOsx7OPr8R8G1oj2',
@@ -333,6 +342,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/alpha-w-box-outline.svg',
       eventsBasedBehaviorsCount: 2,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1',
@@ -366,6 +376,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Restaurant/Restaurant_restaurant_seafood_animal_fish.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'rotBq28wITdtfsrE7McHQri4k2w2',
@@ -407,6 +418,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/boomerang.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'this-is-a-fake-id',
@@ -448,6 +460,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/volleyball.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
@@ -482,6 +495,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 4,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -526,6 +540,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_zoom_in_plus.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
@@ -568,6 +583,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/step-backward.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
@@ -599,6 +615,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/checkbox-marked.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -632,6 +649,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/flag-variant.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
@@ -673,6 +691,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/dice-multiple.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 2,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
@@ -706,6 +725,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/clipboard-text-multiple-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
@@ -751,6 +771,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/invert-colors.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 9,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -801,6 +822,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/folder-zip-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -833,6 +855,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/layers-triple-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -865,6 +888,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/grid.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -897,6 +921,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/numeric.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
@@ -928,6 +953,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_pc.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
@@ -962,6 +988,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/cursor-default-outline.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 2,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -1003,6 +1030,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_vr_computer_3d_cube_screen_tv.svg',
       eventsBasedBehaviorsCount: 2,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -1034,6 +1062,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/discord.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
@@ -1065,6 +1094,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_wireless_pc.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: '8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3',
@@ -1099,6 +1129,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/drag-variant.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'GfzRsieyUFVnsRR8OZThsPR29oq2',
@@ -1140,6 +1171,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Virtual Reality/Virtual Reality_hand_vr_ar_360.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
@@ -1175,6 +1207,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_sliders_options.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
@@ -1216,6 +1249,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/assets/Icons/resistor-nodes.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
+      helpPath: '/fake-help-path',
       authors: [
         {
           id: 'this-is-a-fake-id',

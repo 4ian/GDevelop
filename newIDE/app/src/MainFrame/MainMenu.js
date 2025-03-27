@@ -45,6 +45,7 @@ export type MainMenuCallbacks = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
+  onOpenAskAi: (open?: boolean) => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
@@ -71,6 +72,7 @@ export type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
+  | 'main-menu-open-ask-ai'
   | 'update-status';
 
 const getMainMenuEventCallback = (
@@ -95,6 +97,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-preferences': callbacks.onOpenPreferences,
     'main-menu-open-language': callbacks.onOpenLanguage,
     'main-menu-open-profile': callbacks.onOpenProfile,
+    'main-menu-open-ask-ai': callbacks.onOpenAskAi,
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
@@ -254,6 +257,10 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`Help`),
     role: 'help',
     submenu: [
+      {
+        label: i18n._(t`Ask AI (GDevelop chatbot)`),
+        onClickSendEvent: 'main-menu-open-ask-ai',
+      },
       {
         label: i18n._(t`GDevelop website`),
         onClickOpenLink: 'http://gdevelop.io',

@@ -39,6 +39,7 @@ const mainMenuCallbacks = {
   onOpenPreferences: () => action('onOpenPreferences'),
   onOpenLanguage: () => action('onOpenLanguage'),
   onOpenProfile: () => action('onOpenProfile'),
+  onOpenAskAi: () => action('onOpenAskAi'),
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 

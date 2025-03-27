@@ -23,7 +23,9 @@ declare class gdMetadataProvider {
   static getObjectStrExpressionMetadata(p: gdPlatform, objectType: string, type: string): gdExpressionMetadata;
   static getBehaviorStrExpressionMetadata(p: gdPlatform, autoType: string, type: string): gdExpressionMetadata;
   static isBadExpressionMetadata(metadata: gdExpressionMetadata): boolean;
+  static isBadInstructionMetadata(metadata: gdInstructionMetadata): boolean;
   static isBadBehaviorMetadata(metadata: gdBehaviorMetadata): boolean;
+  static isBadObjectMetadata(metadata: gdObjectMetadata): boolean;
   delete(): void;
   ptr: number;
 };

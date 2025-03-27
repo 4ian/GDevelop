@@ -1,0 +1,43 @@
+a.conceptLink {
+  color: var(--theme-link-color);
+  font-weight: 400;
+  align-items: baseline;
+  cursor: pointer;
+  display: inline;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+a.noValidLink {
+  cursor: default;
+  text-decoration: none;
+}
+
+.conceptLink span {
+  margin-right: 4px;
+  position: relative;
+  top: 3px;
+}
+
+.chatMarkdown * {
+  user-select: text;
+}
+
+/* Override some of the markdown styling: */
+.chatMarkdown :not(pre) code {
+  font-size: 14px;
+  font-family: var(--gdevelop-modern-font-family);
+
+  color: var(--event-sheet-instruction-parameter-number-color);
+}
+
+.chatMarkdown pre code {
+  font-size: 13px;
+  font-family: var(--gdevelop-modern-font-family);
+}
+
+.chatMarkdown pre {
+  background-color: var(--theme-surface-canvas-background-color);
+  padding: 8px;
+  border-radius: 4px;
+}

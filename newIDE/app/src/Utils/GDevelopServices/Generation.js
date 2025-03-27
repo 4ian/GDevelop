@@ -19,6 +19,62 @@ export type GeneratedProject = {
   error?: string,
 };
 
+export type AiRequestMessage =
+  | {
+      type: 'message',
+      status: 'completed',
+      role: 'assistant',
+      content: Array<
+        | {
+            type: 'reasoning',
+            status: 'completed',
+            summary: {
+              text: string,
+              type: 'summary_text',
+            },
+          }
+        | {
+            type: 'output_text',
+            status: 'completed',
+            text: string,
+            annotations: Array<{}>,
+          }
+        | {
+            type: 'recommended_actions',
+            status: 'completed',
+            actions: Array<{
+              actionName: string,
+              actionDescription: string,
+            }>,
+          }
+      >,
+    }
+  | {
+      type: 'message',
+      status: 'completed',
+      role: 'user',
+      content: Array<{
+        type: 'user_request',
+        status: 'completed',
+        text: string,
+      }>,
+    };
+
+export type AiRequest = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
+  userId: string,
+  gameProjectJson: string,
+  status: GenerationStatus,
+  error: {
+    code: string,
+    message: string,
+  } | null,
+
+  output: Array<AiRequestMessage>,
+};
+
 export const getGeneratedProject = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -91,6 +147,161 @@ export const createGeneratedProject = async (
       width,
       height,
       projectName,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getAiRequests = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<AiRequest>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopGenerationApi.baseUrl}/ai-request`,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const createAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    userRequest,
+    simplifiedProjectJson,
+    payWithCredits,
+  }: {|
+    userId: string,
+    userRequest: string,
+    simplifiedProjectJson: string | null,
+    payWithCredits: boolean,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopGenerationApi.baseUrl}/ai-request`,
+    {
+      userRequest,
+      gameProjectJson: simplifiedProjectJson,
+      payWithCredits,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addUserMessageToAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    userRequest,
+    simplifiedProjectJson,
+    payWithCredits,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    userRequest: string,
+    simplifiedProjectJson: string | null,
+    payWithCredits: boolean,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopGenerationApi.baseUrl
+    }/ai-request/${aiRequestId}/action/add-user-message`,
+    {
+      userRequest,
+      gameProjectJson: simplifiedProjectJson,
+      payWithCredits,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const sendAiRequestFeedback = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    messageIndex,
+    feedback,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    messageIndex: number,
+    feedback: 'like' | 'dislike',
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopGenerationApi.baseUrl
+    }/ai-request/${aiRequestId}/action/set-feedback`,
+    {
+      messageIndex,
+      feedback,
     },
     {
       params: {

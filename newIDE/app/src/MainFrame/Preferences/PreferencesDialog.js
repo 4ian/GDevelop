@@ -82,6 +82,7 @@ const PreferencesDialog = ({
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
+    setShowAiAskButtonInTitleBar,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -512,6 +513,13 @@ const PreferencesDialog = ({
                 <Trans>Other</Trans>
               </Text>
               <ColumnStackLayout>
+                <CompactToggleField
+                  labelColor="primary"
+                  hideTooltip
+                  onCheck={setShowAiAskButtonInTitleBar}
+                  checked={values.showAiAskButtonInTitleBar}
+                  label={i18n._(t`Show "Ask AI" button in the title bar`)}
+                />
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip

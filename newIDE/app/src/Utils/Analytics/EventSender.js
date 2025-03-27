@@ -385,7 +385,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock build type'
   | 'Manage subscription as teacher'
   | 'Unlock course chapter'
-  | 'Account get premium';
+  | 'Account get premium'
+  | 'AI requests (subscribe)'
+  | 'AI requests (upgrade)';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata

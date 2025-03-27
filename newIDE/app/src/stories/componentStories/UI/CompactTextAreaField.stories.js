@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-
+import { t } from '@lingui/macro';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
@@ -34,7 +34,7 @@ export const Default = () => {
         <CompactTextAreaField
           value={value2}
           onChange={setValue2}
-          placeholder="With placeholder"
+          placeholder={t`With placeholder`}
           label="With placeholder"
         />
         <CompactTextAreaField

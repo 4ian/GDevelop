@@ -64,6 +64,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
+  | 'ask-ai'
   | 'start page';
 
 type EditorTabMetadata = {|
@@ -447,4 +448,11 @@ export const moveTabToPosition = (
   else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabNewIndex += 1;
 
   return { editors: currentEditorTabs, currentTab: currentTabNewIndex };
+};
+
+export const hasEditorTabOpenedWithKey = (
+  editorTabsState: EditorTabsState,
+  key: string
+) => {
+  return !!editorTabsState.editors.find(editor => editor.key === key);
 };

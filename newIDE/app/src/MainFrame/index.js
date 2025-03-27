@@ -3728,21 +3728,31 @@ const MainFrame = (props: Props) => {
       <TabsTitlebar
         hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
-        renderTabs={onHoverEditorTab => (
+        renderTabs={(onEditorTabHovered, onEditorTabClosed) => (
           <DraggableEditorTabs
             hideLabels={false}
             editorTabs={state.editorTabs}
             onClickTab={(id: number) => _onChangeEditorTab(id)}
-            onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-            onCloseOtherTabs={(editorTab: EditorTab) =>
-              _onCloseOtherEditorTabs(editorTab)
-            }
-            onCloseAll={_onCloseAllEditorTabs}
+            onCloseTab={(editorTab: EditorTab) => {
+              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosed();
+              _onCloseEditorTab(editorTab);
+            }}
+            onCloseOtherTabs={(editorTab: EditorTab) => {
+              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosed();
+              _onCloseOtherEditorTabs(editorTab);
+            }}
+            onCloseAll={() => {
+              // Call onEditorTabClosed before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosed();
+              _onCloseAllEditorTabs();
+            }}
             onTabActivated={(editorTab: EditorTab) =>
               _onEditorTabActivated(editorTab)
             }
             onDropTab={onDropEditorTab}
-            onHoverTab={onHoverEditorTab}
+            onHoverTab={onEditorTabHovered}
           />
         )}
         hasAskAiOpened={hasAskAiOpened}

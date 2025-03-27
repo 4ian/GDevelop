@@ -25,6 +25,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
   'start page': <Trans>Homepage</Trans>,
+  'ask-ai': <Trans>Ask AI</Trans>,
 };
 
 const styles = {

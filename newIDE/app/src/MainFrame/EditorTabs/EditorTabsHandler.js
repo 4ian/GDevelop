@@ -13,6 +13,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
+import { type AskAiEditorInterface } from '../EditorContainers/AskAi';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
 
@@ -25,7 +26,8 @@ type EditorRef =
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
-  | HomePageEditorInterface;
+  | HomePageEditorInterface
+  | AskAiEditorInterface;
 
 type TabOptions = {| data?: HTMLDataset |};
 
@@ -116,6 +118,8 @@ export const getEditorTabMetadata = (
         ? 'custom object'
         : editorTab.editorRef instanceof DebuggerEditorContainer
         ? 'debugger'
+        : editorTab.key === 'ask-ai'
+        ? 'ask-ai'
         : 'start page',
   };
 };

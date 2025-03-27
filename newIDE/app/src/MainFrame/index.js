@@ -3643,6 +3643,7 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
+    onOpenAskAi: openAskAi,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

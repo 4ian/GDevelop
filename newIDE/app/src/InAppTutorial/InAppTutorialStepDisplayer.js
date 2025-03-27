@@ -139,7 +139,7 @@ type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
   goToFallbackStep: () => void,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   progress: number,
   goToNextStep: () => void,
 |};

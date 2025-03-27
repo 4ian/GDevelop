@@ -10,7 +10,7 @@ import Text from '../UI/Text';
 type Props = {|
   onSaveProject: () => Promise<void>,
   canEndTutorial: boolean,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   onClose: () => void,
   isSavingProject: boolean,
 |};
@@ -43,7 +43,7 @@ const QuitInAppTutorialDialog = ({
   );
 
   const quitTutorial = () => {
-    endTutorial();
+    endTutorial({ reason: 'user-early-exit' });
     onClose();
   };
 

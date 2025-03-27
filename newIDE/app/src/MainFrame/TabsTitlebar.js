@@ -15,6 +15,7 @@ import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
 import RaisedButton from '../UI/RaisedButton';
 import RobotIcon from '../ProjectCreation/RobotIcon';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -36,7 +37,7 @@ const styles = {
   },
   askAiContainer: {
     marginBottom: 4,
-    marginRight: 2,
+    marginRight: 0,
     marginLeft: 2,
   },
 };
@@ -60,6 +61,7 @@ export default function TabsTitlebar({
   onOpenAskAi,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
+  const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   const [tooltipData, setTooltipData] = React.useState<?{|
@@ -145,7 +147,8 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {renderTabs(onHoverEditorTab)}
-      {hasAskAiOpened ? null : (
+      {!preferences.values.showAiAskButtonInTitleBar ||
+      hasAskAiOpened ? null : (
         <div style={styles.askAiContainer}>
           <RaisedButton
             icon={<RobotIcon size={16} />}

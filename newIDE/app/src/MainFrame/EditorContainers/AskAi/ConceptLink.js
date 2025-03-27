@@ -306,9 +306,9 @@ const findEventsFunctionInExtensions = (
  * Gives a function that parses an url into a link to a GDevelop concept.
  */
 export const useGetConceptMetadata = () => {
-  const { extensionShortHeadersByName } = React.useContext(
-    ExtensionStoreContext
-  );
+  const {
+    translatedExtensionShortHeadersByName: extensionShortHeadersByName,
+  } = React.useContext(ExtensionStoreContext);
 
   const getExtensionMetadata = useRefWithInit(() => {
     return memoize(

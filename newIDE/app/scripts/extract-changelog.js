@@ -147,6 +147,9 @@ const enrichCommits = rawCommits => {
           lowerCaseMessage.includes('do not show in changelog') ||
           lowerCaseMessage.includes('do not show in the changelog') ||
           lowerCaseMessage.startsWith('update translations') ||
+          lowerCaseMessage.startsWith('update extension translations') ||
+          lowerCaseMessage.startsWith('[auto pr]') ||
+          lowerCaseMessage.startsWith('auto compress images') ||
           lowerCaseMessage === 'prettier' ||
           lowerCaseMessage === 'update jsextension.js' ||
           lowerCaseMessage.includes('run code formatting') ||

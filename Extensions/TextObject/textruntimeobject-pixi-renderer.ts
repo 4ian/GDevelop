@@ -4,7 +4,7 @@ namespace gdjs {
     _fontManager: any;
     _text: PIXI.Text;
     _justCreated: boolean = true;
-    _upscaleRatio: float = 1;
+    _upscaleRatio: integer = 1;
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
@@ -185,10 +185,11 @@ namespace gdjs {
     }
 
     /**
-     * Set the text object scale.
-     * @param upscaleRatio The new scale for the text object.
+     * Set the text object upscale ratio.
+     * @param upscaleRatio The new upscale ratio for the text object.
+     * @see gdjs.RuntimeGame.getZoomFactor
      */
-    setUpscaleRatio(upscaleRatio: float): void {
+    setUpscaleRatio(upscaleRatio: integer): void {
       this._upscaleRatio = upscaleRatio;
       this._text.scale.x = this._object.getScaleX() / this._upscaleRatio;
       this._text.scale.y = this._object.getScaleY() / this._upscaleRatio;

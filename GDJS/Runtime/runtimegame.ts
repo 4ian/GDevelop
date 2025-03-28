@@ -587,6 +587,10 @@ namespace gdjs {
       return this._gameResolutionHeight;
     }
 
+    /**
+     * The scale is usually near 1 unless the 'magnified' scale mode is used.
+     * @returns the factor between game resolution size and rendering resolution size.
+     */
     getZoomFactor() {
       return this._zoomFactor;
     }

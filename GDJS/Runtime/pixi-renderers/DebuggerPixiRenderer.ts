@@ -37,18 +37,10 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
-      const pixiContainer = this._instanceContainer
-        .getRenderer()
-        .getRendererObject();
       if (!this._debugDraw || !this._debugDrawContainer) {
         this._debugDrawContainer = new PIXI.Container();
         this._debugDraw = new PIXI.Graphics();
-
-        // Add on top of all layers:
         this._debugDrawContainer.addChild(this._debugDraw);
-        if (pixiContainer) {
-          //pixiContainer.addChild(this._debugDrawContainer);
-        }
       }
       const debugDraw = this._debugDraw;
 
@@ -326,6 +318,8 @@ namespace gdjs {
       if (!gamePixiContainer) {
         return result;
       }
+      // The scale is usually near 1 unless the 'magnified' scale mode is used.
+      // See gdjs.RuntimeGame.getZoomFactor
       result[0] *= gamePixiContainer.scale.x;
       result[1] *= gamePixiContainer.scale.y;
       return result;

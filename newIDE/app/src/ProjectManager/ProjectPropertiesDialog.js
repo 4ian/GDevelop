@@ -729,7 +729,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                 >
                   <SelectOption
                     value="linear"
-                    label={t`Linear (antialiased rendering, good for most games)`}
+                    label={t`Linear (smooth, good for most games)`}
                   />
                   <SelectOption
                     value="magnified"
@@ -737,7 +737,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                   />
                   <SelectOption
                     value="nearest"
-                    label={t`Nearest (no antialiasing, good for pixel perfect games)`}
+                    label={t`Nearest (aliased, good for pixel perfect games)`}
                   />
                 </SelectField>
                 <Checkbox

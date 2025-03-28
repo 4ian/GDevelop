@@ -46,7 +46,7 @@ type TabsTitlebarProps = {|
   hidden: boolean,
   toggleProjectManager: () => void,
   renderTabs: (
-    onEditorTabHovered: (?EditorTab) => void,
+    onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
     onEditorTabClosing: () => void
   ) => React.Node,
   hasAskAiOpened: boolean,
@@ -81,7 +81,10 @@ export default function TabsTitlebar({
   );
 
   const onEditorTabHovered = React.useCallback(
-    (editorTab: ?EditorTab) => {
+    (
+      editorTab: ?EditorTab,
+      { isLabelTruncated }: {| isLabelTruncated: boolean |}
+    ) => {
       if (isTouchscreen) {
         setTooltipData(null);
         return;
@@ -92,7 +95,7 @@ export default function TabsTitlebar({
         tooltipTimeoutId.current = null;
       }
 
-      if (editorTab) {
+      if (editorTab && isLabelTruncated) {
         const element = document.getElementById(getTabId(editorTab));
         if (element) {
           tooltipTimeoutId.current = setTimeout(

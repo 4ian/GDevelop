@@ -33,7 +33,10 @@ type DraggableEditorTabsProps = {|
   onCloseAll: () => void,
   onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
-  onHoverTab: (editor: ?EditorTab) => void,
+  onHoverTab: (
+    editor: ?EditorTab,
+    options: {| isLabelTruncated: boolean |}
+  ) => void,
 |};
 
 export const getTabId = (editorTab: EditorTab) =>
@@ -110,7 +113,10 @@ export function DraggableEditorTabs({
               onClose={() => onCloseTab(editorTab)}
               onCloseOthers={() => onCloseOtherTabs(editorTab)}
               onCloseAll={onCloseAll}
-              onHover={(enter: boolean) => onHoverTab(enter ? editorTab : null)}
+              onHover={(
+                enter: boolean,
+                options: {| isLabelTruncated: boolean |}
+              ) => onHoverTab(enter ? editorTab : null, options)}
               onActivated={() => onTabActivated(editorTab)}
               closable={editorTab.closable}
               onBeginDrag={() => {

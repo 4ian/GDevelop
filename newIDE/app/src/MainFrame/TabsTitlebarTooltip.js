@@ -12,7 +12,6 @@ import {
   type EditorKind,
 } from './EditorTabs/EditorTabsHandler';
 import { ColumnStackLayout } from '../UI/Layout';
-import { Line } from '../UI/Grid';
 import Text from '../UI/Text';
 
 const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
@@ -62,8 +61,6 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
     styles.tooltip
   );
 
-  const brightness = gdevelopTheme.palette.type === 'dark' ? 0.978 : 0.224;
-
   const editorTabMetadata = getEditorTabMetadata(editorTab);
 
   React.useEffect(
@@ -81,7 +78,7 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
     []
   );
 
-  const title = editorKindToLabel[editorTabMetadata.editorKind];
+  let title = null;
   let subtitle = null;
   if (
     [
@@ -92,7 +89,8 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
       'events functions extension',
     ].includes(editorTabMetadata.editorKind)
   ) {
-    subtitle = editorTabMetadata.projectItemName;
+    title = editorTabMetadata.projectItemName;
+    subtitle = editorKindToLabel[editorTabMetadata.editorKind];
   } else if (
     editorTabMetadata.editorKind === 'custom object' &&
     editorTabMetadata.projectItemName
@@ -100,8 +98,11 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
     const nameParts = editorTabMetadata.projectItemName.split('::');
     const customObjectName = nameParts[1];
     if (customObjectName) {
-      subtitle = customObjectName;
+      title = customObjectName;
+      subtitle = editorKindToLabel[editorTabMetadata.editorKind];
     }
+  } else {
+    title = editorKindToLabel[editorTabMetadata.editorKind];
   }
 
   return (
@@ -136,21 +137,11 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
             elevation={4}
           >
             <ColumnStackLayout noMargin>
-              <Line alignItems="center" noMargin>
-                {editorTab.icon || editorTab.renderCustomIcon ? (
-                  <span style={styles.tabIcon}>
-                    {editorTab.renderCustomIcon
-                      ? editorTab.renderCustomIcon(brightness)
-                      : editorTab.icon}
-                  </span>
-                ) : null}
-                <Text noMargin>{title}</Text>
-              </Line>
+              <Text noMargin>{title}</Text>
               {subtitle && (
-                <Line alignItems="center" noMargin>
-                  <span style={styles.emptyTabIcon} />
-                  <Text noMargin>{subtitle}</Text>
-                </Line>
+                <Text noMargin size="body-small">
+                  {subtitle}
+                </Text>
               )}
             </ColumnStackLayout>
           </Paper>

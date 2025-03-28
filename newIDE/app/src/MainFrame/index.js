@@ -3752,7 +3752,10 @@ const MainFrame = (props: Props) => {
               _onEditorTabActivated(editorTab)
             }
             onDropTab={onDropEditorTab}
-            onHoverTab={onEditorTabHovered}
+            onHoverTab={(
+              editorTab: ?EditorTab,
+              options: {| isLabelTruncated: boolean |}
+            ) => onEditorTabHovered(editorTab, options)}
           />
         )}
         hasAskAiOpened={hasAskAiOpened}

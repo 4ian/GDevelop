@@ -6,6 +6,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <unordered_set>
 
 #include "GDCore/String.h"
 
@@ -52,6 +53,11 @@ private:
   ObjectAssetSerializer(){};
 
   static gd::String GetObjectExtensionName(const gd::Object &object);
+
+  static void SerializeUsedVariantsTo(
+      gd::Project &project, const gd::Object &object,
+      SerializerElement &variantsElement,
+      std::unordered_set<gd::String> &alreadyUsedVariantIdentifiers);
 };
 
 } // namespace gd

@@ -77,7 +77,9 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   onOpenCustomObjectEditor: gdEventsBasedObject => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onRenamedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     oldName: string,
@@ -778,7 +780,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Some custom object instances may target the pasted event-based object name.
     // It can happen when an event-based object is deleted and another one is
     // pasted to replace it.
-    this.props.onEventsBasedObjectChildrenEdited();
+    this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
   };
 
   _onEventsBasedBehaviorRenamed = () => {
@@ -797,7 +799,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _onEventsBasedObjectRenamed = () => {
+  _onEventsBasedObjectRenamed = (eventsBasedObject: gdEventsBasedObject) => {
     // Name of an object changed, so notify parent
     // that an object was edited (to trigger reload of extensions)
     if (this.props.onObjectEdited) {
@@ -814,7 +816,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Some custom object instances may target the new event-based object name.
     // It can happen when an event-based object is deleted and another one is
     // renamed to replace it.
-    this.props.onEventsBasedObjectChildrenEdited();
+    this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
   };
 
   _onDeleteEventsBasedBehavior = (
@@ -853,7 +855,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunctionsExtension,
       eventsBasedObject.getName()
     );
-    onEventsBasedObjectChildrenEdited();
+    onEventsBasedObjectChildrenEdited(eventsBasedObject);
   };
 
   _onCloseExtensionFunctionSelectorDialog = (
@@ -1702,6 +1704,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            isListLocked={false}
           />
         )}
         {objectMethodSelectorDialogOpen && selectedEventsBasedObject && (

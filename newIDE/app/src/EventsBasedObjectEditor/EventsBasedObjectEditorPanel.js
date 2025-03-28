@@ -21,7 +21,9 @@ type Props = {|
   onEventsFunctionsAdded: () => void,
   onOpenCustomObjectEditor: () => void,
   unsavedChanges?: ?UnsavedChanges,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 export default function EventsBasedObjectEditorPanel({

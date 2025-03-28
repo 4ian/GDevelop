@@ -67,6 +67,9 @@
   caret-color: var(--theme-text-field-active-caret-color);
   min-width: 0px;
   border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
+
+  min-height: 21px;
+  max-height: 200px;
 }
 
 .compactTextAreaField textarea::placeholder {

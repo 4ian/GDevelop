@@ -445,8 +445,7 @@ export const useGetConceptMetadata = () => {
         eventsBasedObject,
         eventsFunction,
       } = findEventsFunctionInExtensions(extensionShortHeadersByName, type);
-      console.log(type);
-      console.log({ eventsBasedBehavior, eventsBasedObject, eventsFunction });
+
       if (extensionShortHeader && eventsFunction) {
         console.log(eventsFunction);
         return {

@@ -79,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("SetStringVariable",
-                 _("Change text variable"),
+                 _("Change variable value"),
                  _("Modify the text (string) of a variable."),
                  _("the variable _PARAM0_"),
                  "",
@@ -92,7 +92,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction(
           "SetBooleanVariable",
-          _("Change boolean variable"),
+          _("Change variable value"),
           _("Modify the boolean value of a variable."),
           _("Change the variable _PARAM0_: _PARAM1_"),
           "",
@@ -180,7 +180,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction(
           "PushString",
-          _("Add text variable"),
+          _("Add value to array variable"),
           _("Adds a text (string) at the end of a array variable."),
           _("Add the value _PARAM1_ to array variable _PARAM0_"),
           _("Arrays and structures"),
@@ -193,7 +193,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("PushNumber",
-                 _("Add variable array value"),
+                 _("Add value to array variable"),
                  _("Adds a number at the end of an array variable."),
                  _("Add the value _PARAM1_ to array variable _PARAM0_"),
                  _("Arrays and structures"),
@@ -206,7 +206,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("PushBoolean",
-                 _("Add boolean variable"),
+                 _("Add value to array variable"),
                  _("Adds a boolean at the end of an array variable."),
                  _("Add the value _PARAM1_ to array variable _PARAM0_"),
                  _("Arrays and structures"),

@@ -3728,21 +3728,34 @@ const MainFrame = (props: Props) => {
       <TabsTitlebar
         hidden={tabsTitleBarAndEditorToolbarHidden}
         toggleProjectManager={toggleProjectManager}
-        renderTabs={onHoverEditorTab => (
+        renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
           <DraggableEditorTabs
             hideLabels={false}
             editorTabs={state.editorTabs}
             onClickTab={(id: number) => _onChangeEditorTab(id)}
-            onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-            onCloseOtherTabs={(editorTab: EditorTab) =>
-              _onCloseOtherEditorTabs(editorTab)
-            }
-            onCloseAll={_onCloseAllEditorTabs}
+            onCloseTab={(editorTab: EditorTab) => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseEditorTab(editorTab);
+            }}
+            onCloseOtherTabs={(editorTab: EditorTab) => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseOtherEditorTabs(editorTab);
+            }}
+            onCloseAll={() => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseAllEditorTabs();
+            }}
             onTabActivated={(editorTab: EditorTab) =>
               _onEditorTabActivated(editorTab)
             }
             onDropTab={onDropEditorTab}
-            onHoverTab={onHoverEditorTab}
+            onHoverTab={(
+              editorTab: ?EditorTab,
+              options: {| isLabelTruncated: boolean |}
+            ) => onEditorTabHovered(editorTab, options)}
           />
         )}
         hasAskAiOpened={hasAskAiOpened}

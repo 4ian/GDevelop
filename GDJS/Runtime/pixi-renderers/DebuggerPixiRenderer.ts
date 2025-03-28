@@ -319,15 +319,10 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
-      layer.applyLayerTransformation(
-        x,
-        y,
-        cameraId,
-        result
-      );
+      layer.applyLayerTransformation(x, y, cameraId, result);
       const gamePixiContainer = this._instanceContainer
-      .getRenderer()
-      .getRendererObject();
+        .getRenderer()
+        .getRendererObject();
       if (!gamePixiContainer) {
         return result;
       }

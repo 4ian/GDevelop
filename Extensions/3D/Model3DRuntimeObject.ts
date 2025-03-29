@@ -95,7 +95,6 @@ namespace gdjs {
      * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
      */
     _centerPoint: FloatPoint3D | null;
-
     _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
@@ -213,9 +212,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Model3DObjectNetworkSyncData
+      networkSyncData: Model3DObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.mt !== undefined) {
         this._materialType = networkSyncData.mt;
@@ -249,6 +249,10 @@ namespace gdjs {
       this._modelResourceName = objectData.content.modelResourceName;
       this._renderer._reloadModel(this, this._runtimeScene);
       this.onModelChanged(objectData);
+    }
+
+    a(currentScene: RuntimeScene): void {
+      console.log('pomme');
     }
 
     _updateModel(objectData: Model3DObjectData) {

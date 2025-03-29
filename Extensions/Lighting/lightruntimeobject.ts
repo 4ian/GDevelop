@@ -95,8 +95,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: LightNetworkSyncData): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: LightNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.rad !== undefined) {
         this.setRadius(networkSyncData.rad);

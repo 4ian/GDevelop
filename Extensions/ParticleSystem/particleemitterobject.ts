@@ -399,9 +399,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      syncData: ParticleEmitterObjectNetworkSyncData
+      syncData: ParticleEmitterObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
     ): void {
-      super.updateFromNetworkSyncData(syncData);
+      super.updateFromNetworkSyncData(syncData, options);
       if (syncData.x !== undefined) {
         this.setX(syncData.x);
       }

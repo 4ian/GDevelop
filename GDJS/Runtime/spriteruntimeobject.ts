@@ -128,8 +128,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
-      super.updateFromNetworkSyncData(newNetworkSyncData);
+    updateFromNetworkSyncData(
+      newNetworkSyncData: SpriteNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ) {
+      super.updateFromNetworkSyncData(newNetworkSyncData, options);
       if (newNetworkSyncData.ifx !== undefined) {
         this.flipX(newNetworkSyncData.ifx);
       }

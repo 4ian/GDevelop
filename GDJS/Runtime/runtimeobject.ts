@@ -454,10 +454,10 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getNetworkSyncData(): ObjectNetworkSyncData {
+    getNetworkSyncData(saveWholeGame?: boolean): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (!behavior.isSyncedOverNetwork()) {
+        if (!behavior.isSyncedOverNetwork() && !saveWholeGame) {
           return;
         }
 
@@ -507,7 +507,10 @@ namespace gdjs {
      * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+    updateFromNetworkSyncData(
+      networkSyncData: ObjectNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }
@@ -567,7 +570,7 @@ namespace gdjs {
 
       // If variables are synchronized, update them.
       if (networkSyncData.var) {
-        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
       }
 
       // If effects are synchronized, update them.

@@ -163,8 +163,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: TilemapNetworkSyncData): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: TilemapNetworkSyncData,
+      options?: { skipMultiplayerInstructions: boolean }
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.op !== undefined) {
         this.setOpacity(networkSyncData.op);

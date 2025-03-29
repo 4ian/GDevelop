@@ -990,6 +990,10 @@ interface Layout {
 
     void SetStopSoundsOnStartup(boolean enable);
     boolean StopSoundsOnStartup();
+
+    void SetUnloadSceneAssets(boolean enable);
+    boolean UnloadSceneAssets();
+
 };
 
 interface ExternalEvents {

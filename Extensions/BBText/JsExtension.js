@@ -81,6 +81,19 @@ module.exports = {
         .setLabel(_('Base alignment'))
         .setGroup(_('Appearance'));
 
+      if (!objectContent.verticalTextAlignment) {
+        objectContent.verticalTextAlignment = 'top';
+      }
+      objectProperties
+        .getOrCreate('verticalTextAlignment')
+        .setValue(objectContent.verticalTextAlignment)
+        .setType('choice')
+        .addExtraInfo('top')
+        .addExtraInfo('center')
+        .addExtraInfo('bottom')
+        .setLabel(_('Vertical alignment'))
+        .setGroup(_('Appearance'));
+
       objectProperties
         .getOrCreate('fontFamily')
         .setValue(objectContent.fontFamily)
@@ -88,13 +101,6 @@ module.exports = {
         .addExtraInfo('font')
         .setLabel(_('Font'))
         .setGroup(_('Font'));
-
-      objectProperties
-        .getOrCreate('wordWrap')
-        .setValue(objectContent.wordWrap ? 'true' : 'false')
-        .setType('boolean')
-        .setLabel(_('Word wrapping'))
-        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('visible')
@@ -113,7 +119,7 @@ module.exports = {
       color: '0;0;0',
       fontFamily: 'Arial',
       align: 'left',
-      wordWrap: true,
+      verticalTextAlignment: 'top',
     };
 
     objectBBText.updateInitialInstanceProperty = function (
@@ -358,7 +364,7 @@ module.exports = {
         expressionDescription: _('Get the base font family'),
       },
       {
-        functionName: 'Alignment',
+        functionName: 'TextAlignment',
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
         instructionLabel: _('Alignment'),
@@ -370,19 +376,6 @@ module.exports = {
         actionSentence: _('text alignment'),
         expressionLabel: _('Get the text alignment'),
         expressionDescription: _('Get the text alignment'),
-      },
-      {
-        functionName: 'WordWrap',
-        iconPath: 'res/actions/scaleWidth24_black.png',
-        type: 'boolean',
-        instructionLabel: _('Word wrap'),
-        paramLabel: _('Word wrap'),
-        conditionDescription: _('Check if word wrap is enabled.'),
-        conditionSentence: _('Word wrap is enabled'),
-        actionDescription: _('Set word wrap'),
-        actionSentence: _('Activate word wrap for _PARAM0_: _PARAM1_'),
-        expressionLabel: '',
-        expressionDescription: '',
       },
       {
         functionName: 'WrappingWidth',
@@ -404,6 +397,35 @@ module.exports = {
     ];
 
     addSettersAndGettersToObject(object, setterAndGetterProperties, 'BBText');
+
+    object
+      .addCondition(
+        'WordWrap',
+        _('Word wrapping'),
+        _('Check if word wrapping is enabled.'),
+        _('_PARAM0_ word wrapping is enabled'),
+        '',
+        'res/conditions/wordWrap24_black.png',
+        'res/conditions/wordWrap_black.png'
+      )
+      .addParameter('object', 'BBText', 'BBText', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isWrapping');
+
+    object
+      .addAction(
+        'SetWordWrap',
+        _('Word wrapping'),
+        _('De/activate word wrapping.'),
+        _('Activate word wrapping of _PARAM0_: _PARAM1_'),
+        '',
+        'res/actions/wordWrap24_black.png',
+        'res/actions/wordWrap_black.png'
+      )
+      .addParameter('object', 'BBText', 'BBText', false)
+      .addParameter('yesorno', _('Activate word wrapping'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setWrapping');
 
     object
       .addAction(
@@ -502,7 +524,6 @@ module.exports = {
             fontSize: '24px',
             fill: '#cccccc',
             tagStyle: 'bbcode',
-            wordWrap: true,
             wordWrapWidth: 250, // This value is the default wrapping width of the runtime object.
             align: 'left',
           },
@@ -574,10 +595,17 @@ module.exports = {
             });
         }
 
-        const wordWrap = object.content.wordWrap;
+        const wordWrap = this._instance.hasCustomSize();
         if (wordWrap !== this._pixiObject._style.wordWrap) {
           this._pixiObject._style.wordWrap = wordWrap;
           this._pixiObject.dirty = true;
+        }
+        if (this._instance.hasCustomSize()) {
+          const customWidth = this.getCustomWidth();
+          if (this._pixiObject._style.wordWrapWidth !== customWidth) {
+            this._pixiObject._style.wordWrapWidth = customWidth;
+            this._pixiObject.dirty = true;
+          }
         }
 
         const align = object.content.align;
@@ -586,24 +614,41 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        this._pixiObject.position.x =
-          this._instance.getX() + this._pixiObject.width / 2;
+        if (this._instance.hasCustomSize()) {
+          const alignmentX =
+            object.content.align === 'right'
+              ? 1
+              : object.content.align === 'center'
+                ? 0.5
+                : 0;
+
+          const width = this.getCustomWidth();
+
+          // A vector from the custom size center to the renderer center.
+          const centerToCenterX =
+            (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+          this._pixiObject.position.x = this._instance.getX() + width / 2;
+          this._pixiObject.anchor.x =
+            0.5 - centerToCenterX / this._pixiObject.width;
+        } else {
+          this._pixiObject.position.x =
+            this._instance.getX() + this._pixiObject.width / 2;
+          this._pixiObject.anchor.x = 0.5;
+        }
+        const alignmentY =
+          object.content.verticalTextAlignment === 'bottom'
+            ? 1
+            : object.content.verticalTextAlignment === 'center'
+              ? 0.5
+              : 0;
         this._pixiObject.position.y =
-          this._instance.getY() + this._pixiObject.height / 2;
+          this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
+        this._pixiObject.anchor.y = 0.5;
+
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
-
-        if (this._instance.hasCustomSize() && this._pixiObject) {
-          const customWidth = this.getCustomWidth();
-          if (
-            this._pixiObject &&
-            this._pixiObject._style.wordWrapWidth !== customWidth
-          ) {
-            this._pixiObject._style.wordWrapWidth = customWidth;
-            this._pixiObject.dirty = true;
-          }
-        }
 
         // Do not hide completely an object so it can still be manipulated
         const alphaForDisplay = Math.max(
@@ -625,6 +670,19 @@ module.exports = {
        */
       getDefaultHeight() {
         return this._pixiObject.height;
+      }
+
+      getOriginY() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const height = this.getHeight();
+        return object.content.verticalTextAlignment === 'bottom'
+          ? height
+          : object.content.verticalTextAlignment === 'center'
+            ? height / 2
+            : 0;
       }
     }
 

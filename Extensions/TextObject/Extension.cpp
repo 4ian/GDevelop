@@ -357,8 +357,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetTextAlignment",
                 _("Alignment"),
-                _("Set the text alignment of a multiline text object (does not "
-                  "work with single line texts)."),
+                _("Change the text alignment of a multiline text object."),
                 _("Align _PARAM0_: _PARAM1_"),
                 _("Style"),
                 "res/actions/textAlign24.png",
@@ -388,10 +387,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction(
          "SetWrapping",
-         _("Wrapping"),
+         _("Word wrapping"),
          _("De/activate word wrapping. Note that word wrapping is a graphical "
            "option,\nyou can't get the number of lines displayed"),
-         _("Activate wrapping style of _PARAM0_: _PARAM1_"),
+         _("Activate word wrapping of _PARAM0_: _PARAM1_"),
          _("Style"),
          "res/actions/wordWrap24_black.png",
          "res/actions/wordWrap_black.png")
@@ -401,8 +400,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("IsWrapping",
                    _("Wrapping"),
-                   _("Test if the word wrapping style of an object is set."),
-                   _("_PARAM0_ word wrapping style is activated"),
+                   _("Check if word wrapping is enabled."),
+                   _("_PARAM0_ word wrapping is enabled"),
                    _("Style"),
                    "res/conditions/wordWrap24_black.png",
                    "res/conditions/wordWrap_black.png")
@@ -411,7 +410,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("WrappingWidth",
                 _("Wrapping width"),
-                _("Modify the word wrapping width of a Text object."),
+                _("Change the word wrapping width of a Text object."),
                 _("the wrapping width"),
                 _("Style"),
                 "res/actions/wordWrap24_black.png",
@@ -423,7 +422,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("WrappingWidth",
                    _("Wrapping width"),
-                   _("Test the word wrapping width of a Text object."),
+                   _("Compare the word wrapping width of a Text object."),
                    _("the wrapping width"),
                    _("Style"),
                    "res/conditions/wordWrap24_black.png",

@@ -19,6 +19,7 @@ namespace gdjs {
       wordWrap: boolean;
       /** Alignment of the text: "left", "center" or "right" */
       align: 'left' | 'center' | 'right';
+      verticalTextAlignment: 'top' | 'center' | 'bottom';
     };
   };
   export type BBTextObjectData = ObjectData & BBTextObjectDataType;
@@ -32,6 +33,7 @@ namespace gdjs {
     wwrap: boolean;
     wwidth: float;
     align: string;
+    vta: string;
     hidden: boolean;
   };
 
@@ -52,13 +54,14 @@ namespace gdjs {
     /** color in format [r, g, b], where each component is in the range [0, 255] */
     _color: integer[];
     _fontFamily: string;
-    _fontSize: number;
+    _fontSize: float;
 
-    _wordWrap: boolean;
+    _wrapping: boolean = false;
     _wrappingWidth: float = 250;
 
-    // This value is the default wrapping width of the runtime object.
-    _align: string;
+    _textAlign: string;
+    _verticalTextAlignment: string;
+
     _renderer: gdjs.BBTextRuntimeObjectRenderer;
 
     // While this should rather be exposed as a property for all objects, honor the "visible"
@@ -81,24 +84,26 @@ namespace gdjs {
       this._fontFamily = objectData.content.fontFamily;
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._fontSize = parseFloat(objectData.content.fontSize);
-      this._wordWrap = objectData.content.wordWrap;
-      this._align = objectData.content.align;
+      this._textAlign = objectData.content.align;
+      this._verticalTextAlignment =
+        objectData.content.verticalTextAlignment || 'top';
+      this.hidden = !objectData.content.visible;
+
       this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
         this,
         instanceContainer
       );
-      this.hidden = !objectData.content.visible;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
     // @ts-ignore
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: BBTextObjectDataType,
       newObjectData: BBTextObjectDataType
     ): boolean {
@@ -124,15 +129,23 @@ namespace gdjs {
         this.setFontSize(newObjectData.content.fontSize);
       }
       if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
-        this.setWordWrap(newObjectData.content.wordWrap);
+        this.setWrapping(newObjectData.content.wordWrap);
       }
       if (oldObjectData.content.align !== newObjectData.content.align) {
-        this.setAlignment(newObjectData.content.align);
+        this.setTextAlignment(newObjectData.content.align);
+      }
+      if (
+        oldObjectData.content.verticalTextAlignment !==
+        newObjectData.content.verticalTextAlignment
+      ) {
+        this.setVerticalTextAlignment(
+          newObjectData.content.verticalTextAlignment
+        );
       }
       return true;
     }
 
-    getNetworkSyncData(): BBTextObjectNetworkSyncData {
+    override getNetworkSyncData(): BBTextObjectNetworkSyncData {
       return {
         ...super.getNetworkSyncData(),
         text: this._text,
@@ -140,14 +153,15 @@ namespace gdjs {
         c: this._color,
         ff: this._fontFamily,
         fs: this._fontSize,
-        wwrap: this._wordWrap,
+        wwrap: this._wrapping,
         wwidth: this._wrappingWidth,
-        align: this._align,
+        align: this._textAlign,
+        vta: this._verticalTextAlignment,
         hidden: this.hidden,
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: BBTextObjectNetworkSyncData
     ): void {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -167,26 +181,29 @@ namespace gdjs {
       if (this._fontSize !== undefined) {
         this.setFontSize(networkSyncData.fs);
       }
-      if (this._wordWrap !== undefined) {
-        this.setWordWrap(networkSyncData.wwrap);
+      if (this._wrapping !== undefined) {
+        this.setWrapping(networkSyncData.wwrap);
       }
       if (this._wrappingWidth !== undefined) {
         this.setWrappingWidth(networkSyncData.wwidth);
       }
-      if (this._align !== undefined) {
-        this.setAlignment(networkSyncData.align);
+      if (this._textAlign !== undefined) {
+        this.setTextAlignment(networkSyncData.align);
+      }
+      if (this._verticalTextAlignment !== undefined) {
+        this.setVerticalTextAlignment(networkSyncData.vta);
       }
       if (this.hidden !== undefined) {
         this.hide(networkSyncData.hidden);
       }
     }
 
-    /**
-     * Initialize the extra parameters that could be set for an instance.
-     */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
+        this.setWrapping(true);
       } else {
         this.setWrappingWidth(
           // This value is the default wrapping width of the runtime object.
@@ -198,7 +215,7 @@ namespace gdjs {
       }
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
@@ -206,7 +223,7 @@ namespace gdjs {
     /**
      * Set the markup text to display.
      */
-    setBBText(text): void {
+    setBBText(text: string): void {
       this._text = text;
       this._renderer.updateText();
       this.invalidateHitboxes();
@@ -219,7 +236,7 @@ namespace gdjs {
       return this._text;
     }
 
-    setColor(rgbColorString): void {
+    setColor(rgbColorString: string): void {
       this._color = gdjs.rgbOrHexToRGBColor(rgbColorString);
       this._renderer.updateColor();
     }
@@ -232,7 +249,7 @@ namespace gdjs {
       return this._color[0] + ';' + this._color[1] + ';' + this._color[2];
     }
 
-    setFontSize(fontSize): void {
+    setFontSize(fontSize: float): void {
       this._fontSize = fontSize;
       this._renderer.updateFontSize();
     }
@@ -241,7 +258,7 @@ namespace gdjs {
       return this._fontSize;
     }
 
-    setFontFamily(fontFamily): void {
+    setFontFamily(fontFamily: string): void {
       this._fontFamily = fontFamily;
       this._renderer.updateFontFamily();
     }
@@ -250,38 +267,43 @@ namespace gdjs {
       return this._fontFamily;
     }
 
-    setAlignment(align): void {
-      this._align = align;
+    setTextAlignment(align: string): void {
+      this._textAlign = align;
       this._renderer.updateAlignment();
     }
 
-    getAlignment() {
-      return this._align;
+    getTextAlignment() {
+      return this._textAlign;
     }
 
     /**
-     * Set object position on X axis.
-     * @param x The new position X of the object.
+     * Set the text alignment on Y axis for multiline text objects.
+     * @param alignment The text alignment.
      */
-    setX(x: float): void {
+    setVerticalTextAlignment(alignment: string): void {
+      this._verticalTextAlignment = alignment;
+      this._renderer.updatePosition();
+    }
+
+    /**
+     * Get the text alignment on Y axis of text object.
+     * @return The text alignment.
+     */
+    getVerticalTextAlignment(): string {
+      return this._verticalTextAlignment;
+    }
+
+    override setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set object position on Y axis.
-     * @param y The new position Y of the object.
-     */
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set the angle of the object.
-     * @param angle The new angle of the object.
-     */
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
     }
@@ -327,30 +349,35 @@ namespace gdjs {
       return this._wrappingWidth;
     }
 
-    setWordWrap(wordWrap: boolean): void {
-      if (this._wordWrap === wordWrap) return;
+    setWrapping(wordWrap: boolean): void {
+      if (this._wrapping === wordWrap) return;
 
-      this._wordWrap = wordWrap;
+      this._wrapping = wordWrap;
       this._renderer.updateWordWrap();
       this.invalidateHitboxes();
     }
 
-    getWordWrap() {
-      return this._wordWrap;
+    isWrapping() {
+      return this._wrapping;
     }
 
-    /**
-     * Get the width of the object.
-     */
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    /**
-     * Get the height of the object.
-     */
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override getDrawableY(): float {
+      return (
+        this.getY() -
+        (this._verticalTextAlignment === 'center'
+          ? this.getHeight() / 2
+          : this._verticalTextAlignment === 'bottom'
+            ? this.getHeight()
+            : 0)
+      );
     }
   }
   // @ts-ignore

@@ -720,7 +720,9 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addObject(
       'SimpleTileMap',
       _('Tile map'),
-      _('Displays a tile-based map. Recommended for most games that need to use static tiles.'),
+      _(
+        'Displays a tile-based map. Recommended for most games that need to use static tiles.'
+      ),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )

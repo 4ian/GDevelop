@@ -35,13 +35,6 @@ namespace gdjs {
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-      // Set the anchor in the center, so that the object rotates around
-      // its center.
-      // @ts-ignore
-      this._pixiObject.anchor.x = 0.5;
-      // @ts-ignore
-      this._pixiObject.anchor.y = 0.5;
-
       this.updateAlignment();
       this.updateTextContent();
       this.updateAngle();
@@ -130,7 +123,7 @@ namespace gdjs {
     }
 
     updateWrappingWidth(): void {
-      if (this._object._wordWrap) {
+      if (this._object._wrapping) {
         this._pixiObject.maxWidth =
           this._object._wrappingWidth / this._object._scaleX;
         this._pixiObject.dirty = true;
@@ -148,13 +141,43 @@ namespace gdjs {
 
     updateAlignment(): void {
       // @ts-ignore - assume align is always a valid value.
-      this._pixiObject.align = this._object._align;
+      this._pixiObject.align = this._object._textAlign;
       this.updatePosition();
     }
 
     updatePosition(): void {
-      this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
-      this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
+      if (this._object.isWrapping()) {
+        const alignmentX =
+          this._object._textAlign === 'right'
+            ? 1
+            : this._object._textAlign === 'center'
+              ? 0.5
+              : 0;
+
+        const width = this._object.getWrappingWidth();
+
+        // A vector from the custom size center to the renderer center.
+        const centerToCenterX =
+          (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+        this._pixiObject.position.x = this._object.x + width / 2;
+        this._pixiObject.anchor.x =
+          0.5 - centerToCenterX / this._pixiObject.width;
+      } else {
+        this._pixiObject.position.x =
+          this._object.x + this._pixiObject.width / 2;
+        this._pixiObject.anchor.x = 0.5;
+      }
+
+      const alignmentY =
+        this._object._verticalTextAlignment === 'bottom'
+          ? 1
+          : this._object._verticalTextAlignment === 'center'
+            ? 0.5
+            : 0;
+      this._pixiObject.position.y =
+        this._object.y + this._pixiObject.height * (0.5 - alignmentY);
+      this._pixiObject.anchor.y = 0.5;
     }
 
     updateAngle(): void {

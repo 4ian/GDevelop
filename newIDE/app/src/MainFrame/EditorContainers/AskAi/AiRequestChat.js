@@ -25,6 +25,9 @@ import Like from '../../../UI/CustomSvgIcons/Like';
 import Dislike from '../../../UI/CustomSvgIcons/Dislike';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
+import Link from '../../../UI/Link';
+import { getHelpLink } from '../../../Utils/HelpLink';
+import Window from '../../../Utils/Window';
 
 const TOO_MANY_MESSAGES_WARNING_COUNT = 9;
 const TOO_MANY_MESSAGES_ERROR_COUNT = 14;
@@ -200,66 +203,80 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             An error happened when sending your request, please try again.
           </Trans>
         ) : (
-          quotaOrCreditsExplanation
+          quotaOrCreditsExplanation || '\u00a0'
         )}
       </Text>
     );
 
     if (!aiRequest) {
-      const disclaimer = errorOrQuotaOrCreditsExplanation || (
-        <Text size="body2" color="secondary">
-          <Trans>
-            The AI will answer according to your game project. Always verify AI
-            answers before applying them.
-          </Trans>
-        </Text>
-      );
-
       return (
         <div className={classes.newChatContainer}>
-          <Line noMargin justifyContent="center">
-            <RobotIcon rotating size={40} />
-          </Line>
-          <Column noMargin alignItems="center">
-            <Text size="bold-title">
-              <Trans>What do you want to make?</Trans>
+          <ColumnStackLayout justifyContent="center" expand>
+            <Line noMargin justifyContent="center">
+              <RobotIcon rotating size={40} />
+            </Line>
+            <Column noMargin alignItems="center">
+              <Text size="bold-title">
+                <Trans>What do you want to make?</Trans>
+              </Text>
+            </Column>
+            <Column noMargin alignItems="stretch" justifyContent="stretch">
+              <CompactTextAreaField
+                maxLength={6000}
+                value={userRequestText}
+                disabled={isLaunchingAiRequest}
+                onChange={userRequestText =>
+                  setUserRequestText(userRequestText)
+                }
+                placeholder={newChatPlaceholder}
+                rows={5}
+              />
+            </Column>
+            <Line noMargin>
+              <ResponsiveLineStackLayout
+                noMargin
+                alignItems="flex-start"
+                justifyContent="space-between"
+                expand
+              >
+                {!isMobile && errorOrQuotaOrCreditsExplanation}
+                <Line noMargin justifyContent="flex-end">
+                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                    <RaisedButton
+                      color="primary"
+                      label={<Trans>Send</Trans>}
+                      style={{ flexShrink: 0 }}
+                      disabled={isLaunchingAiRequest}
+                      onClick={() => {
+                        onSendUserRequest(userRequestText);
+                      }}
+                    />
+                  </LeftLoader>
+                </Line>
+                {isMobile && errorOrQuotaOrCreditsExplanation}
+              </ResponsiveLineStackLayout>
+            </Line>
+            {subscriptionBanner}
+          </ColumnStackLayout>
+          <Column justifyContent="center" noMargin>
+            <Text size="body-small" color="secondary" align="center" noMargin>
+              <Trans>
+                The AI is experimental and still being improved.{' '}
+                <Link
+                  href={getHelpLink('/interface/ask-ai')}
+                  color="secondary"
+                  onClick={() =>
+                    Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                  }
+                >
+                  It has access to your game objects but not events.
+                </Link>
+              </Trans>
+            </Text>
+            <Text size="body-small" color="secondary" align="center" noMargin>
+              <Trans>Answers may have mistakes: always verify them.</Trans>
             </Text>
           </Column>
-          <Column noMargin alignItems="stretch" justifyContent="stretch">
-            <CompactTextAreaField
-              maxLength={6000}
-              value={userRequestText}
-              disabled={isLaunchingAiRequest}
-              onChange={userRequestText => setUserRequestText(userRequestText)}
-              placeholder={newChatPlaceholder}
-              rows={5}
-            />
-          </Column>
-          <Line noMargin>
-            <ResponsiveLineStackLayout
-              noMargin
-              alignItems="flex-start"
-              justifyContent="space-between"
-              expand
-            >
-              {!isMobile && disclaimer}
-              <Line noMargin justifyContent="flex-end">
-                <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
-                  <RaisedButton
-                    color="primary"
-                    label={<Trans>Send</Trans>}
-                    style={{ flexShrink: 0 }}
-                    disabled={isLaunchingAiRequest}
-                    onClick={() => {
-                      onSendUserRequest(userRequestText);
-                    }}
-                  />
-                </LeftLoader>
-              </Line>
-              {isMobile && disclaimer}
-            </ResponsiveLineStackLayout>
-          </Line>
-          {subscriptionBanner}
         </div>
       );
     }
@@ -381,8 +398,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             <Line justifyContent="flex-start">
               <AlertMessage kind="error">
                 <Trans>
-                  The AI encountered an error while handling your request. Try
-                  again later.
+                  The AI encountered an error while handling your request - this
+                  was request was not counted in your AI usage. Try again later.
                 </Trans>
               </AlertMessage>
             </Line>

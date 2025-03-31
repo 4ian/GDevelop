@@ -3167,6 +3167,7 @@ const MainFrame = (props: Props) => {
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
     openProfileDialog: onOpenProfileDialog,
+    openAskAi,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {

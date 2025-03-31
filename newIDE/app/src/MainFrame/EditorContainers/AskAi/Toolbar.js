@@ -23,6 +23,7 @@ export const Toolbar = ({
       <ToolbarGroup firstChild>
         <IconButton
           size="small"
+          color="default"
           tooltip={t`View history`}
           onClick={onOpenHistory}
         >

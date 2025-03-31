@@ -13,6 +13,11 @@ import { type EditorTab } from './EditorTabs/EditorTabsHandler';
 import { getTabId } from './EditorTabs/DraggableEditorTabs';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
+import RobotIcon from '../ProjectCreation/RobotIcon';
+import PreferencesContext from './Preferences/PreferencesContext';
+import TextButton from '../UI/TextButton';
+import { useInterval } from '../Utils/UseInterval';
+import { useIsMounted } from '../Utils/UseIsMounted';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -34,7 +39,7 @@ const styles = {
   },
   askAiContainer: {
     marginBottom: 4,
-    marginRight: 0,
+    marginRight: 1,
     marginLeft: 2,
   },
 };
@@ -50,6 +55,46 @@ type TabsTitlebarProps = {|
   onOpenAskAi: () => void,
 |};
 
+const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
+  const isMounted = useIsMounted();
+
+  const [isAskAiIconAnimated, setIsAskAiIconAnimated] = React.useState(true);
+  const animate = React.useCallback(
+    (animationDuration: number) => {
+      if (isMounted.current) {
+        setIsAskAiIconAnimated(true);
+        setTimeout(() => {
+          if (!isMounted.current) return;
+
+          setIsAskAiIconAnimated(false);
+        }, animationDuration);
+      }
+    },
+    [isMounted]
+  );
+
+  React.useEffect(
+    () => {
+      // Animate the icon for a long time at the beginning.
+      animate(9000);
+    },
+    [animate]
+  );
+
+  useInterval(
+    () => {
+      setIsAskAiIconAnimated(true);
+      setTimeout(() => {
+        setIsAskAiIconAnimated(false);
+      }, 8000);
+    },
+    // Animate the icon every 20 minutes.
+    shouldDisplayAskAi ? 20 * 60 * 1000 : null
+  );
+
+  return isAskAiIconAnimated;
+};
+
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
@@ -63,6 +108,7 @@ export default function TabsTitlebar({
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
+  const preferences = React.useContext(PreferencesContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -135,6 +181,10 @@ export default function TabsTitlebar({
     []
   );
 
+  const shouldDisplayAskAi =
+    preferences.values.showAiAskButtonInTitleBar && !hasAskAiOpened;
+  const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
+
   return (
     <div
       style={{
@@ -160,17 +210,18 @@ export default function TabsTitlebar({
         <MenuIcon />
       </IconButton>
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
-      {/* {!preferences.values.showAiAskButtonInTitleBar ||
-      hasAskAiOpened ? null : (
-        <div style={styles.askAiContainer}>
-          <RaisedButton
-            icon={<RobotIcon size={16} />}
-            color="primary"
+      {shouldDisplayAskAi ? (
+        <div
+          style={styles.askAiContainer}
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        >
+          <TextButton
+            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
             label={'Ask AI'}
             onClick={onOpenAskAi}
           />
         </div>
-      )} */}
+      ) : null}
       <TitleBarRightSafeMargins />
       {tooltipData && (
         <TabsTitlebarTooltip

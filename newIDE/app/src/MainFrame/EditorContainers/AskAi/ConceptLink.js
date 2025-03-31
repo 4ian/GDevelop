@@ -151,10 +151,10 @@ export const ConceptLink = ({
   return (
     <Tooltip
       title={[
-        <Text>
+        <Text color="inherit">
           <b>{getConceptKindLabel(conceptMetadata.kind)}</b>
         </Text>,
-        conceptParent ? <Text>{conceptParent}</Text> : null,
+        conceptParent ? <Text color="inherit">{conceptParent}</Text> : null,
         <MarkdownText source={conceptMetadata.description} />,
       ]}
       placement="bottom"

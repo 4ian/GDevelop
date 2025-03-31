@@ -9,8 +9,10 @@ a.conceptLink {
 }
 
 a.noValidLink {
+  color: inherit;
   cursor: default;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-style: dotted;
 }
 
 .conceptLink span {

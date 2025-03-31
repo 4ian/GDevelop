@@ -13,14 +13,14 @@ type SimplifiedVariableJson = {|
   variableName: string,
   type: string,
   value?: string,
-  children: ?Array<SimplifiedVariableJson>,
+  variableChildren?: Array<SimplifiedVariableJson>,
 |};
 
 type SimplifiedObjectJson = {|
   objectName: string,
   objectType: string,
-  behaviors: Array<SimplifiedBehaviorJson>,
-  objectVariables: Array<SimplifiedVariableJson>,
+  behaviors?: Array<SimplifiedBehaviorJson>,
+  objectVariables?: Array<SimplifiedVariableJson>,
 |};
 
 type SimplifiedSceneJson = {|
@@ -83,16 +83,13 @@ const getSimplifiedVariableJson = (
 ): SimplifiedVariableJson => {
   const isCollection = isCollectionVariable(variable);
 
-  // Don't diplay children of arrays, and only display the first level of children of structures.
-  const shouldDisplayChildren =
-    variable.getType() === gd.Variable.Structure && depth === 0;
-
-  return {
-    variableName: name,
-    type: getVariableType(variable),
-    value: !isCollection ? getVariableValueAsString(variable) : undefined,
-    children: shouldDisplayChildren
-      ? variable
+  if (isCollection) {
+    // Don't diplay children of arrays, and only display the first level of children of structures.
+    if (variable.getType() === gd.Variable.Structure && depth === 0) {
+      return {
+        variableName: name,
+        type: getVariableType(variable),
+        variableChildren: variable
           .getAllChildrenNames()
           .toJSArray()
           .map(childName => {
@@ -102,9 +99,19 @@ const getSimplifiedVariableJson = (
               childVariable,
               depth + 1
             );
-          })
-          .filter(Boolean)
-      : undefined,
+          }),
+      };
+    }
+    return {
+      variableName: name,
+      type: getVariableType(variable),
+    };
+  }
+
+  return {
+    variableName: name,
+    type: getVariableType(variable),
+    value: getVariableValueAsString(variable),
   };
 };
 
@@ -119,20 +126,32 @@ const getSimplifiedVariablesContainerJson = (
 };
 
 const getSimplifiedObjectJson = (object: gdObject): SimplifiedObjectJson => {
-  return {
+  const objectVariables = getSimplifiedVariablesContainerJson(
+    object.getVariables()
+  );
+  const behaviors = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => {
+      const behavior = object.getBehavior(behaviorName);
+      if (behavior.isDefaultBehavior()) return null;
+      return getSimplifiedBehaviorJson(behavior);
+    })
+    .filter(Boolean);
+
+  const simplifiedObject: SimplifiedObjectJson = {
     objectName: object.getName(),
     objectType: object.getType(),
-    behaviors: object
-      .getAllBehaviorNames()
-      .toJSArray()
-      .map(behaviorName => {
-        const behavior = object.getBehavior(behaviorName);
-        if (behavior.isDefaultBehavior()) return null;
-        return getSimplifiedBehaviorJson(behavior);
-      })
-      .filter(Boolean),
-    objectVariables: getSimplifiedVariablesContainerJson(object.getVariables()),
   };
+
+  if (behaviors.length > 0) {
+    simplifiedObject.behaviors = behaviors;
+  }
+  if (objectVariables.length > 0) {
+    simplifiedObject.objectVariables = objectVariables;
+  }
+
+  return simplifiedObject;
 };
 
 const getSimplifiedObjectsJson = (

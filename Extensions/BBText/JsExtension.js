@@ -364,7 +364,7 @@ module.exports = {
         expressionDescription: _('Get the base font family'),
       },
       {
-        functionName: 'TextAlignment',
+        functionName: 'Alignment',
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
         instructionLabel: _('Alignment'),
@@ -400,7 +400,7 @@ module.exports = {
 
     object
       .addCondition(
-        'WordWrap',
+        'IsWordWrap',
         _('Word wrapping'),
         _('Check if word wrapping is enabled.'),
         _('_PARAM0_ word wrapping is enabled'),

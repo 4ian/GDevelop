@@ -263,8 +263,15 @@ namespace gdjs {
       this._renderer.updateFontFamily();
     }
 
-    getFontFamily() {
+    getFontFamily(): string {
       return this._fontFamily;
+    }
+
+    /**
+     * @deprecated Use `setTextAlignment` instead
+     */
+    setAlignment(align: string): void {
+      this.setTextAlignment(align);
     }
 
     setTextAlignment(align: string): void {
@@ -272,7 +279,14 @@ namespace gdjs {
       this._renderer.updateAlignment();
     }
 
-    getTextAlignment() {
+    /**
+     * @deprecated Use `getTextAlignment` instead
+     */
+    getAlignment(): string {
+      return this.getTextAlignment();
+    }
+
+    getTextAlignment(): string {
       return this._textAlign;
     }
 

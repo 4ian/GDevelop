@@ -287,11 +287,13 @@ export const sendAiRequestFeedback = async (
     aiRequestId,
     messageIndex,
     feedback,
+    reason,
   }: {|
     userId: string,
     aiRequestId: string,
     messageIndex: number,
     feedback: 'like' | 'dislike',
+    reason?: string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -302,6 +304,7 @@ export const sendAiRequestFeedback = async (
     {
       messageIndex,
       feedback,
+      reason,
     },
     {
       params: {

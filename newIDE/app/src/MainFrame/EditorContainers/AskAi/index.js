@@ -244,7 +244,7 @@ export const AskAi = React.memo<Props>(
       );
 
       const onSendFeedback = React.useCallback(
-        async (aiRequestId, messageIndex, feedback) => {
+        async (aiRequestId, messageIndex, feedback, reason) => {
           if (!profile) return;
           try {
             await retryIfFailed({ times: 2 }, () =>
@@ -253,6 +253,7 @@ export const AskAi = React.memo<Props>(
                 aiRequestId,
                 messageIndex,
                 feedback,
+                reason,
               })
             );
           } catch (error) {

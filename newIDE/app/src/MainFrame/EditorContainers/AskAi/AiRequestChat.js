@@ -28,9 +28,10 @@ import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.fl
 import Link from '../../../UI/Link';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
+import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 
-const TOO_MANY_MESSAGES_WARNING_COUNT = 9;
-const TOO_MANY_MESSAGES_ERROR_COUNT = 14;
+const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
+const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
 
 type Props = {
   aiRequest: AiRequest | null,
@@ -40,7 +41,8 @@ type Props = {
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
-    feedback: 'like' | 'dislike'
+    feedback: 'like' | 'dislike',
+    reason?: string
   ) => Promise<void>,
   hasOpenedProject: boolean,
 
@@ -107,6 +109,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
     const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
     const theme = React.useContext(GDevelopThemeContext);
+    const [
+      dislikeFeedbackDialogOpenedFor,
+      setDislikeFeedbackDialogOpenedFor,
+    ] = React.useState(null);
+
     const [newChatPlaceholder] = React.useState(() => {
       const newChatPlaceholders: Array<MessageDescriptor> = [
         t`How to add a leaderboard?`,
@@ -281,6 +288,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       );
     }
 
+    const userMessagesCount = aiRequest.output.filter(
+      message => message.role === 'user'
+    ).length;
+
     return (
       <ColumnStackLayout
         expand
@@ -350,11 +361,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                                       ...messageFeedbacks,
                                       [feedbackKey]: 'dislike',
                                     });
-                                    onSendFeedback(
-                                      aiRequest.id,
+                                    setDislikeFeedbackDialogOpenedFor({
+                                      aiRequestId: aiRequest.id,
                                       messageIndex,
-                                      'dislike'
-                                    );
+                                    });
                                   }}
                                 >
                                   <Dislike
@@ -415,10 +425,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Line>
           ) : null}
         </ScrollView>
-        {aiRequest.output.length >= TOO_MANY_MESSAGES_WARNING_COUNT ? (
+        {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
           <AlertMessage
             kind={
-              aiRequest.output.length >= TOO_MANY_MESSAGES_ERROR_COUNT
+              userMessagesCount >= TOO_MANY_USER_MESSAGES_ERROR_COUNT
                 ? 'error'
                 : 'warning'
             }
@@ -463,6 +473,20 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             {isMobile && errorOrQuotaOrCreditsExplanation}
           </ResponsiveLineStackLayout>
         </Column>
+        {dislikeFeedbackDialogOpenedFor && (
+          <DislikeFeedbackDialog
+            open
+            onClose={() => setDislikeFeedbackDialogOpenedFor(null)}
+            onSendFeedback={(reason: string) => {
+              onSendFeedback(
+                dislikeFeedbackDialogOpenedFor.aiRequestId,
+                dislikeFeedbackDialogOpenedFor.messageIndex,
+                'dislike',
+                reason
+              );
+            }}
+          />
+        )}
       </ColumnStackLayout>
     );
   }

@@ -231,36 +231,68 @@ const fakeOutputWithAiResponses = [
 
 const fakeOutputWithMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
-  ...new Array(10).fill({
-    type: 'message',
-    status: 'completed',
-    role: 'assistant',
-    content: [
+  ...new Array(7)
+    .fill([
       {
-        type: 'output_text',
+        type: 'message',
         status: 'completed',
-        text: 'Some **answer** from the AI. Lorem ipsum AI.',
-        annotations: [],
+        role: 'user',
+        content: [
+          {
+            type: 'user_request',
+            status: 'completed',
+            text: 'Some follow up question. Lorem ipsum user.',
+          },
+        ],
       },
-    ],
-  }),
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'assistant',
+        content: [
+          {
+            type: 'output_text',
+            status: 'completed',
+            text: 'Some **answer** from the AI. Lorem ipsum AI.',
+            annotations: [],
+          },
+        ],
+      },
+    ])
+    .flat(),
 ];
 
 const fakeOutputWithEvenMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
-  ...new Array(15).fill({
-    type: 'message',
-    status: 'completed',
-    role: 'assistant',
-    content: [
+  ...new Array(15)
+    .fill([
       {
-        type: 'output_text',
+        type: 'message',
         status: 'completed',
-        text: 'Some **answer** from the AI. Lorem ipsum AI.',
-        annotations: [],
+        role: 'user',
+        content: [
+          {
+            type: 'user_request',
+            status: 'completed',
+            text: 'Some follow up question. Lorem ipsum user.',
+          },
+        ],
       },
-    ],
-  }),
+      {
+        type: 'message',
+        status: 'completed',
+        role: 'assistant',
+        content: [
+          {
+            type: 'output_text',
+            status: 'completed',
+            text: 'Some **answer** from the AI. Lorem ipsum AI.',
+            annotations: [],
+          },
+        ],
+      },
+    ])
+    .flat(),
 ];
 
 export const ReadyAiRequest = () => (

@@ -45,8 +45,9 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
-    _steerAngleMax = 30;
-    private _steerAngularVelocity: float = 30;
+    _steerAngleMax = 70;
+    private _beginningSteerAngularVelocity: float = 35;
+    private _endSteerAngularVelocity: float = 5;
     private _currentSteerRatio: float = 0;
 
     private _hasPressedForwardKey: boolean = false;
@@ -256,22 +257,28 @@ namespace gdjs {
           ? -1.0
           : 0.0;
 
-      if (!this._hasPressedLeftKey && !this._hasPressedRightKey) {
+      if (this._hasPressedLeftKey === this._hasPressedRightKey) {
         this._currentSteerRatio = 0;
-      }
-      if (this._hasPressedLeftKey) {
-        // Avoid to much latency when changing of direction
-        this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
-        this._currentSteerRatio -=
-          (this._steerAngularVelocity * timeDelta) / this._steerAngleMax;
-        this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
-      }
-      if (this._hasPressedRightKey) {
-        // Avoid to much latency when changing of direction
-        this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
-        this._currentSteerRatio +=
-          (this._steerAngularVelocity * timeDelta) / this._steerAngleMax;
-        this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
+      } else {
+        const steerAngularVelocity = gdjs.evtTools.common.lerp(
+          this._beginningSteerAngularVelocity,
+          this._endSteerAngularVelocity,
+          this._currentSteerRatio
+        );
+        if (this._hasPressedLeftKey) {
+          // Avoid to much latency when changing of direction
+          this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
+          this._currentSteerRatio -=
+            (steerAngularVelocity * timeDelta) / this._steerAngleMax;
+          this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
+        }
+        if (this._hasPressedRightKey) {
+          // Avoid to much latency when changing of direction
+          this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
+          this._currentSteerRatio +=
+            (steerAngularVelocity * timeDelta) / this._steerAngleMax;
+          this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
+        }
       }
 
       if (this.previousForward < 0 !== forward < 0) {
@@ -513,7 +520,7 @@ namespace gdjs {
         const BR_WHEEL = 3;
 
         const vehicleMass = 1500;
-        const maxEngineTorque = 3000;
+        const maxEngineTorque = 1.5 * 3000;
         const clutchStrength = 10;
 
         const carShape = behavior.createShape();
@@ -607,16 +614,16 @@ namespace gdjs {
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
         controllerSettings.mEngine.mMaxTorque = maxEngineTorque;
-        controllerSettings.mEngine.mMaxRPM = 1000;
+        // controllerSettings.mEngine.mMaxRPM = 1000;
         controllerSettings.mEngine.mInertia = 0.01;
-        controllerSettings.mEngine.mNormalizedTorque.Clear();
-        controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
-        controllerSettings.mEngine.mNormalizedTorque.AddPoint(1, 1);
+        // controllerSettings.mEngine.mNormalizedTorque.Clear();
+        // controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
+        // controllerSettings.mEngine.mNormalizedTorque.AddPoint(1, 1);
         controllerSettings.mTransmission.mClutchStrength = clutchStrength;
-        controllerSettings.mTransmission.mGearRatios.clear();
-        controllerSettings.mTransmission.mGearRatios.push_back(1);
-        controllerSettings.mTransmission.mReverseGearRatios.clear();
-        controllerSettings.mTransmission.mReverseGearRatios.push_back(-1);
+        // controllerSettings.mTransmission.mGearRatios.clear();
+        // controllerSettings.mTransmission.mGearRatios.push_back(1);
+        // controllerSettings.mTransmission.mReverseGearRatios.clear();
+        // controllerSettings.mTransmission.mReverseGearRatios.push_back(-1);
 
         vehicle.mController = controllerSettings;
 

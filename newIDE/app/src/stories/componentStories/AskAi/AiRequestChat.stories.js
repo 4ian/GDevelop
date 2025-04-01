@@ -73,7 +73,28 @@ export const ErrorLaunchingNewAiRequest = () => (
   </FixedHeightFlexContainer>
 );
 
-export const NewAiRequestQuotaLimitReached = () => (
+export const NewAiRequestQuotaLimitReachedAndNoCredits = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={null}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: true,
+        current: 2,
+        max: 2,
+      }}
+      increaseQuotaOffering="subscribe"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={0}
+      onSendFeedback={async () => {}}
+      hasOpenedProject={false}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const NewAiRequestQuotaLimitReachedAndSomeCredits = () => (
   <FixedHeightFlexContainer height={500}>
     <AiRequestChat
       aiRequest={null}

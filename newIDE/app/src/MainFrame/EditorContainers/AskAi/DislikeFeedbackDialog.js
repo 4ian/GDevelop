@@ -89,6 +89,16 @@ export const DislikeFeedbackDialog = ({
             label={<Trans>The answer is out of scope for GDevelop</Trans>}
           />
           <FormControlLabel
+            value="too-short"
+            control={<Radio color="secondary" />}
+            label={<Trans>The answer is too short</Trans>}
+          />
+          <FormControlLabel
+            value="too-long"
+            control={<Radio color="secondary" />}
+            label={<Trans>The answer is too long</Trans>}
+          />
+          <FormControlLabel
             value="other"
             control={<Radio color="secondary" />}
             label={<Trans>Other reason</Trans>}

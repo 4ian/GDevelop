@@ -15,6 +15,7 @@ type Props = {|
   isGlobalTabInitiallyOpen?: boolean,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const GlobalAndSceneVariablesDialog = ({
@@ -26,6 +27,7 @@ const GlobalAndSceneVariablesDialog = ({
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const {
     project,
@@ -127,6 +129,7 @@ const GlobalAndSceneVariablesDialog = ({
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-and-scene-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

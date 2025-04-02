@@ -379,6 +379,29 @@ export const closeCustomObjectTab = (
   });
 };
 
+export const closeEventsBasedObjectVariantTab = (
+  state: EditorTabsState,
+  eventsFunctionsExtensionName: string,
+  eventsBasedObjectName: string,
+  eventsBasedObjectVariantName: string
+) => {
+  return closeTabsExceptIf(state, editorTab => {
+    const editor = editorTab.editorRef;
+    if (editor instanceof CustomObjectEditorContainer) {
+      return (
+        (!editor.getEventsFunctionsExtensionName() ||
+          editor.getEventsFunctionsExtensionName() !==
+            eventsFunctionsExtensionName) &&
+        (!editor.getEventsBasedObjectName() ||
+          editor.getEventsBasedObjectName() !== eventsBasedObjectName) &&
+        (!editor.getVariantName() ||
+          editor.getVariantName() !== eventsBasedObjectVariantName)
+      );
+    }
+    return true;
+  });
+};
+
 export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
@@ -399,14 +422,16 @@ export const getEventsFunctionsExtensionEditor = (
 export const getCustomObjectEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsBasedObject: gdEventsBasedObject
+  eventsBasedObject: gdEventsBasedObject,
+  variantName: string
 ): ?{| editor: CustomObjectEditorContainer, tabIndex: number |} => {
   for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
     const editor = state.editors[tabIndex].editorRef;
     if (
       editor instanceof CustomObjectEditorContainer &&
       editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
-      editor.getEventsBasedObject() === eventsBasedObject
+      editor.getEventsBasedObject() === eventsBasedObject &&
+      editor.getVariantName() === variantName
     ) {
       return { editor, tabIndex };
     }

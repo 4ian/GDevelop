@@ -59,6 +59,8 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     auto &configuration = object.GetConfiguration();
     auto *customObjectConfiguration =
         dynamic_cast<gd::CustomObjectConfiguration *>(&configuration);
+    customObjectConfiguration
+        ->SetMarkedAsOverridingEventsBasedObjectChildrenConfiguration(true);
     auto *spriteConfiguration = dynamic_cast<gd::SpriteObject *>(
         &customObjectConfiguration->GetChildObjectConfiguration("MyChild"));
     REQUIRE(spriteConfiguration != nullptr);

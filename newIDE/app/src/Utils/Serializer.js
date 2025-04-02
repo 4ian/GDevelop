@@ -8,7 +8,7 @@ const gd: libGDevelop = global.gd;
  * and unserializeFrom method.
  *
  * @param {*} serializable
- * @param {*} methodName The name of the serialization method. "unserializeFrom" by default
+ * @param {*} methodName The name of the serialization method. "serializeTo" by default
  */
 export function serializeToJSObject(
   serializable: gdSerializable,

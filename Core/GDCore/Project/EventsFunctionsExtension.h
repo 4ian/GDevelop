@@ -286,7 +286,14 @@ class GD_CORE_API EventsFunctionsExtension {
   /**
    * \brief Serialize the EventsFunctionsExtension to the specified element
    */
-  void SerializeTo(gd::SerializerElement& element) const;
+  void SerializeTo(gd::SerializerElement& element, bool isExternal = false) const;
+
+  /**
+   * \brief Serialize the EventsFunctionsExtension to the specified element
+   */
+  void SerializeToExternal(gd::SerializerElement& element) const {
+    SerializeTo(element, true);
+  }
 
   /**
    * \brief Load the EventsFunctionsExtension from the specified element.

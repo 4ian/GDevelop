@@ -15,9 +15,8 @@ namespace gdjs {
     upk: boolean;
     dok: boolean;
     hbk: boolean;
-    us: boolean;
-    sa: float;
-    sf: float;
+    asf: float;
+    ssf: float;
   }
 
   export interface PhysicsVehicle3DNetworkSyncData
@@ -46,7 +45,7 @@ namespace gdjs {
     private _destroyedDuringFrameLogic: boolean = false;
 
     _steerAngleMax = 70;
-    private _beginningSteerAngularVelocity: float = 35;
+    private _beginningSteerAngularVelocity: float = 70;
     private _endSteerAngularVelocity: float = 5;
     private _currentSteerRatio: float = 0;
 
@@ -55,9 +54,8 @@ namespace gdjs {
     private _hasPressedRightKey: boolean = false;
     private _hasPressedLeftKey: boolean = false;
     private _hasPressedHandBreakKey: boolean = false;
-    private _hasUsedStick: boolean = false;
-    private _stickAngle: float = 0;
-    private _stickForce: float = 0;
+    private _acceleratorStickForce: float = 0;
+    private _steeringStickForce: float = 0;
 
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
@@ -67,7 +65,8 @@ namespace gdjs {
     private _wasForwardKeyPressed: boolean = false;
     private _wasBackwardKeyPressed: boolean = false;
     private _wasHandBreakKeyPressed: boolean = false;
-    private _wasStickUsed: boolean = false;
+    private _previousAcceleratorStickForce: float = 0;
+    private _previousSteeringStickForce: float = 0;
 
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
@@ -139,9 +138,8 @@ namespace gdjs {
           upk: this._wasForwardKeyPressed,
           dok: this._wasBackwardKeyPressed,
           hbk: this._wasHandBreakKeyPressed,
-          us: this._wasStickUsed,
-          sa: this._stickAngle,
-          sf: this._stickForce,
+          asf: this._previousAcceleratorStickForce,
+          ssf: this._previousSteeringStickForce,
         },
       };
     }
@@ -157,9 +155,8 @@ namespace gdjs {
       this._hasPressedLeftKey = behaviorSpecificProps.lek;
       this._hasPressedRightKey = behaviorSpecificProps.rik;
       this._hasPressedHandBreakKey = behaviorSpecificProps.hbk;
-      this._hasUsedStick = behaviorSpecificProps.us;
-      this._stickAngle = behaviorSpecificProps.sa;
-      this._stickForce = behaviorSpecificProps.sf;
+      this._acceleratorStickForce = behaviorSpecificProps.asf;
+      this._steeringStickForce = behaviorSpecificProps.ssf;
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;
@@ -241,46 +238,41 @@ namespace gdjs {
         return;
       }
 
-      let forward = 0.0,
-        right = 0.0,
-        brake = 0.0,
-        handBrake = 0.0;
-
-      forward = this._hasPressedForwardKey
-        ? 1.0
-        : this._hasPressedBackwardKey
-          ? -1.0
-          : 0.0;
-      right = this._hasPressedRightKey
-        ? 1.0
-        : this._hasPressedLeftKey
-          ? -1.0
-          : 0.0;
-
-      if (this._hasPressedLeftKey === this._hasPressedRightKey) {
+      const steeringControl =
+        this._steeringStickForce ||
+        (this._hasPressedLeftKey ? -1 : 0) + (this._hasPressedRightKey ? 1 : 0);
+      if (steeringControl === 0) {
         this._currentSteerRatio = 0;
       } else {
         const steerAngularVelocity = gdjs.evtTools.common.lerp(
           this._beginningSteerAngularVelocity,
           this._endSteerAngularVelocity,
-          this._currentSteerRatio
+          Math.abs(this._currentSteerRatio)
         );
-        if (this._hasPressedLeftKey) {
+        if (steeringControl < 0) {
           // Avoid to much latency when changing of direction
           this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
-          this._currentSteerRatio -=
-            (steerAngularVelocity * timeDelta) / this._steerAngleMax;
+          this._currentSteerRatio +=
+            (steeringControl * steerAngularVelocity * timeDelta) /
+            this._steerAngleMax;
           this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
         }
-        if (this._hasPressedRightKey) {
+        if (steeringControl > 0) {
           // Avoid to much latency when changing of direction
           this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
           this._currentSteerRatio +=
-            (steerAngularVelocity * timeDelta) / this._steerAngleMax;
+            (steeringControl * steerAngularVelocity * timeDelta) /
+            this._steerAngleMax;
           this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
         }
       }
 
+      let brake = 0;
+      const acceleratorControl =
+        this._acceleratorStickForce ||
+        (this._hasPressedBackwardKey ? -1 : 0) +
+          (this._hasPressedForwardKey ? 1 : 0);
+      let forward = acceleratorControl;
       if (this.previousForward < 0 !== forward < 0) {
         const velocity = carBody
           .GetRotation()
@@ -299,6 +291,7 @@ namespace gdjs {
         }
       }
 
+      let handBrake = 0;
       if (this._hasPressedHandBreakKey) {
         forward = 0.0;
         handBrake = 1.0;
@@ -352,16 +345,16 @@ namespace gdjs {
           vec3ToString(wheels[3].GetContactPosition()),
 
           'Speed',
-          wheels[0].GetAngularVelocity(),
-          wheels[1].GetAngularVelocity(),
-          wheels[2].GetAngularVelocity(),
-          wheels[3].GetAngularVelocity(),
+          wheels[0].GetAngularVelocity().toFixed(1),
+          wheels[1].GetAngularVelocity().toFixed(1),
+          wheels[2].GetAngularVelocity().toFixed(1),
+          wheels[3].GetAngularVelocity().toFixed(1),
 
           'Slip',
-          wheels[0].mLongitudinalSlip,
-          wheels[1].mLongitudinalSlip,
-          wheels[2].mLongitudinalSlip,
-          wheels[3].mLongitudinalSlip,
+          wheels[0].mLongitudinalSlip.toFixed(3),
+          wheels[1].mLongitudinalSlip.toFixed(3),
+          wheels[2].mLongitudinalSlip.toFixed(3),
+          wheels[3].mLongitudinalSlip.toFixed(3),
 
           'Steer angle',
           gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
@@ -381,8 +374,8 @@ namespace gdjs {
         handBrake
       );
       if (
-        right !== 0.0 ||
         forward !== 0.0 ||
+        this._currentSteerRatio !== 0.0 ||
         brake !== 0.0 ||
         handBrake !== 0.0
       ) {
@@ -395,7 +388,8 @@ namespace gdjs {
       this._wasRightKeyPressed = this._hasPressedRightKey;
       this._wasLeftKeyPressed = this._hasPressedLeftKey;
       this._wasHandBreakKeyPressed = this._hasPressedHandBreakKey;
-      this._wasStickUsed = this._hasUsedStick;
+      this._previousAcceleratorStickForce = this._acceleratorStickForce;
+      this._previousSteeringStickForce = this._steeringStickForce;
 
       if (!this._dontClearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;
@@ -403,7 +397,8 @@ namespace gdjs {
         this._hasPressedRightKey = false;
         this._hasPressedLeftKey = false;
         this._hasPressedHandBreakKey = false;
-        this._hasUsedStick = false;
+        this._acceleratorStickForce = 0;
+        this._steeringStickForce = 0;
       }
     }
 
@@ -451,22 +446,32 @@ namespace gdjs {
       return this._wasHandBreakKeyPressed;
     }
 
-    simulateStick(stickAngle: float, stickForce: float) {
-      this._hasUsedStick = true;
-      this._stickAngle = stickAngle;
-      this._stickForce = Math.max(0, Math.min(1, stickForce));
+    simulateAcceleratorStick(stickForce: float): void {
+      this._acceleratorStickForce = gdjs.evtTools.common.clamp(
+        -1,
+        1,
+        stickForce
+      );
     }
 
-    wasStickUsed(): boolean {
-      return this._wasStickUsed;
+    simulateSteeringStick(stickForce: float): void {
+      this._steeringStickForce = gdjs.evtTools.common.clamp(-1, 1, stickForce);
     }
 
-    getStickAngle(): float {
-      return this._wasStickUsed ? this._stickAngle : 0;
+    getAcceleratorStickForce(): float {
+      return this._acceleratorStickForce;
     }
 
-    getStickForce(): float {
-      return this._wasStickUsed ? this._stickForce : 0;
+    getSteeringStickForce(): float {
+      return this._steeringStickForce;
+    }
+
+    getPreviousAcceleratorStickForce(): float {
+      return this._previousAcceleratorStickForce;
+    }
+
+    getPreviousSteeringStickForce(): float {
+      return this._previousSteeringStickForce;
     }
   }
 

@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+import { type MenuItemTemplate } from './Menu/Menu.flow';
 import Container from '@material-ui/core/Container';
 import { ColumnStackLayout } from './Layout';
 import { ResponsiveLineStackLayout } from './Layout';
@@ -12,6 +14,7 @@ import Text from '../UI/Text';
 import TutorialButton from './TutorialButton';
 import CircularProgress from './CircularProgress';
 import Add from './CustomSvgIcons/Add';
+import RaisedButtonWithSplitMenu from './RaisedButtonWithSplitMenu';
 
 type Props = {|
   title: React.Node,
@@ -23,6 +26,7 @@ type Props = {|
   actionButtonId?: string,
   actionLabel: React.Node,
   actionIcon?: React.Node,
+  actionBuildSplitMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onAction: () => void,
   secondaryActionLabel?: React.Node,
   secondaryActionIcon?: React.Node,
@@ -74,22 +78,42 @@ export const EmptyPlaceholder = (props: Props) => (
                 leftIcon={props.secondaryActionIcon}
               />
             )}
-            <RaisedButton
-              label={props.actionLabel}
-              primary
-              onClick={props.onAction}
-              disabled={!!props.isLoading}
-              icon={
-                props.isLoading ? (
-                  <CircularProgress size={24} />
-                ) : props.actionIcon ? (
-                  props.actionIcon
-                ) : (
-                  <Add />
-                )
-              }
-              id={props.actionButtonId}
-            />
+            {props.actionBuildSplitMenuTemplate ? (
+              <RaisedButtonWithSplitMenu
+                label={props.actionLabel}
+                primary
+                onClick={props.onAction}
+                disabled={!!props.isLoading}
+                icon={
+                  props.isLoading ? (
+                    <CircularProgress size={24} />
+                  ) : props.actionIcon ? (
+                    props.actionIcon
+                  ) : (
+                    <Add />
+                  )
+                }
+                id={props.actionButtonId}
+                buildMenuTemplate={props.actionBuildSplitMenuTemplate}
+              />
+            ) : (
+              <RaisedButton
+                label={props.actionLabel}
+                primary
+                onClick={props.onAction}
+                disabled={!!props.isLoading}
+                icon={
+                  props.isLoading ? (
+                    <CircularProgress size={24} />
+                  ) : props.actionIcon ? (
+                    props.actionIcon
+                  ) : (
+                    <Add />
+                  )
+                }
+                id={props.actionButtonId}
+              />
+            )}
           </ResponsiveLineStackLayout>
           {props.tutorialId ? (
             <TutorialButton

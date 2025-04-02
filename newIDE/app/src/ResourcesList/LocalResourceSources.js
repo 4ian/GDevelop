@@ -4,7 +4,7 @@ import * as React from 'react';
 import {
   type ChooseResourceProps,
   type ResourceSourceComponentProps,
-  type ResourceStorePrimaryActionProps,
+  type ResourceSourceComponentPrimaryActionProps,
   type ResourceSource,
   type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
@@ -26,6 +26,7 @@ import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 import { DialogPrimaryButton } from '../UI/Dialog';
+import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser';
 
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -208,9 +209,11 @@ const localResourceSources: Array<ResourceSource> = [
 
       return {
         name: 'local-file-opener-' + kind,
-        displayName: t`Choose a file`,
+        displayName: t`File(s) from your device`,
         displayTab: 'import',
         onlyForStorageProvider: 'LocalFile',
+        shouldCreateResource: true,
+        shouldGuessAnimationsFromName: true,
         kind,
         selectResourcesHeadless: selectLocalFileResources,
         renderComponent: (props: ResourceSourceComponentProps) => (
@@ -248,6 +251,8 @@ const localResourceSources: Array<ResourceSource> = [
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `upload-${kind}`,
     displayName: t`File(s) from your device`,
+    shouldCreateResource: true,
+    shouldGuessAnimationsFromName: true,
     displayTab: 'import',
     onlyForStorageProvider: 'Cloud',
     kind,
@@ -274,6 +279,8 @@ const localResourceSources: Array<ResourceSource> = [
         displayName: t`Choose from asset store`,
         displayTab: 'standalone',
         kind,
+        shouldCreateResource: true,
+        shouldGuessAnimationsFromName: false,
         renderComponent: (props: ResourceSourceComponentProps) => (
           <ResourceStoreChooser
             selectedResourceIndex={props.selectedResourceIndex}
@@ -285,7 +292,7 @@ const localResourceSources: Array<ResourceSource> = [
         renderPrimaryAction: ({
           resource,
           onChooseResources,
-        }: ResourceStorePrimaryActionProps) => (
+        }: ResourceSourceComponentPrimaryActionProps) => (
           <DialogPrimaryButton
             primary
             key="add-resource"
@@ -312,6 +319,46 @@ const localResourceSources: Array<ResourceSource> = [
       };
     })
     .filter(Boolean),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `project-resources-${kind}`,
+    displayName: t`Project resources`,
+    displayTab: 'standalone',
+    shouldCreateResource: false,
+    shouldGuessAnimationsFromName: false,
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <ProjectResourcesChooser
+        project={props.project}
+        onResourcesSelected={props.onResourcesSelected}
+        resourceKind={kind}
+        key={`project-resources-${kind}`}
+        multiSelection={props.options.multiSelection}
+      />
+    ),
+    renderPrimaryAction: ({
+      selectedResources,
+      onChooseResources,
+    }: ResourceSourceComponentPrimaryActionProps) => (
+      <DialogPrimaryButton
+        primary
+        key="select-resources"
+        label={
+          !selectedResources ||
+          !selectedResources.length ||
+          selectedResources.length === 1 ? (
+            <Trans>Select resource</Trans>
+          ) : (
+            <Trans>Select {selectedResources.length} resources</Trans>
+          )
+        }
+        disabled={!selectedResources || !selectedResources.length}
+        onClick={() => {
+          if (!selectedResources || !selectedResources.length) return;
+          onChooseResources(selectedResources);
+        }}
+      />
+    ),
+  })),
 ];
 
 export default localResourceSources;

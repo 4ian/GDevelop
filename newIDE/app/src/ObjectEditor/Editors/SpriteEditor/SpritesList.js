@@ -393,13 +393,17 @@ const SpritesList = ({
         multiSelection: true,
         resourceKind: 'image',
       });
-      resources.forEach(resource => {
-        applyResourceDefaults(project, resource);
-        project.getResourcesManager().addResource(resource);
-      });
+      if (resourceSource.shouldCreateResource) {
+        resources.forEach(resource => {
+          applyResourceDefaults(project, resource);
+          project.getResourcesManager().addResource(resource);
+        });
+      }
 
       if (directionSpritesCountBeforeAdding === 0 && resources.length > 1) {
-        const resourcesByAnimation = groupResourcesByAnimations(resources);
+        const resourcesByAnimation = resourceSource.shouldGuessAnimationsFromName
+          ? groupResourcesByAnimations(resources)
+          : new Map<string, Array<gdResource>>();
         if (resourcesByAnimation.size > 1) {
           addAnimations(resourcesByAnimation);
         } else {
@@ -416,9 +420,11 @@ const SpritesList = ({
         }
       }
 
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
+      if (resourceSource.shouldCreateResource) {
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+        resources.forEach(resource => resource.delete());
+      }
 
       forceUpdate();
 

@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import { Trans, t } from '@lingui/macro';
 
 import SemiControlledAutoComplete, {
+  type AutoCompleteOption,
   type DataSource,
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
@@ -78,6 +79,14 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
+    // We use a state value for the autoComplete input,
+    // so that we can adapt the dataSource options depending
+    // on whether the user has started typing or not.
+    // (The state value is needed to force a re-render of the component)
+    const [
+      autoCompleteInputValue,
+      setAutoCompleteInputValue,
+    ] = React.useState<string>(props.initialResourceName);
     const { showConfirmation } = useAlertDialog();
     const abortControllerRef = React.useRef<?AbortController>(null);
     const allResourcesNamesRef = React.useRef<Array<string>>([]);
@@ -88,6 +97,10 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const [
       externalEditorOpened,
       setExternalEditorOpened,
+    ] = React.useState<boolean>(false);
+    const [
+      forceShowResourceSources,
+      setForceShowResourceSources,
     ] = React.useState<boolean>(false);
 
     const focus: FieldFocusFunction = React.useCallback(options => {
@@ -101,6 +114,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     React.useEffect(
       () => {
         setResourceName(initialResourceName);
+        if (autoCompleteRef.current)
+          autoCompleteRef.current.forceInputValueTo(initialResourceName);
       },
       // Update resource name with the one given by the parent if it changes.
       [initialResourceName]
@@ -109,6 +124,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const onResetResourceName = React.useCallback(
       () => {
         setResourceName('');
+        if (autoCompleteRef.current)
+          autoCompleteRef.current.forceInputValueTo('');
         setNotFoundError(false);
         if (onChange) onChange('');
       },
@@ -128,9 +145,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           if (onChange) onChange(newResourceName);
         }
         setResourceName(newResourceName);
+        if (autoCompleteRef.current)
+          autoCompleteRef.current.forceInputValueTo(newResourceName);
         setNotFoundError(isMissing);
       },
       [onChange, onResetResourceName]
+    );
+
+    const onInputValueChange = React.useCallback(
+      (newInputValue: string) => {
+        if (forceShowResourceSources) {
+          setForceShowResourceSources(false);
+        }
+        setAutoCompleteInputValue(newInputValue);
+      },
+      [setAutoCompleteInputValue, forceShowResourceSources]
     );
 
     const loadFrom = React.useCallback(
@@ -199,11 +228,6 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
           if (!resources.length) return;
           const resource = resources[0];
-          applyResourceDefaults(project, resource);
-
-          // addResource will check if a resource with the same name exists, and if it is
-          // the case, no new resource will be added.
-          project.getResourcesManager().addResource(resource);
 
           const resourceName: string = resource.getName();
 
@@ -213,12 +237,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           if (autoCompleteRef.current)
             autoCompleteRef.current.forceInputValueTo(resourceName);
 
-          // Important, we are responsible for deleting the resources that were given to us.
-          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-          resources.forEach(resource => resource.delete());
+          if (source.shouldCreateResource) {
+            applyResourceDefaults(project, resource);
 
-          await resourceManagementProps.onFetchNewlyAddedResources();
-          triggerResourcesHaveChanged();
+            // addResource will check if a resource with the same name exists, and if it is
+            // the case, no new resource will be added.
+            project.getResourcesManager().addResource(resource);
+
+            // Important, we are responsible for deleting the resources that were given to us.
+            // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+            resources.forEach(resource => resource.delete());
+
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            triggerResourcesHaveChanged();
+          }
+
           onChangeResourceName(resourceName);
         } catch (err) {
           // Should never happen, errors should be shown in the interface.
@@ -369,7 +402,16 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       text: resourceName,
       value: resourceName,
     }));
-    const autoCompleteData = [...resourceSourceItems, ...resourceItems];
+    const placeholderSearchItem: AutoCompleteOption = {
+      text: '',
+      value: '',
+      translatableValue: t`Or start typing...`,
+      disabled: true,
+    };
+    const autoCompleteData =
+      autoCompleteInputValue && !forceShowResourceSources
+        ? resourceItems
+        : [...resourceSourceItems, placeholderSearchItem];
 
     return (
       <I18n>
@@ -392,6 +434,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                   dataSource={autoCompleteData}
                   value={resourceName}
                   onChange={onChangeResourceName}
+                  onInputValueChange={onInputValueChange}
                   errorText={errorText}
                   fullWidth={props.fullWidth}
                   margin={props.margin}
@@ -400,6 +443,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                   ref={autoCompleteRef}
                   id={props.id}
                   disabled={disabled}
+                  onBlur={() => {
+                    if (forceShowResourceSources) {
+                      setForceShowResourceSources(false);
+                    }
+                  }}
                 />
                 {props.canBeReset && (
                   <IconButton size="small" onClick={onResetResourceName}>
@@ -417,7 +465,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 )
               }
               onClick={() => {
-                autoCompleteRef.current && autoCompleteRef.current.focus();
+                const autocomplete = autoCompleteRef.current;
+                if (autocomplete) {
+                  setForceShowResourceSources(true);
+                  autocomplete.focus();
+                }
               }}
               primary
               disabled={disabled}

@@ -154,14 +154,17 @@ export type ResourceSourceComponentProps = {|
   onChooseResources: (Array<gdResource>) => void,
   selectedResourceIndex?: ?number,
   onSelectResource?: (?number) => void,
+  selectedResources?: ?Array<gdResource>,
+  onResourcesSelected?: (Array<gdResource>) => void,
 |};
 
-export type ResourceStorePrimaryActionProps = {
+export type ResourceSourceComponentPrimaryActionProps = {|
   resource: ?(ResourceV2 | Resource),
+  selectedResources: ?Array<gdResource>,
   onChooseResources: (resources: Array<gdResource>) => void,
-};
+|};
 
-export type ResourceSource = {
+export type ResourceSource = {|
   name: string,
   displayName: MessageDescriptor,
   displayTab: 'standalone' | 'import' | 'import-advanced',
@@ -171,8 +174,10 @@ export type ResourceSource = {
     ChooseResourceProps
   ) => Promise<Array<gdResource>>,
   renderComponent: ResourceSourceComponentProps => React.Node,
-  renderPrimaryAction?: ResourceStorePrimaryActionProps => React.Node,
-};
+  renderPrimaryAction?: ResourceSourceComponentPrimaryActionProps => React.Node,
+  shouldCreateResource: boolean,
+  shouldGuessAnimationsFromName: boolean,
+|};
 
 export type ChooseResourceFunction = (
   options: ChooseResourceOptions

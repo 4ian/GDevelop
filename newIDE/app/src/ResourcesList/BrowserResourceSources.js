@@ -3,7 +3,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
   type ResourceSourceComponentProps,
-  type ResourceStorePrimaryActionProps,
+  type ResourceSourceComponentPrimaryActionProps,
   type ResourceSource,
   type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
@@ -24,6 +24,7 @@ import {
   isPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 import { DialogPrimaryButton } from '../UI/Dialog';
+import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser';
 
 const ResourceStoreChooser = ({
   options,
@@ -179,6 +180,8 @@ const browserResourceSources: Array<ResourceSource> = [
     name: `upload-${kind}`,
     displayName: t`File(s) from your device`,
     displayTab: 'import',
+    shouldCreateResource: true,
+    shouldGuessAnimationsFromName: true,
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <FileToCloudProjectResourceUploader
@@ -202,6 +205,8 @@ const browserResourceSources: Array<ResourceSource> = [
         name: `resource-store-${kind}`,
         displayName: t`Choose from asset store`,
         displayTab: 'standalone',
+        shouldCreateResource: true,
+        shouldGuessAnimationsFromName: false,
         kind,
         renderComponent: (props: ResourceSourceComponentProps) => (
           <ResourceStoreChooser
@@ -214,7 +219,7 @@ const browserResourceSources: Array<ResourceSource> = [
         renderPrimaryAction: ({
           resource,
           onChooseResources,
-        }: ResourceStorePrimaryActionProps) => (
+        }: ResourceSourceComponentPrimaryActionProps) => (
           <DialogPrimaryButton
             primary
             key="add-resource"
@@ -249,9 +254,51 @@ const browserResourceSources: Array<ResourceSource> = [
     })
     .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `project-resources-${kind}`,
+    displayName: t`Project resources`,
+    displayTab: 'standalone',
+    shouldCreateResource: false,
+    shouldGuessAnimationsFromName: false,
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <ProjectResourcesChooser
+        project={props.project}
+        onResourcesSelected={props.onResourcesSelected}
+        resourceKind={kind}
+        key={`project-resources-${kind}`}
+        multiSelection={props.options.multiSelection}
+      />
+    ),
+    renderPrimaryAction: ({
+      selectedResources,
+      onChooseResources,
+    }: ResourceSourceComponentPrimaryActionProps) => (
+      <DialogPrimaryButton
+        primary
+        key="select-resources"
+        label={
+          !selectedResources ||
+          !selectedResources.length ||
+          selectedResources.length === 1 ? (
+            <Trans>Select resource</Trans>
+          ) : (
+            <Trans>Select {selectedResources.length} resources</Trans>
+          )
+        }
+        disabled={!selectedResources || !selectedResources.length}
+        onClick={() => {
+          if (!selectedResources || !selectedResources.length) return;
+          onChooseResources(selectedResources);
+        }}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
     displayName: t`Use a public URL`,
     displayTab: 'import-advanced',
+    shouldCreateResource: true,
+    shouldGuessAnimationsFromName: false,
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <UrlChooser

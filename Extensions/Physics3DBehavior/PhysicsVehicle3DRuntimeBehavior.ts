@@ -47,6 +47,9 @@ namespace gdjs {
     _steerAngleMax = 70;
     private _beginningSteerAngularVelocity: float = 70;
     private _endSteerAngularVelocity: float = 5;
+    _mass: float = 1500;
+    _engineTorqueMax: float = 4500;
+
     private _currentSteerRatio: float = 0;
 
     private _hasPressedForwardKey: boolean = false;
@@ -493,6 +496,12 @@ namespace gdjs {
         this.physicsBodyUpdater = physicsBodyUpdater;
       }
 
+      private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
+        const tempVec3 = this.vehicleBehavior._sharedData._tempVec3;
+        tempVec3.Set(x, y, z);
+        return tempVec3;
+      }
+
       createAndAddBody(): Jolt.Body | null {
         const physics3D = this.vehicleBehavior.getPhysics3D();
         if (!physics3D) {
@@ -519,13 +528,6 @@ namespace gdjs {
         const leftRightLimitedSlipRatio = 1.4;
         const antiRollbar = true;
 
-        const FL_WHEEL = 0;
-        const FR_WHEEL = 1;
-        const BL_WHEEL = 2;
-        const BR_WHEEL = 3;
-
-        const vehicleMass = 1500;
-        const maxEngineTorque = 1.5 * 3000;
         const clutchStrength = 10;
 
         const carShape = behavior.createShape();
@@ -542,8 +544,10 @@ namespace gdjs {
         );
         carBodySettings.mOverrideMassProperties =
           Jolt.EOverrideMassProperties_CalculateInertia;
-        carBodySettings.mMassPropertiesOverride.mMass = vehicleMass;
+        carBodySettings.mMassPropertiesOverride.mMass =
+          this.vehicleBehavior._mass;
         const carBody = _sharedData.bodyInterface.CreateBody(carBodySettings);
+        Jolt.destroy(carBodySettings);
 
         _sharedData.bodyInterface.AddBody(
           carBody.GetID(),
@@ -552,73 +556,81 @@ namespace gdjs {
 
         // Create vehicle constraint
         const vehicle = new Jolt.VehicleConstraintSettings();
-        vehicle.mUp = new Jolt.Vec3(0, 0, 1);
-        vehicle.mForward = new Jolt.Vec3(1, 0, 0);
+        vehicle.mUp = this.getVec3(0, 0, 1);
+        vehicle.mForward = this.getVec3(1, 0, 0);
         vehicle.mMaxPitchRollAngle = gdjs.toRad(60.0);
-        vehicle.mWheels.clear();
-        const mWheels: Array<Jolt.WheelSettingsWV> = [];
+        
+        const FL_WHEEL = 0;
+        const FR_WHEEL = 1;
+        const BL_WHEEL = 2;
+        const BR_WHEEL = 3;
         {
+          const setupWheel = (wheelS: Jolt.WheelSettingsWV) => {
+            wheelS.mWheelUp = this.getVec3(0, 0, 1);
+            wheelS.mWheelForward = this.getVec3(1, 0, 0);
+            wheelS.mSuspensionDirection = this.getVec3(0, 0, -1);
+            wheelS.mSteeringAxis = this.getVec3(0, 0, 1);
+            wheelS.mRadius = wheelRadius;
+            wheelS.mWidth = wheelWidth;
+            wheelS.mSuspensionMinLength = suspensionMinLength;
+            wheelS.mSuspensionMaxLength = suspensionMaxLength;
+            // wheelS.mLongitudinalFriction.Clear();
+            // wheelS.mLongitudinalFriction.AddPoint(0, 1);
+            // wheelS.mLongitudinalFriction.AddPoint(1, 1);
+            // wheelS.mLateralFriction.Clear();
+            // wheelS.mLateralFriction.AddPoint(0, 1.2);
+            // wheelS.mLateralFriction.AddPoint(90, 1.2);
+          };
+
+          vehicle.mWheels.clear();
+
           const fl = new Jolt.WheelSettingsWV();
-          fl.mPosition = new Jolt.Vec3(
+          fl.mPosition = this.getVec3(
             wheelOffsetX,
             -wheelOffsetY,
             -wheelOffsetZ
           );
           fl.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
+          // Front wheel doesn't have hand brake
           fl.mMaxHandBrakeTorque = 0.0;
+          setupWheel(fl);
           vehicle.mWheels.push_back(fl);
-          mWheels.push(fl);
 
           const fr = new Jolt.WheelSettingsWV();
-          fr.mPosition = new Jolt.Vec3(
+          fr.mPosition = this.getVec3(
             wheelOffsetX,
             wheelOffsetY,
             -wheelOffsetZ
           );
           fr.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
-          fr.mMaxHandBrakeTorque = 0.0; // Front wheel doesn't have hand brake
+          fr.mMaxHandBrakeTorque = 0.0;
+          setupWheel(fr);
           vehicle.mWheels.push_back(fr);
-          mWheels.push(fr);
 
           const bl = new Jolt.WheelSettingsWV();
-          bl.mPosition = new Jolt.Vec3(
+          bl.mPosition = this.getVec3(
             -wheelOffsetX,
             -wheelOffsetY,
             -wheelOffsetZ
           );
           bl.mMaxSteerAngle = 0.0;
+          setupWheel(bl);
           vehicle.mWheels.push_back(bl);
-          mWheels.push(bl);
 
           const br = new Jolt.WheelSettingsWV();
-          br.mPosition = new Jolt.Vec3(
+          br.mPosition = this.getVec3(
             -wheelOffsetX,
             wheelOffsetY,
             -wheelOffsetZ
           );
           br.mMaxSteerAngle = 0.0;
+          setupWheel(br);
           vehicle.mWheels.push_back(br);
-          mWheels.push(br);
         }
-        mWheels.forEach((wheelS) => {
-          wheelS.mWheelUp = new Jolt.Vec3(0, 0, 1);
-          wheelS.mWheelForward = new Jolt.Vec3(1, 0, 0);
-          wheelS.mSuspensionDirection = new Jolt.Vec3(0, 0, -1);
-          wheelS.mSteeringAxis = new Jolt.Vec3(0, 0, 1);
-          wheelS.mRadius = wheelRadius;
-          wheelS.mWidth = wheelWidth;
-          wheelS.mSuspensionMinLength = suspensionMinLength;
-          wheelS.mSuspensionMaxLength = suspensionMaxLength;
-          // wheelS.mLongitudinalFriction.Clear();
-          // wheelS.mLongitudinalFriction.AddPoint(0, 1);
-          // wheelS.mLongitudinalFriction.AddPoint(1, 1);
-          // wheelS.mLateralFriction.Clear();
-          // wheelS.mLateralFriction.AddPoint(0, 1.2);
-          // wheelS.mLateralFriction.AddPoint(90, 1.2);
-        });
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
-        controllerSettings.mEngine.mMaxTorque = maxEngineTorque;
+        controllerSettings.mEngine.mMaxTorque =
+          this.vehicleBehavior._engineTorqueMax;
         // controllerSettings.mEngine.mMaxRPM = 1000;
         controllerSettings.mEngine.mInertia = 0.01;
         // controllerSettings.mEngine.mNormalizedTorque.Clear();
@@ -669,10 +681,11 @@ namespace gdjs {
         }
 
         const constraint = new Jolt.VehicleConstraint(carBody, vehicle);
+        Jolt.destroy(vehicle);
         constraint.SetVehicleCollisionTester(
           new Jolt.VehicleCollisionTesterRay(
             behavior.getBodyLayer(),
-            new Jolt.Vec3(0, 0, 1)
+            this.getVec3(0, 0, 1)
           )
         );
         // constraint.SetVehicleCollisionTester(
@@ -690,7 +703,15 @@ namespace gdjs {
         // );
 
         //constraint.ResetGravityOverride();
-        constraint.OverrideGravity(new Jolt.Vec3(0, 0, -9.8 * 4));
+        //constraint.OverrideGravity(new Jolt.Vec3(0, 0, -9.8 * 4));
+        // TODO Ask why the gravity override have a different result that relying on the body properties.
+        constraint.OverrideGravity(
+          new Jolt.Vec3(
+            behavior.gravityScale * behavior._sharedData.gravityX,
+            behavior.gravityScale * behavior._sharedData.gravityY,
+            behavior.gravityScale * behavior._sharedData.gravityZ
+          )
+        );
         _sharedData.physicsSystem.AddConstraint(constraint);
         this.vehicleBehavior._vehicleController = Jolt.castObject(
           constraint.GetController(),

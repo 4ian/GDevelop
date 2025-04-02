@@ -2669,7 +2669,7 @@ module.exports = {
           _('Simulate move forward key press'),
           _('Simulate a press of the move forward key.'),
           _('Simulate pressing Forward key for _PARAM0_'),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -2683,7 +2683,7 @@ module.exports = {
           _('Simulate move backward key press'),
           _('Simulate a press of the move backward key.'),
           _('Simulate pressing Backward key for _PARAM0_'),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -2697,7 +2697,7 @@ module.exports = {
           _('Simulate move right key press'),
           _('Simulate a press of the move right key.'),
           _('Simulate pressing Right key for _PARAM0_'),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -2711,7 +2711,7 @@ module.exports = {
           _('Simulate move left key press'),
           _('Simulate a press of the move left key.'),
           _('Simulate pressing Left key for _PARAM0_'),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -2725,7 +2725,7 @@ module.exports = {
           _('Simulate hand break key press'),
           _('Simulate a press of the hand break key.'),
           _('Simulate pressing hand break key for _PARAM0_'),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
@@ -2735,22 +2735,39 @@ module.exports = {
 
       aut
         .addScopedAction(
-          'SimulateStick',
-          _('Simulate stick control'),
-          _('Simulate a stick control.'),
+          'SimulateAcceleratorStick',
+          _('Simulate accelerator stick control'),
+          _('Simulate an accelerator stick control.'),
           _(
-            'Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force'
+            'Simulate an accelerator stick control for _PARAM0_ with a _PARAM2_ force'
           ),
-          _('Character controls'),
+          _('Car controls'),
           'JsPlatform/Extensions/physics_character3d.svg',
           'JsPlatform/Extensions/physics_character3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
-        .addParameter('expression', _('Stick angle (in degrees)'))
-        .addParameter('expression', _('Stick force (between 0 and 1)'))
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
         .markAsAdvanced()
-        .setFunctionName('simulateStick');
+        .setFunctionName('simulateAcceleratorStick');
+
+      aut
+        .addScopedAction(
+          'SimulateSteeringStick',
+          _('Simulate steering stick control'),
+          _('Simulate a steering stick control.'),
+          _(
+            'Simulate a steering stick control for _PARAM0_ with a _PARAM2_ force'
+          ),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateSteeringStick');
     }
 
     extension

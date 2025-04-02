@@ -323,7 +323,7 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       { type: 'separator' },
       {
-        label: i18n._(t`Help to Translate GDevelop`),
+        label: i18n._(t`Help translate GDevelop`),
         onClickOpenLink: 'https://crowdin.com/project/gdevelop',
       },
       {

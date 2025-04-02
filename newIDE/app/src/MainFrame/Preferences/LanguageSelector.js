@@ -54,6 +54,7 @@ const incompleteLocales = localesToDisplay.filter(
 
 const renderLanguageSelectOption = localeMetadata => {
   const translationRatio = localeMetadata.translationRatio || 0;
+  const percent = (100 * localeMetadata.translationRatio).toFixed(0);
   const isIncomplete = translationRatio < 0.3;
   const isStarted = translationRatio > 0;
 
@@ -61,7 +62,7 @@ const renderLanguageSelectOption = localeMetadata => {
     ? `${localeMetadata.languageNativeName} (${localeMetadata.languageName})`
     : `${localeMetadata.languageNativeName} (${
         localeMetadata.languageName
-      } - incomplete)`;
+      } - ${percent}% translated)`;
 
   return (
     <SelectOption

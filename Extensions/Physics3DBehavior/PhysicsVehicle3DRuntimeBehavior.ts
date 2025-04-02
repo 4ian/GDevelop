@@ -559,7 +559,7 @@ namespace gdjs {
         vehicle.mUp = this.getVec3(0, 0, 1);
         vehicle.mForward = this.getVec3(1, 0, 0);
         vehicle.mMaxPitchRollAngle = gdjs.toRad(60.0);
-        
+
         const FL_WHEEL = 0;
         const FR_WHEEL = 1;
         const BL_WHEEL = 2;
@@ -733,38 +733,51 @@ namespace gdjs {
       }
 
       recreateShape() {
-        // const physics3D = this.vehicleBehavior.getPhysics3D();
-        // if (!physics3D) {
-        //   return;
-        // }
-        // const {
-        //   behavior,
-        //   broadPhaseLayerFilter,
-        //   objectLayerFilter,
-        //   bodyFilter,
-        //   shapeFilter,
-        // } = physics3D;
-        // const { _vehicleController, _sharedData } = this.vehicleBehavior;
-        // if (!_vehicleController) {
-        //   return;
-        // }
-        // const shape = behavior.createShape();
-        // const isShapeValid = _vehicleController.SetShape(
-        //   shape,
-        //   Number.MAX_VALUE,
-        //   broadPhaseLayerFilter,
-        //   objectLayerFilter,
-        //   bodyFilter,
-        //   shapeFilter,
-        //   _sharedData.jolt.GetTempAllocator()
-        // );
-        // if (!isShapeValid) {
-        //   return;
-        // }
-        // _vehicleController.SetInnerBodyShape(shape);
-        // _vehicleController.SetMass(shape.GetMassProperties().get_mMass());
-        // // shapeHalfDepth may have changed, update the character position accordingly.
-        // this.updateCharacterPosition();
+        this.physicsBodyUpdater.recreateShape();
+
+        const { _vehicleController } = this.vehicleBehavior;
+        if (!_vehicleController) {
+          return;
+        }
+
+        const physics3D = this.vehicleBehavior.getPhysics3D();
+        if (!physics3D) {
+          return;
+        }
+        const { behavior } = physics3D;
+
+        const halfVehicleWidth = behavior._shapeHalfWidth;
+        const halfVehicleHeight = behavior._shapeHalfHeight;
+        const halfVehicleDepth = behavior._shapeHalfDepth;
+
+        const wheelOffsetX = halfVehicleWidth;
+        const wheelOffsetY = halfVehicleHeight;
+        const wheelOffsetZ = 0;
+        const wheelRadius = halfVehicleDepth;
+        const wheelWidth = halfVehicleDepth / 3;
+        const suspensionMinLength = wheelRadius;
+        const suspensionMaxLength = 1.5 * suspensionMinLength;
+
+        const constraint = _vehicleController.GetConstraint();
+        const fl = constraint.GetWheel(0).GetSettings();
+        fl.mPosition = this.getVec3(wheelOffsetX, -wheelOffsetY, -wheelOffsetZ);
+        const fr = constraint.GetWheel(1).GetSettings();
+        fr.mPosition = this.getVec3(wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
+        const bl = constraint.GetWheel(2).GetSettings();
+        bl.mPosition = this.getVec3(
+          -wheelOffsetX,
+          -wheelOffsetY,
+          -wheelOffsetZ
+        );
+        const br = constraint.GetWheel(3).GetSettings();
+        br.mPosition = this.getVec3(-wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
+        for (let index = 0; index < 4; index++) {
+          const wheel = constraint.GetWheel(index).GetSettings();
+          wheel.mRadius = wheelRadius;
+          wheel.mWidth = wheelWidth;
+          wheel.mSuspensionMinLength = suspensionMinLength;
+          wheel.mSuspensionMaxLength = suspensionMaxLength;
+        }
       }
 
       destroyBody() {

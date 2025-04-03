@@ -283,11 +283,11 @@ namespace gdjs {
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     const physics3DSharedData = runtimeScene.physics3DSharedData;
     if (physics3DSharedData) {
-      Jolt.destroy(physics3DSharedData.jolt);
       Jolt.destroy(physics3DSharedData.contactListener);
       Jolt.destroy(physics3DSharedData._tempVec3);
       Jolt.destroy(physics3DSharedData._tempRVec3);
       Jolt.destroy(physics3DSharedData._tempQuat);
+      Jolt.destroy(physics3DSharedData.jolt);
       runtimeScene.physics3DSharedData = null;
     }
   });

@@ -36,6 +36,7 @@ namespace gdjs {
     private _physics3DBehaviorName: string;
     private _physics3D: Physics3D | null = null;
     _vehicleController: Jolt.WheeledVehicleController | null = null;
+    _stepListener: Jolt.VehicleConstraintStepListener | null = null;
     /**
      * sharedData is a reference to the shared data of the scene, that registers
      * every physics behavior that is created so that collisions can be cleared
@@ -124,11 +125,11 @@ namespace gdjs {
       return this._physics3D;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       return true;
     }
 
-    getNetworkSyncData(): PhysicsVehicle3DNetworkSyncData {
+    override getNetworkSyncData(): PhysicsVehicle3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -147,7 +148,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: PhysicsVehicle3DNetworkSyncData
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -185,38 +186,39 @@ namespace gdjs {
       return result;
     }
 
-    onDeActivate() {}
-
-    onActivate() {}
-
-    onDestroy() {
-      this._destroyedDuringFrameLogic = true;
-      this.onDeActivate();
-      this._destroyVehicle();
-    }
-
-    /**
-     * Remove the character and its body from the physics engine.
-     * This method is called when:
-     * - The Physics3D behavior is deactivated
-     * - The object is destroyed
-     *
-     * Only deactivating the character behavior won't destroy the character.
-     * Indeed, deactivated characters don't move as characters but still have collisions.
-     */
-    _destroyVehicle() {
-      if (this._vehicleController) {
-        // TODO The body is destroyed with the character.
-        Jolt.destroy(this._vehicleController);
-        this._vehicleController = null;
-        if (this._physics3D) {
-          this._physics3D.behavior._body = null;
-          this._physics3D = null;
-        }
+    override onDeActivate() {
+      if (this._stepListener) {
+        this._sharedData.physicsSystem.RemoveStepListener(this._stepListener);
       }
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override onActivate() {
+      if (this._stepListener) {
+        this._sharedData.physicsSystem.AddStepListener(this._stepListener);
+      }
+    }
+
+    override onDestroy() {
+      if (!this._vehicleController) {
+        return;
+      }
+      this._destroyedDuringFrameLogic = true;
+      this.onDeActivate();
+      Jolt.destroy(this._vehicleController);
+      this._vehicleController = null;
+      if (this._physics3D) {
+        this._physics3D = null;
+      }
+    }
+
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Trigger createAndAddBody()
+      this.getPhysics3D();
+    }
+
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       // Trigger createAndAddBody()
       this.getPhysics3D();
     }
@@ -325,48 +327,48 @@ namespace gdjs {
           )
         );
       }
-      console.log(
-        [
-          'Car center',
-          vec3ToString(carBody.GetPosition()),
-          'Mass center',
-          vec3ToString(carBody.GetCenterOfMassPosition()),
-          'Mass',
-          1 / carBody.GetMotionProperties().GetInverseMass(),
-          'Speed',
-          (carBody
-            .GetRotation()
-            .InverseRotate(carBody.GetLinearVelocity())
-            .GetX() *
-            60 *
-            60) /
-            1000,
-          'Wheels',
-          vec3ToString(wheels[0].GetContactPosition()),
-          vec3ToString(wheels[1].GetContactPosition()),
-          vec3ToString(wheels[2].GetContactPosition()),
-          vec3ToString(wheels[3].GetContactPosition()),
+      // console.log(
+      //   [
+      //     'Car center',
+      //     vec3ToString(carBody.GetPosition()),
+      //     'Mass center',
+      //     vec3ToString(carBody.GetCenterOfMassPosition()),
+      //     'Mass',
+      //     1 / carBody.GetMotionProperties().GetInverseMass(),
+      //     'Speed',
+      //     (carBody
+      //       .GetRotation()
+      //       .InverseRotate(carBody.GetLinearVelocity())
+      //       .GetX() *
+      //       60 *
+      //       60) /
+      //       1000,
+      //     'Wheels',
+      //     vec3ToString(wheels[0].GetContactPosition()),
+      //     vec3ToString(wheels[1].GetContactPosition()),
+      //     vec3ToString(wheels[2].GetContactPosition()),
+      //     vec3ToString(wheels[3].GetContactPosition()),
 
-          'Speed',
-          wheels[0].GetAngularVelocity().toFixed(1),
-          wheels[1].GetAngularVelocity().toFixed(1),
-          wheels[2].GetAngularVelocity().toFixed(1),
-          wheels[3].GetAngularVelocity().toFixed(1),
+      //     'Speed',
+      //     wheels[0].GetAngularVelocity().toFixed(1),
+      //     wheels[1].GetAngularVelocity().toFixed(1),
+      //     wheels[2].GetAngularVelocity().toFixed(1),
+      //     wheels[3].GetAngularVelocity().toFixed(1),
 
-          'Slip',
-          wheels[0].mLongitudinalSlip.toFixed(3),
-          wheels[1].mLongitudinalSlip.toFixed(3),
-          wheels[2].mLongitudinalSlip.toFixed(3),
-          wheels[3].mLongitudinalSlip.toFixed(3),
+      //     'Slip',
+      //     wheels[0].mLongitudinalSlip.toFixed(3),
+      //     wheels[1].mLongitudinalSlip.toFixed(3),
+      //     wheels[2].mLongitudinalSlip.toFixed(3),
+      //     wheels[3].mLongitudinalSlip.toFixed(3),
 
-          'Steer angle',
-          gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
-          ,
-        ].join('\n')
-      );
+      //     'Steer angle',
+      //     gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
+      //     gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
+      //     gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
+      //     gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
+      //     ,
+      //   ].join('\n')
+      // );
 
       // console.log(forward, right, brake, handBrake);
 
@@ -405,9 +407,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
-
-    onObjectHotReloaded() {}
+    override onObjectHotReloaded() {}
 
     simulateForwardKey(): void {
       this._hasPressedForwardKey = true;
@@ -510,11 +510,11 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _sharedData } = this.vehicleBehavior;
 
+        const carShape = behavior.createShape();
+        // Retrieved the dimensions are set by `createShape`.
         const halfVehicleWidth = behavior._shapeHalfWidth;
         const halfVehicleHeight = behavior._shapeHalfHeight;
         const halfVehicleDepth = behavior._shapeHalfDepth;
-
-        console.log(halfVehicleWidth, halfVehicleHeight, halfVehicleDepth);
 
         const wheelOffsetX = halfVehicleWidth;
         const wheelOffsetY = halfVehicleHeight;
@@ -530,8 +530,6 @@ namespace gdjs {
 
         const clutchStrength = 10;
 
-        const carShape = behavior.createShape();
-
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
           carShape,
@@ -546,9 +544,13 @@ namespace gdjs {
           Jolt.EOverrideMassProperties_CalculateInertia;
         carBodySettings.mMassPropertiesOverride.mMass =
           this.vehicleBehavior._mass;
+        carBodySettings.mFriction = behavior.friction;
+        carBodySettings.mRestitution = behavior.restitution;
+        carBodySettings.mLinearDamping = behavior.linearDamping;
+        carBodySettings.mAngularDamping = behavior.angularDamping;
+        carBodySettings.mGravityFactor = behavior.gravityScale;
         const carBody = _sharedData.bodyInterface.CreateBody(carBodySettings);
         Jolt.destroy(carBodySettings);
-
         _sharedData.bodyInterface.AddBody(
           carBody.GetID(),
           Jolt.EActivation_Activate
@@ -717,10 +719,11 @@ namespace gdjs {
           constraint.GetController(),
           Jolt.WheeledVehicleController
         );
+        this.vehicleBehavior._stepListener =
+          new Jolt.VehicleConstraintStepListener(constraint);
         _sharedData.physicsSystem.AddStepListener(
-          new Jolt.VehicleConstraintStepListener(constraint)
+          this.vehicleBehavior._stepListener
         );
-
         return carBody;
       }
 
@@ -781,7 +784,8 @@ namespace gdjs {
       }
 
       destroyBody() {
-        this.vehicleBehavior._destroyVehicle();
+        this.vehicleBehavior.onDestroy();
+        this.physicsBodyUpdater.destroyBody();
       }
     }
   }

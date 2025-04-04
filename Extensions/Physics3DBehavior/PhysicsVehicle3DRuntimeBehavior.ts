@@ -204,7 +204,9 @@ namespace gdjs {
       }
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
-      Jolt.destroy(this._vehicleController);
+      const constraint = this._vehicleController.GetConstraint();
+      this._sharedData.physicsSystem.RemoveConstraint(constraint);
+      // The controller is destroyed with the constraint.
       this._vehicleController = null;
       if (this._physics3D) {
         this._physics3D = null;

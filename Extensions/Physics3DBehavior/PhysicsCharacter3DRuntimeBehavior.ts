@@ -354,7 +354,6 @@ namespace gdjs {
         rotation.GetZ(),
         rotation.GetW()
       );
-      Jolt.destroy(rotation);
       return result;
     }
 
@@ -446,6 +445,11 @@ namespace gdjs {
     override doStepPostEvents(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
+      // Trigger createAndAddBody()
+      this.getPhysics3D();
+    }
+
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // Trigger createAndAddBody()
       this.getPhysics3D();
     }
@@ -1503,7 +1507,7 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
 
-        const shape = behavior.createShape();
+        const shape = behavior.createShapeWithoutMassCenterOffset();
 
         const settings = new Jolt.CharacterVirtualSettings();
         // Characters innerBody are Kinematic body, they don't allow other
@@ -1622,6 +1626,19 @@ namespace gdjs {
             contactNormal,
             settings
           ) => {};
+          characterContactListener.OnContactPersisted = (
+            inCharacter,
+            inBodyID2,
+            inSubShapeID2,
+            inContactPosition,
+            inContactNormal,
+            ioSettings
+          ) => {};
+          characterContactListener.OnContactRemoved = (
+            inCharacter,
+            inBodyID2,
+            inSubShapeID2
+          ) => {};
           characterContactListener.OnCharacterContactAdded = (
             character,
             otherCharacter,
@@ -1629,6 +1646,19 @@ namespace gdjs {
             contactPosition,
             contactNormal,
             settings
+          ) => {};
+          characterContactListener.OnCharacterContactPersisted = (
+            inCharacter,
+            inOtherCharacter,
+            inSubShapeID2,
+            inContactPosition,
+            inContactNormal,
+            ioSettings
+          ) => {};
+          characterContactListener.OnCharacterContactRemoved = (
+            inCharacter,
+            inOtherCharacter,
+            inSubShapeID2
           ) => {};
           characterContactListener.OnContactSolve = (
             character,
@@ -1732,7 +1762,7 @@ namespace gdjs {
         if (!character) {
           return;
         }
-        const shape = behavior.createShape();
+        const shape = behavior.createShapeWithoutMassCenterOffset();
         const isShapeValid = character.SetShape(
           shape,
           Number.MAX_VALUE,

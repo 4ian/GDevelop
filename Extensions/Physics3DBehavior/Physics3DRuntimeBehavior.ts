@@ -401,12 +401,12 @@ namespace gdjs {
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
-      this.shapeOffsetX = behaviorData.shapeOffsetX;
-      this.shapeOffsetY = behaviorData.shapeOffsetY;
-      this.shapeOffsetZ = behaviorData.shapeOffsetZ;
-      this.massCenterOffsetX = behaviorData.massCenterOffsetX;
-      this.massCenterOffsetY = behaviorData.massCenterOffsetY;
-      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ;
+      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
+      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -649,6 +649,39 @@ namespace gdjs {
     }
 
     createShape(): Jolt.Shape {
+      if (
+        this.massCenterOffsetX === 0 &&
+        this.massCenterOffsetY === 0 &&
+        this.massCenterOffsetZ === 0
+      ) {
+        return this.createShapeWithoutMassCenterOffset();
+      }
+      const rotatedShapeSettings =
+        this._createShapeSettingsWithoutMassCenterOffset();
+      const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
+      const offsetCenterShapeSettings =
+        new Jolt.OffsetCenterOfMassShapeSettings(
+          this.getVec3(
+            this.massCenterOffsetX * shapeScale,
+            this.massCenterOffsetY * shapeScale,
+            this.massCenterOffsetZ * shapeScale
+          ),
+          rotatedShapeSettings
+        );
+      const shape = offsetCenterShapeSettings.Create().Get();
+      Jolt.destroy(offsetCenterShapeSettings);
+      return shape;
+    }
+
+    createShapeWithoutMassCenterOffset(): Jolt.Shape {
+      const rotatedShapeSettings =
+        this._createShapeSettingsWithoutMassCenterOffset();
+      const shape = rotatedShapeSettings.Create().Get();
+      Jolt.destroy(rotatedShapeSettings);
+      return shape;
+    }
+
+    private _createShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -758,7 +791,7 @@ namespace gdjs {
         this._shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
-      const rotatedShapeSettings = new Jolt.RotatedTranslatedShapeSettings(
+      return new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(
           this.shapeOffsetX * shapeScale,
           this.shapeOffsetY * shapeScale,
@@ -767,18 +800,6 @@ namespace gdjs {
         quat,
         shapeSettings
       );
-      const offsetCenterShapeSettings =
-        new Jolt.OffsetCenterOfMassShapeSettings(
-          this.getVec3(
-            this.massCenterOffsetX * shapeScale,
-            this.massCenterOffsetY * shapeScale,
-            this.massCenterOffsetZ * shapeScale
-          ),
-          rotatedShapeSettings
-        );
-      const shape = offsetCenterShapeSettings.Create().Get();
-      Jolt.destroy(offsetCenterShapeSettings);
-      return shape;
     }
 
     private _getShapeOrientationQuat(): Jolt.Quat {

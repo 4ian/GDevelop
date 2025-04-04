@@ -18,6 +18,7 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import TextButton from '../UI/TextButton';
 import { useInterval } from '../Utils/UseInterval';
 import { useIsMounted } from '../Utils/UseIsMounted';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -109,6 +110,7 @@ export default function TabsTitlebar({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   const preferences = React.useContext(PreferencesContext);
+  const { subscription } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -181,8 +183,15 @@ export default function TabsTitlebar({
     []
   );
 
+  const isStudentAccount =
+    !!subscription &&
+    !!subscription.benefitsFromEducationPlan &&
+    !subscription.isTeacher;
+
   const shouldDisplayAskAi =
-    preferences.values.showAiAskButtonInTitleBar && !hasAskAiOpened;
+    preferences.values.showAiAskButtonInTitleBar &&
+    !hasAskAiOpened &&
+    !isStudentAccount;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (

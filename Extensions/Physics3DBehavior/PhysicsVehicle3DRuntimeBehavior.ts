@@ -45,11 +45,11 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
-    _steerAngleMax = 70;
-    private _beginningSteerAngularVelocity: float = 70;
-    private _endSteerAngularVelocity: float = 5;
-    _mass: float = 1500;
-    _engineTorqueMax: float = 4500;
+    _steerAngleMax;
+    private _beginningSteerAngularVelocity: float;
+    private _endSteerAngularVelocity: float;
+    _mass: float;
+    _engineTorqueMax: float;
 
     private _currentSteerRatio: float = 0;
 
@@ -89,6 +89,11 @@ namespace gdjs {
         instanceContainer.getScene(),
         behaviorData.Physics3D
       );
+      this._steerAngleMax = behaviorData.steerAngleMax;
+      this._beginningSteerAngularVelocity = behaviorData.beginningSteerAngularVelocity;
+      this._endSteerAngularVelocity = behaviorData.endSteerAngularVelocity;
+      this._mass = behaviorData.mass;
+      this._engineTorqueMax = behaviorData.engineTorqueMax;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -126,6 +131,21 @@ namespace gdjs {
     }
 
     override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+      if (oldBehaviorData.steerAngleMax !== newBehaviorData.steerAngleMax) {
+        this.setSteerAngleMax(newBehaviorData.steerAngleMax);
+      }
+      if (oldBehaviorData.beginningSteerAngularVelocity !== newBehaviorData.beginningSteerAngularVelocity) {
+        this.setBeginningSteerAngularVelocity(newBehaviorData.beginningSteerAngularVelocity);
+      }
+      if (oldBehaviorData.endSteerAngularVelocity !== newBehaviorData.endSteerAngularVelocity) {
+        this.setEndSteerAngularVelocity(newBehaviorData.endSteerAngularVelocity);
+      }
+      if (oldBehaviorData.mass !== newBehaviorData.mass) {
+        this.setMass(newBehaviorData.mass);
+      }
+      if (oldBehaviorData.engineTorqueMax !== newBehaviorData.engineTorqueMax) {
+        this.setEngineTorqueMax(newBehaviorData.engineTorqueMax);
+      }
       return true;
     }
 
@@ -477,6 +497,56 @@ namespace gdjs {
 
     getPreviousSteeringStickForce(): float {
       return this._previousSteeringStickForce;
+    }
+
+    getSteerAngleMax(): float {
+      return this._steerAngleMax;
+    }
+
+    setSteerAngleMax(steerAngleMax: float) {
+      this._steerAngleMax = steerAngleMax;
+    }
+
+    getBeginningSteerAngularVelocity(): float {
+      return this._beginningSteerAngularVelocity;
+    }
+
+    setBeginningSteerAngularVelocity(beginningSteerAngularVelocity: float): void {
+      this._beginningSteerAngularVelocity = beginningSteerAngularVelocity;
+    }
+
+    getEndSteerAngularVelocity(): float {
+      return this._endSteerAngularVelocity;
+    }
+
+    setEndSteerAngularVelocity(endSteerAngularVelocity: float): void {
+      this._endSteerAngularVelocity = endSteerAngularVelocity;
+    }
+
+    getMass(): float {
+      return this._mass;
+    }
+
+    setMass(mass: float): void {
+      this._mass = mass;
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        return;
+      }
+      const { behavior } = physics3D;
+      behavior._needToRecreateShape = true;
+    }
+
+    getEngineTorqueMax(): float {
+      return this._engineTorqueMax;
+    }
+
+    setEngineTorqueMax(engineTorqueMax: float): void {
+      this._engineTorqueMax = engineTorqueMax;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._vehicleController.GetEngine().mMaxTorque = engineTorqueMax;
     }
   }
 

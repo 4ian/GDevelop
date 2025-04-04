@@ -774,7 +774,7 @@ namespace gdjs {
           rotatedShapeSettings
         );
       const shape = offsetCenterShapeSettings.Create().Get();
-      Jolt.destroy(shapeSettings);
+      Jolt.destroy(offsetCenterShapeSettings);
       return shape;
     }
 

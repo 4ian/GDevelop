@@ -2626,6 +2626,52 @@ module.exports = {
           behaviorContent.getChild('physics3D').setStringValue(newValue);
           return true;
         }
+
+        if (propertyName === 'steerAngleMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('steerAngleMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'beginningSteerAngularVelocity') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('beginningSteerAngularVelocity')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'endSteerAngularVelocity') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('endSteerAngularVelocity')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'mass') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('mass')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -2639,19 +2685,90 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
+        behaviorProperties
+          .getOrCreate('steerAngleMax')
+          .setLabel('Max steer angle')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            behaviorContent
+              .getChild('steerAngleMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('beginningSteerAngularVelocity')
+          .setLabel('Beginning steer speed')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('beginningSteerAngularVelocity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('endSteerAngularVelocity')
+          .setLabel('End steer speed')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('endSteerAngularVelocity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('mass')
+          .setLabel('Mass')
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('mass')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('engineTorqueMax')
+          .setLabel('Max engine torque')
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('engineTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
         return behaviorProperties;
       };
 
       behavior.initializeContent = function (behaviorContent) {
         behaviorContent.addChild('physics3D').setStringValue('');
+        behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
+        behaviorContent.addChild('beginningSteerAngularVelocity').setDoubleValue(70);
+        behaviorContent.addChild('endSteerAngularVelocity').setDoubleValue(5);
+        behaviorContent.addChild('mass').setDoubleValue(1500);
+        behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
       };
 
       const aut = extension
         .addBehavior(
           'PhysicsVehicle3D',
-          _('3D physics vehicle'),
+          _('3D physics car'),
           'PhysicsVehicle3D',
-          _('Jump and run on platforms.'),
+          _('Simulate a realistic car.'),
           '',
           'JsPlatform/Extensions/physics_character3d.svg',
           'PhysicsVehicle3D',

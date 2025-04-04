@@ -354,7 +354,7 @@ namespace gdjs {
     /**
      * When set to `true` the shape will be recreated before the next physics step.
      */
-    private _needToRecreateShape: boolean = false;
+    _needToRecreateShape: boolean = false;
 
     _shapeHalfWidth: float = 0;
     _shapeHalfHeight: float = 0;

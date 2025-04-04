@@ -980,6 +980,7 @@ export class MeasurementUnit extends EmscriptenObject {
   static getPixel(): MeasurementUnit;
   static getPixelSpeed(): MeasurementUnit;
   static getPixelAcceleration(): MeasurementUnit;
+  static getAngularSpeed(): MeasurementUnit;
   static getNewton(): MeasurementUnit;
   static getDefaultMeasurementUnitsCount(): number;
   static getDefaultMeasurementUnitAtIndex(index: number): MeasurementUnit;

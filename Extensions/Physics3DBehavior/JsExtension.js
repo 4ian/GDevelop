@@ -97,6 +97,60 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'shapeOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'shapeOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'shapeOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('shapeOffsetZ')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'massCenterOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('massCenterOffsetZ')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'density') {
           behaviorContent
             .getChild('density')
@@ -277,6 +331,107 @@ module.exports = {
           .setLabel('Shape Dimension C')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetX')) {
+          behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetX')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset X')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetY')) {
+          behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetY')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset Y')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('shapeOffsetZ')) {
+          behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('shapeOffsetZ')
+          .setValue(
+            behaviorContent
+              .getChild('shapeOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Shape offset Z')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetX')) {
+          behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetX')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset X')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetY')) {
+          behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetY')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset Y')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
+        if (!behaviorContent.hasChild('massCenterOffsetZ')) {
+          behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massCenterOffsetZ')
+          .setValue(
+            behaviorContent
+              .getChild('massCenterOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setLabel('Center of mass offset Z')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setAdvanced(true)
+          .setHidden(true); // Hidden as required to be changed in the full editor.
         behaviorProperties
           .getOrCreate('density')
           .setValue(
@@ -387,6 +542,12 @@ module.exports = {
         behaviorContent.addChild('shapeDimensionA').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionB').setDoubleValue(0);
         behaviorContent.addChild('shapeDimensionC').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
         behaviorContent.addChild('density').setDoubleValue(1.0);
         behaviorContent.addChild('friction').setDoubleValue(0.3);
         behaviorContent.addChild('restitution').setDoubleValue(0.1);
@@ -1569,7 +1730,7 @@ module.exports = {
           .getOrCreate('physics3D')
           .setValue(behaviorContent.getChild('physics3D').getStringValue())
           .setType('Behavior')
-          .setLabel('3D capability')
+          .setLabel('3D physics')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .addExtraInfo('Physics3D::Physics3DBehavior');
 
@@ -2452,6 +2613,278 @@ module.exports = {
         .markAsAdvanced()
         .setFunctionName('setMaxFallingSpeed')
         .setGetter('getMaxFallingSpeed');
+    }
+
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'physics3D') {
+          behaviorContent.getChild('physics3D').setStringValue(newValue);
+          return true;
+        }
+
+        if (propertyName === 'steerAngleMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('steerAngleMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'beginningSteerAngularVelocity') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('beginningSteerAngularVelocity')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'endSteerAngularVelocity') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('endSteerAngularVelocity')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'mass') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('mass')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        return false;
+      };
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('physics3D')
+          .setValue(behaviorContent.getChild('physics3D').getStringValue())
+          .setType('Behavior')
+          .setLabel('3D physics')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .addExtraInfo('Physics3D::Physics3DBehavior');
+
+        behaviorProperties
+          .getOrCreate('steerAngleMax')
+          .setLabel('Max steer angle')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            behaviorContent
+              .getChild('steerAngleMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('beginningSteerAngularVelocity')
+          .setLabel('Beginning steer speed')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('beginningSteerAngularVelocity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('endSteerAngularVelocity')
+          .setLabel('End steer speed')
+          .setGroup(_('Steering'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
+          .setValue(
+            behaviorContent
+              .getChild('endSteerAngularVelocity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('mass')
+          .setLabel('Mass')
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('mass')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('engineTorqueMax')
+          .setLabel('Max engine torque')
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('engineTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('physics3D').setStringValue('');
+        behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
+        behaviorContent.addChild('beginningSteerAngularVelocity').setDoubleValue(70);
+        behaviorContent.addChild('endSteerAngularVelocity').setDoubleValue(5);
+        behaviorContent.addChild('mass').setDoubleValue(1500);
+        behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
+      };
+
+      const aut = extension
+        .addBehavior(
+          'PhysicsVehicle3D',
+          _('3D physics car'),
+          'PhysicsVehicle3D',
+          _('Simulate a realistic car.'),
+          '',
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'PhysicsVehicle3D',
+          //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .addIncludeFile(
+          'Extensions/Physics3DBehavior/PhysicsVehicle3DRuntimeBehavior.js'
+        );
+
+      aut
+        .addScopedAction(
+          'SimulateForwardKey',
+          _('Simulate move forward key press'),
+          _('Simulate a press of the move forward key.'),
+          _('Simulate pressing Forward key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateForwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateBackwardKey',
+          _('Simulate move backward key press'),
+          _('Simulate a press of the move backward key.'),
+          _('Simulate pressing Backward key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateBackwardKey');
+
+      aut
+        .addScopedAction(
+          'SimulateRightKey',
+          _('Simulate move right key press'),
+          _('Simulate a press of the move right key.'),
+          _('Simulate pressing Right key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateRightKey');
+
+      aut
+        .addScopedAction(
+          'SimulateLeftKey',
+          _('Simulate move left key press'),
+          _('Simulate a press of the move left key.'),
+          _('Simulate pressing Left key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateLeftKey');
+
+      aut
+        .addScopedAction(
+          'SimulateHandBreakKey',
+          _('Simulate hand break key press'),
+          _('Simulate a press of the hand break key.'),
+          _('Simulate pressing hand break key for _PARAM0_'),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .setFunctionName('simulateHandBreakKey');
+
+      aut
+        .addScopedAction(
+          'SimulateAcceleratorStick',
+          _('Simulate accelerator stick control'),
+          _('Simulate an accelerator stick control.'),
+          _(
+            'Simulate an accelerator stick control for _PARAM0_ with a _PARAM2_ force'
+          ),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateAcceleratorStick');
+
+      aut
+        .addScopedAction(
+          'SimulateSteeringStick',
+          _('Simulate steering stick control'),
+          _('Simulate a steering stick control.'),
+          _(
+            'Simulate a steering stick control for _PARAM0_ with a _PARAM2_ force'
+          ),
+          _('Car controls'),
+          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_character3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('expression', _('Stick force (between -1 and 1)'))
+        .markAsAdvanced()
+        .setFunctionName('simulateSteeringStick');
     }
 
     extension

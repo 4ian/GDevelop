@@ -283,11 +283,11 @@ namespace gdjs {
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     const physics3DSharedData = runtimeScene.physics3DSharedData;
     if (physics3DSharedData) {
-      Jolt.destroy(physics3DSharedData.jolt);
       Jolt.destroy(physics3DSharedData.contactListener);
       Jolt.destroy(physics3DSharedData._tempVec3);
       Jolt.destroy(physics3DSharedData._tempRVec3);
       Jolt.destroy(physics3DSharedData._tempQuat);
+      Jolt.destroy(physics3DSharedData.jolt);
       runtimeScene.physics3DSharedData = null;
     }
   });
@@ -302,9 +302,15 @@ namespace gdjs {
     fixedRotation: boolean;
     private shape: string;
     private shapeOrientation: string;
-    private shapeDimensionA: any;
-    private shapeDimensionB: any;
-    private shapeDimensionC: any;
+    private shapeDimensionA: float;
+    private shapeDimensionB: float;
+    private shapeDimensionC: float;
+    private shapeOffsetX: float;
+    private shapeOffsetY: float;
+    private shapeOffsetZ: float;
+    private massCenterOffsetX: float;
+    private massCenterOffsetY: float;
+    private massCenterOffsetZ: float;
     private density: float;
     friction: float;
     restitution: float;
@@ -348,7 +354,10 @@ namespace gdjs {
     /**
      * When set to `true` the shape will be recreated before the next physics step.
      */
-    private _needToRecreateShape: boolean = false;
+    _needToRecreateShape: boolean = false;
+
+    _shapeHalfWidth: float = 0;
+    _shapeHalfHeight: float = 0;
     /**
      * Used by {@link gdjs.PhysicsCharacter3DRuntimeBehavior} to convert coordinates.
      */
@@ -391,6 +400,12 @@ namespace gdjs {
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
+      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
+      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
       this.density = behaviorData.density;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
@@ -631,6 +646,39 @@ namespace gdjs {
     }
 
     createShape(): Jolt.Shape {
+      if (
+        this.massCenterOffsetX === 0 &&
+        this.massCenterOffsetY === 0 &&
+        this.massCenterOffsetZ === 0
+      ) {
+        return this.createShapeWithoutMassCenterOffset();
+      }
+      const rotatedShapeSettings =
+        this._createShapeSettingsWithoutMassCenterOffset();
+      const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
+      const offsetCenterShapeSettings =
+        new Jolt.OffsetCenterOfMassShapeSettings(
+          this.getVec3(
+            this.massCenterOffsetX * shapeScale,
+            this.massCenterOffsetY * shapeScale,
+            this.massCenterOffsetZ * shapeScale
+          ),
+          rotatedShapeSettings
+        );
+      const shape = offsetCenterShapeSettings.Create().Get();
+      Jolt.destroy(offsetCenterShapeSettings);
+      return shape;
+    }
+
+    createShapeWithoutMassCenterOffset(): Jolt.Shape {
+      const rotatedShapeSettings =
+        this._createShapeSettingsWithoutMassCenterOffset();
+      const shape = rotatedShapeSettings.Create().Get();
+      Jolt.destroy(rotatedShapeSettings);
+      return shape;
+    }
+
+    private _createShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -676,6 +724,8 @@ namespace gdjs {
           convexRadius
         );
         quat = this.getQuat(0, 0, 0, 1);
+        this._shapeHalfWidth = boxWidth / 2;
+        this._shapeHalfHeight = boxHeight / 2;
         this._shapeHalfDepth = boxDepth / 2;
       } else if (this.shape === 'Capsule') {
         const radius =
@@ -691,8 +741,12 @@ namespace gdjs {
           radius
         );
         quat = this._getShapeOrientationQuat();
+        this._shapeHalfWidth =
+          this.shapeOrientation === 'X' ? capsuleDepth / 2 : radius;
+        this._shapeHalfHeight =
+          this.shapeOrientation === 'Y' ? capsuleDepth / 2 : radius;
         this._shapeHalfDepth =
-          this.shapeOrientation !== 'Z' ? radius : capsuleDepth / 2;
+          this.shapeOrientation === 'Z' ? capsuleDepth / 2 : radius;
       } else if (this.shape === 'Cylinder') {
         const radius =
           shapeDimensionA > 0
@@ -713,8 +767,12 @@ namespace gdjs {
           convexRadius
         );
         quat = this._getShapeOrientationQuat();
+        this._shapeHalfWidth =
+          this.shapeOrientation === 'X' ? cylinderDepth / 2 : radius;
+        this._shapeHalfHeight =
+          this.shapeOrientation === 'Y' ? cylinderDepth / 2 : radius;
         this._shapeHalfDepth =
-          this.shapeOrientation !== 'Z' ? radius : cylinderDepth / 2;
+          this.shapeOrientation === 'Z' ? cylinderDepth / 2 : radius;
       } else {
         // Create a 'Sphere' by default.
         const radius =
@@ -725,19 +783,20 @@ namespace gdjs {
               : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
+        this._shapeHalfWidth = radius;
+        this._shapeHalfHeight = radius;
         this._shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
-      const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
-        this.getVec3(0, 0, 0),
+      return new Jolt.RotatedTranslatedShapeSettings(
+        this.getVec3(
+          this.shapeOffsetX * shapeScale,
+          this.shapeOffsetY * shapeScale,
+          this.shapeOffsetZ * shapeScale
+        ),
         quat,
         shapeSettings
-      )
-        .Create()
-        .Get();
-
-      Jolt.destroy(shapeSettings);
-      return rotatedShape;
+      );
     }
 
     private _getShapeOrientationQuat(): Jolt.Quat {

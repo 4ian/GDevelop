@@ -4,7 +4,6 @@
  * The zip should be uploaded with one of the git releases (use gitRelease variable for version where you released it)
  */
 var shell = require('shelljs');
-var fs = require('fs');
 var AdmZip = require('adm-zip');
 var process = require('process');
 var path = require('path');

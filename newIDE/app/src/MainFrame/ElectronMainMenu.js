@@ -10,6 +10,7 @@ import {
   type MainMenuEvent,
 } from './MainMenu';
 import PreferencesContext from './Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -102,6 +103,12 @@ const ElectronMainMenu = ({
   const {
     values: { useShortcutToClosePreviewWindow },
   } = React.useContext(PreferencesContext);
+  const { limits } = React.useContext(AuthenticatedUserContext);
+
+  const hideAskAi =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
 
   useAppEventListener({
     event: 'browser-window-focus',
@@ -233,6 +240,7 @@ const ElectronMainMenu = ({
             recentProjectFiles,
             shortcutMap,
             isApplicationTopLevelMenu,
+            hideAskAi,
           })
         );
       }
@@ -245,6 +253,7 @@ const ElectronMainMenu = ({
       recentProjectFiles,
       shortcutMap,
       isApplicationTopLevelMenu,
+      hideAskAi,
     ]
   );
 

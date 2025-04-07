@@ -124,7 +124,7 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
     const shouldHideAnnouncements =
       !!authenticatedUser.limits &&
       !!authenticatedUser.limits.capabilities.classrooms &&
-      !!authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
+      authenticatedUser.limits.capabilities.classrooms.hideAnnouncements;
 
     return (
       <Column expand useFullHeight noMargin>

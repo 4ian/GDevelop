@@ -148,10 +148,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const { isMobile } = useResponsiveWindowSize();
 
     const quotaOrCreditsExplanation = !quota ? null /* User is probably not even logged in. */ : !quota.limitReached ? (
-      quota.current < 1 || increaseQuotaOffering === 'subscribe' ? null : (
+      increaseQuotaOffering === 'subscribe' ? (
         <Trans>
-          You still have {quota.max - quota.current} free questions thanks to
-          your membership.
+          You still have {quota.max - quota.current} free answers from the AI.
+        </Trans>
+      ) : (
+        <Trans>
+          You still have {quota.max - quota.current} free answers with your
+          membership (refreshed every month).
         </Trans>
       )
     ) : aiRequestPriceInCredits ? (

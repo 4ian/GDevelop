@@ -289,6 +289,10 @@ const CreditsPackagesDialog = ({
                   this guide
                 </Link>{' '}
                 to help you decide.
+              </Trans>{' '}
+              <Trans>
+                Follow GDevelop on socials and check your profile to get some
+                free credits!
               </Trans>
             </BackgroundText>
           </ColumnStackLayout>

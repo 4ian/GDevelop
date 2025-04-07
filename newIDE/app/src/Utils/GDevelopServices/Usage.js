@@ -81,6 +81,8 @@ export type Capabilities = {|
     allowedIdPrefixes: Array<string>,
   },
   classrooms?: {
+    hideAskAi: boolean,
+    hideAnnouncements: boolean,
     hidePlayTab: boolean,
     hideSocials: boolean,
     hidePremiumProducts: boolean,

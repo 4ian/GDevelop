@@ -2636,20 +2636,20 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'beginningSteerAngularVelocity') {
+        if (propertyName === 'beginningSteerSpeed') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('beginningSteerAngularVelocity')
+            .getChild('beginningSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
 
-        if (propertyName === 'endSteerAngularVelocity') {
+        if (propertyName === 'endSteerSpeed') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
-            .getChild('endSteerAngularVelocity')
+            .getChild('endSteerSpeed')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2657,9 +2657,7 @@ module.exports = {
         if (propertyName === 'mass') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent
-            .getChild('mass')
-            .setDoubleValue(newValueAsNumber);
+          behaviorContent.getChild('mass').setDoubleValue(newValueAsNumber);
           return true;
         }
 
@@ -2668,6 +2666,141 @@ module.exports = {
           if (newValueAsNumber !== newValueAsNumber) return false;
           behaviorContent
             .getChild('engineTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'engineSpeedMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineSpeedMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'reverseGearRatio1') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('reverseGearRatio1')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio1') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio1')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio2') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio2')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio2') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio2')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio3') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio3')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio4') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio4')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio5') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio5')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'gearRatio6') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('gearRatio6')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelRadius') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelRadius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelWidth') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelWidth')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'backWheelOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('backWheelOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'frontWheelOffsetX') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('frontWheelOffsetX')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelOffsetY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelOffsetY')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'wheelOffsetZ') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('wheelOffsetZ')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -2700,28 +2833,28 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         behaviorProperties
-          .getOrCreate('beginningSteerAngularVelocity')
+          .getOrCreate('beginningSteerSpeed')
           .setLabel('Beginning steer speed')
           .setGroup(_('Steering'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
           .setValue(
             behaviorContent
-              .getChild('beginningSteerAngularVelocity')
+              .getChild('beginningSteerSpeed')
               .getDoubleValue()
               .toString(10)
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         behaviorProperties
-          .getOrCreate('endSteerAngularVelocity')
+          .getOrCreate('endSteerSpeed')
           .setLabel('End steer speed')
           .setGroup(_('Steering'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
           .setValue(
             behaviorContent
-              .getChild('endSteerAngularVelocity')
+              .getChild('endSteerSpeed')
               .getDoubleValue()
               .toString(10)
           )
@@ -2733,16 +2866,13 @@ module.exports = {
           .setGroup('')
           .setType('Number')
           .setValue(
-            behaviorContent
-              .getChild('mass')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.getChild('mass').getDoubleValue().toString(10)
           );
 
         behaviorProperties
           .getOrCreate('engineTorqueMax')
           .setLabel('Max engine torque')
-          .setGroup('')
+          .setGroup('Speed')
           .setType('Number')
           .setValue(
             behaviorContent
@@ -2751,18 +2881,207 @@ module.exports = {
               .toString(10)
           );
 
+        behaviorProperties
+          .getOrCreate('engineSpeedMax')
+          .setLabel('Max engine speed')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('engineSpeedMax')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
+          .getOrCreate('reverseGearRatio1')
+          .setLabel('Reverse gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('reverseGearRatio1')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio1')
+          .setLabel('1st gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio1').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio2')
+          .setLabel('2nd gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio2').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio3')
+          .setLabel('3rd gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio3').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio4')
+          .setLabel('4th gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio4').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio5')
+          .setLabel('5th gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio5').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('gearRatio6')
+          .setLabel('6th gear ratio')
+          .setGroup('Speed')
+          .setType('Number')
+          .setValue(
+            behaviorContent.getChild('gearRatio6').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelRadius')
+          .setLabel('Wheel radius')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('wheelRadius')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelWidth')
+          .setLabel('Wheel width')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent.getChild('wheelWidth').getDoubleValue().toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('backWheelOffsetX')
+          .setLabel('Back wheel offset X')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('backWheelOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('frontWheelOffsetX')
+          .setLabel('Front wheel offset X')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('frontWheelOffsetX')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelOffsetY')
+          .setLabel('Wheel offset Y')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('wheelOffsetY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('wheelOffsetZ')
+          .setLabel('Wheel offset Z')
+          .setGroup('Wheels')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            behaviorContent
+              .getChild('wheelOffsetZ')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return behaviorProperties;
       };
 
       behavior.initializeContent = function (behaviorContent) {
         behaviorContent.addChild('physics3D').setStringValue('');
         behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
-        behaviorContent.addChild('beginningSteerAngularVelocity').setDoubleValue(70);
-        behaviorContent.addChild('endSteerAngularVelocity').setDoubleValue(5);
+        behaviorContent.addChild('beginningSteerSpeed').setDoubleValue(70);
+        behaviorContent.addChild('endSteerSpeed').setDoubleValue(35);
         behaviorContent.addChild('mass').setDoubleValue(1500);
         behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
+        behaviorContent.addChild('engineSpeedMax').setDoubleValue(6000);
+        behaviorContent.addChild('reverseGearRatio1').setDoubleValue(-2.9);
+        behaviorContent.addChild('gearRatio1').setDoubleValue(2.66);
+        behaviorContent.addChild('gearRatio2').setDoubleValue(1.78);
+        behaviorContent.addChild('gearRatio3').setDoubleValue(1.3);
+        behaviorContent.addChild('gearRatio4').setDoubleValue(1);
+        behaviorContent.addChild('gearRatio5').setDoubleValue(0.74);
+        behaviorContent.addChild('gearRatio6').setDoubleValue(0);
+        behaviorContent.addChild('backWheelOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('frontWheelOffsetX').setDoubleValue(0);
+        behaviorContent.addChild('wheelOffsetY').setDoubleValue(0);
+        behaviorContent.addChild('wheelOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('wheelRadius').setDoubleValue(10);
+        behaviorContent.addChild('wheelWidth').setDoubleValue(5);
       };
-
       const aut = extension
         .addBehavior(
           'PhysicsVehicle3D',

@@ -307,7 +307,7 @@ namespace gdjs {
     private shapeDimensionC: float;
     private shapeOffsetX: float;
     private shapeOffsetY: float;
-    private shapeOffsetZ: float;
+    shapeOffsetZ: float;
     private massCenterOffsetX: float;
     private massCenterOffsetY: float;
     private massCenterOffsetZ: float;
@@ -319,7 +319,7 @@ namespace gdjs {
     gravityScale: float;
     private layers: integer;
     private masks: integer;
-    private shapeScale: number = 1;
+    shapeScale: number = 1;
 
     /**
      * Array containing the beginning of contacts reported by onContactBegin. Each contact

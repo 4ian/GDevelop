@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "electron": "32-x-y",
-    "electron-builder": "26.0.12"
+    "electron-builder": "^26.0.12"
   },
   "build": {
     "appId": "GDJS_GAME_PACKAGE_NAME",

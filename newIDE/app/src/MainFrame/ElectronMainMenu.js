@@ -103,12 +103,12 @@ const ElectronMainMenu = ({
   const {
     values: { useShortcutToClosePreviewWindow },
   } = React.useContext(PreferencesContext);
-  const { subscription } = React.useContext(AuthenticatedUserContext);
+  const { limits } = React.useContext(AuthenticatedUserContext);
 
-  const isStudentAccount =
-    !!subscription &&
-    !!subscription.benefitsFromEducationPlan &&
-    !subscription.isTeacher;
+  const hideAskAi =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
 
   useAppEventListener({
     event: 'browser-window-focus',
@@ -240,7 +240,7 @@ const ElectronMainMenu = ({
             recentProjectFiles,
             shortcutMap,
             isApplicationTopLevelMenu,
-            isStudentAccount,
+            hideAskAi,
           })
         );
       }
@@ -253,7 +253,7 @@ const ElectronMainMenu = ({
       recentProjectFiles,
       shortcutMap,
       isApplicationTopLevelMenu,
-      isStudentAccount,
+      hideAskAi,
     ]
   );
 

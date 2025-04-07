@@ -23,7 +23,7 @@ export type BuildMainMenuProps = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   shortcutMap: ShortcutMap,
   isApplicationTopLevelMenu: boolean,
-  isStudentAccount: boolean,
+  hideAskAi: boolean,
 |};
 
 export type MainMenuCallbacks = {|
@@ -112,7 +112,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   project,
   canSaveProjectAs,
   isApplicationTopLevelMenu,
-  isStudentAccount,
+  hideAskAi,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
   const fileTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`File`),
@@ -259,7 +259,7 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`Help`),
     role: 'help',
     submenu: [
-      ...(isStudentAccount
+      ...(hideAskAi
         ? []
         : [
             {

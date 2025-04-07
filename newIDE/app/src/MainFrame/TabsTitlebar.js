@@ -110,7 +110,7 @@ export default function TabsTitlebar({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   const preferences = React.useContext(PreferencesContext);
-  const { subscription } = React.useContext(AuthenticatedUserContext);
+  const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -183,15 +183,15 @@ export default function TabsTitlebar({
     []
   );
 
-  const isStudentAccount =
-    !!subscription &&
-    !!subscription.benefitsFromEducationPlan &&
-    !subscription.isTeacher;
+  const hideAskAi =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
 
   const shouldDisplayAskAi =
     preferences.values.showAiAskButtonInTitleBar &&
     !hasAskAiOpened &&
-    !isStudentAccount;
+    !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (

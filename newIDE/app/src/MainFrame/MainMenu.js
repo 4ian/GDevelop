@@ -23,6 +23,7 @@ export type BuildMainMenuProps = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   shortcutMap: ShortcutMap,
   isApplicationTopLevelMenu: boolean,
+  hideAskAi: boolean,
 |};
 
 export type MainMenuCallbacks = {|
@@ -111,6 +112,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   project,
   canSaveProjectAs,
   isApplicationTopLevelMenu,
+  hideAskAi,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
   const fileTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`File`),
@@ -257,10 +259,14 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`Help`),
     role: 'help',
     submenu: [
-      {
-        label: i18n._(t`Ask AI (GDevelop chatbot)`),
-        onClickSendEvent: 'main-menu-open-ask-ai',
-      },
+      ...(hideAskAi
+        ? []
+        : [
+            {
+              label: i18n._(t`Ask AI (GDevelop chatbot)`),
+              onClickSendEvent: 'main-menu-open-ask-ai',
+            },
+          ]),
       {
         label: i18n._(t`GDevelop website`),
         onClickOpenLink: 'http://gdevelop.io',
@@ -323,7 +329,7 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       { type: 'separator' },
       {
-        label: i18n._(t`Help to Translate GDevelop`),
+        label: i18n._(t`Help translate GDevelop`),
         onClickOpenLink: 'https://crowdin.com/project/gdevelop',
       },
       {

@@ -46,23 +46,28 @@ const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata).map(
   }
 );
 const goodProgressLocales = localesToDisplay.filter(
-  localeMetadata => localeMetadata.translationRatio > 0.5
+  localeMetadata => localeMetadata.translationRatio > 0.3
 );
-const startedLocales = localesToDisplay.filter(
-  localeMetadata => localeMetadata.translationRatio < 0.5
+const incompleteLocales = localesToDisplay.filter(
+  localeMetadata => localeMetadata.translationRatio < 0.3
 );
 
 const renderLanguageSelectOption = localeMetadata => {
   const translationRatio = localeMetadata.translationRatio || 0;
   const percent = (100 * localeMetadata.translationRatio).toFixed(0);
+  const isIncomplete = translationRatio < 0.3;
   const isStarted = translationRatio > 0;
+
+  const label = !isIncomplete
+    ? `${localeMetadata.languageNativeName} (${localeMetadata.languageName})`
+    : `${localeMetadata.languageNativeName} (${
+        localeMetadata.languageName
+      } - ${percent}% translated)`;
 
   return (
     <SelectOption
       value={localeMetadata.languageCode}
-      label={`${localeMetadata.languageNativeName} (${
-        localeMetadata.languageName
-      })${isStarted ? ` - ~${percent}%` : ''}`}
+      label={label}
       disabled={!isStarted}
       key={localeMetadata.languageCode}
     />
@@ -92,7 +97,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
             {goodProgressLocales.map(localeMetadata =>
               renderLanguageSelectOption(localeMetadata)
             )}
-            {startedLocales.map(localeMetadata =>
+            {incompleteLocales.map(localeMetadata =>
               renderLanguageSelectOption(localeMetadata)
             )}
           </CompactSelectField>
@@ -107,7 +112,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
               Window.openExternalURL('https://crowdin.com/project/gdevelop')
             }
           >
-            help to translate GDevelop in your language
+            help translate GDevelop into your language
           </Link>
           .
         </Trans>

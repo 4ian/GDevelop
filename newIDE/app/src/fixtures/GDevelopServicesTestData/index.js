@@ -534,6 +534,8 @@ export const limitsForTeacherUser: Limits = {
       hideUpgradeNotice: false,
       hideSocials: false,
       showClassroomTab: true,
+      hideAskAi: false,
+      hideAnnouncements: false,
     },
     multiplayer: {
       lobbiesCount: -1,
@@ -596,6 +598,8 @@ export const limitsForStudentUser: Limits = {
       hideSocials: true,
       hideUpgradeNotice: true,
       showClassroomTab: false,
+      hideAskAi: true,
+      hideAnnouncements: true,
     },
     multiplayer: {
       lobbiesCount: -1,

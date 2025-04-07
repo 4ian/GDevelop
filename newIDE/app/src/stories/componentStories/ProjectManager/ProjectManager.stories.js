@@ -100,6 +100,7 @@ export const NoProjectOpen = () => {
                     recentProjectFiles: [],
                     shortcutMap,
                     isApplicationTopLevelMenu: false,
+                    hideAskAi: false,
                   }}
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
@@ -169,6 +170,7 @@ export const ProjectOpen = () => {
                     recentProjectFiles: [],
                     shortcutMap,
                     isApplicationTopLevelMenu: false,
+                    hideAskAi: false,
                   }}
                   mainMenuCallbacks={mainMenuCallbacks}
                 />

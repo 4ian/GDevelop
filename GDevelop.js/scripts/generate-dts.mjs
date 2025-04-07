@@ -262,6 +262,7 @@ for (const [
       attributes.push(
         `${attributeName}${optionalReturn ? '?' : ''}: ${returnType};`
       );
+      Parser.skipWhitespaces();
       continue;
     }
 

@@ -292,7 +292,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
-  ['Front', 'Back'],
+  ['Back', 'Front'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -307,6 +307,9 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['MaxSpeed', 'SlopeMaxAngle'],
   ['Beginning', 'End'],
   ['Start', 'End'],
+  ['1', '2'],
+  ['3', '4'],
+  ['5', '6'],
 ];
 
 const uncapitalize = str => {

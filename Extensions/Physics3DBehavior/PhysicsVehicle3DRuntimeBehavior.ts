@@ -46,10 +46,20 @@ namespace gdjs {
     private _destroyedDuringFrameLogic: boolean = false;
 
     _steerAngleMax;
-    private _beginningSteerAngularVelocity: float;
-    private _endSteerAngularVelocity: float;
+    private _beginningSteerSpeed: float;
+    private _endSteerSpeed: float;
     _mass: float;
     _engineTorqueMax: float;
+    /** in RPM (rotation per minute) */
+    _engineSpeedMax: float;
+    _gearRatios: Array<float>;
+    _reverseGearRatios: Array<float>;
+    _backWheelOffsetX: float;
+    _frontWheelOffsetX: float;
+    _wheelOffsetY: float;
+    _wheelOffsetZ: float;
+    _wheelRadius: float;
+    _wheelWidth: float;
 
     private _currentSteerRatio: float = 0;
 
@@ -90,10 +100,33 @@ namespace gdjs {
         behaviorData.Physics3D
       );
       this._steerAngleMax = behaviorData.steerAngleMax;
-      this._beginningSteerAngularVelocity = behaviorData.beginningSteerAngularVelocity;
-      this._endSteerAngularVelocity = behaviorData.endSteerAngularVelocity;
+      this._beginningSteerSpeed = behaviorData.beginningSteerSpeed;
+      this._endSteerSpeed = behaviorData.endSteerSpeed;
       this._mass = behaviorData.mass;
       this._engineTorqueMax = behaviorData.engineTorqueMax;
+      this._engineSpeedMax = behaviorData.engineSpeedMax;
+      this._reverseGearRatios = [behaviorData.reverseGearRatio1];
+      this._gearRatios = [
+        behaviorData.gearRatio1,
+        behaviorData.gearRatio2,
+        behaviorData.gearRatio3,
+        behaviorData.gearRatio4,
+        behaviorData.gearRatio5,
+        behaviorData.gearRatio6,
+      ];
+      for (let index = 0; index < this._gearRatios.length; index++) {
+        const gearRatio = this._gearRatios[index];
+        if (gearRatio <= 0 || gearRatio >= this._gearRatios[index - 1]) {
+          this._gearRatios.splice(index);
+          index--;
+        }
+      }
+      this._backWheelOffsetX = behaviorData.backWheelOffsetX;
+      this._frontWheelOffsetX = behaviorData.frontWheelOffsetX;
+      this._wheelOffsetY = behaviorData.wheelOffsetY;
+      this._wheelOffsetZ = behaviorData.wheelOffsetZ;
+      this._wheelRadius = behaviorData.wheelRadius;
+      this._wheelWidth = behaviorData.wheelWidth;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -134,11 +167,14 @@ namespace gdjs {
       if (oldBehaviorData.steerAngleMax !== newBehaviorData.steerAngleMax) {
         this.setSteerAngleMax(newBehaviorData.steerAngleMax);
       }
-      if (oldBehaviorData.beginningSteerAngularVelocity !== newBehaviorData.beginningSteerAngularVelocity) {
-        this.setBeginningSteerAngularVelocity(newBehaviorData.beginningSteerAngularVelocity);
+      if (
+        oldBehaviorData.beginningSteerSpeed !==
+        newBehaviorData.beginningSteerSpeed
+      ) {
+        this.setBeginningSteerSpeed(newBehaviorData.beginningSteerSpeed);
       }
-      if (oldBehaviorData.endSteerAngularVelocity !== newBehaviorData.endSteerAngularVelocity) {
-        this.setEndSteerAngularVelocity(newBehaviorData.endSteerAngularVelocity);
+      if (oldBehaviorData.endSteerSpeed !== newBehaviorData.endSteerSpeed) {
+        this.setEndSteerSpeed(newBehaviorData.endSteerSpeed);
       }
       if (oldBehaviorData.mass !== newBehaviorData.mass) {
         this.setMass(newBehaviorData.mass);
@@ -271,25 +307,23 @@ namespace gdjs {
       if (steeringControl === 0) {
         this._currentSteerRatio = 0;
       } else {
-        const steerAngularVelocity = gdjs.evtTools.common.lerp(
-          this._beginningSteerAngularVelocity,
-          this._endSteerAngularVelocity,
+        const steerSpeed = gdjs.evtTools.common.lerp(
+          this._beginningSteerSpeed,
+          this._endSteerSpeed,
           Math.abs(this._currentSteerRatio)
         );
         if (steeringControl < 0) {
           // Avoid to much latency when changing of direction
           this._currentSteerRatio = Math.min(0, this._currentSteerRatio);
           this._currentSteerRatio +=
-            (steeringControl * steerAngularVelocity * timeDelta) /
-            this._steerAngleMax;
+            (steeringControl * steerSpeed * timeDelta) / this._steerAngleMax;
           this._currentSteerRatio = Math.max(-1, this._currentSteerRatio);
         }
         if (steeringControl > 0) {
           // Avoid to much latency when changing of direction
           this._currentSteerRatio = Math.max(0, this._currentSteerRatio);
           this._currentSteerRatio +=
-            (steeringControl * steerAngularVelocity * timeDelta) /
-            this._steerAngleMax;
+            (steeringControl * steerSpeed * timeDelta) / this._steerAngleMax;
           this._currentSteerRatio = Math.min(1, this._currentSteerRatio);
         }
       }
@@ -349,48 +383,48 @@ namespace gdjs {
           )
         );
       }
-      // console.log(
-      //   [
-      //     'Car center',
-      //     vec3ToString(carBody.GetPosition()),
-      //     'Mass center',
-      //     vec3ToString(carBody.GetCenterOfMassPosition()),
-      //     'Mass',
-      //     1 / carBody.GetMotionProperties().GetInverseMass(),
-      //     'Speed',
-      //     (carBody
-      //       .GetRotation()
-      //       .InverseRotate(carBody.GetLinearVelocity())
-      //       .GetX() *
-      //       60 *
-      //       60) /
-      //       1000,
-      //     'Wheels',
-      //     vec3ToString(wheels[0].GetContactPosition()),
-      //     vec3ToString(wheels[1].GetContactPosition()),
-      //     vec3ToString(wheels[2].GetContactPosition()),
-      //     vec3ToString(wheels[3].GetContactPosition()),
+      console.log(
+        [
+          'Car center',
+          vec3ToString(carBody.GetPosition()),
+          'Mass center',
+          vec3ToString(carBody.GetCenterOfMassPosition()),
+          'Mass',
+          1 / carBody.GetMotionProperties().GetInverseMass(),
+          'Speed',
+          (carBody
+            .GetRotation()
+            .InverseRotate(carBody.GetLinearVelocity())
+            .GetX() *
+            60 *
+            60) /
+            1000,
+          'Wheels',
+          vec3ToString(wheels[0].GetContactPosition()),
+          vec3ToString(wheels[1].GetContactPosition()),
+          vec3ToString(wheels[2].GetContactPosition()),
+          vec3ToString(wheels[3].GetContactPosition()),
 
-      //     'Speed',
-      //     wheels[0].GetAngularVelocity().toFixed(1),
-      //     wheels[1].GetAngularVelocity().toFixed(1),
-      //     wheels[2].GetAngularVelocity().toFixed(1),
-      //     wheels[3].GetAngularVelocity().toFixed(1),
+          'Speed',
+          wheels[0].GetAngularVelocity().toFixed(1),
+          wheels[1].GetAngularVelocity().toFixed(1),
+          wheels[2].GetAngularVelocity().toFixed(1),
+          wheels[3].GetAngularVelocity().toFixed(1),
 
-      //     'Slip',
-      //     wheels[0].mLongitudinalSlip.toFixed(3),
-      //     wheels[1].mLongitudinalSlip.toFixed(3),
-      //     wheels[2].mLongitudinalSlip.toFixed(3),
-      //     wheels[3].mLongitudinalSlip.toFixed(3),
+          'Slip',
+          wheels[0].mLongitudinalSlip.toFixed(3),
+          wheels[1].mLongitudinalSlip.toFixed(3),
+          wheels[2].mLongitudinalSlip.toFixed(3),
+          wheels[3].mLongitudinalSlip.toFixed(3),
 
-      //     'Steer angle',
-      //     gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
-      //     gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
-      //     gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
-      //     gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
-      //     ,
-      //   ].join('\n')
-      // );
+          'Steer angle',
+          gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
+          gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
+          ,
+        ].join('\n')
+      );
 
       // console.log(forward, right, brake, handBrake);
 
@@ -507,20 +541,20 @@ namespace gdjs {
       this._steerAngleMax = steerAngleMax;
     }
 
-    getBeginningSteerAngularVelocity(): float {
-      return this._beginningSteerAngularVelocity;
+    getBeginningSteerSpeed(): float {
+      return this._beginningSteerSpeed;
     }
 
-    setBeginningSteerAngularVelocity(beginningSteerAngularVelocity: float): void {
-      this._beginningSteerAngularVelocity = beginningSteerAngularVelocity;
+    setBeginningSteerSpeed(beginningSteerSpeed: float): void {
+      this._beginningSteerSpeed = beginningSteerSpeed;
     }
 
-    getEndSteerAngularVelocity(): float {
-      return this._endSteerAngularVelocity;
+    getEndSteerSpeed(): float {
+      return this._endSteerSpeed;
     }
 
-    setEndSteerAngularVelocity(endSteerAngularVelocity: float): void {
-      this._endSteerAngularVelocity = endSteerAngularVelocity;
+    setEndSteerSpeed(endSteerSpeed: float): void {
+      this._endSteerSpeed = endSteerSpeed;
     }
 
     getMass(): float {
@@ -583,18 +617,7 @@ namespace gdjs {
         const { _sharedData } = this.vehicleBehavior;
 
         const carShape = behavior.createShape();
-        // Retrieved the dimensions are set by `createShape`.
-        const halfVehicleWidth = behavior._shapeHalfWidth;
-        const halfVehicleHeight = behavior._shapeHalfHeight;
-        const halfVehicleDepth = behavior._shapeHalfDepth;
 
-        const wheelOffsetX = halfVehicleWidth;
-        const wheelOffsetY = halfVehicleHeight;
-        const wheelOffsetZ = 0;
-        const wheelRadius = halfVehicleDepth;
-        const wheelWidth = halfVehicleDepth / 3;
-        const suspensionMinLength = wheelRadius;
-        const suspensionMaxLength = 1.5 * suspensionMinLength;
         const fourWheelDrive = false;
         const frontBackLimitedSlipRatio = 1.4;
         const leftRightLimitedSlipRatio = 1.4;
@@ -644,26 +667,11 @@ namespace gdjs {
             wheelS.mWheelForward = this.getVec3(1, 0, 0);
             wheelS.mSuspensionDirection = this.getVec3(0, 0, -1);
             wheelS.mSteeringAxis = this.getVec3(0, 0, 1);
-            wheelS.mRadius = wheelRadius;
-            wheelS.mWidth = wheelWidth;
-            wheelS.mSuspensionMinLength = suspensionMinLength;
-            wheelS.mSuspensionMaxLength = suspensionMaxLength;
-            // wheelS.mLongitudinalFriction.Clear();
-            // wheelS.mLongitudinalFriction.AddPoint(0, 1);
-            // wheelS.mLongitudinalFriction.AddPoint(1, 1);
-            // wheelS.mLateralFriction.Clear();
-            // wheelS.mLateralFriction.AddPoint(0, 1.2);
-            // wheelS.mLateralFriction.AddPoint(90, 1.2);
           };
 
           vehicle.mWheels.clear();
 
           const fl = new Jolt.WheelSettingsWV();
-          fl.mPosition = this.getVec3(
-            wheelOffsetX,
-            -wheelOffsetY,
-            -wheelOffsetZ
-          );
           fl.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
           // Front wheel doesn't have hand brake
           fl.mMaxHandBrakeTorque = 0.0;
@@ -671,32 +679,17 @@ namespace gdjs {
           vehicle.mWheels.push_back(fl);
 
           const fr = new Jolt.WheelSettingsWV();
-          fr.mPosition = this.getVec3(
-            wheelOffsetX,
-            wheelOffsetY,
-            -wheelOffsetZ
-          );
           fr.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
           fr.mMaxHandBrakeTorque = 0.0;
           setupWheel(fr);
           vehicle.mWheels.push_back(fr);
 
           const bl = new Jolt.WheelSettingsWV();
-          bl.mPosition = this.getVec3(
-            -wheelOffsetX,
-            -wheelOffsetY,
-            -wheelOffsetZ
-          );
           bl.mMaxSteerAngle = 0.0;
           setupWheel(bl);
           vehicle.mWheels.push_back(bl);
 
           const br = new Jolt.WheelSettingsWV();
-          br.mPosition = this.getVec3(
-            -wheelOffsetX,
-            wheelOffsetY,
-            -wheelOffsetZ
-          );
           br.mMaxSteerAngle = 0.0;
           setupWheel(br);
           vehicle.mWheels.push_back(br);
@@ -705,16 +698,23 @@ namespace gdjs {
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
         controllerSettings.mEngine.mMaxTorque =
           this.vehicleBehavior._engineTorqueMax;
-        // controllerSettings.mEngine.mMaxRPM = 1000;
+        controllerSettings.mEngine.mMaxRPM =
+          this.vehicleBehavior._engineSpeedMax;
         controllerSettings.mEngine.mInertia = 0.01;
         // controllerSettings.mEngine.mNormalizedTorque.Clear();
         // controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
         // controllerSettings.mEngine.mNormalizedTorque.AddPoint(1, 1);
         controllerSettings.mTransmission.mClutchStrength = clutchStrength;
-        // controllerSettings.mTransmission.mGearRatios.clear();
-        // controllerSettings.mTransmission.mGearRatios.push_back(1);
-        // controllerSettings.mTransmission.mReverseGearRatios.clear();
-        // controllerSettings.mTransmission.mReverseGearRatios.push_back(-1);
+        controllerSettings.mTransmission.mGearRatios.clear();
+        for (const gearRatio of this.vehicleBehavior._gearRatios) {
+          controllerSettings.mTransmission.mGearRatios.push_back(gearRatio);
+        }
+        controllerSettings.mTransmission.mReverseGearRatios.clear();
+        for (const gearRatio of this.vehicleBehavior._reverseGearRatios) {
+          controllerSettings.mTransmission.mReverseGearRatios.push_back(
+            gearRatio
+          );
+        }
 
         vehicle.mController = controllerSettings;
 
@@ -796,6 +796,7 @@ namespace gdjs {
         _sharedData.physicsSystem.AddStepListener(
           this.vehicleBehavior._stepListener
         );
+        this.updateWheels();
         return carBody;
       }
 
@@ -809,7 +810,10 @@ namespace gdjs {
 
       recreateShape() {
         this.physicsBodyUpdater.recreateShape();
+        this.updateWheels();
+      }
 
+      private updateWheels() {
         const { _vehicleController } = this.vehicleBehavior;
         if (!_vehicleController) {
           return;
@@ -821,31 +825,61 @@ namespace gdjs {
         }
         const { behavior } = physics3D;
 
+        // Retrieved the dimensions set by `createShape`.
         const halfVehicleWidth = behavior._shapeHalfWidth;
         const halfVehicleHeight = behavior._shapeHalfHeight;
         const halfVehicleDepth = behavior._shapeHalfDepth;
 
-        const wheelOffsetX = halfVehicleWidth;
-        const wheelOffsetY = halfVehicleHeight;
-        const wheelOffsetZ = 0;
-        const wheelRadius = halfVehicleDepth;
-        const wheelWidth = halfVehicleDepth / 3;
+        const shapeScale =
+          behavior.shapeScale * behavior._sharedData.worldInvScale;
+
+        const wheelRadius = this.vehicleBehavior._wheelRadius * shapeScale;
+        const wheelWidth = this.vehicleBehavior._wheelWidth * shapeScale;
+        const backWheelOffsetX =
+          halfVehicleWidth -
+          wheelRadius +
+          this.vehicleBehavior._backWheelOffsetX * shapeScale;
+        const frontWheelOffsetX =
+          halfVehicleWidth -
+          wheelRadius +
+          this.vehicleBehavior._frontWheelOffsetX * shapeScale;
+        const wheelOffsetY =
+          halfVehicleHeight -
+          wheelWidth / 2 +
+          this.vehicleBehavior._wheelOffsetY * shapeScale;
+        // Put the wheels center at the bottom of the car physics shape.
+        const wheelOffsetZ =
+          -halfVehicleDepth +
+          (behavior.shapeOffsetZ + this.vehicleBehavior._wheelOffsetZ) *
+            shapeScale;
         const suspensionMinLength = wheelRadius;
         const suspensionMaxLength = 1.5 * suspensionMinLength;
 
         const constraint = _vehicleController.GetConstraint();
         const fl = constraint.GetWheel(0).GetSettings();
-        fl.mPosition = this.getVec3(wheelOffsetX, -wheelOffsetY, -wheelOffsetZ);
+        fl.mPosition = this.getVec3(
+          frontWheelOffsetX,
+          -wheelOffsetY,
+          wheelOffsetZ
+        );
         const fr = constraint.GetWheel(1).GetSettings();
-        fr.mPosition = this.getVec3(wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
+        fr.mPosition = this.getVec3(
+          frontWheelOffsetX,
+          wheelOffsetY,
+          wheelOffsetZ
+        );
         const bl = constraint.GetWheel(2).GetSettings();
         bl.mPosition = this.getVec3(
-          -wheelOffsetX,
+          -backWheelOffsetX,
           -wheelOffsetY,
-          -wheelOffsetZ
+          wheelOffsetZ
         );
         const br = constraint.GetWheel(3).GetSettings();
-        br.mPosition = this.getVec3(-wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
+        br.mPosition = this.getVec3(
+          -backWheelOffsetX,
+          wheelOffsetY,
+          wheelOffsetZ
+        );
         for (let index = 0; index < 4; index++) {
           const wheel = constraint.GetWheel(index).GetSettings();
           wheel.mRadius = wheelRadius;

@@ -3616,6 +3616,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const hideAskAi =
+    !!authenticatedUser.limits &&
+    !!authenticatedUser.limits.capabilities.classrooms &&
+    authenticatedUser.limits.capabilities.classrooms.hideAskAi;
   const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
@@ -3625,6 +3629,7 @@ const MainFrame = (props: Props) => {
     recentProjectFiles: preferences.getRecentProjectFiles({ limit: 20 }),
     shortcutMap,
     isApplicationTopLevelMenu: false,
+    hideAskAi,
   };
   const mainMenuCallbacks = {
     onChooseProject: () => openOpenFromStorageProviderDialog(),

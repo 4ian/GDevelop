@@ -293,6 +293,8 @@ namespace gdjs {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
           z: objectNetworkSyncData.z,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
@@ -370,6 +372,8 @@ namespace gdjs {
         this._lastSentBasicObjectSyncData = {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,

@@ -3026,6 +3026,8 @@ module.exports = {
           .setLabel('Back wheel offset X')
           .setGroup('Wheels')
           .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
           .setValue(
             behaviorContent
               .getChild('backWheelOffsetX')
@@ -3041,6 +3043,7 @@ module.exports = {
           .setGroup('Wheels')
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
           .setValue(
             behaviorContent
               .getChild('frontWheelOffsetX')
@@ -3056,6 +3059,7 @@ module.exports = {
           .setGroup('Wheels')
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
           .setValue(
             behaviorContent
               .getChild('wheelOffsetY')
@@ -3071,6 +3075,7 @@ module.exports = {
           .setGroup('Wheels')
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setDescription(_('Positive values move wheels outside.'))
           .setValue(
             behaviorContent
               .getChild('wheelOffsetZ')
@@ -3158,7 +3163,7 @@ module.exports = {
           'PhysicsVehicle3D',
           _('Simulate a realistic car.'),
           '',
-          'JsPlatform/Extensions/physics_character3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg',
           'PhysicsVehicle3D',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
@@ -3175,8 +3180,8 @@ module.exports = {
           _('Simulate a press of the move forward key.'),
           _('Simulate pressing Forward key for _PARAM0_'),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3189,8 +3194,8 @@ module.exports = {
           _('Simulate a press of the move backward key.'),
           _('Simulate pressing Backward key for _PARAM0_'),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3203,8 +3208,8 @@ module.exports = {
           _('Simulate a press of the move right key.'),
           _('Simulate pressing Right key for _PARAM0_'),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3217,8 +3222,8 @@ module.exports = {
           _('Simulate a press of the move left key.'),
           _('Simulate pressing Left key for _PARAM0_'),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3231,8 +3236,8 @@ module.exports = {
           _('Simulate a press of the hand break key.'),
           _('Simulate pressing hand break key for _PARAM0_'),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3247,8 +3252,8 @@ module.exports = {
             'Simulate an accelerator stick control for _PARAM0_ with a _PARAM2_ force'
           ),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3265,8 +3270,8 @@ module.exports = {
             'Simulate a steering stick control for _PARAM0_ with a _PARAM2_ force'
           ),
           _('Car controls'),
-          'JsPlatform/Extensions/physics_character3d.svg',
-          'JsPlatform/Extensions/physics_character3d.svg'
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
@@ -3282,8 +3287,8 @@ module.exports = {
         _('Check if a 3D physics character is on a given platform.'),
         _('_PARAM0_ is on platform _PARAM2_'),
         _('Collision'),
-        'JsPlatform/Extensions/physics_character3d.svg',
-        'JsPlatform/Extensions/physics_character3d.svg'
+        'JsPlatform/Extensions/physics_car3d.svg',
+        'JsPlatform/Extensions/physics_car3d.svg'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'PhysicsCharacter3D')

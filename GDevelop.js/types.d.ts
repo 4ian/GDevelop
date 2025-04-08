@@ -816,8 +816,8 @@ export class Layout extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   setStopSoundsOnStartup(enable: boolean): void;
   stopSoundsOnStartup(): boolean;
-  setUnloadSceneAssets(enable: boolean): void;
-  unloadSceneAssets(): boolean;
+  setShouldUnloadAssetsWhenUnloaded(enable: boolean): void;
+  shouldUnloadAssetsWhenUnloaded(): boolean;
 }
 
 export class ExternalEvents extends EmscriptenObject {

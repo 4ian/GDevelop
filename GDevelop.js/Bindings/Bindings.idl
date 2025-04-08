@@ -991,8 +991,8 @@ interface Layout {
     void SetStopSoundsOnStartup(boolean enable);
     boolean StopSoundsOnStartup();
 
-    void SetUnloadSceneAssets(boolean enable);
-    boolean UnloadSceneAssets();
+    void SetShouldUnloadAssetsWhenUnloaded(boolean enable);
+    boolean ShouldUnloadAssetsWhenUnloaded();
 
 };
 

@@ -61,7 +61,7 @@ const ScenePropertiesDialog = ({
   const [
     shouldUnloadAssetsAfterExit,
     setShouldUnloadAssetsAfterExit,
-  ] = React.useState<boolean>(layout.unloadSceneAssets());
+  ] = React.useState<boolean>(layout.shouldUnloadAssetsWhenUnloaded());
 
   const [backgroundColor, setBackgroundColor] = React.useState<?RGBColor>({
     r: layout.getBackgroundColorRed(),
@@ -75,7 +75,7 @@ const ScenePropertiesDialog = ({
       if (open && layout) {
         setWindowTitle(layout.getWindowDefaultTitle());
         setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
-        setShouldUnloadAssetsAfterExit(layout.unloadSceneAssets());
+        setShouldUnloadAssetsAfterExit(layout.shouldUnloadAssetsWhenUnloaded());
         setBackgroundColor({
           r: layout.getBackgroundColorRed(),
           g: layout.getBackgroundColorGreen(),
@@ -90,7 +90,7 @@ const ScenePropertiesDialog = ({
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
     layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
-    layout.setUnloadSceneAssets(shouldUnloadAssetsAfterExit);
+    layout.setShouldUnloadAssetsWhenUnloaded(shouldUnloadAssetsAfterExit);
     layout.setBackgroundColor(
       backgroundColor ? backgroundColor.r : 0,
       backgroundColor ? backgroundColor.g : 0,

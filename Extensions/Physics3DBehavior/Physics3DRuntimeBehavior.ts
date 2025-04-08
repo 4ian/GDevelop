@@ -1824,7 +1824,9 @@ namespace gdjs {
       destroyBody(): void;
     }
 
-    export class DefaultBodyUpdater {
+    export class DefaultBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       behavior: gdjs.Physics3DRuntimeBehavior;
 
       constructor(behavior: gdjs.Physics3DRuntimeBehavior) {

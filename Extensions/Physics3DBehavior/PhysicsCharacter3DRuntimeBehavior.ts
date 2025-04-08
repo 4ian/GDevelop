@@ -1482,7 +1482,9 @@ namespace gdjs {
       ).destroy();
     });
 
-    export class CharacterBodyUpdater {
+    export class CharacterBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
 
       constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {

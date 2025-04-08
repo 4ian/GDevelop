@@ -2805,6 +2805,29 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'hasBackWheelDrive') {
+          behaviorContent
+            .getChild('hasBackWheelDrive')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'hasFrontWheelDrive') {
+          behaviorContent
+            .getChild('hasFrontWheelDrive')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'pitchRollAngleMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('pitchRollAngleMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
@@ -3057,6 +3080,49 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        behaviorProperties
+          .getOrCreate('hasBackWheelDrive')
+          .setValue(
+            behaviorContent.getChild('hasBackWheelDrive').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setType('Boolean')
+          .setLabel(_('Back wheel drive'))
+          .setGroup(_('Wheels'))
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('hasFrontWheelDrive')
+          .setValue(
+            behaviorContent.getChild('hasFrontWheelDrive').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .setType('Boolean')
+          .setLabel(_('Front wheel drive'))
+          .setGroup(_('Wheels'))
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('pitchRollAngleMax')
+          .setLabel('Pitch and roll max angle')
+          .setGroup('')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            behaviorContent
+              .getChild('pitchRollAngleMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return behaviorProperties;
       };
 
@@ -3081,6 +3147,9 @@ module.exports = {
         behaviorContent.addChild('wheelOffsetZ').setDoubleValue(0);
         behaviorContent.addChild('wheelRadius').setDoubleValue(10);
         behaviorContent.addChild('wheelWidth').setDoubleValue(5);
+        behaviorContent.addChild('hasBackWheelDrive').setBoolValue(false);
+        behaviorContent.addChild('hasFrontWheelDrive').setBoolValue(true);
+        behaviorContent.addChild('pitchRollAngleMax').setDoubleValue(90);
       };
       const aut = extension
         .addBehavior(

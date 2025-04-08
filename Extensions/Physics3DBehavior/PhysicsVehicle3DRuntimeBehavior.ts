@@ -54,12 +54,15 @@ namespace gdjs {
     _engineSpeedMax: float;
     _gearRatios: Array<float>;
     _reverseGearRatios: Array<float>;
-    _backWheelOffsetX: float;
-    _frontWheelOffsetX: float;
-    _wheelOffsetY: float;
-    _wheelOffsetZ: float;
-    _wheelRadius: float;
-    _wheelWidth: float;
+    private _backWheelOffsetX: float;
+    private _frontWheelOffsetX: float;
+    private _wheelOffsetY: float;
+    private _wheelOffsetZ: float;
+    private _wheelRadius: float;
+    private _wheelWidth: float;
+    _pitchRollAngleMax: float;
+    _hasBackWheelDrive: boolean;
+    _hasFrontWheelDrive: boolean;
 
     private _currentSteerRatio: float = 0;
 
@@ -114,19 +117,15 @@ namespace gdjs {
         behaviorData.gearRatio5,
         behaviorData.gearRatio6,
       ];
-      for (let index = 0; index < this._gearRatios.length; index++) {
-        const gearRatio = this._gearRatios[index];
-        if (gearRatio <= 0 || gearRatio >= this._gearRatios[index - 1]) {
-          this._gearRatios.splice(index);
-          index--;
-        }
-      }
       this._backWheelOffsetX = behaviorData.backWheelOffsetX;
       this._frontWheelOffsetX = behaviorData.frontWheelOffsetX;
       this._wheelOffsetY = behaviorData.wheelOffsetY;
       this._wheelOffsetZ = behaviorData.wheelOffsetZ;
       this._wheelRadius = behaviorData.wheelRadius;
       this._wheelWidth = behaviorData.wheelWidth;
+      this._hasBackWheelDrive = behaviorData.hasBackWheelDrive;
+      this._hasFrontWheelDrive = behaviorData.hasFrontWheelDrive;
+      this._pitchRollAngleMax = behaviorData.pitchRollAngleMax;
     }
 
     private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
@@ -181,6 +180,70 @@ namespace gdjs {
       }
       if (oldBehaviorData.engineTorqueMax !== newBehaviorData.engineTorqueMax) {
         this.setEngineTorqueMax(newBehaviorData.engineTorqueMax);
+      }
+      if (oldBehaviorData.engineSpeedMax !== newBehaviorData.engineSpeedMax) {
+        this.setEngineSpeedMax(newBehaviorData.engineSpeedMax);
+      }
+      if (
+        oldBehaviorData.reverseGearRatio1 !== newBehaviorData.reverseGearRatio1
+      ) {
+        this.setGearRatio(-1, newBehaviorData.reverseGearRatio1);
+      }
+      if (oldBehaviorData.gearRatio1 !== newBehaviorData.gearRatio1) {
+        this.setGearRatio(1, newBehaviorData.gearRatio1);
+      }
+      if (oldBehaviorData.gearRatio2 !== newBehaviorData.gearRatio2) {
+        this.setGearRatio(2, newBehaviorData.gearRatio2);
+      }
+      if (oldBehaviorData.gearRatio3 !== newBehaviorData.gearRatio3) {
+        this.setGearRatio(3, newBehaviorData.gearRatio3);
+      }
+      if (oldBehaviorData.gearRatio4 !== newBehaviorData.gearRatio4) {
+        this.setGearRatio(4, newBehaviorData.gearRatio4);
+      }
+      if (oldBehaviorData.gearRatio5 !== newBehaviorData.gearRatio5) {
+        this.setGearRatio(5, newBehaviorData.gearRatio5);
+      }
+      if (oldBehaviorData.gearRatio6 !== newBehaviorData.gearRatio6) {
+        this.setGearRatio(6, newBehaviorData.gearRatio6);
+      }
+      if (
+        oldBehaviorData.backWheelOffsetX !== newBehaviorData.backWheelOffsetX
+      ) {
+        this.setBackWheelOffsetX(newBehaviorData.backWheelOffsetX);
+      }
+      if (
+        oldBehaviorData.frontWheelOffsetX !== newBehaviorData.frontWheelOffsetX
+      ) {
+        this.setFrontWheelOffsetX(newBehaviorData.frontWheelOffsetX);
+      }
+      if (oldBehaviorData.wheelOffsetY !== newBehaviorData.wheelOffsetY) {
+        this.setWheelOffsetY(newBehaviorData.wheelOffsetY);
+      }
+      if (oldBehaviorData.wheelOffsetZ !== newBehaviorData.wheelOffsetZ) {
+        this.setWheelOffsetZ(newBehaviorData.wheelOffsetZ);
+      }
+      if (oldBehaviorData.wheelRadius !== newBehaviorData.wheelRadius) {
+        this.setWheelRadius(newBehaviorData.wheelRadius);
+      }
+      if (oldBehaviorData.wheelWidth !== newBehaviorData.wheelWidth) {
+        this.setWheelWidth(newBehaviorData.wheelWidth);
+      }
+      if (
+        oldBehaviorData.hasBackWheelDrive !== newBehaviorData.hasBackWheelDrive
+      ) {
+        this.setBackWheelDrive(newBehaviorData.hasBackWheelDrive);
+      }
+      if (
+        oldBehaviorData.hasFrontWheelDrive !==
+        newBehaviorData.hasFrontWheelDrive
+      ) {
+        this.setFrontWheelDrive(newBehaviorData.hasFrontWheelDrive);
+      }
+      if (
+        oldBehaviorData.pitchRollAngleMax !== newBehaviorData.pitchRollAngleMax
+      ) {
+        this.setPitchRollAngleMax(newBehaviorData.pitchRollAngleMax);
       }
       return true;
     }
@@ -357,22 +420,6 @@ namespace gdjs {
         forward = 0.0;
         handBrake = 1.0;
       }
-
-      // console.log(
-      //   this._vehicleController
-      //     .GetConstraint()
-      //     .GetWheel(0)
-      //     .GetAngularVelocity(),
-      //   this._vehicleController
-      //     .GetConstraint()
-      //     .GetWheel(1)
-      //     .GetAngularVelocity(),
-      //   this._vehicleController
-      //     .GetConstraint()
-      //     .GetWheel(2)
-      //     .GetAngularVelocity(),
-      //   this._vehicleController.GetConstraint().GetWheel(3).GetAngularVelocity()
-      // );
 
       const wheels: Array<Jolt.WheelWV> = [];
       for (let index = 0; index < 4; index++) {
@@ -563,6 +610,10 @@ namespace gdjs {
 
     setMass(mass: float): void {
       this._mass = mass;
+      this.invalidateShape();
+    }
+
+    invalidateShape(): void {
       const physics3D = this.getPhysics3D();
       if (!physics3D) {
         return;
@@ -582,6 +633,230 @@ namespace gdjs {
       }
       this._vehicleController.GetEngine().mMaxTorque = engineTorqueMax;
     }
+
+    /**
+     * @returns The engine speed in RPM (rotation per minute)
+     */
+    getEngineSpeedMax(): float {
+      return this._engineSpeedMax;
+    }
+
+    setEngineSpeedMax(engineSpeedMax: float): void {
+      this._engineSpeedMax = engineSpeedMax;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._vehicleController.GetEngine().mMaxRPM = engineSpeedMax;
+    }
+
+    getGearRatio(gearNumber: integer): float {
+      if (gearNumber === 0) {
+        return 0;
+      }
+      if (gearNumber < 0) {
+        return this._reverseGearRatios[-gearNumber - 1] || 0;
+      }
+      return this._gearRatios[gearNumber - 1] || 0;
+    }
+
+    setGearRatio(gearNumber: integer, ratio: float) {
+      if (gearNumber > 0) {
+        this._gearRatios[gearNumber - 1] = ratio;
+        if (!this._vehicleController) {
+          return;
+        }
+        this._updateGearRatios();
+      } else if (gearNumber < 0) {
+        this._reverseGearRatios[-gearNumber - 1] = ratio;
+        this._updateReverseGearRatios();
+      }
+    }
+
+    _updateGearRatios() {
+      if (!this._vehicleController) {
+        return;
+      }
+      const gearRatios = this._vehicleController.GetTransmission().mGearRatios;
+      gearRatios.clear();
+      let previousGearRatio = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < this._gearRatios.length; index++) {
+        const gearRatio = this._gearRatios[index];
+        if (0 < gearRatio && gearRatio < previousGearRatio) {
+          gearRatios.push_back(gearRatio);
+          previousGearRatio = gearRatio;
+        }
+      }
+    }
+
+    _updateReverseGearRatios() {
+      if (!this._vehicleController) {
+        return;
+      }
+      const reverseGearRatios =
+        this._vehicleController.GetTransmission().mReverseGearRatios;
+      reverseGearRatios.clear();
+      let previousGearRatio = Number.NEGATIVE_INFINITY;
+      for (let index = 0; index < this._reverseGearRatios.length; index++) {
+        const gearRatio = this._reverseGearRatios[index];
+        if (previousGearRatio < gearRatio && gearRatio < 0) {
+          reverseGearRatios.push_back(gearRatio);
+          previousGearRatio = gearRatio;
+        }
+      }
+    }
+
+    getBackWheelOffsetX(): float {
+      return this._backWheelOffsetX;
+    }
+
+    setBackWheelOffsetX(backWheelOffsetX: float): void {
+      this._backWheelOffsetX = backWheelOffsetX;
+      this._updateWheels();
+    }
+
+    getFrontWheelOffsetX(): float {
+      return this._frontWheelOffsetX;
+    }
+
+    setFrontWheelOffsetX(frontWheelOffsetX: float): void {
+      this._frontWheelOffsetX = frontWheelOffsetX;
+      this._updateWheels();
+    }
+
+    getWheelOffsetY(): float {
+      return this._wheelOffsetY;
+    }
+
+    setWheelOffsetY(wheelOffsetY: float): void {
+      this._wheelOffsetY = wheelOffsetY;
+      this._updateWheels();
+    }
+
+    getWheelOffsetZ(): float {
+      return this._wheelOffsetZ;
+    }
+
+    setWheelOffsetZ(wheelOffsetZ: float): void {
+      this._wheelOffsetY = wheelOffsetZ;
+      this._updateWheels();
+    }
+
+    getWheelRadius(): float {
+      return this._wheelRadius;
+    }
+
+    setWheelRadius(wheelRadius: float): void {
+      this._wheelRadius = wheelRadius;
+      this._updateWheels();
+    }
+
+    getWheelWidth(): float {
+      return this._wheelWidth;
+    }
+
+    setWheelWidth(wheelWidth: float): void {
+      this._wheelWidth = wheelWidth;
+      this._updateWheels();
+    }
+
+    hasBackWheelDrive(): boolean {
+      return this._hasBackWheelDrive;
+    }
+
+    setBackWheelDrive(hasBackWheelDrive: boolean): void {
+      this._hasBackWheelDrive = hasBackWheelDrive;
+      this.invalidateShape();
+    }
+
+    hasFrontWheelDrive(): boolean {
+      return this._hasBackWheelDrive;
+    }
+
+    setFrontWheelDrive(hasFrontWheelDrive: boolean): void {
+      this._hasBackWheelDrive = hasFrontWheelDrive;
+      this.invalidateShape();
+    }
+
+    getPitchRollAngleMax(): float {
+      return this._pitchRollAngleMax;
+    }
+
+    setPitchRollAngleMax(pitchRollAngleMax: float): void {
+      this._pitchRollAngleMax = pitchRollAngleMax;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._vehicleController
+        .GetConstraint()
+        .SetMaxPitchRollAngle(pitchRollAngleMax);
+    }
+
+    _updateWheels() {
+      if (!this._vehicleController) {
+        return;
+      }
+      const physics3D = this.getPhysics3D();
+      if (!physics3D) {
+        return;
+      }
+      const { behavior } = physics3D;
+
+      // Retrieved the dimensions set by `createShape`.
+      const halfVehicleWidth = behavior._shapeHalfWidth;
+      const halfVehicleHeight = behavior._shapeHalfHeight;
+      const halfVehicleDepth = behavior._shapeHalfDepth;
+
+      const shapeScale =
+        behavior.shapeScale * behavior._sharedData.worldInvScale;
+
+      const wheelRadius = this._wheelRadius * shapeScale;
+      const wheelWidth = this._wheelWidth * shapeScale;
+      const backWheelOffsetX =
+        halfVehicleWidth - wheelRadius + this._backWheelOffsetX * shapeScale;
+      const frontWheelOffsetX =
+        halfVehicleWidth - wheelRadius + this._frontWheelOffsetX * shapeScale;
+      const wheelOffsetY =
+        halfVehicleHeight - wheelWidth / 2 + this._wheelOffsetY * shapeScale;
+      // Put the wheels center at the bottom of the car physics shape.
+      const wheelOffsetZ =
+        -halfVehicleDepth +
+        (behavior.shapeOffsetZ + this._wheelOffsetZ) * shapeScale;
+      const suspensionMinLength = wheelRadius;
+      const suspensionMaxLength = 1.5 * suspensionMinLength;
+
+      const constraint = this._vehicleController.GetConstraint();
+      const fl = constraint.GetWheel(0).GetSettings();
+      fl.mPosition = this.getVec3(
+        frontWheelOffsetX,
+        -wheelOffsetY,
+        wheelOffsetZ
+      );
+      const fr = constraint.GetWheel(1).GetSettings();
+      fr.mPosition = this.getVec3(
+        frontWheelOffsetX,
+        wheelOffsetY,
+        wheelOffsetZ
+      );
+      const bl = constraint.GetWheel(2).GetSettings();
+      bl.mPosition = this.getVec3(
+        -backWheelOffsetX,
+        -wheelOffsetY,
+        wheelOffsetZ
+      );
+      const br = constraint.GetWheel(3).GetSettings();
+      br.mPosition = this.getVec3(
+        -backWheelOffsetX,
+        wheelOffsetY,
+        wheelOffsetZ
+      );
+      for (let index = 0; index < 4; index++) {
+        const wheel = constraint.GetWheel(index).GetSettings();
+        wheel.mRadius = wheelRadius;
+        wheel.mWidth = wheelWidth;
+        wheel.mSuspensionMinLength = suspensionMinLength;
+        wheel.mSuspensionMaxLength = suspensionMaxLength;
+      }
+    }
   }
 
   gdjs.registerBehavior(
@@ -590,7 +865,9 @@ namespace gdjs {
   );
 
   export namespace PhysicsVehicle3DRuntimeBehavior {
-    export class VehicleBodyUpdater {
+    export class VehicleBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       vehicleBehavior: gdjs.PhysicsVehicle3DRuntimeBehavior;
       physicsBodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
 
@@ -617,13 +894,6 @@ namespace gdjs {
         const { _sharedData } = this.vehicleBehavior;
 
         const carShape = behavior.createShape();
-
-        const fourWheelDrive = false;
-        const frontBackLimitedSlipRatio = 1.4;
-        const leftRightLimitedSlipRatio = 1.4;
-        const antiRollbar = true;
-
-        const clutchStrength = 10;
 
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
@@ -655,7 +925,9 @@ namespace gdjs {
         const vehicle = new Jolt.VehicleConstraintSettings();
         vehicle.mUp = this.getVec3(0, 0, 1);
         vehicle.mForward = this.getVec3(1, 0, 0);
-        vehicle.mMaxPitchRollAngle = gdjs.toRad(60.0);
+        vehicle.mMaxPitchRollAngle = gdjs.toRad(
+          this.vehicleBehavior._pitchRollAngleMax
+        );
 
         const FL_WHEEL = 0;
         const FR_WHEEL = 1;
@@ -700,59 +972,49 @@ namespace gdjs {
           this.vehicleBehavior._engineTorqueMax;
         controllerSettings.mEngine.mMaxRPM =
           this.vehicleBehavior._engineSpeedMax;
+        // TODO
         controllerSettings.mEngine.mInertia = 0.01;
-        // controllerSettings.mEngine.mNormalizedTorque.Clear();
-        // controllerSettings.mEngine.mNormalizedTorque.AddPoint(0, 1);
-        // controllerSettings.mEngine.mNormalizedTorque.AddPoint(1, 1);
-        controllerSettings.mTransmission.mClutchStrength = clutchStrength;
-        controllerSettings.mTransmission.mGearRatios.clear();
-        for (const gearRatio of this.vehicleBehavior._gearRatios) {
-          controllerSettings.mTransmission.mGearRatios.push_back(gearRatio);
-        }
-        controllerSettings.mTransmission.mReverseGearRatios.clear();
-        for (const gearRatio of this.vehicleBehavior._reverseGearRatios) {
-          controllerSettings.mTransmission.mReverseGearRatios.push_back(
-            gearRatio
-          );
-        }
-
         vehicle.mController = controllerSettings;
 
-        // Front differential
+        const fourWheelDrive =
+          this.vehicleBehavior._hasBackWheelDrive &&
+          this.vehicleBehavior._hasFrontWheelDrive;
         controllerSettings.mDifferentials.clear();
-        const frontWheelDrive = new Jolt.VehicleDifferentialSettings();
-        frontWheelDrive.mLeftWheel = FL_WHEEL;
-        frontWheelDrive.mRightWheel = FR_WHEEL;
-        frontWheelDrive.mLimitedSlipRatio = leftRightLimitedSlipRatio;
-        if (fourWheelDrive) {
-          frontWheelDrive.mEngineTorqueRatio = 0.5; // Split engine torque when 4WD
+
+        // Front differential
+        if (this.vehicleBehavior._hasFrontWheelDrive) {
+          const frontWheelDrive = new Jolt.VehicleDifferentialSettings();
+          frontWheelDrive.mLeftWheel = FL_WHEEL;
+          frontWheelDrive.mRightWheel = FR_WHEEL;
+          if (fourWheelDrive) {
+            // Split engine torque when 4 wheels drive
+            frontWheelDrive.mEngineTorqueRatio = 0.5;
+          }
+          controllerSettings.mDifferentials.push_back(frontWheelDrive);
         }
-        controllerSettings.mDifferentials.push_back(frontWheelDrive);
-        controllerSettings.mDifferentialLimitedSlipRatio =
-          frontBackLimitedSlipRatio;
 
         // Rear differential
-        if (fourWheelDrive) {
+        if (this.vehicleBehavior._hasBackWheelDrive) {
           const rearWheelDrive = new Jolt.VehicleDifferentialSettings();
           rearWheelDrive.mLeftWheel = BL_WHEEL;
           rearWheelDrive.mRightWheel = BR_WHEEL;
-          rearWheelDrive.mLimitedSlipRatio = leftRightLimitedSlipRatio;
-          rearWheelDrive.mEngineTorqueRatio = 0.5;
+          if (fourWheelDrive) {
+            // Split engine torque when 4 wheels drive
+            rearWheelDrive.mEngineTorqueRatio = 0.5;
+          }
           controllerSettings.mDifferentials.push_back(rearWheelDrive);
         }
 
         // Anti-roll bars
-        if (antiRollbar) {
-          vehicle.mAntiRollBars.clear();
-          const frontRollBar = new Jolt.VehicleAntiRollBar();
-          frontRollBar.mLeftWheel = FL_WHEEL;
-          frontRollBar.mRightWheel = FR_WHEEL;
-          const rearRollBar = new Jolt.VehicleAntiRollBar();
-          rearRollBar.mLeftWheel = BL_WHEEL;
-          rearRollBar.mRightWheel = BR_WHEEL;
-          vehicle.mAntiRollBars.push_back(frontRollBar);
-          vehicle.mAntiRollBars.push_back(rearRollBar);
-        }
+        vehicle.mAntiRollBars.clear();
+        const frontRollBar = new Jolt.VehicleAntiRollBar();
+        frontRollBar.mLeftWheel = FL_WHEEL;
+        frontRollBar.mRightWheel = FR_WHEEL;
+        const rearRollBar = new Jolt.VehicleAntiRollBar();
+        rearRollBar.mLeftWheel = BL_WHEEL;
+        rearRollBar.mRightWheel = BR_WHEEL;
+        vehicle.mAntiRollBars.push_back(frontRollBar);
+        vehicle.mAntiRollBars.push_back(rearRollBar);
 
         const constraint = new Jolt.VehicleConstraint(carBody, vehicle);
         Jolt.destroy(vehicle);
@@ -796,7 +1058,9 @@ namespace gdjs {
         _sharedData.physicsSystem.AddStepListener(
           this.vehicleBehavior._stepListener
         );
-        this.updateWheels();
+        this.vehicleBehavior._updateWheels();
+        this.vehicleBehavior._updateGearRatios();
+        this.vehicleBehavior._updateReverseGearRatios();
         return carBody;
       }
 
@@ -810,83 +1074,7 @@ namespace gdjs {
 
       recreateShape() {
         this.physicsBodyUpdater.recreateShape();
-        this.updateWheels();
-      }
-
-      private updateWheels() {
-        const { _vehicleController } = this.vehicleBehavior;
-        if (!_vehicleController) {
-          return;
-        }
-
-        const physics3D = this.vehicleBehavior.getPhysics3D();
-        if (!physics3D) {
-          return;
-        }
-        const { behavior } = physics3D;
-
-        // Retrieved the dimensions set by `createShape`.
-        const halfVehicleWidth = behavior._shapeHalfWidth;
-        const halfVehicleHeight = behavior._shapeHalfHeight;
-        const halfVehicleDepth = behavior._shapeHalfDepth;
-
-        const shapeScale =
-          behavior.shapeScale * behavior._sharedData.worldInvScale;
-
-        const wheelRadius = this.vehicleBehavior._wheelRadius * shapeScale;
-        const wheelWidth = this.vehicleBehavior._wheelWidth * shapeScale;
-        const backWheelOffsetX =
-          halfVehicleWidth -
-          wheelRadius +
-          this.vehicleBehavior._backWheelOffsetX * shapeScale;
-        const frontWheelOffsetX =
-          halfVehicleWidth -
-          wheelRadius +
-          this.vehicleBehavior._frontWheelOffsetX * shapeScale;
-        const wheelOffsetY =
-          halfVehicleHeight -
-          wheelWidth / 2 +
-          this.vehicleBehavior._wheelOffsetY * shapeScale;
-        // Put the wheels center at the bottom of the car physics shape.
-        const wheelOffsetZ =
-          -halfVehicleDepth +
-          (behavior.shapeOffsetZ + this.vehicleBehavior._wheelOffsetZ) *
-            shapeScale;
-        const suspensionMinLength = wheelRadius;
-        const suspensionMaxLength = 1.5 * suspensionMinLength;
-
-        const constraint = _vehicleController.GetConstraint();
-        const fl = constraint.GetWheel(0).GetSettings();
-        fl.mPosition = this.getVec3(
-          frontWheelOffsetX,
-          -wheelOffsetY,
-          wheelOffsetZ
-        );
-        const fr = constraint.GetWheel(1).GetSettings();
-        fr.mPosition = this.getVec3(
-          frontWheelOffsetX,
-          wheelOffsetY,
-          wheelOffsetZ
-        );
-        const bl = constraint.GetWheel(2).GetSettings();
-        bl.mPosition = this.getVec3(
-          -backWheelOffsetX,
-          -wheelOffsetY,
-          wheelOffsetZ
-        );
-        const br = constraint.GetWheel(3).GetSettings();
-        br.mPosition = this.getVec3(
-          -backWheelOffsetX,
-          wheelOffsetY,
-          wheelOffsetZ
-        );
-        for (let index = 0; index < 4; index++) {
-          const wheel = constraint.GetWheel(index).GetSettings();
-          wheel.mRadius = wheelRadius;
-          wheel.mWidth = wheelWidth;
-          wheel.mSuspensionMinLength = suspensionMinLength;
-          wheel.mSuspensionMaxLength = suspensionMaxLength;
-        }
+        this.vehicleBehavior._updateWheels();
       }
 
       destroyBody() {

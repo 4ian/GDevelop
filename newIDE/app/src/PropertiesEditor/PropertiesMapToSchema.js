@@ -307,6 +307,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['MaxSpeed', 'SlopeMaxAngle'],
   ['Beginning', 'End'],
   ['Start', 'End'],
+  ['Rear', 'Front'],
   ['1', '2'],
   ['3', '4'],
   ['5', '6'],

@@ -198,6 +198,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
     setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
+    setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this),
   };
 
   componentDidMount() {
@@ -1025,6 +1026,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           takeScreenshotOnPreview: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowAiAskButtonInTitleBar(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showAiAskButtonInTitleBar: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

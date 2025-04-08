@@ -13,6 +13,12 @@ import { type EditorTab } from './EditorTabs/EditorTabsHandler';
 import { getTabId } from './EditorTabs/DraggableEditorTabs';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
+import RobotIcon from '../ProjectCreation/RobotIcon';
+import PreferencesContext from './Preferences/PreferencesContext';
+import TextButton from '../UI/TextButton';
+import { useInterval } from '../Utils/UseInterval';
+import { useIsMounted } from '../Utils/UseIsMounted';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -32,13 +38,63 @@ const styles = {
     width: 34,
     height: 34,
   },
+  askAiContainer: {
+    marginBottom: 4,
+    marginRight: 1,
+    marginLeft: 2,
+  },
 };
 
 type TabsTitlebarProps = {|
   hidden: boolean,
   toggleProjectManager: () => void,
-  renderTabs: (onHoverEditorTab: (?EditorTab) => void) => React.Node,
+  renderTabs: (
+    onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
+    onEditorTabClosing: () => void
+  ) => React.Node,
+  hasAskAiOpened: boolean,
+  onOpenAskAi: () => void,
 |};
+
+const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
+  const isMounted = useIsMounted();
+
+  const [isAskAiIconAnimated, setIsAskAiIconAnimated] = React.useState(true);
+  const animate = React.useCallback(
+    (animationDuration: number) => {
+      if (isMounted.current) {
+        setIsAskAiIconAnimated(true);
+        setTimeout(() => {
+          if (!isMounted.current) return;
+
+          setIsAskAiIconAnimated(false);
+        }, animationDuration);
+      }
+    },
+    [isMounted]
+  );
+
+  React.useEffect(
+    () => {
+      // Animate the icon for a long time at the beginning.
+      animate(9000);
+    },
+    [animate]
+  );
+
+  useInterval(
+    () => {
+      setIsAskAiIconAnimated(true);
+      setTimeout(() => {
+        setIsAskAiIconAnimated(false);
+      }, 8000);
+    },
+    // Animate the icon every 20 minutes.
+    shouldDisplayAskAi ? 20 * 60 * 1000 : null
+  );
+
+  return isAskAiIconAnimated;
+};
 
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
@@ -47,10 +103,14 @@ export default function TabsTitlebar({
   toggleProjectManager,
   hidden,
   renderTabs,
+  hasAskAiOpened,
+  onOpenAskAi,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
+  const preferences = React.useContext(PreferencesContext);
+  const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -64,8 +124,11 @@ export default function TabsTitlebar({
     [backgroundColor]
   );
 
-  const onHoverEditorTab = React.useCallback(
-    (editorTab: ?EditorTab) => {
+  const onEditorTabHovered = React.useCallback(
+    (
+      editorTab: ?EditorTab,
+      { isLabelTruncated }: {| isLabelTruncated: boolean |}
+    ) => {
       if (isTouchscreen) {
         setTooltipData(null);
         return;
@@ -76,7 +139,7 @@ export default function TabsTitlebar({
         tooltipTimeoutId.current = null;
       }
 
-      if (editorTab) {
+      if (editorTab && isLabelTruncated) {
         const element = document.getElementById(getTabId(editorTab));
         if (element) {
           tooltipTimeoutId.current = setTimeout(
@@ -97,6 +160,17 @@ export default function TabsTitlebar({
     [isTouchscreen, tooltipData]
   );
 
+  const onEditorTabClosing = React.useCallback(() => {
+    // Always clear the tooltip when a tab is closed,
+    // as they are multiple actions that can be done to
+    // close it, it's safer (close all, close others, close one).
+    if (tooltipTimeoutId.current) {
+      clearTimeout(tooltipTimeoutId.current);
+      tooltipTimeoutId.current = null;
+    }
+    setTooltipData(null);
+  }, []);
+
   React.useEffect(
     () => {
       return () => {
@@ -108,6 +182,17 @@ export default function TabsTitlebar({
     // Clear timeout if necessary when unmounting.
     []
   );
+
+  const hideAskAi =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hideAskAi;
+
+  const shouldDisplayAskAi =
+    preferences.values.showAiAskButtonInTitleBar &&
+    !hasAskAiOpened &&
+    !hideAskAi;
+  const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (
     <div
@@ -133,7 +218,19 @@ export default function TabsTitlebar({
       >
         <MenuIcon />
       </IconButton>
-      {renderTabs(onHoverEditorTab)}
+      {renderTabs(onEditorTabHovered, onEditorTabClosing)}
+      {shouldDisplayAskAi ? (
+        <div
+          style={styles.askAiContainer}
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        >
+          <TextButton
+            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
+            label={'Ask AI'}
+            onClick={onOpenAskAi}
+          />
+        </div>
+      ) : null}
       <TitleBarRightSafeMargins />
       {tooltipData && (
         <TabsTitlebarTooltip

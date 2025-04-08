@@ -80,6 +80,10 @@ const extraClassAttributes = {
   ],
   ObjectJsImplementation: ['content: Record<string, any>;'],
   VectorString: ['toJSArray(): Array<string>;'],
+  Serializer: [
+    'static fromJSObject(object: Object): gdSerializerElement;',
+    'static toJSObject(element: gdSerializerElement): any;',
+  ],
 };
 
 const PrimitiveTypes = new Map([
@@ -258,6 +262,7 @@ for (const [
       attributes.push(
         `${attributeName}${optionalReturn ? '?' : ''}: ${returnType};`
       );
+      Parser.skipWhitespaces();
       continue;
     }
 

@@ -31,7 +31,7 @@ const WalletWidget = ({
     badges,
     onOpenCreateAccountDialog,
   } = React.useContext(AuthenticatedUserContext);
-  const creditsAvailable = limits ? limits.credits.userBalance.amount : 0;
+  const availableCredits = limits ? limits.credits.userBalance.amount : 0;
 
   return (
     <DashboardWidget
@@ -40,7 +40,7 @@ const WalletWidget = ({
       topRightAction={
         <TextButton
           icon={<Coin fontSize="small" />}
-          label={creditsAvailable.toString()}
+          label={availableCredits.toString()}
           onClick={profile ? onOpenProfile : onOpenCreateAccountDialog}
         />
       }

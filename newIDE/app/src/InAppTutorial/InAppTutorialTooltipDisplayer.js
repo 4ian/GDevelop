@@ -208,7 +208,7 @@ type TooltipHeaderProps = {|
   showFoldButton: boolean,
   onClickFoldButton: () => void,
   tooltipContent?: string,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
 |};
 
 const TooltipHeader = ({
@@ -246,7 +246,10 @@ const TooltipHeader = ({
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
         {tooltipContent ? null : (
           // We hide the quit button only when the tooltip is folded, the tooltip content should not be null;
-          <ButtonBase disableRipple onClick={endTutorial}>
+          <ButtonBase
+            disableRipple
+            onClick={() => endTutorial({ reason: 'user-early-exit' })}
+          >
             <div
               style={{
                 ...styles.iconButtonContainer,
@@ -292,7 +295,7 @@ type Props = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
   progress: number,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   goToNextStep: () => void,
   fillAutomatically?: () => void,
   isBlockingLayerDisplayed: boolean,

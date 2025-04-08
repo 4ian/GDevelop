@@ -13,6 +13,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
+import { type AskAiEditorInterface } from '../EditorContainers/AskAi';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
 
@@ -25,7 +26,8 @@ type EditorRef =
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
-  | HomePageEditorInterface;
+  | HomePageEditorInterface
+  | AskAiEditorInterface;
 
 type TabOptions = {| data?: HTMLDataset |};
 
@@ -64,6 +66,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
+  | 'ask-ai'
   | 'start page';
 
 type EditorTabMetadata = {|
@@ -115,6 +118,8 @@ export const getEditorTabMetadata = (
         ? 'custom object'
         : editorTab.editorRef instanceof DebuggerEditorContainer
         ? 'debugger'
+        : editorTab.key === 'ask-ai'
+        ? 'ask-ai'
         : 'start page',
   };
 };
@@ -447,4 +452,11 @@ export const moveTabToPosition = (
   else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabNewIndex += 1;
 
   return { editors: currentEditorTabs, currentTab: currentTabNewIndex };
+};
+
+export const hasEditorTabOpenedWithKey = (
+  editorTabsState: EditorTabsState,
+  key: string
+) => {
+  return !!editorTabsState.editors.find(editor => editor.key === key);
 };

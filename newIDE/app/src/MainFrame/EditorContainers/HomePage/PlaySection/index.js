@@ -2,18 +2,22 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
-import { GamesPlatformFrameContext } from './GamesPlatformFrameContext';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import { sendPlaySectionOpened } from '../../../../Utils/Analytics/EventSender';
+import { type GamesPlatformFrameTools } from './UseGamesPlatformFrame';
 
-const PlaySection = () => {
+type Props = {|
+  gamesPlatformFrameTools: GamesPlatformFrameTools,
+|};
+
+const PlaySection = ({ gamesPlatformFrameTools }: Props) => {
   const {
     iframeLoaded,
     iframeErrored,
     loadIframeOrRemoveTimeout,
-  } = React.useContext(GamesPlatformFrameContext);
+  } = gamesPlatformFrameTools;
 
   React.useEffect(() => {
     sendPlaySectionOpened();
@@ -38,13 +42,13 @@ const PlaySection = () => {
   );
 };
 
-const PlaySectionWithErrorBoundary = () => {
+const PlaySectionWithErrorBoundary = (props: Props) => {
   return (
     <ErrorBoundary
       componentTitle={<Trans>Play section</Trans>}
       scope="start-page-play"
     >
-      <PlaySection />
+      <PlaySection {...props} />
     </ErrorBoundary>
   );
 };

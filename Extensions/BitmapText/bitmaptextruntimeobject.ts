@@ -15,12 +15,11 @@ namespace gdjs {
       textureAtlasResourceName: string;
       /** The scale of the text. */
       scale: float;
-      /** Activate word wrap if set to true. */
-      wordWrap: boolean;
       /** Wrapping with from custom size properties. */
       wrappingWidth: float;
       /** Alignment of the text. */
       align: 'left' | 'center' | 'right';
+      verticalTextAlignment: 'top' | 'center' | 'bottom';
     };
   };
   export type BitmapTextObjectData = ObjectData & BitmapTextObjectDataType;
@@ -35,6 +34,7 @@ namespace gdjs {
     wwrap: boolean;
     wwidth: float;
     align: string;
+    vta: string;
   };
 
   export type BitmapTextObjectNetworkSyncData = ObjectNetworkSyncData &
@@ -62,9 +62,10 @@ namespace gdjs {
     _textureAtlasResourceName: string;
     _scaleX: number;
     _scaleY: number;
-    _wordWrap: boolean;
+    _wrapping: boolean = false;
     _wrappingWidth: float;
-    _align: string;
+    _textAlign: string;
+    _verticalTextAlignment: string;
 
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
@@ -87,9 +88,10 @@ namespace gdjs {
         objectData.content.textureAtlasResourceName; // texture file used with fnt/xml (bitmap font file)
       this._scaleX = objectData.content.scale;
       this._scaleY = objectData.content.scale;
-      this._wordWrap = objectData.content.wordWrap;
       this._wrappingWidth = 0;
-      this._align = objectData.content.align;
+      this._textAlign = objectData.content.align;
+      this._verticalTextAlignment =
+        objectData.content.verticalTextAlignment || 'top';
 
       this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
         this,
@@ -100,12 +102,12 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
     // @ts-ignore
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: BitmapTextObjectDataType,
       newObjectData: BitmapTextObjectDataType
     ): boolean {
@@ -138,17 +140,22 @@ namespace gdjs {
       if (oldObjectData.content.scale !== newObjectData.content.scale) {
         this.setScale(newObjectData.content.scale);
       }
-      if (oldObjectData.content.wordWrap !== newObjectData.content.wordWrap) {
-        this.setWordWrap(newObjectData.content.wordWrap);
-      }
       if (oldObjectData.content.align !== newObjectData.content.align) {
-        this.setAlignment(newObjectData.content.align);
+        this.setTextAlignment(newObjectData.content.align);
+      }
+      if (
+        oldObjectData.content.verticalTextAlignment !==
+        newObjectData.content.verticalTextAlignment
+      ) {
+        this.setVerticalTextAlignment(
+          newObjectData.content.verticalTextAlignment
+        );
       }
 
       return true;
     }
 
-    getNetworkSyncData(): BitmapTextObjectNetworkSyncData {
+    override getNetworkSyncData(): BitmapTextObjectNetworkSyncData {
       return {
         ...super.getNetworkSyncData(),
         text: this._text,
@@ -157,13 +164,14 @@ namespace gdjs {
         bfrn: this._bitmapFontResourceName,
         tarn: this._textureAtlasResourceName,
         scale: this.getScale(),
-        wwrap: this._wordWrap,
+        wwrap: this._wrapping,
         wwidth: this._wrappingWidth,
-        align: this._align,
+        align: this._textAlign,
+        vta: this._verticalTextAlignment,
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: BitmapTextObjectNetworkSyncData
     ): void {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -186,30 +194,36 @@ namespace gdjs {
       if (this._scaleX !== undefined) {
         this.setScale(networkSyncData.scale);
       }
-      if (this._wordWrap !== undefined) {
-        this.setWordWrap(networkSyncData.wwrap);
+      if (this._wrapping !== undefined) {
+        this.setWrapping(networkSyncData.wwrap);
       }
       if (this._wrappingWidth !== undefined) {
         this.setWrappingWidth(networkSyncData.wwidth);
       }
-      if (this._align !== undefined) {
-        this.setAlignment(networkSyncData.align);
+      if (this._textAlign !== undefined) {
+        this.setTextAlignment(networkSyncData.align);
+      }
+      if (this._verticalTextAlignment !== undefined) {
+        this.setVerticalTextAlignment(networkSyncData.vta);
       }
     }
 
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
+        this.setWrapping(true);
       }
       if (initialInstanceData.opacity !== undefined) {
         this.setOpacity(initialInstanceData.opacity);
       }
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.onDestroy();
     }
@@ -314,38 +328,43 @@ namespace gdjs {
       return this._textureAtlasResourceName;
     }
 
-    setAlignment(align: string): void {
-      this._align = align;
+    setTextAlignment(align: string): void {
+      this._textAlign = align;
       this._renderer.updateAlignment();
     }
 
-    getAlignment(): string {
-      return this._align;
+    getTextAlignment(): string {
+      return this._textAlign;
     }
 
     /**
-     * Set object position on X axis.
-     * @param x The new position X of the object.
+     * Set the text alignment on Y axis for multiline text objects.
+     * @param alignment The text alignment.
      */
-    setX(x: float): void {
+    setVerticalTextAlignment(alignment: string): void {
+      this._verticalTextAlignment = alignment;
+      this._renderer.updatePosition();
+    }
+
+    /**
+     * Get the text alignment on Y axis of text object.
+     * @return The text alignment.
+     */
+    getVerticalTextAlignment(): string {
+      return this._verticalTextAlignment;
+    }
+
+    override setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set object position on Y axis.
-     * @param y The new position Y of the object.
-     */
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set the angle of the object.
-     * @param angle The new angle of the object.
-     */
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
     }
@@ -389,28 +408,33 @@ namespace gdjs {
       return this._wrappingWidth;
     }
 
-    setWordWrap(wordWrap: boolean): void {
-      this._wordWrap = wordWrap;
+    setWrapping(wordWrap: boolean): void {
+      this._wrapping = wordWrap;
       this._renderer.updateWrappingWidth();
       this.invalidateHitboxes();
     }
 
-    getWordWrap(): boolean {
-      return this._wordWrap;
+    isWrapping(): boolean {
+      return this._wrapping;
     }
 
-    /**
-     * Get the width of the object.
-     */
-    getWidth(): float {
+    override getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    /**
-     * Get the height of the object.
-     */
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    override getDrawableY(): float {
+      return (
+        this.getY() -
+        (this._verticalTextAlignment === 'center'
+          ? this.getHeight() / 2
+          : this._verticalTextAlignment === 'bottom'
+            ? this.getHeight()
+            : 0)
+      );
     }
   }
   gdjs.registerObject(

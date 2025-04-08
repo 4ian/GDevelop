@@ -819,9 +819,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         const answer = Window.showConfirmDialog(
           i18n._(
-            t`Global elements help to manage objects across multiple scenes and it is recommended for the most used objects. This action cannot be undone.
+            t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
 
-            Do you want to set as global object?`
+            Do you want to set this as global object?`
           )
         );
         if (!answer) return;

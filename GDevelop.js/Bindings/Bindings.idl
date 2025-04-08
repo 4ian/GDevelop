@@ -2887,7 +2887,9 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
 
     boolean STATIC_IsBadExpressionMetadata([Const, Ref] ExpressionMetadata metadata);
+    boolean STATIC_IsBadInstructionMetadata([Const, Ref] InstructionMetadata metadata);
     boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
+    boolean STATIC_IsBadObjectMetadata([Const, Ref] ObjectMetadata metadata);
 };
 
 enum ProjectDiagnostic_ErrorType {

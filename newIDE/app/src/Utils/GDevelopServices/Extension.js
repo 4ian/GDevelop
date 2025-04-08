@@ -24,19 +24,53 @@ export type ExtensionRegistryItemHeader = {|
   previewIconUrl: string,
 |};
 
-export type ExtensionShortHeader = {|
+export type EventsFunctionInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  functionType:
+    | 'StringExpression'
+    | 'Expression'
+    | 'Action'
+    | 'Condition'
+    | 'ExpressionAndCondition'
+    | 'ActionWithOperator',
+  name: string,
+};
+
+export type EventsBasedBehaviorInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  name: string,
+  objectType: string,
+  eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
+};
+
+export type EventsBasedObjectInsideExtensionShortHeader = {
+  description: string,
+  fullName: string,
+  name: string,
+  defaultName: string,
+  eventsFunctions: EventsFunctionInsideExtensionShortHeader[],
+};
+
+export type ExtensionShortHeader = {
   ...ExtensionRegistryItemHeader,
   shortDescription: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
-|};
 
-export type ExtensionHeader = {|
-  ...ExtensionShortHeader,
+  eventsBasedBehaviors?: Array<EventsBasedBehaviorInsideExtensionShortHeader>,
+  eventsFunctions?: Array<EventsFunctionInsideExtensionShortHeader>,
+  eventsBasedObjects?: Array<EventsBasedObjectInsideExtensionShortHeader>,
+
   helpPath: string,
+};
+
+export type ExtensionHeader = {
+  ...ExtensionShortHeader,
   description: string,
   iconUrl: string,
-|};
+};
 
 export type BehaviorShortHeader = {|
   ...ExtensionRegistryItemHeader,
@@ -97,10 +131,10 @@ export type BehaviorsRegistry = {
  * The ExtensionHeader returned by the API, with tags being a string
  * (which is kept in the API for compatibility with older GDevelop versions).
  */
-type ExtensionHeaderWithTagsAsString = {|
+type ExtensionHeaderWithTagsAsString = {
   ...ExtensionHeader,
   tags: string,
-|};
+};
 
 /**
  * The SerializedExtension returned by the API, with tags being a string

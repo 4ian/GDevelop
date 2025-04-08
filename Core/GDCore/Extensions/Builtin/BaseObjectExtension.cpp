@@ -415,7 +415,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("SetNumberObjectVariable",
-                _("Change variable value"),
+                _("Change object variable value"),
                 _("Modify the number value of an object variable."),
                 _("the variable _PARAM1_"),
                 _("Variables"),
@@ -430,7 +430,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("SetStringObjectVariable",
-                _("Change text variable"),
+                _("Change object variable value"),
                 _("Modify the text of an object variable."),
                 _("the variable _PARAM1_"),
                 _("Variables"),
@@ -445,7 +445,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("SetBooleanObjectVariable",
-                _("Change boolean variable"),
+                _("Change object variable value"),
                 _("Modify the boolean value of an object variable."),
                 _("Change the variable _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Variables"),
@@ -461,7 +461,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("NumberObjectVariable",
-                   _("Variable value"),
+                   _("Object variable value"),
                    _("Compare the number value of an object variable."),
                    _("the variable _PARAM1_"),
                    _("Variables"),
@@ -476,7 +476,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("StringObjectVariable",
-                   _("Text variable"),
+                   _("Object variable value"),
                    _("Compare the text of an object variable."),
                    _("the variable _PARAM1_"),
                    _("Variables"),
@@ -491,7 +491,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("BooleanObjectVariable",
-                   _("Boolean variable"),
+                   _("Object variable value"),
                    _("Compare the boolean value of an object variable."),
                    _("The variable _PARAM1_ of _PARAM0_ is _PARAM2_"),
                    _("Variables"),
@@ -808,7 +808,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "PushStringToObjectVariable",
-         _("Add text variable"),
+         _("Add value to object array variable"),
          _("Adds a text (string) to the end of an object array variable."),
          _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
          _("Variables ❯ Arrays and structures"),
@@ -822,7 +822,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("PushNumberToObjectVariable",
-                _("Add variable array value"),
+                _("Add value to object array variable"),
                 _("Adds a number to the end of an object array variable."),
                 _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
                 _("Variables ❯ Arrays and structures"),
@@ -837,7 +837,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "PushBooleanToObjectVariable",
-         _("Add boolean variable"),
+         _("Add value to object array variable"),
          _("Adds a boolean to the end of an object array variable."),
          _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
          _("Variables ❯ Arrays and structures"),

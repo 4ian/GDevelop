@@ -720,7 +720,9 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addObject(
       'SimpleTileMap',
       _('Tile map'),
-      _('Displays a tiled-based map.'),
+      _(
+        'Displays a tile-based map. Recommended for most games that need to use static tiles.'
+      ),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )
@@ -1520,7 +1522,7 @@ module.exports = {
         'TileMap',
         _('Tile map'),
         _(
-          "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc..."
+          "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc... External tilemaps are also supported - but it's recommended to use the built-in, simple Tilemap object for most use cases."
         ),
         'Todor Imreorov',
         'Open source (MIT License)'

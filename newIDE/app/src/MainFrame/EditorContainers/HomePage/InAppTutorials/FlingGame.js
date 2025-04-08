@@ -104,6 +104,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
       key: 'create',
       title: t`Start your game`,
       description: t`Add your first characters to the scene and throw your first objects.`,
+      shortDescription: t`Add characters and objects to the scene.`,
       keyPoints: [
         t`Game scene size`,
         t`Objects and characters`,
@@ -129,6 +130,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
       key: 'publish',
       title: t`Improve and publish your Game`,
       description: t`Add personality to your game and publish it online.`,
+      shortDescription: t`Add personality and publish your game.`,
       keyPoints: [
         t`Game background`,
         t`In-game obstacles`,
@@ -158,6 +160,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
       key: 'leaderboards',
       title: t`Add leaderboards to your online Game`,
       description: t`Add player logins to your game and add a leaderboard.`,
+      shortDescription: t`Add player logins and a leaderboard.`,
       keyPoints: [
         t`Game personalisation`,
         t`“Start” screen`,
@@ -227,6 +230,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
                 <InAppTutorialPhaseCard
                   title={t`Congratulations! You've finished this tutorial!`}
                   description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
+                  shortDescription={t`Your game is in the “Build” section or you can restart the tutorial.`}
                   size="banner"
                   locked={false}
                   disabled={false}

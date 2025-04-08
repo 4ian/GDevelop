@@ -18,7 +18,10 @@ import {
 import InAppTutorialDialog from './InAppTutorialDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
-import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
+import {
+  sendInAppTutorialExited,
+  sendInAppTutorialProgress,
+} from '../Utils/Analytics/EventSender';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
@@ -1189,14 +1192,19 @@ const InAppTutorialOrchestrator = React.forwardRef<
           goToFallbackStep={() => {
             changeStep(currentStepFallbackStepIndex.current);
           }}
-          endTutorial={() =>
+          endTutorial={({ reason }) => {
+            sendInAppTutorialExited({
+              tutorialId: tutorialId,
+              reason,
+              isUIRestricted: !!tutorial.shouldRestrictUI,
+            });
             endTutorial({
               // Don't close the project if it's a mini tutorial, so that the user can continue playing with the game.
               shouldCloseProject: !isRunningMiniTutorial,
               // Don't warn about unsaved changes if it's a mini tutorial.
               shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,
-            })
-          }
+            });
+          }}
           progress={computeProgress()[currentPhaseIndex]}
           goToNextStep={goToNextStep}
         />
@@ -1235,7 +1243,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           <InAppTutorialDialog
             isLastStep
             dialogContent={endDialog}
-            endTutorial={() => {
+            endTutorial={({ reason }) => {
               setDisplayEndDialog(false);
               if (isRunningMiniTutorial) {
                 // If running a mini tutorial, we save the progress to indicate that the user has finished this lesson.
@@ -1248,6 +1256,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
                   // We do not specify a storage provider, as we don't need to reload the project.
                 });
               }
+              sendInAppTutorialExited({
+                tutorialId: tutorialId,
+                reason,
+                isUIRestricted: !!tutorial.shouldRestrictUI,
+              });
               endTutorial({
                 shouldCloseProject: false,
                 shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,

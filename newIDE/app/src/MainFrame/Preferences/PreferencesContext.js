@@ -236,6 +236,7 @@ export type PreferencesValues = {|
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
+  showAiAskButtonInTitleBar: boolean,
 |};
 
 /**
@@ -340,6 +341,7 @@ export type Preferences = {|
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
+  setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -397,6 +399,7 @@ export const initialPreferences = {
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
+    showAiAskButtonInTitleBar: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -471,6 +474,7 @@ export const initialPreferences = {
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
+  setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

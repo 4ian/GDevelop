@@ -10,26 +10,37 @@ type Props = {|
   href: string,
   onClick: () => void | Promise<void>,
   disabled?: boolean,
+  color?: 'primary' | 'secondary',
 |};
 
-const useLinkStyles = (theme: GDevelopTheme, disabled: boolean) =>
+const useLinkStyles = (
+  theme: GDevelopTheme,
+  color: 'primary' | 'secondary',
+  disabled: boolean
+) =>
   makeStyles({
     root: {
-      color: theme.link.color.default,
+      color: color === 'primary' ? theme.link.color.default : undefined,
       textDecoration: 'underline',
       '&:hover': {
-        color: !disabled ? theme.link.color.hover : undefined,
+        color:
+          color === 'primary' && !disabled ? theme.link.color.hover : undefined,
         cursor: !disabled ? 'pointer' : 'default',
       },
       '&:focus': {
-        color: !disabled ? theme.link.color.hover : undefined,
+        color:
+          color === 'primary' && !disabled ? theme.link.color.hover : undefined,
       },
     },
   })();
 
 const Link = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const linkStyles = useLinkStyles(gdevelopTheme, !!props.disabled);
+  const linkStyles = useLinkStyles(
+    gdevelopTheme,
+    props.color || 'primary',
+    !!props.disabled
+  );
   const onClick = (event: MouseEvent) => {
     event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
     if (!props.disabled) {

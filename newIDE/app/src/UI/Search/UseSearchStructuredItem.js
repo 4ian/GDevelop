@@ -367,8 +367,11 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
             lowerCaseChosenFilters.has(tag.toLowerCase())
           )) ||
         (item.categories &&
-          item.categories.some(category =>
-            lowerCaseChosenFilters.has(category.toLowerCase())
+          Array.isArray(item.categories) &&
+          item.categories.some(
+            category =>
+              typeof category === 'string' &&
+              lowerCaseChosenFilters.has(category.toLowerCase())
           ));
 
       return passTier && passChosenFilters;

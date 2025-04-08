@@ -140,7 +140,7 @@ export type ClosableTabProps = {|
   onCloseAll: () => void,
   onClick: () => void,
   onActivated: () => void,
-  onHover: boolean => void,
+  onHover: (boolean, options: {| isLabelTruncated: boolean |}) => void,
   maxWidth: number,
 |};
 
@@ -169,6 +169,20 @@ export function ClosableTab({
     [active, onActivated]
   );
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const spanLabelRef = React.useRef<?HTMLSpanElement>(null);
+  const [isLabelTruncated, setIsLabelTruncated] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      if (maxWidth && spanLabelRef.current) {
+        setIsLabelTruncated(
+          spanLabelRef.current.scrollWidth > spanLabelRef.current.clientWidth
+        );
+      }
+      // Update when maxWidth changes.
+    },
+    [maxWidth]
+  );
 
   const openContextMenu = event => {
     event.stopPropagation();
@@ -250,8 +264,8 @@ export function ClosableTab({
         // A tab lives in the top bar, which has the ability to drag the app window.
         // Ensure the tab does not have this ability, as it can be dragged itself.
         className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-        onMouseEnter={() => onHover(true)}
-        onMouseLeave={() => onHover(false)}
+        onMouseEnter={() => onHover(true, { isLabelTruncated })}
+        onMouseLeave={() => onHover(false, { isLabelTruncated })}
       >
         <ButtonBase
           onClick={onClick}
@@ -281,6 +295,7 @@ export function ClosableTab({
             ) : null}
             {label && (
               <span
+                ref={spanLabelRef}
                 style={{
                   ...styles.tabLabel,
                   maxWidth: labelMaxWidth,

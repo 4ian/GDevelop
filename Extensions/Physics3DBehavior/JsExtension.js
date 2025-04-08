@@ -2679,6 +2679,15 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'engineInertia') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('engineInertia')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'reverseGearRatio1') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
@@ -2805,6 +2814,24 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'brakeTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('brakeTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'handBrakeTorqueMax') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getChild('handBrakeTorqueMax')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         if (propertyName === 'hasBackWheelDrive') {
           behaviorContent
             .getChild('hasBackWheelDrive')
@@ -2843,7 +2870,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('steerAngleMax')
-          .setLabel('Max steer angle')
+          .setLabel(_('Max steer angle'))
           .setGroup(_('Steering'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
@@ -2857,7 +2884,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('beginningSteerSpeed')
-          .setLabel('Beginning steer speed')
+          .setLabel(_('Beginning steer speed'))
           .setGroup(_('Steering'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
@@ -2871,7 +2898,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('endSteerSpeed')
-          .setLabel('End steer speed')
+          .setLabel(_('End steer speed'))
           .setGroup(_('Steering'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed())
@@ -2885,7 +2912,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('mass')
-          .setLabel('Mass')
+          .setLabel(_('Mass'))
           .setGroup('')
           .setType('Number')
           .setValue(
@@ -2894,8 +2921,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('engineTorqueMax')
-          .setLabel('Max engine torque')
-          .setGroup('Speed')
+          .setLabel(_('Max engine torque'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent
@@ -2906,8 +2933,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('engineSpeedMax')
-          .setLabel('Max engine speed')
-          .setGroup('Speed')
+          .setLabel(_('Max engine speed'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent
@@ -2917,9 +2944,21 @@ module.exports = {
           );
 
         behaviorProperties
+          .getOrCreate('engineInertia')
+          .setLabel(_('Engine inertia'))
+          .setGroup(_('Speed'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('engineInertia')
+              .getDoubleValue()
+              .toString(10)
+          );
+
+        behaviorProperties
           .getOrCreate('reverseGearRatio1')
-          .setLabel('Reverse gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('Reverse gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent
@@ -2932,8 +2971,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio1')
-          .setLabel('1st gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('1st gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio1').getDoubleValue().toString(10)
@@ -2943,8 +2982,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio2')
-          .setLabel('2nd gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('2nd gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio2').getDoubleValue().toString(10)
@@ -2954,8 +2993,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio3')
-          .setLabel('3rd gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('3rd gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio3').getDoubleValue().toString(10)
@@ -2965,8 +3004,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio4')
-          .setLabel('4th gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('4th gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio4').getDoubleValue().toString(10)
@@ -2976,8 +3015,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio5')
-          .setLabel('5th gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('5th gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio5').getDoubleValue().toString(10)
@@ -2987,8 +3026,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('gearRatio6')
-          .setLabel('6th gear ratio')
-          .setGroup('Speed')
+          .setLabel(_('6th gear ratio'))
+          .setGroup(_('Speed'))
           .setType('Number')
           .setValue(
             behaviorContent.getChild('gearRatio6').getDoubleValue().toString(10)
@@ -2998,8 +3037,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('wheelRadius')
-          .setLabel('Wheel radius')
-          .setGroup('Wheels')
+          .setLabel(_('Wheel radius'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -3012,8 +3051,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('wheelWidth')
-          .setLabel('Wheel width')
-          .setGroup('Wheels')
+          .setLabel(_('Wheel width'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -3023,8 +3062,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('backWheelOffsetX')
-          .setLabel('Back wheel offset X')
-          .setGroup('Wheels')
+          .setLabel(_('Back wheel offset X'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setDescription(_('Positive values move wheels outside.'))
@@ -3039,8 +3078,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('frontWheelOffsetX')
-          .setLabel('Front wheel offset X')
-          .setGroup('Wheels')
+          .setLabel(_('Front wheel offset X'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setDescription(_('Positive values move wheels outside.'))
@@ -3055,8 +3094,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('wheelOffsetY')
-          .setLabel('Wheel offset Y')
-          .setGroup('Wheels')
+          .setLabel(_('Wheel offset Y'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setDescription(_('Positive values move wheels outside.'))
@@ -3071,8 +3110,8 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('wheelOffsetZ')
-          .setLabel('Wheel offset Z')
-          .setGroup('Wheels')
+          .setLabel(_('Wheel offset Z'))
+          .setGroup(_('Wheels'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setDescription(_('Positive values move wheels outside.'))
@@ -3083,6 +3122,32 @@ module.exports = {
               .toString(10)
           )
           .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('brakeTorqueMax')
+          .setLabel(_('Brake max torque'))
+          .setGroup(_('Brakes'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('brakeTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        behaviorProperties
+          .getOrCreate('handBrakeTorqueMax')
+          .setLabel(_('Hand brake max torque'))
+          .setGroup(_('Brakes'))
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('handBrakeTorqueMax')
+              .getDoubleValue()
+              .toString(10)
+          )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         behaviorProperties
@@ -3115,7 +3180,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('pitchRollAngleMax')
-          .setLabel('Pitch and roll max angle')
+          .setLabel(_('Pitch and roll max angle'))
           .setGroup('')
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
@@ -3139,6 +3204,7 @@ module.exports = {
         behaviorContent.addChild('mass').setDoubleValue(1500);
         behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
         behaviorContent.addChild('engineSpeedMax').setDoubleValue(6000);
+        behaviorContent.addChild('engineInertia').setDoubleValue(0.5);
         behaviorContent.addChild('reverseGearRatio1').setDoubleValue(-2.9);
         behaviorContent.addChild('gearRatio1').setDoubleValue(2.66);
         behaviorContent.addChild('gearRatio2').setDoubleValue(1.78);
@@ -3152,6 +3218,8 @@ module.exports = {
         behaviorContent.addChild('wheelOffsetZ').setDoubleValue(0);
         behaviorContent.addChild('wheelRadius').setDoubleValue(10);
         behaviorContent.addChild('wheelWidth').setDoubleValue(5);
+        behaviorContent.addChild('brakeTorqueMax').setDoubleValue(1500);
+        behaviorContent.addChild('handBrakeTorqueMax').setDoubleValue(4000);
         behaviorContent.addChild('hasBackWheelDrive').setBoolValue(false);
         behaviorContent.addChild('hasFrontWheelDrive').setBoolValue(true);
         behaviorContent.addChild('pitchRollAngleMax').setDoubleValue(90);

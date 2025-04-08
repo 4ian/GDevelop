@@ -52,6 +52,7 @@ namespace gdjs {
     _engineTorqueMax: float;
     /** in RPM (rotation per minute) */
     _engineSpeedMax: float;
+    _engineInertia: float;
     _gearRatios: Array<float>;
     _reverseGearRatios: Array<float>;
     private _backWheelOffsetX: float;
@@ -60,11 +61,15 @@ namespace gdjs {
     private _wheelOffsetZ: float;
     private _wheelRadius: float;
     private _wheelWidth: float;
-    _pitchRollAngleMax: float;
+    private _brakeTorqueMax: float;
+    private _handBrakeTorqueMax: float;
     _hasBackWheelDrive: boolean;
     _hasFrontWheelDrive: boolean;
+    _pitchRollAngleMax: float;
 
     private _currentSteerRatio: float = 0;
+    /** Used to make sure the car is stopped before going backward. */
+    _previousForward = 1;
 
     private _hasPressedForwardKey: boolean = false;
     private _hasPressedBackwardKey: boolean = false;
@@ -108,6 +113,7 @@ namespace gdjs {
       this._mass = behaviorData.mass;
       this._engineTorqueMax = behaviorData.engineTorqueMax;
       this._engineSpeedMax = behaviorData.engineSpeedMax;
+      this._engineInertia = behaviorData.engineInertia;
       this._reverseGearRatios = [behaviorData.reverseGearRatio1];
       this._gearRatios = [
         behaviorData.gearRatio1,
@@ -123,6 +129,8 @@ namespace gdjs {
       this._wheelOffsetZ = behaviorData.wheelOffsetZ;
       this._wheelRadius = behaviorData.wheelRadius;
       this._wheelWidth = behaviorData.wheelWidth;
+      this._brakeTorqueMax = behaviorData.brakeTorqueMax;
+      this._handBrakeTorqueMax = behaviorData.handBrakeTorqueMax;
       this._hasBackWheelDrive = behaviorData.hasBackWheelDrive;
       this._hasFrontWheelDrive = behaviorData.hasFrontWheelDrive;
       this._pitchRollAngleMax = behaviorData.pitchRollAngleMax;
@@ -184,6 +192,9 @@ namespace gdjs {
       if (oldBehaviorData.engineSpeedMax !== newBehaviorData.engineSpeedMax) {
         this.setEngineSpeedMax(newBehaviorData.engineSpeedMax);
       }
+      if (oldBehaviorData.engineInertia !== newBehaviorData.engineInertia) {
+        this.setEngineInertia(newBehaviorData.engineInertia);
+      }
       if (
         oldBehaviorData.reverseGearRatio1 !== newBehaviorData.reverseGearRatio1
       ) {
@@ -228,6 +239,15 @@ namespace gdjs {
       }
       if (oldBehaviorData.wheelWidth !== newBehaviorData.wheelWidth) {
         this.setWheelWidth(newBehaviorData.wheelWidth);
+      }
+      if (oldBehaviorData.brakeTorqueMax !== newBehaviorData.brakeTorqueMax) {
+        this.setBrakeTorqueMax(newBehaviorData.brakeTorqueMax);
+      }
+      if (
+        oldBehaviorData.handBrakeTorqueMax !==
+        newBehaviorData.handBrakeTorqueMax
+      ) {
+        this.setHandBrakeTorqueMax(newBehaviorData.handBrakeTorqueMax);
       }
       if (
         oldBehaviorData.hasBackWheelDrive !== newBehaviorData.hasBackWheelDrive
@@ -344,9 +364,6 @@ namespace gdjs {
       this.getPhysics3D();
     }
 
-    // TODO
-    previousForward = 1;
-
     doBeforePhysicsStep(timeDelta: float): void {
       if (!this.activated()) {
         return;
@@ -397,7 +414,7 @@ namespace gdjs {
         (this._hasPressedBackwardKey ? -1 : 0) +
           (this._hasPressedForwardKey ? 1 : 0);
       let forward = acceleratorControl;
-      if (this.previousForward < 0 !== forward < 0) {
+      if (this._previousForward * forward < 0.0) {
         const velocity = carBody
           .GetRotation()
           .InverseRotate(carBody.GetLinearVelocity())
@@ -411,7 +428,7 @@ namespace gdjs {
           brake = 1.0;
         } else {
           // When we've come to a stop, accept the new direction
-          this.previousForward = forward;
+          this._previousForward = forward;
         }
       }
 
@@ -651,6 +668,18 @@ namespace gdjs {
       this._vehicleController.GetEngine().mMaxRPM = engineSpeedMax;
     }
 
+    getEngineInertia(): float {
+      return this._engineInertia;
+    }
+
+    setEngineInertia(engineInertia: float): void {
+      this._engineInertia = engineInertia;
+      if (!this._vehicleController) {
+        return;
+      }
+      this._vehicleController.GetEngine().mInertia = engineInertia;
+    }
+
     getGearRatio(gearNumber: integer): float {
       if (gearNumber === 0) {
         return 0;
@@ -761,6 +790,24 @@ namespace gdjs {
       this._updateWheels();
     }
 
+    getBrakeTorqueMax(): float {
+      return this._brakeTorqueMax;
+    }
+
+    setBrakeTorqueMax(brakeTorqueMax: float): void {
+      this._brakeTorqueMax = brakeTorqueMax;
+      this._updateWheels();
+    }
+
+    getHandBrakeTorqueMax(): float {
+      return this._handBrakeTorqueMax;
+    }
+
+    setHandBrakeTorqueMax(handBrakeTorqueMax: float): void {
+      this._handBrakeTorqueMax = handBrakeTorqueMax;
+      this._updateWheels();
+    }
+
     hasBackWheelDrive(): boolean {
       return this._hasBackWheelDrive;
     }
@@ -852,11 +899,18 @@ namespace gdjs {
         -wheelOffsetZ
       );
       for (let index = 0; index < 4; index++) {
-        const wheel = constraint.GetWheel(index).GetSettings();
+        const wheel = Jolt.castObject(
+          constraint.GetWheel(index),
+          Jolt.WheelWV
+        ).GetSettings();
         wheel.mRadius = wheelRadius;
         wheel.mWidth = wheelWidth;
         wheel.mSuspensionMinLength = suspensionMinLength;
         wheel.mSuspensionMaxLength = suspensionMaxLength;
+        wheel.mMaxBrakeTorque = this._brakeTorqueMax;
+        if (index >= 2) {
+          wheel.mMaxHandBrakeTorque = this._handBrakeTorqueMax;
+        }
       }
     }
   }
@@ -974,8 +1028,8 @@ namespace gdjs {
           this.vehicleBehavior._engineTorqueMax;
         controllerSettings.mEngine.mMaxRPM =
           this.vehicleBehavior._engineSpeedMax;
-        // TODO
-        controllerSettings.mEngine.mInertia = 0.01;
+        controllerSettings.mEngine.mInertia =
+          this.vehicleBehavior._engineInertia;
         vehicle.mController = controllerSettings;
 
         const fourWheelDrive =

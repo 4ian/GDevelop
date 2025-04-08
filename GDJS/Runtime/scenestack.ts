@@ -12,6 +12,7 @@ namespace gdjs {
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
     _wasDisposed: boolean = false;
+    _scenesWithUnloadedAssets: Set<string>;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -21,6 +22,7 @@ namespace gdjs {
         throw 'SceneStack must be constructed with a gdjs.RuntimeGame.';
       }
       this._runtimeGame = runtimeGame;
+      this._scenesWithUnloadedAssets = new Set<string>();
     }
 
     /**
@@ -63,10 +65,16 @@ namespace gdjs {
           this.pop();
         } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
-          this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
-          this.replace(currentScene.getRequestedScene(), true);
+        } else if (
+          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
+          request === gdjs.SceneChangeRequest.CLEAR_SCENES
+        ) {
+          currentScene.getUnloadAssetsOnSceneExit() &&
+            this._scenesWithUnloadedAssets.add(currentScene.getName());
+          this.replace(
+            currentScene.getRequestedScene(),
+            request === gdjs.SceneChangeRequest.CLEAR_SCENES
+          );
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
@@ -135,11 +143,21 @@ namespace gdjs {
         return this._loadNewScene(newSceneName, externalLayoutName);
       }
 
+      const wasUnloaded = this._scenesWithUnloadedAssets.has(newSceneName);
       this._isNextLayoutLoading = true;
-      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
+
+      const loadPromise = wasUnloaded
+        ? this._runtimeGame.loadSceneAssetsBySceneName(newSceneName)
+        : this._runtimeGame.loadSceneAssets(newSceneName);
+
+      loadPromise.then(() => {
         this._loadNewScene(newSceneName);
+        if (wasUnloaded) {
+          this._scenesWithUnloadedAssets.delete(newSceneName);
+        }
         this._isNextLayoutLoading = false;
       });
+
       return null;
     }
 

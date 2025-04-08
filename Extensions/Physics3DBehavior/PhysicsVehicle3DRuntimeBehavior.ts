@@ -446,6 +446,8 @@ namespace gdjs {
             60 *
             60) /
             1000,
+          'Gear',
+          this._vehicleController.GetTransmission().GetCurrentGear(),
           'Wheels',
           vec3ToString(wheels[0].GetContactPosition()),
           vec3ToString(wheels[1].GetContactPosition()),
@@ -819,8 +821,8 @@ namespace gdjs {
         halfVehicleHeight - wheelWidth / 2 + this._wheelOffsetY * shapeScale;
       // Put the wheels center at the bottom of the car physics shape.
       const wheelOffsetZ =
-        -halfVehicleDepth +
-        (behavior.shapeOffsetZ + this._wheelOffsetZ) * shapeScale;
+        halfVehicleDepth +
+        (-behavior.shapeOffsetZ + this._wheelOffsetZ) * shapeScale;
       const suspensionMinLength = wheelRadius;
       const suspensionMaxLength = 1.5 * suspensionMinLength;
 
@@ -829,25 +831,25 @@ namespace gdjs {
       fl.mPosition = this.getVec3(
         frontWheelOffsetX,
         -wheelOffsetY,
-        wheelOffsetZ
+        -wheelOffsetZ
       );
       const fr = constraint.GetWheel(1).GetSettings();
       fr.mPosition = this.getVec3(
         frontWheelOffsetX,
         wheelOffsetY,
-        wheelOffsetZ
+        -wheelOffsetZ
       );
       const bl = constraint.GetWheel(2).GetSettings();
       bl.mPosition = this.getVec3(
         -backWheelOffsetX,
         -wheelOffsetY,
-        wheelOffsetZ
+        -wheelOffsetZ
       );
       const br = constraint.GetWheel(3).GetSettings();
       br.mPosition = this.getVec3(
         -backWheelOffsetX,
         wheelOffsetY,
-        wheelOffsetZ
+        -wheelOffsetZ
       );
       for (let index = 0; index < 4; index++) {
         const wheel = constraint.GetWheel(index).GetSettings();

@@ -16,6 +16,11 @@ namespace gdjs {
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
+  export type CustomObjectNetworkSyncDataType = ObjectNetworkSyncData & {
+    ifx: boolean;
+    ify: boolean;
+  };
+
   /**
    * An object that contains other object.
    *
@@ -166,6 +171,29 @@ namespace gdjs {
         );
       }
       return true;
+    }
+
+    getNetworkSyncData(
+      saveWholeGame?: boolean
+    ): CustomObjectNetworkSyncDataType {
+      return {
+        ...super.getNetworkSyncData(saveWholeGame),
+        ifx: this.isFlippedX(),
+        ify: this.isFlippedY(),
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: CustomObjectNetworkSyncDataType,
+      options?: UpdateFromNetworkSyncDataOptions
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData, options);
+      if (networkSyncData.ifx !== undefined) {
+        this.flipX(networkSyncData.ifx);
+      }
+      if (networkSyncData.ify !== undefined) {
+        this.flipY(networkSyncData.ify);
+      }
     }
 
     override extraInitializationFromInitialInstance(

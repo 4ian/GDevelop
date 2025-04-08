@@ -133,7 +133,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: SpineNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

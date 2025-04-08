@@ -244,7 +244,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: TextObjectNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.str !== undefined) {

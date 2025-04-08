@@ -38,8 +38,8 @@ module.exports = {
         _('Save the whole game'),
         _('Save the wole game.'),
         _('Syncall'),
-        'res/conditions/animation24.png',
-        'res/conditions/animation.png'
+        'res/actions/save.svg',
+        'res/actions/save.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -52,8 +52,8 @@ module.exports = {
         _('Load the whole game'),
         _('Load the wole game.'),
         _('Loadall'),
-        'res/conditions/animation24.png',
-        'res/conditions/animation.png'
+        'res/actions/save.svg',
+        'res/actions/save.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()

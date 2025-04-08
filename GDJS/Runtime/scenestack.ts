@@ -71,42 +71,61 @@ namespace gdjs {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
 
-        const allSyncData: GameSaveState = JSON.parse(
-          localStorage.getItem('save') as string
-        );
+        if (currentScene.getIsLoadingRequest()) {
+          this.loadGameFromIndexedDB('gameSaveDB', 'game_save')
+            .then((jsonData) => {
+              const allSyncData: GameSaveState = JSON.parse(jsonData);
 
-        if (currentScene._isLoadingRequested && allSyncData) {
-          currentScene
-            .getGame()
-            .updateFromNetworkSyncData(allSyncData.gameNetworkSyncData, {
-              skipMultiplayerInstructions: true,
-            });
-          currentScene
-            .getGame()
-            .getSceneStack()
-            .applyUpdateFromNetworkSyncDataIfAny({
-              skipCreatingInstances: true,
-            });
-          const sceneStack = currentScene.getGame().getSceneStack()._stack;
-          sceneStack.forEach((scene, index) => {
-            scene.updateFromNetworkSyncData(
-              allSyncData.layoutNetworkSyncDatas[index].sceneData,
-              { skipMultiplayerInstructions: true }
-            );
+              if (allSyncData) {
+                const options: UpdateFromNetworkSyncDataOptions = {
+                  loadSave: true,
+                };
 
-            const objectDatas =
-              allSyncData.layoutNetworkSyncDatas[index].objectDatas;
-            for (const name in objectDatas) {
-              const object = scene.createObject(name);
-              const objectNetworkSyncData = objectDatas[name];
-              if (object) {
-                object?.updateFromNetworkSyncData(objectNetworkSyncData, {
-                  skipMultiplayerInstructions: true,
+                currentScene
+                  .getGame()
+                  .updateFromNetworkSyncData(
+                    allSyncData.gameNetworkSyncData,
+                    options
+                  );
+
+                this.applyUpdateFromNetworkSyncDataIfAny({
+                  skipCreatingInstances: true,
                 });
+
+                const sceneStack = this._stack;
+
+                sceneStack.forEach((scene, index) => {
+                  const layoutSyncData =
+                    allSyncData.layoutNetworkSyncDatas[index];
+                  if (!layoutSyncData) return;
+
+                  scene.updateFromNetworkSyncData(
+                    layoutSyncData.sceneData,
+                    options
+                  );
+
+                  const objectDatas = layoutSyncData.objectDatas;
+                  for (const id in objectDatas) {
+                    const objectNetworkSyncData = objectDatas[id];
+                    const object = scene.createObject(objectNetworkSyncData.n);
+                    if (object) {
+                      object.updateFromNetworkSyncData(
+                        objectNetworkSyncData,
+                        options
+                      );
+                    }
+                  }
+                });
+
+                const game = currentScene.getGame();
+                console.log(game._eventsBasedObjectDatas);
+
+                currentScene._isLoadingRequested = false;
               }
-            }
-            currentScene._isLoadingRequested = false;
-          });
+            })
+            .catch((error) => {
+              console.error('Error on loading a save :', error);
+            });
         }
       }
 
@@ -453,5 +472,47 @@ namespace gdjs {
         throw 'The scene stack has been disposed and should not be used anymore.';
       }
     }
+
+    loadGameFromIndexedDB = async function (
+      dbName: string,
+      key: string
+    ): Promise<any> {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = function (event) {
+          const db = request.result;
+          if (!db.objectStoreNames.contains('saves')) {
+            db.createObjectStore('saves');
+          }
+        };
+
+        request.onsuccess = function () {
+          const db = request.result;
+
+          const tx = db.transaction('saves', 'readonly');
+          const store = tx.objectStore('saves');
+          const getRequest = store.get(key);
+          getRequest.onsuccess = function () {
+            if (getRequest.result !== undefined) {
+              resolve(getRequest.result);
+            } else {
+              resolve(null);
+            }
+          };
+          getRequest.onerror = function () {
+            console.error(
+              'Error loading game from IndexedDB:',
+              getRequest.error
+            );
+            reject(getRequest.error);
+          };
+        };
+        request.onerror = function () {
+          console.error('Error opening IndexedDB:', request.error);
+          reject(request.error);
+        };
+      });
+    };
   }
 }

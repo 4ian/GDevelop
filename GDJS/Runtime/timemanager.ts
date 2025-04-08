@@ -9,6 +9,15 @@ namespace gdjs {
    * frame, since the beginning of the scene and other time related values.
    * All durations are expressed in milliseconds.
    */
+
+  declare interface TimeManagerSyncData {
+    elapsedTime: float;
+    timeScale: float;
+    timeFromStart: float;
+    firstFrame: boolean;
+    timers: Hashtable<TimerNetworkSyncData>;
+    firstUpdateDone: boolean;
+  }
   export class TimeManager {
     _elapsedTime: float = 0;
     _timeScale: float = 1;
@@ -59,6 +68,47 @@ namespace gdjs {
       }
     }
 
+    getNetworkSyncData(): TimeManagerSyncData {
+      let tab = new Hashtable<TimerNetworkSyncData>();
+      Object.entries(this._timers.items).forEach(([key, timer]) => {
+        tab.put(key, timer.getNetworkSyncData());
+      });
+
+      return {
+        elapsedTime: this._elapsedTime,
+        timeScale: this._timeScale,
+        timeFromStart: this._timeFromStart,
+        firstFrame: this._firstFrame,
+        timers: tab,
+        firstUpdateDone: this._firstUpdateDone,
+      };
+    }
+
+    updateFromnetworkSyncData(syncData: TimeManagerSyncData): void {
+      if (syncData.elapsedTime !== undefined) {
+        this._elapsedTime = syncData.elapsedTime;
+      }
+      if (syncData.timeScale !== undefined) {
+        this._timeScale = syncData.timeScale;
+      }
+      if (syncData.timeFromStart !== undefined) {
+        this._timeFromStart = syncData.timeFromStart;
+      }
+      if (syncData.firstFrame !== undefined) {
+        this._firstFrame = syncData.firstFrame;
+      }
+      if (syncData.timers !== undefined) {
+        Object.entries(syncData.timers.items).forEach(([key, timerData]) => {
+          const newTimer = new gdjs.Timer(timerData.name as string);
+          newTimer.updateFromNetworkSyncData(timerData);
+          this._timers.put(key, newTimer);
+        });
+      }
+
+      if (syncData.firstUpdateDone !== undefined) {
+        this._firstUpdateDone = syncData.firstUpdateDone;
+      }
+    }
     /**
      * Get the time scale.
      * @return The time scale (positive, 1 is normal speed).

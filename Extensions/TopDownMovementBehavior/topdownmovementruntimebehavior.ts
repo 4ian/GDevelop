@@ -129,9 +129,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TopDownMovementNetworkSyncData
+      networkSyncData: TopDownMovementNetworkSyncData,
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.a !== undefined) {
@@ -169,7 +170,11 @@ namespace gdjs {
       }
 
       // When the object is synchronized from the network, the inputs must not be cleared.
-      this._dontClearInputsBetweenFrames = true;
+      if (!options || !options.loadSave) {
+        this._dontClearInputsBetweenFrames = true;
+      } else {
+        this._dontClearInputsBetweenFrames = false;
+      }
       // And we are not using the default controls.
       this._ignoreDefaultControlsAsSyncedByNetwork = true;
     }

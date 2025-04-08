@@ -529,8 +529,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: Physics2NetworkSyncData) {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: Physics2NetworkSyncData,
+      options?: UpdateFromNetworkSyncDataOptions
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (

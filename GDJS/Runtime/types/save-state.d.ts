@@ -1,6 +1,6 @@
 declare type SceneSaveState = {
   sceneData: LayoutNetworkSyncData;
-  objectDatas: { [objectName: string]: ObjectNetworkSyncData };
+  objectDatas: { [objectId: integer]: ObjectNetworkSyncData };
 };
 
 declare type GameSaveState = {

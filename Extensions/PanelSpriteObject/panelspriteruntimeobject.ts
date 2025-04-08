@@ -133,7 +133,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: PanelSpriteNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

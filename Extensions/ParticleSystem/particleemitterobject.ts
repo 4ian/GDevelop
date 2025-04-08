@@ -400,7 +400,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: ParticleEmitterObjectNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
       if (syncData.x !== undefined) {

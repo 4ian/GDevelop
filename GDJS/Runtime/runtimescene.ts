@@ -371,6 +371,7 @@ namespace gdjs {
         this._profiler.beginFrame();
       }
       this._requestedChange = SceneChangeRequest.CONTINUE;
+      console.log(this._timeManager.update);
       this._timeManager.update(
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
@@ -655,6 +656,9 @@ namespace gdjs {
       return this._cachedGameResolutionHeight / 2;
     }
 
+    getIsLoadingRequest() {
+      return this._isLoadingRequested;
+    }
     convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {
       // The result parameter used to be optional.
       const point = result || [0, 0];
@@ -848,12 +852,13 @@ namespace gdjs {
         var: variablesNetworkSyncData,
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
+        timeManager: this._timeManager.getNetworkSyncData(),
       };
     }
 
     updateFromNetworkSyncData(
       syncData: LayoutNetworkSyncData,
-      options?: { skipMultiplayerInstructions?: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var, options);
@@ -871,6 +876,9 @@ namespace gdjs {
               extensionVariablesData
             );
           }
+        }
+        if (syncData.timeManager && options?.loadSave) {
+          this._timeManager.updateFromnetworkSyncData(syncData.timeManager);
         }
       }
     }

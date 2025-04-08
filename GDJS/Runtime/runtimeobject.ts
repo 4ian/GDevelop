@@ -486,6 +486,8 @@ namespace gdjs {
       return {
         x: this.x,
         y: this.y,
+        w: this.getWidth(),
+        h: this.getHeight(),
         zo: this.zOrder,
         a: this.angle,
         hid: this.hidden,
@@ -493,6 +495,8 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
+        n: this.name,
+
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
@@ -509,13 +513,19 @@ namespace gdjs {
      */
     updateFromNetworkSyncData(
       networkSyncData: ObjectNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }
       if (networkSyncData.y !== undefined) {
         this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.w !== undefined) {
+        this.setWidth(networkSyncData.w);
+      }
+      if (networkSyncData.h !== undefined) {
+        this.setHeight(networkSyncData.h);
       }
       if (networkSyncData.zo !== undefined) {
         this.setZOrder(networkSyncData.zo);

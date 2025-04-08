@@ -94,7 +94,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: TiledSpriteNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

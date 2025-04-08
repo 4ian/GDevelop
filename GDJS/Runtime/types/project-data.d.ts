@@ -45,6 +45,10 @@ declare type GetNetworkSyncDataOptions = {
   syncEverythingForWholeGameSaveState?: boolean;
 };
 
+declare type UpdateFromNetworkSyncDataOptions = {
+  loadSave?: boolean;
+};
+
 /** Object containing basic properties for all objects synchronizing over the network. */
 declare type BasicObjectNetworkSyncData = {
   /** The position of the instance on the X axis. */
@@ -53,6 +57,10 @@ declare type BasicObjectNetworkSyncData = {
   y: number;
   /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
+  /** The width of the instance */
+  w: number;
+  /** The height of the instance */
+  h: number;
   /** Z order of the instance */
   zo: number;
   /** The angle of the instance. */
@@ -67,6 +75,8 @@ declare type BasicObjectNetworkSyncData = {
   pfx: number;
   /** Permanent force on Y */
   pfy: number;
+  /* name :*/
+  n: string;
 };
 
 /**
@@ -99,6 +109,7 @@ declare type ForceNetworkSyncData = {
 };
 
 declare type TimerNetworkSyncData = {
+  name?: string;
   time: float;
   paused: boolean;
 };
@@ -178,6 +189,7 @@ declare interface LayoutNetworkSyncData {
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  timeManager?: TimeManagerSyncData;
 }
 
 declare interface SceneStackSceneNetworkSyncData {

@@ -530,7 +530,8 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: Physics3DNetworkSyncData
+      networkSyncData: Physics3DNetworkSyncData,
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
 

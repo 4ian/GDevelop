@@ -1385,7 +1385,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: GameNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       this._throwIfDisposed();
       if (syncData.var) {

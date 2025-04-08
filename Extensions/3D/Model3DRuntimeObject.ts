@@ -10,6 +10,7 @@ namespace gdjs {
     ass: float;
     ap: boolean;
     cfd: float;
+    d: number;
   };
 
   type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &
@@ -20,6 +21,7 @@ namespace gdjs {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
       modelResourceName: string;
+      depth: number;
       rotationX: number;
       rotationY: number;
       rotationZ: number;
@@ -95,6 +97,7 @@ namespace gdjs {
      * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
      */
     _centerPoint: FloatPoint3D | null;
+
     _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
@@ -208,12 +211,13 @@ namespace gdjs {
         ass: this._animationSpeedScale,
         ap: this._animationPaused,
         cfd: this._crossfadeDuration,
+        d: this.getDepth(),
       };
     }
 
     updateFromNetworkSyncData(
       networkSyncData: Model3DObjectNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
@@ -243,16 +247,15 @@ namespace gdjs {
       if (networkSyncData.cfd !== undefined) {
         this._crossfadeDuration = networkSyncData.cfd;
       }
+      if (networkSyncData.d !== undefined) {
+        this.setDepth(networkSyncData.d);
+      }
     }
 
     _reloadModel(objectData: Model3DObjectData) {
       this._modelResourceName = objectData.content.modelResourceName;
       this._renderer._reloadModel(this, this._runtimeScene);
       this.onModelChanged(objectData);
-    }
-
-    a(currentScene: RuntimeScene): void {
-      console.log('pomme');
     }
 
     _updateModel(objectData: Model3DObjectData) {

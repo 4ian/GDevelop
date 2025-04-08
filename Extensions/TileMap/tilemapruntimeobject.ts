@@ -165,7 +165,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: TilemapNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

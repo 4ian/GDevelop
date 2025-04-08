@@ -449,7 +449,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Cube3DObjectNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

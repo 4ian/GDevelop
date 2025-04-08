@@ -129,7 +129,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Object3DNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);

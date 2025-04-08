@@ -355,7 +355,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: VariableNetworkSyncData[],
-      options?: { skipMultiplayerInstructions?: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       const that = this;
       for (let j = 0; j < networkSyncData.length; ++j) {
@@ -374,7 +374,7 @@ namespace gdjs {
         // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
         //   ownership and then update the variable.
         const syncedVariableOwner = variableSyncData.owner;
-        if (!options) {
+        if (!options || !options.loadSave) {
           const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
           const currentVariableOwner = variable.getPlayerOwnership();

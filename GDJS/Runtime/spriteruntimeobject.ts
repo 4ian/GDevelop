@@ -130,7 +130,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       newNetworkSyncData: SpriteNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(newNetworkSyncData, options);
       if (newNetworkSyncData.ifx !== undefined) {

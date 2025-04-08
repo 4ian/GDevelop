@@ -280,7 +280,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: TextInputNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

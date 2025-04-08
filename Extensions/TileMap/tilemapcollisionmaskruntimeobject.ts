@@ -209,7 +209,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: TilemapCollisionMaskNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

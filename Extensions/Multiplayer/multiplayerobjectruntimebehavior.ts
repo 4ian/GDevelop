@@ -300,6 +300,7 @@ namespace gdjs {
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
+          n: objectNetworkSyncData.n,
         });
       const shouldSyncObjectBasicInfo =
         !this._hasObjectBasicInfoBeenSyncedRecently() ||
@@ -376,6 +377,7 @@ namespace gdjs {
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
+          n: objectNetworkSyncData.n,
         };
         this._numberOfForcedBasicObjectUpdates = Math.max(
           this._numberOfForcedBasicObjectUpdates - 1,

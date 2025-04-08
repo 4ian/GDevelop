@@ -150,7 +150,8 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: PathfindingNetworkSyncData
+      networkSyncData: PathfindingNetworkSyncData,
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData);
       const behaviorSpecificProps = networkSyncData.props;

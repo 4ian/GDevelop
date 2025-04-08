@@ -116,7 +116,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: VideoNetworkSyncData,
-      options?: { skipMultiplayerInstructions: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

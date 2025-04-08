@@ -57,6 +57,12 @@ const ScenePropertiesDialog = ({
     shouldStopSoundsOnStartup,
     setShouldStopSoundsOnStartup,
   ] = React.useState<boolean>(layout.stopSoundsOnStartup());
+
+  const [
+    shouldUnloadAssetsAfterExit,
+    setShouldUnloadAssetsAfterExit,
+  ] = React.useState<boolean>(layout.shouldUnloadAssetsWhenUnloaded());
+
   const [backgroundColor, setBackgroundColor] = React.useState<?RGBColor>({
     r: layout.getBackgroundColorRed(),
     g: layout.getBackgroundColorGreen(),
@@ -69,6 +75,7 @@ const ScenePropertiesDialog = ({
       if (open && layout) {
         setWindowTitle(layout.getWindowDefaultTitle());
         setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
+        setShouldUnloadAssetsAfterExit(layout.shouldUnloadAssetsWhenUnloaded());
         setBackgroundColor({
           r: layout.getBackgroundColorRed(),
           g: layout.getBackgroundColorGreen(),
@@ -83,6 +90,7 @@ const ScenePropertiesDialog = ({
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
     layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
+    layout.setShouldUnloadAssetsWhenUnloaded(shouldUnloadAssetsAfterExit);
     layout.setBackgroundColor(
       backgroundColor ? backgroundColor.r : 0,
       backgroundColor ? backgroundColor.g : 0,
@@ -241,6 +249,11 @@ const ScenePropertiesDialog = ({
             <Trans>Stop music and sounds at the beginning of this scene</Trans>
           }
           onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
+        />
+        <Checkbox
+          checked={shouldUnloadAssetsAfterExit}
+          label={<Trans>Unload assets after the exit scene</Trans>}
+          onCheck={(e, check) => setShouldUnloadAssetsAfterExit(check)}
         />
         <ColorField
           floatingLabelText={<Trans>Scene background color</Trans>}

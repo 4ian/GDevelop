@@ -18,6 +18,8 @@ import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Column, Line } from '../../UI/Grid';
+import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 const gd = global.gd;
 
 const minimumWidths = {
@@ -149,36 +151,39 @@ class InstancesList extends Component<Props, State> {
     }
   };
 
-  _renderLockCell = ({
-    rowData: { instance },
-  }: {
-    rowData: RenderedRowInfo,
-  }) => {
-    return (
-      <IconButton
-        size="small"
-        onClick={() => {
-          if (instance.isSealed()) {
-            instance.setSealed(false);
-            instance.setLocked(false);
-            return;
-          }
-          if (instance.isLocked()) {
-            instance.setSealed(true);
-            return;
-          }
-          instance.setLocked(true);
-        }}
-      >
-        {instance.isLocked() && instance.isSealed() ? (
-          <RemoveCircle />
-        ) : instance.isLocked() ? (
-          <Lock />
-        ) : (
-          <LockOpen />
-        )}
-      </IconButton>
-    );
+_renderLockCell = ({
+  rowData: { instance },
+}: {
+  rowData: RenderedRowInfo,
+}) => {
+  return (
+    <IconButton
+      size="small"
+      style={{
+        color: instance.isLocked() ? '#F5F5F7' : '#A6A6AB',
+      }}
+      onClick={() => {
+        if (instance.isSealed()) {
+          instance.setSealed(false);
+          instance.setLocked(false);
+          return;
+        }
+        if (instance.isLocked()) {
+          instance.setSealed(true);
+          return;
+        }
+        instance.setLocked(true);
+      }}
+    >
+      {instance.isLocked() && instance.isSealed() ? (
+        <RemoveCircle />
+      ) : instance.isLocked() ? (
+        <Lock />
+      ) : (
+        <LockOpen />
+      )}
+    </IconButton>
+  );
   };
 
   _selectFirstInstance = () => {
@@ -291,16 +296,7 @@ class InstancesList extends Component<Props, State> {
                       width={Math.max(width * 0.35, minimumWidths.objectName)}
                       className={'tableColumn'}
                     />
-                    <RVColumn
-                      label=""
-                      dataKey="locked"
-                      width={Math.max(
-                        width * 0.05,
-                        minimumWidths.numberProperty
-                      )}
-                      className={'tableColumn'}
-                      cellRenderer={this._renderLockCell}
-                    />
+                   
                     <RVColumn
                       label={<Trans>X</Trans>}
                       dataKey="x"
@@ -319,8 +315,8 @@ class InstancesList extends Component<Props, State> {
                       )}
                       className={'tableColumn'}
                     />
-                    <RVColumn
-                      label={<Trans>Angle</Trans>}
+                     <RVColumn
+                      label={<Trans><RotateZ></RotateZ></Trans>}
                       dataKey="angle"
                       width={Math.max(
                         width * 0.1,
@@ -329,12 +325,12 @@ class InstancesList extends Component<Props, State> {
                       className={'tableColumn'}
                     />
                     <RVColumn
-                      label={<Trans>Layer</Trans>}
+                      label={<Trans><LayersIcon></LayersIcon></Trans>}
                       dataKey="layer"
-                      width={Math.max(width * 0.2, minimumWidths.layerName)}
+                      width={Math.max(width * 0.1, minimumWidths.layerName)}
                       className={'tableColumn'}
                     />
-                    <RVColumn
+                      <RVColumn
                       label={<Trans>Z Order</Trans>}
                       dataKey="zOrder"
                       width={Math.max(
@@ -343,7 +339,17 @@ class InstancesList extends Component<Props, State> {
                       )}
                       className={'tableColumn'}
                     />
-                  </RVTable>
+                     <RVColumn
+                      label=""
+                      dataKey="locked"
+                      width={Math.max(
+                        width * 0.05,
+                        minimumWidths.numberProperty
+                      )}
+                      className={'tableColumn'}
+                      cellRenderer={this._renderLockCell}
+                    />
+                  </RVTable>  
                 )}
               </AutoSizer>
             </div>

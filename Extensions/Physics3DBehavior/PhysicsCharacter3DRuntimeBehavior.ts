@@ -209,7 +209,7 @@ namespace gdjs {
       return this._physics3D;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
       }
@@ -268,7 +268,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
+    override getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -296,7 +296,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: PhysicsCharacter3DNetworkSyncData
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -389,13 +389,13 @@ namespace gdjs {
       this.owner3D.setAngle(gdjs.toDegrees(euler.z));
     }
 
-    onDeActivate() {
+    override onDeActivate() {
       this.collisionChecker.clearContacts();
     }
 
-    onActivate() {}
+    override onActivate() {}
 
-    onDestroy() {
+    override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
       this._destroyCharacter();
@@ -437,12 +437,14 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // Trigger createAndAddBody()
       this.getPhysics3D();
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       // Trigger createAndAddBody()
       this.getPhysics3D();
     }

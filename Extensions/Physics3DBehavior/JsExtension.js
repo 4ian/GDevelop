@@ -3350,6 +3350,131 @@ module.exports = {
         .addParameter('expression', _('Stick force (between -1 and 1)'))
         .markAsAdvanced()
         .setFunctionName('simulateSteeringStick');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'SteerAngle',
+          _('Steer angle'),
+          _(
+            'the current steer angle (in degree). The value is negative when cars turn left'
+          ),
+          _('the steer angle'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Steer angle (in degree)')
+          )
+        )
+        .setFunctionName('getSteerAngle');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'EngineSpeed',
+          _('Engine speed'),
+          _('the current engine speed (RPM)'),
+          _('the engine speed'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine speed (RPM)')
+          )
+        )
+        .setFunctionName('getEngineSpeed');
+
+      aut
+        .addExpressionAndCondition(
+          'number',
+          'CurrentGear',
+          _('Current gear'),
+          _('the current gear (-1 = reverse, 0 = neutral, 1 = 1st gear)'),
+          _('the current gear'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(_('Current gear'))
+        )
+        .setFunctionName('getCurrentGear');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineTorqueMax',
+          _('Engine max torque'),
+          _(
+            'the engine max torque (N·m). It allows cars to climb steep slopes and push heavy obstacles'
+          ),
+          _('the engine max torque'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine max torque (N·m)')
+          )
+        )
+        .setFunctionName('setEngineTorqueMax')
+        .setGetter('getEngineTorqueMax');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineSpeedMax',
+          _('Engine max speed'),
+          _('the engine max speed (RPM)'),
+          _('the engine max speed'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine max speed (RPM)')
+          )
+        )
+        .setFunctionName('setEngineSpeedMax')
+        .setGetter('getEngineSpeedMax');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EngineInertia',
+          _('Engine inertia'),
+          _('the engine inertia (kg·m²). It slows down car acceleration'),
+          _('the engine inertia'),
+          _('Car configuration'),
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Engine inertia (kg·m²)')
+          )
+        )
+        .setFunctionName('setEngineInertia')
+        .setGetter('getEngineInertia');
     }
 
     extension

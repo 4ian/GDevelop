@@ -605,6 +605,25 @@ namespace gdjs {
       return this._previousSteeringStickForce;
     }
 
+    getSteerAngle(): float {
+      return this._currentSteerRatio * this._steerAngleMax;
+    }
+
+    /**
+     * @returns The engine current speed in RPM (rotation per minute)
+     */
+    getEngineSpeed(): float {
+      return this._vehicleController
+        ? this._vehicleController.GetEngine().GetCurrentRPM()
+        : 0;
+    }
+
+    getCurrentGear(): float {
+      return this._vehicleController
+        ? this._vehicleController.GetTransmission().GetCurrentGear()
+        : 0;
+    }
+
     getSteerAngleMax(): float {
       return this._steerAngleMax;
     }
@@ -660,7 +679,7 @@ namespace gdjs {
     }
 
     /**
-     * @returns The engine speed in RPM (rotation per minute)
+     * @returns The engine maximum speed in RPM (rotation per minute)
      */
     getEngineSpeedMax(): float {
       return this._engineSpeedMax;

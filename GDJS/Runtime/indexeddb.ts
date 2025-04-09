@@ -15,10 +15,19 @@ namespace gdjs {
       );
       return;
     }
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
 
-      request.onupgradeneeded = function (event) {
+    return new Promise((resolve, reject) => {
+      let request: IDBOpenDBRequest;
+
+      try {
+        request = indexedDB.open(dbName, 1);
+      } catch (err) {
+        console.error('Exception thrown while opening IndexedDB:', err);
+        reject(err);
+        return;
+      }
+
+      request.onupgradeneeded = function () {
         const db = request.result;
         if (!db.objectStoreNames.contains(objectStoreName)) {
           db.createObjectStore(objectStoreName);
@@ -31,6 +40,7 @@ namespace gdjs {
         const tx = db.transaction(objectStoreName, 'readonly');
         const store = tx.objectStore(objectStoreName);
         const getRequest = store.get(key);
+
         getRequest.onsuccess = function () {
           if (getRequest.result !== undefined) {
             resolve(getRequest.result);
@@ -38,11 +48,13 @@ namespace gdjs {
             resolve(null);
           }
         };
+
         getRequest.onerror = function () {
           console.error('Error loading game from IndexedDB:', getRequest.error);
           reject(getRequest.error);
         };
       };
+
       request.onerror = function () {
         console.error('Error opening IndexedDB:', request.error);
         reject(request.error);

@@ -354,6 +354,7 @@ namespace gdjs {
         rotation.GetZ(),
         rotation.GetW()
       );
+      Jolt.destroy(rotation);
       return result;
     }
 
@@ -1544,6 +1545,7 @@ namespace gdjs {
           behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           _sharedData.physicsSystem
         );
+        Jolt.destroy(settings);
         const body = _sharedData.physicsSystem
           .GetBodyLockInterface()
           .TryGetBody(character.GetInnerBodyID());

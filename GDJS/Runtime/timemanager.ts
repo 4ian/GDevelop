@@ -69,9 +69,9 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): TimeManagerSyncData {
-      let tab = new Hashtable<TimerNetworkSyncData>();
+      const timerNetworkSyncDatas = new Hashtable<TimerNetworkSyncData>();
       Object.entries(this._timers.items).forEach(([key, timer]) => {
-        tab.put(key, timer.getNetworkSyncData());
+        timerNetworkSyncDatas.put(key, timer.getNetworkSyncData());
       });
 
       return {
@@ -79,7 +79,7 @@ namespace gdjs {
         timeScale: this._timeScale,
         timeFromStart: this._timeFromStart,
         firstFrame: this._firstFrame,
-        timers: tab,
+        timers: timerNetworkSyncDatas,
         firstUpdateDone: this._firstUpdateDone,
       };
     }

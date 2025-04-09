@@ -321,9 +321,9 @@ namespace gdjs {
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
       // When the object is synchronized from the network, the inputs must not be cleared UNLESS we have to force clear them for loading a savestate.
-      if (options && options.forceInputClear)
+      if (!options || !options.forceInputClear) {
         this._dontClearInputsBetweenFrames = false;
-      else {
+      } else {
         this._dontClearInputsBetweenFrames = true;
       }
     }

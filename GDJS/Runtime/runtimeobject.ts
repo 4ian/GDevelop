@@ -461,7 +461,7 @@ namespace gdjs {
       this._behaviors.forEach((behavior) => {
         if (
           !behavior.isSyncedOverNetwork() &&
-          !syncOptions?.forceSyncEverything
+          (!syncOptions || !syncOptions.forceSyncEverything)
         ) {
           return;
         }

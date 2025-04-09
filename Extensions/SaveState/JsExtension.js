@@ -26,18 +26,18 @@ module.exports = {
         'Neyl Mahfouf',
         'Gdevelop'
       )
-      .setExtensionHelpPath('/all-features/device-vibration')
-      .setCategory('User interface');
+      .setExtensionHelpPath('/all-features/save-state')
+      .setCategory('Save & Load');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Save State'))
-      .setIcon('JsPlatform/Extensions/vibration_start32.png');
-
+      .setIcon('JsPlatform/Extensions/snapshotsave.svg');
     extension
       .addAction(
-        'SyncAll',
+        'SaveGame',
         _('Save the whole game'),
-        _('Save the wole game.'),
-        _('Syncall'),
+        _('Save the whole game'),
+        _('Save the game.'),
+        '',
         'res/actions/save.svg',
         'res/actions/save.svg'
       )
@@ -48,10 +48,11 @@ module.exports = {
 
     extension
       .addAction(
-        'LoadAll',
-        _('Load the whole game'),
-        _('Load the wole game.'),
-        _('Loadall'),
+        'LoadGame',
+        _('Load game save.'),
+        _('Load a game save.'),
+        _('Load a game save'),
+        '',
         'res/actions/save.svg',
         'res/actions/save.svg'
       )

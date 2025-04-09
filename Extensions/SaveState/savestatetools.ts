@@ -1,5 +1,8 @@
 namespace gdjs {
   export namespace saveState {
+    export const INDEXED_DB_NAME: string = 'gameSaveDB';
+    export const INDEXED_DB_KEY: string = 'game_save';
+    export const INDEXED_DB_OBJECT_STORE: string = 'saves';
     export const saveWholeGame = async function (currentScene: RuntimeScene) {
       let allSyncData: GameSaveState = {
         gameNetworkSyncData: {},
@@ -7,8 +10,7 @@ namespace gdjs {
       };
       const gameData = currentScene
         .getGame()
-        .getNetworkSyncData({ syncEverythingForWholeGameSaveState: true });
-      console.log(currentScene.getGame()._captureManager);
+        .getNetworkSyncData({ forceSyncEverything: true });
       const sceneStack = currentScene.getGame()._sceneStack._stack;
       if (gameData) {
         allSyncData.gameNetworkSyncData = gameData;
@@ -17,9 +19,8 @@ namespace gdjs {
       if (sceneStack) {
         sceneStack.forEach((scene, index) => {
           const sceneDatas = scene.getNetworkSyncData({
-            syncEverythingForWholeGameSaveState: true,
+            forceSyncEverything: true,
           });
-          scene._variablesByExtensionName;
 
           if (sceneDatas) {
             allSyncData.layoutNetworkSyncDatas[index] = {
@@ -28,10 +29,13 @@ namespace gdjs {
             };
             allSyncData.layoutNetworkSyncDatas[index].sceneData = sceneDatas;
             const sceneRuntimeObjects = scene.getAdhocListOfAllInstances();
+            const syncOptions: GetNetworkSyncDataOptions = {
+              forceSyncEverything: true,
+            };
             for (const key in sceneRuntimeObjects) {
               if (sceneRuntimeObjects.hasOwnProperty(key)) {
                 const object = sceneRuntimeObjects[key];
-                const syncData = object.getNetworkSyncData(true);
+                const syncData = object.getNetworkSyncData(syncOptions);
                 allSyncData.layoutNetworkSyncDatas[index].objectDatas[
                   object.id
                 ] = syncData;
@@ -41,50 +45,16 @@ namespace gdjs {
         });
       }
       const syncDataJson = JSON.stringify(allSyncData);
-      await saveToIndexedDB('gameSaveDB', 'game_save', syncDataJson);
+      await gdjs.saveToIndexedDB(
+        INDEXED_DB_NAME,
+        INDEXED_DB_KEY,
+        INDEXED_DB_OBJECT_STORE,
+        syncDataJson
+      );
     };
 
     export const loadWholeGame = function (currentScene: RuntimeScene) {
-      currentScene.requestLoad();
+      currentScene.requestLoad(true);
     };
-  }
-
-  async function saveToIndexedDB(
-    dbName: string,
-    key: string,
-    data: any
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
-
-      request.onupgradeneeded = function (event) {
-        const db = request.result;
-        if (!db.objectStoreNames.contains('saves')) {
-          db.createObjectStore('saves');
-        }
-      };
-
-      request.onsuccess = function () {
-        const db = request.result;
-        const tx = db.transaction('saves', 'readwrite');
-        const store = tx.objectStore('saves');
-        const putRequest = store.put(data, key);
-
-        putRequest.onsuccess = function () {
-          console.log('Game saved successfully in IndexedDB.');
-          resolve();
-        };
-
-        putRequest.onerror = function () {
-          console.error('Error saving game in IndexedDB:', putRequest.error);
-          reject(putRequest.error);
-        };
-      };
-
-      request.onerror = function () {
-        console.error('Error opening IndexedDB:', request.error);
-        reject(request.error);
-      };
-    });
   }
 }

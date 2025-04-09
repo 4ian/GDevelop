@@ -10,7 +10,6 @@ namespace gdjs {
     ass: float;
     ap: boolean;
     cfd: float;
-    d: number;
   };
 
   type Model3DObjectNetworkSyncData = Object3DNetworkSyncData &

@@ -42,11 +42,11 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
-  syncEverythingForWholeGameSaveState?: boolean;
+  forceSyncEverything?: boolean;
 };
 
 declare type UpdateFromNetworkSyncDataOptions = {
-  loadSave?: boolean;
+  forceInputClear?: boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */

@@ -454,10 +454,15 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getNetworkSyncData(saveWholeGame?: boolean): ObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions?: GetNetworkSyncDataOptions
+    ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (!behavior.isSyncedOverNetwork() && !saveWholeGame) {
+        if (
+          !behavior.isSyncedOverNetwork() &&
+          !syncOptions?.forceSyncEverything
+        ) {
           return;
         }
 
@@ -574,7 +579,7 @@ namespace gdjs {
         const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
         const behavior = this.getBehavior(behaviorName);
         if (behavior) {
-          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData, options);
         }
       }
 

@@ -242,7 +242,7 @@ namespace gdjs {
         const variable = this._variables.get(variableName);
         const variableOwner = variable.getPlayerOwnership();
         if (
-          (!syncOptions.syncEverythingForWholeGameSaveState &&
+          (!syncOptions.forceSyncEverything &&
             // Variable undefined.
             variable.isUndefinedInContainer()) ||
           // Variable marked as not to be synchronized.
@@ -374,7 +374,7 @@ namespace gdjs {
         // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
         //   ownership and then update the variable.
         const syncedVariableOwner = variableSyncData.owner;
-        if (!options || !options.loadSave) {
+        if (!options || !options.forceInputClear) {
           const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
           const currentVariableOwner = variable.getPlayerOwnership();

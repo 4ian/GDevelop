@@ -25,8 +25,6 @@ namespace gdjs {
   export type PanelSpriteObjectData = ObjectData & PanelSpriteObjectDataType;
 
   export type PanelSpriteNetworkSyncDataType = {
-    wid: number;
-    hei: number;
     op: number;
     color: string;
   };
@@ -86,12 +84,6 @@ namespace gdjs {
       oldObjectData: PanelSpriteObjectData,
       newObjectData: PanelSpriteObjectData
     ): boolean {
-      if (oldObjectData.width !== newObjectData.width) {
-        this.setWidth(newObjectData.width);
-      }
-      if (oldObjectData.height !== newObjectData.height) {
-        this.setHeight(newObjectData.height);
-      }
       let updateTexture = false;
       if (oldObjectData.rightMargin !== newObjectData.rightMargin) {
         this._rBorder = newObjectData.rightMargin;
@@ -124,8 +116,6 @@ namespace gdjs {
     getNetworkSyncData(): PanelSpriteNetworkSyncData {
       return {
         ...super.getNetworkSyncData(),
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         op: this.getOpacity(),
         color: this.getColor(),
       };
@@ -139,12 +129,6 @@ namespace gdjs {
 
       // Texture is not synchronized, see if this is asked or not.
 
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
-      }
       if (networkSyncData.op !== undefined) {
         this.setOpacity(networkSyncData.op);
       }

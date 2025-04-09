@@ -72,13 +72,18 @@ namespace gdjs {
         }
 
         if (currentScene.getIsLoadingRequest()) {
-          this.loadGameFromIndexedDB('gameSaveDB', 'game_save')
+          currentScene.requestLoad(false);
+          gdjs
+            .loadFromIndexedDB(
+              gdjs.saveState.INDEXED_DB_NAME,
+              gdjs.saveState.INDEXED_DB_OBJECT_STORE,
+              gdjs.saveState.INDEXED_DB_KEY
+            )
             .then((jsonData) => {
               const allSyncData: GameSaveState = JSON.parse(jsonData);
-
               if (allSyncData) {
                 const options: UpdateFromNetworkSyncDataOptions = {
-                  loadSave: true,
+                  forceInputClear: true,
                 };
 
                 currentScene
@@ -89,7 +94,7 @@ namespace gdjs {
                   );
 
                 this.applyUpdateFromNetworkSyncDataIfAny({
-                  skipCreatingInstances: true,
+                  isLoadingFromSaveState: true,
                 });
 
                 const sceneStack = this._stack;
@@ -116,11 +121,6 @@ namespace gdjs {
                     }
                   }
                 });
-
-                const game = currentScene.getGame();
-                console.log(game._eventsBasedObjectDatas);
-
-                currentScene._isLoadingRequested = false;
               }
             })
             .catch((error) => {
@@ -177,7 +177,7 @@ namespace gdjs {
     push(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: { skipCreatingInstances: boolean }
+      options?: { isLoadingFromSaveState: boolean }
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -204,7 +204,7 @@ namespace gdjs {
     private _loadNewScene(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: { skipCreatingInstances: boolean }
+      options?: { isLoadingFromSaveState: boolean }
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
       // Load the new one
@@ -219,7 +219,10 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (externalLayoutData && !options?.skipCreatingInstances) {
+        if (
+          externalLayoutData &&
+          (!options || !options.isLoadingFromSaveState)
+        ) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -241,7 +244,7 @@ namespace gdjs {
     replace(
       newSceneName: string,
       clear?: boolean,
-      options?: { skipCreatingInstances }
+      options?: { isLoadingFromSaveState: boolean }
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -324,7 +327,7 @@ namespace gdjs {
     }
 
     applyUpdateFromNetworkSyncDataIfAny(options?: {
-      skipCreatingInstances: boolean;
+      isLoadingFromSaveState: boolean;
     }): boolean {
       this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
@@ -333,7 +336,7 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      if (options?.skipCreatingInstances) {
+      if (options && options.isLoadingFromSaveState) {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
@@ -472,47 +475,5 @@ namespace gdjs {
         throw 'The scene stack has been disposed and should not be used anymore.';
       }
     }
-
-    loadGameFromIndexedDB = async function (
-      dbName: string,
-      key: string
-    ): Promise<any> {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName, 1);
-
-        request.onupgradeneeded = function (event) {
-          const db = request.result;
-          if (!db.objectStoreNames.contains('saves')) {
-            db.createObjectStore('saves');
-          }
-        };
-
-        request.onsuccess = function () {
-          const db = request.result;
-
-          const tx = db.transaction('saves', 'readonly');
-          const store = tx.objectStore('saves');
-          const getRequest = store.get(key);
-          getRequest.onsuccess = function () {
-            if (getRequest.result !== undefined) {
-              resolve(getRequest.result);
-            } else {
-              resolve(null);
-            }
-          };
-          getRequest.onerror = function () {
-            console.error(
-              'Error loading game from IndexedDB:',
-              getRequest.error
-            );
-            reject(getRequest.error);
-          };
-        };
-        request.onerror = function () {
-          console.error('Error opening IndexedDB:', request.error);
-          reject(request.error);
-        };
-      });
-    };
   }
 }

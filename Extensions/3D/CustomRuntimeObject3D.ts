@@ -4,7 +4,7 @@ namespace gdjs {
     d: float;
     rx: float;
     ry: float;
-    flipZ: boolean;
+    ifz: boolean;
   };
 
   /**
@@ -87,15 +87,15 @@ namespace gdjs {
     }
 
     getNetworkSyncData(
-      saveWholeGame?: boolean
+      syncOptions?: GetNetworkSyncDataOptions
     ): Custom3DObjectNetworkSyncDataType {
       return {
-        ...super.getNetworkSyncData(saveWholeGame),
+        ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
         d: this.getDepth(),
         rx: this.getRotationX(),
         ry: this.getRotationY(),
-        flipZ: this.isFlippedZ(),
+        ifz: this.isFlippedZ(),
       };
     }
 
@@ -110,8 +110,7 @@ namespace gdjs {
         this.setRotationX(networkSyncData.rx);
       if (networkSyncData.ry !== undefined)
         this.setRotationY(networkSyncData.ry);
-      if (networkSyncData.flipZ !== undefined)
-        this.flipZ(networkSyncData.flipZ);
+      if (networkSyncData.ifz !== undefined) this.flipZ(networkSyncData.ifz);
     }
 
     /**

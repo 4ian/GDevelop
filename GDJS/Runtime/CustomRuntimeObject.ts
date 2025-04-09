@@ -174,10 +174,10 @@ namespace gdjs {
     }
 
     getNetworkSyncData(
-      saveWholeGame?: boolean
+      syncOptions?: GetNetworkSyncDataOptions
     ): CustomObjectNetworkSyncDataType {
       return {
-        ...super.getNetworkSyncData(saveWholeGame),
+        ...super.getNetworkSyncData(syncOptions),
         ifx: this.isFlippedX(),
         ify: this.isFlippedY(),
       };

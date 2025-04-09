@@ -127,7 +127,7 @@ namespace gdjs {
      */
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
-      options?: { skipCreatingInstances?: boolean }
+      options?: { isLoadingFromSaveState?: boolean }
     ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
@@ -186,7 +186,7 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      if (!options || !options.skipCreatingInstances)
+      if (!options || !options.isLoadingFromSaveState)
         this.createObjectsFrom(
           sceneData.instances,
           0,
@@ -371,7 +371,6 @@ namespace gdjs {
         this._profiler.beginFrame();
       }
       this._requestedChange = SceneChangeRequest.CONTINUE;
-      console.log(this._timeManager.update);
       this._timeManager.update(
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
@@ -757,8 +756,8 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoad(): void {
-      this._isLoadingRequested = true;
+    requestLoad(request: boolean): void {
+      this._isLoadingRequested = request;
     }
 
     /**
@@ -825,10 +824,7 @@ namespace gdjs {
         const extensionVariablesSyncData =
           variables.getNetworkSyncData(syncOptions);
         // If there is no variables to sync, don't include the extension in the sync data.
-        if (
-          extensionVariablesSyncData &&
-          !syncOptions.syncEverythingForWholeGameSaveState
-        ) {
+        if (extensionVariablesSyncData) {
           extensionsVariablesSyncData[extensionName] =
             extensionVariablesSyncData;
         }
@@ -877,8 +873,8 @@ namespace gdjs {
             );
           }
         }
-        if (syncData.timeManager && options?.loadSave) {
-          this._timeManager.updateFromnetworkSyncData(syncData.timeManager);
+        if (syncData.timeManager && options?.forceInputClear) {
+          this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
         }
       }
     }

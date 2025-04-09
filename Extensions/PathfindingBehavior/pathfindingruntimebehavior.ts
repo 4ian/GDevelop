@@ -153,7 +153,7 @@ namespace gdjs {
       networkSyncData: PathfindingNetworkSyncData,
       options?: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       const behaviorSpecificProps = networkSyncData.props;
       if (behaviorSpecificProps.path !== undefined) {
         this._path = behaviorSpecificProps.path;

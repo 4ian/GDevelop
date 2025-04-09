@@ -300,7 +300,7 @@ namespace gdjs {
       networkSyncData: PhysicsCharacter3DNetworkSyncData,
       options?: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       this._forwardAngle = behaviorSpecificProps.fwa;
@@ -320,8 +320,8 @@ namespace gdjs {
       this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      if (!options || !options.loadSave)
+      // When the object is synchronized from the network, the inputs must not be cleared UNLESS we have to force clear them for loading a savestate.
+      if (options && options.forceInputClear)
         this._dontClearInputsBetweenFrames = false;
       else {
         this._dontClearInputsBetweenFrames = true;

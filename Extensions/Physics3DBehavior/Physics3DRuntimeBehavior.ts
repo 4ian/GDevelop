@@ -533,7 +533,7 @@ namespace gdjs {
       networkSyncData: Physics3DNetworkSyncData,
       options?: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (

@@ -84,7 +84,7 @@ namespace gdjs {
       };
     }
 
-    updateFromnetworkSyncData(syncData: TimeManagerSyncData): void {
+    updateFromNetworkSyncData(syncData: TimeManagerSyncData): void {
       if (syncData.elapsedTime !== undefined) {
         this._elapsedTime = syncData.elapsedTime;
       }

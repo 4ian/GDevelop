@@ -5,8 +5,6 @@ namespace gdjs {
   type Object3DNetworkSyncDataType = {
     // z is position on the Z axis, different from zo, which is Z order
     z: number;
-    w: number;
-    h: number;
     d: number;
     rx: number;
     ry: number;
@@ -116,8 +114,6 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         z: this.getZ(),
-        w: this.getWidth(),
-        h: this.getHeight(),
         d: this.getDepth(),
         rx: this.getRotationX(),
         ry: this.getRotationY(),
@@ -133,8 +129,6 @@ namespace gdjs {
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
-      if (networkSyncData.w !== undefined) this.setWidth(networkSyncData.w);
-      if (networkSyncData.h !== undefined) this.setHeight(networkSyncData.h);
       if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
       if (networkSyncData.rx !== undefined)
         this.setRotationX(networkSyncData.rx);

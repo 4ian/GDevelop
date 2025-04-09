@@ -169,8 +169,8 @@ namespace gdjs {
         this._stickForce = behaviorSpecificProps.sf;
       }
 
-      // When the object is synchronized from the network, the inputs must not be cleared.
-      if (!options || !options.loadSave) {
+      // When the object is synchronized from the network, the inputs must not be cleared UNLESS we have to force clear them for loading a savestate.
+      if (!options || !options.forceInputClear) {
         this._dontClearInputsBetweenFrames = true;
       } else {
         this._dontClearInputsBetweenFrames = false;

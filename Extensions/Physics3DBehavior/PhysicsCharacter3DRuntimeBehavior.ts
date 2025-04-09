@@ -354,6 +354,7 @@ namespace gdjs {
         rotation.GetZ(),
         rotation.GetW()
       );
+      Jolt.destroy(rotation);
       return result;
     }
 

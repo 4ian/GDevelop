@@ -37,6 +37,8 @@ namespace gdjs {
     private _physics3D: Physics3D | null = null;
     _vehicleController: Jolt.WheeledVehicleController | null = null;
     _stepListener: Jolt.VehicleConstraintStepListener | null = null;
+    _vehicleCollisionTester: Jolt.VehicleCollisionTesterCastCylinder | null =
+      null;
     /**
      * sharedData is a reference to the shared data of the scene, that registers
      * every physics behavior that is created so that collisions can be cleared
@@ -343,6 +345,10 @@ namespace gdjs {
       }
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+      if (this._vehicleCollisionTester) {
+        Jolt.destroy(this._vehicleCollisionTester);
+        this._vehicleCollisionTester = null;
+      }
       const constraint = this._vehicleController.GetConstraint();
       this._sharedData.physicsSystem.RemoveConstraint(constraint);
       // The controller is destroyed with the constraint.
@@ -1074,36 +1080,15 @@ namespace gdjs {
 
         const constraint = new Jolt.VehicleConstraint(carBody, vehicle);
         Jolt.destroy(vehicle);
-        constraint.SetVehicleCollisionTester(
-          new Jolt.VehicleCollisionTesterRay(
-            behavior.getBodyLayer(),
-            this.getVec3(0, 0, 1)
-          )
-        );
-        // constraint.SetVehicleCollisionTester(
-        //   new Jolt.VehicleCollisionTesterCastSphere(
-        //     behavior.getBodyLayer(),
-        //     wheelWidth / 2,
-        //     new Jolt.Vec3(0, 0, 1),
-        //   )
-        // );
-        // constraint.SetVehicleCollisionTester(
-        //   new Jolt.VehicleCollisionTesterCastCylinder(
-        //     behavior.getBodyLayer(),
-        //     0.05,
-        //   )
-        // );
 
-        //constraint.ResetGravityOverride();
-        //constraint.OverrideGravity(new Jolt.Vec3(0, 0, -9.8 * 4));
-        // TODO Ask why the gravity override have a different result that relying on the body properties.
-        constraint.OverrideGravity(
-          new Jolt.Vec3(
-            behavior.gravityScale * behavior._sharedData.gravityX,
-            behavior.gravityScale * behavior._sharedData.gravityY,
-            behavior.gravityScale * behavior._sharedData.gravityZ
-          )
-        );
+        const vehicleCollisionTester =
+          new Jolt.VehicleCollisionTesterCastCylinder(
+            behavior.getBodyLayer(),
+            0.05
+          );
+        constraint.SetVehicleCollisionTester(vehicleCollisionTester);
+        this.vehicleBehavior._vehicleCollisionTester = vehicleCollisionTester;
+
         _sharedData.physicsSystem.AddConstraint(constraint);
         this.vehicleBehavior._vehicleController = Jolt.castObject(
           constraint.GetController(),

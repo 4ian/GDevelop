@@ -450,11 +450,6 @@ namespace gdjs {
       this.getPhysics3D();
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      // Trigger createAndAddBody()
-      this.getPhysics3D();
-    }
-
     doBeforePhysicsStep(timeDelta: float): void {
       if (!this.activated()) {
         return;

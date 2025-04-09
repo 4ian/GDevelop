@@ -2924,6 +2924,9 @@ module.exports = {
           .setLabel(_('Max engine torque'))
           .setGroup(_('Speed'))
           .setType('Number')
+          .setDescription(
+            _('Allow cars to climb steep slopes and push heavy obstacles.')
+          )
           .setValue(
             behaviorContent
               .getChild('engineTorqueMax')
@@ -2948,6 +2951,7 @@ module.exports = {
           .setLabel(_('Engine inertia'))
           .setGroup(_('Speed'))
           .setType('Number')
+          .setDescription(_('Slow down car acceleration.'))
           .setValue(
             behaviorContent
               .getChild('engineInertia')

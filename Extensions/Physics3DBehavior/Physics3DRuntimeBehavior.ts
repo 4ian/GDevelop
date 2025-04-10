@@ -312,6 +312,7 @@ namespace gdjs {
     private massCenterOffsetY: float;
     private massCenterOffsetZ: float;
     private density: float;
+    massOverride: float;
     friction: float;
     restitution: float;
     linearDamping: float;
@@ -408,6 +409,7 @@ namespace gdjs {
       this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
       this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
       this.density = behaviorData.density;
+      this.massOverride = behaviorData.massOverride;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);
@@ -1164,6 +1166,18 @@ namespace gdjs {
       this._needToRecreateShape = true;
     }
 
+    getMassOverride(): float {
+      return this.massOverride;
+    }
+
+    setMassOverride(mass: float): void {
+      if (this.massOverride === mass) {
+        return;
+      }
+      this.massOverride = mass;
+      this._needToRecreateBody = true;
+    }
+
     getFriction(): float {
       return this.friction;
     }
@@ -1867,6 +1881,12 @@ namespace gdjs {
         bodyCreationSettings.mLinearDamping = behavior.linearDamping;
         bodyCreationSettings.mAngularDamping = behavior.angularDamping;
         bodyCreationSettings.mGravityFactor = behavior.gravityScale;
+        if (behavior.massOverride > 0) {
+          bodyCreationSettings.mOverrideMassProperties =
+            Jolt.EOverrideMassProperties_CalculateInertia;
+          bodyCreationSettings.mMassPropertiesOverride.mMass =
+            behavior.massOverride;
+        }
 
         const bodyInterface = _sharedData.bodyInterface;
         const body = bodyInterface.CreateBody(bodyCreationSettings);

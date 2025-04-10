@@ -256,6 +256,18 @@ const Physics3DEditor = (props: Props) => {
           }
         />
         <NumericProperty
+          id="physics3d-parameter-mass-override"
+          properties={properties}
+          propertyName={'massOverride'}
+          step={0.1}
+          onUpdate={newValue =>
+            updateBehaviorProperty(
+              'massOverride',
+              parseFloat(newValue) > 0 ? newValue : '0'
+            )
+          }
+        />
+        <NumericProperty
           properties={properties}
           propertyName={'gravityScale'}
           step={0.1}

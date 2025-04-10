@@ -50,7 +50,6 @@ namespace gdjs {
     _steerAngleMax;
     private _beginningSteerSpeed: float;
     private _endSteerSpeed: float;
-    _mass: float;
     _engineTorqueMax: float;
     /** in RPM (rotation per minute) */
     _engineSpeedMax: float;
@@ -112,7 +111,6 @@ namespace gdjs {
       this._steerAngleMax = behaviorData.steerAngleMax;
       this._beginningSteerSpeed = behaviorData.beginningSteerSpeed;
       this._endSteerSpeed = behaviorData.endSteerSpeed;
-      this._mass = behaviorData.mass;
       this._engineTorqueMax = behaviorData.engineTorqueMax;
       this._engineSpeedMax = behaviorData.engineSpeedMax;
       this._engineInertia = behaviorData.engineInertia;
@@ -184,9 +182,6 @@ namespace gdjs {
       }
       if (oldBehaviorData.endSteerSpeed !== newBehaviorData.endSteerSpeed) {
         this.setEndSteerSpeed(newBehaviorData.endSteerSpeed);
-      }
-      if (oldBehaviorData.mass !== newBehaviorData.mass) {
-        this.setMass(newBehaviorData.mass);
       }
       if (oldBehaviorData.engineTorqueMax !== newBehaviorData.engineTorqueMax) {
         this.setEngineTorqueMax(newBehaviorData.engineTorqueMax);
@@ -648,15 +643,6 @@ namespace gdjs {
       this._endSteerSpeed = endSteerSpeed;
     }
 
-    getMass(): float {
-      return this._mass;
-    }
-
-    setMass(mass: float): void {
-      this._mass = mass;
-      this.invalidateShape();
-    }
-
     invalidateShape(): void {
       const physics3D = this.getPhysics3D();
       if (!physics3D) {
@@ -986,15 +972,16 @@ namespace gdjs {
           Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
-        carBodySettings.mOverrideMassProperties =
-          Jolt.EOverrideMassProperties_CalculateInertia;
-        carBodySettings.mMassPropertiesOverride.mMass =
-          this.vehicleBehavior._mass;
         carBodySettings.mFriction = behavior.friction;
         carBodySettings.mRestitution = behavior.restitution;
         carBodySettings.mLinearDamping = behavior.linearDamping;
         carBodySettings.mAngularDamping = behavior.angularDamping;
         carBodySettings.mGravityFactor = behavior.gravityScale;
+        if (behavior.massOverride > 0) {
+          carBodySettings.mOverrideMassProperties =
+            Jolt.EOverrideMassProperties_CalculateInertia;
+          carBodySettings.mMassPropertiesOverride.mMass = behavior.massOverride;
+        }
         const carBody = _sharedData.bodyInterface.CreateBody(carBodySettings);
         Jolt.destroy(carBodySettings);
         _sharedData.bodyInterface.AddBody(

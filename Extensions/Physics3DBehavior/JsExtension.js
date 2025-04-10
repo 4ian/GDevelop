@@ -158,6 +158,13 @@ module.exports = {
           return true;
         }
 
+        if (propertyName === 'massOverride') {
+          behaviorContent
+            .getChild('massOverride')
+            .setDoubleValue(parseFloat(newValue));
+          return true;
+        }
+
         if (propertyName === 'friction') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
@@ -444,6 +451,21 @@ module.exports = {
               'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
             )
           );
+        if (!behaviorContent.hasChild('massOverride')) {
+          behaviorContent.addChild('massOverride').setDoubleValue(0);
+        }
+        behaviorProperties
+          .getOrCreate('massOverride')
+          .setLabel(_('Mass override'))
+          .setGroup('')
+          .setType('Number')
+          .setValue(
+            behaviorContent
+              .getChild('massOverride')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setDescription(_('Leave at 0 to use the density.'));
         behaviorProperties
           .getOrCreate('friction')
           .setValue(
@@ -548,6 +570,7 @@ module.exports = {
         behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
         behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
         behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
+        behaviorContent.addChild('massOverride').setDoubleValue(0);
         behaviorContent.addChild('density').setDoubleValue(1.0);
         behaviorContent.addChild('friction').setDoubleValue(0.3);
         behaviorContent.addChild('restitution').setDoubleValue(0.1);
@@ -2654,13 +2677,6 @@ module.exports = {
           return true;
         }
 
-        if (propertyName === 'mass') {
-          const newValueAsNumber = parseFloat(newValue);
-          if (newValueAsNumber !== newValueAsNumber) return false;
-          behaviorContent.getChild('mass').setDoubleValue(newValueAsNumber);
-          return true;
-        }
-
         if (propertyName === 'engineTorqueMax') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
@@ -2909,15 +2925,6 @@ module.exports = {
               .toString(10)
           )
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
-
-        behaviorProperties
-          .getOrCreate('mass')
-          .setLabel(_('Mass'))
-          .setGroup('')
-          .setType('Number')
-          .setValue(
-            behaviorContent.getChild('mass').getDoubleValue().toString(10)
-          );
 
         behaviorProperties
           .getOrCreate('engineTorqueMax')
@@ -3205,7 +3212,6 @@ module.exports = {
         behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
         behaviorContent.addChild('beginningSteerSpeed').setDoubleValue(70);
         behaviorContent.addChild('endSteerSpeed').setDoubleValue(35);
-        behaviorContent.addChild('mass').setDoubleValue(1500);
         behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
         behaviorContent.addChild('engineSpeedMax').setDoubleValue(6000);
         behaviorContent.addChild('engineInertia').setDoubleValue(0.5);

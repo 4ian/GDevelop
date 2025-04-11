@@ -102,7 +102,7 @@ const ObjectGroupVariablesDialog = ({
       changeset,
       originalSerializedVariables
     );
-    const { eventsBasedObject } = projectScopedContainersAccessor._scope;
+    const { eventsBasedObject } = projectScopedContainersAccessor.getScope();
     if (eventsBasedObject) {
       for (const objectName of objectGroup.getAllObjectsNames().toJSArray()) {
         gd.ObjectVariableHelper.applyChangesToVariants(

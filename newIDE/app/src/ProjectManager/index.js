@@ -419,7 +419,7 @@ type Props = {|
   onReloadEventsFunctionsExtensions: () => void,
   isOpen: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: ExtensionShortHeader => void,
+  onInstallExtension: (extensionName: string) => void,
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,

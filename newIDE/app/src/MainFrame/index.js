@@ -1251,13 +1251,12 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  // TODO Call this function when an extension is imported
-  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+  const onInstallExtension = (extensionName: string) => {
     const { currentProject } = state;
     if (!currentProject) return;
 
     // Close the extension tab before updating/reinstalling the extension.
-    const eventsFunctionsExtensionName = extensionShortHeader.name;
+    const eventsFunctionsExtensionName = extensionName;
 
     if (
       currentProject.hasEventsFunctionsExtensionNamed(
@@ -3970,14 +3969,7 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
-                    onExtractAsEventBasedObject: (
-                      extensionName: string,
-                      eventsBasedObjectName: string
-                    ) =>
-                      onOpenEventBasedObjectEditor(
-                        extensionName,
-                        eventsBasedObjectName
-                      ),
+                    onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
                     onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,

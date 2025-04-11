@@ -209,6 +209,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       const customObjectConfiguration = gd.asCustomObjectConfiguration(
         this._associatedObjectConfiguration
       );
+      const customObjectProperties = customObjectConfiguration.getProperties();
       for (const propertyMappingRule of this._propertyMappingRules) {
         if (propertyMappingRule.targetChild !== instance.getObjectName()) {
           continue;
@@ -217,8 +218,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           propertyMappingRule.sourceProperty
         )
           ? this._propertyOverridings.get(propertyMappingRule.sourceProperty)
-          : customObjectConfiguration
-              .getProperties()
+          : customObjectProperties
               .get(propertyMappingRule.sourceProperty)
               .getValue();
         if (sourceValue !== undefined) {

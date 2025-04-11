@@ -206,7 +206,7 @@ export const addAssetToProject = async ({
           if (!variant) {
             // TODO Forbid name with `::`
             const uniqueNewName = newNameGenerator(
-              serializedVariant.name,
+              serializedVariant.name || asset.name,
               tentativeNewName => variants.hasVariantNamed(tentativeNewName)
             );
             variant = variants.insertNewVariant(

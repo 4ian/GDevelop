@@ -28,6 +28,7 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
+  // TODO Rename it to PhysicsCar3DRuntimeBehavior
   export class PhysicsVehicle3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
@@ -448,6 +449,7 @@ namespace gdjs {
           )
         );
       }
+      // TODO remove
       console.log(
         [
           'Car center',

@@ -329,75 +329,78 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     project={project}
                     resourceManagementProps={resourceManagementProps}
                   />
-                  <Line>
-                    <Column expand noMargin>
-                      <Text size="block-title">Variant</Text>
-                    </Column>
-                  </Line>
-                  <ColumnStackLayout expand noMargin>
-                    <LineStackLayout>
-                      <FlatButton
-                        label={<Trans>Edit</Trans>}
-                        leftIcon={<Edit />}
-                        onClick={editVariant}
-                        disabled={
-                          !eventBasedObject ||
-                          getVariant(
+                  {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                    <>
+                      <Line>
+                        <Column expand noMargin>
+                          <Text size="block-title">Variant</Text>
+                        </Column>
+                      </Line>
+                      <ColumnStackLayout expand noMargin>
+                        <LineStackLayout>
+                          <FlatButton
+                            label={<Trans>Edit</Trans>}
+                            leftIcon={<Edit />}
+                            onClick={editVariant}
+                            disabled={
+                              !eventBasedObject ||
+                              getVariant(
+                                eventBasedObject,
+                                customObjectConfiguration
+                              ).getAssetStoreAssetId() !== ''
+                            }
+                          />
+                          <FlatButton
+                            label={<Trans>Duplicate</Trans>}
+                            leftIcon={<Add />}
+                            onClick={() => setNewVariantDialogOpen(true)}
+                          />
+                          <FlatButton
+                            label={<Trans>Delete</Trans>}
+                            leftIcon={<Trash />}
+                            onClick={deleteVariant}
+                          />
+                        </LineStackLayout>
+                        <SelectField
+                          floatingLabelText={<Trans>Variant</Trans>}
+                          value={getVariantName(
                             eventBasedObject,
                             customObjectConfiguration
-                          ).getAssetStoreAssetId() !== ''
-                        }
-                      />
-                      <FlatButton
-                        label={<Trans>Duplicate</Trans>}
-                        leftIcon={<Add />}
-                        onClick={() => setNewVariantDialogOpen(true)}
-                      />
-                      <FlatButton
-                        label={<Trans>Delete</Trans>}
-                        leftIcon={<Trash />}
-                        onClick={deleteVariant}
-                      />
-                    </LineStackLayout>
-                    <SelectField
-                      floatingLabelText={<Trans>Variant</Trans>}
-                      value={getVariantName(
-                        eventBasedObject,
-                        customObjectConfiguration
-                      )}
-                      onChange={(e, i, value: string) => {
-                        customObjectConfiguration.setVariantName(value);
-                        forceUpdate();
-                      }}
-                    >
-                      <SelectOption
-                        key="default-variant"
-                        value=""
-                        label={t`Default`}
-                      />
-                      {eventBasedObject &&
-                        mapFor(
-                          0,
-                          eventBasedObject.getVariants().getVariantsCount(),
-                          i => {
-                            if (!eventBasedObject) {
-                              return null;
-                            }
-                            const variant = eventBasedObject
-                              .getVariants()
-                              .getVariantAt(i);
-                            return (
-                              <SelectOption
-                                key={'variant-' + variant.getName()}
-                                value={variant.getName()}
-                                label={variant.getName()}
-                              />
-                            );
-                          }
-                        )}
-                    </SelectField>
-                  </ColumnStackLayout>
-
+                          )}
+                          onChange={(e, i, value: string) => {
+                            customObjectConfiguration.setVariantName(value);
+                            forceUpdate();
+                          }}
+                        >
+                          <SelectOption
+                            key="default-variant"
+                            value=""
+                            label={t`Default`}
+                          />
+                          {eventBasedObject &&
+                            mapFor(
+                              0,
+                              eventBasedObject.getVariants().getVariantsCount(),
+                              i => {
+                                if (!eventBasedObject) {
+                                  return null;
+                                }
+                                const variant = eventBasedObject
+                                  .getVariants()
+                                  .getVariantAt(i);
+                                return (
+                                  <SelectOption
+                                    key={'variant-' + variant.getName()}
+                                    value={variant.getName()}
+                                    label={variant.getName()}
+                                  />
+                                );
+                              }
+                            )}
+                        </SelectField>
+                      </ColumnStackLayout>
+                    </>
+                  )}
                   {!getVariantName(
                     eventBasedObject,
                     customObjectConfiguration

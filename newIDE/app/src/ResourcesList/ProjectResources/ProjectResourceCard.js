@@ -9,6 +9,7 @@ import Text from '../../UI/Text';
 import { getDefaultResourceThumbnail } from '..';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { isProjectImageResourceSmooth } from '../ResourcePreview/ImagePreview';
+import Model3DPreview from '../ResourcePreview/Model3DPreview';
 
 const paddingSize = 10;
 const styles = {
@@ -126,6 +127,16 @@ export const ProjectResourceCard = ({
     switch (resource.getKind()) {
       case 'image':
         return <ImagePreview resource={resource} project={project} />;
+      case 'model3D':
+        return (
+          <Model3DPreview
+            modelUrl={ResourcesLoader.getResourceFullUrl(
+              project,
+              resourceName,
+              {}
+            )}
+          />
+        );
       default:
         return <DefaultPreview resource={resource} />;
     }

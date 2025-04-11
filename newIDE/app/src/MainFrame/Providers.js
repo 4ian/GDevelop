@@ -41,6 +41,7 @@ import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
 import { CourseChapterStoreStateProvider } from '../Course/CourseChapterStoreContext';
+import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 
 type Props = {|
   authentication: Authentication,
@@ -119,9 +120,13 @@ const Providers = ({
                                                               <TutorialStateProvider>
                                                                 <AnnouncementsFeedStateProvider>
                                                                   <PrivateAssetsAuthorizationProvider>
-                                                                    {children({
-                                                                      i18n,
-                                                                    })}
+                                                                    <Resource3DPreviewProvider>
+                                                                      {children(
+                                                                        {
+                                                                          i18n,
+                                                                        }
+                                                                      )}
+                                                                    </Resource3DPreviewProvider>
                                                                   </PrivateAssetsAuthorizationProvider>
                                                                 </AnnouncementsFeedStateProvider>
                                                               </TutorialStateProvider>

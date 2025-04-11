@@ -26,7 +26,8 @@ type Props<Item> = {|
   onRename: (Item, string) => void,
   renderItemLabel?: Item => React.Node,
   getItemName: Item => string,
-  getItemThumbnail?: Item => string,
+  getItemThumbnail?: Item => ?string,
+  getItemThumbnailAsync?: Item => Promise<?string>,
   getItemId?: (Item, index: number) => string,
   getItemData?: (Item, index: number) => HTMLDataset,
   isItemBold?: Item => boolean,
@@ -66,6 +67,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     const {
       selectedItems,
       getItemThumbnail,
+      getItemThumbnailAsync,
       erroredItems,
       isItemBold,
       onEditItem,
@@ -97,6 +99,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
+        getThumbnailAsync={
+          getItemThumbnailAsync ? () => getItemThumbnailAsync(item) : undefined
+        }
         selected={selected}
         onItemSelected={this.props.onItemSelected}
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
@@ -116,6 +121,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       addNewItemId,
       renamedItem,
       getItemThumbnail,
+      getItemThumbnailAsync,
       getItemName,
       onAddNewItem,
       onMoveSelectionToItem,
@@ -157,7 +163,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                 height={height}
                 rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
                 rowHeight={
-                  getItemThumbnail
+                  getItemThumbnail || getItemThumbnailAsync
                     ? listItemWith32PxIconHeight
                     : listItemWithoutIconHeight
                 }

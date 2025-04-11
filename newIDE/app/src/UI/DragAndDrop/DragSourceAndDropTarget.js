@@ -53,7 +53,7 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
 // creates a circular dependency, so we define it here instead.
 export type DraggedItem = {|
   name: string,
-  thumbnail?: string,
+  thumbnail?: ?string,
 |};
 
 type Options = {| vibrate?: number |};

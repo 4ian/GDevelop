@@ -33,7 +33,8 @@ type Props<Item> = {|
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
-  getThumbnail?: () => string,
+  getThumbnail?: () => ?string,
+  getThumbnailAsync?: () => Promise<?string>,
   renderItemLabel?: () => React.Node,
   selected: boolean,
   onItemSelected: (?Item) => void,
@@ -52,6 +53,7 @@ function ItemRow<Item>({
   onRename,
   editingName,
   getThumbnail,
+  getThumbnailAsync,
   renderItemLabel,
   selected,
   onItemSelected,
@@ -63,6 +65,24 @@ function ItemRow<Item>({
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [itemThumbnail, setItemThumbnail] = React.useState<?string>(null);
+
+  React.useEffect(
+    () => {
+      async function updateThumbnail() {
+        if (getThumbnail) {
+          const thumbnail = getThumbnail();
+          if (thumbnail) setItemThumbnail(thumbnail);
+        }
+        if (getThumbnailAsync) {
+          const thumbnail = await getThumbnailAsync();
+          if (thumbnail) setItemThumbnail(thumbnail);
+        }
+      }
+      updateThumbnail();
+    },
+    [getThumbnail, getThumbnailAsync]
+  );
 
   React.useEffect(
     () => {
@@ -141,8 +161,8 @@ function ItemRow<Item>({
         : gdevelopTheme.listItem.warningTextColor,
   };
 
-  const leftIcon = getThumbnail ? (
-    <ListIcon iconSize={24} src={getThumbnail()} />
+  const leftIcon = itemThumbnail ? (
+    <ListIcon iconSize={24} src={itemThumbnail} />
   ) : null;
 
   return (

@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import ResourcesList from '../ResourcesList';
+import ResourcesList, { type ResourcesListInterface } from '../ResourcesList';
 import ResourcePropertiesEditor, {
   type ResourcePropertiesEditorInterface,
 } from './ResourcePropertiesEditor';
@@ -73,7 +73,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   resourceExternallyChangedCallbackId: ?string;
   editorMosaic: ?EditorMosaicInterface = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
-  _resourcesList: ?ResourcesList = null;
+  _resourcesList: ?ResourcesListInterface = null;
   resourcesLoader = ResourcesLoader;
   state = {
     selectedResource: null,
@@ -91,7 +91,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   }
 
   refreshResourcesList() {
-    if (this._resourcesList) this._resourcesList.forceUpdate();
+    if (this._resourcesList) this._resourcesList.forceUpdateList();
   }
 
   updateToolbar = () => {

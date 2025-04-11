@@ -7,6 +7,7 @@ import FontDownload from '@material-ui/icons/FontDownload';
 import File from '../../UI/CustomSvgIcons/File';
 import Video from '../../UI/CustomSvgIcons/Video';
 import Music from '../../UI/CustomSvgIcons/Music';
+import Model3DPreview from './Model3DPreview';
 
 type Props = {|
   project: gdProject,
@@ -42,10 +43,20 @@ const ResourcePreview = (props: Props) => {
       );
     case 'audio':
       return <GenericIconPreview renderIcon={props => <Music {...props} />} />;
+    case 'model3D':
+      return (
+        <Model3DPreview
+          modelUrl={props.resourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {}
+          )}
+          expand
+        />
+      );
     case 'json':
     case 'tilemap':
     case 'tileset':
-    case 'model3D':
     case 'atlas':
     case 'spine':
       return <GenericIconPreview renderIcon={props => <File {...props} />} />;

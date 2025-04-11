@@ -11,9 +11,14 @@ const styles = {
   },
 };
 
-const PlaceholderLoader = props => (
+type Props = {|
+  style?: any,
+  size?: number,
+|};
+
+const PlaceholderLoader = (props: Props) => (
   <div style={{ ...styles.containerStyle, ...props.style }}>
-    <CircularProgress size={40} />
+    <CircularProgress size={props.size || 40} />
   </div>
 );
 

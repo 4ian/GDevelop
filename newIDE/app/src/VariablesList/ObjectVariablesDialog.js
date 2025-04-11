@@ -18,6 +18,7 @@ type Props = {|
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
   onComputeAllVariableNames: () => Array<string>,
+  isListLocked: boolean,
 |};
 
 const ObjectVariablesDialog = ({
@@ -33,6 +34,7 @@ const ObjectVariablesDialog = ({
   shouldCreateInitiallySelectedVariable,
   projectScopedContainersAccessor,
   onComputeAllVariableNames,
+  isListLocked,
 }: Props) => {
   const tabs = React.useMemo(
     () => [
@@ -70,6 +72,7 @@ const ObjectVariablesDialog = ({
       helpPagePath={'/all-features/variables/object-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="object-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

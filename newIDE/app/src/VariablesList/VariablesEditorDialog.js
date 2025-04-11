@@ -48,6 +48,7 @@ type Props = {|
   initiallyOpenTabId?: string,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 
   project: gdProject,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
@@ -73,6 +74,7 @@ const VariablesEditorDialog = ({
   projectScopedContainersAccessor,
   objectName,
   initialInstances,
+  isListLocked,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -295,6 +297,7 @@ const VariablesEditorDialog = ({
                   helpPagePath={helpPagePath}
                   onVariablesUpdated={notifyOfChange}
                   onSelectedVariableChange={onSelectedVariableChange}
+                  isListLocked={isListLocked}
                 />
               </Column>
             )

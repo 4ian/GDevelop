@@ -64,6 +64,7 @@ type Props = {|
   historyHandler?: HistoryHandler,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
+  isVariableListLocked: boolean,
 |};
 
 export const CompactInstancePropertiesEditor = ({
@@ -83,6 +84,7 @@ export const CompactInstancePropertiesEditor = ({
   projectScopedContainersAccessor,
   tileMapTileSelection,
   onSelectTileMapTile,
+  isVariableListLocked,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
@@ -276,16 +278,18 @@ export const CompactInstancePropertiesEditor = ({
                     >
                       <ShareExternal style={styles.icon} />
                     </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={
-                        variablesListRef.current
-                          ? variablesListRef.current.addVariable
-                          : undefined
-                      }
-                    >
-                      <Add style={styles.icon} />
-                    </IconButton>
+                    {isVariableListLocked ? null : (
+                      <IconButton
+                        size="small"
+                        onClick={
+                          variablesListRef.current
+                            ? variablesListRef.current.addVariable
+                            : undefined
+                        }
+                      >
+                        <Add style={styles.icon} />
+                      </IconButton>
+                    )}
                   </Line>
                 </Line>
               </Column>
@@ -314,6 +318,7 @@ export const CompactInstancePropertiesEditor = ({
                 compactEmptyPlaceholderText={
                   <Trans>There are no variables on this instance.</Trans>
                 }
+                isListLocked={isVariableListLocked}
               />
             </>
           ) : null}

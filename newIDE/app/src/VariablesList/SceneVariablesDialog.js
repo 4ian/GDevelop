@@ -15,6 +15,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const SceneVariablesDialog = ({
@@ -26,6 +27,7 @@ const SceneVariablesDialog = ({
   hotReloadPreviewButtonProps,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -78,6 +80,7 @@ const SceneVariablesDialog = ({
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="scene-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

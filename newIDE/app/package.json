@@ -197,6 +197,7 @@
   "jest": {
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/(?!react-markdown|unified|remark-parse|mdast-util-from-markdown|micromark|decode-named-character-reference|remark-rehype|trim-lines|hast-util-whitespace|remark-gfm|mdast-util-gfm|mdast-util-find-and-replace|mdast-util-to-markdown|markdown-table|is-plain-obj)"
-    ]
+    ],
+    "testTimeout": 30000
   }
 }

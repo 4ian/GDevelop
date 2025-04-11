@@ -30,7 +30,7 @@ export const AutocompletePaperComponent = (props: any) => (
   <Paper {...props} background="light" />
 );
 
-type Option =
+export type AutoCompleteOption =
   | {|
       type: 'separator',
     |}
@@ -40,14 +40,16 @@ type Option =
       translatableValue?: MessageDescriptor,
       onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
+      disabled?: boolean, // If true, the item is disabled and cannot be selected.
     |};
 
-export type DataSource = Array<Option>;
+export type DataSource = Array<AutoCompleteOption>;
 
 type Props = {|
   value: string,
   onChange: string => void,
   onChoose?: string => void,
+  onInputValueChange?: string => void,
   dataSource: DataSource,
 
   id?: ?string,
@@ -109,7 +111,7 @@ const useStyles = makeStyles({
 });
 
 const makeRenderItem = (i18n: I18nType) => (
-  option: Option,
+  option: AutoCompleteOption,
   state: Object
 ): React.Node => {
   if (option.type && option.type === 'separator') {
@@ -145,8 +147,8 @@ const makeRenderItem = (i18n: I18nType) => (
   );
 };
 
-const isOptionDisabled = (option: Option) =>
-  option.type === 'separator' ? true : false;
+const isOptionDisabled = (option: AutoCompleteOption) =>
+  option.type === 'separator' || !!option.disabled;
 
 const filterFunction = (
   options: DataSource,
@@ -183,10 +185,10 @@ const filterFunction = (
 
 const handleChange = (
   input: HTMLInputElement,
-  option: Option,
+  option: AutoCompleteOption,
   props: Props
 ): void => {
-  if (option.type === 'separator') return;
+  if (option.type === 'separator' || option.disabled) return;
   else if (option.onClick) option.onClick();
   else {
     // Force the input to the selected value. We do this, bypassing inputValue state,
@@ -246,7 +248,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
   };
 };
 
-const getOptionLabel = (option: Option, value: string): string =>
+const getOptionLabel = (option: AutoCompleteOption, value: string): string =>
   option.value ? option.value : value;
 
 export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
@@ -270,6 +272,9 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       focus,
       forceInputValueTo: (newValue: string) => {
         if (inputValue !== null) setInputValue(newValue);
+        if (props.onInputValueChange) {
+          props.onInputValueChange(newValue);
+        }
       },
       getInputValue: () => (input.current ? input.current.value : ''),
     }));
@@ -286,6 +291,9 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       reason: string
     ): void => {
       setInputValue(value);
+      if (props.onInputValueChange) {
+        props.onInputValueChange(value);
+      }
       if (!isMenuOpen) setIsMenuOpen(true);
       if (props.commitOnInputChange) props.onChange(value);
     };
@@ -298,7 +306,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             classes={classes}
             onChange={(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
-              option: Option | null
+              option: AutoCompleteOption | null
             ) => {
               if (option === null || !input.current) return;
 
@@ -318,7 +326,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             options={props.dataSource}
             renderOption={makeRenderItem(i18n)}
             getOptionDisabled={isOptionDisabled}
-            getOptionLabel={(option: Option) =>
+            getOptionLabel={(option: AutoCompleteOption) =>
               getOptionLabel(option, currentInputValue)
             }
             filterOptions={(options: DataSource, state) =>

@@ -29,7 +29,8 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { mapFor } from '../Utils/MapFor';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

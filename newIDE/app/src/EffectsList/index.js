@@ -42,7 +42,8 @@ import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../UI/CustomSvgIcons/Add';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

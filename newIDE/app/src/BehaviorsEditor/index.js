@@ -34,7 +34,8 @@ import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import Add from '../UI/CustomSvgIcons/Add';
 import { mapVector } from '../Utils/MapFor';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

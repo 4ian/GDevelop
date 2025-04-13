@@ -9,7 +9,7 @@ const vec3ToString = (vec3: Jolt.RVec3) =>
   vec3.GetZ().toFixed(3);
 
 namespace gdjs {
-  interface PhysicsVehicle3DNetworkSyncDataType {
+  interface PhysicsCar3DNetworkSyncDataType {
     lek: boolean;
     rik: boolean;
     upk: boolean;
@@ -19,9 +19,8 @@ namespace gdjs {
     ssf: float;
   }
 
-  export interface PhysicsVehicle3DNetworkSyncData
-    extends BehaviorNetworkSyncData {
-    props: PhysicsVehicle3DNetworkSyncDataType;
+  export interface PhysicsCar3DNetworkSyncData extends BehaviorNetworkSyncData {
+    props: PhysicsCar3DNetworkSyncDataType;
   }
 
   type Physics3D = {
@@ -29,7 +28,7 @@ namespace gdjs {
   };
 
   // TODO Rename it to PhysicsCar3DRuntimeBehavior
-  export class PhysicsVehicle3DRuntimeBehavior
+  export class PhysicsCar3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook
   {
@@ -162,7 +161,7 @@ namespace gdjs {
       sharedData.registerHook(this);
 
       behavior.bodyUpdater =
-        new gdjs.PhysicsVehicle3DRuntimeBehavior.VehicleBodyUpdater(
+        new gdjs.PhysicsCar3DRuntimeBehavior.VehicleBodyUpdater(
           this,
           behavior.bodyUpdater
         );
@@ -266,7 +265,7 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): PhysicsVehicle3DNetworkSyncData {
+    override getNetworkSyncData(): PhysicsCar3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -286,7 +285,7 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: PhysicsVehicle3DNetworkSyncData
+      networkSyncData: PhysicsCar3DNetworkSyncData
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
 
@@ -929,47 +928,45 @@ namespace gdjs {
   }
 
   gdjs.registerBehavior(
-    'Physics3D::PhysicsVehicle3D',
-    gdjs.PhysicsVehicle3DRuntimeBehavior
+    'Physics3D::PhysicsCar3D',
+    gdjs.PhysicsCar3DRuntimeBehavior
   );
 
-  export namespace PhysicsVehicle3DRuntimeBehavior {
+  export namespace PhysicsCar3DRuntimeBehavior {
     export class VehicleBodyUpdater
       implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
     {
-      vehicleBehavior: gdjs.PhysicsVehicle3DRuntimeBehavior;
+      carBehavior: gdjs.PhysicsCar3DRuntimeBehavior;
       physicsBodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater;
 
       constructor(
-        vehicleBehavior: gdjs.PhysicsVehicle3DRuntimeBehavior,
+        carBehavior: gdjs.PhysicsCar3DRuntimeBehavior,
         physicsBodyUpdater: gdjs.Physics3DRuntimeBehavior.BodyUpdater
       ) {
-        this.vehicleBehavior = vehicleBehavior;
+        this.carBehavior = carBehavior;
         this.physicsBodyUpdater = physicsBodyUpdater;
       }
 
       private getVec3(x: float, y: float, z: float): Jolt.Vec3 {
-        const tempVec3 = this.vehicleBehavior._sharedData._tempVec3;
+        const tempVec3 = this.carBehavior._sharedData._tempVec3;
         tempVec3.Set(x, y, z);
         return tempVec3;
       }
 
       createAndAddBody(): Jolt.Body | null {
-        const physics3D = this.vehicleBehavior.getPhysics3D();
+        const physics3D = this.carBehavior.getPhysics3D();
         if (!physics3D) {
           return null;
         }
         const { behavior } = physics3D;
-        const { _sharedData } = this.vehicleBehavior;
+        const { _sharedData } = this.carBehavior;
 
         const carShape = behavior.createShape();
 
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
           carShape,
-          this.vehicleBehavior.getPhysicsPosition(
-            _sharedData.getRVec3(0, 0, 0)
-          ),
+          this.carBehavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
           behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
@@ -996,7 +993,7 @@ namespace gdjs {
         vehicle.mUp = this.getVec3(0, 0, 1);
         vehicle.mForward = this.getVec3(1, 0, 0);
         vehicle.mMaxPitchRollAngle = gdjs.toRad(
-          this.vehicleBehavior._pitchRollAngleMax
+          this.carBehavior._pitchRollAngleMax
         );
 
         const FL_WHEEL = 0;
@@ -1014,14 +1011,14 @@ namespace gdjs {
           vehicle.mWheels.clear();
 
           const fl = new Jolt.WheelSettingsWV();
-          fl.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
+          fl.mMaxSteerAngle = gdjs.toRad(this.carBehavior._steerAngleMax);
           // Front wheel doesn't have hand brake
           fl.mMaxHandBrakeTorque = 0.0;
           setupWheel(fl);
           vehicle.mWheels.push_back(fl);
 
           const fr = new Jolt.WheelSettingsWV();
-          fr.mMaxSteerAngle = gdjs.toRad(this.vehicleBehavior._steerAngleMax);
+          fr.mMaxSteerAngle = gdjs.toRad(this.carBehavior._steerAngleMax);
           fr.mMaxHandBrakeTorque = 0.0;
           setupWheel(fr);
           vehicle.mWheels.push_back(fr);
@@ -1039,20 +1036,18 @@ namespace gdjs {
 
         const controllerSettings = new Jolt.WheeledVehicleControllerSettings();
         controllerSettings.mEngine.mMaxTorque =
-          this.vehicleBehavior._engineTorqueMax;
-        controllerSettings.mEngine.mMaxRPM =
-          this.vehicleBehavior._engineSpeedMax;
-        controllerSettings.mEngine.mInertia =
-          this.vehicleBehavior._engineInertia;
+          this.carBehavior._engineTorqueMax;
+        controllerSettings.mEngine.mMaxRPM = this.carBehavior._engineSpeedMax;
+        controllerSettings.mEngine.mInertia = this.carBehavior._engineInertia;
         vehicle.mController = controllerSettings;
 
         const fourWheelDrive =
-          this.vehicleBehavior._hasBackWheelDrive &&
-          this.vehicleBehavior._hasFrontWheelDrive;
+          this.carBehavior._hasBackWheelDrive &&
+          this.carBehavior._hasFrontWheelDrive;
         controllerSettings.mDifferentials.clear();
 
         // Front differential
-        if (this.vehicleBehavior._hasFrontWheelDrive) {
+        if (this.carBehavior._hasFrontWheelDrive) {
           const frontWheelDrive = new Jolt.VehicleDifferentialSettings();
           frontWheelDrive.mLeftWheel = FL_WHEEL;
           frontWheelDrive.mRightWheel = FR_WHEEL;
@@ -1064,7 +1059,7 @@ namespace gdjs {
         }
 
         // Rear differential
-        if (this.vehicleBehavior._hasBackWheelDrive) {
+        if (this.carBehavior._hasBackWheelDrive) {
           const rearWheelDrive = new Jolt.VehicleDifferentialSettings();
           rearWheelDrive.mLeftWheel = BL_WHEEL;
           rearWheelDrive.mRightWheel = BR_WHEEL;
@@ -1095,21 +1090,22 @@ namespace gdjs {
             0.05
           );
         constraint.SetVehicleCollisionTester(vehicleCollisionTester);
-        this.vehicleBehavior._vehicleCollisionTester = vehicleCollisionTester;
+        this.carBehavior._vehicleCollisionTester = vehicleCollisionTester;
 
         _sharedData.physicsSystem.AddConstraint(constraint);
-        this.vehicleBehavior._vehicleController = Jolt.castObject(
+        this.carBehavior._vehicleController = Jolt.castObject(
           constraint.GetController(),
           Jolt.WheeledVehicleController
         );
-        this.vehicleBehavior._stepListener =
-          new Jolt.VehicleConstraintStepListener(constraint);
-        _sharedData.physicsSystem.AddStepListener(
-          this.vehicleBehavior._stepListener
+        this.carBehavior._stepListener = new Jolt.VehicleConstraintStepListener(
+          constraint
         );
-        this.vehicleBehavior._updateWheels();
-        this.vehicleBehavior._updateGearRatios();
-        this.vehicleBehavior._updateReverseGearRatios();
+        _sharedData.physicsSystem.AddStepListener(
+          this.carBehavior._stepListener
+        );
+        this.carBehavior._updateWheels();
+        this.carBehavior._updateGearRatios();
+        this.carBehavior._updateReverseGearRatios();
         return carBody;
       }
 
@@ -1123,11 +1119,11 @@ namespace gdjs {
 
       recreateShape() {
         this.physicsBodyUpdater.recreateShape();
-        this.vehicleBehavior._updateWheels();
+        this.carBehavior._updateWheels();
       }
 
       destroyBody() {
-        this.vehicleBehavior.onDestroy();
+        this.carBehavior.onDestroy();
         this.physicsBodyUpdater.destroyBody();
       }
     }

@@ -3236,19 +3236,19 @@ module.exports = {
       };
       const aut = extension
         .addBehavior(
-          'PhysicsVehicle3D',
+          'PhysicsCar3D',
           _('3D physics car'),
-          'PhysicsVehicle3D',
+          'PhysicsCar3D',
           _('Simulate a realistic car.'),
           '',
           'JsPlatform/Extensions/physics_car3d.svg',
-          'PhysicsVehicle3D',
+          'PhysicsCar3D',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
           new gd.BehaviorsSharedData()
         )
         .addIncludeFile(
-          'Extensions/Physics3DBehavior/PhysicsVehicle3DRuntimeBehavior.js'
+          'Extensions/Physics3DBehavior/PhysicsCar3DRuntimeBehavior.js'
         );
 
       aut
@@ -3262,7 +3262,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .setFunctionName('simulateForwardKey');
 
       aut
@@ -3276,7 +3276,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .setFunctionName('simulateBackwardKey');
 
       aut
@@ -3290,7 +3290,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .setFunctionName('simulateRightKey');
 
       aut
@@ -3304,7 +3304,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .setFunctionName('simulateLeftKey');
 
       aut
@@ -3318,7 +3318,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .setFunctionName('simulateHandBreakKey');
 
       aut
@@ -3334,7 +3334,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .addParameter('expression', _('Stick force (between -1 and 1)'))
         .markAsAdvanced()
         .setFunctionName('simulateAcceleratorStick');
@@ -3352,7 +3352,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .addParameter('expression', _('Stick force (between -1 and 1)'))
         .markAsAdvanced()
         .setFunctionName('simulateSteeringStick');
@@ -3370,7 +3370,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -3390,7 +3390,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -3410,7 +3410,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(_('Current gear'))
@@ -3430,7 +3430,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -3451,7 +3451,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(
@@ -3472,7 +3472,7 @@ module.exports = {
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'PhysicsVehicle3D')
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
         .useStandardParameters(
           'number',
           gd.ParameterOptions.makeNewOptions().setDescription(

@@ -3210,8 +3210,8 @@ module.exports = {
       behavior.initializeContent = function (behaviorContent) {
         behaviorContent.addChild('physics3D').setStringValue('');
         behaviorContent.addChild('steerAngleMax').setDoubleValue(70);
-        behaviorContent.addChild('beginningSteerSpeed').setDoubleValue(70);
-        behaviorContent.addChild('endSteerSpeed').setDoubleValue(35);
+        behaviorContent.addChild('beginningSteerSpeed').setDoubleValue(140);
+        behaviorContent.addChild('endSteerSpeed').setDoubleValue(10);
         behaviorContent.addChild('engineTorqueMax').setDoubleValue(4500);
         behaviorContent.addChild('engineSpeedMax').setDoubleValue(6000);
         behaviorContent.addChild('engineInertia').setDoubleValue(0.5);

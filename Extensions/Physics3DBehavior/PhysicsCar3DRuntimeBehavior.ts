@@ -1,13 +1,5 @@
 /// <reference path="./jolt-physics.d.ts" />
 
-// TODO Remove
-const vec3ToString = (vec3: Jolt.RVec3) =>
-  vec3.GetX().toFixed(3) +
-  ' ' +
-  vec3.GetY().toFixed(3) +
-  ' ' +
-  vec3.GetZ().toFixed(3);
-
 namespace gdjs {
   interface PhysicsCar3DNetworkSyncDataType {
     lek: boolean;
@@ -437,63 +429,6 @@ namespace gdjs {
         forward = 0.0;
         handBrake = 1.0;
       }
-
-      const wheels: Array<Jolt.WheelWV> = [];
-      for (let index = 0; index < 4; index++) {
-        wheels.push(
-          Jolt.castObject(
-            this._vehicleController.GetConstraint().GetWheel(index),
-            Jolt.WheelWV
-          )
-        );
-      }
-      // TODO remove
-      console.log(
-        [
-          'Car center',
-          vec3ToString(carBody.GetPosition()),
-          'Mass center',
-          vec3ToString(carBody.GetCenterOfMassPosition()),
-          'Mass',
-          1 / carBody.GetMotionProperties().GetInverseMass(),
-          'Speed',
-          (carBody
-            .GetRotation()
-            .InverseRotate(carBody.GetLinearVelocity())
-            .GetX() *
-            60 *
-            60) /
-            1000,
-          'Gear',
-          this._vehicleController.GetTransmission().GetCurrentGear(),
-          'Wheels',
-          vec3ToString(wheels[0].GetContactPosition()),
-          vec3ToString(wheels[1].GetContactPosition()),
-          vec3ToString(wheels[2].GetContactPosition()),
-          vec3ToString(wheels[3].GetContactPosition()),
-
-          'Speed',
-          wheels[0].GetAngularVelocity().toFixed(1),
-          wheels[1].GetAngularVelocity().toFixed(1),
-          wheels[2].GetAngularVelocity().toFixed(1),
-          wheels[3].GetAngularVelocity().toFixed(1),
-
-          'Slip',
-          wheels[0].mLongitudinalSlip.toFixed(3),
-          wheels[1].mLongitudinalSlip.toFixed(3),
-          wheels[2].mLongitudinalSlip.toFixed(3),
-          wheels[3].mLongitudinalSlip.toFixed(3),
-
-          'Steer angle',
-          gdjs.toDegrees(wheels[0].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[1].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[2].GetSteerAngle()).toFixed(1),
-          gdjs.toDegrees(wheels[3].GetSteerAngle()).toFixed(1),
-          ,
-        ].join('\n')
-      );
-
-      // console.log(forward, right, brake, handBrake);
 
       this._vehicleController.SetDriverInput(
         forward,

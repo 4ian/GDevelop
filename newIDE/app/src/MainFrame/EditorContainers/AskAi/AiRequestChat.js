@@ -29,6 +29,7 @@ import Link from '../../../UI/Link';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
+import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -45,6 +46,8 @@ type Props = {
     reason?: string
   ) => Promise<void>,
   hasOpenedProject: boolean,
+
+  appliedFunctionCallOutputs: ?Array<EditorFunctionCallResult>,
 
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
@@ -102,6 +105,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequestPriceInCredits,
       availableCredits,
       hasOpenedProject,
+      appliedFunctionCallOutputs,
     }: Props,
     ref
   ) => {
@@ -293,7 +297,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }
 
     const userMessagesCount = aiRequest.output.filter(
-      message => message.role === 'user'
+      message => message.type === 'message' && message.role === 'user'
     ).length;
 
     return (
@@ -305,7 +309,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       >
         <ScrollView ref={scrollViewRef}>
           {aiRequest.output.flatMap((message, messageIndex) => {
-            if (message.role === 'user') {
+            if (message.type === 'message' && message.role === 'user') {
               return [
                 <Line key={messageIndex} justifyContent="flex-end">
                   <ChatBubble role="user">
@@ -318,7 +322,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Line>,
               ];
             }
-            if (message.role === 'assistant') {
+            if (message.type === 'message' && message.role === 'assistant') {
               return [
                 ...message.content
                   .map((messageContent, messageContentIndex) => {
@@ -399,9 +403,41 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         </Line>
                       );
                     }
+                    if (messageContent.type === 'function_call') {
+                      const pendingFunctionCallOutput =
+                        appliedFunctionCallOutputs &&
+                        appliedFunctionCallOutputs.find(
+                          functionCallOutput =>
+                            functionCallOutput.call_id ===
+                            messageContent.call_id
+                        );
+                      return (
+                        <Line key={key} justifyContent="flex-start">
+                          <ChatBubble role="assistant">
+                            <ChatMarkdownText
+                              source={JSON.stringify(messageContent)}
+                            />
+                            <ChatMarkdownText
+                              source={
+                                // TODO: read if success or not.
+                                JSON.stringify(pendingFunctionCallOutput)}
+                            />
+                          </ChatBubble>
+                        </Line>
+                      );
+                    }
                     return null;
                   })
                   .filter(Boolean),
+              ];
+            }
+            if (message.type === 'function_call_output') {
+              return [
+                <Line key={messageIndex} justifyContent="flex-end">
+                  <ChatBubble role="user">
+                    <ChatMarkdownText source={JSON.stringify(message)} />
+                  </ChatBubble>
+                </Line>,
               ];
             }
 

@@ -19,6 +19,20 @@ export type GeneratedProject = {
   error?: string,
 };
 
+export type AiRequestMessageAssistantFunctionCall = {|
+  type: 'function_call',
+  status: 'completed',
+  call_id: string,
+  name: string,
+  arguments: string,
+|};
+
+export type AiRequestFunctionCallOutput = {
+  type: 'function_call_output',
+  call_id: string,
+  output: string,
+};
+
 export type AiRequestMessage =
   | {
       type: 'message',
@@ -39,14 +53,7 @@ export type AiRequestMessage =
             text: string,
             annotations: Array<{}>,
           }
-        | {
-            type: 'recommended_actions',
-            status: 'completed',
-            actions: Array<{
-              actionName: string,
-              actionDescription: string,
-            }>,
-          }
+        | AiRequestMessageAssistantFunctionCall
       >,
     }
   | {
@@ -58,7 +65,8 @@ export type AiRequestMessage =
         status: 'completed',
         text: string,
       }>,
-    };
+    }
+  | AiRequestFunctionCallOutput;
 
 export type AiRequest = {
   id: string,
@@ -229,6 +237,7 @@ export const createAiRequest = async (
       userRequest,
       gameProjectJson: simplifiedProjectJson,
       payWithCredits,
+      mode: 'agent',
     },
     {
       params: {
@@ -267,6 +276,38 @@ export const addUserMessageToAiRequest = async (
       userRequest,
       gameProjectJson: simplifiedProjectJson,
       payWithCredits,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addFunctionCallOutputsToAiRequest = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiRequestId,
+    functionCallOutputs,
+  }: {|
+    userId: string,
+    aiRequestId: string,
+    functionCallOutputs: Array<AiRequestFunctionCallOutput>,
+  |}
+): Promise<AiRequest> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopGenerationApi.baseUrl
+    }/ai-request/${aiRequestId}/action/add-function-call-output`,
+    {
+      functionCallOutputs
     },
     {
       params: {

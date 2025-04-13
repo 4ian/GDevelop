@@ -61,8 +61,15 @@ const getFirstUserRequestText = (aiRequest: AiRequest): string => {
   if (!aiRequest.output || aiRequest.output.length === 0) return '';
 
   // Find the first user message
-  const userMessage = aiRequest.output.find(message => message.role === 'user');
-  if (!userMessage) return '';
+  const userMessage = aiRequest.output.find(
+    message => message.type === 'message' && message.role === 'user'
+  );
+  if (
+    !userMessage ||
+    userMessage.type !== 'message' ||
+    userMessage.role !== 'user'
+  )
+    return '';
 
   // Extract text from user message content
   return userMessage.content

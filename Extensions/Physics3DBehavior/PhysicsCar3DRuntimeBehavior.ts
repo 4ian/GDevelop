@@ -27,7 +27,6 @@ namespace gdjs {
     behavior: gdjs.Physics3DRuntimeBehavior;
   };
 
-  // TODO Rename it to PhysicsCar3DRuntimeBehavior
   export class PhysicsCar3DRuntimeBehavior
     extends gdjs.RuntimeBehavior
     implements gdjs.Physics3DRuntimeBehavior.Physics3DHook

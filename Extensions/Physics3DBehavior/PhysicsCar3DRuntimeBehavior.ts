@@ -335,14 +335,13 @@ namespace gdjs {
         Jolt.destroy(this._stepListener);
         this._stepListener = null;
       }
-      if (this._vehicleCollisionTester) {
-        Jolt.destroy(this._vehicleCollisionTester);
-        this._vehicleCollisionTester = null;
-      }
       const constraint = this._vehicleController.GetConstraint();
       this._sharedData.physicsSystem.RemoveConstraint(constraint);
       // The controller is destroyed with the constraint.
       this._vehicleController = null;
+      // VehicleConstraint.mVehicleCollisionTester is a RefConst
+      // It is destroyed with the constraint.
+      this._vehicleCollisionTester = null;
       if (this._physics3D) {
         this._physics3D = null;
       }
@@ -1022,15 +1021,14 @@ namespace gdjs {
         const constraint = new Jolt.VehicleConstraint(carBody, vehicle);
         Jolt.destroy(vehicle);
 
+        // VehicleConstraint.mVehicleCollisionTester is a RefConst
+        // previously created ones are destroyed automatically.
         const vehicleCollisionTester =
           new Jolt.VehicleCollisionTesterCastCylinder(
             behavior.getBodyLayer(),
             0.05
           );
         constraint.SetVehicleCollisionTester(vehicleCollisionTester);
-        if (this.carBehavior._vehicleCollisionTester) {
-          Jolt.destroy(this.carBehavior._vehicleCollisionTester);
-        }
         this.carBehavior._vehicleCollisionTester = vehicleCollisionTester;
 
         if (this.carBehavior._vehicleController) {

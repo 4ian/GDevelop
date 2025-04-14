@@ -68,18 +68,29 @@ const SingleCanvasRenderer = ({
           box.getSize(size);
           box.getCenter(center);
 
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 2 / maxDim;
+          const sphere = new THREE.Sphere();
+          box.getBoundingSphere(sphere);
+
+          const scale = 1 / sphere.radius;
           model.scale.set(scale, scale, scale);
-          model.position.sub(center);
+
+          // Center horizontally
+          model.position.x -= center.x * scale;
+          model.position.z -= center.z * scale;
+
+          // Slight upward shift so base isn't too low
+          model.position.y -= (center.y - size.y / 2) * scale;
 
           scene.add(model);
-          camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-          renderer.render(scene, camera);
+          // Aim camera slightly above center
+          camera.lookAt(0, 1, 0);
 
-          const screenshot = renderer.domElement.toDataURL();
-          onPreviewReady(resourceUrl, screenshot);
+          requestAnimationFrame(() => {
+            renderer.render(scene, camera);
+            const screenshot = renderer.domElement.toDataURL();
+            onPreviewReady(resourceUrl, screenshot);
+          });
         },
         undefined,
         error => {
@@ -89,7 +100,6 @@ const SingleCanvasRenderer = ({
       );
 
       return () => {
-        // Ensure the renderer is removed when the canvas is unmounted.
         renderer.dispose();
       };
     },

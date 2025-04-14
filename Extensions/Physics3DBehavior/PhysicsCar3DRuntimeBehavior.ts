@@ -1024,13 +1024,28 @@ namespace gdjs {
             0.05
           );
         constraint.SetVehicleCollisionTester(vehicleCollisionTester);
+        if (this.carBehavior._vehicleCollisionTester) {
+          Jolt.destroy(this.carBehavior._vehicleCollisionTester);
+        }
         this.carBehavior._vehicleCollisionTester = vehicleCollisionTester;
 
+        if (this.carBehavior._vehicleController) {
+          const constraint =
+            this.carBehavior._vehicleController.GetConstraint();
+          this.carBehavior._sharedData.physicsSystem.RemoveConstraint(
+            constraint
+          );
+        }
         _sharedData.physicsSystem.AddConstraint(constraint);
         this.carBehavior._vehicleController = Jolt.castObject(
           constraint.GetController(),
           Jolt.WheeledVehicleController
         );
+        if (this.carBehavior._stepListener) {
+          _sharedData.physicsSystem.RemoveStepListener(
+            this.carBehavior._stepListener
+          );
+        }
         this.carBehavior._stepListener = new Jolt.VehicleConstraintStepListener(
           constraint
         );

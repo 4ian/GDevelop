@@ -32,7 +32,11 @@ export const CompactToggleField = (props: Props) => {
     ? null
     : !props.markdownDescription
     ? props.label
-    : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
+    : [
+        props.label,
+        ' - ',
+        <MarkdownText key="markdown-desc" source={props.markdownDescription} />,
+      ];
 
   const label = (
     <Text

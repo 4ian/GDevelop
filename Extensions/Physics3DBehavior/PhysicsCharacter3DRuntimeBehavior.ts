@@ -414,6 +414,7 @@ namespace gdjs {
       if (this.character) {
         if (this._canBePushed) {
           this.charactersManager.removeCharacter(this.character);
+          Jolt.destroy(this.character.GetListener());
         }
         // The body is destroyed with the character.
         Jolt.destroy(this.character);
@@ -1551,6 +1552,15 @@ namespace gdjs {
         const body = _sharedData.physicsSystem
           .GetBodyLockInterface()
           .TryGetBody(character.GetInnerBodyID());
+        if (this.characterBehavior.character) {
+          if (this.characterBehavior._canBePushed) {
+            this.characterBehavior.charactersManager.removeCharacter(
+              this.characterBehavior.character
+            );
+            Jolt.destroy(this.characterBehavior.character.GetListener());
+          }
+          Jolt.destroy(this.characterBehavior.character);
+        }
         this.characterBehavior.character = character;
 
         if (this.characterBehavior._canBePushed) {

@@ -335,6 +335,17 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                               <div className={classes.feedbackButtonsContainer}>
                                 <IconButton
                                   size="small"
+                                  tooltip={t`Copy`}
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(
+                                      messageContent.text
+                                    );
+                                  }}
+                                >
+                                  <Copy fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
                                   tooltip={t`This was helpful`}
                                   onClick={() => {
                                     setMessageFeedbacks({

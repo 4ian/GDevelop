@@ -1,7 +1,7 @@
 import React from 'react';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import ResourcePreviewContext from './Resource3DPreviewContext';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import CheckeredBackground from '../CheckeredBackground';
 
 const styles = {
   container: {
@@ -34,13 +34,13 @@ const styles = {
 type Props = {|
   modelUrl: string,
   expand?: boolean,
+  fullWidth?: boolean,
   size?: number,
 |};
 
-const Model3DPreview = ({ modelUrl, size, expand }: Props) => {
+const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
   const { getResourcePreview } = React.useContext(ResourcePreviewContext);
   const [imageDataUrl, setImageDataUrl] = React.useState(null);
-  const theme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
@@ -53,21 +53,15 @@ const Model3DPreview = ({ modelUrl, size, expand }: Props) => {
     [modelUrl, getResourcePreview]
   );
 
-  const loaderSize = size ? Math.max(size, 24) : undefined;
-
   return (
     <div
       style={{
         ...styles.container,
         flex: expand ? 1 : undefined,
+        width: fullWidth ? '100%' : undefined,
       }}
     >
-      <div
-        style={{
-          ...styles.background,
-          filter: theme.imagePreview.backgroundFilter || 'none',
-        }}
-      />
+      <CheckeredBackground borderRadius={4} />
       {imageDataUrl ? (
         <img
           src={imageDataUrl}
@@ -79,7 +73,7 @@ const Model3DPreview = ({ modelUrl, size, expand }: Props) => {
           }}
         />
       ) : (
-        <PlaceholderLoader size={loaderSize} style={styles.loader} />
+        <PlaceholderLoader size={size} style={styles.loader} />
       )}
     </div>
   );

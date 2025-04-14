@@ -3,7 +3,6 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ResourcesLoader from '../../ResourcesLoader';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import CheckeredBackground from '../CheckeredBackground';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import Text from '../../UI/Text';
 import { getDefaultResourceThumbnail } from '..';
@@ -135,6 +134,7 @@ export const ProjectResourceCard = ({
               resourceName,
               {}
             )}
+            fullWidth
           />
         );
       default:
@@ -154,7 +154,6 @@ export const ProjectResourceCard = ({
             : undefined,
         }}
       >
-        <CheckeredBackground />
         {renderResourcePreview()}
         <div style={styles.titleContainer}>
           <Text noMargin style={styles.title}>

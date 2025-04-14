@@ -271,9 +271,13 @@ export const CompactResourceSelectorWithThumbnail = ({
             label: i18n._(resourceSource.displayName),
             click: () => addFrom(resourceSource),
           })),
-          {
-            type: 'separator',
-          },
+          ...(externalEditors.length
+            ? [
+                {
+                  type: 'separator',
+                },
+              ]
+            : []),
           ...externalEditors.map(externalEditor => ({
             label: resourceName
               ? i18n._(externalEditor.editDisplayName)

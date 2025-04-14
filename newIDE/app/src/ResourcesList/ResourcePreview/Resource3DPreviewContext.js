@@ -1,7 +1,38 @@
 // @flow
 import * as React from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// Import the worker (will be handled by worker-loader)
+import Resource3DPreviewWorker from './Resource3DPreview.worker';
+
+type WorkerInitMessage = {|
+  type: 'INIT',
+|};
+
+type WorkerRenderModelMessage = {|
+  type: 'RENDER_MODEL',
+  resourceUrl: string,
+|};
+
+type WorkerOutInitMessage = {|
+  type: 'INIT',
+  success: boolean,
+|};
+
+type WorkerOutRenderCompleteMessage = {|
+  type: 'RENDER_COMPLETE',
+  resourceUrl: string,
+  screenshot: string,
+|};
+
+type WorkerOutRenderErrorMessage = {|
+  type: 'RENDER_ERROR',
+  resourceUrl: string,
+  error: string,
+|};
+
+type WorkerOutMessage =
+  | WorkerOutInitMessage
+  | WorkerOutRenderCompleteMessage
+  | WorkerOutRenderErrorMessage;
 
 export type Resource3DPreviewState = {|
   getResourcePreview: (resourceUrl: string) => Promise<?string>,
@@ -17,112 +48,112 @@ const Resource3DPreviewContext = React.createContext<Resource3DPreviewState>(
 
 export default Resource3DPreviewContext;
 
-const SingleCanvasRenderer = ({
-  resourceUrl,
-  onPreviewReady,
-}: {
-  resourceUrl: string,
-  onPreviewReady: (resourceUrl: string, dataUrl: string) => void,
-}) => {
-  const containerRef = React.useRef();
-
-  React.useEffect(
-    () => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const width = 256;
-      const height = 256;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      camera.position.set(2, 2, 4);
-
-      const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-      });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.0;
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
-      const mainLight = new THREE.DirectionalLight(0xffffff, 3);
-      hemiLight.position.set(0, 20, 0);
-      mainLight.position.set(5, 10, 7.5);
-      scene.add(ambientLight, hemiLight, mainLight);
-
-      const loader = new GLTFLoader();
-      let model = null;
-
-      loader.load(
-        resourceUrl,
-        gltf => {
-          model = gltf.scene;
-
-          const box = new THREE.Box3().setFromObject(model);
-          const size = new THREE.Vector3();
-          const center = new THREE.Vector3();
-          box.getSize(size);
-          box.getCenter(center);
-
-          const sphere = new THREE.Sphere();
-          box.getBoundingSphere(sphere);
-
-          const scale = 1 / sphere.radius;
-          model.scale.set(scale, scale, scale);
-
-          // Center horizontally
-          model.position.x -= center.x * scale;
-          model.position.z -= center.z * scale;
-
-          // Slight upward shift so base isn't too low
-          model.position.y -= (center.y - size.y / 2) * scale;
-
-          scene.add(model);
-
-          // Aim camera slightly above center
-          camera.lookAt(0, 0.75, 0);
-
-          requestAnimationFrame(() => {
-            renderer.render(scene, camera);
-            const screenshot = renderer.domElement.toDataURL();
-            onPreviewReady(resourceUrl, screenshot);
-          });
-        },
-        undefined,
-        error => {
-          console.error('Failed to load 3D model:', error);
-          onPreviewReady(resourceUrl, 'JsPlatform/Extensions/3d_model.svg');
-        }
-      );
-
-      return () => {
-        renderer.dispose();
-      };
-    },
-    [resourceUrl, onPreviewReady]
-  );
-
-  return (
-    // This component is here just to create a canvas and render the 3D model.
-    // The canvas is not visible to the user.
-    <div
-      id="preview-3d-canvas"
-      ref={containerRef}
-      style={{
-        position: 'absolute',
-        width: 256,
-        height: 256,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-        opacity: 0,
-      }}
-    />
-  );
+// Message types matching the worker's constants
+const MESSAGE_TYPES = {
+  RENDER_MODEL: 'RENDER_MODEL',
+  RENDER_COMPLETE: 'RENDER_COMPLETE',
+  RENDER_ERROR: 'RENDER_ERROR',
+  INIT: 'INIT',
 };
+
+// Worker manager that handles initialization and communication
+class Resource3DPreviewWorkerManager {
+  worker: Worker;
+  isInitialized: boolean = false;
+  pendingPromises: Map<
+    string,
+    { resolve: Function, reject: Function }
+  > = new Map();
+  fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
+
+  constructor() {
+    // $FlowExpectedError - worker-loader types aren't recognized by Flow
+    this.worker = new Resource3DPreviewWorker();
+    this.setupMessageHandlers();
+    this.initWorker();
+  }
+
+  setupMessageHandlers() {
+    this.worker.onmessage = (event: MessageEvent) => {
+      // $FlowExpectedError
+      const workerOutMessageData = (event.data: WorkerOutMessage);
+      const type = workerOutMessageData.type;
+
+      switch (type) {
+        case MESSAGE_TYPES.INIT:
+          const { success } =
+            // $FlowExpectedError
+            (workerOutMessageData: WorkerOutInitMessage);
+          this.isInitialized = success;
+          break;
+
+        case MESSAGE_TYPES.RENDER_COMPLETE:
+          const { resourceUrl, screenshot } =
+            // $FlowExpectedError
+            (workerOutMessageData: WorkerOutRenderCompleteMessage);
+          const pendingPromise = this.pendingPromises.get(resourceUrl);
+          if (pendingPromise) {
+            pendingPromise.resolve(screenshot);
+            this.pendingPromises.delete(resourceUrl);
+          }
+          break;
+
+        case MESSAGE_TYPES.RENDER_ERROR:
+          const { resourceUrl: errorResourceUrl, error } =
+            // $FlowExpectedError
+            (workerOutMessageData: WorkerOutRenderErrorMessage);
+          console.error('Worker error rendering 3D model:', error);
+          const pendingErrorPromise = this.pendingPromises.get(
+            errorResourceUrl
+          );
+          if (pendingErrorPromise) {
+            pendingErrorPromise.resolve(this.fallbackImagePath);
+            this.pendingPromises.delete(errorResourceUrl);
+          }
+          break;
+        default:
+          console.warn('Unknown message type from worker:', type);
+          break;
+      }
+    };
+
+    this.worker.onerror = error => {
+      console.error('Worker error:', error);
+      // Resolve any pending promises with the fallback image
+      this.pendingPromises.forEach(promise => {
+        promise.resolve(this.fallbackImagePath);
+      });
+      this.pendingPromises.clear();
+    };
+  }
+
+  initWorker() {
+    const message: WorkerInitMessage = { type: MESSAGE_TYPES.INIT };
+    this.worker.postMessage(message);
+  }
+
+  renderModel(resourceUrl: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!this.isInitialized) {
+        resolve(this.fallbackImagePath);
+        return;
+      }
+
+      this.pendingPromises.set(resourceUrl, { resolve, reject });
+      const message: WorkerRenderModelMessage = {
+        type: MESSAGE_TYPES.RENDER_MODEL,
+        resourceUrl,
+      };
+      this.worker.postMessage(message);
+    });
+  }
+
+  terminate() {
+    if (this.worker) {
+      this.worker.terminate();
+    }
+  }
+}
 
 type Props = {|
   children: React.Node,
@@ -134,15 +165,22 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>
   >([]);
   const previewCache = React.useRef<{ [url: string]: string }>({});
-  const timeoutRef = React.useRef<?TimeoutID>(null);
+  const workerManagerRef = React.useRef<?Resource3DPreviewWorkerManager>(null);
 
+  // Initialize the worker manager on mount
   React.useEffect(() => {
-    // Ensure we clear everything when the component is unmounted.
+    workerManagerRef.current = new Resource3DPreviewWorkerManager();
+
+    // Cleanup on unmount
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
       queueRef.current = [];
       previewCache.current = {};
+
+      // Terminate the worker
+      if (workerManagerRef.current) {
+        workerManagerRef.current.terminate();
+        workerManagerRef.current = null;
+      }
     };
   }, []);
 
@@ -154,14 +192,10 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
         return;
       }
 
-      // Clear the timeout if it exists. (in case it just finished processing)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-
       // Add the item to the queue.
       queueRef.current.push({ url, resolve });
       // If the queue didn't have items before,
-      // then process it immediatelly.
+      // then process it immediately.
       // Otherwise, let the queue process handle it.
       if (queueRef.current.length === 1) {
         setCurrentResource(url);
@@ -169,36 +203,59 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
     });
   }, []);
 
-  // Called when a preview is generated.
-  // - Resolves the promise with the data URL.
-  // - Caches the data URL.
-  // - Starts the next preview in the queue. (or hide the canvas if empty)
-  const handlePreviewGenerated = React.useCallback(
-    (url: string, dataUrl: string) => {
-      // Save it in the cache for future use.
-      previewCache.current[url] = dataUrl;
-      // Resolve all the requests made for that URL.
-      const queueItemsToResolve = queueRef.current.filter(
-        item => item.url === url
-      );
-      queueItemsToResolve.forEach(item => {
-        const { resolve } = item;
-        if (resolve) resolve(dataUrl);
-      });
+  // Process the next resource in the queue
+  const processNextResource = React.useCallback(async (url: string) => {
+    if (!workerManagerRef.current) {
+      return null;
+    }
 
-      // Remove the items from the queue.
-      queueRef.current = queueRef.current.filter(item => item.url !== url);
+    try {
+      const dataUrl = await workerManagerRef.current.renderModel(url);
+      return dataUrl;
+    } catch (error) {
+      console.error('Error rendering 3D model:', error);
+      return 'JsPlatform/Extensions/3d_model.svg';
+    }
+  }, []);
 
-      // And trigger the next item to be processed.
-      const nextItemToProcess = queueRef.current[0];
-      if (nextItemToProcess) {
-        setCurrentResource(nextItemToProcess.url);
-      } else {
-        // Auto-hide after 2s if no new resources.
-        timeoutRef.current = setTimeout(() => setCurrentResource(null), 2000);
-      }
+  // Effect to process the current resource
+  React.useEffect(
+    () => {
+      if (!currentResource) return;
+
+      const processResource = async () => {
+        const dataUrl = await processNextResource(currentResource);
+
+        // Handle the result
+        if (dataUrl) {
+          // Save it in the cache for future use
+          previewCache.current[currentResource] = dataUrl;
+
+          // Resolve all the requests made for that URL
+          const queueItemsToResolve = queueRef.current.filter(
+            item => item.url === currentResource
+          );
+          queueItemsToResolve.forEach(item => {
+            const { resolve } = item;
+            if (resolve) resolve(dataUrl);
+          });
+
+          // Remove the items from the queue
+          queueRef.current = queueRef.current.filter(
+            item => item.url !== currentResource
+          );
+
+          // And trigger the next item to be processed
+          const nextItemToProcess = queueRef.current[0];
+          if (nextItemToProcess) {
+            setCurrentResource(nextItemToProcess.url);
+          }
+        }
+      };
+
+      processResource();
     },
-    []
+    [currentResource, processNextResource]
   );
 
   return (
@@ -206,12 +263,6 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
       value={{ getResourcePreview: enqueueResource }}
     >
       {children}
-      {currentResource && (
-        <SingleCanvasRenderer
-          resourceUrl={currentResource}
-          onPreviewReady={handlePreviewGenerated}
-        />
-      )}
     </Resource3DPreviewContext.Provider>
   );
 };

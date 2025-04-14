@@ -331,6 +331,10 @@ namespace gdjs {
       }
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+      if (this._stepListener) {
+        Jolt.destroy(this._stepListener);
+        this._stepListener = null;
+      }
       if (this._vehicleCollisionTester) {
         Jolt.destroy(this._vehicleCollisionTester);
         this._vehicleCollisionTester = null;

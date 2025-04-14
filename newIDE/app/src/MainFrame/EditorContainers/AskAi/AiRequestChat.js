@@ -23,6 +23,7 @@ import { type Quota } from '../../../Utils/GDevelopServices/Usage';
 import IconButton from '../../../UI/IconButton';
 import Like from '../../../UI/CustomSvgIcons/Like';
 import Dislike from '../../../UI/CustomSvgIcons/Dislike';
+import Copy from '../../../UI/CustomSvgIcons/Copy';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
 import Link from '../../../UI/Link';

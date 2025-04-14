@@ -214,6 +214,7 @@ declare type SoundSyncData = {
   initialVolume: float;
   rate: float;
   resourceName: string;
+  position: float,
 };
 
 declare interface GameNetworkSyncData {

@@ -212,7 +212,7 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (sceneData.stopSoundsOnStartup && this._runtimeGame) {
+      if (sceneData.stopSoundsOnStartup && this._runtimeGame && (!options || !options.forceInputClear)) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;

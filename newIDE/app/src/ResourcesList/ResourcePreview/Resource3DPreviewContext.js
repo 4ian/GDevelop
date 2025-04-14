@@ -84,7 +84,7 @@ const SingleCanvasRenderer = ({
           scene.add(model);
 
           // Aim camera slightly above center
-          camera.lookAt(0, 1, 0);
+          camera.lookAt(0, 0.75, 0);
 
           requestAnimationFrame(() => {
             renderer.render(scene, camera);

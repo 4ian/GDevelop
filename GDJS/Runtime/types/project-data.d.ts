@@ -199,12 +199,30 @@ declare interface SceneStackSceneNetworkSyncData {
 
 declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 
+declare type SoundManagerSyncData = {
+  globalVolume: float;
+  availableResources: Record<string, ResourceData>;
+  cachedSpatialPosition: Record<integer, [number, number, number]>;
+  freeSounds: SoundSyncData[];
+  freeMusics: SoundSyncData[];
+  musics: SoundSyncData[];
+  sounds: SoundSyncData[];
+};
+
+declare type SoundSyncData = {
+  loop: boolean;
+  initialVolume: float;
+  rate: float;
+  resourceName: string;
+};
+
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  sm?: SoundManagerSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {

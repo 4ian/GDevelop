@@ -94,7 +94,7 @@ namespace gdjs {
                   );
 
                 this.applyUpdateFromNetworkSyncDataIfAny({
-                  isLoadingFromSaveState: true,
+                  forceInputClear: true,
                 });
 
                 const sceneStack = this._stack;
@@ -177,7 +177,7 @@ namespace gdjs {
     push(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: { isLoadingFromSaveState: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -204,7 +204,7 @@ namespace gdjs {
     private _loadNewScene(
       newSceneName: string,
       externalLayoutName?: string,
-      options?: { isLoadingFromSaveState: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
       // Load the new one
@@ -219,10 +219,7 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (
-          externalLayoutData &&
-          (!options || !options.isLoadingFromSaveState)
-        ) {
+        if (externalLayoutData && (!options || !options.forceInputClear)) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -244,7 +241,7 @@ namespace gdjs {
     replace(
       newSceneName: string,
       clear?: boolean,
-      options?: { isLoadingFromSaveState: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
 
@@ -326,9 +323,9 @@ namespace gdjs {
       this._sceneStackSyncDataToApply = sceneStackSyncData;
     }
 
-    applyUpdateFromNetworkSyncDataIfAny(options?: {
-      isLoadingFromSaveState: boolean;
-    }): boolean {
+    applyUpdateFromNetworkSyncDataIfAny(
+      options?: UpdateFromNetworkSyncDataOptions
+    ): boolean {
       this._throwIfDisposed();
       const sceneStackSyncData = this._sceneStackSyncDataToApply;
       let hasMadeChangeToStack = false;
@@ -336,7 +333,7 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      if (options && options.isLoadingFromSaveState) {
+      if (options && options.forceInputClear) {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {

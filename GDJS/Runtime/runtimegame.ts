@@ -1353,8 +1353,8 @@ namespace gdjs {
       const syncData: GameNetworkSyncData = {
         var: this._variables.getNetworkSyncData(syncOptions),
         ss: this._sceneStack.getNetworkSyncData(syncOptions) || undefined,
+        sm: this.getSoundManager().getNetworkSyncData() || undefined,
       };
-
       const extensionsVariablesSyncData = {};
       this._variablesByExtensionName.forEach((variables, extensionName) => {
         const extensionVariablesSyncData =
@@ -1393,6 +1393,9 @@ namespace gdjs {
       }
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);
+      }
+      if (syncData.sm) {
+        this.getSoundManager().updateFromNetworkSyncData(syncData.sm);
       }
       if (syncData.extVar) {
         for (const extensionName in syncData.extVar) {

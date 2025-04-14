@@ -84,11 +84,24 @@ namespace gdjs {
      */
     private _onPlay: Array<HowlCallback> = [];
 
-    constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
+    /**
+     * The filepath to the resource
+     */
+
+    private _audioResourceName;
+
+    constructor(
+      howl: Howl,
+      volume: float,
+      loop: boolean,
+      rate: float,
+      audioResourceName: string
+    ) {
       this._howl = howl;
       this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
+      this._audioResourceName = audioResourceName;
     }
 
     /**
@@ -357,10 +370,19 @@ namespace gdjs {
       if (this._id !== null) this._howl.off(event, handler, this._id);
       return this;
     }
+
+    getNetworkSyncData(): SoundSyncData {
+      return {
+        resourceName: this._audioResourceName,
+        loop: this._loop,
+        initialVolume: this._initialVolume,
+        rate: this._rate,
+      };
+    }
   }
 
   /**
-   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeScene.
+   * HowlerSoundManager is used to manage the sounds and musics of a RuntimeGame.
    *
    * It is basically a container to associate channels to sounds and keep a list
    * of all sounds being played.
@@ -601,8 +623,7 @@ namespace gdjs {
         );
         cacheContainer.set(resource, howl);
       }
-
-      return new gdjs.HowlerSound(howl, volume, loop, rate);
+      return new gdjs.HowlerSound(howl, volume, loop, rate, soundName);
     }
 
     /**
@@ -921,6 +942,81 @@ namespace gdjs {
             'There was an error while preloading an audio file: ' + error
           );
         }
+      }
+    }
+
+    getNetworkSyncData(): SoundManagerSyncData {
+      const freeMusicsDatas: SoundSyncData[] = [];
+      for (const sound of Object.values(this._freeMusics)) {
+        freeMusicsDatas.push(sound.getNetworkSyncData());
+      }
+      const freeSoundsDatas: SoundSyncData[] = [];
+      for (const sound of Object.values(this._freeSounds)) {
+        freeSoundsDatas.push(sound.getNetworkSyncData());
+      }
+      const musicsDatas: SoundSyncData[] = [];
+      for (const sound of Object.values(this._musics)) {
+        musicsDatas.push(sound.getNetworkSyncData());
+      }
+      const soundsDatas: SoundSyncData[] = [];
+      for (const sound of Object.values(this._sounds)) {
+        soundsDatas.push(sound.getNetworkSyncData());
+      }
+      return {
+        globalVolume: this._globalVolume,
+        availableResources: this._availableResources,
+        cachedSpatialPosition: this._cachedSpatialPosition,
+        freeMusics: freeMusicsDatas,
+        freeSounds: freeSoundsDatas,
+        musics: musicsDatas,
+        sounds: soundsDatas,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: SoundManagerSyncData): void {
+      this.clearAll();
+      this._globalVolume = syncData.globalVolume;
+
+      for (let i = 0; i < syncData.freeSounds.length; i++) {
+        const freeSoundsSyncData: SoundSyncData = syncData.freeSounds[i];
+        this.playSound(
+          freeSoundsSyncData.resourceName,
+          freeSoundsSyncData.loop,
+          freeSoundsSyncData.initialVolume,
+          freeSoundsSyncData.rate
+        );
+      }
+
+      for (let i = 0; i < syncData.freeMusics.length; i++) {
+        const freeMusicsSyncData: SoundSyncData = syncData.freeMusics[i];
+        this.playMusic(
+          freeMusicsSyncData.resourceName,
+          freeMusicsSyncData.loop,
+          freeMusicsSyncData.initialVolume,
+          freeMusicsSyncData.rate
+        );
+      }
+
+      for (let i = 0; i < syncData.sounds.length; i++) {
+        const soundsSyncData: SoundSyncData = syncData.sounds[i];
+        this.playSoundOnChannel(
+          soundsSyncData.resourceName,
+          i,
+          soundsSyncData.loop,
+          soundsSyncData.initialVolume,
+          soundsSyncData.rate
+        );
+      }
+
+      for (let i = 0; i < syncData.musics.length; i++) {
+        const musicsSyncData: SoundSyncData = syncData.musics[i];
+        this.playMusicOnChannel(
+          musicsSyncData.resourceName,
+          i,
+          musicsSyncData.loop,
+          musicsSyncData.initialVolume,
+          musicsSyncData.rate
+        );
       }
     }
 

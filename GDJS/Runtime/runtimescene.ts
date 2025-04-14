@@ -127,7 +127,7 @@ namespace gdjs {
      */
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
-      options?: { isLoadingFromSaveState?: boolean }
+      options?: UpdateFromNetworkSyncDataOptions
     ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
@@ -186,7 +186,7 @@ namespace gdjs {
       }
 
       //Create initial instances of objects
-      if (!options || !options.isLoadingFromSaveState)
+      if (!options || !options.forceInputClear)
         this.createObjectsFrom(
           sceneData.instances,
           0,
@@ -658,6 +658,7 @@ namespace gdjs {
     getIsLoadingRequest() {
       return this._isLoadingRequested;
     }
+
     convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {
       // The result parameter used to be optional.
       const point = result || [0, 0];
@@ -869,13 +870,14 @@ namespace gdjs {
             this._variablesByExtensionName.get(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
-              extensionVariablesData
+              extensionVariablesData,
+              options
             );
           }
         }
-        if (syncData.timeManager && options?.forceInputClear) {
-          this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
-        }
+      }
+      if (syncData.timeManager && options && options.forceInputClear) {
+        this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
       }
     }
 

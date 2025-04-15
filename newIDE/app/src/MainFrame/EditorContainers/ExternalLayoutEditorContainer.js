@@ -270,6 +270,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
+            previewDebuggerServer={this.props.previewDebuggerServer}
             openBehaviorEvents={this.props.openBehaviorEvents}
             onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
             onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
@@ -281,6 +282,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             }
             // Nothing to do as events-based objects can't have external layout.
             onEventsBasedObjectChildrenEdited={() => {}}
+            onExtensionInstalled={this.props.onExtensionInstalled}
           />
         )}
         {!layout && (

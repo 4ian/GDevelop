@@ -68,6 +68,7 @@ namespace gdjs {
       this._input.style.resize = 'none'; // Prevent user from resizing the input when it's a text area.
       this._input.style.border = '1px solid black';
       this._input.style.boxSizing = 'border-box';
+      this._input.style.borderRadius = '0px'; // Remove any style added by the browser (Safari adds some radius for instance).
       this._input.style.width = '100%';
       this._input.style.height = '100%';
       this._input.maxLength = this._object.getMaxLength();
@@ -116,9 +117,14 @@ namespace gdjs {
     }
 
     _destroyElement() {
-      if (!this._input) return;
-      this._input.remove();
-      this._input = null;
+      if (this._form) {
+        this._form.remove();
+        this._form = null;
+      }
+      if (this._input) {
+        this._input.remove();
+        this._input = null;
+      }
     }
 
     onScenePaused() {
@@ -326,14 +332,14 @@ namespace gdjs {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
     updateDisabled() {
-      if (!this._form) return;
+      if (!this._input) return;
 
-      this._form.disabled = this._object.isDisabled();
+      this._input.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
-      if (!this._form) return;
+      if (!this._input) return;
 
-      this._form.readOnly = this._object.isReadOnly();
+      this._input.readOnly = this._object.isReadOnly();
     }
 
     updateMaxLength() {
@@ -371,6 +377,8 @@ namespace gdjs {
       this._input.focus();
     }
   }
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

@@ -177,9 +177,7 @@ export declare class EditableTileMap {
   isTileFlippedOnX(x: integer, y: integer, layerId: integer): boolean;
   isTileFlippedOnY(x: integer, y: integer, layerId: integer): boolean;
   removeTile(x: integer, y: integer, layerId: integer): void;
-  trimEmptyColumnsAndRowToFitLayer(
-    layerId: integer
-  ):
+  trimEmptyColumnsAndRowToFitLayer(layerId: integer):
     | {
         poppedRows: number;
         poppedColumns: number;

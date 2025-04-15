@@ -19,12 +19,14 @@ namespace gdjs {
        * The transformation from the time map coordinate (in pixels)
        * to the scene coordinate (in pixels).
        */
-      private _transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      private _transformation: gdjs.AffineTransformation =
+        new gdjs.AffineTransformation();
       /**
        * The transformation from the scene coordinate (in pixels)
        * to the time map coordinate (in pixels).
        */
-      private _inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      private _inverseTransformation: gdjs.AffineTransformation =
+        new gdjs.AffineTransformation();
       /**
        * This allows tiles to know if their hitboxes must be updated.
        * @see {@link TransformedCollisionTile.affineTransformationUpToDateCount}
@@ -654,7 +656,8 @@ namespace gdjs {
       /**
        * An reusable AffineTransformation to avoid allocations.
        */
-      private static readonly workingTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      private static readonly workingTransformation: gdjs.AffineTransformation =
+        new gdjs.AffineTransformation();
 
       /**
        *
@@ -714,7 +717,8 @@ namespace gdjs {
       }
 
       private _setHitboxesUpToDate() {
-        this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
+        this.affineTransformationUpToDateCount =
+          this.layer.tileMap._transformationUpToDateCount;
       }
 
       invalidate() {

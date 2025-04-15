@@ -64,14 +64,12 @@ import ObjectTypeSelector from '../ObjectTypeSelector';
 import SemiControlledTextField, {
   type SemiControlledTextFieldInterface,
 } from '../UI/SemiControlledTextField';
-import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
@@ -114,9 +112,9 @@ import {
   ExtensionsAccordion,
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
-import ListIcon from '../UI/ListIcon';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import fakeResourceManagementProps from './FakeResourceManagement';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 
 configureActions({
   depth: 2,
@@ -265,258 +263,6 @@ storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
     <DragAndDropTestBed />
   </DragAndDropContextProvider>
 ));
-
-storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
-  .addDecorator(paperDecorator)
-  .add('default, with text', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-              text: `Choice ${i}`,
-              value: `Choice ${i}`,
-            }))}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('default, with error', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-              text: `Choice ${i}`,
-              value: `Choice ${i}`,
-            }))}
-            errorText={'There was an error somewhere'}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('default, with translatable elements and a separator', () => (
-    <ValueStateHolder
-      initialValue={''}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            dataSource={[
-              {
-                text: '',
-                value: '',
-                translatableValue: 'Click me',
-                onClick: action('Click me clicked'),
-              },
-              {
-                type: 'separator',
-              },
-              {
-                text: '',
-                value: '',
-                translatableValue: 'Or click me',
-                onClick: action('Click me clicked'),
-              },
-            ]}
-          />
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('default, with onClick for some elements', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            dataSource={[
-              {
-                text: '',
-                value: 'Click me 1',
-                onClick: action('Click me 1 clicked'),
-              },
-              {
-                text: '',
-                value: 'Click me 2',
-                onClick: action('Click me 2 clicked'),
-              },
-              {
-                type: 'separator',
-              },
-            ].concat(
-              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-                text: `Choice ${i}`,
-                value: `Choice ${i}`,
-              }))
-            )}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add(
-    'default, with onClick, long texts and renderIcon for some elements',
-    () => (
-      <ValueStateHolder
-        initialValue={'Choice 6'}
-        render={(value, onChange) => (
-          <React.Fragment>
-            <SemiControlledAutoComplete
-              value={value}
-              onChange={onChange}
-              dataSource={[
-                {
-                  text: '',
-                  value: 'Click me 1',
-                  onClick: action('Click me 1 clicked'),
-                  renderIcon: () => <Brush />,
-                },
-                {
-                  text: '',
-                  value: 'Click me 2',
-                  onClick: action('Click me 2 clicked'),
-                  renderIcon: () => (
-                    <ListIcon iconSize={24} src={'res/icon128.png'} />
-                  ),
-                },
-                {
-                  text: '',
-                  value: 'Click me 3',
-                  onClick: action('Click me 3 clicked'),
-                },
-                {
-                  type: 'separator',
-                },
-              ].concat(
-                [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-                  text:
-                    i % 2
-                      ? `Choice ${i}`
-                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
-                  value:
-                    i % 2
-                      ? `Choice ${i}`
-                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
-                  renderIcon: i % 3 ? () => <Brush /> : undefined,
-                }))
-              )}
-            />
-            <p>State value is {value}</p>
-          </React.Fragment>
-        )}
-      />
-    )
-  )
-  .add('in a dialog, with onClick for some elements', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <Dialog open title="some title">
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            dataSource={[
-              {
-                text: '',
-                value: 'Click me 1',
-                onClick: action('Click me 1 clicked'),
-              },
-              {
-                text: '',
-                value: 'Click me 2',
-                onClick: action('Click me 2 clicked'),
-              },
-              {
-                type: 'separator',
-              },
-            ].concat(
-              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-                text: `Choice ${i}`,
-                value: `Choice ${i}`,
-              }))
-            )}
-          />
-          <p>State value is {value}</p>
-        </Dialog>
-      )}
-    />
-  ))
-  .add('reduced margin, in a MiniToolbar', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <MiniToolbar>
-            <MiniToolbarText firstChild>Please make a choice:</MiniToolbarText>
-            <SemiControlledAutoComplete
-              margin="none"
-              value={value}
-              onChange={onChange}
-              dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-                text: `Choice ${i}`,
-                value: `Choice ${i}`,
-              }))}
-            />
-          </MiniToolbar>
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('with a (markdown) helper text', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-              text: `Choice ${i}`,
-              value: `Choice ${i}`,
-            }))}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ))
-  .add('with a floating label', () => (
-    <ValueStateHolder
-      initialValue={'Choice 6'}
-      render={(value, onChange) => (
-        <React.Fragment>
-          <SemiControlledAutoComplete
-            value={value}
-            onChange={onChange}
-            floatingLabelText="This is a floating label"
-            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
-              text: `Choice ${i}`,
-              value: `Choice ${i}`,
-            }))}
-          />
-          <p>State value is {value}</p>
-        </React.Fragment>
-      )}
-    />
-  ));
 
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
   .addDecorator(paperDecorator)
@@ -2314,6 +2060,7 @@ storiesOf('InstructionEditorDialog', module)
           onSubmit={action('submit')}
           canPasteInstructions={true}
           onPasteInstructions={action('paste instructions')}
+          onExtensionInstalled={action('extension installed')}
         />
       )}
     </I18n>
@@ -2340,6 +2087,7 @@ storiesOf('InstructionEditorDialog', module)
           onSubmit={action('submit')}
           canPasteInstructions={true}
           onPasteInstructions={action('paste instructions')}
+          onExtensionInstalled={action('extension installed')}
         />
       )}
     </I18n>
@@ -2375,6 +2123,7 @@ storiesOf('InstructionEditorDialog', module)
             onSubmit={action('submit')}
             canPasteInstructions={true}
             onPasteInstructions={action('paste instructions')}
+            onExtensionInstalled={action('extension installed')}
           />
         )}
       </I18n>
@@ -2420,6 +2169,7 @@ storiesOf('InstructionEditorMenu', module)
                 anchorEl={buttonElement}
                 canPasteInstructions={true}
                 onPasteInstructions={action('paste instructions')}
+                onExtensionInstalled={action('extension installed')}
               />
             )}
           </I18n>

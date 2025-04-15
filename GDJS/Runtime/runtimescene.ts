@@ -121,7 +121,6 @@ namespace gdjs {
 
     /**
      * Load the runtime scene from the given scene.
-     *
      * @param sceneAndExtensionsData The data of the scene and extension variables to be loaded.
      * @param options Options to change what is loaded.
      * @see gdjs.RuntimeGame#getSceneAndExtensionsData
@@ -134,10 +133,8 @@ namespace gdjs {
         logger.error('loadFromScene was called without a scene');
         return;
       }
-      const {
-        sceneData,
-        usedExtensionsWithVariablesData,
-      } = sceneAndExtensionsData;
+      const { sceneData, usedExtensionsWithVariablesData } =
+        sceneAndExtensionsData;
 
       if (this._isLoaded) {
         this.unloadScene();
@@ -506,9 +503,8 @@ namespace gdjs {
             if (object.isHidden()) {
               rendererObject.visible = false;
             } else {
-              const cameraCoords = this._layersCameraCoordinates[
-                object.getLayer()
-              ];
+              const cameraCoords =
+                this._layersCameraCoordinates[object.getLayer()];
               if (!cameraCoords) {
                 continue;
               }
@@ -815,19 +811,16 @@ namespace gdjs {
       syncOptions: GetNetworkSyncDataOptions
     ): LayoutNetworkSyncData | null {
       const syncedPlayerNumber = syncOptions.playerNumber;
-      const variablesNetworkSyncData = this._variables.getNetworkSyncData(
-        syncOptions
-      );
+      const variablesNetworkSyncData =
+        this._variables.getNetworkSyncData(syncOptions);
       const extensionsVariablesSyncData = {};
       this._variablesByExtensionName.forEach((variables, extensionName) => {
-        const extensionVariablesSyncData = variables.getNetworkSyncData(
-          syncOptions
-        );
+        const extensionVariablesSyncData =
+          variables.getNetworkSyncData(syncOptions);
         // If there is no variables to sync, don't include the extension in the sync data.
         if (extensionVariablesSyncData) {
-          extensionsVariablesSyncData[
-            extensionName
-          ] = extensionVariablesSyncData;
+          extensionsVariablesSyncData[extensionName] =
+            extensionVariablesSyncData;
         }
       });
 
@@ -862,9 +855,8 @@ namespace gdjs {
             continue;
           }
           const extensionVariablesData = syncData.extVar[extensionName];
-          const extensionVariables = this._variablesByExtensionName.get(
-            extensionName
-          );
+          const extensionVariables =
+            this._variablesByExtensionName.get(extensionName);
           if (extensionVariables) {
             extensionVariables.updateFromNetworkSyncData(
               extensionVariablesData

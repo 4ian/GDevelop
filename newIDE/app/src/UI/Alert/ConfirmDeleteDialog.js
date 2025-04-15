@@ -11,6 +11,7 @@ import { LargeSpacer } from '../Grid';
 import Text from '../Text';
 import TextField from '../TextField';
 import { useShouldAutofocusInput } from '../Responsive/ScreenTypeMeasurer';
+import { MarkdownText } from '../MarkdownText';
 
 type Props = {|
   open: boolean,
@@ -22,6 +23,7 @@ type Props = {|
   onDismiss: () => void,
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
+  header?: React.Node,
 |};
 
 function ConfirmDeleteDialog(props: Props) {
@@ -98,8 +100,9 @@ function ConfirmDeleteDialog(props: Props) {
           ]}
           fullscreen="never-even-on-mobile"
         >
+          {props.header}
           <Text size="body" style={{ userSelect: 'text' }}>
-            {i18n._(props.message)}
+            <MarkdownText translatableSource={props.message} allowParagraphs />
           </Text>
           {props.confirmText && props.fieldMessage && (
             <>

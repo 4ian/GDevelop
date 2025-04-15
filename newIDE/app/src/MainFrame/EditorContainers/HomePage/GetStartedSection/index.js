@@ -65,7 +65,8 @@ type Props = {|
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    i18n: I18nType,
+    isQuickCustomization?: boolean
   ) => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
 |};
@@ -128,11 +129,6 @@ const GetStartedSection = ({
     },
     [authenticatedUser.authenticated]
   );
-
-  const shouldDisplayAnnouncements =
-    !authenticatedUser.limits ||
-    !authenticatedUser.limits.capabilities.classrooms ||
-    !authenticatedUser.limits.capabilities.classrooms.hidePlayTab;
 
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&
@@ -247,10 +243,7 @@ const GetStartedSection = ({
   if (step === 'recommendations') {
     return (
       <>
-        <SectionContainer
-          flexBody
-          showUrgentAnnouncements={shouldDisplayAnnouncements}
-        >
+        <SectionContainer flexBody showUrgentAnnouncements>
           <RecommendationList
             authenticatedUser={authenticatedUser}
             selectInAppTutorial={selectInAppTutorial}

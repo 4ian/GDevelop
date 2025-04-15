@@ -133,6 +133,10 @@ private:
       gd::PlatformExtension &extension,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension);
 
+  /**
+   * @brief Declare deprecated instructions to access properties.
+   * Variable instructions are now used instead of this.
+   */
   static void DeclarePropertyInstructionAndExpression(
       gd::PlatformExtension &extension,
       gd::InstructionOrExpressionContainerMetadata &entityMetadata,
@@ -145,7 +149,8 @@ private:
       const int valueParameterIndex,
       std::function<gd::AbstractFunctionMetadata &(
           gd::AbstractFunctionMetadata &instructionOrExpression)>
-          addObjectAndBehaviorParameters);
+          addObjectAndBehaviorParameters,
+      bool isSharedProperty);
 
   /**
    * Declare the instructions (actions/conditions) and expressions for the
@@ -324,8 +329,7 @@ private:
 
   static gd::String UncapitalizeFirstLetter(const gd::String &string);
 
-  static const gd::String &
-  GetFullName(const gd::EventsFunction &eventsFunction);
+  static gd::String GetFullName(const gd::EventsFunction &eventsFunction);
   static gd::String GetDefaultSentence(const gd::EventsFunction &eventsFunction,
                                        const int firstParameterIndex,
                                        const int parameterIndexOffset);

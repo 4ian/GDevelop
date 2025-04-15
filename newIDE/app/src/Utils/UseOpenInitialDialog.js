@@ -7,7 +7,8 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
-  openProfileDialog: boolean => void,
+  openProfileDialog: () => void,
+  openAskAi: () => void,
 |};
 
 /**
@@ -17,6 +18,7 @@ type Props = {|
 const useOpenInitialDialog = ({
   openInAppTutorialDialog,
   openProfileDialog,
+  openAskAi,
 }: Props) => {
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
@@ -50,7 +52,7 @@ const useOpenInitialDialog = ({
           // to make sure the most relevant dialog is opened.
           const signupTimeoutId = setTimeout(() => {
             if (authenticated) {
-              openProfileDialog(true);
+              openProfileDialog();
             } else {
               onOpenCreateAccountDialog();
             }
@@ -72,6 +74,9 @@ const useOpenInitialDialog = ({
           // Do nothing as it should open the games dashboard on the homepage
           // in the manage tab. So the homepage handles the route arguments itself.
           break;
+        case 'ask-ai':
+          openAskAi();
+          break;
         default:
           break;
       }
@@ -85,6 +90,7 @@ const useOpenInitialDialog = ({
       authenticated,
       onOpenCreateAccountDialog,
       onOpenLoginDialog,
+      openAskAi,
     ]
   );
 };

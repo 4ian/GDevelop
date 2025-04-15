@@ -75,9 +75,8 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics3DRuntimeBehavior>;
 
-    private _physics3DHooks: Array<
-      gdjs.Physics3DRuntimeBehavior.Physics3DHook
-    > = [];
+    private _physics3DHooks: Array<gdjs.Physics3DRuntimeBehavior.Physics3DHook> =
+      [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
@@ -181,9 +180,8 @@ namespace gdjs {
       behaviorName: string
     ): gdjs.Physics3DSharedData {
       if (!runtimeScene.physics3DSharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics3DSharedData = new gdjs.Physics3DSharedData(
           runtimeScene,
           initialData
@@ -207,9 +205,8 @@ namespace gdjs {
       const dynamicBroadPhaseLayer = new Jolt.BroadPhaseLayer(
         gdjs.Physics3DSharedData.dynamicBroadPhaseLayerIndex
       );
-      const broadPhaseLayerInterfaceMask = new Jolt.BroadPhaseLayerInterfaceMask(
-        2
-      );
+      const broadPhaseLayerInterfaceMask =
+        new Jolt.BroadPhaseLayerInterfaceMask(2);
       broadPhaseLayerInterfaceMask.ConfigureLayer(
         staticBroadPhaseLayer,
         gdjs.Physics3DSharedData.staticLayersMask,
@@ -226,9 +223,10 @@ namespace gdjs {
 
       settings.mObjectLayerPairFilter = objectFilter;
       settings.mBroadPhaseLayerInterface = broadPhaseLayerInterfaceMask;
-      settings.mObjectVsBroadPhaseLayerFilter = new Jolt.ObjectVsBroadPhaseLayerFilterMask(
-        broadPhaseLayerInterfaceMask
-      );
+      settings.mObjectVsBroadPhaseLayerFilter =
+        new Jolt.ObjectVsBroadPhaseLayerFilterMask(
+          broadPhaseLayerInterfaceMask
+        );
     }
 
     /**
@@ -341,7 +339,7 @@ namespace gdjs {
      */
     _currentContacts: Array<Physics3DRuntimeBehavior> = [];
 
-    private _destroyedDuringFrameLogic: boolean;
+    private _destroyedDuringFrameLogic: boolean = false;
     _body: Jolt.Body | null = null;
     /**
      * When set to `true` the body will be recreated before the next physics step.
@@ -382,9 +380,8 @@ namespace gdjs {
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
         this
       );
-      this.collisionChecker = new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(
-        this
-      );
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
       this.owner3D = owner;
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
@@ -402,7 +399,6 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this._destroyedDuringFrameLogic = false;
       this._sharedData = Physics3DSharedData.getSharedData(
         instanceContainer.getScene(),
         behaviorData.name
@@ -614,11 +610,7 @@ namespace gdjs {
 
     onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
-      if (this._body !== null) {
-        this._sharedData.bodyInterface.RemoveBody(this._body.GetID());
-        this._sharedData.bodyInterface.DestroyBody(this._body.GetID());
-        this._body = null;
-      }
+      this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
@@ -670,8 +662,8 @@ namespace gdjs {
           shapeDimensionB > 0
             ? shapeDimensionB
             : height > 0
-            ? height
-            : onePixel;
+              ? height
+              : onePixel;
         const boxDepth =
           shapeDimensionC > 0 ? shapeDimensionC : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -690,8 +682,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const capsuleDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         shapeSettings = new Jolt.CapsuleShapeSettings(
@@ -706,8 +698,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.sqrt(width * height) / 2
-            : onePixel;
+              ? Math.sqrt(width * height) / 2
+              : onePixel;
         const cylinderDepth =
           shapeDimensionB > 0 ? shapeDimensionB : depth > 0 ? depth : onePixel;
         // The convex radius should not eat up the whole volume.
@@ -729,8 +721,8 @@ namespace gdjs {
           shapeDimensionA > 0
             ? shapeDimensionA
             : width > 0
-            ? Math.pow(width * height * depth, 1 / 3) / 2
-            : onePixel;
+              ? Math.pow(width * height * depth, 1 / 3) / 2
+              : onePixel;
         shapeSettings = new Jolt.SphereShapeSettings(radius);
         quat = this.getQuat(0, 0, 0, 1);
         this._shapeHalfDepth = radius;
@@ -794,6 +786,10 @@ namespace gdjs {
       if (!this.activated() || this._destroyedDuringFrameLogic) return false;
 
       this._body = this.bodyUpdater.createAndAddBody();
+      if (!this._body) {
+        // It can only happen when the character behavior is destroyed.
+        return false;
+      }
       this._body.gdjsAssociatedBehavior = this;
 
       this._objectOldWidth = this.owner3D.getWidth();
@@ -1762,10 +1758,11 @@ namespace gdjs {
     }
 
     export interface BodyUpdater {
-      createAndAddBody(): Jolt.Body;
+      createAndAddBody(): Jolt.Body | null;
       updateObjectFromBody(): void;
       updateBodyFromObject(): void;
       recreateShape(): void;
+      destroyBody(): void;
     }
 
     export class DefaultBodyUpdater {
@@ -1775,7 +1772,7 @@ namespace gdjs {
         this.behavior = behavior;
       }
 
-      createAndAddBody(): Jolt.Body {
+      createAndAddBody(): Jolt.Body | null {
         const { behavior } = this;
         const { _sharedData } = behavior;
 
@@ -1787,8 +1784,8 @@ namespace gdjs {
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
-            ? Jolt.EMotionType_Kinematic
-            : Jolt.EMotionType_Dynamic,
+              ? Jolt.EMotionType_Kinematic
+              : Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
         bodyCreationSettings.mMotionQuality = behavior.bullet
@@ -1867,6 +1864,16 @@ namespace gdjs {
           true,
           Jolt.EActivation_Activate
         );
+      }
+
+      destroyBody() {
+        const { behavior } = this;
+        const { _sharedData } = behavior;
+        if (behavior._body !== null) {
+          _sharedData.bodyInterface.RemoveBody(behavior._body.GetID());
+          _sharedData.bodyInterface.DestroyBody(behavior._body.GetID());
+          behavior._body = null;
+        }
       }
     }
 

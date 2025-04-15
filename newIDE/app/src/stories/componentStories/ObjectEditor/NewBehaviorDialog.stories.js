@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import { I18n } from '@lingui/react';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -44,20 +45,25 @@ const apiDataFakeBehaviors = {
 };
 
 export const DefaultForSpriteObject = () => (
-  <BehaviorStoreStateProvider>
-    <NewBehaviorDialog
-      open
-      project={testProject.project}
-      eventsFunctionsExtension={null}
-      objectType={'Sprite'}
-      onClose={action('on close')}
-      onChoose={action('on choose')}
-      objectBehaviorsTypes={[
-        'DestroyOutsideBehavior::DestroyOutside',
-        'PlatformBehavior::PlatformBehavior',
-      ]}
-    />
-  </BehaviorStoreStateProvider>
+  <I18n>
+    {({ i18n }) => (
+      <BehaviorStoreStateProvider i18n={i18n}>
+        <NewBehaviorDialog
+          open
+          project={testProject.project}
+          eventsFunctionsExtension={null}
+          objectType={'Sprite'}
+          onClose={action('on close')}
+          onChoose={action('on choose')}
+          objectBehaviorsTypes={[
+            'DestroyOutsideBehavior::DestroyOutside',
+            'PlatformBehavior::PlatformBehavior',
+          ]}
+          onExtensionInstalled={action('extension installed')}
+        />
+      </BehaviorStoreStateProvider>
+    )}
+  </I18n>
 );
 DefaultForSpriteObject.parameters = apiDataFakeBehaviors;
 
@@ -72,9 +78,38 @@ export const WithCommunityExtensions = () => {
   };
 
   return (
-    <PreferencesContext.Provider value={preferences}>
+    <I18n>
+      {({ i18n }) => (
+        <PreferencesContext.Provider value={preferences}>
+          <FixedHeightFlexContainer height={400}>
+            <BehaviorStoreStateProvider i18n={i18n}>
+              <NewBehaviorDialog
+                open
+                project={testProject.project}
+                eventsFunctionsExtension={null}
+                objectType={'Sprite'}
+                onClose={action('on close')}
+                onChoose={action('on choose')}
+                objectBehaviorsTypes={[
+                  'DestroyOutsideBehavior::DestroyOutside',
+                  'PlatformBehavior::PlatformBehavior',
+                ]}
+                onExtensionInstalled={action('extension installed')}
+              />
+            </BehaviorStoreStateProvider>
+          </FixedHeightFlexContainer>
+        </PreferencesContext.Provider>
+      )}
+    </I18n>
+  );
+};
+WithCommunityExtensions.parameters = apiDataFakeBehaviors;
+
+export const WithServerSideErrors = () => (
+  <I18n>
+    {({ i18n }) => (
       <FixedHeightFlexContainer height={400}>
-        <BehaviorStoreStateProvider>
+        <BehaviorStoreStateProvider i18n={i18n}>
           <NewBehaviorDialog
             open
             project={testProject.project}
@@ -86,30 +121,11 @@ export const WithCommunityExtensions = () => {
               'DestroyOutsideBehavior::DestroyOutside',
               'PlatformBehavior::PlatformBehavior',
             ]}
+            onExtensionInstalled={action('extension installed')}
           />
         </BehaviorStoreStateProvider>
       </FixedHeightFlexContainer>
-    </PreferencesContext.Provider>
-  );
-};
-WithCommunityExtensions.parameters = apiDataFakeBehaviors;
-
-export const WithServerSideErrors = () => (
-  <FixedHeightFlexContainer height={400}>
-    <BehaviorStoreStateProvider>
-      <NewBehaviorDialog
-        open
-        project={testProject.project}
-        eventsFunctionsExtension={null}
-        objectType={'Sprite'}
-        onClose={action('on close')}
-        onChoose={action('on choose')}
-        objectBehaviorsTypes={[
-          'DestroyOutsideBehavior::DestroyOutside',
-          'PlatformBehavior::PlatformBehavior',
-        ]}
-      />
-    </BehaviorStoreStateProvider>
-  </FixedHeightFlexContainer>
+    )}
+  </I18n>
 );
 WithServerSideErrors.parameters = apiDataServerSideError;

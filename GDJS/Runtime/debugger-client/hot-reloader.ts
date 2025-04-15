@@ -29,7 +29,7 @@ namespace gdjs {
     }
 
     static indexByPersistentUuid<
-      ObjectWithPersistentId extends { persistentUuid: string | null }
+      ObjectWithPersistentId extends { persistentUuid: string | null },
     >(
       objectsWithPersistentId: ObjectWithPersistentId[]
     ): Map<string, ObjectWithPersistentId> {
@@ -175,8 +175,18 @@ namespace gdjs {
 
       const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
 
-      const newScriptFiles = newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-      const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
+      if (gdjs.inAppTutorialMessage) {
+        gdjs.inAppTutorialMessage.displayInAppTutorialMessage(
+          this._runtimeGame,
+          newRuntimeGameOptions.inAppTutorialMessageInPreview,
+          newRuntimeGameOptions.inAppTutorialMessagePositionInPreview || ''
+        );
+      }
+
+      const newScriptFiles =
+        newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
+      const projectDataOnlyExport =
+        !!newRuntimeGameOptions.projectDataOnlyExport;
 
       // Reload the changed scripts, which will have the side effects of re-running
       // the new scripts, potentially replacing the code of the free functions from
@@ -399,10 +409,11 @@ namespace gdjs {
 
           // Update extension's scene variables.
           for (const newExtensionData of newProjectData.eventsFunctionsExtensions) {
-            const oldExtensionData = oldProjectData.eventsFunctionsExtensions.find(
-              (oldExtensionData) =>
-                oldExtensionData.name === newExtensionData.name
-            );
+            const oldExtensionData =
+              oldProjectData.eventsFunctionsExtensions.find(
+                (oldExtensionData) =>
+                  oldExtensionData.name === newExtensionData.name
+              );
 
             const oldSceneVariables = oldExtensionData
               ? oldExtensionData.sceneVariables
@@ -672,9 +683,8 @@ namespace gdjs {
       objectDatas: ObjectData[]
     ): ObjectData[] {
       return objectDatas.map((objectData) => {
-        const [extensionName, eventsBasedObjectName] = objectData.type.split(
-          '::'
-        );
+        const [extensionName, eventsBasedObjectName] =
+          objectData.type.split('::');
 
         const extensionData = projectData.eventsFunctionsExtensions.find(
           (extension) => extension.name === extensionName
@@ -695,12 +705,13 @@ namespace gdjs {
         const customObjectConfiguration = objectData as ObjectData &
           CustomObjectConfiguration;
 
-        const mergedChildObjectDataList = customObjectConfiguration.childrenContent
-          ? eventsBasedObjectData.objects.map((objectData) => ({
-              ...objectData,
-              ...customObjectConfiguration.childrenContent[objectData.name],
-            }))
-          : eventsBasedObjectData.objects;
+        const mergedChildObjectDataList =
+          customObjectConfiguration.childrenContent
+            ? eventsBasedObjectData.objects.map((objectData) => ({
+                ...objectData,
+                ...customObjectConfiguration.childrenContent[objectData.name],
+              }))
+            : eventsBasedObjectData.objects;
 
         const mergedObjectConfiguration = {
           ...eventsBasedObjectData,
@@ -1341,12 +1352,12 @@ namespace gdjs {
       newInstances: InstanceData[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const runtimeObjects = runtimeInstanceContainer.getAdhocListOfAllInstances();
+      const runtimeObjects =
+        runtimeInstanceContainer.getAdhocListOfAllInstances();
       const oldInstanceByUuid = HotReloader.indexByPersistentUuid(oldInstances);
       const newInstanceByUuid = HotReloader.indexByPersistentUuid(newInstances);
-      const runtimeObjectByUuid = HotReloader.indexByPersistentUuid(
-        runtimeObjects
-      );
+      const runtimeObjectByUuid =
+        HotReloader.indexByPersistentUuid(runtimeObjects);
 
       const oldObjectsMap = HotReloader.indexByName(oldObjects);
       const newObjectsMap = HotReloader.indexByName(newObjects);
@@ -1406,7 +1417,8 @@ namespace gdjs {
           );
 
           if (runtimeObject instanceof gdjs.CustomRuntimeObject) {
-            const childrenInstanceContainer = runtimeObject.getChildrenContainer();
+            const childrenInstanceContainer =
+              runtimeObject.getChildrenContainer();
 
             // The `objects` attribute is already resolved by `resolveCustomObjectConfigurations()`.
             const oldCustomObjectData = oldObjectData as ObjectData &

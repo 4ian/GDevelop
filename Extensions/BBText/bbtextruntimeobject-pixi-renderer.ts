@@ -29,9 +29,9 @@ namespace gdjs {
             runtimeObject._color[2]
           ),
           tagStyle: 'bbcode',
-          wordWrap: runtimeObject._wordWrap,
+          wordWrap: runtimeObject._wrapping,
           wordWrapWidth: runtimeObject._wrappingWidth,
-          align: runtimeObject._align as PIXI.TextStyleAlign | undefined,
+          align: runtimeObject._textAlign as PIXI.TextStyleAlign | undefined,
         },
       });
       instanceContainer
@@ -39,10 +39,7 @@ namespace gdjs {
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-      // Set the anchor in the center, so that the object rotates around
-      // its center
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
+      this.updateAlignment();
       this.updateText();
       this.updatePosition();
       this.updateAngle();
@@ -55,7 +52,7 @@ namespace gdjs {
 
     updateWordWrap(): void {
       //@ts-ignore Private member usage.
-      this._pixiObject._style.wordWrap = this._object._wordWrap;
+      this._pixiObject._style.wordWrap = this._object._wrapping;
       this._pixiObject.dirty = true;
       this.updatePosition();
     }
@@ -84,7 +81,7 @@ namespace gdjs {
 
     updateAlignment(): void {
       //@ts-ignore Private member usage.
-      this._pixiObject._style.align = this._object._align;
+      this._pixiObject._style.align = this._object._textAlign;
       this._pixiObject.dirty = true;
     }
 
@@ -106,9 +103,38 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
+      if (this._object.isWrapping()) {
+        const alignmentX =
+          this._object._textAlign === 'right'
+            ? 1
+            : this._object._textAlign === 'center'
+              ? 0.5
+              : 0;
+
+        const width = this._object.getWrappingWidth();
+
+        // A vector from the custom size center to the renderer center.
+        const centerToCenterX =
+          (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+        this._pixiObject.position.x = this._object.x + width / 2;
+        this._pixiObject.anchor.x =
+          0.5 - centerToCenterX / this._pixiObject.width;
+      } else {
+        this._pixiObject.position.x =
+          this._object.x + this._pixiObject.width / 2;
+        this._pixiObject.anchor.x = 0.5;
+      }
+
+      const alignmentY =
+        this._object._verticalTextAlignment === 'bottom'
+          ? 1
+          : this._object._verticalTextAlignment === 'center'
+            ? 0.5
+            : 0;
       this._pixiObject.position.y =
-        this._object.y + this._pixiObject.height / 2;
+        this._object.y + this._pixiObject.height * (0.5 - alignmentY);
+      this._pixiObject.anchor.y = 0.5;
     }
 
     updateAngle(): void {

@@ -193,7 +193,8 @@ type Props = {|
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    i18n: I18nType,
+    isQuickCustomization?: boolean
   ) => Promise<void>,
   askToCloseProject: () => Promise<boolean>,
 |};

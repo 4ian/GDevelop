@@ -22,7 +22,7 @@ import { FullSizeMeasurer } from '../../UI/FullSizeMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import Paper from '../../UI/Paper';
-import { type EditorId } from '..';
+import { type EditorId } from '../utils';
 import {
   type SceneEditorsDisplayInterface,
   type SceneEditorsDisplayProps,
@@ -397,6 +397,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       tileMapTileSelection={props.tileMapTileSelection}
                       onSelectTileMapTile={props.onSelectTileMapTile}
                       lastSelectionType={props.lastSelectionType}
+                      onExtensionInstalled={props.onExtensionInstalled}
                     />
                   )}
                 </I18n>

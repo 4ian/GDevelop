@@ -324,12 +324,10 @@ describe('Multiplayer', () => {
       // Create the instances of the MultiplayerMessageManager and MultiplayerVariablesManager
       // for each player.
       for (const player of players) {
-        peerMultiplayerMessageManager[
-          player.peerId
-        ] = gdjs.makeMultiplayerMessageManager();
-        peerMultiplayerVariablesManager[
-          player.peerId
-        ] = gdjs.makeMultiplayerVariablesManager();
+        peerMultiplayerMessageManager[player.peerId] =
+          gdjs.makeMultiplayerMessageManager();
+        peerMultiplayerVariablesManager[player.peerId] =
+          gdjs.makeMultiplayerVariablesManager();
 
         // Define the host for everyone.
         gdjs.multiplayer.hostPeerId = host.peerId;
@@ -1051,12 +1049,11 @@ describe('Multiplayer', () => {
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p1RuntimeScene.createObject('MySpriteObject');
-      const {
-        object: p1SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p1RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p1SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
       p1SpriteObjectOriginal.setX(142);
       p1SpriteObjectOriginal.setY(143);
 
@@ -1075,12 +1072,11 @@ describe('Multiplayer', () => {
       p2RuntimeScene.renderAndStep(1000 / 60);
       markAllPeerMessagesAsProcessed();
 
-      const {
-        object: p2SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
       expect(p2SpriteObject.getX()).to.be(142);
       expect(p2SpriteObject.getY()).to.be(143);
 
@@ -1091,12 +1087,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p1SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p1SpriteObject.setX(242);
         p1SpriteObject.setY(243);
@@ -1112,12 +1107,11 @@ describe('Multiplayer', () => {
         p2RuntimeScene.renderAndStep(1000 / 60);
         markAllPeerMessagesAsProcessed();
 
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p2SpriteObject.getX()).to.be(242);
         expect(p2SpriteObject.getY()).to.be(243);
@@ -1130,12 +1124,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p1SpriteObject1,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject1 } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p1SpriteObject1.deleteFromScene(p1RuntimeScene);
         p1RuntimeScene.renderAndStep(1000 / 60);
@@ -1204,12 +1197,11 @@ describe('Multiplayer', () => {
       expect(p1Objects.length).to.be(0);
       p1RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p1SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p1RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p1SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p1SpriteObject.getX()).to.be(142);
       expect(p1SpriteObject.getY()).to.be(143);
@@ -1226,12 +1218,11 @@ describe('Multiplayer', () => {
       expect(p3Objects.length).to.be(0);
       p3RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p3SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p3RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p3SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p3RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p3SpriteObject.getX()).to.be(142);
       expect(p3SpriteObject.getY()).to.be(143);
@@ -1245,12 +1236,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
@@ -1265,12 +1255,11 @@ describe('Multiplayer', () => {
         });
         p1RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          object: p1SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p1SpriteObject.getX()).to.be(242);
         expect(p1SpriteObject.getY()).to.be(243);
@@ -1285,12 +1274,11 @@ describe('Multiplayer', () => {
         p3RuntimeScene.renderAndStep(1000 / 60);
         markAllPeerMessagesAsProcessed();
 
-        const {
-          object: p3SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p3SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p3SpriteObject.getX()).to.be(242);
         expect(p3SpriteObject.getY()).to.be(243);
@@ -1303,12 +1291,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p2SpriteObject1,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject1 } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p2SpriteObject1.deleteFromScene(p2RuntimeScene);
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -1327,10 +1314,11 @@ describe('Multiplayer', () => {
         );
         expect(p1ObjectsAndBehaviors.length).to.be(1);
         p1RuntimeScene.renderAndStep(1000 / 60);
-        const p1ObjectsAndBehaviorsUpdated = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        );
+        const p1ObjectsAndBehaviorsUpdated =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          );
         expect(p1ObjectsAndBehaviorsUpdated.length).to.be(0);
       }
 
@@ -1347,10 +1335,11 @@ describe('Multiplayer', () => {
         );
         expect(p3ObjectsAndBehaviors.length).to.be(1);
         p3RuntimeScene.renderAndStep(1000 / 60);
-        const p3ObjectsAndBehaviorsUpdated = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        );
+        const p3ObjectsAndBehaviorsUpdated =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          );
         expect(p3ObjectsAndBehaviorsUpdated.length).to.be(0);
       }
 
@@ -1380,12 +1369,11 @@ describe('Multiplayer', () => {
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p1RuntimeScene.createObject('MySpriteObject');
-      const {
-        object: p1SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p1RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p1SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
       p1SpriteObjectOriginal.setX(142);
       p1SpriteObjectOriginal.setY(143);
 
@@ -1399,12 +1387,11 @@ describe('Multiplayer', () => {
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p2RuntimeScene.renderAndStep(1000 / 60);
-      const {
-        object: p2SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
       expect(p2SpriteObjectOriginal.getX()).to.be(142);
       expect(p2SpriteObjectOriginal.getY()).to.be(143);
 
@@ -1415,12 +1402,11 @@ describe('Multiplayer', () => {
 
       const p3RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p3RuntimeScene.renderAndStep(1000 / 60);
-      const {
-        object: p3SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p3RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p3SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p3RuntimeScene,
+          'MySpriteObject'
+        )[0];
       expect(p3SpriteObjectOriginal.getX()).to.be(142);
       expect(p3SpriteObjectOriginal.getY()).to.be(143);
 
@@ -1526,22 +1512,20 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p1MultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p1MultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p1MultiplayerObjectBehavior.getPlayerObjectOwnership()).to.be(3);
         p1RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          behavior: p1MultiplayerObjectBehaviorUpdated,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p1MultiplayerObjectBehaviorUpdated } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(
           p1MultiplayerObjectBehaviorUpdated.getPlayerObjectOwnership()
         ).to.be(2);
@@ -1554,22 +1538,20 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p3MultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p3MultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p3MultiplayerObjectBehavior.getPlayerObjectOwnership()).to.be(3);
         p3RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          behavior: p3MultiplayerObjectBehaviorUpdated,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p3MultiplayerObjectBehaviorUpdated } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(
           p3MultiplayerObjectBehaviorUpdated.getPlayerObjectOwnership()
         ).to.be(2);
@@ -1584,21 +1566,19 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p1MultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p1MultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p1MultiplayerObjectBehavior.getPlayerObjectOwnership()).to.be(2);
         p1RuntimeScene.renderAndStep(1000 / 60);
-        const {
-          object: p1SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(p1SpriteObject.getX()).to.be(242);
         expect(p1SpriteObject.getY()).to.be(243);
 
@@ -1607,21 +1587,19 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p3MultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p3MultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p3MultiplayerObjectBehavior.getPlayerObjectOwnership()).to.be(2);
         p3RuntimeScene.renderAndStep(1000 / 60);
-        const {
-          object: p3SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p3SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(p3SpriteObject.getX()).to.be(242);
         expect(p3SpriteObject.getY()).to.be(243);
       }
@@ -1652,13 +1630,11 @@ describe('Multiplayer', () => {
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p2RuntimeScene.createObject('MySpriteObject');
-      const {
-        object: p2SpriteObject,
-        behavior: p2SpriteObjectBehavior,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObject, behavior: p2SpriteObjectBehavior } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
       p2SpriteObject.setX(142);
       p2SpriteObject.setY(143);
       p2SpriteObjectBehavior.setPlayerObjectOwnership(2);
@@ -1678,12 +1654,11 @@ describe('Multiplayer', () => {
 
       p1RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p1SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p1RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p1SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p1SpriteObject.getX()).to.be(142);
       expect(p1SpriteObject.getY()).to.be(143);
@@ -1701,12 +1676,11 @@ describe('Multiplayer', () => {
 
       p3RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p3SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p3RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p3SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p3RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p3SpriteObject.getX()).to.be(142);
       expect(p3SpriteObject.getY()).to.be(143);
@@ -1723,12 +1697,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
         p1RuntimeScene.createObject('MySpriteObject');
-        const {
-          behavior: p1MultiplayerBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[1]; // The new instance
+        const { behavior: p1MultiplayerBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[1]; // The new instance
         p1MultiplayerBehavior.setPlayerObjectOwnership(2);
         p1RuntimeScene.renderAndStep(1000 / 60);
 
@@ -1749,12 +1722,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
         p3RuntimeScene.createObject('MySpriteObject');
-        const {
-          behavior: p3MultiplayerBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[1]; // The new instance
+        const { behavior: p3MultiplayerBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[1]; // The new instance
         p3MultiplayerBehavior.setPlayerObjectOwnership(2);
         p3RuntimeScene.renderAndStep(1000 / 60);
 
@@ -1784,10 +1756,8 @@ describe('Multiplayer', () => {
         );
         expect(p2ObjectsAndBehaviors.length).to.be(2);
         const { object: p2Object1 } = p2ObjectsAndBehaviors[0];
-        const {
-          object: p2Object2,
-          behavior: p2MultiplayerBehavior2,
-        } = p2ObjectsAndBehaviors[1];
+        const { object: p2Object2, behavior: p2MultiplayerBehavior2 } =
+          p2ObjectsAndBehaviors[1];
         expect(p2Object1.getX()).to.be(142);
         expect(p2Object1.getY()).to.be(143);
         expect(p2Object2.getX()).to.be(0);
@@ -1842,10 +1812,8 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player after a bit (if not "reconciled" in the meantime)', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -1901,10 +1869,8 @@ describe('Multiplayer', () => {
     });
 
     it('deletes an instance owned by another player instantly if not belonging to an existing player', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -1991,12 +1957,11 @@ describe('Multiplayer', () => {
       expect(p2Objects.length).to.be(0);
       p2RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p2SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p2SpriteObject.getX()).to.be(142);
       expect(p2SpriteObject.getY()).to.be(143);
@@ -2013,12 +1978,11 @@ describe('Multiplayer', () => {
       expect(p3Objects.length).to.be(0);
       p3RuntimeScene.renderAndStep(1000 / 60);
 
-      const {
-        object: p3SpriteObject,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p3RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p3SpriteObject } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p3RuntimeScene,
+          'MySpriteObject'
+        )[0];
 
       expect(p3SpriteObject.getX()).to.be(142);
       expect(p3SpriteObject.getY()).to.be(143);
@@ -2032,12 +1996,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p2SpriteMultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p2SpriteMultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p2SpriteMultiplayerObjectBehavior.setPlayerObjectOwnership(2);
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -2047,12 +2010,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          behavior: p3SpriteMultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p3SpriteMultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         p3SpriteMultiplayerObjectBehavior.setPlayerObjectOwnership(3);
         p3RuntimeScene.renderAndStep(1000 / 60);
@@ -2064,24 +2026,22 @@ describe('Multiplayer', () => {
           playerNumber: 1,
           allConnectedPlayers,
         });
-        const {
-          behavior: p1SpriteMultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p1SpriteMultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(
           p1SpriteMultiplayerObjectBehavior.getPlayerObjectOwnership()
         ).to.be(0);
         p1RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          behavior: p1SpriteMultiplayerObjectBehaviorUpdated,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p1SpriteMultiplayerObjectBehaviorUpdated } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(
           p1SpriteMultiplayerObjectBehaviorUpdated.getPlayerObjectOwnership()
         ).to.be(2);
@@ -2102,12 +2062,11 @@ describe('Multiplayer', () => {
 
           p3RuntimeScene.renderAndStep(1000 / 60);
 
-          const {
-            behavior: p3SpriteMultiplayerObjectBehavior,
-          } = getObjectAndMultiplayerBehaviorsFromScene(
-            p3RuntimeScene,
-            'MySpriteObject'
-          )[0];
+          const { behavior: p3SpriteMultiplayerObjectBehavior } =
+            getObjectAndMultiplayerBehaviorsFromScene(
+              p3RuntimeScene,
+              'MySpriteObject'
+            )[0];
           expect(
             p3SpriteMultiplayerObjectBehavior.getPlayerObjectOwnership()
           ).to.be(3);
@@ -2127,12 +2086,11 @@ describe('Multiplayer', () => {
 
         p3RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          behavior: p3SpriteMultiplayerObjectBehavior,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p3RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { behavior: p3SpriteMultiplayerObjectBehavior } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p3RuntimeScene,
+            'MySpriteObject'
+          )[0];
         expect(
           p3SpriteMultiplayerObjectBehavior.getPlayerObjectOwnership()
         ).to.be(0);
@@ -2146,12 +2104,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
         p2SpriteObject.setX(242);
         p2SpriteObject.setY(243);
         p2RuntimeScene.renderAndStep(1000 / 60);
@@ -2165,12 +2122,11 @@ describe('Multiplayer', () => {
         });
         p1RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          object: p1SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
 
         expect(p1SpriteObject.getX()).to.be(242);
         expect(p1SpriteObject.getY()).to.be(243);
@@ -2202,10 +2158,8 @@ describe('Multiplayer', () => {
     });
 
     it('synchronizes object behaviors from the host to other players', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -2221,18 +2175,16 @@ describe('Multiplayer', () => {
 
       const p1RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p1RuntimeScene.createObject('MySpriteObject');
-      const {
-        object: p1SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p1RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p1SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p1RuntimeScene,
+          'MySpriteObject'
+        )[0];
       // Ensure dummy behavior is there.
       /** @type {gdjs.DummyRuntimeBehavior | null} */
       // @ts-ignore - We know this returns an DummyRuntimeBehavior
-      const p1DummyBehaviorOriginal = p1SpriteObjectOriginal.getBehavior(
-        'DummyBehavior'
-      );
+      const p1DummyBehaviorOriginal =
+        p1SpriteObjectOriginal.getBehavior('DummyBehavior');
       if (!p1DummyBehaviorOriginal) throw new Error('No dummy behavior found');
       expect(p1DummyBehaviorOriginal._activated).to.be(true);
 
@@ -2246,18 +2198,16 @@ describe('Multiplayer', () => {
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p2RuntimeScene.renderAndStep(1000 / 60);
-      const {
-        object: p2SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
       // Ensure dummy behavior is there.
       /** @type {gdjs.DummyRuntimeBehavior | null} */
       // @ts-ignore - We know this returns an DummyRuntimeBehavior
-      const p2DummyBehaviorOriginal = p2SpriteObjectOriginal.getBehavior(
-        'DummyBehavior'
-      );
+      const p2DummyBehaviorOriginal =
+        p2SpriteObjectOriginal.getBehavior('DummyBehavior');
       if (!p2DummyBehaviorOriginal) throw new Error('No dummy behavior found');
       expect(p2DummyBehaviorOriginal._activated).to.be(true);
 
@@ -2268,12 +2218,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
         /** @type {gdjs.DummyRuntimeBehavior | null} */
         // @ts-ignore - We know this returns an DummyRuntimeBehavior
         const p2DummyBehavior = p2SpriteObject.getBehavior('DummyBehavior');
@@ -2304,12 +2253,11 @@ describe('Multiplayer', () => {
         await delay(20);
         p2RuntimeScene.renderAndStep(1000 / 60);
 
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
         /** @type {gdjs.DummyRuntimeBehavior | null} */
         // @ts-ignore - We know this returns an DummyRuntimeBehavior
         const p2DummyBehavior = p2SpriteObject.getBehavior('DummyBehavior');
@@ -2324,12 +2272,11 @@ describe('Multiplayer', () => {
           allConnectedPlayers,
         });
 
-        const {
-          object: p1SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p1RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p1SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p1RuntimeScene,
+            'MySpriteObject'
+          )[0];
         /** @type {gdjs.DummyRuntimeBehavior | null} */
         // @ts-ignore - We know this returns an DummyRuntimeBehavior
         const p1DummyBehavior = p1SpriteObject.getBehavior('DummyBehavior');
@@ -2350,12 +2297,11 @@ describe('Multiplayer', () => {
         // As the object is not moving, it will not be synced a lot, so we need to wait a bit.
         await delay(20);
         p2RuntimeScene.renderAndStep(1000 / 60);
-        const {
-          object: p2SpriteObject,
-        } = getObjectAndMultiplayerBehaviorsFromScene(
-          p2RuntimeScene,
-          'MySpriteObject'
-        )[0];
+        const { object: p2SpriteObject } =
+          getObjectAndMultiplayerBehaviorsFromScene(
+            p2RuntimeScene,
+            'MySpriteObject'
+          )[0];
         /** @type {gdjs.DummyRuntimeBehavior | null} */
         // @ts-ignore - We know this returns an DummyRuntimeBehavior
         const p2DummyBehavior = p2SpriteObject.getBehavior('DummyBehavior');
@@ -2365,10 +2311,8 @@ describe('Multiplayer', () => {
     });
 
     it('does not synchronize object behaviors if defined as not synchronized', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -2394,9 +2338,8 @@ describe('Multiplayer', () => {
       // Ensure dummy behavior is there.
       /** @type {gdjs.DummyRuntimeBehavior | null} */
       // @ts-ignore - We know this returns an DummyRuntimeBehavior
-      const p1DummyBehaviorOriginal = p1SpriteObjectOriginal.getBehavior(
-        'DummyBehavior'
-      );
+      const p1DummyBehaviorOriginal =
+        p1SpriteObjectOriginal.getBehavior('DummyBehavior');
       if (!p1DummyBehaviorOriginal) throw new Error('No dummy behavior found');
       expect(p1DummyBehaviorOriginal._activated).to.be(true);
       // Deactivate it and mark it as not synchronized.
@@ -2416,18 +2359,16 @@ describe('Multiplayer', () => {
 
       const p2RuntimeScene = makeTestRuntimeSceneWithNetworkId();
       p2RuntimeScene.renderAndStep(1000 / 60);
-      const {
-        object: p2SpriteObjectOriginal,
-      } = getObjectAndMultiplayerBehaviorsFromScene(
-        p2RuntimeScene,
-        'MySpriteObject'
-      )[0];
+      const { object: p2SpriteObjectOriginal } =
+        getObjectAndMultiplayerBehaviorsFromScene(
+          p2RuntimeScene,
+          'MySpriteObject'
+        )[0];
       // Ensure dummy behavior is there.
       /** @type {gdjs.DummyRuntimeBehavior | null} */
       // @ts-ignore - We know this returns an DummyRuntimeBehavior
-      const p2DummyBehaviorOriginal = p2SpriteObjectOriginal.getBehavior(
-        'DummyBehavior'
-      );
+      const p2DummyBehaviorOriginal =
+        p2SpriteObjectOriginal.getBehavior('DummyBehavior');
       if (!p2DummyBehaviorOriginal) throw new Error('No dummy behavior found');
 
       // It is activated as it is not synchronized.
@@ -2450,10 +2391,8 @@ describe('Multiplayer', () => {
     };
 
     it('synchronizes scenes from the host to other players', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -2676,10 +2615,8 @@ describe('Multiplayer', () => {
 
   describe('Player joins and leaves', () => {
     it('detects a player leaving and send it to other players', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -2708,14 +2645,13 @@ describe('Multiplayer', () => {
         allConnectedPlayers: newConnectedPlayers,
       });
       runtimeScene.renderAndStep(1000 / 60);
-      const p2PlayersLeft = gdjs.multiplayerMessageManager.getPlayersWhoJustLeft();
+      const p2PlayersLeft =
+        gdjs.multiplayerMessageManager.getPlayersWhoJustLeft();
       expect(p2PlayersLeft).to.be.eql([2]);
     });
     it('detects a player joining and send it to other players', async () => {
-      const {
-        switchToPeer,
-        initiateGameWithPlayers,
-      } = createMultiplayerManagersMock();
+      const { switchToPeer, initiateGameWithPlayers } =
+        createMultiplayerManagersMock();
 
       const allConnectedPlayers = [
         { playerNumber: 1, peerId: 'player-1', isHost: true },
@@ -2754,7 +2690,8 @@ describe('Multiplayer', () => {
         allConnectedPlayers: newConnectedPlayers,
       });
       runtimeScene.renderAndStep(1000 / 60);
-      const p1PlayersJoined = gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
+      const p1PlayersJoined =
+        gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
       expect(p1PlayersJoined).to.be.eql([2]);
 
       // Player 3 also sees the player 2 joining.
@@ -2763,7 +2700,8 @@ describe('Multiplayer', () => {
         allConnectedPlayers: newConnectedPlayers,
       });
       runtimeScene.renderAndStep(1000 / 60);
-      const p3PlayersJoined = gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
+      const p3PlayersJoined =
+        gdjs.multiplayerMessageManager.getPlayersWhoJustJoined();
       expect(p3PlayersJoined).to.be.eql([2]);
     });
   });

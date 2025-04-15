@@ -1,5 +1,8 @@
 // @flow
-export const useSoftKeyboardBottomOffset = () => {
+
+type Props = {| useCumulatedValue: boolean |};
+
+export const useSoftKeyboardBottomOffset = (props?: Props) => {
   return 0;
 };
 

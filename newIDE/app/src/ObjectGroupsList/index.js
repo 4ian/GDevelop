@@ -326,9 +326,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const answer = await showConfirmation({
           title: t`Set as global group`,
-          message: t`Global elements help to manage objects across multiple scenes and it is recommended for the most used objects.
-          This action cannot be undone.
-          Do you want to set as global group?`,
+          message: t`Global elements help manage objects across multiple scenes and are recommended for frequently used objects. This action cannot be undone.
+
+            Do you want to set this as global group?`,
           confirmButtonLabel: t`Set as global`,
         });
         if (!answer) return;

@@ -69,7 +69,7 @@ module.exports = {
           _('Center Z position'),
           _('the Z position of the center of rotation'),
           _('the Z position of the center'),
-          _('Position/Center'),
+          _('Position ❯ Center'),
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D object'), '', false)
@@ -800,6 +800,20 @@ module.exports = {
         .markAsSimple()
         .setHidden()
         .setFunctionName('hasAnimationEnded');
+
+      object
+        .addScopedAction(
+          'SetCrossfadeDuration',
+          _('Set crossfade duration'),
+          _('Set the crossfade duration when switching to a new animation.'),
+          _('Set crossfade duration of _PARAM0_ to _PARAM1_ seconds'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Crossfade duration (in seconds)'), '', false)
+        .setFunctionName('setCrossfadeDuration');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
@@ -822,7 +836,8 @@ module.exports = {
         propertyName === 'bottomFaceResourceName' ||
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
         propertyName === 'facesOrientation' ||
-        propertyName === 'materialType'
+        propertyName === 'materialType' ||
+        propertyName === 'tint'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -902,6 +917,12 @@ module.exports = {
         .setLabel(_('Depth'))
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('tint')
+        .setValue(objectContent.tint || '255;255;255')
+        .setType('Color')
+        .setLabel(_('Tint'))
+        .setGroup(_('Texture'));
 
       objectProperties
         .getOrCreate('frontFaceResourceName')
@@ -1092,6 +1113,7 @@ module.exports = {
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
+      tint: '255;255;255',
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -1567,6 +1589,21 @@ module.exports = {
       )
       .addParameter('imageResource', _('Image'), '', false)
       .setFunctionName('setFaceResourceName');
+
+    object
+      .addScopedAction(
+        'SetTint',
+        _('Tint color'),
+        _('Change the tint of the cube.'),
+        _('Change the tint of _PARAM0_ to _PARAM1_'),
+        _('Effects'),
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('3D Cube'), 'Cube3DObject', false)
+      .addParameter('color', _('Tint'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -2062,6 +2099,10 @@ module.exports = {
       3: [1, 0],
     };
 
+    /**
+     * @param {*} objectConfiguration
+     * @returns {string | null}
+     */
     const getFirstVisibleFaceResourceName = (objectConfiguration) => {
       const object = gd.castObject(
         objectConfiguration,
@@ -2090,25 +2131,44 @@ module.exports = {
       return null;
     };
 
+    /** @type {THREE.MeshBasicMaterial | null} */
     let transparentMaterial = null;
+    /**
+     * @returns {THREE.MeshBasicMaterial}
+     */
     const getTransparentMaterial = () => {
-      if (!transparentMaterial)
-        transparentMaterial = new THREE.MeshBasicMaterial({
-          transparent: true,
-          opacity: 0,
-          // Set the alpha test to to ensure the faces behind are rendered
-          // (no "back face culling" that would still be done if alphaTest is not set).
-          alphaTest: 1,
-        });
-
-      return transparentMaterial;
+      if (transparentMaterial) {
+        return transparentMaterial;
+      }
+      const newTransparentMaterial = new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        // Set the alpha test to to ensure the faces behind are rendered
+        // (no "back face culling" that would still be done if alphaTest is not set).
+        alphaTest: 1,
+      });
+      transparentMaterial = newTransparentMaterial;
+      return newTransparentMaterial;
     };
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
       /** @type {number} */
+      _defaultWidth;
+      /** @type {number} */
+      _defaultHeight;
+      /** @type {number} */
+      _defaultDepth;
+      /** @type {number} */
       _centerX = 0;
       /** @type {number} */
       _centerY = 0;
+      /**
+       * The name of the resource that is rendered.
+       * If no face is visible, this will be null.
+       * @type {string | null | undefined}
+       */
+      _renderedResourceName = undefined;
+      _renderFallbackObject = false;
 
       constructor(
         project,
@@ -2124,11 +2184,6 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-
-        // Name of the resource that is rendered.
-        // If no face is visible, this will be null.
-        this._renderedResourceName = undefined;
-
         const object = gd.castObject(
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
@@ -2145,7 +2200,6 @@ module.exports = {
         this._pixiObject.addChild(this._pixiTexturedObject);
         this._pixiObject.addChild(this._pixiFallbackObject);
         this._pixiContainer.addChild(this._pixiObject);
-        this._renderFallbackObject = false;
         this.updateTexture();
       }
 
@@ -2160,9 +2214,10 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          objectConfiguration
-        );
+        const textureResourceName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            objectConfiguration
+          );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2174,18 +2229,20 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2308,6 +2365,17 @@ module.exports = {
     }
 
     class RenderedCube3DObject3DInstance extends Rendered3DInstance {
+      _defaultWidth = 1;
+      _defaultHeight = 1;
+      _defaultDepth = 1;
+      _faceResourceNames = new Array(6).fill(null);
+      _faceVisibilities = new Array(6).fill(null);
+      _shouldRepeatTextureOnFace = new Array(6).fill(null);
+      _facesOrientation = 'Y';
+      _backFaceUpThroughWhichAxisRotation = 'X';
+      _shouldUseTransparentTexture = false;
+      _tint = '';
+
       constructor(
         project,
         instance,
@@ -2324,20 +2392,8 @@ module.exports = {
           threeGroup,
           pixiResourcesLoader
         );
-
-        this._defaultWidth = 1;
-        this._defaultHeight = 1;
-        this._defaultDepth = 1;
-
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
-
-        this._faceResourceNames = new Array(6).fill(null);
-        this._faceVisibilities = new Array(6).fill(null);
-        this._shouldRepeatTextureOnFace = new Array(6).fill(null);
-        this._facesOrientation = 'Y';
-        this._backFaceUpThroughWhichAxisRotation = 'X';
-        this._shouldUseTransparentTexture = false;
 
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
@@ -2357,8 +2413,9 @@ module.exports = {
 
       async _updateThreeObjectMaterials() {
         const getFaceMaterial = async (project, faceIndex) => {
-          if (!this._faceVisibilities[faceIndex])
+          if (!this._faceVisibilities[faceIndex]) {
             return getTransparentMaterial();
+          }
 
           return await this._pixiResourcesLoader.getThreeMaterial(
             project,
@@ -2389,11 +2446,35 @@ module.exports = {
         this._updateTextureUvMapping();
       }
 
+      _updateTint() {
+        const tints = [];
+        const normalizedTint = objectsRenderingService
+          .hexNumberToRGBArray(
+            objectsRenderingService.rgbOrHexToHexNumber(this._tint)
+          )
+          .map((component) => component / 255);
+
+        for (
+          let i = 0;
+          i < this._threeObject.geometry.attributes.position.count;
+          i++
+        ) {
+          tints.push(...normalizedTint);
+        }
+
+        this._threeObject.geometry.setAttribute(
+          'color',
+          new THREE.BufferAttribute(new Float32Array(tints), 3)
+        );
+      }
+
       static _getResourceNameToDisplay(objectConfiguration) {
         return getFirstVisibleFaceResourceName(objectConfiguration);
       }
 
       updateThreeObject() {
+        /** @type {gdjs.Cube3DObjectData} */
+        //@ts-ignore This works because the properties are set to `content` in JavaScript.
         const object = gd.castObject(
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
@@ -2421,12 +2502,18 @@ module.exports = {
 
         let materialsDirty = false;
         let uvMappingDirty = false;
+        let tintDirty = false;
 
         const shouldUseTransparentTexture =
-          object.content.enableTextureTransparency;
+          object.content.enableTextureTransparency || false;
         if (this._shouldUseTransparentTexture !== shouldUseTransparentTexture) {
           this._shouldUseTransparentTexture = shouldUseTransparentTexture;
           materialsDirty = true;
+        }
+        const tint = object.content.tint || '255;255;255';
+        if (this._tint !== tint) {
+          this._tint = tint;
+          tintDirty = true;
         }
 
         const faceResourceNames = [
@@ -2471,12 +2558,12 @@ module.exports = {
         }
 
         const shouldRepeatTextureOnFace = [
-          object.content.frontFaceResourceRepeat,
-          object.content.backFaceResourceRepeat,
-          object.content.leftFaceResourceRepeat,
-          object.content.rightFaceResourceRepeat,
-          object.content.topFaceResourceRepeat,
-          object.content.bottomFaceResourceRepeat,
+          object.content.frontFaceResourceRepeat || false,
+          object.content.backFaceResourceRepeat || false,
+          object.content.leftFaceResourceRepeat || false,
+          object.content.rightFaceResourceRepeat || false,
+          object.content.topFaceResourceRepeat || false,
+          object.content.bottomFaceResourceRepeat || false,
         ];
         if (
           this._shouldRepeatTextureOnFace[0] !== shouldRepeatTextureOnFace[0] ||
@@ -2491,16 +2578,17 @@ module.exports = {
         }
 
         const backFaceUpThroughWhichAxisRotation =
-          object.content.backFaceUpThroughWhichAxisRotation;
+          object.content.backFaceUpThroughWhichAxisRotation || 'X';
         if (
           backFaceUpThroughWhichAxisRotation !==
           this._backFaceUpThroughWhichAxisRotation
         ) {
-          this._backFaceUpThroughWhichAxisRotation = backFaceUpThroughWhichAxisRotation;
+          this._backFaceUpThroughWhichAxisRotation =
+            backFaceUpThroughWhichAxisRotation;
           uvMappingDirty = true;
         }
 
-        const facesOrientation = object.content.facesOrientation;
+        const facesOrientation = object.content.facesOrientation || 'Y';
         if (facesOrientation !== this._facesOrientation) {
           this._facesOrientation = facesOrientation;
           uvMappingDirty = true;
@@ -2520,6 +2608,7 @@ module.exports = {
 
         if (materialsDirty) this._updateThreeObjectMaterials();
         if (uvMappingDirty) this._updateTextureUvMapping();
+        if (tintDirty) this._updateTint();
       }
 
       /**
@@ -2529,11 +2618,11 @@ module.exports = {
        * for the method to work.
        */
       _updateTextureUvMapping() {
+        /** @type {THREE.BufferAttribute} */
         // @ts-ignore - position is stored as a Float32BufferAttribute
-        /** @type {THREE.BufferAttribute} */
         const pos = this._threeObject.geometry.getAttribute('position');
-        // @ts-ignore - uv is stored as a Float32BufferAttribute
         /** @type {THREE.BufferAttribute} */
+        // @ts-ignore - uv is stored as a Float32BufferAttribute
         const uvMapping = this._threeObject.geometry.getAttribute('uv');
         const startIndex = 0;
         const endIndex = 23;
@@ -2552,9 +2641,10 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
-            materialIndexToFaceIndex[materialIndex]
-          ];
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2589,16 +2679,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                 }
               }
               break;
@@ -2628,16 +2715,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                   x = -x;
                   y = -y;
                 }
@@ -2786,6 +2870,19 @@ module.exports = {
     const epsilon = 1 / (1 << 16);
 
     class Model3DRendered2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _defaultWidth;
+      /** @type {number} */
+      _defaultHeight;
+      /** @type {number} */
+      _defaultDepth;
+
+      /** @type {[number, number, number] | null} */
+      _originPoint;
+      /** @type {[number, number, number] | null} */
+      _centerPoint;
+
+      /** @type {[number, number, number]} */
       _modelOriginPoint = [0, 0, 0];
 
       constructor(
@@ -3028,10 +3125,15 @@ module.exports = {
       }
     }
 
+    /**
+     * @param {[number, number, number] | null} point1
+     * @param {[number, number, number] | null} point2
+     * @returns {boolean}
+     */
     const isSamePoint = (point1, point2) => {
-      if (!point1 && !point2) return true;
-      if (point1 && !point2) return false;
-      if (!point1 && point2) return false;
+      if (!!point1 !== !!point2) return false;
+      // At this point || or && doesn't matter and the type checking prefer ||.
+      if (!point1 || !point2) return true;
       return (
         point1[0] === point2[0] &&
         point1[1] === point2[1] &&
@@ -3039,6 +3141,10 @@ module.exports = {
       );
     };
 
+    /**
+     * @param {string} location
+     * @returns {[number, number, number] | null}
+     */
     const getPointForLocation = (location) => {
       switch (location) {
         case 'ModelOrigin':
@@ -3057,7 +3163,26 @@ module.exports = {
     };
 
     class Model3DRendered3DInstance extends Rendered3DInstance {
+      _defaultWidth = 1;
+      _defaultHeight = 1;
+      _defaultDepth = 1;
+      _originalWidth = 1;
+      _originalHeight = 1;
+      _originalDepth = 1;
+      _rotationX = 0;
+      _rotationY = 0;
+      _rotationZ = 0;
+      _keepAspectRatio = false;
+      /** @type {[number, number, number] | null} */
+      _originPoint = null;
+      /** @type {[number, number, number] | null} */
+      _centerPoint = null;
+
+      /** @type {[number, number, number]} */
       _modelOriginPoint = [0, 0, 0];
+
+      /** @type {THREE.Object3D | null} */
+      _clonedModel3D = null;
 
       constructor(
         project,
@@ -3076,29 +3201,12 @@ module.exports = {
           pixiResourcesLoader
         );
 
-        this._defaultWidth = 1;
-        this._defaultHeight = 1;
-        this._defaultDepth = 1;
-        this._originalWidth = 1;
-        this._originalHeight = 1;
-        this._originalDepth = 1;
-        this._rotationX = 0;
-        this._rotationY = 0;
-        this._rotationZ = 0;
-        this._keepAspectRatio = false;
-
-        this._originPoint = null;
-        this._centerPoint = null;
-
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
 
         this._threeObject = new THREE.Group();
         this._threeObject.rotation.order = 'ZYX';
         this._threeGroup.add(this._threeObject);
-
-        this._threeModelGroup = null;
-        this._clonedModel3D = null;
       }
 
       getOriginX() {
@@ -3140,27 +3248,30 @@ module.exports = {
       }
 
       _updateDefaultTransformation() {
-        if (!this._clonedModel3D) return; // Model is not ready - nothing to do.
+        if (!this._clonedModel3D) {
+          // Model is not ready - nothing to do.
+          return;
+        }
 
         if (this._threeModelGroup) {
           // Remove any previous container as we will recreate it just below
           this._threeObject.clear();
         }
+
         // This group hold the rotation defined by properties.
         // Always restart from a new group to avoid miscomputing bounding boxes/sizes.
-        this._threeModelGroup = new THREE.Group();
-        this._threeModelGroup.rotation.order = 'ZYX';
-        this._threeModelGroup.add(this._clonedModel3D);
+        const threeModelGroup = new THREE.Group();
+        this._threeModelGroup = threeModelGroup;
+        threeModelGroup.rotation.order = 'ZYX';
+        threeModelGroup.add(this._clonedModel3D);
 
-        this._threeModelGroup.rotation.set(
+        threeModelGroup.rotation.set(
           (this._rotationX * Math.PI) / 180,
           (this._rotationY * Math.PI) / 180,
           (this._rotationZ * Math.PI) / 180
         );
-        this._threeModelGroup.updateMatrixWorld(true);
-        const boundingBox = new THREE.Box3().setFromObject(
-          this._threeModelGroup
-        );
+        threeModelGroup.updateMatrixWorld(true);
+        const boundingBox = new THREE.Box3().setFromObject(threeModelGroup);
 
         const shouldKeepModelOrigin = !this._originPoint;
         if (shouldKeepModelOrigin) {
@@ -3187,7 +3298,7 @@ module.exports = {
         // Center the model.
         const centerPoint = this._centerPoint;
         if (centerPoint) {
-          this._threeModelGroup.position.set(
+          threeModelGroup.position.set(
             -(boundingBox.min.x + modelWidth * centerPoint[0]),
             // The model is flipped on Y axis.
             -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
@@ -3196,8 +3307,8 @@ module.exports = {
         }
 
         // Rotate the model.
-        this._threeModelGroup.scale.set(1, 1, 1);
-        this._threeModelGroup.rotation.set(
+        threeModelGroup.scale.set(1, 1, 1);
+        threeModelGroup.rotation.set(
           (this._rotationX * Math.PI) / 180,
           (this._rotationY * Math.PI) / 180,
           (this._rotationZ * Math.PI) / 180
@@ -3212,8 +3323,8 @@ module.exports = {
         // Flip on Y because the Y axis is on the opposite side of direct basis.
         // It avoids models to be like a mirror refection.
         scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
-        this._threeModelGroup.updateMatrix();
-        this._threeModelGroup.applyMatrix4(scaleMatrix);
+        threeModelGroup.updateMatrix();
+        threeModelGroup.applyMatrix4(scaleMatrix);
 
         if (this._keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
@@ -3280,7 +3391,7 @@ module.exports = {
           this._defaultDepth = this._originalDepth;
         }
 
-        this._threeObject.add(this._threeModelGroup);
+        this._threeObject.add(threeModelGroup);
       }
 
       updateThreeObject() {

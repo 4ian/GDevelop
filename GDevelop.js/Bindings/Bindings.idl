@@ -364,7 +364,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface GroupVariableHelper {
+interface ObjectVariableHelper {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -2239,7 +2239,6 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
     [Const, Ref] DOMString GetIconUrl();
-    boolean IsBuiltin();
     [Const, Ref] DOMString GetNameSpace();
 
     [Ref] InstructionMetadata AddDuplicatedAction(
@@ -2513,14 +2512,23 @@ interface WholeProjectRefactorer {
     [Value] VariablesChangeset STATIC_ComputeChangesetForVariablesContainer(
       [Const, Ref] SerializerElement oldSerializedVariablesContainer,
       [Const, Ref] VariablesContainer newVariablesContainer);
-    void STATIC_ApplyRefactoringForVariablesContainer([Ref] Project project,
+    void STATIC_ApplyRefactoringForVariablesContainer(
+      [Ref] Project project,
       [Ref] VariablesContainer newVariablesContainer,
+      [Const, Ref] VariablesChangeset changeset,
+      [Const, Ref] SerializerElement originalSerializedVariables);
+      void STATIC_ApplyRefactoringForObjectVariablesContainer(
+      [Ref] Project project,
+      [Ref] VariablesContainer objectVariablesContainer,
+      [Ref] InitialInstancesContainer initialInstancesContainer,
+      [Const] DOMString objectName,
       [Const, Ref] VariablesChangeset changeset,
       [Const, Ref] SerializerElement originalSerializedVariables);
     void STATIC_ApplyRefactoringForGroupVariablesContainer(
       [Ref] Project project,
       [Ref] ObjectsContainer globalObjectsContainer,
       [Ref] ObjectsContainer objectsContainer,
+      [Ref] InitialInstancesContainer initialInstancesContainer,
       [Const, Ref] VariablesContainer groupVariablesContainer,
       [Const, Ref] ObjectGroup objectGroup,
       [Const, Ref] VariablesChangeset changeset,
@@ -2787,6 +2795,13 @@ interface WholeProjectRefactorer {
     [Value] SetString STATIC_FindAllLeaderboardIds([Ref] Project project);
 };
 
+interface ObjectTools {
+    boolean STATIC_IsBehaviorCompatibleWithObject(
+        [Const, Ref] Platform platform,
+        [Const] DOMString objectType,
+        [Const] DOMString behaviorType);
+};
+
 interface EventsBasedObjectDependencyFinder {
   boolean STATIC_IsDependentFromEventsBasedObject(
     [Const, Ref] Project project,
@@ -2808,6 +2823,10 @@ interface UsedExtensionsResult {
 
 interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
+};
+
+interface ExampleExtensionUsagesFinder {
+  [Value] SetString STATIC_GetUsedExtensions([Ref] Project project);
 };
 
 interface InstructionsCountEvaluator {
@@ -2865,7 +2884,9 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
 
     boolean STATIC_IsBadExpressionMetadata([Const, Ref] ExpressionMetadata metadata);
+    boolean STATIC_IsBadInstructionMetadata([Const, Ref] InstructionMetadata metadata);
     boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
+    boolean STATIC_IsBadObjectMetadata([Const, Ref] ObjectMetadata metadata);
 };
 
 enum ProjectDiagnostic_ErrorType {
@@ -3877,6 +3898,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions UseWebsocketDebuggerClientWithServerAddress([Const] DOMString address, [Const] DOMString port);
     [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
     [Ref] PreviewExportOptions UseMinimalDebuggerClient();
+    [Ref] PreviewExportOptions SetInAppTutorialMessageInPreview([Const] DOMString message, [Const] DOMString position);
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] PreviewExportOptions SetAuthenticatedPlayer([Const] DOMString playerId, [Const] DOMString playerUsername, [Const] DOMString playerToken);

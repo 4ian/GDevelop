@@ -47,6 +47,7 @@ import {
   notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
   getCustomObjectEditor,
+  hasEditorTabOpenedWithKey,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -56,6 +57,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
+import { renderAskAiContainer } from './EditorContainers/AskAi';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
@@ -199,6 +201,9 @@ import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import { EmbeddedGameFrame } from '../EmbeddedGame/EmbeddedGameFrame';
+import RobotIcon from '../ProjectCreation/RobotIcon';
+import PublicProfileContext from '../Profile/PublicProfileContext';
+import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -216,6 +221,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'ask-ai': renderAskAiContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -258,6 +264,21 @@ const isCurrentProjectFresh = (
 ) =>
   currentProjectRef.current &&
   currentProject.ptr === currentProjectRef.current.ptr;
+
+/**
+ * When a project is created or opened, the fileMetadata is not aware of some project
+ * properties like the projectUuid or the name, until the project is deserialized.
+ * This function returns a new fileMetadata with the latest project properties,
+ * allowing the editor to have the latest information.
+ */
+const updateFileMetadataWithOpenedProject = (
+  fileMetadata: FileMetadata,
+  project: gdProject
+) => ({
+  ...fileMetadata,
+  gameId: project.getProjectUuid(),
+  name: project.getName(),
+});
 
 export type State = {|
   currentProject: ?gdProject,
@@ -332,6 +353,10 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
+  const [
+    tabsTitleBarAndEditorToolbarHidden,
+    setTabsTitleBarAndEditorToolbarHidden,
+  ] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -473,8 +498,6 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
-  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer();
-
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -526,6 +549,11 @@ const MainFrame = (props: Props) => {
     getHotReloadPreviewLaunchCaptureOptions,
   } = useCapturesManager({ project: currentProject, gamesList });
 
+  const { getAuthenticatedPlayerForPreview } = useAuthenticatedPlayer({
+    project: currentProject,
+    gamesList,
+  });
+
   /**
    * This reference is useful to get the current opened project,
    * even in the callback of a hook/promise - without risking to read "stale" data.
@@ -555,6 +583,8 @@ const MainFrame = (props: Props) => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'ask-ai'
+          ? i18n._(t`Ask AI`)
           : kind === 'start page'
           ? undefined
           : kind === 'debugger'
@@ -612,6 +642,8 @@ const MainFrame = (props: Props) => {
         ) : kind === 'events functions extension' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
+        ) : kind === 'ask-ai' ? (
+          <RobotIcon size={16} />
         ) : null;
 
       // Scene editors can have an embedded game, so they redefine manually
@@ -763,8 +795,12 @@ const MainFrame = (props: Props) => {
     // dialog is closed after a language change. We then reload GDevelop
     // extensions so that they declare all objects/actions/condition/etc...
     // using the new language.
+    console.info('Language changed, reloading extensions...');
     gd.MeasurementUnit.applyTranslation();
     gd.JsPlatform.get().reloadBuiltinExtensions();
+    eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+      currentProject
+    );
     _loadExtensions().catch(() => {});
   };
 
@@ -862,7 +898,11 @@ const MainFrame = (props: Props) => {
 
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
-      if (fileMetadata) {
+      let updatedFileMetadata: ?FileMetadata = fileMetadata
+        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
+        : null;
+
+      if (updatedFileMetadata) {
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
           storageProvider
@@ -875,11 +915,7 @@ const MainFrame = (props: Props) => {
         // (like locally or on Google Drive).
         if (onSaveProject) {
           preferences.insertRecentProjectFile({
-            fileMetadata: {
-              ...fileMetadata,
-              name: project.getName(),
-              gameId: project.getProjectUuid(),
-            },
+            fileMetadata: updatedFileMetadata,
             storageProviderName: storageProvider.internalName,
           });
         }
@@ -896,7 +932,7 @@ const MainFrame = (props: Props) => {
       const state = await setState(state => ({
         ...state,
         currentProject: project,
-        currentFileMetadata: fileMetadata,
+        currentFileMetadata: updatedFileMetadata,
       }));
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
@@ -905,8 +941,8 @@ const MainFrame = (props: Props) => {
         project
       );
 
-      if (fileMetadata) {
-        project.setProjectFile(fileMetadata.fileIdentifier);
+      if (updatedFileMetadata) {
+        project.setProjectFile(updatedFileMetadata.fileIdentifier);
 
         const storageProvider = getStorageProvider();
         const storageProviderOperations = getStorageProviderOperations(
@@ -923,7 +959,7 @@ const MainFrame = (props: Props) => {
         // See `ResourceFetcher` for all the cases.
         await ensureResourcesAreFetched(() => ({
           project,
-          fileMetadata,
+          fileMetadata: updatedFileMetadata,
           storageProvider,
           storageProviderOperations,
           authenticatedUser,
@@ -1092,7 +1128,7 @@ const MainFrame = (props: Props) => {
           );
           return state;
         } finally {
-          sealUnsavedChanges({ setCheckpointTime: true });
+          sealUnsavedChanges();
           serializedProject.delete();
         }
       } catch (error) {
@@ -1146,11 +1182,10 @@ const MainFrame = (props: Props) => {
       // it can have been updated in the meantime (gameId, project name, etc...).
       // Use the ref here to be sure to have the latest file metadata.
       if (currentFileMetadataRef.current) {
-        const newFileMetadata: FileMetadata = {
-          ...currentFileMetadataRef.current,
-          name: project.getName(),
-          gameId: project.getProjectUuid(),
-        };
+        const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
+          currentFileMetadataRef.current,
+          project
+        );
         setState(state => ({
           ...state,
           currentFileMetadata: newFileMetadata,
@@ -1212,6 +1247,18 @@ const MainFrame = (props: Props) => {
     createProjectFromPrivateGameTemplate,
     createProjectFromAIGeneration,
     storageProviders: props.storageProviders,
+  });
+
+  const onOpenProfileDialog = React.useCallback(
+    () => {
+      openProfileDialog(true);
+    },
+    [openProfileDialog]
+  );
+
+  const gamesPlatformFrameTools = useGamesPlatformFrame({
+    fetchAndOpenNewProjectSetupDialogForExample,
+    onOpenProfileDialog,
   });
 
   const closeApp = React.useCallback((): void => {
@@ -1358,6 +1405,19 @@ const MainFrame = (props: Props) => {
         currentProject
       );
     });
+  };
+
+  const onExtensionInstalled = (extensionName: string) => {
+    // TODO Open the closed tabs back
+    // It would be safer to close the tabs before the extension is installed
+    // but it would make opening them back more complicated.
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsFunctionsExtensionTabs(
+        state.editorTabs,
+        extensionName
+      ),
+    }));
   };
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -1652,9 +1712,7 @@ const MainFrame = (props: Props) => {
           }
         : null;
 
-      const authenticatedPlayer = await getAuthenticatedPlayerForPreview(
-        currentProject
-      );
+      const authenticatedPlayer = await getAuthenticatedPlayerForPreview();
 
       const captureOptions = await createCaptureOptionsForPreview(
         launchCaptureOptions
@@ -1664,6 +1722,12 @@ const MainFrame = (props: Props) => {
         await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         const startTime = Date.now();
+        let inAppTutorialMessageInPreview = { message: '', position: '' };
+        if (inAppTutorialOrchestratorRef.current) {
+          inAppTutorialMessageInPreview =
+            inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
+            inAppTutorialMessageInPreview;
+        }
         await previewLauncher.launchPreview({
           project: currentProject,
           // TODO: replace by scene name and external layout name
@@ -1679,6 +1743,9 @@ const MainFrame = (props: Props) => {
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
+          inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
+          inAppTutorialMessagePositionInPreview:
+            inAppTutorialMessageInPreview.position,
           captureOptions,
           onCaptureFinished,
         });
@@ -1971,6 +2038,19 @@ const MainFrame = (props: Props) => {
         editorTabs: openEditorTab(
           state.editorTabs,
           getEditorOpeningOptions({ kind: 'start page', name: '' })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
+  const openAskAi = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
         ),
       }));
     },
@@ -2278,7 +2358,7 @@ const MainFrame = (props: Props) => {
       );
     }
 
-    extension.insertEventsFunction(eventsFunction, 0);
+    extension.getEventsFunctions().insertEventsFunction(eventsFunction, 0);
     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
       currentProject
     );
@@ -2667,7 +2747,13 @@ const MainFrame = (props: Props) => {
               oldStorageProvider.internalName !== 'UrlStorageProvider',
           });
           if (!saveAsLocation) {
-            return; // Save as was cancelled.
+            // Save as was cancelled.
+            // Restore former storage provider. This is useful in case a user
+            // cancels the "save as" operation and then saves again. If the
+            // storage provider was kept selected, it would directly save the project
+            // if it's possible (LocalFile storage provider allows it).
+            getStorageProviderOperations(oldStorageProvider);
+            return;
           }
           newSaveAsLocation = saveAsLocation;
           newSaveAsOptions = saveAsOptions;
@@ -2730,7 +2816,7 @@ const MainFrame = (props: Props) => {
           return;
         }
 
-        sealUnsavedChanges({ setCheckpointTime: true });
+        sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
         setCloudProjectRecoveryOpenedVersionId(null);
@@ -2975,7 +3061,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          sealUnsavedChanges({ setCheckpointTime: true });
+          sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (error) {
@@ -3134,7 +3220,8 @@ const MainFrame = (props: Props) => {
 
   useOpenInitialDialog({
     openInAppTutorialDialog: selectInAppTutorial,
-    openProfileDialog,
+    openProfileDialog: onOpenProfileDialog,
+    openAskAi,
   });
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -3148,7 +3235,7 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (fileMetadataNewAttributes) {
-        sealUnsavedChanges({ setCheckpointTime: true });
+        sealUnsavedChanges();
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }
@@ -3376,7 +3463,11 @@ const MainFrame = (props: Props) => {
         initialStepIndex,
         initialProjectData,
       });
-      sendInAppTutorialStarted({ tutorialId, scenario });
+      sendInAppTutorialStarted({
+        tutorialId,
+        scenario,
+        isUIRestricted: !!selectedInAppTutorialShortHeader.shouldRestrictUI,
+      });
       setSelectedInAppTutorialInfo(null);
     },
     [
@@ -3436,6 +3527,10 @@ const MainFrame = (props: Props) => {
       commandPaletteRef.current.open();
     }
   }, []);
+
+  const {
+    configureNewProjectActions: configureNewProjectActionsForProfile,
+  } = React.useContext(PublicProfileContext);
 
   React.useEffect(
     () => {
@@ -3504,6 +3599,10 @@ const MainFrame = (props: Props) => {
                 fileMetadataAndStorageProviderName
               );
           }
+
+          configureNewProjectActionsForProfile({
+            fetchAndOpenNewProjectSetupDialogForExample,
+          });
         })
         .catch(() => {
           /* Ignore errors */
@@ -3547,7 +3646,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: onOpenProfileDialog,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3571,15 +3670,20 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const hideAskAi =
+    !!authenticatedUser.limits &&
+    !!authenticatedUser.limits.capabilities.classrooms &&
+    authenticatedUser.limits.capabilities.classrooms.hideAskAi;
   const showLoader = isProjectOpening || isLoadingProject || previewLoading;
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
     canSaveProjectAs,
-    recentProjectFiles: preferences.getRecentProjectFiles(),
+    recentProjectFiles: preferences.getRecentProjectFiles({ limit: 20 }),
     shortcutMap,
     isApplicationTopLevelMenu: false,
+    hideAskAi,
   };
   const mainMenuCallbacks = {
     onChooseProject: () => openOpenFromStorageProviderDialog(),
@@ -3598,7 +3702,8 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: () => openProfileDialog(true),
+    onOpenProfile: onOpenProfileDialog,
+    onOpenAskAi: openAskAi,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3608,6 +3713,7 @@ const MainFrame = (props: Props) => {
     !!state.currentProject &&
     !isSavingProject &&
     (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
+  const hasAskAiOpened = hasEditorTabOpenedWithKey(state.editorTabs, 'ask-ai');
 
   return (
     <div
@@ -3691,6 +3797,7 @@ const MainFrame = (props: Props) => {
               currentProject
             );
           }}
+          onExtensionInstalled={onExtensionInstalled}
           onShareProject={() => openShareDialog()}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
@@ -3702,26 +3809,47 @@ const MainFrame = (props: Props) => {
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>
-      <TabsTitlebar toggleProjectManager={toggleProjectManager}>
-        <DraggableEditorTabs
-          hideLabels={false}
-          editorTabs={state.editorTabs}
-          onClickTab={(id: number) => _onChangeEditorTab(id)}
-          onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-          onCloseOtherTabs={(editorTab: EditorTab) =>
-            _onCloseOtherEditorTabs(editorTab)
-          }
-          onCloseAll={_onCloseAllEditorTabs}
-          onTabActivated={(editorTab: EditorTab) =>
-            _onEditorTabActivated(editorTab)
-          }
-          onDropTab={onDropEditorTab}
-        />
-      </TabsTitlebar>
+      <TabsTitlebar
+        hidden={tabsTitleBarAndEditorToolbarHidden}
+        toggleProjectManager={toggleProjectManager}
+        renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
+          <DraggableEditorTabs
+            hideLabels={false}
+            editorTabs={state.editorTabs}
+            onClickTab={(id: number) => _onChangeEditorTab(id)}
+            onCloseTab={(editorTab: EditorTab) => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseEditorTab(editorTab);
+            }}
+            onCloseOtherTabs={(editorTab: EditorTab) => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseOtherEditorTabs(editorTab);
+            }}
+            onCloseAll={() => {
+              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+              onEditorTabClosing();
+              _onCloseAllEditorTabs();
+            }}
+            onTabActivated={(editorTab: EditorTab) =>
+              _onEditorTabActivated(editorTab)
+            }
+            onDropTab={onDropEditorTab}
+            onHoverTab={(
+              editorTab: ?EditorTab,
+              options: {| isLabelTruncated: boolean |}
+            ) => onEditorTabHovered(editorTab, options)}
+          />
+        )}
+        hasAskAiOpened={hasAskAiOpened}
+        onOpenAskAi={openAskAi}
+      />
       <Toolbar
         ref={toolbar}
+        hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
-          !['start page', 'debugger', null].includes(
+          !['start page', 'debugger', 'ask-ai', null].includes(
             getCurrentTab(state.editorTabs)
               ? getCurrentTab(state.editorTabs).key
               : null
@@ -3755,6 +3883,9 @@ const MainFrame = (props: Props) => {
         onQuitVersionHistory={onQuitVersionHistory}
         canQuitVersionHistory={!isSavingProject}
       />
+      {// Render games platform frame before the editors, so the editor have priority
+      // in what to display (ex: Loader of play section)
+      gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
         gameId={
           state.currentProject ? state.currentProject.getProjectUuid() : ''
@@ -3768,7 +3899,12 @@ const MainFrame = (props: Props) => {
             <TabContentContainer
               key={editorTab.key}
               active={isCurrentTab}
-              removePointerEvents={editorTab.removePointerEvents}
+              // Deactivate pointer events when the play tab is active, so the iframe
+              // can be interacted with.
+              removePointerEvents={
+                gamesPlatformFrameTools.iframeVisible ||
+                editorTab.removePointerEvents
+              }
             >
               <CommandsContextScopedProvider active={isCurrentTab}>
                 <ErrorBoundary
@@ -3784,6 +3920,7 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
+                    hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,
@@ -3842,7 +3979,7 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     onCreateProjectFromExample: createProjectFromExample,
-                    onOpenProfile: () => openProfileDialog(true),
+                    onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3889,7 +4026,9 @@ const MainFrame = (props: Props) => {
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    onExtensionInstalled: onExtensionInstalled,
                     gamesList,
+                    gamesPlatformFrameTools,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -3949,8 +4088,12 @@ const MainFrame = (props: Props) => {
         />
       )}
       {profileDialogOpen && (
+        // ProfileDialog is dependent on multiple contexts,
+        // which are dependent of AuthenticatedUserContext.
+        // So it cannot be moved inside the AuthenticatedUserProvider,
+        // otherwise, those contexts would not be correctly mounted,
+        // as they are defined after the AuthenticatedUserProvider in Providers.js.
         <ProfileDialog
-          open
           onClose={() => {
             openProfileDialog(false);
           }}
@@ -4080,6 +4223,8 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
+          quitInAppTutorialDialogOpen={quitInAppTutorialDialogOpen}
+          i18n={props.i18n}
           endTutorial={({
             shouldCloseProject,
             shouldWarnAboutUnsavedChanges,

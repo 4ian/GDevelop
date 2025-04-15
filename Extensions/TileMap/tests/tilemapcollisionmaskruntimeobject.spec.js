@@ -5,21 +5,21 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       resources: {
         resources: [
           {
-            file: 'base/tests-utils/simple-tiled-map/SmallTiledMap.json',
+            file: 'base/GDJS/tests/tests-utils/simple-tiled-map/SmallTiledMap.json',
             kind: 'json',
             metadata: '',
             name: 'SmallTiledMap.json',
             userAdded: true,
           },
           {
-            file: 'base/tests-utils/simple-tiled-map/FlippingTiledMap.json',
+            file: 'base/GDJS/tests/tests-utils/simple-tiled-map/FlippingTiledMap.json',
             kind: 'json',
             metadata: '',
             name: 'FlippingTiledMap.json',
             userAdded: true,
           },
           {
-            file: 'base/tests-utils/simple-tiled-map/MiniTiledSet.json',
+            file: 'base/GDJS/tests/tests-utils/simple-tiled-map/MiniTiledSet.json',
             kind: 'json',
             metadata: '',
             name: 'MiniTiledSet.json',

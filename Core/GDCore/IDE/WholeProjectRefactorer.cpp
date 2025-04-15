@@ -11,7 +11,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
-#include "GDCore/IDE/GroupVariableHelper.h"
+#include "GDCore/IDE/ObjectVariableHelper.h"
 #include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/EventBasedObjectBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
@@ -314,9 +314,16 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
   variablesContainer.SerializeTo(editedSerializedVariables);
   variablesContainer.UnserializeFrom(originalSerializedVariables);
 
-  // Rename and remove variables
+  // Rename variables
+  // Pass an empty set to avoid deletion of actions/conditions or events using
+  // them.
+  // While we support refactoring that would remove all references (actions,
+  // conditions...) it's both a bit dangerous for the user and we would need to
+  // show the user what will be removed before doing so. For now, just clear the
+  // removed variables so they don't trigger any refactoring.
+  std::unordered_set<gd::String> removedVariableNames;
   gd::EventsVariableReplacer eventsVariableReplacer(
-      project.GetCurrentPlatform(), changeset, changeset.removedVariableNames,
+      project.GetCurrentPlatform(), changeset, removedVariableNames,
       variablesContainer);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
@@ -333,9 +340,25 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
       project, eventsVariableInstructionTypeSwitcher);
 }
 
+// TODO Apply the refactor to external layouts.
+void WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
+    gd::Project &project, gd::VariablesContainer &objectVariablesContainer,
+    gd::InitialInstancesContainer &initialInstancesContainer,
+    const gd::String &objectName, const gd::VariablesChangeset &changeset,
+    const gd::SerializerElement &originalSerializedVariables) {
+  gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+      project, objectVariablesContainer, changeset,
+      originalSerializedVariables);
+
+  gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+      objectVariablesContainer, initialInstancesContainer, objectName,
+      changeset);
+}
+
 void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
     gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
     gd::ObjectsContainer &objectsContainer,
+    gd::InitialInstancesContainer &initialInstancesContainer,
     const gd::VariablesContainer &groupVariablesContainer,
     const gd::ObjectGroup &objectGroup,
     const gd::VariablesChangeset &changeset,
@@ -355,11 +378,15 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
     }
     auto &object = hasObject ? objectsContainer.GetObject(objectName)
                              : globalObjectsContainer.GetObject(objectName);
-    auto &variablesContainer = object.GetVariables();
+    auto &objectVariablesContainer = object.GetVariables();
+
+    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+      objectVariablesContainer, initialInstancesContainer, objectName,
+      changeset);
 
     gd::EventsVariableReplacer eventsVariableReplacer(
         project.GetCurrentPlatform(), changeset,
-        removedVariableNames, variablesContainer);
+        removedVariableNames, objectVariablesContainer);
     gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                   eventsVariableReplacer);
   }
@@ -372,12 +399,12 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                                                 eventsVariableReplacer);
 
   // Apply changes to objects.
-  gd::GroupVariableHelper::FillMissingGroupVariablesToObjects(
+  gd::ObjectVariableHelper::FillMissingGroupVariablesToObjects(
       globalObjectsContainer,
       objectsContainer,
       objectGroup,
       originalSerializedVariables);
-  gd::GroupVariableHelper::ApplyChangesToObjects(
+  gd::ObjectVariableHelper::ApplyChangesToObjects(
       globalObjectsContainer, objectsContainer, groupVariablesContainer,
       objectGroup, changeset);
 

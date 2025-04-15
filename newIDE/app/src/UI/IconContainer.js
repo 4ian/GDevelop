@@ -9,9 +9,8 @@ export const iconWithBackgroundStyle = {
 
 const styles = {
   iconBackground: {
-    flex: 0,
-    display: 'flex',
-    justifyContent: 'center',
+    display: 'inline',
+    textAlign: 'center',
   },
   icon: iconWithBackgroundStyle,
 };
@@ -29,7 +28,7 @@ type Props = {|
 export const IconContainer = ({ src, alt, size }: Props) => {
   const padding = size > 24 ? 4 : 2;
   return (
-    <div style={styles.iconBackground}>
+    <span style={styles.iconBackground}>
       <CorsAwareImage
         style={{
           ...styles.icon,
@@ -40,6 +39,6 @@ export const IconContainer = ({ src, alt, size }: Props) => {
         src={src}
         alt={alt}
       />
-    </div>
+    </span>
   );
 };

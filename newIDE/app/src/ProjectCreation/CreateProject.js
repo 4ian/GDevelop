@@ -112,16 +112,20 @@ export const createNewProjectFromPrivateGameTemplate = (
 export const createNewProjectFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
+  isQuickCustomization,
 }: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  isQuickCustomization?: boolean,
 |}): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
-      exampleSlug: exampleShortHeader.slug,
+      exampleSlug: `${isQuickCustomization ? 'qc-' : ''}${
+        exampleShortHeader.slug
+      }`,
     });
     const newProjectSource = getNewProjectSourceFromUrl(example.projectFileUrl);
     newProjectSource.templateSlug = exampleShortHeader.slug;

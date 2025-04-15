@@ -115,6 +115,7 @@ export class VectorString extends EmscriptenObject {
   at(index: number): string;
   set(index: number, str: string): void;
   clear(): void;
+  toJSArray(): Array<string>;
 }
 
 export class VectorPlatformExtension extends EmscriptenObject {
@@ -380,7 +381,7 @@ export class ObjectGroup extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
 }
 
-export class GroupVariableHelper extends EmscriptenObject {
+export class ObjectVariableHelper extends EmscriptenObject {
   static mergeVariableContainers(objectsContainersList: ObjectsContainersList, objectGroup: ObjectGroup): VariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
 }
@@ -1259,6 +1260,8 @@ export class SharedPtrSerializerElement extends EmscriptenObject {
 export class Serializer extends EmscriptenObject {
   static toJSON(element: SerializerElement): string;
   static fromJSON(json: string): SerializerElement;
+  static fromJSObject(object: Object): gdSerializerElement;
+  static toJSObject(element: gdSerializerElement): any;
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
@@ -1701,7 +1704,6 @@ export class PlatformExtension extends EmscriptenObject {
   getLicense(): string;
   getHelpPath(): string;
   getIconUrl(): string;
-  isBuiltin(): boolean;
   getNameSpace(): string;
   addDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
   addDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;
@@ -1924,7 +1926,8 @@ export class VariablesChangeset extends EmscriptenObject {
 export class WholeProjectRefactorer extends EmscriptenObject {
   static computeChangesetForVariablesContainer(oldSerializedVariablesContainer: SerializerElement, newVariablesContainer: VariablesContainer): VariablesChangeset;
   static applyRefactoringForVariablesContainer(project: Project, newVariablesContainer: VariablesContainer, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
-  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForObjectVariablesContainer(project: Project, objectVariablesContainer: VariablesContainer, initialInstancesContainer: InitialInstancesContainer, objectName: string, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
+  static applyRefactoringForGroupVariablesContainer(project: Project, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, initialInstancesContainer: InitialInstancesContainer, groupVariablesContainer: VariablesContainer, objectGroup: ObjectGroup, changeset: VariablesChangeset, originalSerializedVariables: SerializerElement): void;
   static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, sourceExtensionName: string): void;
@@ -1986,6 +1989,10 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static findAllLeaderboardIds(project: Project): SetString;
 }
 
+export class ObjectTools extends EmscriptenObject {
+  static isBehaviorCompatibleWithObject(platform: Platform, objectType: string, behaviorType: string): boolean;
+}
+
 export class EventsBasedObjectDependencyFinder extends EmscriptenObject {
   static isDependentFromEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, dependency: EventsBasedObject): boolean;
 }
@@ -2003,6 +2010,10 @@ export class UsedExtensionsResult extends EmscriptenObject {
 
 export class UsedExtensionsFinder extends EmscriptenObject {
   static scanProject(project: Project): UsedExtensionsResult;
+}
+
+export class ExampleExtensionUsagesFinder extends EmscriptenObject {
+  static getUsedExtensions(project: Project): SetString;
 }
 
 export class InstructionsCountEvaluator extends EmscriptenObject {
@@ -2058,7 +2069,9 @@ export class MetadataProvider extends EmscriptenObject {
   static getObjectStrExpressionMetadata(p: Platform, objectType: string, type: string): ExpressionMetadata;
   static getBehaviorStrExpressionMetadata(p: Platform, autoType: string, type: string): ExpressionMetadata;
   static isBadExpressionMetadata(metadata: ExpressionMetadata): boolean;
+  static isBadInstructionMetadata(metadata: InstructionMetadata): boolean;
   static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
+  static isBadObjectMetadata(metadata: ObjectMetadata): boolean;
 }
 
 export class ProjectDiagnostic extends EmscriptenObject {
@@ -2862,6 +2875,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
   useWindowMessageDebuggerClient(): PreviewExportOptions;
   useMinimalDebuggerClient(): PreviewExportOptions;
+  setInAppTutorialMessageInPreview(message: string, position: string): PreviewExportOptions;
   setLayoutName(layoutName: string): PreviewExportOptions;
   setFallbackAuthor(id: string, username: string): PreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): PreviewExportOptions;

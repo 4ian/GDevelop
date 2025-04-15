@@ -11,6 +11,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Drawer } from '@material-ui/core';
 import { isMobile } from '../../Utils/Platform';
+import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
@@ -82,6 +83,9 @@ const MaterialUIContextMenu = React.forwardRef<
             maxHeight: '80vh',
           },
         }}
+        style={{
+          zIndex: itemAboveBlockingLayerZIndex,
+        }}
       >
         {menuImplementation.buildFromTemplate(menuTemplate, forceUpdate)}
       </Drawer>
@@ -94,6 +98,9 @@ const MaterialUIContextMenu = React.forwardRef<
       anchorPosition={{
         left: anchorPosition[0],
         top: anchorPosition[1],
+      }}
+      style={{
+        zIndex: itemAboveBlockingLayerZIndex,
       }}
       anchorReference={'anchorPosition'}
       onClose={(event, reason) => {

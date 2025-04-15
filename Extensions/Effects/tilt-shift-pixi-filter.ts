@@ -16,7 +16,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        const tiltShiftFilter =
+          filter as unknown as PIXI.filters.TiltShiftFilter;
         if (parameterName === 'blur') {
           tiltShiftFilter.blur = value;
         } else if (parameterName === 'gradientBlur') {
@@ -24,7 +25,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        const tiltShiftFilter =
+          filter as unknown as PIXI.filters.TiltShiftFilter;
         if (parameterName === 'blur') {
           return tiltShiftFilter.blur;
         }
@@ -52,14 +54,16 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): TiltShiftFilterNetworkSyncData {
-        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        const tiltShiftFilter =
+          filter as unknown as PIXI.filters.TiltShiftFilter;
         return { b: tiltShiftFilter.blur, gb: tiltShiftFilter.gradientBlur };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: TiltShiftFilterNetworkSyncData
       ) {
-        const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+        const tiltShiftFilter =
+          filter as unknown as PIXI.filters.TiltShiftFilter;
         tiltShiftFilter.blur = data.b;
         tiltShiftFilter.gradientBlur = data.gb;
       }

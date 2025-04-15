@@ -30,7 +30,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       props.scope.eventsBasedBehavior || props.scope.eventsBasedObject;
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
-      : props.scope.eventsFunctionsExtension;
+      : props.scope.eventsFunctionsExtension
+      ? props.scope.eventsFunctionsExtension.getEventsFunctions()
+      : null;
     const parameters: Array<gdParameterMetadata> =
       props.scope.eventsFunction && functionsContainer
         ? enumerateParametersUsableInExpressions(

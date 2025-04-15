@@ -60,8 +60,6 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "pixi-spine": "4.0.4",
-    "pixi.js-legacy": "7.3.0",
     "posthog-js": "^1.57.2",
     "prop-types": "^15.5.10",
     "qr-creator": "^1.0.0",
@@ -95,17 +93,19 @@
     "three": "0.160.0",
     "url-search-params": "^1.0.2",
     "wavesurfer.js": "^7.8.6",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "pixi-spine": "4.0.4",
+    "pixi.js-legacy": "7.4.2"
   },
   "overrides": {
     "pixi-spine": {
-      "@pixi/assets": "7.3.0",
-      "@pixi/core": "7.3.0",
-      "@pixi/display": "7.3.0",
-      "@pixi/graphics": "7.3.0",
-      "@pixi/mesh": "7.3.0",
-      "@pixi/mesh-extras": "7.3.0",
-      "@pixi/sprite": "7.3.0"
+      "@pixi/assets": "7.4.2",
+      "@pixi/core": "7.4.2",
+      "@pixi/display": "7.4.2",
+      "@pixi/graphics": "7.4.2",
+      "@pixi/mesh": "7.4.2",
+      "@pixi/mesh-extras": "7.4.2",
+      "@pixi/sprite": "7.4.2"
     }
   },
   "scripts": {
@@ -131,7 +131,7 @@
     "reload-extensions": "node scripts/import-GDJS-Runtime.js --skip-clean",
     "build-theme-resources": "node scripts/build-theme-resources.js",
     "create-new-theme": "node scripts/create-new-theme.js",
-    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc"
+    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.5.228 b161dc74582e428a6d210cd1b74f052ca4aab301d0d522e0be87bdb4962d0fb7 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc"
   },
   "eslintConfig": {
     "extends": "react-app",

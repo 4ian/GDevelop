@@ -39,41 +39,48 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     }
   }
 
-  _loadCatalog = (language: string): Promise<Catalogs> => {
+  _loadCatalog = async (language: string): Promise<Catalogs> => {
     if (this.state.catalogs[language]) {
-      return Promise.resolve(this.state.catalogs);
+      return this.state.catalogs;
     }
 
-    return import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
-    `../../locales/${language.replace('-', '_')}/messages`).then(
-      catalog => {
-        return { ...this.state.catalogs, [language]: catalog };
-      },
-      (error: Error) => {
-        console.error('Error while loading language=' + language, error);
-        return this.state.catalogs;
-      }
-    );
+    try {
+      const languageFolder = language.replace('-', '_');
+      const [editorCatalog, extensionCatalog] = await Promise.all([
+        import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */ `../../locales/${languageFolder}/messages`),
+        import(/* webpackMode: "lazy", webpackChunkName: "extension-locales-[request]" */ `../../locales/${languageFolder}/extension-messages`),
+      ]);
+      const catalog = {
+        languageData: editorCatalog.languageData,
+        messages: {
+          ...extensionCatalog.messages,
+          ...editorCatalog.messages,
+        },
+      };
+      return { ...this.state.catalogs, [language]: catalog };
+    } catch (error) {
+      console.error('Error while loading language=' + language, error);
+      return this.state.catalogs;
+    }
   };
 
-  _loadLanguage(language: string) {
-    this._loadCatalog(language).then(catalogs => {
-      this.setState(
-        {
-          language,
+  async _loadLanguage(language: string) {
+    const catalogs = await this._loadCatalog(language);
+    this.setState(
+      {
+        language,
+        catalogs,
+        i18n: setupI18n({
+          language: language,
           catalogs,
-          i18n: setupI18n({
-            language: language,
-            catalogs,
-          }),
-        },
-        () => {
-          const { i18n } = this.state;
-          gd.getTranslation = getTranslationFunction(i18n);
-          console.info(`Loaded "${language}" language`);
-        }
-      );
-    });
+        }),
+      },
+      () => {
+        const { i18n } = this.state;
+        gd.getTranslation = getTranslationFunction(i18n);
+        console.info(`Loaded "${language}" language`);
+      }
+    );
   }
 
   render() {

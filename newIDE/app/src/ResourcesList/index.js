@@ -29,6 +29,29 @@ const styles = {
 };
 
 const getResourceName = (resource: gdResource) => resource.getName();
+export const getDefaultResourceThumbnail = (resource: gdResource) => {
+  switch (resource.getKind()) {
+    case 'audio':
+      return 'res/actions/music24.png';
+    case 'json':
+    case 'tilemap':
+    case 'tileset':
+    case 'spine':
+      return 'res/actions/fichier24.png';
+    case 'video':
+      return 'JsPlatform/Extensions/videoicon24.png';
+    case 'font':
+      return 'res/actions/font24.png';
+    case 'bitmapFont':
+      return 'JsPlatform/Extensions/bitmapfont32.png';
+    case 'model3D':
+      return 'JsPlatform/Extensions/3d_model.svg';
+    case 'javascript':
+      return 'res/javascript.svg';
+    default:
+      return 'res/unknown32.png';
+  }
+};
 
 type State = {|
   renamedResource: ?gdResource,
@@ -113,25 +136,8 @@ export default class ResourcesList extends React.Component<Props, State> {
           resource.getName(),
           {}
         );
-      case 'audio':
-        return 'res/actions/music24.png';
-      case 'json':
-      case 'tilemap':
-      case 'tileset':
-      case 'spine':
-        return 'res/actions/fichier24.png';
-      case 'video':
-        return 'JsPlatform/Extensions/videoicon24.png';
-      case 'font':
-        return 'res/actions/font24.png';
-      case 'bitmapFont':
-        return 'JsPlatform/Extensions/bitmapfont32.png';
-      case 'model3D':
-        return 'JsPlatform/Extensions/3d_model.svg';
-      case 'javascript':
-        return 'res/javascript.svg';
       default:
-        return 'res/unknown32.png';
+        return getDefaultResourceThumbnail(resource);
     }
   };
 

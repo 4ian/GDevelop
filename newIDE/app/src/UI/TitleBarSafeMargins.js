@@ -7,14 +7,12 @@ import optionalRequire from '../Utils/OptionalRequire';
 
 const electron = optionalRequire('electron');
 
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
-
 const titleBarStyles = {
   leftSideArea: {
     alignSelf: 'stretch',
     flexShrink: 0,
   },
-  rightSideArea: { alignSelf: 'stretch', flex: 1 },
+  rightSideArea: { alignSelf: 'stretch', flexShrink: 0 },
 };
 
 export const TitleBarLeftSafeMargins = ({
@@ -52,7 +50,6 @@ export const TitleBarLeftSafeMargins = ({
   if (leftSideOffset) {
     return (
       <div
-        className={DRAGGABLE_PART_CLASS_NAME}
         style={{
           ...titleBarStyles.leftSideArea,
           width: leftSideOffset,
@@ -69,10 +66,8 @@ export const TitleBarLeftSafeMargins = ({
 
 export const TitleBarRightSafeMargins = ({
   backgroundColor,
-  rightSideAdditionalOffsetToGiveSpaceToDrag,
 }: {|
   backgroundColor?: string,
-  rightSideAdditionalOffsetToGiveSpaceToDrag?: boolean,
 |}) => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
@@ -95,17 +90,13 @@ export const TitleBarRightSafeMargins = ({
     }
   }
 
-  const draggableMinWidth =
-    rightSideOffset + (rightSideAdditionalOffsetToGiveSpaceToDrag ? 30 : 0);
-
   // Always display this draggable area, as it will take the whole available space
   // in the title bar.
   return (
     <div
-      className={DRAGGABLE_PART_CLASS_NAME}
       style={{
         ...titleBarStyles.rightSideArea,
-        minWidth: draggableMinWidth,
+        minWidth: rightSideOffset,
         backgroundColor: backgroundColor || 'transparent',
       }}
     />

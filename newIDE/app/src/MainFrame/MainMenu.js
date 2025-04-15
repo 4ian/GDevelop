@@ -23,6 +23,7 @@ export type BuildMainMenuProps = {|
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   shortcutMap: ShortcutMap,
   isApplicationTopLevelMenu: boolean,
+  hideAskAi: boolean,
 |};
 
 export type MainMenuCallbacks = {|
@@ -45,6 +46,7 @@ export type MainMenuCallbacks = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
+  onOpenAskAi: (open?: boolean) => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
@@ -71,6 +73,7 @@ export type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
+  | 'main-menu-open-ask-ai'
   | 'update-status';
 
 const getMainMenuEventCallback = (
@@ -95,6 +98,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-preferences': callbacks.onOpenPreferences,
     'main-menu-open-language': callbacks.onOpenLanguage,
     'main-menu-open-profile': callbacks.onOpenProfile,
+    'main-menu-open-ask-ai': callbacks.onOpenAskAi,
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
@@ -108,6 +112,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   project,
   canSaveProjectAs,
   isApplicationTopLevelMenu,
+  hideAskAi,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
   const fileTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`File`),
@@ -254,6 +259,14 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`Help`),
     role: 'help',
     submenu: [
+      ...(hideAskAi
+        ? []
+        : [
+            {
+              label: i18n._(t`Ask AI (GDevelop chatbot)`),
+              onClickSendEvent: 'main-menu-open-ask-ai',
+            },
+          ]),
       {
         label: i18n._(t`GDevelop website`),
         onClickOpenLink: 'http://gdevelop.io',
@@ -316,7 +329,7 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       { type: 'separator' },
       {
-        label: i18n._(t`Help to Translate GDevelop`),
+        label: i18n._(t`Help translate GDevelop`),
         onClickOpenLink: 'https://crowdin.com/project/gdevelop',
       },
       {

@@ -373,7 +373,9 @@ const Instruction = (props: Props) => {
                   props.scope.eventsBasedObject;
                 const functionsContainer = eventsBasedEntity
                   ? eventsBasedEntity.getEventsFunctions()
-                  : props.scope.eventsFunctionsExtension;
+                  : props.scope.eventsFunctionsExtension
+                  ? props.scope.eventsFunctionsExtension.getEventsFunctions()
+                  : null;
 
                 if (functionsContainer) {
                   const allowedParameterTypes = parameterMetadata

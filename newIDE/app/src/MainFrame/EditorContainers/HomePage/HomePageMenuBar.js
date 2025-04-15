@@ -30,7 +30,7 @@ const iconButtonPadding = 4;
  */
 const iconButtonMarginBottom = 12;
 const iconButtonLabelSize = 20;
-const toolbarHeight =
+export const homepageMobileMenuHeight =
   iconSize +
   iconButtonLabelSize +
   2 * iconButtonPadding +
@@ -56,7 +56,7 @@ export const styles = {
   mobileContainer: {
     width: '100%',
     fontSize: iconSize,
-    height: toolbarHeight,
+    height: homepageMobileMenuHeight,
   },
   buttonContainer: {
     display: 'flex',
@@ -65,7 +65,7 @@ export const styles = {
     flex: 1,
   },
   bottomButtonsContainer: {
-    marginBottom: 'env(safe-area-inset-bottom)',
+    marginBottom: 'var(--safe-area-inset-bottom)',
   },
   mobileButton: {
     padding: iconButtonPadding,
@@ -133,7 +133,7 @@ const HomePageMenuBar = ({
           borderTop: `1px solid ${gdevelopTheme.home.separator.color}`,
         }}
       >
-        <Toolbar height={toolbarHeight}>
+        <Toolbar height={homepageMobileMenuHeight}>
           <ToolbarGroup spaceOut>
             {tabsToDisplay.map(({ label, tab, getIcon, id }) => {
               const isActive = activeTab === tab;
@@ -151,10 +151,10 @@ const HomePageMenuBar = ({
                       ? { color: gdevelopTheme.text.color.secondary }
                       : {}),
                   }}
+                  key={id}
                 >
                   <IconButton
                     color="inherit"
-                    key={id}
                     disableRipple
                     disableFocusRipple
                     disableHover

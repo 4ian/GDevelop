@@ -81,7 +81,8 @@ type Props = {|
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
     newProjectSetup: NewProjectSetup,
-    i18n: I18nType
+    i18n: I18nType,
+    isQuickCustomization?: boolean
   ) => Promise<void>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -166,8 +167,9 @@ const CreateSection = ({
     authenticatedUser
   );
   const allRecentProjectFiles = useProjectsListFor(null);
-  const hasAProjectOpenedOrSavedOrGameRegistered =
-    !!project || (!!games && games.length) || !!allRecentProjectFiles.length;
+  const savedGames = (games || []).filter(game => game.savedStatus !== 'draft');
+  const hasAProjectOpenedNowOrRecentlyOrGameSaved =
+    !!project || savedGames.length || !!allRecentProjectFiles.length;
   const hidePerformanceDashboard =
     !!limits &&
     !!limits.capabilities.classrooms &&
@@ -456,11 +458,12 @@ const CreateSection = ({
                 )
               : undefined
           }
+          showUrgentAnnouncements
         >
           <SectionRow expand>
             {!!profile || loginState === 'done' ? (
               <ColumnStackLayout noMargin>
-                {hidePerformanceDashboard ? null : hasAProjectOpenedOrSavedOrGameRegistered ? (
+                {hidePerformanceDashboard ? null : hasAProjectOpenedNowOrRecentlyOrGameSaved ? (
                   <ColumnStackLayout noMargin>
                     <Grid container spacing={2}>
                       <UserEarningsWidget
@@ -550,7 +553,8 @@ const CreateSection = ({
                         onCreateProjectFromExample(
                           exampleShortHeader,
                           newProjectSetup,
-                          i18n
+                          i18n,
+                          true // isQuickCustomization
                         );
                       }}
                       quickCustomizationRecommendation={
@@ -559,7 +563,7 @@ const CreateSection = ({
                     />
                   </ColumnStackLayout>
                 )}
-                {!hasAProjectOpenedOrSavedOrGameRegistered && (
+                {!hasAProjectOpenedNowOrRecentlyOrGameSaved && (
                   <ColumnStackLayout noMargin>
                     <Line noMargin justifyContent="space-between">
                       <Text size="block-title" noMargin>

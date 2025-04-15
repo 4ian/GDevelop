@@ -144,6 +144,7 @@ type ResponsiveLineStackLayoutProps = {|
   noColumnMargin?: boolean,
   /** Do not measure window width in case parent component is in smaller component */
   forceMobileLayout?: boolean,
+  noOverflowParent?: boolean,
   noResponsiveLandscape?: boolean,
   useLargeSpacer?: boolean,
   children: React.Node,
@@ -157,6 +158,7 @@ export const ResponsiveLineStackLayout = ({
   noMargin,
   noColumnMargin,
   forceMobileLayout,
+  noOverflowParent,
   noResponsiveLandscape,
   useLargeSpacer,
   children,
@@ -173,6 +175,7 @@ export const ResponsiveLineStackLayout = ({
       noMargin={noMargin || noColumnMargin}
       expand
       useLargeSpacer={useLargeSpacer}
+      noOverflowParent={noOverflowParent}
     >
       {children}
     </ColumnStackLayout>

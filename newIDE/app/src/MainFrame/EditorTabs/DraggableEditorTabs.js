@@ -17,6 +17,8 @@ import {
   type ClosableTabProps,
 } from '../../UI/ClosableTabs';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import useOnResize from '../../Utils/UseOnResize';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
   'draggable-closable-tab'
@@ -31,10 +33,16 @@ type DraggableEditorTabsProps = {|
   onCloseAll: () => void,
   onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
+  onHoverTab: (
+    editor: ?EditorTab,
+    options: {| isLabelTruncated: boolean |}
+  ) => void,
 |};
 
-const getTabId = (editorTab: EditorTab) =>
+export const getTabId = (editorTab: EditorTab) =>
   `tab-${editorTab.key.replace(/\s/g, '-')}`;
+
+const homeTabApproximateWidth = 35;
 
 export function DraggableEditorTabs({
   hideLabels,
@@ -45,8 +53,12 @@ export function DraggableEditorTabs({
   onCloseAll,
   onTabActivated,
   onDropTab,
+  onHoverTab,
 }: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
+
+  // Ensure the component is re-rendered when the window is resized.
+  useOnResize(useForceUpdate());
   const { windowSize } = useResponsiveWindowSize();
 
   const currentTab = getCurrentTab(editorTabs);
@@ -68,39 +80,61 @@ export function DraggableEditorTabs({
   );
 
   return (
-    <ClosableTabs hideLabels={hideLabels}>
-      {getEditors(editorTabs).map((editorTab, id) => {
-        const isCurrentTab = getCurrentTabIndex(editorTabs) === id;
-        return (
-          <DraggableClosableTab
-            index={id}
-            label={editorTab.label}
-            icon={editorTab.icon}
-            renderCustomIcon={editorTab.renderCustomIcon}
-            key={editorTab.key}
-            id={getTabId(editorTab)}
-            data={editorTab.tabOptions ? editorTab.tabOptions.data : undefined}
-            active={isCurrentTab}
-            onClick={() => onClickTab(id)}
-            onClose={() => onCloseTab(editorTab)}
-            onCloseOthers={() => onCloseOtherTabs(editorTab)}
-            onCloseAll={onCloseAll}
-            onActivated={() => onTabActivated(editorTab)}
-            closable={editorTab.closable}
-            onBeginDrag={() => {
-              draggedTabIndex = id;
-              return editorTab;
-            }}
-            onDrop={toHoveredIndex => {
-              if (typeof draggedTabIndex === 'number') {
-                onDropTab(draggedTabIndex, id);
-                draggedTabIndex = null;
+    <ClosableTabs
+      hideLabels={hideLabels}
+      renderTabs={({ containerWidth }) => {
+        const editors = getEditors(editorTabs);
+        return editors.map((editorTab, id) => {
+          const isCurrentTab = getCurrentTabIndex(editorTabs) === id;
+
+          // Maximum width of a tab is the width so that all tabs can fit it,
+          // unless on a small screen, where we want to avoid compressing tabs too much
+          // (and encourage scrolling instead).
+          const minimumMaxWidth = windowSize === 'small' ? 100 : 80;
+          const maxWidth = Math.max(
+            minimumMaxWidth,
+            // The home tab is special because it's just an icon.
+            (containerWidth - homeTabApproximateWidth) / (editors.length - 1)
+          );
+
+          return (
+            <DraggableClosableTab
+              index={id}
+              label={editorTab.label}
+              icon={editorTab.icon}
+              renderCustomIcon={editorTab.renderCustomIcon}
+              key={editorTab.key}
+              id={getTabId(editorTab)}
+              data={
+                editorTab.tabOptions ? editorTab.tabOptions.data : undefined
               }
-            }}
-          />
-        );
-      })}
-    </ClosableTabs>
+              active={isCurrentTab}
+              onClick={() => onClickTab(id)}
+              onClose={() => onCloseTab(editorTab)}
+              onCloseOthers={() => onCloseOtherTabs(editorTab)}
+              onCloseAll={onCloseAll}
+              onHover={(
+                enter: boolean,
+                options: {| isLabelTruncated: boolean |}
+              ) => onHoverTab(enter ? editorTab : null, options)}
+              onActivated={() => onTabActivated(editorTab)}
+              closable={editorTab.closable}
+              onBeginDrag={() => {
+                draggedTabIndex = id;
+                return editorTab;
+              }}
+              onDrop={toHoveredIndex => {
+                if (typeof draggedTabIndex === 'number') {
+                  onDropTab(draggedTabIndex, id);
+                  draggedTabIndex = null;
+                }
+              }}
+              maxWidth={maxWidth}
+            />
+          );
+        });
+      }}
+    />
   );
 }
 
@@ -127,6 +161,8 @@ export function DraggableClosableTab({
   onActivated,
   onBeginDrag,
   onDrop,
+  onHover,
+  maxWidth,
 }: DraggableClosableTabProps) {
   return (
     <ScreenTypeMeasurer>
@@ -164,7 +200,9 @@ export function DraggableClosableTab({
                   renderCustomIcon={renderCustomIcon}
                   closable={closable}
                   onClick={onClick}
+                  onHover={onHover}
                   onActivated={onActivated}
+                  maxWidth={maxWidth}
                   key={id}
                 />
                 {isOver && <ColumnDropIndicator />}

@@ -15,13 +15,13 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        const noiseFilter = filter as unknown as PIXI.NoiseFilter;
         if (parameterName === 'noise') {
           noiseFilter.noise = gdjs.PixiFiltersTools.clampValue(value, 0, 1);
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        const noiseFilter = filter as unknown as PIXI.NoiseFilter;
         if (parameterName === 'noise') {
           return noiseFilter.noise;
         }
@@ -46,14 +46,14 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): NoiseFilterNetworkSyncData {
-        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        const noiseFilter = filter as unknown as PIXI.NoiseFilter;
         return { n: noiseFilter.noise };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: NoiseFilterNetworkSyncData
       ) {
-        const noiseFilter = (filter as unknown) as PIXI.NoiseFilter;
+        const noiseFilter = filter as unknown as PIXI.NoiseFilter;
         noiseFilter.noise = data.n;
       }
     })()

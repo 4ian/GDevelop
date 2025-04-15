@@ -54,7 +54,7 @@ module.exports = {
       objectProperties
         .getOrCreate('text')
         .setValue(objectContent.text)
-        .setType('textarea')
+        .setType('multilinestring')
         .setLabel(_('Text'));
 
       objectProperties
@@ -65,6 +65,19 @@ module.exports = {
         .addExtraInfo('center')
         .addExtraInfo('right')
         .setLabel(_('Alignment'))
+        .setGroup(_('Appearance'));
+
+      if (!objectContent.verticalTextAlignment) {
+        objectContent.verticalTextAlignment = 'top';
+      }
+      objectProperties
+        .getOrCreate('verticalTextAlignment')
+        .setValue(objectContent.verticalTextAlignment)
+        .setType('choice')
+        .addExtraInfo('top')
+        .addExtraInfo('center')
+        .addExtraInfo('bottom')
+        .setLabel(_('Vertical alignment'))
         .setGroup(_('Appearance'));
 
       objectProperties
@@ -97,18 +110,10 @@ module.exports = {
         .setLabel(_('Font tint'))
         .setGroup(_('Font'));
 
-      objectProperties
-        .getOrCreate('wordWrap')
-        .setValue(objectContent.wordWrap ? 'true' : 'false')
-        .setType('boolean')
-        .setLabel(_('Word wrapping'))
-        .setGroup(_('Appearance'));
-
       return objectProperties;
     };
     bitmapTextObject.content = {
-      text:
-        'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+      text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
       opacity: 255,
       scale: 1,
       fontSize: 20,
@@ -116,7 +121,7 @@ module.exports = {
       bitmapFontResourceName: '',
       textureAtlasResourceName: '',
       align: 'left',
-      wordWrap: true,
+      verticalTextAlignment: 'top',
     };
 
     bitmapTextObject.updateInitialInstanceProperty = function (
@@ -342,7 +347,7 @@ module.exports = {
           _('Alignment ("left", "right" or "center")')
         )
       )
-      .setFunctionName('getAlignment');
+      .setFunctionName('getTextAlignment');
 
     object
       .addAction(
@@ -362,36 +367,36 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setFunctionName('setAlignment');
+      .setFunctionName('setTextAlignment');
 
     object
       .addCondition(
         'WordWrap',
-        _('Word wrap'),
-        _('Check if word wrap is enabled.'),
-        _('_PARAM0_ word wrap is enabled'),
+        _('Word wrapping'),
+        _('Check if word wrapping is enabled.'),
+        _('_PARAM0_ word wrapping is enabled'),
         '',
         'res/conditions/wordWrap24_black.png',
         'res/conditions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getWordWrap');
+      .setFunctionName('isWrapping');
 
     object
       .addAction(
         'SetWordWrap',
-        _('Word wrap'),
+        _('Word wrapping'),
         _('De/activate word wrapping.'),
-        _('Activate word wrap of _PARAM0_: _PARAM1_'),
+        _('Activate word wrapping of _PARAM0_: _PARAM1_'),
         '',
         'res/actions/wordWrap24_black.png',
         'res/actions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .addParameter('yesorno', _('Activate word wrap'), '', false)
+      .addParameter('yesorno', _('Activate word wrapping'), '', false)
       .getCodeExtraInformation()
-      .setFunctionName('setWordWrap');
+      .setFunctionName('setWrapping');
 
     object
       .addExpressionAndConditionAndAction(
@@ -665,9 +670,8 @@ module.exports = {
         this._pixiObject.align = align;
 
         const color = object.content.tint;
-        this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
-          color
-        );
+        this._pixiObject.tint =
+          objectsRenderingService.rgbOrHexToHexNumber(color);
 
         const scale = object.content.scale;
         this._pixiObject.scale.set(scale);
@@ -706,20 +710,46 @@ module.exports = {
         }
 
         // Set up the wrapping width if enabled.
-        const wordWrap = object.content.wordWrap;
-        if (wordWrap && this._instance.hasCustomSize()) {
-          this._pixiObject.maxWidth =
-            this.getCustomWidth() / this._pixiObject.scale.x;
-          this._pixiObject.dirty = true;
-        } else {
-          this._pixiObject.maxWidth = 0;
+        const oldMaxWidth = this._pixiObject.maxWidth;
+        this._pixiObject.maxWidth = this._instance.hasCustomSize()
+          ? this.getCustomWidth() / this._pixiObject.scale.x
+          : 0;
+        if (oldMaxWidth !== this._pixiObject.maxWidth) {
           this._pixiObject.dirty = true;
         }
 
-        this._pixiObject.position.x =
-          this._instance.getX() + (this._pixiObject.textWidth * scale) / 2;
+        if (this._instance.hasCustomSize()) {
+          const alignmentX =
+            object.content.align === 'right'
+              ? 1
+              : object.content.align === 'center'
+                ? 0.5
+                : 0;
+
+          const width = this.getCustomWidth();
+
+          // A vector from the custom size center to the renderer center.
+          const centerToCenterX =
+            (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+          this._pixiObject.position.x = this._instance.getX() + width / 2;
+          this._pixiObject.anchor.x =
+            0.5 - centerToCenterX / this._pixiObject.width;
+        } else {
+          this._pixiObject.position.x =
+            this._instance.getX() + this._pixiObject.width / 2;
+          this._pixiObject.anchor.x = 0.5;
+        }
+        const alignmentY =
+          object.content.verticalTextAlignment === 'bottom'
+            ? 1
+            : object.content.verticalTextAlignment === 'center'
+              ? 0.5
+              : 0;
         this._pixiObject.position.y =
-          this._instance.getY() + (this._pixiObject.textHeight * scale) / 2;
+          this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
+        this._pixiObject.anchor.y = 0.5;
+
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
@@ -740,18 +770,25 @@ module.exports = {
         releaseBitmapFont(fontName);
       }
 
-      /**
-       * Return the width of the instance, when it's not resized.
-       */
       getDefaultWidth() {
         return this._pixiObject.width;
       }
 
-      /**
-       * Return the height of the instance, when it's not resized.
-       */
       getDefaultHeight() {
         return this._pixiObject.height;
+      }
+
+      getOriginY() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const height = this.getHeight();
+        return object.content.verticalTextAlignment === 'bottom'
+          ? height
+          : object.content.verticalTextAlignment === 'center'
+            ? height / 2
+            : 0;
       }
     }
 

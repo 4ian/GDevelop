@@ -241,7 +241,7 @@ const useCreateProject = ({
           }
 
           onProjectSaved(fileMetadata);
-          unsavedChanges.sealUnsavedChanges({ setCheckpointTime: true });
+          unsavedChanges.sealUnsavedChanges();
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
             preferences.setHasProjectOpened(true);
           }
@@ -314,12 +314,14 @@ const useCreateProject = ({
     async (
       exampleShortHeader: ExampleShortHeader,
       newProjectSetup: NewProjectSetup,
-      i18n: I18nType
+      i18n: I18nType,
+      isQuickCustomization?: boolean
     ) => {
       beforeCreatingProject();
       const newProjectSource = await createNewProjectFromExampleShortHeader({
         i18n,
         exampleShortHeader,
+        isQuickCustomization,
       });
       await createProject(newProjectSource, newProjectSetup);
     },

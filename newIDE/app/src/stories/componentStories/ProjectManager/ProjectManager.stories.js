@@ -39,6 +39,7 @@ const mainMenuCallbacks = {
   onOpenPreferences: () => action('onOpenPreferences'),
   onOpenLanguage: () => action('onOpenLanguage'),
   onOpenProfile: () => action('onOpenProfile'),
+  onOpenAskAi: () => action('onOpenAskAi'),
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 
@@ -78,6 +79,7 @@ export const NoProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -98,6 +100,7 @@ export const NoProjectOpen = () => {
                     recentProjectFiles: [],
                     shortcutMap,
                     isApplicationTopLevelMenu: false,
+                    hideAskAi: false,
                   }}
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
@@ -146,6 +149,7 @@ export const ProjectOpen = () => {
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                   onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -166,6 +170,7 @@ export const ProjectOpen = () => {
                     recentProjectFiles: [],
                     shortcutMap,
                     isApplicationTopLevelMenu: false,
+                    hideAskAi: false,
                   }}
                   mainMenuCallbacks={mainMenuCallbacks}
                 />

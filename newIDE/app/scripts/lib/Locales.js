@@ -23,6 +23,7 @@ const getLocales = () => {
         locales
           .filter(name => name !== '.DS_Store')
           .filter(name => name !== 'LocalesMetadata.js')
+          .filter(name => name !== 'ExtensionLocalesMetadata.js')
           .filter(name => name !== '_build')
       );
     });

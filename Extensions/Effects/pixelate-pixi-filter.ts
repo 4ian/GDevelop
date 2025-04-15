@@ -21,15 +21,17 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
-          PixelateFilterExtra;
+        const pixelateFilter =
+          filter as unknown as PIXI.filters.PixelateFilter &
+            PixelateFilterExtra;
         if (parameterName === 'size') {
           pixelateFilter.size = value;
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
-          PixelateFilterExtra;
+        const pixelateFilter =
+          filter as unknown as PIXI.filters.PixelateFilter &
+            PixelateFilterExtra;
         if (parameterName === 'size') {
           return pixelateFilter.size;
         }
@@ -54,16 +56,18 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): PixelateFilterNetworkSyncData {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
-          PixelateFilterExtra;
+        const pixelateFilter =
+          filter as unknown as PIXI.filters.PixelateFilter &
+            PixelateFilterExtra;
         return { s: pixelateFilter.size };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: PixelateFilterNetworkSyncData
       ) {
-        const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter &
-          PixelateFilterExtra;
+        const pixelateFilter =
+          filter as unknown as PIXI.filters.PixelateFilter &
+            PixelateFilterExtra;
         pixelateFilter.size = data.s;
       }
     })()

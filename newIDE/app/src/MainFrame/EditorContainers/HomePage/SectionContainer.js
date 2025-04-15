@@ -10,6 +10,7 @@ import Paper from '../../../UI/Paper';
 import { LineStackLayout } from '../../../UI/Layout';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export const SECTION_DESKTOP_SPACING = 20;
 const SECTION_MOBILE_SPACING_TOP = 10;
@@ -118,12 +119,18 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
           : SECTION_DESKTOP_SPACING
         : 0,
     };
+    const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+    const shouldHideAnnouncements =
+      !!authenticatedUser.limits &&
+      !!authenticatedUser.limits.capabilities.classrooms &&
+      authenticatedUser.limits.capabilities.classrooms.hideAnnouncements;
 
     return (
       <Column expand useFullHeight noMargin>
         <Paper style={paperStyle} square background="dark" ref={ref}>
           <div style={childrenContainerStyle}>
-            {showUrgentAnnouncements && (
+            {showUrgentAnnouncements && !shouldHideAnnouncements && (
               <>
                 <AnnouncementsFeed canClose level="urgent" hideLoader />
                 {announcements && announcements.length > 0 && <Spacer />}

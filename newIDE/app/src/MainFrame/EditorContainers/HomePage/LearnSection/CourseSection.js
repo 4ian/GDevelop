@@ -173,7 +173,7 @@ const CourseSection = ({
             style={textEllipsisStyle}
             color={chapter.isLocked ? 'secondary' : 'primary'}
           >
-            {chapter.title}
+            {chapter.shortTitle || chapter.title}
           </Text>
         </Line>
         {chapter.isLocked ? (
@@ -330,7 +330,7 @@ const CourseSection = ({
                       style={styles.desktopTableOfContent}
                     >
                       <Text noMargin size="sub-title">
-                        Chapters
+                        <Trans>Chapters</Trans>
                       </Text>
                       {courseCompletion !== null && (
                         <Line noMargin>

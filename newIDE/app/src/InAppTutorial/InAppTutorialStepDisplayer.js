@@ -19,6 +19,10 @@ import {
 } from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
+import BlockingLayerWithHoles from './BlockingLayerWithHoles';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { instancesEditorId } from '../InstancesEditor';
+import { swipeableDrawerContainerId } from '../SceneEditor/SwipeableDrawerEditorsDisplay';
 
 const styles = {
   avatarContainer: {
@@ -135,7 +139,7 @@ type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
   goToFallbackStep: () => void,
-  endTutorial: () => void,
+  endTutorial: ({| reason: 'completed' | 'user-early-exit' |}) => void,
   progress: number,
   goToNextStep: () => void,
 |};
@@ -145,8 +149,9 @@ function InAppTutorialStepDisplayer({
     elementToHighlightId,
     tooltip,
     nextStepTrigger,
-    isOnClosableDialog,
     dialog,
+    interactsWithCanvas,
+    disableBlockingLayer,
   },
   expectedEditor,
   goToFallbackStep,
@@ -166,6 +171,7 @@ function InAppTutorialStepDisplayer({
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
   );
+  const [blockingLayerHoles, setBlockingLayerHoles] = React.useState([]);
 
   const defineAssistantImage = React.useCallback(node => {
     if (node) {
@@ -319,27 +325,87 @@ function InAppTutorialStepDisplayer({
     [nextStepTrigger, elementWithId]
   );
 
+  const anchorElement = tooltip
+    ? tooltip.standalone
+      ? assistantImage
+      : elementToHighlight || null
+    : null;
+  const activeCanvas = document.querySelector(
+    `#scene-editor[data-active=true] #${instancesEditorId}`
+  );
+  const swipeableDrawerContainer = document.querySelector(
+    `#${swipeableDrawerContainerId}`
+  );
+
+  const updateBlockingLayerVisibility = React.useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      let holes = [];
+      if (
+        anchorElement &&
+        !expectedEditor &&
+        !hideBehindPriorityElement &&
+        !disableBlockingLayer
+      ) {
+        const isIntersecting = entries[0].isIntersecting;
+        if (isIntersecting) {
+          if (elementToHighlight) {
+            holes.push(elementToHighlight);
+          }
+          if (tooltip && tooltip.standalone && assistantImage) {
+            holes.push(assistantImage);
+          }
+          if (interactsWithCanvas && activeCanvas) {
+            // If the swipeable drawer exists, we are on mobile and as the drawers are on top
+            // of the canvas, let's avoid creating holes as it will produce the opposite effect.
+            if (swipeableDrawerContainer) {
+              holes = [];
+            } else {
+              holes.push(activeCanvas);
+            }
+          }
+        }
+      }
+
+      setBlockingLayerHoles(holes);
+    },
+    [
+      anchorElement,
+      expectedEditor,
+      hideBehindPriorityElement,
+      activeCanvas,
+      interactsWithCanvas,
+      disableBlockingLayer,
+      elementToHighlight,
+      assistantImage,
+      tooltip,
+      swipeableDrawerContainer,
+    ]
+  );
+
+  useIsElementVisibleInScroll(anchorElement, updateBlockingLayerVisibility);
+
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor && !hideBehindPriorityElement) {
-      const anchorElement = tooltip.standalone
-        ? assistantImage
-        : elementToHighlight || null;
       if (!anchorElement) return null;
+
       return (
-        <InAppTutorialTooltipDisplayer
-          endTutorial={endTutorial}
-          showQuitButton={!isOnClosableDialog}
-          anchorElement={anchorElement}
-          tooltip={tooltip}
-          progress={progress}
-          goToNextStep={goToNextStep}
-          buttonLabel={
-            nextStepTrigger && nextStepTrigger.clickOnTooltipButton
-              ? nextStepTrigger.clickOnTooltipButton
-              : undefined
-          }
-          fillAutomatically={getFillAutomaticallyFunction()}
-        />
+        <>
+          <InAppTutorialTooltipDisplayer
+            endTutorial={endTutorial}
+            anchorElement={anchorElement}
+            tooltip={tooltip}
+            progress={progress}
+            goToNextStep={goToNextStep}
+            buttonLabel={
+              nextStepTrigger && nextStepTrigger.clickOnTooltipButton
+                ? nextStepTrigger.clickOnTooltipButton
+                : undefined
+            }
+            fillAutomatically={getFillAutomaticallyFunction()}
+            isBlockingLayerDisplayed={!!blockingLayerHoles.length}
+          />
+          <BlockingLayerWithHoles elements={blockingLayerHoles} />
+        </>
       );
     }
 
@@ -348,11 +414,12 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
-          showQuitButton // Always show the quit button when the user is on the wrong editor
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}
           goToNextStep={goToNextStep}
+          // No Blocking Layer when on the wrong editor.
+          isBlockingLayerDisplayed={false}
         />
       );
     }

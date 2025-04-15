@@ -31,7 +31,7 @@ namespace gdjs {
 void MetadataDeclarationHelper::DeclareExtension(
     gd::PlatformExtension &extension,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
-  gd::String fullName = eventsFunctionsExtension.GetFullName() ||
+  gd::String fullName = GetTranslation(eventsFunctionsExtension.GetFullName()) ||
                         eventsFunctionsExtension.GetName();
   extension
       .SetExtensionInformation(eventsFunctionsExtension.GetName(), fullName,
@@ -92,10 +92,11 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
       extension
           .AddBehavior(
               eventsBasedBehavior.GetName(),
-              eventsBasedBehavior.GetFullName() ||
+              GetTranslation(eventsBasedBehavior.GetFullName()) ||
                   eventsBasedBehavior.GetName(),
               eventsBasedBehavior.GetName(),
-              eventsBasedBehavior.GetDescription(), "",
+              GetTranslation(eventsBasedBehavior.GetDescription()),
+              "",
               GetExtensionIconUrl(extension), "",
               std::make_shared<gd::CustomBehavior>(
                   eventsBasedBehavior.GetName(), project,
@@ -124,9 +125,9 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
   auto &objectMetadata =
       extension
           .AddEventsBasedObject(eventsBasedObject.GetName(),
-                                eventsBasedObject.GetFullName() ||
+          GetTranslation(eventsBasedObject.GetFullName()) ||
                                     eventsBasedObject.GetName(),
-                                eventsBasedObject.GetDescription(),
+                                    GetTranslation(eventsBasedObject.GetDescription()),
                                 GetExtensionIconUrl(extension))
           // TODO Change the metadata model to only set a category on the
           // extension. If an extension has behavior or object across
@@ -456,8 +457,8 @@ MetadataDeclarationHelper::DeclareInstructionOrExpressionMetadata(
   }
 }
 
-const gd::String &MetadataDeclarationHelper::GetFullName(const gd::EventsFunction &eventsFunction) {
-  return eventsFunction.GetFullName() || eventsFunction.GetName();
+gd::String MetadataDeclarationHelper::GetFullName(const gd::EventsFunction &eventsFunction) {
+  return GetTranslation(eventsFunction.GetFullName()) || eventsFunction.GetName();
 };
 
 gd::String MetadataDeclarationHelper::GetDefaultSentence(
@@ -484,27 +485,27 @@ gd::String MetadataDeclarationHelper::GetDefaultSentence(
 };
 
 gd::String MetadataDeclarationHelper::GetFreeFunctionSentence(const gd::EventsFunction &eventsFunction) {
-  return eventsFunction.GetSentence().empty()
+  return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction, 0, 1)
-             : eventsFunction.GetSentence();
+             : GetTranslation(eventsFunction.GetSentence());
 };
 
 gd::String MetadataDeclarationHelper::GetBehaviorFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  return eventsFunction.GetSentence().empty()
+  return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 2 : 0, 0)
-             : eventsFunction.GetSentence();
+             : GetTranslation(eventsFunction.GetSentence());
 };
 
 gd::String MetadataDeclarationHelper::GetObjectFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  return eventsFunction.GetSentence().empty()
+  return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 1 : 0, 0)
-             : eventsFunction.GetSentence();
+             : GetTranslation(eventsFunction.GetSentence());
 };
 
 /**
@@ -572,7 +573,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     auto &condition = extension.AddCondition(
         eventsFunction.GetName(),
         GetFullName(eventsFunction),
-        eventsFunction.GetDescription() || GetFullName(eventsFunction),
+        GetTranslation(eventsFunction.GetDescription()) || GetFullName(eventsFunction),
         GetFreeFunctionSentence(eventsFunction), eventsFunction.GetGroup(),
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
@@ -625,7 +626,7 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     auto &action = extension.AddAction(
         eventsFunction.GetName(),
         GetFullName(eventsFunction),
-        eventsFunction.GetDescription() || GetFullName(eventsFunction),
+        GetTranslation(eventsFunction.GetDescription()) || GetFullName(eventsFunction),
         GetFreeFunctionSentence(eventsFunction), eventsFunction.GetGroup(),
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
@@ -1041,7 +1042,8 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     const int valueParameterIndex,
     std::function<gd::AbstractFunctionMetadata &(
         gd::AbstractFunctionMetadata &instructionOrExpression)>
-        addObjectAndBehaviorParameters) {
+        addObjectAndBehaviorParameters,
+    bool isSharedProperty) {
   auto &propertyType = property.GetType();
 
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
@@ -1058,6 +1060,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
     conditionMetadata.SetFunctionName(getterName);
+    if (!isSharedProperty) {
+      conditionMetadata.SetHidden();
+    }
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
@@ -1075,6 +1080,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
     setterActionMetadata
         .AddParameter("yesorno", _("New value to set"), "", false)
         .SetFunctionName(setterName);
+    if (!isSharedProperty) {
+      setterActionMetadata.SetHidden();
+    }
 
     auto &toggleActionMetadata = entityMetadata.AddScopedAction(
         toggleActionName, _("Toggle") + " " + propertyLabel,
@@ -1088,6 +1096,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
     toggleActionMetadata.SetFunctionName(toggleFunctionName);
+    if (!isSharedProperty) {
+      toggleActionMetadata.SetHidden();
+    }
   } else {
     auto typeExtraInfo = GetStringifiedExtraInfo(property);
     auto parameterOptions = gd::ParameterOptions::MakeNewOptions();
@@ -1111,6 +1122,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             parameterOptions)
         .SetFunctionName(setterName)
         .SetGetter(getterName);
+    if (!isSharedProperty) {
+      propertyInstructionMetadata.SetHidden();
+    }
   }
 }
 
@@ -1186,7 +1200,7 @@ void MetadataDeclarationHelper::
         extension, behaviorMetadata, eventsBasedBehavior, *property,
         propertyLabel, expressionName, conditionName, actionName,
         toggleActionName, setterName, getterName, toggleFunctionName, 2,
-        addObjectAndBehaviorParameters);
+        addObjectAndBehaviorParameters, false);
   }
 
   for (auto &property :
@@ -1218,7 +1232,7 @@ void MetadataDeclarationHelper::
         extension, behaviorMetadata, eventsBasedBehavior, *property,
         propertyLabel, expressionName, conditionName, actionName,
         toggleActionName, setterName, getterName, toggleFunctionName, 2,
-        addObjectAndBehaviorParameters);
+        addObjectAndBehaviorParameters, true);
   }
 }
 
@@ -1274,7 +1288,7 @@ void MetadataDeclarationHelper::
     DeclarePropertyInstructionAndExpression(
         extension, objectMetadata, eventsBasedObject, *property, propertyLabel,
         expressionName, conditionName, actionName, toggleActionName, setterName,
-        getterName, toggleFunctionName, 1, addObjectParameter);
+        getterName, toggleFunctionName, 1, addObjectParameter, false);
   }
 }
 
@@ -1332,7 +1346,7 @@ void MetadataDeclarationHelper::AddParameter(
   if (!parameter.IsCodeOnly()) {
     instructionOrExpression
         .AddParameter(parameter.GetType(),
-                      parameter.GetDescription() || parameter.GetName(),
+                      GetTranslation(parameter.GetDescription()) || parameter.GetName(),
                       "", // See below for adding the extra information
                       parameter.IsOptional())
         // Manually add the "extra info" without relying on addParameter (or
@@ -1341,7 +1355,7 @@ void MetadataDeclarationHelper::AddParameter(
         // declarations when dealing with object).
         .SetParameterExtraInfo(parameter.GetExtraInfo());
     instructionOrExpression.SetParameterLongDescription(
-        parameter.GetLongDescription());
+      GetTranslation(parameter.GetLongDescription()));
     instructionOrExpression.SetDefaultValue(parameter.GetDefaultValue());
   } else {
     instructionOrExpression.AddCodeOnlyParameter(parameter.GetType(),

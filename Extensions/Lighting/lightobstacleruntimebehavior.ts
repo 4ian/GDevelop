@@ -18,9 +18,8 @@ namespace gdjs {
       if (!instanceContainer._lightObstaclesManager) {
         // Create the shared manager if necessary.
         // @ts-ignore
-        instanceContainer._lightObstaclesManager = new gdjs.LightObstaclesManager(
-          instanceContainer
-        );
+        instanceContainer._lightObstaclesManager =
+          new gdjs.LightObstaclesManager(instanceContainer);
       }
       // @ts-ignore
       return instanceContainer._lightObstaclesManager;
@@ -70,9 +69,8 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles: gdjs.BehaviorRBushAABB<
-        gdjs.LightObstacleRuntimeBehavior
-      >[] = this._obstacleRBush.search(searchArea);
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<gdjs.LightObstacleRuntimeBehavior>[] =
+        this._obstacleRBush.search(searchArea);
       result.length = 0;
       nearbyObstacles.forEach((nearbyObstacle) =>
         result.push(nearbyObstacle.behavior)
@@ -85,9 +83,8 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      LightObstacleRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<LightObstacleRuntimeBehavior> | null =
+      null;
     _manager: any;
     _registeredInManager: boolean = false;
 

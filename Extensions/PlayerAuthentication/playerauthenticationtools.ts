@@ -4,6 +4,14 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
+
+  export type PlayerAuthenticationPlatform =
+    | 'electron'
+    | 'cordova-websocket'
+    | 'web-iframe'
+    | 'web'
+    | 'games-platform';
+
   // TODO EBO Replace runtimeScene to instanceContainer.
   export namespace playerAuthentication {
     // Authentication information.
@@ -21,25 +29,52 @@ namespace gdjs {
     let _authenticationIframeContainer: HTMLDivElement | null = null;
     let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
-    let _automaticGamesPlatformAuthenticationTimeoutId: NodeJS.Timeout | null = null;
+    let _automaticGamesPlatformAuthenticationTimeoutId: NodeJS.Timeout | null =
+      null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
     let _automaticGamesPlatformAuthenticationCallback:
       | ((event: MessageEvent) => void)
       | null = null;
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _websocket: WebSocket | null = null;
 
     type AuthenticationWindowStatus = 'logged' | 'errored' | 'dismissed';
     type AuthenticationWindowOptions = { disableGuestLogin: boolean };
 
+    const notifyParentWindowThatPlayerAuthIsReady = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      if (getPlayerAuthPlatform(runtimeScene) !== 'games-platform') {
+        // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
+        return;
+      }
+
+      logger.info(
+        'Notifying parent window that player authentication is ready.'
+      );
+      window.parent.postMessage(
+        {
+          id: 'playerAuthReady',
+        },
+        '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
+      );
+
+      // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
+      _automaticGamesPlatformAuthenticationTimeoutId = setTimeout(() => {
+        logger.info(
+          'Removing automatic games platform authentication listener.'
+        );
+        removeAutomaticGamesPlatformAuthenticationCallback();
+      }, 3000);
+    };
+
     const handleAutomaticGamesPlatformAuthentication = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
-      if (getPlayerAuthPlatform(runtimeScene) !== 'web') {
+      if (getPlayerAuthPlatform(runtimeScene) !== 'games-platform') {
         // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
         return;
       }
@@ -57,22 +92,6 @@ namespace gdjs {
         _automaticGamesPlatformAuthenticationCallback,
         true
       );
-      logger.info(
-        'Notifying parent window that player authentication is ready.'
-      );
-      window.parent.postMessage(
-        {
-          id: 'playerAuthReady',
-        },
-        '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
-      );
-      // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
-      _automaticGamesPlatformAuthenticationTimeoutId = setTimeout(() => {
-        logger.info(
-          'Removing automatic games platform authentication listener.'
-        );
-        removeAutomaticGamesPlatformAuthenticationCallback();
-      }, 3000);
     };
 
     const handleAutomaticPreviewAuthentication = (
@@ -110,6 +129,7 @@ namespace gdjs {
       (runtimeScene: RuntimeScene) => {
         handleAutomaticPreviewAuthentication(runtimeScene);
         handleAutomaticGamesPlatformAuthentication(runtimeScene);
+        notifyParentWindowThatPlayerAuthIsReady(runtimeScene);
       }
     );
 
@@ -155,7 +175,7 @@ namespace gdjs {
      */
     const getPlayerAuthPlatform = (
       runtimeScene: RuntimeScene
-    ): 'electron' | 'cordova-websocket' | 'web-iframe' | 'web' => {
+    ): PlayerAuthenticationPlatform => {
       const runtimeGame = runtimeScene.getGame();
       const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
@@ -175,9 +195,19 @@ namespace gdjs {
       }
 
       // This can be a:
+      // - Game hosted on GDevelop games platform (gd.games)
+      if (
+        window.parent !== window &&
+        (document.referrer.indexOf('https://gd.games') === 0 ||
+          document.referrer.indexOf('http://localhost:4000') === 0)
+      ) {
+        return 'games-platform';
+      }
+
+      // This can be a:
       // - Preview in GDevelop web-app
       // - Preview in Gdevelop mobile app (Android only)
-      // - Web game (gd.games or any website/server) accessed via a desktop browser...
+      // - Web game (any website/server other than GDevelop's game-platform) accessed via a desktop browser...
       // - Or a web game accessed via a mobile browser (Android/iOS).
       return 'web';
     };
@@ -461,9 +491,34 @@ namespace gdjs {
       checkOrigin: boolean;
       onDone?: (status: 'logged' | 'errored' | 'dismissed') => void;
     }) {
-      const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
-      // const allowedOrigins = ['localhost:4000'];
+      // This happens when the user triggers the login from the game.
+      // -> This will close the authentication window and log the user in.
+      const onManualLoginSuccessFul = (event: MessageEvent) => {
+        login({
+          runtimeScene,
+          userId: event.data.body.userId,
+          username: event.data.body.username,
+          userToken: event.data.body.token,
+        });
+        focusOnGame(runtimeScene);
+        if (onDone) onDone('logged');
+      };
 
+      // This happens when the login happens automatically, because the parent window
+      // (e.g: GDevelop games platform) is already authenticated.
+      // -> This logs the user in, without closing the banner or showing the login notification.
+      const onAutomaticLoginSuccessful = (event: MessageEvent) => {
+        saveAuthKeyToStorage({
+          userId: event.data.body.userId,
+          username: event.data.body.username,
+          userToken: event.data.body.token,
+        });
+        removeAutomaticGamesPlatformAuthenticationCallback();
+        refreshAuthenticationBannerIfAny(runtimeScene);
+        if (onDone) onDone('logged');
+      };
+
+      const allowedOrigins = ['https://gd.games', 'http://localhost:4000'];
       // Check origin of message.
       if (checkOrigin && !allowedOrigins.includes(event.origin)) {
         // Automatic authentication message ignored: wrong origin. Return silently.
@@ -481,14 +536,8 @@ namespace gdjs {
             throw new Error('Malformed message.');
           }
 
-          login({
-            runtimeScene,
-            userId: event.data.body.userId,
-            username: event.data.body.username,
-            userToken: event.data.body.token,
-          });
-          focusOnGame(runtimeScene);
-          if (onDone) onDone('logged');
+          logger.info('Received authentication result, logging in player.');
+          onManualLoginSuccessFul(event);
           break;
         }
         case 'alreadyAuthenticated': {
@@ -496,13 +545,18 @@ namespace gdjs {
             throw new Error('Malformed message.');
           }
 
-          saveAuthKeyToStorage({
-            userId: event.data.body.userId,
-            username: event.data.body.username,
-            userToken: event.data.body.token,
-          });
-          removeAutomaticGamesPlatformAuthenticationCallback();
-          refreshAuthenticationBannerIfAny(runtimeScene);
+          logger.info('Player is already authenticated, logging in player.');
+          // If we receive this message while the authentication dialog is open,
+          // it can come from the parent window (e.g: GDevelop games platform) which is handling the authentication for the game.
+          // In this case, we assume the log-in was successful and initiated by the player.
+          if (_authenticationRootContainer) {
+            onManualLoginSuccessFul(event);
+            break;
+          }
+
+          // If the authentication dialog is not open, it means that the parent window (e.g: GDevelop games platform) has informed the game
+          // that the player is already authenticated. We can log the player in automatically.
+          onAutomaticLoginSuccessful(event);
           break;
         }
       }
@@ -923,6 +977,43 @@ namespace gdjs {
         );
       });
 
+    export const openAuthenticationWindowForGamesPlatform = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string,
+      authWindowOptions: AuthenticationWindowOptions
+    ) =>
+      new Promise<AuthenticationWindowStatus>((resolve) => {
+        // First, clear the automatic authentication timeout.
+        // It can still exist if the user triggers a log-in manually, while the automatic authentication is still waiting.
+        removeAutomaticGamesPlatformAuthenticationCallback();
+
+        // Listen to messages posted by the authentication window, so that we can
+        // know when the user is authenticated.
+        _authenticationMessageCallback = (event: MessageEvent) => {
+          receiveAuthenticationMessage({
+            runtimeScene,
+            event,
+            checkOrigin: true,
+            onDone: resolve,
+          });
+        };
+        window.addEventListener(
+          'message',
+          _authenticationMessageCallback,
+          true
+        );
+
+        // Login dialog will be handled by the platform.
+        window.parent.postMessage(
+          {
+            id: 'openGameAuthenticationDialog',
+            gameId,
+            disableGuestLogin: authWindowOptions.disableGuestLogin,
+          },
+          '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
+        );
+      });
+
     /**
      * Action to display the authentication window to the user.
      */
@@ -971,13 +1062,10 @@ namespace gdjs {
           if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
           const playerAuthPlatform = getPlayerAuthPlatform(runtimeScene);
-          const {
-            rootContainer,
-            loaderContainer,
-            iframeContainer,
-          } = authComponents.computeAuthenticationContainer(
-            onAuthenticationContainerDismissed
-          );
+          const { rootContainer, loaderContainer, iframeContainer } =
+            authComponents.computeAuthenticationContainer(
+              onAuthenticationContainerDismissed
+            );
           _authenticationRootContainer = rootContainer;
           _authenticationLoaderContainer = loaderContainer;
           _authenticationIframeContainer = iframeContainer;
@@ -1006,12 +1094,13 @@ namespace gdjs {
                     )
                 : null; // Only show a link if we're on electron.
 
-              _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-                _authenticationLoaderContainer,
-                playerAuthPlatform,
-                isGameRegistered,
-                wikiOpenAction
-              );
+              _authenticationTextContainer =
+                authComponents.addAuthenticationTextsToLoadingContainer(
+                  _authenticationLoaderContainer,
+                  playerAuthPlatform,
+                  isGameRegistered,
+                  wikiOpenAction
+                );
             }
             if (!isGameRegistered) return;
 
@@ -1048,12 +1137,21 @@ namespace gdjs {
                   authWindowOptions
                 );
                 break;
+              case 'games-platform':
+                // This game is running on gd.games.
+                // The authentication is handled by the platform.
+                status = await openAuthenticationWindowForGamesPlatform(
+                  runtimeScene,
+                  _gameId,
+                  authWindowOptions
+                );
+                break;
               case 'web':
               default:
                 // This can be a:
                 // - Preview in GDevelop web-app
                 // - Preview in Gdevelop mobile app (Android only)
-                // - Web game (gd.games or any website/server) accessed via a desktop browser...
+                // - Web game (any website/server except gd.games) accessed via a desktop browser...
                 // - Or a web game accessed via a mobile browser (Android/iOS).
                 status = await openAuthenticationWindowForWeb(
                   runtimeScene,

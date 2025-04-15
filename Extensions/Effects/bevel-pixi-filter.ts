@@ -25,7 +25,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         if (parameterName === 'rotation') {
           bevelFilter.rotation = value;
@@ -40,7 +40,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         if (parameterName === 'rotation') {
           return bevelFilter.rotation;
@@ -64,7 +64,7 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         if (parameterName === 'lightColor') {
           bevelFilter.lightColor = gdjs.rgbOrHexStringToNumber(value);
@@ -78,7 +78,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         if (parameterName === 'lightColor') {
           bevelFilter.lightColor = value;
@@ -88,7 +88,7 @@ namespace gdjs {
         }
       }
       getColorParameter(filter: PIXI.Filter, parameterName: string): number {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter;
         if (parameterName === 'lightColor') {
           return bevelFilter.lightColor;
         }
@@ -103,7 +103,7 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): BevelFilterNetworkSyncData {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         return {
           r: bevelFilter.rotation,
@@ -119,7 +119,7 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: BevelFilterNetworkSyncData
       ) {
-        const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter &
+        const bevelFilter = filter as unknown as PIXI.filters.BevelFilter &
           BevelFilterExtra;
         bevelFilter.rotation = data.r;
         bevelFilter.thickness = data.t;

@@ -16,7 +16,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const colorMatrixFilter = filter as unknown as PIXI.ColorMatrixFilter;
         if (parameterName === 'opacity') {
           colorMatrixFilter.alpha = gdjs.PixiFiltersTools.clampValue(
             value,
@@ -26,7 +26,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const colorMatrixFilter = filter as unknown as PIXI.ColorMatrixFilter;
         if (parameterName === 'opacity') {
           return colorMatrixFilter.alpha;
         }
@@ -51,14 +51,14 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): SepiaFilterNetworkSyncData {
-        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const colorMatrixFilter = filter as unknown as PIXI.ColorMatrixFilter;
         return { a: colorMatrixFilter.alpha };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: SepiaFilterNetworkSyncData
       ) {
-        const colorMatrixFilter = (filter as unknown) as PIXI.ColorMatrixFilter;
+        const colorMatrixFilter = filter as unknown as PIXI.ColorMatrixFilter;
         colorMatrixFilter.alpha = data.a;
       }
     })()

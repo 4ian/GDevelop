@@ -45,7 +45,7 @@ class ClickInterceptor {
     this.interceptingSprite = new PIXI.Sprite();
     panable(this.interceptingSprite);
     this.interceptingSprite.alpha = 0;
-    this.interceptingSprite.interactive = true;
+    this.interceptingSprite.eventMode = 'static';
     this.pointerPathCoordinates = null;
     this.interceptingSprite.addEventListener('panmove', (event: PanMoveEvent) =>
       this.onPanMove(

@@ -13,7 +13,7 @@ import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type InstancesEditorShortcutsCallbacks } from '../InstancesEditor';
-import { type EditorId } from '.';
+import { type EditorId } from './utils';
 import Rectangle from '../Utils/Rectangle';
 import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
@@ -94,6 +94,7 @@ export type SceneEditorsDisplayProps = {|
     i18n: I18nType,
     objectOrGroupName: string
   ) => boolean,
+  onExtensionInstalled: (extensionName: string) => void,
 
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,

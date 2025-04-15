@@ -359,7 +359,6 @@ namespace gdjs {
     }
 
     playAnimation(animationName: string, shouldLoop: boolean) {
-      this._animationMixer.stopAllAction();
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
         animationName
@@ -370,12 +369,27 @@ namespace gdjs {
         );
         return;
       }
+      const previousAction = this._action;
       this._action = this._animationMixer.clipAction(clip);
+      // Reset the animation and play it from the start.
+      // `clipAction` always gives back the same action for a given animation
+      // and its likely to be in a finished or at least started state.
+      this._action.reset();
       this._action.setLoop(
         shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce,
         Number.POSITIVE_INFINITY
       );
       this._action.clampWhenFinished = true;
+      this._action.timeScale =
+        this._model3DRuntimeObject.getAnimationSpeedScale();
+
+      if (previousAction && previousAction !== this._action) {
+        this._action.crossFadeFrom(
+          previousAction,
+          this._model3DRuntimeObject._crossfadeDuration,
+          false
+        );
+      }
       this._action.play();
       // Make sure the first frame is displayed.
       this._animationMixer.update(0);
@@ -388,6 +402,12 @@ namespace gdjs {
     setAnimationElapsedTime(time: float): void {
       if (this._action) {
         this._action.time = time;
+      }
+    }
+
+    setAnimationTimeScale(timeScale: float): void {
+      if (this._action) {
+        this._action.timeScale = timeScale;
       }
     }
 

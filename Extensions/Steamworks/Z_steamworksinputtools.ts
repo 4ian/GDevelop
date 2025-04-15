@@ -17,9 +17,9 @@ namespace gdjs {
       if (!gdjs.steamworks.steamAPI) return;
       gdjs.steamworks.steamAPI.input
         .getControllers()
-        [controllerIndex]?.activateActionSet(
-          gdjs.steamworks.steamAPI.input.getActionSet(actionSetName)
-        );
+        [
+          controllerIndex
+        ]?.activateActionSet(gdjs.steamworks.steamAPI.input.getActionSet(actionSetName));
     }
 
     export function isDigitalActionPressed(
@@ -29,9 +29,9 @@ namespace gdjs {
       if (!gdjs.steamworks.steamAPI) return false;
       return !!gdjs.steamworks.steamAPI.input
         .getControllers()
-        [controllerIndex]?.isDigitalActionPressed(
-          gdjs.steamworks.steamAPI.input.getDigitalAction(actionName)
-        );
+        [
+          controllerIndex
+        ]?.isDigitalActionPressed(gdjs.steamworks.steamAPI.input.getDigitalAction(actionName));
     }
 
     export function getAnalogActionVectorX(
@@ -39,11 +39,12 @@ namespace gdjs {
       actionName: string
     ): float {
       return gdjs.steamworks.steamAPI
-        ? gdjs.steamworks.steamAPI.input
+        ? (gdjs.steamworks.steamAPI.input
             .getControllers()
-            [controllerIndex]?.getAnalogActionVector(
-              gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
-            ).x ?? 0
+            [
+              controllerIndex
+            ]?.getAnalogActionVector(gdjs.steamworks.steamAPI.input.getAnalogAction(actionName))
+            .x ?? 0)
         : 0;
     }
 
@@ -52,11 +53,12 @@ namespace gdjs {
       actionName: string
     ): float {
       return gdjs.steamworks.steamAPI
-        ? gdjs.steamworks.steamAPI.input
+        ? (gdjs.steamworks.steamAPI.input
             .getControllers()
-            [controllerIndex]?.getAnalogActionVector(
-              gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
-            ).y ?? 0
+            [
+              controllerIndex
+            ]?.getAnalogActionVector(gdjs.steamworks.steamAPI.input.getAnalogAction(actionName))
+            .y ?? 0)
         : 0;
     }
   }

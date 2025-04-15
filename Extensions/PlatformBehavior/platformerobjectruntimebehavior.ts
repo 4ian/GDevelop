@@ -766,9 +766,10 @@ namespace gdjs {
             ? -this._xGrabTolerance
             : this._xGrabTolerance)
       );
-      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
-        PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
-      );
+      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] =
+        gdjs.staticArray(
+          PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
+        );
       collidingPlatforms.length = 0;
       for (const platform of this._potentialCollidingObjects) {
         if (this._isCollidingWith(platform) && this._canGrab(platform)) {
@@ -813,14 +814,12 @@ namespace gdjs {
 
       // The interval could be smaller.
       // It's just for rounding errors.
-      const {
-        highestGroundPlatform,
-        highestGroundPolygon,
-      } = this._findHighestFloorAndMoveOnTop(
-        this._potentialCollidingObjects,
-        -1,
-        1
-      );
+      const { highestGroundPlatform, highestGroundPolygon } =
+        this._findHighestFloorAndMoveOnTop(
+          this._potentialCollidingObjects,
+          -1,
+          1
+        );
       // don't fall if GrabbingPlatform or OnLadder
       if (this._state === this._onFloor) {
         if (!highestGroundPlatform || !highestGroundPolygon) {
@@ -1573,7 +1572,7 @@ namespace gdjs {
 
     /**
      * Set the jump sustain time of the Platformer Object.
-     * @param jumpSpeed The new jump sustain time.
+     * @param jumpSustainTime The new jump sustain time.
      */
     setJumpSustainTime(jumpSustainTime: float): void {
       this._jumpSustainTime = jumpSustainTime;
@@ -2093,14 +2092,13 @@ namespace gdjs {
 
           // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
-          const {
-            highestGroundPlatform: highestGroundAtJunction,
-          } = behavior._findHighestFloorAndMoveOnTop(
-            behavior._potentialCollidingObjects,
-            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
-            Math.min(-1, -1 * behavior._slopeClimbingFactor),
-            0
-          );
+          const { highestGroundPlatform: highestGroundAtJunction } =
+            behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+              Math.min(-1, -1 * behavior._slopeClimbingFactor),
+              0
+            );
           if (highestGroundAtJunction) {
             // The obstacle 1st pixel can be climbed.
             // Now that the character is on the obstacle,
@@ -2133,18 +2131,17 @@ namespace gdjs {
                 // We went too far in order to check that.
                 // Now, find the right position on the obstacles.
                 object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
-                const {
-                  highestGroundPlatform: highestGroundOnObstacle,
-                } = behavior._findHighestFloorAndMoveOnTop(
-                  behavior._potentialCollidingObjects,
-                  // requestedDeltaX can be small when the object start moving.
-                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-                  Math.min(
-                    -1,
-                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
-                  ),
-                  0
-                );
+                const { highestGroundPlatform: highestGroundOnObstacle } =
+                  behavior._findHighestFloorAndMoveOnTop(
+                    behavior._potentialCollidingObjects,
+                    // requestedDeltaX can be small when the object start moving.
+                    // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                    Math.min(
+                      -1,
+                      -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                    ),
+                    0
+                  );
                 // Should always be true
                 if (highestGroundOnObstacle && highestGroundPolygon) {
                   behavior._setOnFloor(
@@ -2544,7 +2541,8 @@ namespace gdjs {
    * A context used to search for a floor.
    */
   class FollowConstraintContext {
-    static readonly instance: FollowConstraintContext = new FollowConstraintContext();
+    static readonly instance: FollowConstraintContext =
+      new FollowConstraintContext();
     /**
      * Character right side
      *

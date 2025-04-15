@@ -38,6 +38,7 @@ export type ShowConfirmDeleteDialogOptions = {|
   message: MessageDescriptor,
   fieldMessage?: MessageDescriptor,
   confirmText?: string,
+  header?: React.Node,
 |};
 export type ShowConfirmDeleteDialogOptionsWithCallback = {|
   ...ShowConfirmDeleteDialogOptions,

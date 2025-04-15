@@ -272,6 +272,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           targetX = playerX;
           targetY = playerY - 2 * cellSize;
           break;
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacle.setPosition(obstacleX, obstacleY);
@@ -341,6 +343,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           targetX = playerX;
           targetY = playerY - 2 * cellSize;
           break;
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacle.setPosition(obstacleX, obstacleY);
@@ -474,6 +478,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           obstacleY =
             targetY + playerBottomBorder + obstacleTopBorder + inclusiveMargin;
           break;
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacle.setPosition(obstacleX, obstacleY);
@@ -631,6 +637,8 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           straightLineCellCount = (targetY - playerY) / cellSize + 1;
           break;
         }
+        default:
+          throw new Error('Invalid direction for the test');
       }
 
       obstacleTop.setPosition(topObstacleX, topObstacleY);

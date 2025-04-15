@@ -32,7 +32,8 @@ describe('EnumerateInstructions', () => {
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Animation finished',
-        fullGroupName: 'General/Animatable capability/Animations and images',
+        fullGroupName:
+          'General ❯ Animatable capability ❯ Animations and images',
         type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
       })
     );
@@ -41,7 +42,7 @@ describe('EnumerateInstructions', () => {
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Current frame',
-        fullGroupName: 'General/Sprite/Animations and images',
+        fullGroupName: 'General ❯ Sprite ❯ Animations and images',
         type: 'Sprite',
       })
     );
@@ -52,7 +53,7 @@ describe('EnumerateInstructions', () => {
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Trigger once while true',
-        fullGroupName: 'Advanced/Events and control flow',
+        fullGroupName: 'Advanced ❯ Events and control flow',
         type: 'BuiltinCommonInstructions::Once',
       })
     );
@@ -61,7 +62,7 @@ describe('EnumerateInstructions', () => {
     ).toEqual(
       expect.objectContaining({
         displayedName: 'The cursor/touch is on an object',
-        fullGroupName: 'General/Objects/Mouse and touch',
+        fullGroupName: 'General ❯ Objects ❯ Mouse and touch',
         type: 'SourisSurObjet',
       })
     );
@@ -79,12 +80,12 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Start (or reset) a scene timer',
-          fullGroupName: 'General/Timers and time',
+          fullGroupName: 'General ❯ Timers and time',
           type: 'ResetTimer',
         }),
         expect.objectContaining({
           displayedName: 'Rotate',
-          fullGroupName: 'General/Objects/Angle',
+          fullGroupName: 'General ❯ Objects ❯ Angle',
           type: 'Rotate',
         }),
       ])
@@ -101,7 +102,7 @@ describe('EnumerateInstructions', () => {
         'Events and control flow': {
           'BuiltinCommonInstructions::Once': {
             displayedName: 'Trigger once while true',
-            fullGroupName: 'Advanced/Events and control flow',
+            fullGroupName: 'Advanced ❯ Events and control flow',
             type: 'BuiltinCommonInstructions::Once',
           },
         },
@@ -110,7 +111,7 @@ describe('EnumerateInstructions', () => {
         'Sounds and music': {
           GlobalVolume: {
             displayedName: 'Global volume',
-            fullGroupName: 'Audio/Sounds and music',
+            fullGroupName: 'Audio ❯ Sounds and music',
             type: 'GlobalVolume',
           },
         },

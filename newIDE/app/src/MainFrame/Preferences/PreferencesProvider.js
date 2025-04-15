@@ -39,7 +39,6 @@ type Props = {|
 type State = Preferences;
 
 const localStorageItem = 'gd-preferences';
-const MAX_RECENT_FILES_COUNT = 20;
 
 export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   try {
@@ -85,7 +84,7 @@ export const getInitialPreferences = () => {
   return { ...initialPreferences.values, language: languageOrLocale };
 };
 
-const getPreferences = () => {
+const getPreferences = (): PreferencesValues => {
   const preferences =
     loadPreferencesFromLocalStorage() || getInitialPreferences();
   setLanguageInDOM(preferences.language);
@@ -199,6 +198,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
     setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
+    setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this),
   };
 
   componentDidMount() {
@@ -718,8 +718,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getRecentProjectFiles() {
-    return this.state.values.recentProjectFiles;
+  _getRecentProjectFiles(
+    options: ?{| limit: number |}
+  ): Array<FileMetadataAndStorageProviderName> {
+    const limit = options ? options.limit : undefined;
+    const recentProjectFiles = this.state.values.recentProjectFiles;
+    return limit ? recentProjectFiles.slice(0, limit) : recentProjectFiles;
   }
 
   _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
@@ -742,24 +746,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     const isNotNewRecentFile = recentFile =>
       recentFile.fileMetadata.fileIdentifier !==
       newRecentFile.fileMetadata.fileIdentifier;
-    this._setRecentProjectFiles(
-      [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
-        0,
-        MAX_RECENT_FILES_COUNT
-      )
-    );
+    this._setRecentProjectFiles([
+      newRecentFile,
+      ...recentProjectFiles.filter(isNotNewRecentFile),
+    ]);
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
     const isNotRemovedRecentFile = recentFileItem =>
       recentFileItem.fileMetadata.fileIdentifier !==
       recentFile.fileMetadata.fileIdentifier;
-    this._setRecentProjectFiles(
-      [...this._getRecentProjectFiles().filter(isNotRemovedRecentFile)].slice(
-        0,
-        MAX_RECENT_FILES_COUNT
-      )
-    );
+    this._setRecentProjectFiles([
+      ...this._getRecentProjectFiles().filter(isNotRemovedRecentFile),
+    ]);
   }
 
   _getAutoOpenMostRecentProject() {
@@ -1027,6 +1026,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           takeScreenshotOnPreview: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowAiAskButtonInTitleBar(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showAiAskButtonInTitleBar: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

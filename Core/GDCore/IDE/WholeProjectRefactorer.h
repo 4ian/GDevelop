@@ -32,6 +32,7 @@ class UnfilledRequiredBehaviorPropertyProblem;
 class ProjectBrowser;
 class SerializerElement;
 class ProjectScopedContainers;
+class InitialInstancesContainer;
 struct VariablesRenamingChangesetNode;
 }  // namespace gd
 
@@ -80,11 +81,21 @@ class GD_CORE_API WholeProjectRefactorer {
 
   /**
    * \brief Refactor the project according to the changes (renaming or deletion)
-   * made to variables.
+   * made to global or scene variables.
    */
   static void ApplyRefactoringForVariablesContainer(
       gd::Project &project, gd::VariablesContainer &variablesContainer,
       const gd::VariablesChangeset &changeset,
+      const gd::SerializerElement &originalSerializedVariables);
+
+  /**
+   * \brief Refactor the project according to the changes (renaming or deletion)
+   * made to object variables.
+   */
+  static void ApplyRefactoringForObjectVariablesContainer(
+      gd::Project &project, gd::VariablesContainer &objectVariablesContainer,
+      gd::InitialInstancesContainer &initialInstancesContainer,
+      const gd::String &objectName, const gd::VariablesChangeset &changeset,
       const gd::SerializerElement &originalSerializedVariables);
 
   /**
@@ -94,6 +105,7 @@ class GD_CORE_API WholeProjectRefactorer {
   static void ApplyRefactoringForGroupVariablesContainer(
       gd::Project &project, gd::ObjectsContainer &globalObjectsContainer,
       gd::ObjectsContainer &objectsContainer,
+      gd::InitialInstancesContainer &initialInstancesContainer,
       const gd::VariablesContainer &groupVariablesContainer,
       const gd::ObjectGroup &objectGroup,
       const gd::VariablesChangeset &changeset,

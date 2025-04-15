@@ -126,7 +126,6 @@ const GlobalAndSceneVariablesDialog = ({
       }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      preventRefactoringToDeleteInstructions={true}
       id="global-and-scene-variables-dialog"
     />
   );

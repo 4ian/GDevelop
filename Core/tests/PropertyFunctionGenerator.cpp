@@ -116,14 +116,11 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterEvent.GetConditions().size() == 0);
       REQUIRE(setterEvent.GetActions().size() == 1);
       auto &setterAction = setterEvent.GetActions().at(0);
-      REQUIRE(
-          setterAction.GetType() ==
-          "MyEventsExtension::MyEventsBasedBehavior::SetPropertyMovementAngle");
-      REQUIRE(setterAction.GetParametersCount() == 4);
-      REQUIRE(setterAction.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(setterAction.GetParameter(1).GetPlainString() == "Behavior");
-      REQUIRE(setterAction.GetParameter(2).GetPlainString() == "=");
-      REQUIRE(setterAction.GetParameter(3).GetPlainString() == "Value");
+      REQUIRE(setterAction.GetType() == "SetNumberVariable");
+      REQUIRE(setterAction.GetParametersCount() == 3);
+      REQUIRE(setterAction.GetParameter(0).GetPlainString() == "MovementAngle");
+      REQUIRE(setterAction.GetParameter(1).GetPlainString() == "=");
+      REQUIRE(setterAction.GetParameter(2).GetPlainString() == "Value");
     }
   }
 
@@ -206,12 +203,12 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(getterEvent.GetActions().size() == 1);
 
       auto &getterCondition = getterEvent.GetConditions().at(0);
-      REQUIRE(getterCondition.GetType() ==
-              "MyEventsExtension::MyEventsBasedBehavior::PropertyRotate");
+      REQUIRE(getterCondition.GetType() == "BooleanVariable");
       REQUIRE(!getterCondition.IsInverted());
-      REQUIRE(getterCondition.GetParametersCount() == 2);
-      REQUIRE(getterCondition.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(getterCondition.GetParameter(1).GetPlainString() == "Behavior");
+      REQUIRE(getterCondition.GetParametersCount() == 3);
+      REQUIRE(getterCondition.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(getterCondition.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(getterCondition.GetParameter(2).GetPlainString() == "");
 
       auto &getterAction = getterEvent.GetActions().at(0);
       REQUIRE(getterAction.GetType() == "SetReturnBoolean");
@@ -257,19 +254,19 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterNoEvent.GetActions().size() == 1);
 
       auto &setterNoCondition = setterNoEvent.GetConditions().at(0);
-      REQUIRE(setterNoCondition.GetType() == "GetArgumentAsBoolean");
-      REQUIRE(setterNoCondition.IsInverted());
-      REQUIRE(setterNoCondition.GetParametersCount() == 1);
-      REQUIRE(setterNoCondition.GetParameter(0).GetPlainString() ==
-              "\"Value\"");
+      REQUIRE(setterNoCondition.GetType() == "BooleanVariable");
+      REQUIRE(!setterNoCondition.IsInverted());
+      REQUIRE(setterNoCondition.GetParametersCount() == 3);
+      REQUIRE(setterNoCondition.GetParameter(0).GetPlainString() == "Value");
+      REQUIRE(setterNoCondition.GetParameter(1).GetPlainString() == "False");
+      REQUIRE(setterNoCondition.GetParameter(2).GetPlainString() == "");
 
       auto &setterNoAction = setterNoEvent.GetActions().at(0);
-      REQUIRE(setterNoAction.GetType() ==
-              "MyEventsExtension::MyEventsBasedBehavior::SetPropertyRotate");
+      REQUIRE(setterNoAction.GetType() == "SetBooleanVariable");
       REQUIRE(setterNoAction.GetParametersCount() == 3);
-      REQUIRE(setterNoAction.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(setterNoAction.GetParameter(1).GetPlainString() == "Behavior");
-      REQUIRE(setterNoAction.GetParameter(2).GetPlainString() == "no");
+      REQUIRE(setterNoAction.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(setterNoAction.GetParameter(1).GetPlainString() == "False");
+      REQUIRE(setterNoAction.GetParameter(2).GetPlainString() == "");
 
       auto &setterYesEvent =
           dynamic_cast<gd::StandardEvent &>(setter.GetEvents().GetEvent(1));
@@ -277,19 +274,19 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterYesEvent.GetActions().size() == 1);
 
       auto &setterYesCondition = setterYesEvent.GetConditions().at(0);
-      REQUIRE(setterYesCondition.GetType() == "GetArgumentAsBoolean");
+      REQUIRE(setterYesCondition.GetType() == "BooleanVariable");
       REQUIRE(!setterYesCondition.IsInverted());
-      REQUIRE(setterYesCondition.GetParametersCount() == 1);
-      REQUIRE(setterYesCondition.GetParameter(0).GetPlainString() ==
-              "\"Value\"");
+      REQUIRE(setterYesCondition.GetParametersCount() == 3);
+      REQUIRE(setterYesCondition.GetParameter(0).GetPlainString() == "Value");
+      REQUIRE(setterYesCondition.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(setterYesCondition.GetParameter(2).GetPlainString() == "");
 
       auto &setterYesAction = setterYesEvent.GetActions().at(0);
-      REQUIRE(setterYesAction.GetType() ==
-              "MyEventsExtension::MyEventsBasedBehavior::SetPropertyRotate");
+      REQUIRE(setterYesAction.GetType() == "SetBooleanVariable");
       REQUIRE(setterYesAction.GetParametersCount() == 3);
-      REQUIRE(setterYesAction.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(setterYesAction.GetParameter(1).GetPlainString() == "Behavior");
-      REQUIRE(setterYesAction.GetParameter(2).GetPlainString() == "yes");
+      REQUIRE(setterYesAction.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(setterYesAction.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(setterYesAction.GetParameter(2).GetPlainString() == "");
     }
   }
   SECTION("Can generate functions for a number property in an object") {
@@ -366,11 +363,9 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterEvent.GetConditions().size() == 0);
       REQUIRE(setterEvent.GetActions().size() == 1);
       auto &setterAction = setterEvent.GetActions().at(0);
-      REQUIRE(
-          setterAction.GetType() ==
-          "MyEventsExtension::MyEventsBasedObject::SetPropertyMovementAngle");
+      REQUIRE(setterAction.GetType() == "SetNumberVariable");
       REQUIRE(setterAction.GetParametersCount() == 3);
-      REQUIRE(setterAction.GetParameter(0).GetPlainString() == "Object");
+      REQUIRE(setterAction.GetParameter(0).GetPlainString() == "MovementAngle");
       REQUIRE(setterAction.GetParameter(1).GetPlainString() == "=");
       REQUIRE(setterAction.GetParameter(2).GetPlainString() == "Value");
     }
@@ -454,11 +449,12 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(getterEvent.GetActions().size() == 1);
 
       auto &getterCondition = getterEvent.GetConditions().at(0);
-      REQUIRE(getterCondition.GetType() ==
-              "MyEventsExtension::MyEventsBasedObject::PropertyRotate");
+      REQUIRE(getterCondition.GetType() == "BooleanVariable");
       REQUIRE(!getterCondition.IsInverted());
-      REQUIRE(getterCondition.GetParametersCount() == 1);
-      REQUIRE(getterCondition.GetParameter(0).GetPlainString() == "Object");
+      REQUIRE(getterCondition.GetParametersCount() == 3);
+      REQUIRE(getterCondition.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(getterCondition.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(getterCondition.GetParameter(2).GetPlainString() == "");
 
       auto &getterAction = getterEvent.GetActions().at(0);
       REQUIRE(getterAction.GetType() == "SetReturnBoolean");
@@ -500,18 +496,19 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterNoEvent.GetActions().size() == 1);
 
       auto &setterNoCondition = setterNoEvent.GetConditions().at(0);
-      REQUIRE(setterNoCondition.GetType() == "GetArgumentAsBoolean");
-      REQUIRE(setterNoCondition.IsInverted());
-      REQUIRE(setterNoCondition.GetParametersCount() == 1);
-      REQUIRE(setterNoCondition.GetParameter(0).GetPlainString() ==
-              "\"Value\"");
+      REQUIRE(setterNoCondition.GetType() == "BooleanVariable");
+      REQUIRE(!setterNoCondition.IsInverted());
+      REQUIRE(setterNoCondition.GetParametersCount() == 3);
+      REQUIRE(setterNoCondition.GetParameter(0).GetPlainString() == "Value");
+      REQUIRE(setterNoCondition.GetParameter(1).GetPlainString() == "False");
+      REQUIRE(setterNoCondition.GetParameter(2).GetPlainString() == "");
 
       auto &setterNoAction = setterNoEvent.GetActions().at(0);
-      REQUIRE(setterNoAction.GetType() ==
-              "MyEventsExtension::MyEventsBasedObject::SetPropertyRotate");
-      REQUIRE(setterNoAction.GetParametersCount() == 2);
-      REQUIRE(setterNoAction.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(setterNoAction.GetParameter(1).GetPlainString() == "no");
+      REQUIRE(setterNoAction.GetType() == "SetBooleanVariable");
+      REQUIRE(setterNoAction.GetParametersCount() == 3);
+      REQUIRE(setterNoAction.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(setterNoAction.GetParameter(1).GetPlainString() == "False");
+      REQUIRE(setterNoAction.GetParameter(2).GetPlainString() == "");
 
       auto &setterYesEvent =
           dynamic_cast<gd::StandardEvent &>(setter.GetEvents().GetEvent(1));
@@ -519,18 +516,19 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterYesEvent.GetActions().size() == 1);
 
       auto &setterYesCondition = setterYesEvent.GetConditions().at(0);
-      REQUIRE(setterYesCondition.GetType() == "GetArgumentAsBoolean");
+      REQUIRE(setterYesCondition.GetType() == "BooleanVariable");
       REQUIRE(!setterYesCondition.IsInverted());
-      REQUIRE(setterYesCondition.GetParametersCount() == 1);
-      REQUIRE(setterYesCondition.GetParameter(0).GetPlainString() ==
-              "\"Value\"");
+      REQUIRE(setterYesCondition.GetParametersCount() == 3);
+      REQUIRE(setterYesCondition.GetParameter(0).GetPlainString() == "Value");
+      REQUIRE(setterYesCondition.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(setterYesCondition.GetParameter(2).GetPlainString() == "");
 
       auto &setterYesAction = setterYesEvent.GetActions().at(0);
-      REQUIRE(setterYesAction.GetType() ==
-              "MyEventsExtension::MyEventsBasedObject::SetPropertyRotate");
-      REQUIRE(setterYesAction.GetParametersCount() == 2);
-      REQUIRE(setterYesAction.GetParameter(0).GetPlainString() == "Object");
-      REQUIRE(setterYesAction.GetParameter(1).GetPlainString() == "yes");
+      REQUIRE(setterYesAction.GetType() == "SetBooleanVariable");
+      REQUIRE(setterYesAction.GetParametersCount() == 3);
+      REQUIRE(setterYesAction.GetParameter(0).GetPlainString() == "Rotate");
+      REQUIRE(setterYesAction.GetParameter(1).GetPlainString() == "True");
+      REQUIRE(setterYesAction.GetParameter(2).GetPlainString() == "");
     }
   }
 
@@ -588,9 +586,11 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setterEvent.GetConditions().size() == 0);
       REQUIRE(setterEvent.GetActions().size() == 1);
       auto &setterAction = setterEvent.GetActions().at(0);
-      REQUIRE(setterAction.GetType() ==
-              "MyEventsExtension::MyEventsBasedBehavior::"
-              "SetSharedPropertyMovementAngle");
+      REQUIRE(setterAction.GetType() == "SetNumberVariable");
+      REQUIRE(setterAction.GetParametersCount() == 3);
+      REQUIRE(setterAction.GetParameter(0).GetPlainString() == "MovementAngle");
+      REQUIRE(setterAction.GetParameter(1).GetPlainString() == "=");
+      REQUIRE(setterAction.GetParameter(2).GetPlainString() == "Value");
     }
   }
 

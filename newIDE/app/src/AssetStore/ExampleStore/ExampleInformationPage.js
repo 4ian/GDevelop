@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
-import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
+import { isCompatibleWithGDevelopVersion } from '../../Utils/GDevelopServices/Asset';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
@@ -14,10 +14,6 @@ import Window from '../../Utils/Window';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
-import {
-  isStartingPointExampleShortHeader,
-  getStartingPointExampleShortHeaderTitle,
-} from '../../ProjectCreation/EmptyAndStartingPointProjects';
 const isDev = Window.isDev();
 
 const styles = {
@@ -39,16 +35,10 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
   );
 };
 
-const getExampleName = (exampleShortHeader: ExampleShortHeader) => {
-  return isStartingPointExampleShortHeader(exampleShortHeader)
-    ? getStartingPointExampleShortHeaderTitle(exampleShortHeader)
-    : exampleShortHeader.name;
-};
-
 const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
-  const isCompatible = isCompatibleWithAsset(
+  const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
-    exampleShortHeader
+    exampleShortHeader.gdevelopVersion
   );
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
@@ -92,7 +82,7 @@ const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
           </Line>
           <Line noMargin>
             <Text size="block-title" noMargin>
-              {getExampleName(exampleShortHeader)}
+              {exampleShortHeader.name}
             </Text>
           </Line>
           <Text size="body" displayInlineAsSpan>

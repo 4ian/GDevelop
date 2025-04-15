@@ -125,15 +125,17 @@ export const EmbeddedGameFrame = ({
             if (!name) return;
 
             // TODO: Move these into a helper.
-            previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-              previewDebuggerServer.sendMessage(debuggerId, {
-                command: 'dragNewInstance',
-                x: clientOffset.x,
-                y: clientOffset.y,
-                name,
-                dropped: false,
+            previewDebuggerServer
+              .getExistingDebuggerIds()
+              .forEach(debuggerId => {
+                previewDebuggerServer.sendMessage(debuggerId, {
+                  command: 'dragNewInstance',
+                  x: clientOffset.x,
+                  y: clientOffset.y,
+                  name,
+                  dropped: false,
+                });
               });
-            });
           }}
           drop={monitor => {
             if (!previewDebuggerServer) return;
@@ -143,26 +145,30 @@ export const EmbeddedGameFrame = ({
             if (!name) return;
 
             // TODO: Move these into a helper.
-            previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-              previewDebuggerServer.sendMessage(debuggerId, {
-                command: 'dragNewInstance',
-                x: clientOffset.x,
-                y: clientOffset.y,
-                name,
-                dropped: true,
+            previewDebuggerServer
+              .getExistingDebuggerIds()
+              .forEach(debuggerId => {
+                previewDebuggerServer.sendMessage(debuggerId, {
+                  command: 'dragNewInstance',
+                  x: clientOffset.x,
+                  y: clientOffset.y,
+                  name,
+                  dropped: true,
+                });
               });
-            });
           }}
         >
           {({ connectDropTarget, canDrop, isOver }) => {
             if (!isOver) {
               // TODO: Move these into a helper.
               if (previewDebuggerServer) {
-                previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-                  previewDebuggerServer.sendMessage(debuggerId, {
-                    command: 'cancelDragNewInstance',
+                previewDebuggerServer
+                  .getExistingDebuggerIds()
+                  .forEach(debuggerId => {
+                    previewDebuggerServer.sendMessage(debuggerId, {
+                      command: 'cancelDragNewInstance',
+                    });
                   });
-                });
               }
             }
 

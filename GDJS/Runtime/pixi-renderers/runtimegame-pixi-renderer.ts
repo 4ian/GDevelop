@@ -55,7 +55,11 @@ namespace gdjs {
       this._forceFullscreen = forceFullscreen;
 
       //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
-      this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
+      this._marginLeft =
+        this._marginTop =
+        this._marginRight =
+        this._marginBottom =
+          0;
       this._setupOrientation();
     }
 
@@ -549,8 +553,7 @@ namespace gdjs {
       const pos = [pageX - canvas.offsetLeft, pageY - canvas.offsetTop];
 
       // Handle the fact that the game is stretched to fill the canvas.
-      pos[0] *=
-        this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pos[0] *= this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
       pos[1] *=
         this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
       return pos;
@@ -582,8 +585,8 @@ namespace gdjs {
         );
       };
 
-      //Some browsers lacks definition of some variables used to do calculations
-      //in getEventPosition. They are defined to 0 as they are useless.
+      // Some browsers lacks definition of some variables used to do calculations
+      // in convertPageToGameCoords. They are defined to 0 as they are useless.
 
       (function ensureOffsetsExistence() {
         if (isNaN(canvas.offsetLeft)) {
@@ -690,7 +693,9 @@ namespace gdjs {
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
       };
-      canvas.onmousedown = function (e) {
+      canvas.onmousedown = (e) => {
+        const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
+        manager.onMouseMove(pos[0], pos[1]);
         manager.onMouseButtonPressed(
           convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
@@ -765,12 +770,12 @@ namespace gdjs {
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
-              const pos = this.convertPageToGameCoords(touch.pageX, touch.pageY);
-              manager.onTouchMove(
-                touch.identifier,
-                pos[0],
-                pos[1]
+              const pos = this.convertPageToGameCoords(
+                touch.pageX,
+                touch.pageY
               );
+              manager.onTouchMove(touch.identifier, pos[0], pos[1]);
+              manager.onTouchMove(touch.identifier, pos[0], pos[1]);
               // This works because touch events are sent
               // when they continue outside of the canvas.
               if (manager.isSimulatingMouseWithTouch()) {
@@ -800,7 +805,10 @@ namespace gdjs {
           if (e.changedTouches) {
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
-              const pos = this.convertPageToGameCoords(touch.pageX, touch.pageY);
+              const pos = this.convertPageToGameCoords(
+                touch.pageX,
+                touch.pageY
+              );
               manager.onTouchStart(
                 e.changedTouches[i].identifier,
                 pos[0],

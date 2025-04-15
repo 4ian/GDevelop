@@ -9,7 +9,9 @@ import {
   type PrivateGameTemplateListingData,
   type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useStableUpToDateCallback } from '../Utils/UseStableUpToDateCallback';
+import { gamesPlatformEmbeddedVersion } from '../MainFrame/EditorContainers/HomePage/PlaySection/GamesPlatformFrame.js';
 
 type Props = {|
   userId: string,
@@ -20,6 +22,8 @@ type Props = {|
   onGameTemplateOpen?: (
     privateAssetPackListingData: PrivateGameTemplateListingData
   ) => void,
+  onGameOpen?: (gameId: string) => void,
+  onExampleOpen?: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
 const PublicProfileDialog = ({
@@ -27,6 +31,8 @@ const PublicProfileDialog = ({
   onClose,
   onAssetPackOpen,
   onGameTemplateOpen,
+  onGameOpen,
+  onExampleOpen,
 }: Props) => {
   const callbacks = React.useMemo(
     () => ({
@@ -44,8 +50,22 @@ const PublicProfileDialog = ({
             }
           }
         : null,
+      openGame: onGameOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.gameId) {
+              onGameOpen(data.gameId);
+            }
+          }
+        : null,
+      openExample: onExampleOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.exampleShortHeader) {
+              onExampleOpen(data.exampleShortHeader);
+            }
+          }
+        : null,
     }),
-    [onAssetPackOpen, onGameTemplateOpen]
+    [onAssetPackOpen, onGameTemplateOpen, onGameOpen, onExampleOpen]
   );
 
   const onMessageReceived = React.useCallback(
@@ -77,7 +97,7 @@ const PublicProfileDialog = ({
       onRequestClose={onClose}
     >
       <GdGamesFrame
-        path={`/embedded/user/${userId}`}
+        path={`/app-embedded/${gamesPlatformEmbeddedVersion}/user/${userId}`}
         loadErrorMessage={
           <Trans>
             Can't load the profile. Verify your internet connection or try again

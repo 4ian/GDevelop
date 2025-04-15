@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Text from '../../../../UI/Text';
 import {
+  ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
@@ -17,6 +18,7 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../../UI/TextButton';
+import RouterContext from '../../../RouterContext';
 
 type CreditItemType = 'badge' | 'feedback';
 type BadgeInfo = {|
@@ -33,6 +35,9 @@ type FeedbackInfo = {|
 type CreditItem = BadgeInfo | FeedbackInfo;
 
 const styles = {
+  widgetContainer: {
+    maxWidth: 1800, // To avoid taking too much space on large screens.
+  },
   badgeContainer: {
     position: 'relative',
     width: 65,
@@ -68,6 +73,7 @@ const styles = {
 };
 
 const FeedbackItem = () => {
+  const { navigateToRoute } = React.useContext(RouterContext);
   return (
     <LineStackLayout expand alignItems="center" noMargin>
       <div style={styles.badgeContainer}>
@@ -97,7 +103,9 @@ const FeedbackItem = () => {
         label={<Trans>Play a game</Trans>}
         secondary
         onClick={() => {
-          Window.openExternalURL('https://gd.games/games/random');
+          navigateToRoute('play', {
+            'playable-game-id': 'random',
+          });
         }}
       />
     </LineStackLayout>
@@ -107,7 +115,7 @@ const FeedbackItem = () => {
 const allBadgesInfo: BadgeInfo[] = [
   {
     id: 'github-star',
-    label: <Trans>Star GDevelop</Trans>,
+    label: 'Star GDevelop', // Do not translate "Star".
     linkUrl: 'https://github.com/4ian/GDevelop',
     type: 'badge',
   },
@@ -121,6 +129,12 @@ const allBadgesInfo: BadgeInfo[] = [
     id: 'twitter-follow',
     label: <Trans>Follow</Trans>,
     linkUrl: 'https://x.com/GDevelopApp',
+    type: 'badge',
+  },
+  {
+    id: 'youtube-subscription',
+    label: <Trans>Subscribe</Trans>,
+    linkUrl: 'https://youtube.com/GDevelopApp',
     type: 'badge',
   },
 ];
@@ -231,9 +245,8 @@ export const EarnCredits = ({
   showRandomItem,
   showAllItems,
 }: Props) => {
-  const { windowSize, isMobile } = useResponsiveWindowSize();
-  const isMobileOrMediumWidth =
-    windowSize === 'small' || windowSize === 'medium';
+  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const isExtraLargeScreen = windowSize === 'xlarge';
 
   const allBadgesWithOwnedStatus = React.useMemo(
     () => getAllBadgesWithOwnedStatus(badges),
@@ -314,28 +327,24 @@ export const EarnCredits = ({
     [badgesToShow, feedbackItemsToShow]
   );
 
+  const onlyOneItemDisplayed = allItemsToShow.length === 1;
+  const itemsPerRow = onlyOneItemDisplayed ? 1 : isExtraLargeScreen ? 3 : 2;
   // Slice items in arrays of two to display them in a responsive way.
-  const itemsSlicedInArraysOfTwo: CreditItem[][] = React.useMemo(
+  const itemsSlicedInArrays: CreditItem[][] = React.useMemo(
     () => {
       const slicedItems: CreditItem[][] = [];
-      for (let i = 0; i < allItemsToShow.length; i += 2) {
-        slicedItems.push(allItemsToShow.slice(i, i + 2));
+      for (let i = 0; i < allItemsToShow.length; i += itemsPerRow) {
+        slicedItems.push(allItemsToShow.slice(i, i + itemsPerRow));
       }
       return slicedItems;
     },
-    [allItemsToShow]
+    [allItemsToShow, itemsPerRow]
   );
 
-  const onlyOneItemDisplayed = allItemsToShow.length === 1;
-
   return (
-    <Column noMargin expand>
-      <ResponsiveLineStackLayout
-        noMargin
-        expand
-        forceMobileLayout={isMobileOrMediumWidth}
-      >
-        {itemsSlicedInArraysOfTwo.map((items, index) => (
+    <div style={styles.widgetContainer}>
+      <ColumnStackLayout noMargin expand>
+        {itemsSlicedInArrays.map((items, index) => (
           <ResponsiveLineStackLayout
             noMargin
             expand={onlyOneItemDisplayed}
@@ -362,12 +371,17 @@ export const EarnCredits = ({
                 return null;
               })
               .filter(Boolean)}
-            {items.length === 1 &&
+            {items.length < itemsPerRow &&
               !onlyOneItemDisplayed &&
-              isMobileOrMediumWidth && <div style={styles.itemPlaceholder} />}
+              Array.from(
+                { length: itemsPerRow - items.length },
+                (_, i) => i
+              ).map(i => (
+                <div key={`filler-${i}`} style={styles.itemPlaceholder} />
+              ))}
           </ResponsiveLineStackLayout>
         ))}
-      </ResponsiveLineStackLayout>
-    </Column>
+      </ColumnStackLayout>
+    </div>
   );
 };

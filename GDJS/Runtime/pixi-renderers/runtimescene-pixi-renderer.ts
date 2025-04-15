@@ -3,7 +3,8 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer
-    implements gdjs.RuntimeInstanceContainerPixiRenderer {
+    implements gdjs.RuntimeInstanceContainerPixiRenderer
+  {
     private _runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null;
     private _runtimeScene: gdjs.RuntimeScene;
     private _pixiContainer: PIXI.Container;
@@ -128,7 +129,8 @@ namespace gdjs {
 
             if (isFirstRender) {
               // Render the background color.
-              pixiRenderer.background.color = this._runtimeScene.getBackgroundColor();
+              pixiRenderer.background.color =
+                this._runtimeScene.getBackgroundColor();
               pixiRenderer.background.alpha = 1;
               if (this._runtimeScene.getClearCanvas()) pixiRenderer.clear();
 
@@ -154,7 +156,8 @@ namespace gdjs {
             // Render a layer with 3D rendering, and possibly some 2D rendering too.
             const threeScene = runtimeLayerRenderer.getThreeScene();
             const threeCamera = runtimeLayerRenderer.getThreeCamera();
-            const threeEffectComposer = runtimeLayerRenderer.getThreeEffectComposer();
+            const threeEffectComposer =
+              runtimeLayerRenderer.getThreeEffectComposer();
 
             // Render the 3D objects of this layer.
             if (threeScene && threeCamera && threeEffectComposer) {
@@ -164,7 +167,8 @@ namespace gdjs {
                 runtimeLayerRenderingType ===
                 gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
               ) {
-                const layerHas2DObjectsToRender = runtimeLayerRenderer.has2DObjects();
+                const layerHas2DObjectsToRender =
+                  runtimeLayerRenderer.has2DObjects();
 
                 if (layerHas2DObjectsToRender) {
                   if (lastRenderWas3D) {
@@ -414,10 +418,8 @@ namespace gdjs {
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
       const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
-      let layerPixiObject:
-        | PIXI.Container
-        | PIXI.Sprite
-        | null = layerPixiRenderer.getRendererObject();
+      let layerPixiObject: PIXI.Container | PIXI.Sprite | null =
+        layerPixiRenderer.getRendererObject();
       if (layer.isLightingLayer()) {
         // TODO (2d lights): refactor to remove the need for `getLightingSprite`.
         layerPixiObject = layerPixiRenderer.getLightingSprite();

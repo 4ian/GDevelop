@@ -214,6 +214,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             )
           }
           isActive={isActive}
+          previewDebuggerServer={this.props.previewDebuggerServer}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           openBehaviorEvents={this.props.openBehaviorEvents}
           onObjectEdited={this.props.onEventsBasedObjectChildrenEdited}
@@ -222,6 +223,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           }
           onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
           onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
+          onExtensionInstalled={this.props.onExtensionInstalled}
         />
       </div>
     );

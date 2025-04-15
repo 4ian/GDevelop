@@ -56,6 +56,7 @@ type Props = {|
   i18n: I18nType,
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
+  onExtensionInstalled: (extensionName: string) => void,
 |};
 
 /**
@@ -77,6 +78,7 @@ const InstructionEditorMenu = ({
   onSubmit,
   canPasteInstructions,
   onPasteInstructions,
+  onExtensionInstalled,
   i18n,
 }: Props) => {
   const forceUpdate = useForceUpdate();

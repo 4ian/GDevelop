@@ -16,14 +16,16 @@ namespace gdjs {
     renderingTypeAsString === '3d'
       ? RuntimeLayerRenderingType.THREE_D
       : renderingTypeAsString === '2d+3d' || renderingTypeAsString === ''
-      ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
-      : RuntimeLayerRenderingType.TWO_D;
+        ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+        : RuntimeLayerRenderingType.TWO_D;
 
   export enum RuntimeLayerCameraType {
     PERSPECTIVE,
     ORTHOGRAPHIC,
   }
-  const getCameraTypeFromString = (renderingTypeAsString: string | undefined) =>
+  const getCameraTypeFromString = (
+    renderingTypeAsString: string | undefined
+  ) =>
     renderingTypeAsString === 'orthographic'
       ? RuntimeLayerCameraType.ORTHOGRAPHIC
       : RuntimeLayerCameraType.PERSPECTIVE;

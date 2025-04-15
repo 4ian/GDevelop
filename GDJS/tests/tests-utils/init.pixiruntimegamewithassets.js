@@ -86,7 +86,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
           kind: 'image',
           name: 'base/tests-utils/assets/64x64.jpg',
           metadata: '',
-          file: 'base/tests-utils/assets/64x64.jpg',
+          file: 'base/GDJS/tests/tests-utils/assets/64x64.jpg',
           userAdded: true,
         },
       ],

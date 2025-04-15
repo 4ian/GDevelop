@@ -23,15 +23,17 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         if (parameterName === 'epsilon') {
           colorReplaceFilter.epsilon = value;
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         if (parameterName === 'epsilon') {
           return colorReplaceFilter.epsilon;
         }
@@ -42,8 +44,9 @@ namespace gdjs {
         parameterName: string,
         value: string
       ) {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         if (parameterName === 'originalColor') {
           colorReplaceFilter.originalColor = gdjs.rgbOrHexStringToNumber(value);
         } else if (parameterName === 'newColor') {
@@ -55,8 +58,9 @@ namespace gdjs {
         parameterName: string,
         value: number
       ): void {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         if (parameterName === 'originalColor') {
           colorReplaceFilter.originalColor = value;
         } else if (parameterName === 'newColor') {
@@ -64,8 +68,9 @@ namespace gdjs {
         }
       }
       getColorParameter(filter: PIXI.Filter, parameterName: string): number {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         if (parameterName === 'originalColor') {
           return colorReplaceFilter.originalColor;
         } else if (parameterName === 'newColor') {
@@ -81,8 +86,9 @@ namespace gdjs {
       getNetworkSyncData(
         filter: PIXI.Filter
       ): ColorReplaceFilterNetworkSyncData {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         return {
           e: colorReplaceFilter.epsilon,
           oc: colorReplaceFilter.originalColor,
@@ -93,8 +99,9 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: ColorReplaceFilterNetworkSyncData
       ) {
-        const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter &
-          ColorReplaceFilterExtra;
+        const colorReplaceFilter =
+          filter as unknown as PIXI.filters.ColorReplaceFilter &
+            ColorReplaceFilterExtra;
         colorReplaceFilter.epsilon = data.e;
         colorReplaceFilter.originalColor = data.oc;
         colorReplaceFilter.newColor = data.nc;

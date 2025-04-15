@@ -749,8 +749,8 @@ namespace gdjs {
         this._draggedNewObject &&
         this._draggedNewObject instanceof gdjs.RuntimeObject3D
       ) {
-        draggedNewObjectPreviousMask = this._draggedNewObject.get3DRendererObject()
-          .layers.mask;
+        draggedNewObjectPreviousMask =
+          this._draggedNewObject.get3DRendererObject().layers.mask;
         this._draggedNewObject.get3DRendererObject().layers.set(1);
       }
 
@@ -792,7 +792,8 @@ namespace gdjs {
         this._draggedNewObject &&
         this._draggedNewObject instanceof gdjs.RuntimeObject3D
       ) {
-        this._draggedNewObject.get3DRendererObject().layers.mask = draggedNewObjectPreviousMask;
+        this._draggedNewObject.get3DRendererObject().layers.mask =
+          draggedNewObjectPreviousMask;
       }
 
       let closestIntersect;
@@ -827,7 +828,8 @@ namespace gdjs {
     }
 
     updateAndRender() {
-      const objectUnderCursor: gdjs.RuntimeObject | null = this.getObjectUnderCursor();
+      const objectUnderCursor: gdjs.RuntimeObject | null =
+        this.getObjectUnderCursor();
 
       this._handleCameraMovement();
       this._handleSelectionMovement();

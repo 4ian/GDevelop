@@ -642,7 +642,8 @@ declare namespace PIXI {
      */
     export class Particle
       extends PIXI.Sprite
-      implements PIXI.particles.LinkedListChild {
+      implements PIXI.particles.LinkedListChild
+    {
       /**
        * The emitter that controls this particle.
        */

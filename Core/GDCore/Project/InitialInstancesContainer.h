@@ -88,6 +88,13 @@ class GD_CORE_API InitialInstancesContainer {
   void IterateOverInstances(InitialInstanceFunctor &func);
 
   /**
+   * \brief Apply \a func to each instance of the container.
+   * \see InitialInstanceFunctor
+   */
+  void IterateOverInstances(
+    const std::function< void(gd::InitialInstance &) >& func);
+
+  /**
    * Get the instances on the specified layer,
    * sort them regarding their Z order and then apply \a func on them.
    * \param func The functor to be applied.

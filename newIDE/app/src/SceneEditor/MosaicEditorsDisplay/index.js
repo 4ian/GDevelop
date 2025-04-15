@@ -23,7 +23,7 @@ import InstancesList, {
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 
 import Rectangle from '../../Utils/Rectangle';
-import { type EditorId } from '..';
+import { type EditorId } from '../utils';
 import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,
@@ -292,6 +292,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
               lastSelectionType={props.lastSelectionType}
+              onExtensionInstalled={props.onExtensionInstalled}
             />
           )}
         </I18n>

@@ -9,7 +9,7 @@ import flatten from 'lodash/flatten';
 import { getExtensionPrefix } from './EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
-const GROUP_DELIMITER = '/';
+const GROUP_DELIMITER = ' ❯ ';
 
 const shouldOnlyBeNumberType = (type: string) => type === 'number';
 
@@ -66,7 +66,7 @@ export const enumerateFreeExpressions = (
     mapVector(allExtensions, extension => {
       const prefix = getExtensionPrefix(extension, i18n);
       const scope = {
-        extension,
+        extension: { name: extension.getName() },
         objectMetadata: undefined,
         behaviorMetadata: undefined,
       };
@@ -100,7 +100,13 @@ export const enumerateObjectExpressions = (
   );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
-  const scope = { extension, objectMetadata };
+  const scope = {
+    extension: { name: extension.getName() },
+    objectMetadata: {
+      name: objectMetadata.getName(),
+      isPrivate: objectMetadata.isPrivate(),
+    },
+  };
 
   let objectsExpressions = [
     ...(shouldOnlyBeNumberType(type)
@@ -156,7 +162,13 @@ export const enumerateBehaviorExpressions = (
   );
   const extension = extensionAndBehaviorMetadata.getExtension();
   const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
-  const scope = { extension, behaviorMetadata };
+  const scope = {
+    extension: { name: extension.getName() },
+    behaviorMetadata: {
+      name: behaviorMetadata.getName(),
+      isPrivate: behaviorMetadata.isPrivate(),
+    },
+  };
 
   return [
     ...(shouldOnlyBeNumberType(type)
@@ -192,7 +204,13 @@ export const enumerateAllExpressions = (
     //Objects expressions:
     mapVector(extension.getExtensionObjectsTypes(), objectType => {
       const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = { extension, objectMetadata };
+      const scope = {
+        extension: { name: extension.getName() },
+        objectMetadata: {
+          name: objectMetadata.getName(),
+          isPrivate: objectMetadata.isPrivate(),
+        },
+      };
 
       if (!shouldOnlyBeNumberType(type))
         objectsExpressions.push.apply(
@@ -216,7 +234,13 @@ export const enumerateAllExpressions = (
     //Behaviors expressions:
     mapVector(extension.getBehaviorsTypes(), behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = { extension, behaviorMetadata };
+      const scope = {
+        extension: { name: extension.getName() },
+        behaviorMetadata: {
+          name: behaviorMetadata.getName(),
+          isPrivate: behaviorMetadata.isPrivate(),
+        },
+      };
 
       if (!shouldOnlyBeNumberType(type))
         behaviorsExpressions.push.apply(

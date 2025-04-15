@@ -25,9 +25,9 @@ export const Default = () => (
         eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
         selectedEventsBasedObject={null}
         selectedEventsBasedBehavior={null}
-        selectedEventsFunction={testProject.testEventsFunctionsExtension.getEventsFunctionAt(
-          1
-        )}
+        selectedEventsFunction={testProject.testEventsFunctionsExtension
+          .getEventsFunctions()
+          .getEventsFunctionAt(1)}
         // Objects
         onSelectEventsBasedObject={action('object selected')}
         onDeleteEventsBasedObject={action('object deleted')}

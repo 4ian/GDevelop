@@ -161,9 +161,8 @@ namespace gdjs {
       if (!isSpine(this._rendererObject)) {
         return 0;
       }
-      const animation = this._rendererObject.spineData.findAnimation(
-        sourceAnimationName
-      );
+      const animation =
+        this._rendererObject.spineData.findAnimation(sourceAnimationName);
       return animation ? animation.duration : 0;
     }
 
@@ -194,7 +193,14 @@ namespace gdjs {
     }
 
     isAnimationComplete(): boolean {
-      return this._isAnimationComplete;
+      if (!isSpine(this._rendererObject)) {
+        return true;
+      }
+      const track = this._rendererObject.state.tracks[0];
+      if (!track) {
+        return true;
+      }
+      return this._isAnimationComplete && !track.loop;
     }
 
     getPointAttachmentPosition(

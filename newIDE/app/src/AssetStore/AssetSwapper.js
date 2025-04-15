@@ -81,10 +81,18 @@ type SpriteObjectDataType = {
   animations: Array<SpriteAnimationData>,
 };
 
-export const canSwapAssetOfObject = (object: gdObject) => {
-  const type = object.getType();
-  return type === 'Scene3D::Model3DObject' || type === 'Sprite';
-};
+const unswappableObjectTypes = [
+  'BBText::BBText',
+  'TextObject::Text',
+  'Lighting::LightObject',
+  'PrimitiveDrawing::Drawer',
+  'TileMap::TileMap',
+  'TileMap::CollisionMask',
+  'TileMap::SimpleTileMap',
+  'Video::VideoObject',
+];
+export const canSwapAssetOfObject = (object: gdObject) =>
+  !unswappableObjectTypes.includes(object.getType());
 
 const mergeAnimations = function<A: { name: string }>(
   project: gdProject,
@@ -312,7 +320,7 @@ export const swapAsset = (
   assetObject: gdObject,
   assetShortHeader?: ?AssetShortHeader
 ) => {
-  const serializedObject = serializeToJSObject(object);
+  let serializedObject = serializeToJSObject(object);
   const serializedAssetObject = serializeToJSObject(assetObject);
 
   if (object.getType() === 'Sprite') {
@@ -338,6 +346,7 @@ export const swapAsset = (
       scaleX,
       scaleY
     );
+    serializedObject.assetStoreId = serializedAssetObject.assetStoreId;
   } else if (object.getType() === 'Scene3D::Model3DObject') {
     const objectVolume =
       serializedObject.content.width *
@@ -365,6 +374,15 @@ export const swapAsset = (
       centerLocation: serializedObject.content.centerLocation,
     };
     serializedObject.assetStoreId = serializedAssetObject.assetStoreId;
+  } else {
+    serializedObject = {
+      ...serializedAssetObject,
+      name: serializedObject.name,
+      type: serializedObject.type,
+      variables: serializedObject.variables,
+      behaviors: serializedObject.behaviors,
+      effects: serializedObject.effects,
+    };
   }
   unserializeFromJSObject(object, serializedObject, 'unserializeFrom', project);
 };

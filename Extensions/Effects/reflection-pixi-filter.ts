@@ -40,8 +40,9 @@ namespace gdjs {
         return reflectionFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         if (reflectionFilter.animationSpeed !== 0) {
           reflectionFilter.time +=
             (target.getElapsedTime() / 1000) * reflectionFilter.animationSpeed;
@@ -52,8 +53,9 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         if (parameterName === 'boundary') {
           reflectionFilter.boundary = value;
         }
@@ -80,8 +82,9 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         if (parameterName === 'boundary') {
           return reflectionFilter.boundary;
         }
@@ -126,15 +129,17 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         if (parameterName === 'mirror') {
           reflectionFilter.mirror = value;
         }
       }
       getNetworkSyncData(filter: PIXI.Filter): ReflectionFilterNetworkSyncData {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         return {
           b: reflectionFilter.boundary,
           ams: reflectionFilter.amplitude[0],
@@ -151,8 +156,9 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: ReflectionFilterNetworkSyncData
       ) {
-        const reflectionFilter = (filter as unknown) as PIXI.filters.ReflectionFilter &
-          ReflectionFilterExtra;
+        const reflectionFilter =
+          filter as unknown as PIXI.filters.ReflectionFilter &
+            ReflectionFilterExtra;
         reflectionFilter.boundary = data.b;
         reflectionFilter.amplitude[0] = data.ams;
         reflectionFilter.amplitude[1] = data.ame;

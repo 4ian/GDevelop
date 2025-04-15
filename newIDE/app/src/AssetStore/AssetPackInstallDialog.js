@@ -17,6 +17,7 @@ import {
   checkRequiredExtensionsUpdateForAssets,
   installRequiredExtensions,
   installPublicAsset,
+  type RequiredExtensionInstallation,
 } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -151,7 +152,7 @@ const AssetPackInstallDialog = ({
       setAreAssetsBeingInstalled(true);
       try {
         const assets = await fetchAssets(assetShortHeaders);
-        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
+        const requiredExtensionInstallation: RequiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
           {
             assets,
             project,
@@ -174,6 +175,23 @@ const AssetPackInstallDialog = ({
         const { errors, results } = await PromisePool.withConcurrency(6)
           .for(assets)
           .process<InstallAssetOutput>(async asset => {
+            const isAssetCompatibleWithIde = asset.objectAssets.every(
+              objectAsset =>
+                !objectAsset.requiredExtensions ||
+                objectAsset.requiredExtensions.every(requiredExtension =>
+                  requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.every(
+                    extensionShortHeader =>
+                      extensionShortHeader.name !==
+                      requiredExtension.extensionName
+                  )
+                )
+            );
+            if (!isAssetCompatibleWithIde) {
+              throw new Error(
+                'Unable to install the asset. Please upgrade the editor to the latest version.'
+              );
+            }
+
             const doInstall = isPrivateAsset(asset)
               ? installPrivateAsset
               : installPublicAsset;

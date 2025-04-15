@@ -78,9 +78,10 @@ namespace gdjs {
           return;
         }
 
-        const variableName = currentSceneVariables.getVariableNameInContainerByLoopingThroughAllVariables(
-          variable
-        );
+        const variableName =
+          currentSceneVariables.getVariableNameInContainerByLoopingThroughAllVariables(
+            variable
+          );
 
         if (!variableName) {
           logger.error('Variable is being synchronized but has no name.');
@@ -98,9 +99,10 @@ namespace gdjs {
 
         // TODO: prevent returning a networkID if this is not a root variable.
 
-        const variableName = runtimeGameVariables.getVariableNameInContainerByLoopingThroughAllVariables(
-          variable
-        );
+        const variableName =
+          runtimeGameVariables.getVariableNameInContainerByLoopingThroughAllVariables(
+            variable
+          );
         if (!variableName) {
           logger.error('Variable is being synchronized but has no name.');
           return;
@@ -171,9 +173,8 @@ namespace gdjs {
         return;
       }
 
-      const { type: variableType } = getVariableTypeAndNameFromNetworkId(
-        variableNetworkId
-      );
+      const { type: variableType } =
+        getVariableTypeAndNameFromNetworkId(variableNetworkId);
 
       debugLogger.info(
         `Adding variable to be synchronized: ${variableNetworkId} (type: ${variableType}) from owner ${previousVariablePlayerNumber} to ${newVariablePlayerNumber}.`
@@ -220,21 +221,20 @@ namespace gdjs {
       for (const variableNetworkId in variableOwnershipChangesToSyncAtEndOfFrame) {
         const variableData =
           variableOwnershipChangesToSyncAtEndOfFrame[variableNetworkId];
-        const {
-          messageName,
-          messageData,
-        } = gdjs.multiplayerMessageManager.createChangeVariableOwnerMessage({
-          variableNetworkId,
-          variableOwner: variableData.previousVariableOwner,
-          newVariableOwner: variableData.newVariableOwner,
-        });
+        const { messageName, messageData } =
+          gdjs.multiplayerMessageManager.createChangeVariableOwnerMessage({
+            variableNetworkId,
+            variableOwner: variableData.previousVariableOwner,
+            newVariableOwner: variableData.newVariableOwner,
+          });
         // Before sending the change owner message, if we are becoming the new owner,
         // we want to ensure this message is acknowledged, by everyone we're connected to.
         if (variableData.newVariableOwner === currentPlayerNumber) {
           const otherPeerIds = gdjs.multiplayerPeerJsHelper.getAllPeers();
-          const variableOwnerChangedMessageName = gdjs.multiplayerMessageManager.createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
-            messageName
-          );
+          const variableOwnerChangedMessageName =
+            gdjs.multiplayerMessageManager.createVariableOwnerChangedMessageNameFromChangeVariableOwnerMessage(
+              messageName
+            );
           gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
             originalMessageName: messageName,
             originalData: messageData,

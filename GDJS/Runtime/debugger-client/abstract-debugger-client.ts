@@ -119,8 +119,8 @@ namespace gdjs {
       gdevelop: {
         previewContext: runtimeGame.getAdditionalOptions().previewContext,
         isNativeMobileApp: runtimeGame.getAdditionalOptions().nativeMobileApp,
-        versionWithHash: runtimeGame.getAdditionalOptions()
-          .gdevelopVersionWithHash,
+        versionWithHash:
+          runtimeGame.getAdditionalOptions().gdevelopVersionWithHash,
         environment: runtimeGame.getAdditionalOptions().environment,
       },
       game: {
@@ -129,8 +129,8 @@ namespace gdjs {
         packageName: runtimeGame.getGameData().properties.packageName || '',
         version: runtimeGame.getGameData().properties.version || '',
         location: window.location.href,
-        projectTemplateSlug: runtimeGame.getAdditionalOptions()
-          .projectTemplateSlug,
+        projectTemplateSlug:
+          runtimeGame.getAdditionalOptions().projectTemplateSlug,
         sourceGameId: runtimeGame.getAdditionalOptions().sourceGameId,
       },
       gameState: {
@@ -138,10 +138,11 @@ namespace gdjs {
         isWebGLSupported: runtimeGame.getRenderer().isWebGLSupported(),
         hasPixiRenderer: !!runtimeGame.getRenderer().getPIXIRenderer(),
         hasThreeRenderer: !!runtimeGame.getRenderer().getThreeRenderer(),
-        resourcesTotalCount: runtimeGame.getGameData().resources.resources
-          .length,
+        resourcesTotalCount:
+          runtimeGame.getGameData().resources.resources.length,
         antialiasingMode: runtimeGame.getAntialiasingMode(),
-        isAntialisingEnabledOnMobile: runtimeGame.isAntialisingEnabledOnMobile(),
+        isAntialisingEnabledOnMobile:
+          runtimeGame.isAntialisingEnabledOnMobile(),
         scriptFiles: runtimeGame.getAdditionalOptions().scriptFiles,
         currentSceneTimeFromStart: currentScene
           ? currentScene.getTimeManager().getTimeFromStart()
@@ -314,7 +315,9 @@ namespace gdjs {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
       } else if (data.command === 'dragNewInstance') {
-        const gameCoords = runtimeGame.getRenderer().convertPageToGameCoords(data.x, data.y);
+        const gameCoords = runtimeGame
+          .getRenderer()
+          .convertPageToGameCoords(data.x, data.y);
         runtimeGame.getInputManager().onMouseMove(gameCoords[0], gameCoords[1]);
 
         if (runtimeGame._inGameEditor)
@@ -332,8 +335,8 @@ namespace gdjs {
           const reloadUrl = new URL(location.href);
 
           // Construct the initial status to be restored.
-          const initialRuntimeGameStatus = this._runtimegame.getAdditionalOptions()
-            .initialRuntimeGameStatus;
+          const initialRuntimeGameStatus =
+            this._runtimegame.getAdditionalOptions().initialRuntimeGameStatus;
           const runtimeGameStatus: RuntimeGameStatus = {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),

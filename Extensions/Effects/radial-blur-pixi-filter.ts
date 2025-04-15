@@ -20,8 +20,9 @@ namespace gdjs {
         return radialBlurFilter;
       }
       updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {
-        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
-          RadialBlurFilterExtra;
+        const radialBlurFilter =
+          filter as unknown as PIXI.filters.RadialBlurFilter &
+            RadialBlurFilterExtra;
         radialBlurFilter.center[0] = Math.round(
           radialBlurFilter._centerX * target.getWidth()
         );
@@ -34,8 +35,9 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
-          RadialBlurFilterExtra;
+        const radialBlurFilter =
+          filter as unknown as PIXI.filters.RadialBlurFilter &
+            RadialBlurFilterExtra;
         if (parameterName === 'radius') {
           radialBlurFilter.radius = value < 0 ? -1 : value;
         } else if (parameterName === 'angle') {
@@ -55,8 +57,9 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
-          RadialBlurFilterExtra;
+        const radialBlurFilter =
+          filter as unknown as PIXI.filters.RadialBlurFilter &
+            RadialBlurFilterExtra;
         if (parameterName === 'radius') {
           radialBlurFilter.radius;
         }
@@ -96,8 +99,9 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): RadialBlurFilterNetworkSyncData {
-        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
-          RadialBlurFilterExtra;
+        const radialBlurFilter =
+          filter as unknown as PIXI.filters.RadialBlurFilter &
+            RadialBlurFilterExtra;
         return {
           r: radialBlurFilter.radius,
           a: radialBlurFilter.angle,
@@ -111,8 +115,9 @@ namespace gdjs {
         filter: PIXI.Filter,
         data: RadialBlurFilterNetworkSyncData
       ) {
-        const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter &
-          RadialBlurFilterExtra;
+        const radialBlurFilter =
+          filter as unknown as PIXI.filters.RadialBlurFilter &
+            RadialBlurFilterExtra;
         radialBlurFilter.radius = data.r;
         radialBlurFilter.angle = data.a;
         radialBlurFilter.kernelSize = data.ks;

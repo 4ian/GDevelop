@@ -41,6 +41,7 @@ export type InAppTutorialShortHeader = {|
   initialTemplateUrl?: string,
   initialProjectData?: { [key: string]: string },
   isMiniTutorial?: boolean,
+  shouldRestrictUI?: boolean,
 |};
 
 export type EditorIdentifier =
@@ -70,7 +71,12 @@ export type InAppTutorialFlowStepTrigger =
   | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
-  | {| previewLaunched: true |}
+  | {|
+      previewLaunched: true,
+      inGameMessage?: TranslatedText,
+      inGameTouchMessage?: TranslatedText,
+      inGameMessagePosition?: string,
+    |}
   | {| clickOnTooltipButton: TranslatedText |};
 
 export type InAppTutorialFlowStepFormattedTrigger =
@@ -80,7 +86,12 @@ export type InAppTutorialFlowStepFormattedTrigger =
   | {| valueEquals: string | boolean |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
-  | {| previewLaunched: true |}
+  | {|
+      previewLaunched: true,
+      inGameMessage?: TranslatedText,
+      inGameTouchMessage?: TranslatedText,
+      inGameMessagePosition?: string,
+    |}
   | {| clickOnTooltipButton: string |};
 
 export type InAppTutorialTooltip = {|
@@ -124,6 +135,8 @@ export type InAppTutorialFlowStep = {|
   tooltip?: InAppTutorialTooltip,
   skippable?: true,
   isOnClosableDialog?: true,
+  interactsWithCanvas?: true,
+  disableBlockingLayer?: true,
 |};
 
 export type InAppTutorialFlowFormattedStep = {|
@@ -141,6 +154,7 @@ export type InAppTutorial = {|
   endDialog: InAppTutorialDialog,
   availableLocales?: Array<string>,
   isMiniTutorial?: boolean,
+  shouldRestrictUI?: boolean,
 |};
 
 export const fetchInAppTutorialShortHeaders = async (): Promise<

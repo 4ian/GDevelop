@@ -6,6 +6,7 @@
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
+
 #include "GDCore/String.h"
 
 namespace gd {
@@ -31,5 +32,10 @@ gd::String GetTranslation(const char* str) {  // TODO: Inline?
       str);
   return gd::String(translatedStr);  // TODO: Is copying necessary?
 }
+
+gd::String GetTranslation(const gd::String& str) {
+  return GetTranslation(str.c_str());
+}
+
 }  // namespace gd
 #endif

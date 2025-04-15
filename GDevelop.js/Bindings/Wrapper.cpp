@@ -44,8 +44,9 @@
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
+#include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/GroupVariableHelper.h>
+#include <GDCore/IDE/ObjectVariableHelper.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -77,6 +78,7 @@
 #include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
+#include <GDCore/Project/ObjectTools.h>
 #include <GDCore/Project/ObjectFolderOrObject.h>
 #include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
@@ -599,7 +601,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
   GetExtensionAndBehaviorStrExpressionMetadata
 #define STATIC_IsBadExpressionMetadata IsBadExpressionMetadata
+#define STATIC_IsBadInstructionMetadata IsBadInstructionMetadata
 #define STATIC_IsBadBehaviorMetadata IsBadBehaviorMetadata
+#define STATIC_IsBadObjectMetadata IsBadObjectMetadata
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
@@ -658,6 +662,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindInvalidRequiredBehaviorProperties \
   FindInvalidRequiredBehaviorProperties
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
+#define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene
@@ -714,6 +719,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectNameFromFullObjectType GetObjectNameFromFullObjectType
 #define STATIC_ApplyRefactoringForVariablesContainer \
   ApplyRefactoringForVariablesContainer
+  #define STATIC_ApplyRefactoringForObjectVariablesContainer \
+  ApplyRefactoringForObjectVariablesContainer
 #define STATIC_ApplyRefactoringForGroupVariablesContainer \
   ApplyRefactoringForGroupVariablesContainer
 #define STATIC_ComputeChangesetForVariablesContainer \
@@ -810,6 +817,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
 #define STATIC_ScanProject ScanProject
+#define STATIC_GetUsedExtensions GetUsedExtensions
 
 #define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetUndefined GetUndefined

@@ -248,8 +248,17 @@ export const sendTutorialOpened = (tutorialName: string) => {
 export const sendInAppTutorialStarted = (metadata: {|
   tutorialId: string,
   scenario: 'startOver' | 'resume' | 'start',
+  isUIRestricted: boolean,
 |}) => {
   recordEvent('in-app-tutorial-started', metadata);
+};
+
+export const sendInAppTutorialExited = (metadata: {|
+  tutorialId: string,
+  reason: 'completed' | 'user-early-exit',
+  isUIRestricted: boolean,
+|}) => {
+  recordEvent('in-app-tutorial-exited', metadata);
 };
 
 export const sendAssetPackOpened = (options: {|
@@ -376,7 +385,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock build type'
   | 'Manage subscription as teacher'
   | 'Unlock course chapter'
-  | 'Account get premium';
+  | 'Account get premium'
+  | 'AI requests (subscribe)'
+  | 'AI requests (upgrade)';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata
@@ -484,11 +495,11 @@ export const sendEventsExtractedAsFunction = (metadata: {|
 };
 
 const canSendPreviewStarted = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 15, // Only once every 15 minutes per preview kind (outside quick customization).
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 6, // Only once every 6 hours per preview kind (outside quick customization).
 });
 
 const canSendPreviewStartedForQuickCustomization = makeCanSendEvent({
-  minimumTimeBetweenEvents: 1000 * 60 * 1, // Only once every minute per game for quick customization.
+  minimumTimeBetweenEvents: 1000 * 60 * 10, // Only once every 10 minutes per game for quick customization.
 });
 
 export const sendPreviewStarted = (metadata: {|
@@ -563,20 +574,22 @@ const inAppTutorialProgressLastFiredEvents: {
  * Register the progress of a tutorial.
  *
  * To avoid sending too many events, we only send tutorial progress analytics events
- * when some steps are reached (step index == multiple of 5), when the tutorial is completed,
- * or after some inactivity (more than 30 seconds).
+ * when some steps are reached, when the tutorial is completed,
+ * or after some inactivity (more than 90 seconds).
  */
 export const sendInAppTutorialProgress = ({
   step,
   tutorialId,
   isCompleted,
+  isUIRestricted,
 }: {|
   tutorialId: string,
   step: number,
   isCompleted: boolean,
+  isUIRestricted: boolean,
 |}) => {
   const immediatelyRecordEvent = (
-    spentMoreThan30SecondsSinceLastStep: ?boolean
+    spentMoreThan90SecondsSinceLastStep: ?boolean
   ) => {
     // Remember the last step we sent an event for.
     inAppTutorialProgressLastFiredEvents[tutorialId] = {
@@ -587,8 +600,17 @@ export const sendInAppTutorialProgress = ({
       tutorialId,
       step,
       isCompleted,
-      spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
+      isUIRestricted,
+      spentMoreThan90SecondsSinceLastStep: !!spentMoreThan90SecondsSinceLastStep,
     });
+
+    if (isCompleted) {
+      recordEvent('in-app-tutorial-completed', {
+        tutorialId,
+        step,
+        isUIRestricted,
+      });
+    }
   };
 
   // We receive a new progress event, so we can clear the timeout used
@@ -603,17 +625,59 @@ export const sendInAppTutorialProgress = ({
     return;
   }
 
-  // Then, send an event every 5 steps, or if we had more than 5 steps since the last event.
+  // For long tutorials:
+  // send an event every 30 steps, or if we had more than 30 steps since the last event.
   // This last point is important because some steps might be hidden/skipped.
-  if (step % 5 === 0 || step >= lastFiredEvent.lastStep + 5) {
+  if (step % 30 === 0 || step >= lastFiredEvent.lastStep + 30) {
     immediatelyRecordEvent();
     return;
   }
 
-  // Otherwise, continue to remember the last step that was sent, and force to send it 30 seconds
+  // Otherwise, continue to remember the last step that was sent, and force to send it 90 seconds
   // later if there was no more progress.
   inAppTutorialProgressLastFiredEvents[tutorialId] = {
     lastStep: lastFiredEvent.lastStep,
-    nextCheckTimeoutId: setTimeout(() => immediatelyRecordEvent(true), 30000),
+    nextCheckTimeoutId: setTimeout(() => immediatelyRecordEvent(true), 90000),
   };
+};
+
+export const sendAssetSwapStart = ({
+  originalObjectName,
+  objectType,
+}: {|
+  originalObjectName: string,
+  objectType: string,
+|}) => {
+  recordEvent('asset-swap-start', {
+    originalObjectName,
+    objectType,
+  });
+};
+
+export const sendAssetSwapFinished = ({
+  originalObjectName,
+  newObjectName,
+  objectType,
+}: {|
+  originalObjectName: string,
+  newObjectName: string,
+  objectType: string,
+|}) => {
+  recordEvent('asset-swap-finished', {
+    originalObjectName,
+    newObjectName,
+    objectType,
+  });
+};
+
+const canSendPlaySectionOpened = makeCanSendEvent({
+  minimumTimeBetweenEvents: 1000 * 60 * 60 * 2, // Only once every 2 hours.
+});
+
+export const sendPlaySectionOpened = () => {
+  if (!canSendPlaySectionOpened('play-section-opened')) {
+    return;
+  }
+
+  recordEvent('play-section-opened');
 };

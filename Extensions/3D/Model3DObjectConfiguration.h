@@ -152,6 +152,7 @@ public:
   double GetRotationX() const { return rotationX; };
   double GetRotationY() const { return rotationY; };
   double GetRotationZ() const { return rotationZ; };
+  double GetCrossfadeDuration() const { return crossfadeDuration; };
 
   const gd::String& GetModelResourceName() const { return modelResourceName; };
   const gd::String& GetMaterialType() const { return materialType; };
@@ -173,6 +174,7 @@ private:
   double rotationX;
   double rotationY;
   double rotationZ;
+  double crossfadeDuration;
 
   gd::String modelResourceName;
   gd::String materialType;

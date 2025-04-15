@@ -16,7 +16,7 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        const dotFilter = filter as unknown as PIXI.filters.DotFilter;
         if (parameterName === 'scale') {
           dotFilter.scale = value;
         } else if (parameterName === 'angle') {
@@ -24,7 +24,7 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        const dotFilter = filter as unknown as PIXI.filters.DotFilter;
         if (parameterName === 'scale') {
           return dotFilter.scale;
         }
@@ -52,14 +52,14 @@ namespace gdjs {
         value: boolean
       ) {}
       getNetworkSyncData(filter: PIXI.Filter): DotFilterNetworkSyncData {
-        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        const dotFilter = filter as unknown as PIXI.filters.DotFilter;
         return { s: dotFilter.scale, a: dotFilter.angle };
       }
       updateFromNetworkSyncData(
         filter: PIXI.Filter,
         data: DotFilterNetworkSyncData
       ) {
-        const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+        const dotFilter = filter as unknown as PIXI.filters.DotFilter;
         dotFilter.scale = data.s;
         dotFilter.angle = data.a;
       }

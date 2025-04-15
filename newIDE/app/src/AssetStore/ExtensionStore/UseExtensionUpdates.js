@@ -50,7 +50,10 @@ export const useExtensionUpdate = (
 ): UpdateMetadata | null => {
   return useMemo<UpdateMetadata | null>(
     () => {
-      const extensionName = extension.extensionName || extension.name;
+      const extensionName =
+        typeof extension.extensionName === 'string'
+          ? extension.extensionName
+          : extension.name;
       return project.hasEventsFunctionsExtensionNamed(extensionName)
         ? getUpdateMetadataFromVersions(
             project.getEventsFunctionsExtension(extensionName).getVersion(),

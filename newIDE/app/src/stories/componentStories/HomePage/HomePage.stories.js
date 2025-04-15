@@ -94,6 +94,7 @@ const WrappedHomePage = ({
                 isActive={true}
                 projectItemName={null}
                 setToolbar={() => {}}
+                hideTabsTitleBarAndEditorToolbar={() => {}}
                 canOpen={true}
                 storageProviders={[CloudStorageProvider]}
                 onChooseProject={() => action('onChooseProject')()}
@@ -136,6 +137,14 @@ const WrappedHomePage = ({
                   gamesFetchingError: null,
                   onGameUpdated: () => {},
                   markGameAsSavedIfRelevant: async () => {},
+                }}
+                gamesPlatformFrameTools={{
+                  startTimeoutToUnloadIframe: () => {},
+                  loadIframeOrRemoveTimeout: () => {},
+                  iframeLoaded: false,
+                  iframeVisible: false,
+                  iframeErrored: false,
+                  renderGamesPlatformFrame: () => null,
                 }}
               />
             </TutorialStateProvider>

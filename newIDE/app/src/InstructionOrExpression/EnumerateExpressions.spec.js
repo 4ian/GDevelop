@@ -229,7 +229,7 @@ describe('EnumerateExpressions', () => {
       'Timers and time': {
         Time: {
           displayedName: 'Current time',
-          fullGroupName: 'General/Timers and time',
+          fullGroupName: 'General ❯ Timers and time',
           iconFilename: 'res/actions/time.png',
           isPrivate: false,
           name: 'Time',
@@ -251,7 +251,7 @@ describe('EnumerateExpressions', () => {
       Angle: {
         Angle: {
           displayedName: 'Angle',
-          fullGroupName: 'General/Objects/Angle',
+          fullGroupName: 'General ❯ Objects ❯ Angle',
           iconFilename: 'res/actions/direction_black.png',
           isPrivate: false,
           name: 'Angle',
@@ -270,7 +270,7 @@ describe('EnumerateExpressions', () => {
       Position: {
         PointX: {
           displayedName: 'X position of a point',
-          fullGroupName: 'General/Sprite/Position',
+          fullGroupName: 'General ❯ Sprite ❯ Position',
           iconFilename: 'res/actions/position_black.png',
           isPrivate: false,
           name: 'PointX',
@@ -292,7 +292,8 @@ describe('EnumerateExpressions', () => {
       'Platformer configuration': {
         MaxSpeed: {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'Movement/Platform behavior/Platformer configuration',
+          fullGroupName:
+            'Movement ❯ Platform behavior ❯ Platformer configuration',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',

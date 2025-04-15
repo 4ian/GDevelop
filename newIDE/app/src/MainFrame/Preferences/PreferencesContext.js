@@ -49,7 +49,6 @@ export type AlertMessageIdentifier =
 
 export type EditorMosaicName =
   | 'scene-editor'
-  | 'scene-editor-small'
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor';
@@ -237,6 +236,7 @@ export type PreferencesValues = {|
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
+  showAiAskButtonInTitleBar: boolean,
 |};
 
 /**
@@ -275,7 +275,9 @@ export type Preferences = {|
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => void,
-  getRecentProjectFiles: () => Array<FileMetadataAndStorageProviderName>,
+  getRecentProjectFiles: (
+    options: ?{| limit: number |}
+  ) => Array<FileMetadataAndStorageProviderName>,
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => void,
@@ -339,6 +341,7 @@ export type Preferences = {|
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
+  setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -396,6 +399,7 @@ export const initialPreferences = {
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
+    showAiAskButtonInTitleBar: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -424,7 +428,7 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
-  getRecentProjectFiles: () => [],
+  getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: () => true,
@@ -470,6 +474,7 @@ export const initialPreferences = {
     orderBy: 'lastModifiedAt' | 'totalSessions' | 'weeklySessions'
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
+  setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -68,7 +68,8 @@ namespace gdjs {
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._isLightingLayer = layer.isLightingLayer();
-      const parentRendererObject = runtimeInstanceContainerRenderer.getRendererObject();
+      const parentRendererObject =
+        runtimeInstanceContainerRenderer.getRendererObject();
       if (parentRendererObject) {
         parentRendererObject.addChild(this._pixiContainer);
       }
@@ -365,7 +366,8 @@ namespace gdjs {
       } else {
         // This is a layer of a custom object.
 
-        const parentThreeObject = runtimeInstanceContainerRenderer.get3DRendererObject();
+        const parentThreeObject =
+          runtimeInstanceContainerRenderer.get3DRendererObject();
         if (!parentThreeObject) {
           // No parent 3D renderer object, 3D is disabled.
           return;
@@ -737,9 +739,8 @@ namespace gdjs {
         return;
       }
 
-      const glTexture = this._renderTexture.baseTexture._glTextures[
-        pixiRenderer.CONTEXT_UID
-      ];
+      const glTexture =
+        this._renderTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID];
       if (glTexture) {
         // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
         // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
@@ -766,7 +767,8 @@ namespace gdjs {
 
       this._lightingSprite = new PIXI.Sprite(this._renderTexture);
       this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-      const parentPixiContainer = runtimeInstanceContainerRenderer.getRendererObject();
+      const parentPixiContainer =
+        runtimeInstanceContainerRenderer.getRendererObject();
       if (parentPixiContainer) {
         const index = parentPixiContainer.getChildIndex(this._pixiContainer);
         parentPixiContainer.addChildAt(this._lightingSprite, index);

@@ -21,6 +21,8 @@ const getTransparentMaterial = () => {
   return transparentMaterial;
 };
 
+const vertexColors = [];
+
 /**
  * Renderer for gd.SpriteObject
  */
@@ -65,6 +67,14 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
 
     this.updateSprite();
     const geometry = new THREE.PlaneGeometry(1, -1);
+    // Set a white tint.
+    vertexColors.length = geometry.attributes.position.count * 3;
+    vertexColors.fill(1);
+    geometry.setAttribute(
+      'color',
+      new THREE.BufferAttribute(new Float32Array(vertexColors), 3)
+    );
+
     const threeObject = new THREE.Mesh(geometry, getTransparentMaterial());
     threeObject.rotation.order = 'ZYX';
     this._threeGroup.add(threeObject);

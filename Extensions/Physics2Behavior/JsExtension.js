@@ -20,8 +20,8 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Physics2',
-        _('Physics Engine 2.0'),
-        "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
+        _('2D Physics Engine'),
+        "The 2D physics engine simulates realistic object physics, with gravity, forces, collisions, joints, etc. It's perfect for 2D games that need to have realistic behaving objects and a gameplay centered around it.",
         'Florian Rival, Franco Maciel',
         'MIT'
       )
@@ -326,7 +326,7 @@ module.exports = {
         .setLabel(_('Density'))
         .setDescription(
           _(
-            'Define the weight of the object, according to its size. The biggeer the density, the heavier the object.'
+            'Define the weight of the object, according to its size. The bigger the density, the heavier the object.'
           )
         );
       behaviorProperties
@@ -515,10 +515,10 @@ module.exports = {
       // extension
       .addBehavior(
         'Physics2Behavior',
-        _('Physics Engine 2.0'),
+        _('2D Physics Engine'),
         'Physics2',
         _(
-          'Simulate realistic object physics with gravity, forces, joints, etc.'
+          'Simulate realistic 2D physics for the object including gravity, forces, collisions, and joints.'
         ),
         '',
         'res/physics32.png',
@@ -2076,7 +2076,7 @@ module.exports = {
           'Add a distance joint between two objects. The length is converted to meters using the world scale on X. The frequency and damping ratio are related to the joint speed of oscillation and how fast it stops.'
         ),
         _('Add a distance joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
       )
@@ -2130,7 +2130,7 @@ module.exports = {
         _('Distance joint length'),
         _('Modify a distance joint length.'),
         _('the length for distance joint _PARAM2_'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
       )
@@ -2150,7 +2150,7 @@ module.exports = {
         'DistanceJointLength',
         _('Distance joint length'),
         _('Distance joint length'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2165,7 +2165,7 @@ module.exports = {
         _('Distance joint frequency'),
         _('Modify a distance joint frequency.'),
         _('the frequency for distance joint _PARAM2_'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
       )
@@ -2185,7 +2185,7 @@ module.exports = {
         'DistanceJointFrequency',
         _('Distance joint frequency'),
         _('Distance joint frequency'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2200,7 +2200,7 @@ module.exports = {
         _('Distance joint damping ratio'),
         _('Modify a distance joint damping ratio.'),
         _('the damping ratio for distance joint _PARAM2_'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint24.png',
         'JsPlatform/Extensions/distance_joint16.png'
       )
@@ -2220,7 +2220,7 @@ module.exports = {
         'DistanceJointDampingRatio',
         _('Distance joint damping ratio'),
         _('Distance joint damping ratio'),
-        _('Joints/Distance'),
+        _('Joints ❯ Distance'),
         'JsPlatform/Extensions/distance_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2238,7 +2238,7 @@ module.exports = {
           'Add a revolute joint to an object at a fixed point. The object is attached as the second object in the joint, so you can use this for gear joints.'
         ),
         _('Add a revolute joint to _PARAM0_ at _PARAM2_;_PARAM3_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2287,7 +2287,7 @@ module.exports = {
           'Add a revolute joint between two objects. The reference angle determines what is considered as the base angle at the initial state.'
         ),
         _('Add a revolute joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2343,7 +2343,7 @@ module.exports = {
         'RevoluteJointReferenceAngle',
         _('Revolute joint reference angle'),
         _('Revolute joint reference angle'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2357,7 +2357,7 @@ module.exports = {
         'RevoluteJointAngle',
         _('Revolute joint current angle'),
         _('Revolute joint current angle'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2371,7 +2371,7 @@ module.exports = {
         'RevoluteJointSpeed',
         _('Revolute joint angular speed'),
         _('Revolute joint angular speed'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2386,7 +2386,7 @@ module.exports = {
         _('Revolute joint limits enabled'),
         _('Check if a revolute joint limits are enabled.'),
         _('Limits for revolute joint _PARAM2_ are enabled'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2402,7 +2402,7 @@ module.exports = {
         _('Enable revolute joint limits'),
         _('Enable or disable a revolute joint angle limits.'),
         _('Enable limits for revolute joint _PARAM2_: _PARAM3_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2419,7 +2419,7 @@ module.exports = {
         _('Revolute joint limits'),
         _('Modify a revolute joint angle limits.'),
         _('Set the limits to _PARAM3_;_PARAM4_ for revolute joint _PARAM2_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2436,7 +2436,7 @@ module.exports = {
         'RevoluteJointMinAngle',
         _('Revolute joint minimum angle'),
         _('Revolute joint minimum angle'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2450,7 +2450,7 @@ module.exports = {
         'RevoluteJointMaxAngle',
         _('Revolute joint maximum angle'),
         _('Revolute joint maximum angle'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2465,7 +2465,7 @@ module.exports = {
         _('Revolute joint motor enabled'),
         _('Check if a revolute joint motor is enabled.'),
         _('Motor of revolute joint _PARAM2_ is enabled'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2481,7 +2481,7 @@ module.exports = {
         _('Enable revolute joint motor'),
         _('Enable or disable a revolute joint motor.'),
         _('Enable motor for revolute joint _PARAM2_: _PARAM3_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2498,7 +2498,7 @@ module.exports = {
         _('Revolute joint motor speed'),
         _('Modify a revolute joint motor speed.'),
         _('the motor speed for revolute joint _PARAM2_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2518,7 +2518,7 @@ module.exports = {
         'RevoluteJointMotorSpeed',
         _('Revolute joint motor speed'),
         _('Revolute joint motor speed'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2533,7 +2533,7 @@ module.exports = {
         _('Revolute joint max motor torque'),
         _('Modify a revolute joint maximum motor torque.'),
         _('the maximum motor torque for revolute joint _PARAM2_'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint24.png',
         'JsPlatform/Extensions/revolute_joint16.png'
       )
@@ -2553,7 +2553,7 @@ module.exports = {
         'RevoluteJointMaxMotorTorque',
         _('Revolute joint max motor torque'),
         _('Revolute joint maximum motor torque'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2567,7 +2567,7 @@ module.exports = {
         'RevoluteJointMotorTorque',
         _('Revolute joint motor torque'),
         _('Revolute joint motor torque'),
-        _('Joints/Revolute'),
+        _('Joints ❯ Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2585,7 +2585,7 @@ module.exports = {
           'Add a prismatic joint between two objects. The translation limits are converted to meters using the world scale on X.'
         ),
         _('Add a prismatic joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2647,7 +2647,7 @@ module.exports = {
         'PrismaticJointAxisAngle',
         _('Prismatic joint axis angle'),
         _('Prismatic joint axis angle'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2661,7 +2661,7 @@ module.exports = {
         'PrismaticJointReferenceAngle',
         _('Prismatic joint reference angle'),
         _('Prismatic joint reference angle'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2675,7 +2675,7 @@ module.exports = {
         'PrismaticJointTranslation',
         _('Prismatic joint current translation'),
         _('Prismatic joint current translation'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2689,7 +2689,7 @@ module.exports = {
         'PrismaticJointSpeed',
         _('Prismatic joint current speed'),
         _('Prismatic joint speed'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2704,7 +2704,7 @@ module.exports = {
         _('Prismatic joint limits enabled'),
         _('Check if a prismatic joint limits are enabled.'),
         _('Limits for prismatic joint _PARAM2_ are enabled'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2720,7 +2720,7 @@ module.exports = {
         _('Enable prismatic joint limits'),
         _('Enable or disable a prismatic joint limits.'),
         _('Enable limits for prismatic joint _PARAM2_: _PARAM3_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2737,7 +2737,7 @@ module.exports = {
         _('Prismatic joint limits'),
         _('Modify a prismatic joint limits.'),
         _('Set the limits to _PARAM3_;_PARAM4_ for prismatic joint _PARAM2_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2754,7 +2754,7 @@ module.exports = {
         'PrismaticJointMinTranslation',
         _('Prismatic joint minimum translation'),
         _('Prismatic joint minimum translation'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2768,7 +2768,7 @@ module.exports = {
         'PrismaticJointMaxTranslation',
         _('Prismatic joint maximum translation'),
         _('Prismatic joint maximum translation'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2783,7 +2783,7 @@ module.exports = {
         _('Prismatic joint motor enabled'),
         _('Check if a prismatic joint motor is enabled.'),
         _('Motor for prismatic joint _PARAM2_ is enabled'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2799,7 +2799,7 @@ module.exports = {
         _('Enable prismatic joint motor'),
         _('Enable or disable a prismatic joint motor.'),
         _('Enable motor for prismatic joint _PARAM2_: _PARAM3_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2816,7 +2816,7 @@ module.exports = {
         _('Prismatic joint motor speed'),
         _('Modify a prismatic joint motor speed.'),
         _('the motor force for prismatic joint _PARAM2_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2836,7 +2836,7 @@ module.exports = {
         'PrismaticJointMotorSpeed',
         _('Prismatic joint motor speed'),
         _('Prismatic joint motor speed'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2851,7 +2851,7 @@ module.exports = {
         _('Prismatic joint max motor force'),
         _('Modify a prismatic joint maximum motor force.'),
         _('the maximum motor force for prismatic joint _PARAM2_'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint24.png',
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
@@ -2871,7 +2871,7 @@ module.exports = {
         'PrismaticJointMaxMotorForce',
         _('Prismatic joint max motor force'),
         _('Prismatic joint maximum motor force'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2885,7 +2885,7 @@ module.exports = {
         'PrismaticJointMotorForce',
         _('Prismatic joint motor force'),
         _('Prismatic joint motor force'),
-        _('Joints/Prismatic'),
+        _('Joints ❯ Prismatic'),
         'JsPlatform/Extensions/prismatic_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2903,7 +2903,7 @@ module.exports = {
           'Add a pulley joint between two objects. Lengths are converted to meters using the world scale on X.'
         ),
         _('Add a pulley joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint24.png',
         'JsPlatform/Extensions/pulley_joint16.png'
       )
@@ -2962,7 +2962,7 @@ module.exports = {
         'PulleyJointFirstGroundAnchorX',
         _('Pulley joint first ground anchor X'),
         _('Pulley joint first ground anchor X'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2976,7 +2976,7 @@ module.exports = {
         'PulleyJointFirstGroundAnchorY',
         _('Pulley joint first ground anchor Y'),
         _('Pulley joint first ground anchor Y'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -2990,7 +2990,7 @@ module.exports = {
         'PulleyJointSecondGroundAnchorX',
         _('Pulley joint second ground anchor X'),
         _('Pulley joint second ground anchor X'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3004,7 +3004,7 @@ module.exports = {
         'PulleyJointSecondGroundAnchorY',
         _('Pulley joint second ground anchor Y'),
         _('Pulley joint second ground anchor Y'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3018,7 +3018,7 @@ module.exports = {
         'PulleyJointFirstLength',
         _('Pulley joint first length'),
         _('Pulley joint first length'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3032,7 +3032,7 @@ module.exports = {
         'PulleyJointSecondLength',
         _('Pulley joint second length'),
         _('Pulley joint second length'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3046,7 +3046,7 @@ module.exports = {
         'PulleyJointRatio',
         _('Pulley joint ratio'),
         _('Pulley joint ratio'),
-        _('Joints/Pulley'),
+        _('Joints ❯ Pulley'),
         'JsPlatform/Extensions/pulley_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3064,7 +3064,7 @@ module.exports = {
           'Add a gear joint between two joints. Attention: Gear joints require the joints to be revolute or prismatic, and both of them to be attached to a static body as first object.'
         ),
         _('Add a gear joint between joints _PARAM2_ and _PARAM3_'),
-        _('Joints/Gear'),
+        _('Joints ❯ Gear'),
         'JsPlatform/Extensions/gear_joint24.png',
         'JsPlatform/Extensions/gear_joint16.png'
       )
@@ -3095,7 +3095,7 @@ module.exports = {
         'GearJointFirstJoint',
         _('Gear joint first joint'),
         _('Gear joint first joint'),
-        _('Joints/Gear'),
+        _('Joints ❯ Gear'),
         'JsPlatform/Extensions/gear_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3109,7 +3109,7 @@ module.exports = {
         'GearJointSecondJoint',
         _('Gear joint second joint'),
         _('Gear joint second joint'),
-        _('Joints/Gear'),
+        _('Joints ❯ Gear'),
         'JsPlatform/Extensions/gear_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3124,7 +3124,7 @@ module.exports = {
         _('Gear joint ratio'),
         _('Modify a Gear joint ratio.'),
         _('the ratio for gear joint _PARAM2_'),
-        _('Joints/Gear'),
+        _('Joints ❯ Gear'),
         'JsPlatform/Extensions/gear_joint24.png',
         'JsPlatform/Extensions/gear_joint16.png'
       )
@@ -3144,7 +3144,7 @@ module.exports = {
         'GearJointRatio',
         _('Gear joint ratio'),
         _('Gear joint ratio'),
-        _('Joints/Gear'),
+        _('Joints ❯ Gear'),
         'JsPlatform/Extensions/gear_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3162,7 +3162,7 @@ module.exports = {
           'Add a mouse joint to an object (makes the object move towards a specific point).'
         ),
         _('Add a mouse joint to _PARAM0_'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
       )
@@ -3208,7 +3208,7 @@ module.exports = {
         _(
           'Set the target position of mouse joint _PARAM2_ of _PARAM0_ to _PARAM3_;_PARAM4_'
         ),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
       )
@@ -3225,7 +3225,7 @@ module.exports = {
         'MouseJointTargetX',
         _('Mouse joint target X'),
         _('Mouse joint target X'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3239,7 +3239,7 @@ module.exports = {
         'MouseJointTargetY',
         _('Mouse joint target Y'),
         _('Mouse joint target Y'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3254,7 +3254,7 @@ module.exports = {
         _('Mouse joint max force'),
         _('Set a mouse joint maximum force.'),
         _('the maximum force for mouse joint _PARAM2_'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
       )
@@ -3274,7 +3274,7 @@ module.exports = {
         'MouseJointMaxForce',
         _('Mouse joint max force'),
         _('Mouse joint maximum force'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3289,7 +3289,7 @@ module.exports = {
         _('Mouse joint frequency'),
         _('Set a mouse joint frequency.'),
         _('the frequency for mouse joint _PARAM2_'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
       )
@@ -3309,7 +3309,7 @@ module.exports = {
         'MouseJointFrequency',
         _('Mouse joint frequency'),
         _('Mouse joint frequency'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3324,7 +3324,7 @@ module.exports = {
         _('Mouse joint damping ratio'),
         _('Set a mouse joint damping ratio.'),
         _('the damping ratio for mouse joint _PARAM2_'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',
         'JsPlatform/Extensions/mouse_joint16.png'
       )
@@ -3344,7 +3344,7 @@ module.exports = {
         'MouseJointDampingRatio',
         _('Mouse joint damping ratio'),
         _('Mouse joint damping ratio'),
-        _('Joints/Mouse'),
+        _('Joints ❯ Mouse'),
         'JsPlatform/Extensions/mouse_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3362,7 +3362,7 @@ module.exports = {
           'Add a wheel joint between two objects. Higher frequencies means higher suspensions. Damping determines oscillations, critical damping of 1 means no oscillations.'
         ),
         _('Add a wheel joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3420,7 +3420,7 @@ module.exports = {
         'WheelJointAxisAngle',
         _('Wheel joint axis angle'),
         _('Wheel joint axis angle'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3434,7 +3434,7 @@ module.exports = {
         'WheelJointTranslation',
         _('Wheel joint current translation'),
         _('Wheel joint current translation'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3448,7 +3448,7 @@ module.exports = {
         'WheelJointSpeed',
         _('Wheel joint current speed'),
         _('Wheel joint speed'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3463,7 +3463,7 @@ module.exports = {
         _('Wheel joint motor enabled'),
         _('Check if a wheel joint motor is enabled.'),
         _('Motor for wheel joint _PARAM2_ is enabled'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3479,7 +3479,7 @@ module.exports = {
         _('Enable wheel joint motor'),
         _('Enable or disable a wheel joint motor.'),
         _('Enable motor for wheel joint _PARAM2_: _PARAM3_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3496,7 +3496,7 @@ module.exports = {
         _('Wheel joint motor speed'),
         _('Modify a wheel joint motor speed.'),
         _('the motor speed for wheel joint _PARAM2_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3516,7 +3516,7 @@ module.exports = {
         'WheelJointMotorSpeed',
         _('Wheel joint motor speed'),
         _('Wheel joint motor speed'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3531,7 +3531,7 @@ module.exports = {
         _('Wheel joint max motor torque'),
         _('Modify a wheel joint maximum motor torque.'),
         _('the maximum motor torque for wheel joint _PARAM2_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3551,7 +3551,7 @@ module.exports = {
         'WheelJointMaxMotorTorque',
         _('Wheel joint max motor torque'),
         _('Wheel joint maximum motor torque'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3565,7 +3565,7 @@ module.exports = {
         'WheelJointMotorTorque',
         _('Wheel joint motor torque'),
         _('Wheel joint motor torque'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3580,7 +3580,7 @@ module.exports = {
         _('Wheel joint frequency'),
         _('Modify a wheel joint frequency.'),
         _('the frequency for wheel joint _PARAM2_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3600,7 +3600,7 @@ module.exports = {
         'WheelJointFrequency',
         _('Wheel joint frequency'),
         _('Wheel joint frequency'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3615,7 +3615,7 @@ module.exports = {
         _('Wheel joint damping ratio'),
         _('Modify a wheel joint damping ratio.'),
         _('the damping ratio for wheel joint _PARAM2_'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint24.png',
         'JsPlatform/Extensions/wheel_joint16.png'
       )
@@ -3635,7 +3635,7 @@ module.exports = {
         'WheelJointDampingRatio',
         _('Wheel joint damping ratio'),
         _('Wheel joint damping ratio'),
-        _('Joints/Wheel'),
+        _('Joints ❯ Wheel'),
         'JsPlatform/Extensions/wheel_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3651,7 +3651,7 @@ module.exports = {
         _('Add weld joint'),
         _('Add a weld joint between two objects.'),
         _('Add a weld joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint24.png',
         'JsPlatform/Extensions/weld_joint16.png'
       )
@@ -3699,7 +3699,7 @@ module.exports = {
         'WeldJointReferenceAngle',
         _('Weld joint reference angle'),
         _('Weld joint reference angle'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3714,7 +3714,7 @@ module.exports = {
         _('Weld joint frequency'),
         _('Modify a weld joint frequency.'),
         _('the frequency for weld joint _PARAM2_'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint24.png',
         'JsPlatform/Extensions/weld_joint16.png'
       )
@@ -3734,7 +3734,7 @@ module.exports = {
         'WeldJointFrequency',
         _('Weld joint frequency'),
         _('Weld joint frequency'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3749,7 +3749,7 @@ module.exports = {
         _('Weld joint damping ratio'),
         _('Modify a weld joint damping ratio.'),
         _('the damping ratio for weld joint _PARAM2_'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint24.png',
         'JsPlatform/Extensions/weld_joint16.png'
       )
@@ -3769,7 +3769,7 @@ module.exports = {
         'WeldJointDampingRatio',
         _('Weld joint damping ratio'),
         _('Weld joint damping ratio'),
-        _('Joints/Weld'),
+        _('Joints ❯ Weld'),
         'JsPlatform/Extensions/weld_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3787,7 +3787,7 @@ module.exports = {
           'Add a rope joint between two objects. The maximum length is converted to meters using the world scale on X.'
         ),
         _('Add a rope joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Rope'),
+        _('Joints ❯ Rope'),
         'JsPlatform/Extensions/rope_joint24.png',
         'JsPlatform/Extensions/rope_joint16.png'
       )
@@ -3827,7 +3827,7 @@ module.exports = {
         _('Rope joint max length'),
         _('Modify a rope joint maximum length.'),
         _('the maximum length for rope joint _PARAM2_'),
-        _('Joints/Rope'),
+        _('Joints ❯ Rope'),
         'JsPlatform/Extensions/rope_joint24.png',
         'JsPlatform/Extensions/rope_joint16.png'
       )
@@ -3847,7 +3847,7 @@ module.exports = {
         'RopeJointMaxLength',
         _('Rope joint max length'),
         _('Rope joint maximum length'),
-        _('Joints/Rope'),
+        _('Joints ❯ Rope'),
         'JsPlatform/Extensions/rope_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3863,7 +3863,7 @@ module.exports = {
         _('Add friction joint'),
         _('Add a friction joint between two objects.'),
         _('Add a friction joint between _PARAM0_ and _PARAM4_'),
-        _('Joints/Friction'),
+        _('Joints ❯ Friction'),
         'JsPlatform/Extensions/friction_joint24.png',
         'JsPlatform/Extensions/friction_joint16.png'
       )
@@ -3898,7 +3898,7 @@ module.exports = {
         _('Friction joint max force'),
         _('Modify a friction joint maximum force.'),
         _('the maximum force for friction joint _PARAM2_'),
-        _('Joints/Friction'),
+        _('Joints ❯ Friction'),
         'JsPlatform/Extensions/friction_joint24.png',
         'JsPlatform/Extensions/friction_joint16.png'
       )
@@ -3918,7 +3918,7 @@ module.exports = {
         'FrictionJointMaxForce',
         _('Friction joint max force'),
         _('Friction joint maximum force'),
-        _('Joints/Friction'),
+        _('Joints ❯ Friction'),
         'JsPlatform/Extensions/friction_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3933,7 +3933,7 @@ module.exports = {
         _('Friction joint max torque'),
         _('Modify a friction joint maximum torque.'),
         _('the maximum torque for friction joint _PARAM2_'),
-        _('Joints/Friction'),
+        _('Joints ❯ Friction'),
         'JsPlatform/Extensions/friction_joint24.png',
         'JsPlatform/Extensions/friction_joint16.png'
       )
@@ -3953,7 +3953,7 @@ module.exports = {
         'FrictionJointMaxTorque',
         _('Friction joint max torque'),
         _('Friction joint maximum torque'),
-        _('Joints/Friction'),
+        _('Joints ❯ Friction'),
         'JsPlatform/Extensions/friction_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -3971,7 +3971,7 @@ module.exports = {
           'Add a motor joint between two objects. The position and angle offsets are relative to the first object.'
         ),
         _('Add a motor joint between _PARAM0_ and _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4007,7 +4007,7 @@ module.exports = {
         _('Motor joint offset'),
         _('Modify a motor joint offset.'),
         _('Set offset to _PARAM3_;_PARAM4_ for motor joint _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4024,7 +4024,7 @@ module.exports = {
         'MotorJointOffsetX',
         _('Motor joint offset X'),
         _('Motor joint offset X'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -4038,7 +4038,7 @@ module.exports = {
         'MotorJointOffsetY',
         _('Motor joint offset Y'),
         _('Motor joint offset Y'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -4053,7 +4053,7 @@ module.exports = {
         _('Motor joint angular offset'),
         _('Modify a motor joint angular offset.'),
         _('the angular offset for motor joint _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4073,7 +4073,7 @@ module.exports = {
         'MotorJointAngularOffset',
         _('Motor joint angular offset'),
         _('Motor joint angular offset'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -4088,7 +4088,7 @@ module.exports = {
         _('Motor joint max force'),
         _('Modify a motor joint maximum force.'),
         _('the maximum force for motor joint _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4108,7 +4108,7 @@ module.exports = {
         'MotorJointMaxForce',
         _('Motor joint max force'),
         _('Motor joint maximum force'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -4123,7 +4123,7 @@ module.exports = {
         _('Motor joint max torque'),
         _('Modify a motor joint maximum torque.'),
         _('the maximum torque for motor joint _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4143,7 +4143,7 @@ module.exports = {
         'MotorJointMaxTorque',
         _('Motor joint max torque'),
         _('Motor joint maximum torque'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)
@@ -4158,7 +4158,7 @@ module.exports = {
         _('Motor joint correction factor'),
         _('Modify a motor joint correction factor.'),
         _('the correction factor for motor joint _PARAM2_'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint24.png',
         'JsPlatform/Extensions/motor_joint16.png'
       )
@@ -4178,7 +4178,7 @@ module.exports = {
         'MotorJointCorrectionFactor',
         _('Motor joint correction factor'),
         _('Motor joint correction factor'),
-        _('Joints/Motor'),
+        _('Joints ❯ Motor'),
         'JsPlatform/Extensions/motor_joint16.png'
       )
       .addParameter('object', _('Object'), '', false)

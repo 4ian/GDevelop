@@ -48,12 +48,13 @@ export const Default = () => (
         eventsFunctionsExtensionWriter={null}
         eventsFunctionsExtensionOpener={null}
       >
-        <ExtensionStoreStateProvider>
+        <ExtensionStoreStateProvider i18n={i18n}>
           <ExtensionsSearchDialog
             project={testProject.project}
             onClose={action('onClose')}
             onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>
       </EventsFunctionsExtensionsProvider>
@@ -71,12 +72,13 @@ export const WithServerSideError = () => (
         eventsFunctionsExtensionWriter={null}
         eventsFunctionsExtensionOpener={null}
       >
-        <ExtensionStoreStateProvider>
+        <ExtensionStoreStateProvider i18n={i18n}>
           <ExtensionsSearchDialog
             project={testProject.project}
             onClose={action('onClose')}
             onInstallExtension={action('onInstallExtension')}
             onCreateNew={action('onCreateNew')}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </ExtensionStoreStateProvider>
       </EventsFunctionsExtensionsProvider>

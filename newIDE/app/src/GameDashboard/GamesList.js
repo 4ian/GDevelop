@@ -146,13 +146,7 @@ const getDashboardItemsToDisplay = ({
   orderBy: GamesDashboardOrderBy,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
-  let itemsToDisplay: DashboardItem[] = allDashboardItems.filter(
-    item =>
-      // First, filter out unsaved games, unless they are the opened project.
-      !item.game ||
-      item.game.savedStatus !== 'draft' ||
-      (project && item.game.id === project.getProjectUuid())
-  );
+  let itemsToDisplay: DashboardItem[] = [...allDashboardItems];
 
   if (searchText) {
     // If there is a search, just return those items, ordered by the search relevance.
@@ -165,14 +159,15 @@ const getDashboardItemsToDisplay = ({
     itemsToDisplay = searchResults.map(result => result.item);
   } else {
     // If there is no search, sort the items by the selected order.
-    itemsToDisplay =
-      orderBy === 'totalSessions'
-        ? itemsToDisplay.sort(totalSessionsSort)
-        : orderBy === 'weeklySessions'
-        ? itemsToDisplay.sort(lastWeekSessionsSort)
-        : orderBy === 'lastModifiedAt'
-        ? itemsToDisplay.sort(lastModifiedAtSort)
-        : itemsToDisplay;
+    if (orderBy) {
+      itemsToDisplay.sort(
+        orderBy === 'totalSessions'
+          ? totalSessionsSort
+          : orderBy === 'weeklySessions'
+          ? lastWeekSessionsSort
+          : lastModifiedAtSort
+      );
+    }
 
     // If a project is opened, no search is done, and sorted by last modified date,
     // then the opened project should be displayed first.
@@ -325,9 +320,21 @@ const GamesList = ({
           file => !games.find(game => game.id === file.fileMetadata.gameId)
         )
         .map(file => ({ projectFiles: [file] }));
-      return [...projectFilesWithGame, ...projectFilesWithoutGame];
+      const allItems = [...projectFilesWithGame, ...projectFilesWithoutGame];
+
+      return allItems.filter(
+        item =>
+          // Filter out draft games which don't have a project file linked to it (local or cloud)
+          // and which are not the current opened project.
+          !(
+            item.game &&
+            item.game.savedStatus === 'draft' &&
+            (!item.projectFiles || !item.projectFiles.length) &&
+            (!project || item.game.id !== project.getProjectUuid())
+          )
+      );
     },
-    [games, allRecentProjectFiles]
+    [games, allRecentProjectFiles, project]
   );
 
   const totalNumberOfPages = allDashboardItems

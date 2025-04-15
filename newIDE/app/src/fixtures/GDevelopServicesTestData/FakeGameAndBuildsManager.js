@@ -14,8 +14,8 @@ export const fakeEmptyGameAndBuildsManager: GameAndBuildsManager = {
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: null,
-  builds: null,
-  refreshBuilds: async () => {},
+  gameBuilds: null,
+  refreshGameBuilds: async () => {},
   registerGameIfNeeded: async () => {},
 };
 
@@ -24,14 +24,14 @@ export const fakeGameAndBuildsManager: GameAndBuildsManager = {
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: null,
-  builds: [
+  gameBuilds: [
     pendingCordovaBuild,
     pendingElectronBuild,
     completeCordovaBuild,
     completeElectronBuild,
     completeWebBuild,
   ],
-  refreshBuilds: async () => {},
+  refreshGameBuilds: async () => {},
   registerGameIfNeeded: async () => {},
 };
 
@@ -40,8 +40,8 @@ export const fakeNotOwnedGameAndBuildsManager: GameAndBuildsManager = {
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: 'not-owned',
-  builds: null,
-  refreshBuilds: async () => {},
+  gameBuilds: null,
+  refreshGameBuilds: async () => {},
   registerGameIfNeeded: async () => {},
 };
 
@@ -50,7 +50,7 @@ export const fakeUnexpectedErrorGameAndBuildsManager: GameAndBuildsManager = {
   setGame: () => {},
   refreshGame: async () => {},
   gameAvailabilityError: 'unexpected',
-  builds: null,
-  refreshBuilds: async () => {},
+  gameBuilds: null,
+  refreshGameBuilds: async () => {},
   registerGameIfNeeded: async () => {},
 };

@@ -90,7 +90,7 @@ const ProjectFileList = ({
   onDeleteCloudProject,
   disabled,
 }: Props) => {
-  const projectFiles = useProjectsListFor(game);
+  const projectFiles = useProjectsListFor(game.id);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const [loadingProjectId, setLoadingProjectId] = React.useState<?string>(null);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);

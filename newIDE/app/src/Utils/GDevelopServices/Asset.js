@@ -102,10 +102,10 @@ export type PrivateAssetPackAssetType =
   | 'sprite'
   | '9patch'
   | 'tiled'
-  | 'partial'
   | 'Scene3D::Model3DObject'
   | 'TileMap::SimpleTileMap'
-  | 'ParticleSystem::ParticleEmitter';
+  | 'ParticleSystem::ParticleEmitter'
+  | string;
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 
@@ -189,16 +189,20 @@ export type CourseChapterTask = {|
 export type UnlockedCourseChapter = {|
   id: string,
   title: string,
+  shortTitle?: string,
   videoUrl: string,
   isLocked?: false,
+  isFree?: boolean,
   templateUrl: string,
   tasks: Array<CourseChapterTask>,
 |};
 export type LockedCourseChapter = {|
   id: string,
   title: string,
+  shortTitle?: string,
   videoUrl: string,
   isLocked: true,
+  isFree?: boolean,
   priceInCredits?: number,
   productId: string,
 |};
@@ -237,12 +241,12 @@ export const doesAssetPackContainAudio = (
 /**
  * Check if the IDE version, passed as argument, satisfy the version required by the asset.
  */
-export const isCompatibleWithAsset = (
+export const isCompatibleWithGDevelopVersion = (
   ideVersion: string,
-  assetHeader: { gdevelopVersion: string }
+  assetRequiredGDevelopVersion: ?string
 ) =>
-  assetHeader.gdevelopVersion
-    ? semverSatisfies(ideVersion, assetHeader.gdevelopVersion, {
+  assetRequiredGDevelopVersion
+    ? semverSatisfies(ideVersion, assetRequiredGDevelopVersion, {
         includePrerelease: true,
       })
     : true;

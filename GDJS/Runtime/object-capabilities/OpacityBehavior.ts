@@ -23,7 +23,8 @@ namespace gdjs {
    */
   export class OpacityBehavior
     extends gdjs.RuntimeBehavior
-    implements OpacityHandler {
+    implements OpacityHandler
+  {
     private object: gdjs.RuntimeObject & OpacityHandler;
 
     constructor(

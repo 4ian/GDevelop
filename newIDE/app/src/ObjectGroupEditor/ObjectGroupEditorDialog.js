@@ -18,6 +18,7 @@ type Props = {|
   onObjectGroupAdded: (objectGroup: gdObjectGroup) => void,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
+  initialInstances: gdInitialInstancesContainer | null,
   /**
    * Event-based functions have an ObjectGroupContainer containing the groups,
    * but no ObjectsContainer. Instead, the ObjectsContainer is generated from
@@ -40,6 +41,7 @@ const ObjectGroupEditorDialog = ({
   onObjectGroupAdded,
   globalObjectsContainer,
   objectsContainer,
+  initialInstances,
   bypassedObjectGroupsContainer,
   initialTab,
   onComputeAllVariableNames,
@@ -85,7 +87,7 @@ const ObjectGroupEditorDialog = ({
         objectGroup.addObject(objectName);
       }
       if (shouldSpreadAnyVariables) {
-        gd.GroupVariableHelper.fillAnyVariableBetweenObjects(
+        gd.ObjectVariableHelper.fillAnyVariableBetweenObjects(
           globalObjectsContainer || objectsContainer,
           objectsContainer,
           objectGroup
@@ -125,6 +127,7 @@ const ObjectGroupEditorDialog = ({
       onCancel={onCancel}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
+      initialInstances={initialInstances}
       initialTab={selectedTab}
       onComputeAllVariableNames={onComputeAllVariableNames}
     />

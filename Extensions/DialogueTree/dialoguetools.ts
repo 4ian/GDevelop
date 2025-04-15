@@ -249,13 +249,16 @@ namespace gdjs {
           (clipTextEnd === 0 || clipTextEnd !== dialogueText.length)
         ) {
           pauseScrolling = true;
-          setTimeout(function () {
-            pauseScrolling = false;
-            commandCalls.splice(index, 1);
-            if (gdjs.dialogueTree.getVariable('debug')) {
-              logger.info('CMD:', call);
-            }
-          }, parseInt(call.params[1], 10));
+          setTimeout(
+            function () {
+              pauseScrolling = false;
+              commandCalls.splice(index, 1);
+              if (gdjs.dialogueTree.getVariable('debug')) {
+                logger.info('CMD:', call);
+              }
+            },
+            parseInt(call.params[1], 10)
+          );
         }
         if (call.cmd === command) {
           commandParameters = call.params;

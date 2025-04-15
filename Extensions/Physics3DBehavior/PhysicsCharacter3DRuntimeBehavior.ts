@@ -1503,6 +1503,7 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
 
+        // Jolt doesn't support center of mass offset for characters.
         const shape = behavior.createShapeWithoutMassCenterOffset();
 
         const settings = new Jolt.CharacterVirtualSettings();
@@ -1557,6 +1558,7 @@ namespace gdjs {
             this.characterBehavior.charactersManager.removeCharacter(
               this.characterBehavior.character
             );
+            // Character.mListener is a plain pointer, it's not destroyed with the character.
             Jolt.destroy(this.characterBehavior.character.GetListener());
           }
           Jolt.destroy(this.characterBehavior.character);

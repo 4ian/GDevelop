@@ -3418,6 +3418,21 @@ module.exports = {
         .setFunctionName('getCurrentGear');
 
       aut
+        .addScopedCondition(
+          'IsOnFloor',
+          _('Is on floor'),
+          _('Check if any wheel is in contact with the ground.'),
+          _('_PARAM0_ is on floor'),
+          _('Car state'),
+          'JsPlatform/Extensions/physics_car3d.svg',
+          'JsPlatform/Extensions/physics_car3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
+        .markAsSimple()
+        .setFunctionName('isOnFloor');
+
+      aut
         .addExpressionAndConditionAndAction(
           'number',
           'EngineTorqueMax',

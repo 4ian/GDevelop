@@ -9,6 +9,9 @@ namespace gdjs {
     hbk: boolean;
     asf: float;
     ssf: float;
+    etm: float;
+    esm: float;
+    ei: float;
   }
 
   export interface PhysicsCar3DNetworkSyncData extends BehaviorNetworkSyncData {
@@ -278,6 +281,9 @@ namespace gdjs {
           hbk: this._wasHandBreakKeyPressed,
           asf: this._previousAcceleratorStickForce,
           ssf: this._previousSteeringStickForce,
+          etm: this._engineTorqueMax,
+          esm: this._engineSpeedMax,
+          ei: this._engineInertia,
         },
       };
     }
@@ -295,6 +301,9 @@ namespace gdjs {
       this._hasPressedHandBreakKey = behaviorSpecificProps.hbk;
       this._acceleratorStickForce = behaviorSpecificProps.asf;
       this._steeringStickForce = behaviorSpecificProps.ssf;
+      this._engineTorqueMax = behaviorSpecificProps.etm;
+      this._engineSpeedMax = behaviorSpecificProps.esm;
+      this._engineInertia = behaviorSpecificProps.ei;
 
       // When the object is synchronized from the network, the inputs must not be cleared.
       this._dontClearInputsBetweenFrames = true;

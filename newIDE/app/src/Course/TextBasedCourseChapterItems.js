@@ -5,6 +5,7 @@ import type {
   TextBasedCourseChapterTaskItem as TextBasedCourseChapterTaskItemType,
   TextBasedCourseChapterTextItem as TextBasedCourseChapterTextItemType,
   TextBasedCourseChapterImageItem as TextBasedCourseChapterImageItemType,
+  TextBasedCourseChapterVideoItem as TextBasedCourseChapterVideoItemType,
 } from '../Utils/GDevelopServices/Asset';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -14,8 +15,8 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { Column, Line } from '../UI/Grid';
 
 const styles = {
-  image: {
-    maxWidth: '100%',
+  media: {
+    maxWidth: '80%',
   },
 };
 const TextBasedCourseChapterItems = ({
@@ -26,9 +27,12 @@ const TextBasedCourseChapterItems = ({
         | TextBasedCourseChapterTaskItemType
         | TextBasedCourseChapterTextItemType
         | TextBasedCourseChapterImageItemType
+        | TextBasedCourseChapterVideoItemType
       >
     | Array<
-        TextBasedCourseChapterTextItemType | TextBasedCourseChapterImageItemType
+        | TextBasedCourseChapterTextItemType
+        | TextBasedCourseChapterImageItemType
+        | TextBasedCourseChapterVideoItemType
       >,
 }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -49,8 +53,20 @@ const TextBasedCourseChapterItems = ({
           }
           if (item.type === 'image') {
             return (
-              <ColumnStackLayout key={itemIndex.toString()}>
-                <ImageWithZoom style={styles.image} alt="" src={item.url} />
+              <ColumnStackLayout key={itemIndex.toString()} alignItems="center">
+                <ImageWithZoom width="80%" alt="" src={item.url} />
+                {item.caption && (
+                  <div style={{ color: gdevelopTheme.text.color.secondary }}>
+                    <MarkdownText source={item.caption} />
+                  </div>
+                )}
+              </ColumnStackLayout>
+            );
+          }
+          if (item.type === 'video') {
+            return (
+              <ColumnStackLayout key={itemIndex.toString()} alignItems="center">
+                <video src={item.url} style={styles.media} controls />
                 {item.caption && (
                   <div style={{ color: gdevelopTheme.text.color.secondary }}>
                     <MarkdownText source={item.caption} />

@@ -13,7 +13,6 @@ export default {
 };
 
 const courseChapter1: UnlockedTextBasedCourseChapter = {
-  id: 'intro',
   title: 'Introduction',
   templates: [],
   items: [
@@ -45,7 +44,7 @@ const courseChapter1: UnlockedTextBasedCourseChapter = {
     {
       type: 'image',
       url:
-        'https://prod-files-secure.s3.us-west-2.amazonaws.com/2f7dd1de-c6e0-4f5e-a2bd-f7d1a2207717/0426867a-ae95-485a-885d-16a46bb9886f/monstra.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666KF36RKA%2F20250321%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250321T233352Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFcaCXVzLXdlc3QtMiJIMEYCIQC6ALd%2FSfLxXnfeHPwLpMosGrPadmhTJrSZPdT1ZRdkVAIhAJsAuB1M5blc73SqsYBYboIW2jGSjNi7oRCjpFk3oZO8KogECLD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNjM3NDIzMTgzODA1IgwdpI7FtHRoSretxXAq3AO4nPDEZCkWiKYzJqcwxM0sFoHhdFw0XCNQqR7t2p2VeAEeCtfbj827plsPuPd7AqbHLPAsbmuuS5HfRZlBB2bNn16ywSVQYLJf1pKGNPIm7nfGeij5yF%2B02ba8PmZfiHPQWjZ9IXzoKUio9aWtKRdb3oSY277TG9WmmrzcA6gFB1tkgDP3bwV6VNRLYlC2bEfl0SLsX0bEkPNupoXh%2B2cmTCFWAazxxWnf%2Bx9TfsQhRWGMEq9dD9q836QZpZk7Cdd4ppMLai5DSsxo5gjINxV40ffDpbAVDVC0%2BatPOWwTVS06Q3coUkkdMNSUnsf87qDsZMBi0RbT%2B5dV%2Bl336ZyFayEJbYKYuuGpG629Xhc17BUFoaCxJeK7sig1prmNnX37LMJGE1xIPnp34nXudXTLvJBto%2BLnamx3z6SXhaPI3ICdjHTawKIaSbuYGMFm6xjYORolHzzUv6JbWeTCV1bg5%2Ful2eLQsNAP%2BIW9HC31xSYWcKlj4J2OSY3OAhZ0Fukoh3Icuc%2B%2F76RvcPUP1ydemkijSt3siGFhh20vx%2F3AWubEWQauDZAN4Hau1FAiEZ4QCt9hHG0b9sXDby%2B8UHLHzcG8w%2BYlSdgYKKwjSMINsO%2FgHckvnsU%2BrDskqzDb1ve%2BBjqkAUcnRbCFWdwaSUWoh7u7DsdIrNxEu26%2Ficv94Oy3KubcRM5PytPDj%2F3sxgXW4SYGSPPv2%2F836evAMN8CEwihCsoz4JUvNqme%2BoavjXrBgEcv6o1USUBNiQYMX0mienlrinXgNHSlwHDEL4NR3z9FtCmaTpsai0z3VkyJ7AoUTblkT2V71h1OSGz4gPnasFI9UXGw6tSUHlIypguNukVhe4%2BB%2By7J&X-Amz-Signature=7eb6697a2dea497ff86d6b0fcd711061ab766d821e214b4ffe8d0997c0914f41&X-Amz-SignedHeaders=host&x-id=GetObject',
+        'https://public-resources.gdevelop.io/staging/course/images/0426867a-ae95-485a-885d-16a46bb9886f.png',
       caption: '*Monstra by Game Creator MOHMOH available on gd.games*',
     },
     {
@@ -71,7 +70,7 @@ const courseChapter1: UnlockedTextBasedCourseChapter = {
     {
       type: 'image',
       url:
-        'https://prod-files-secure.s3.us-west-2.amazonaws.com/2f7dd1de-c6e0-4f5e-a2bd-f7d1a2207717/2e9daaf5-c2a8-4401-8446-6b7bd6f38771/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4667X43HVKG%2F20250321%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250321T233355Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFcaCXVzLXdlc3QtMiJGMEQCIGzCA%2BZrAc0mCIFkdz9s4vRD%2FIn%2FfIt7PWwZtmbIPMLPAiBG4E80%2FUvfLhGub%2FZIEiAR5DxJgE%2FFAbo%2FHezl2ipIJCqIBAiw%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIM66kdZFYkUTXue%2BEdKtwD%2Fj6S9sdPdJ%2F4xE4%2B%2BH3266%2FYZ66js21CZ33ly4SeuW5P3VdwBid%2FymKGLY9Wh5HtU%2FdKU88cZJGTbCT%2FNq3MDZpGno2ucKyEewQ5zSq0L821sn1hRTcHDo8vi8iInPm7ievqoNv4cxQX8bLPqI665e6KJlrC41ioCWP2gwvttY2Q3ApYAMzhbyviFcmSHzwUJZsv%2BbZhTggdnN9yqK%2BoCPL4cgg7XzXuRr5c9CRKhNWwgYZBcaqbjxwsJLUc0Yn%2BauGPDbtfUz%2B8Asj4aLYRE40xYF00Y66wvWxJs7%2BkShtjWBwvU%2FmFOgMhndXt%2Bxrcd1x9p7rRJ239WQZzzTLeiN1YQx2j%2F04JmMFgdo3taUvm0FSY15okV%2B4yLxkXcBg7VEoHOF9qMXKXD%2FIjSXv9sfQ7fq2HZ6LL6FbV%2BYgtpvx9Y2YH2x3%2FD8Ocf6iolOOKJjpNJUGE3LrfQvUnetfiPNPbqlSyynjfIUc24It3c1Js6G7UbU05bKuODEmzDuTBJyz1dgD0KX2zCL04nVJ5xkyOptC1kbtSChIXZ0YIFfjj4LRT1IFAT0%2Bnfy%2BlFMfRTDysLsAfvJGxTKKhUPB2T2%2FHd3QXPYwVSYJCd5IOsz%2BoQbTry1%2FBvo8RCZow09b3vgY6pgEw%2BEgIm%2FbLW5Ovp2pMnMobq%2BjN3QSPs5dCBM8p9ZRuzAmAat1K47%2Fuy4CV4iKvJk0USUG7Gjw8HtinjZRbZ7CyjEakDPJcPO4nYbFC1jFQlnFVe2pmu4zUdqBTqG7JUc2gqYp4AfI3HKyRKFc048CgVc2Z%2Fy4sVsyQYSB5g%2FQak5TO5fA7eesFsyRpApRydmQfPiHNPTB1iaR%2BFVINt0C07LOwI1aX&X-Amz-Signature=5a47ca020916b102f41a0847c6c8deec45181ced61c2cb6243c153e1fdf44395&X-Amz-SignedHeaders=host&x-id=GetObject',
+        'https://public-resources.gdevelop.io/staging/course/images/2e9daaf5-c2a8-4401-8446-6b7bd6f38771.png',
     },
     {
       type: 'text',
@@ -92,7 +91,7 @@ const courseChapter1: UnlockedTextBasedCourseChapter = {
     {
       type: 'image',
       url:
-        'https://prod-files-secure.s3.us-west-2.amazonaws.com/2f7dd1de-c6e0-4f5e-a2bd-f7d1a2207717/d079a8a9-4ebf-4933-b02a-6fc9b95e0d46/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466THYDE25S%2F20250321%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250321T233355Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFcaCXVzLXdlc3QtMiJHMEUCIEZOJJCTdEbIPxv8tEvek%2FbB52ZYoDAkloHjVLr1LknzAiEA5QLM7k30oqPh9YLiNriFQYmHtGEY%2ByIaGzxyfaWKXfwqiAQIsP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDBlB%2BD5kKYSniCM53ircAxXnOjTss67MqJWWV2v3siCH3HA7NBAVSB9PSDUAqXmlaasmQyuPUvc5IzV0PQcsP0B6VLJYj%2F5iKIiXf9JUQbBGgZ479Tt%2F2CUWxFVJoxigqogcKBz5Jq4wExYFfIigXrrDqlEArD6DtDrpLpSt2S8Taw5zQes8vEDStGc%2FCQ%2FZ8znTwhUz7%2F2UpqkDWSwSJRZba%2B73BMTXmYDlI%2FEprPRJWPOVYn2SkyGBeshW9jsEB9C%2Bu7xYcUxhVHzWz2dczVp%2FDhTwA2nZt5tpfNFbhGnM%2FsY9vq1rDqfnytM2F6gGDApMbSI5oWzNkEXs9c0eSQ61kyAvKDMEFlloDbeSd8AF6p5oxqT90XDizdHiqaHqSGlqBXvNBsS9aYJ%2B66%2FlSMFRzTBAN44WIy1OCUxttZzcn7y55Xu4qP076urJlGUyH0zB1VJnlmhDVL8tL9fzPTXOv4EK5%2F0AosBOStfhaH7Zj5%2B74OQn8fycexcVVPR6OQwyaZE7xNNXXMnuCZI0Q9P94oITZYLsk60aqa2QcHfGGMn9TmO5zcBqT%2BkgK8hnq4x9OQD%2F7UcgUlNCVrbgZ%2FgoCKwdoe9IaTxVT%2FhqIEGhc3U%2BEtEP9u0gUUO4r7kxZ44np7wlu2L0wJe4MPbW974GOqUBurV2wj7hpg%2FQZpomlxFfokUEYx5fu2sku3RG9QUzWTrJOrJl1U7rtYkof9fxztlvvHXYKi8Zq1CEwpqr9qZsWUu3oOSNzUhI1nCoDkZy3tWQ%2BX8AR69XwZ26WPk1WwaZgxkgEMvhiXcrRNBtclbCSZf6CFVonS1t%2FrimexnVWYIyaweVxSoSaeuZ4If7T4leo9exIDs%2BVOPNzR4MSdiHSfBAJ6dK&X-Amz-Signature=f516389fee295f5605e2999ff794dd1d3f1ddc6b83e1e5cd81cb85fd5e260853&X-Amz-SignedHeaders=host&x-id=GetObject',
+        'https://public-resources.gdevelop.io/staging/course/images/d079a8a9-4ebf-4933-b02a-6fc9b95e0d46.png',
     },
     {
       type: 'text',
@@ -111,7 +110,7 @@ const courseChapter1: UnlockedTextBasedCourseChapter = {
         {
           type: 'image',
           url:
-            'https://prod-files-secure.s3.us-west-2.amazonaws.com/2f7dd1de-c6e0-4f5e-a2bd-f7d1a2207717/f97e3d55-326b-49a2-9fa3-49673822115c/Monalisa.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666KF36RKA%2F20250321%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250321T233352Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFcaCXVzLXdlc3QtMiJIMEYCIQC6ALd%2FSfLxXnfeHPwLpMosGrPadmhTJrSZPdT1ZRdkVAIhAJsAuB1M5blc73SqsYBYboIW2jGSjNi7oRCjpFk3oZO8KogECLD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNjM3NDIzMTgzODA1IgwdpI7FtHRoSretxXAq3AO4nPDEZCkWiKYzJqcwxM0sFoHhdFw0XCNQqR7t2p2VeAEeCtfbj827plsPuPd7AqbHLPAsbmuuS5HfRZlBB2bNn16ywSVQYLJf1pKGNPIm7nfGeij5yF%2B02ba8PmZfiHPQWjZ9IXzoKUio9aWtKRdb3oSY277TG9WmmrzcA6gFB1tkgDP3bwV6VNRLYlC2bEfl0SLsX0bEkPNupoXh%2B2cmTCFWAazxxWnf%2Bx9TfsQhRWGMEq9dD9q836QZpZk7Cdd4ppMLai5DSsxo5gjINxV40ffDpbAVDVC0%2BatPOWwTVS06Q3coUkkdMNSUnsf87qDsZMBi0RbT%2B5dV%2Bl336ZyFayEJbYKYuuGpG629Xhc17BUFoaCxJeK7sig1prmNnX37LMJGE1xIPnp34nXudXTLvJBto%2BLnamx3z6SXhaPI3ICdjHTawKIaSbuYGMFm6xjYORolHzzUv6JbWeTCV1bg5%2Ful2eLQsNAP%2BIW9HC31xSYWcKlj4J2OSY3OAhZ0Fukoh3Icuc%2B%2F76RvcPUP1ydemkijSt3siGFhh20vx%2F3AWubEWQauDZAN4Hau1FAiEZ4QCt9hHG0b9sXDby%2B8UHLHzcG8w%2BYlSdgYKKwjSMINsO%2FgHckvnsU%2BrDskqzDb1ve%2BBjqkAUcnRbCFWdwaSUWoh7u7DsdIrNxEu26%2Ficv94Oy3KubcRM5PytPDj%2F3sxgXW4SYGSPPv2%2F836evAMN8CEwihCsoz4JUvNqme%2BoavjXrBgEcv6o1USUBNiQYMX0mienlrinXgNHSlwHDEL4NR3z9FtCmaTpsai0z3VkyJ7AoUTblkT2V71h1OSGz4gPnasFI9UXGw6tSUHlIypguNukVhe4%2BB%2By7J&X-Amz-Signature=98e540fa0ed5e4b5356cc61e01895e9535c551e0851b14fc177e11c4695b8048&X-Amz-SignedHeaders=host&x-id=GetObject',
+            'https://public-resources.gdevelop.io/staging/course/images/f97e3d55-326b-49a2-9fa3-49673822115c.jpg',
         },
       ],
       answer: {
@@ -125,6 +124,8 @@ const courseChapter1: UnlockedTextBasedCourseChapter = {
       },
     },
   ],
+  id: 'intro',
+  shortTitle: 'Introduction',
 };
 
 export const Chapter1 = () => {

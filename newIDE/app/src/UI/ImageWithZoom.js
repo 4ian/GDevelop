@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 type Props = {|
   src: ?string,
-  style?: Object,
+  width?: string | number,
   /* img elements must have an alt prop, either with meaningful text, or an empty string for decorative images */
   alt: ?string,
 |};

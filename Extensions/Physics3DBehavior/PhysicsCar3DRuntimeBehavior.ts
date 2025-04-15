@@ -61,7 +61,7 @@ namespace gdjs {
     _pitchRollAngleMax: float;
 
     // Mutable configuration
-    
+
     _engineTorqueMax: float;
     /** in RPM (rotation per minute) */
     _engineSpeedMax: float;

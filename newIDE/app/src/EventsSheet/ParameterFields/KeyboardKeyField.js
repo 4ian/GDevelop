@@ -256,7 +256,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select a key</Trans>}
+              label={<Trans>Select</Trans>}
               onClick={switchFieldType}
             />
           ) : (

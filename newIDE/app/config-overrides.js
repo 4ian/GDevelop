@@ -1,20 +1,29 @@
-// This file customizes webpack configuration for react-app-rewired
-// without relying on customize-cra
+// This file customizes webpack configuration for react-app-rewired.
 
-module.exports = function override(config, env) {
-  // Add worker-loader rule
-  config.module.rules.push({
-    test: /\.worker\.js$/,
-    use: {
-      loader: 'worker-loader',
-      options: {
-        filename: '[name].[contenthash].worker.js',
+module.exports = {
+  webpack: function override(config, env) {
+    config.module.rules.push({
+      test: /\.worker\.js$/,
+      use: {
+        loader: 'worker-loader',
+        options: {
+          filename: '[name].[contenthash].worker.js',
+        },
       },
-    },
-  });
+    });
 
-  // Ignore source map warnings
-  config.ignoreWarnings = [/Failed to parse source map/];
+    // A lot of packages we use in node_modules trigger source map warnings
+    // but it is not a blocking issue, so we ignore them.
+    config.ignoreWarnings = [/Failed to parse source map/];
 
-  return config;
+    return config;
+  },
+
+  jest: function(config) {
+    config.transformIgnorePatterns = [
+      '<rootDir>/node_modules/(?!react-markdown|unified|remark-parse|mdast-util-from-markdown|micromark|decode-named-character-reference|remark-rehype|trim-lines|hast-util-whitespace|remark-gfm|mdast-util-gfm|mdast-util-find-and-replace|mdast-util-to-markdown|markdown-table|is-plain-obj)',
+    ];
+
+    return config;
+  },
 };

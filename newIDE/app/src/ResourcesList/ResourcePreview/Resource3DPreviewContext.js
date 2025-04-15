@@ -62,7 +62,7 @@ class Resource3DPreviewWorkerManager {
   isInitialized: boolean = false;
   pendingPromises: Map<
     string,
-    { resolve: Function, reject: Function }
+    { resolve: (dataUrl: string) => void, reject: () => void }
   > = new Map();
   fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
 
@@ -203,8 +203,7 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
     });
   }, []);
 
-  // Process the next resource in the queue
-  const processNextResource = React.useCallback(async (url: string) => {
+  const renderModel = React.useCallback(async (url: string) => {
     if (!workerManagerRef.current) {
       return null;
     }
@@ -224,7 +223,7 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
       if (!currentResource) return;
 
       const processResource = async () => {
-        const dataUrl = await processNextResource(currentResource);
+        const dataUrl = await renderModel(currentResource);
 
         // Handle the result
         if (dataUrl) {
@@ -255,7 +254,7 @@ export const Resource3DPreviewProvider = ({ children }: Props) => {
 
       processResource();
     },
-    [currentResource, processNextResource]
+    [currentResource, renderModel]
   );
 
   return (

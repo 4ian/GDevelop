@@ -43,6 +43,7 @@ import Help from '../../../../UI/CustomSvgIcons/Help';
 import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
+import CourseCard from './CourseCard';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -143,9 +144,12 @@ type Props = {|
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
   course: ?Course,
+  courses: ?(Course[]),
   courseChapters: ?(CourseChapter[]),
-  getCourseCompletion: () => CourseCompletion | null,
+  onSelectCourse: (courseId: string | null) => void,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
+    courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
 |};
@@ -156,7 +160,9 @@ const MainPage = ({
   tutorials,
   selectInAppTutorial,
   course,
+  courses,
   courseChapters,
+  onSelectCourse,
   getCourseCompletion,
   getCourseChapterCompletion,
 }: Props) => {
@@ -215,10 +221,50 @@ const MainPage = ({
             courseChapters={courseChapters}
             getCourseCompletion={getCourseCompletion}
             getCourseChapterCompletion={getCourseChapterCompletion}
-            onDisplayCourse={() => onSelectCategory('course')}
+            onDisplayCourse={() => {
+              onSelectCourse(course.id);
+              onSelectCategory('course');
+            }}
           />
         )}
       </SectionRow>
+      {courses && (
+        <SectionRow>
+          <Text noMargin size="title">
+            <Trans>GameDev official specialization courses</Trans>
+          </Text>
+          <GridList
+            cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={ITEMS_SPACING * 2}
+          >
+            {courses.map(course => {
+              const completion = getCourseCompletion(course.id);
+              return (
+                <GridListTile key={course.id}>
+                  <CourseCard
+                    description={course.shortDescriptionByLocale}
+                    title={course.titleByLocale}
+                    level={course.levelByLocale}
+                    completion={completion}
+                    durationInWeeks={course.durationInWeeks}
+                    onClick={() => {
+                      onSelectCourse(course.id);
+                      onSelectCategory('course');
+                    }}
+                    imageSource={
+                      course.id === 'premium-course'
+                        ? 'https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg'
+                        : 'https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg'
+                    }
+                  />
+                </GridListTile>
+              );
+            })}
+          </GridList>
+        </SectionRow>
+      )}
       <SectionRow>
         <Line justifyContent="space-between" noMargin alignItems="center">
           <Text noMargin size="title">

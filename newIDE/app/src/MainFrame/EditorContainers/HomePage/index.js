@@ -148,7 +148,10 @@ type Props = {|
     isQuickCustomization?: boolean
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
-  onOpenTemplateFromCourseChapter: (CourseChapter, templateId?: string) => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    CourseChapter,
+    templateId?: string
+  ) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,
@@ -246,8 +249,11 @@ export const HomePage = React.memo<Props>(
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
       const {
+        courses,
         selectedCourse,
-        courseChapters,
+        courseChaptersByCourseId,
+        onSelectCourse,
+        fetchCourses,
         areChaptersReady,
         onCompleteTask,
         isTaskCompleted,
@@ -330,18 +336,16 @@ export const HomePage = React.memo<Props>(
               // Do not process requested tab before courses are ready.
               return;
             }
-
-            if (courseId && selectedCourse && selectedCourse.id === courseId) {
-              setLearnCategory('course');
-              removeRouteArguments(['course-id']);
-            }
+            onSelectCourse(courseId);
+            setLearnCategory('course');
+            removeRouteArguments(['course-id']);
           }
 
           removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,
-          selectedCourse,
+          onSelectCourse,
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
@@ -379,6 +383,16 @@ export const HomePage = React.memo<Props>(
           }
         },
         [fetchGames, activeTab, games]
+      );
+
+      // Only fetch courses if the user decides to open the Learn section.
+      React.useEffect(
+        () => {
+          if (activeTab === 'learn' && !courses) {
+            fetchCourses();
+          }
+        },
+        [fetchCourses, activeTab, courses]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -527,6 +541,10 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
+      const premiumCourse = courses
+        ? courses.find(course => course.id === 'premium-course')
+        : null;
+
       return (
         <I18n>
           {({ i18n }) => (
@@ -586,8 +604,20 @@ export const HomePage = React.memo<Props>(
                       }
                       selectedCategory={learnCategory}
                       onSelectCategory={setLearnCategory}
+                      onSelectCourse={onSelectCourse}
+                      courses={courses}
+                      previewedCourse={premiumCourse}
+                      previewedCourseChapters={
+                        premiumCourse
+                          ? courseChaptersByCourseId[premiumCourse.id]
+                          : null
+                      }
                       course={selectedCourse}
-                      courseChapters={courseChapters}
+                      courseChapters={
+                        selectedCourse
+                          ? courseChaptersByCourseId[selectedCourse.id]
+                          : null
+                      }
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}

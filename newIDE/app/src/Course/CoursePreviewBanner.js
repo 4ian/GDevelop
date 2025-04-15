@@ -153,8 +153,9 @@ const ChapterTile = ({
 type Props = {|
   course: Course,
   courseChapters: CourseChapter[],
-  getCourseCompletion: () => CourseCompletion | null,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
+    courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
   onDisplayCourse: boolean => void,
@@ -169,8 +170,7 @@ const CoursePreviewBanner = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
-  const courseCompletion = getCourseCompletion();
-
+  const courseCompletion = getCourseCompletion(course.id);
   const numberOfTilesToDisplay = isMobile ? 2 : windowSize === 'xlarge' ? 5 : 4;
 
   const chapterTiles = React.useMemo(
@@ -180,7 +180,10 @@ const CoursePreviewBanner = ({
         .map((_, index) => {
           const chapter = courseChapters[index];
           if (!chapter) return false;
-          const chapterCompletion = getCourseChapterCompletion(chapter.id);
+          const chapterCompletion = getCourseChapterCompletion(
+            course.id,
+            chapter.id
+          );
           if (!chapterCompletion) return false;
           return chapterCompletion.completedTasks >= chapterCompletion.tasks;
         });
@@ -234,6 +237,7 @@ const CoursePreviewBanner = ({
     },
     [
       course.chaptersTargetCount,
+      course.id,
       courseChapters,
       getCourseChapterCompletion,
       numberOfTilesToDisplay,

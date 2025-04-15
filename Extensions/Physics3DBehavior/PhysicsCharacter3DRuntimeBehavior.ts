@@ -1503,6 +1503,7 @@ namespace gdjs {
         const { behavior } = physics3D;
         const { _slopeMaxAngle, owner3D, _sharedData } = this.characterBehavior;
 
+        // Jolt doesn't support center of mass offset for characters.
         const shape = behavior.createShapeWithoutMassCenterOffset();
 
         const settings = new Jolt.CharacterVirtualSettings();

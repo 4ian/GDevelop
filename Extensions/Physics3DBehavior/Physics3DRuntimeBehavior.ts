@@ -409,7 +409,7 @@ namespace gdjs {
       this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
       this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
       this.density = behaviorData.density;
-      this.massOverride = behaviorData.massOverride;
+      this.massOverride = behaviorData.massOverride || 0;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
       this.linearDamping = Math.max(0, behaviorData.linearDamping);

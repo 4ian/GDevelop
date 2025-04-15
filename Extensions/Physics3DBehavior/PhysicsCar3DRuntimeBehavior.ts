@@ -447,7 +447,6 @@ namespace gdjs {
       ) {
         this._sharedData.bodyInterface.ActivateBody(carBody.GetID());
       }
-      //this._vehicleController.GetEngine().SetCurrentRPM(100000);
 
       this._wasForwardKeyPressed = this._hasPressedForwardKey;
       this._wasBackwardKeyPressed = this._hasPressedBackwardKey;
@@ -787,6 +786,22 @@ namespace gdjs {
       this._vehicleController
         .GetConstraint()
         .SetMaxPitchRollAngle(pitchRollAngleMax);
+    }
+
+    isOnFloor() {
+      if (!this._vehicleController) {
+        return;
+      }
+      for (let index = 0; index < 4; index++) {
+        const wheel = Jolt.castObject(
+          this._vehicleController.GetConstraint().GetWheel(index),
+          Jolt.WheelWV
+        );
+        if (wheel.HasContact()) {
+          return true;
+        }
+      }
+      return false;
     }
 
     _updateWheels() {

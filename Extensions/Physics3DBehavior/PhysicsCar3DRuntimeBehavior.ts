@@ -38,13 +38,11 @@ namespace gdjs {
     _sharedData: gdjs.Physics3DSharedData;
     private _destroyedDuringFrameLogic: boolean = false;
 
+    // Readonly configuration
+
     _steerAngleMax;
     private _beginningSteerSpeed: float;
     private _endSteerSpeed: float;
-    _engineTorqueMax: float;
-    /** in RPM (rotation per minute) */
-    _engineSpeedMax: float;
-    _engineInertia: float;
     _gearRatios: Array<float>;
     _reverseGearRatios: Array<float>;
     private _backWheelOffsetX: float;
@@ -58,6 +56,15 @@ namespace gdjs {
     _hasBackWheelDrive: boolean;
     _hasFrontWheelDrive: boolean;
     _pitchRollAngleMax: float;
+
+    // Mutable configuration
+    
+    _engineTorqueMax: float;
+    /** in RPM (rotation per minute) */
+    _engineSpeedMax: float;
+    _engineInertia: float;
+
+    // State
 
     private _currentSteerRatio: float = 0;
     /** Used to make sure the car is stopped before going backward. */
@@ -300,7 +307,7 @@ namespace gdjs {
         return result;
       }
       const { behavior } = physics3D;
-      // The character origin is at its feet:
+      // Same as for characters, the origin is at its feet:
       // - the center is used for X and Y because Box3D origin is at the top-left corner
       // - the origin is used for Z because, when the character is made smaller,
       //   it must stay on the ground and not fell from its old size.
@@ -332,6 +339,7 @@ namespace gdjs {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
       if (this._stepListener) {
+        // stepListener is removed by onDeActivate
         Jolt.destroy(this._stepListener);
         this._stepListener = null;
       }
@@ -339,7 +347,7 @@ namespace gdjs {
       this._sharedData.physicsSystem.RemoveConstraint(constraint);
       // The controller is destroyed with the constraint.
       this._vehicleController = null;
-      // VehicleConstraint.mVehicleCollisionTester is a RefConst
+      // VehicleConstraint.mVehicleCollisionTester is a RefConst.
       // It is destroyed with the constraint.
       this._vehicleCollisionTester = null;
       if (this._physics3D) {

@@ -2,6 +2,7 @@ import React from 'react';
 import ResourcePreviewContext from './Resource3DPreviewContext';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import CheckeredBackground from '../CheckeredBackground';
+import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const styles = {
   container: {
@@ -10,7 +11,6 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     minHeight: 0,
-    height: '100%',
   },
   background: {
     position: 'absolute',
@@ -40,11 +40,14 @@ type Props = {|
 
 const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
   const { getResourcePreview } = React.useContext(ResourcePreviewContext);
-  const [imageDataUrl, setImageDataUrl] = React.useState(null);
+  const [imageDataUrl, setImageDataUrl] = React.useState(modelUrl ? null : '');
 
   React.useEffect(
     () => {
       async function loadPreviewImageUrl() {
+        if (!modelUrl) {
+          return;
+        }
         const dataUrl = await getResourcePreview(modelUrl);
         setImageDataUrl(dataUrl);
       }
@@ -58,22 +61,25 @@ const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
       style={{
         ...styles.container,
         flex: expand ? 1 : undefined,
-        width: fullWidth ? '100%' : undefined,
+        width: fullWidth ? '100%' : size,
+        height: size || '100%',
       }}
     >
       <CheckeredBackground borderRadius={4} />
-      {imageDataUrl ? (
-        <img
-          src={imageDataUrl}
-          alt="3D Model Preview"
-          style={{
-            ...styles.screenshot,
-            maxWidth: size,
-            maxHeight: size,
-          }}
-        />
-      ) : (
+      {imageDataUrl === null ? (
         <PlaceholderLoader size={size} style={styles.loader} />
+      ) : (
+        imageDataUrl !== '' && (
+          <CorsAwareImage
+            src={imageDataUrl}
+            alt="3D Model Preview"
+            style={{
+              ...styles.screenshot,
+              maxWidth: size,
+              maxHeight: size,
+            }}
+          />
+        )
       )}
     </div>
   );

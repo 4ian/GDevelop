@@ -28,6 +28,7 @@ const initRenderer = () => {
     alpha: true,
   });
 
+  renderer.setSize(width, height, false);
   renderer.setPixelRatio(1); // Use 1 for consistent rendering across devices
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -42,8 +43,6 @@ const renderModel = async resourceUrl => {
   }
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(2, 2, 4);
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
@@ -69,16 +68,30 @@ const renderModel = async resourceUrl => {
 
         const model = gltf.scene;
 
-        const box = new THREE.Box3().setFromObject(model);
+        // We can't just rely on model.boundingBox because it doesn't take into account
+        // the model's scale and position.
+        // So we need to compute the bounding box from the meshes in the model.
+        const box = new THREE.Box3();
+        const meshes = [];
+        model.traverse(child => {
+          if (child.isMesh) {
+            meshes.push(child);
+          }
+        });
+        meshes.forEach(mesh => {
+          mesh.geometry.computeBoundingBox();
+          const geometryBox = mesh.geometry.boundingBox.clone();
+          geometryBox.applyMatrix4(mesh.matrixWorld);
+          box.union(geometryBox);
+        });
+
         const size = new THREE.Vector3();
         const center = new THREE.Vector3();
         box.getSize(size);
         box.getCenter(center);
 
-        const sphere = new THREE.Sphere();
-        box.getBoundingSphere(sphere);
-
-        const scale = 1 / sphere.radius;
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1 / maxDim;
         model.scale.set(scale, scale, scale);
 
         // Center horizontally
@@ -90,8 +103,20 @@ const renderModel = async resourceUrl => {
 
         scene.add(model);
 
-        // Aim camera slightly above center
-        camera.lookAt(0, 0.75, 0);
+        const camera = new THREE.PerspectiveCamera(
+          45,
+          width / height,
+          0.1,
+          1000
+        );
+        // Those are empirical values to make the model fit nicely in the frame.
+        camera.position.set(
+          1 * (0.5 + size.x * scale),
+          1 * (0.5 + size.y * scale),
+          2 * (0.5 + size.z * scale)
+        );
+        // Aim camera slightly above center (based on size)
+        camera.lookAt(0, 0.5 * size.y * scale, 0);
 
         // Render the scene
         renderer.render(scene, camera);

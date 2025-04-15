@@ -21,7 +21,6 @@
     "axios-mock-adapter": "^1.22.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "8.1.0",
-    "customize-cra": "^1.0.0",
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",
     "folder-hash": "^3.0.0",

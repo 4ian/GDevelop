@@ -1,13 +1,9 @@
-const { override, addWebpackModuleRule } = require('customize-cra');
+// This file customizes webpack configuration for react-app-rewired
+// without relying on customize-cra
 
-const ignoreWarnings = value => config => {
-  config.ignoreWarnings = value;
-  return config;
-};
-
-module.exports = override(
+module.exports = function override(config, env) {
   // Add worker-loader rule
-  addWebpackModuleRule({
+  config.module.rules.push({
     test: /\.worker\.js$/,
     use: {
       loader: 'worker-loader',
@@ -15,6 +11,10 @@ module.exports = override(
         filename: '[name].[contenthash].worker.js',
       },
     },
-  }),
-  ignoreWarnings([/Failed to parse source map/])
-);
+  });
+
+  // Ignore source map warnings
+  config.ignoreWarnings = [/Failed to parse source map/];
+
+  return config;
+};

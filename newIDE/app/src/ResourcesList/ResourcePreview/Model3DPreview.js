@@ -1,5 +1,5 @@
 import React from 'react';
-import ResourcePreviewContext from './Resource3DPreviewContext';
+import Resource3DPreviewContext from './Resource3DPreviewContext';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import CheckeredBackground from '../CheckeredBackground';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -39,19 +39,19 @@ type Props = {|
 |};
 
 const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
-  const { getResourcePreview } = React.useContext(ResourcePreviewContext);
+  const { getResourcePreview } = React.useContext(Resource3DPreviewContext);
   const [imageDataUrl, setImageDataUrl] = React.useState(modelUrl ? null : '');
 
+  // Load the model preview when the component mounts or when the modelUrl changes.
   React.useEffect(
     () => {
-      async function loadPreviewImageUrl() {
+      (async () => {
         if (!modelUrl) {
           return;
         }
         const dataUrl = await getResourcePreview(modelUrl);
         setImageDataUrl(dataUrl);
-      }
-      loadPreviewImageUrl();
+      })();
     },
     [modelUrl, getResourcePreview]
   );
@@ -67,7 +67,7 @@ const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
     >
       <CheckeredBackground borderRadius={4} />
       {imageDataUrl === null ? (
-        <PlaceholderLoader size={size} style={styles.loader} />
+        <PlaceholderLoader size={24} style={styles.loader} />
       ) : (
         imageDataUrl !== '' && (
           <CorsAwareImage

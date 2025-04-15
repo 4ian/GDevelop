@@ -9,6 +9,7 @@ import {
 } from '../../../../Utils/GDevelopServices/Asset';
 import SectionContainer from '../SectionContainer';
 import VideoBasedCourseChapterView from '../../../../Course/VideoBasedCourseChapterView';
+import TextBasedCourseChapterView from '../../../../Course/TextBasedCourseChapterView';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
@@ -83,7 +84,10 @@ const alertMessageKey = 'course-subtitles-in-user-language';
 type Props = {|
   course: Course,
   courseChapters: CourseChapter[],
-  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  onOpenTemplateFromCourseChapter: (
+    CourseChapter,
+    templateId?: string
+  ) => Promise<void>,
   onBack: () => void,
   onCompleteTask: (
     chapterId: string,
@@ -119,6 +123,7 @@ const CourseSection = ({
       if (alreadyFoundIncompleteChapterId)
         return alreadyFoundIncompleteChapterId;
       const chapterCompletion = getChapterCompletion(chapter.id);
+      console.log(chapterCompletion);
 
       if (
         !chapterCompletion ||
@@ -234,6 +239,7 @@ const CourseSection = ({
   const scrollToChapter = React.useCallback((chapterId: string) => {
     const { current: scrollContainer } = scrollingContainerRef;
     if (!scrollContainer) return;
+    console.log(chapterTitleRefs);
 
     const chapterTitleRef = chapterTitleRefs.current.find(
       chapterTitleRef => chapterTitleRef.chapterId === chapterId
@@ -259,6 +265,7 @@ const CourseSection = ({
 
   React.useEffect(
     () => {
+      console.log(firstIncompleteChapterIdRef);
       if (firstIncompleteChapterIdRef.current) {
         if (firstIncompleteChapterIdRef.current === 'BEGINNER') return;
         scrollToChapter(firstIncompleteChapterIdRef.current);
@@ -298,28 +305,51 @@ const CourseSection = ({
                     </AlertMessage>
                   </Line>
                 )}
-                {courseChapters.map((chapter, index) => (
-                  <VideoBasedCourseChapterView
-                    chapterIndex={index}
-                    courseChapter={chapter}
-                    onOpenTemplate={() => {
-                      onOpenTemplateFromCourseChapter(chapter);
-                    }}
-                    onCompleteTask={onCompleteTask}
-                    isTaskCompleted={isTaskCompleted}
-                    getChapterCompletion={getChapterCompletion}
-                    key={chapter.id}
-                    onBuyWithCredits={onBuyCourseChapterWithCredits}
-                    ref={_ref => {
-                      if (_ref) {
-                        chapterTitleRefs.current[index] = {
-                          chapterId: chapter.id,
-                          ref: _ref,
-                        };
-                      }
-                    }}
-                  />
-                ))}
+                {courseChapters.map((chapter: CourseChapter, index) =>
+                  chapter.videoUrl ? (
+                    <VideoBasedCourseChapterView
+                      chapterIndex={index}
+                      courseChapter={chapter}
+                      onOpenTemplate={() => {
+                        onOpenTemplateFromCourseChapter(chapter);
+                      }}
+                      onCompleteTask={onCompleteTask}
+                      isTaskCompleted={isTaskCompleted}
+                      getChapterCompletion={getChapterCompletion}
+                      key={chapter.id}
+                      onBuyWithCredits={onBuyCourseChapterWithCredits}
+                      ref={_ref => {
+                        if (_ref) {
+                          chapterTitleRefs.current[index] = {
+                            chapterId: chapter.id,
+                            ref: _ref,
+                          };
+                        }
+                      }}
+                    />
+                  ) : (
+                    <TextBasedCourseChapterView
+                      chapterIndex={index}
+                      courseChapter={chapter}
+                      onOpenTemplate={(templateId?: string) => {
+                        onOpenTemplateFromCourseChapter(chapter, templateId);
+                      }}
+                      onCompleteTask={onCompleteTask}
+                      isTaskCompleted={isTaskCompleted}
+                      getChapterCompletion={getChapterCompletion}
+                      key={chapter.id}
+                      onBuyWithCredits={onBuyCourseChapterWithCredits}
+                      ref={_ref => {
+                        if (_ref) {
+                          chapterTitleRefs.current[index] = {
+                            chapterId: chapter.id,
+                            ref: _ref,
+                          };
+                        }
+                      }}
+                    />
+                  )
+                )}
                 <div style={styles.footer} />
               </Column>
               {isMobile && !isLandscape ? null : (

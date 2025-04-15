@@ -42,7 +42,7 @@ const styles = {
 type Props = {|
   chapterIndex: number,
   courseChapter: TextBasedCourseChapter,
-  onOpenTemplate: () => void,
+  onOpenTemplate: (templateId?: string) => void,
   onCompleteTask: (
     chapterId: string,
     taskIndex: number,
@@ -72,6 +72,7 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           chapterIndex={chapterIndex}
           courseChapter={courseChapter}
           getChapterCompletion={getChapterCompletion}
+          ref={ref}
         />
         {courseChapter.isLocked ? (
           <LockedCourseChapterPreview
@@ -105,7 +106,7 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
                           primary
                           icon={<Cloud fontSize="small" />}
                           label={<Trans>Open template</Trans>}
-                          onClick={onOpenTemplate}
+                          onClick={() => onOpenTemplate(template.id)}
                         />
                       </Column>
                     </Line>

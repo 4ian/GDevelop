@@ -5,7 +5,8 @@ import { Trans } from '@lingui/macro';
 
 import type {
   CourseChapter,
-  LockedCourseChapter,
+  LockedVideoBasedCourseChapter,
+  LockedTextBasedCourseChapter,
 } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
@@ -91,7 +92,7 @@ const LockedOverlay = () => (
 );
 
 type Props = {|
-  courseChapter: LockedCourseChapter,
+  courseChapter: LockedVideoBasedCourseChapter | LockedTextBasedCourseChapter,
   onBuyWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 

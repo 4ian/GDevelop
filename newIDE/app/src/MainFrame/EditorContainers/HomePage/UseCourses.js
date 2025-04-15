@@ -207,7 +207,9 @@ const useCourses = () => {
       const chapter = courseChapters.find(chapter => chapter.id === chapterId);
       if (!chapter || chapter.isLocked) return null;
 
-      const tasksCount = chapter.tasks.length;
+      const tasksCount = chapter.tasks
+        ? chapter.tasks.length
+        : chapter.items.filter(item => item.type === 'task').length;
 
       if (!userCourseProgress) return { completedTasks: 0, tasks: tasksCount };
 
@@ -242,12 +244,16 @@ const useCourses = () => {
         );
         if (!chapterProgress) return;
 
+        const tasksCount = chapter.tasks
+          ? chapter.tasks.length
+          : chapter.items.filter(item => item.type === 'task').length;
+
         const isChapterCompleted =
-          chapterProgress.completedTasks.length >= chapter.tasks.length;
+          chapterProgress.completedTasks.length >= tasksCount;
         if (isChapterCompleted) completedChapters++;
 
         completion +=
-          (chapterProgress.completedTasks.length / chapter.tasks.length) *
+          (chapterProgress.completedTasks.length / tasksCount) *
           chapterProportion;
       });
 

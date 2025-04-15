@@ -131,7 +131,7 @@ export type RenderEditorContainerProps = {|
     isQuickCustomization?: boolean
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
-  onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  onOpenTemplateFromCourseChapter: (CourseChapter, templateId?: string) => Promise<void>,
   onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
 
   // Project save

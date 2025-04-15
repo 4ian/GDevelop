@@ -148,9 +148,7 @@ type Props = {|
     isQuickCustomization?: boolean
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
-  onOpenTemplateFromCourseChapter: (
-    courseChapter: CourseChapter
-  ) => Promise<void>,
+  onOpenTemplateFromCourseChapter: (CourseChapter, templateId?: string) => Promise<void>,
 
   // Project save
   onSave: () => Promise<void>,

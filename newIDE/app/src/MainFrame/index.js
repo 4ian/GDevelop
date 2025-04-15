@@ -3290,16 +3290,20 @@ const MainFrame = (props: Props) => {
   );
 
   const openTemplateFromCourseChapter = React.useCallback(
-    async (courseChapter: CourseChapter) => {
+    async (courseChapter: CourseChapter, templateId?: string) => {
       const projectIsClosed = await askToCloseProject();
       if (!projectIsClosed) {
         return;
       }
       try {
-        await createProjectFromCourseChapter(courseChapter, {
-          storageProvider: emptyStorageProvider,
-          saveAsLocation: null,
-          // Remaining will be set by the template.
+        await createProjectFromCourseChapter({
+          courseChapter,
+          templateId,
+          newProjectSetup: {
+            storageProvider: emptyStorageProvider,
+            saveAsLocation: null,
+            // Remaining will be set by the template.
+          },
         });
       } catch (error) {
         showErrorBox({

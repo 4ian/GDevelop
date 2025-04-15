@@ -117,6 +117,7 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
           chapterIndex={chapterIndex}
           courseChapter={courseChapter}
           getChapterCompletion={getChapterCompletion}
+          ref={ref}
         />
         {courseChapter.isLocked ? (
           <LockedCourseChapterPreview

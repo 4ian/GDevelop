@@ -415,13 +415,31 @@ const useCreateProject = ({
   );
 
   const createProjectFromCourseChapter = React.useCallback(
-    async (courseChapter: CourseChapter, newProjectSetup: NewProjectSetup) => {
+    async ({
+      courseChapter,
+      templateId,
+      newProjectSetup,
+    }: {|
+      courseChapter: CourseChapter,
+      templateId?: string,
+      newProjectSetup: NewProjectSetup,
+    |}) => {
       if (courseChapter.isLocked) return;
       beforeCreatingProject();
-      const { templateUrl } = courseChapter;
+      let templateUrl;
+      if (courseChapter.templateUrl) {
+        templateUrl = courseChapter.templateUrl;
+      } else if (courseChapter.templates) {
+        const matchingTemplate = courseChapter.templates.find(
+          template => template.id === templateId
+        );
+        if (matchingTemplate) templateUrl = matchingTemplate.url;
+      }
       if (!templateUrl) {
         throw new Error(
-          `No template URL for the course chapter "${courseChapter.id}"`
+          `No template URL for the course chapter "${
+            courseChapter.id
+          }" and template id "${templateId || 'undefined'}"`
         );
       }
       const newProjectSource = await createNewProjectFromCourseChapterTemplate(

@@ -236,7 +236,7 @@ export type UnlockedTextBasedCourseChapter = {|
   shortTitle?: string,
   isLocked?: false,
   isFree?: boolean,
-  templates: Array<{| url: string, title?: string | null |}>,
+  templates: Array<{| url: string, title?: string | null, id: string |}>,
   items: Array<
     | TextBasedCourseChapterTextItem
     | TextBasedCourseChapterImageItem
@@ -245,27 +245,39 @@ export type UnlockedTextBasedCourseChapter = {|
   >,
 |};
 
-export type LockedCourseChapter = {|
+interface LockedCourseChapterAttributes {
+  isLocked: true;
+  isFree?: boolean;
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number;
+  productId: string;
+}
+
+export type LockedVideoBasedCourseChapter = {|
+  ...LockedCourseChapterAttributes,
   id: string,
   title: string,
   shortTitle?: string,
   videoUrl?: string,
-  isLocked: true,
-  isFree?: boolean,
-  priceInCredits?: number,
-  productId: string,
+|};
+export type LockedTextBasedCourseChapter = {|
+  ...LockedCourseChapterAttributes,
+  id: string,
+  title: string,
+  shortTitle?: string,
 |};
 
 export type VideoBasedCourseChapter =
-  | LockedCourseChapter
+  | LockedVideoBasedCourseChapter
   | UnlockedVideoBasedCourseChapter;
 
 export type TextBasedCourseChapter =
-  | LockedCourseChapter
+  | LockedTextBasedCourseChapter
   | UnlockedTextBasedCourseChapter;
 
 export type CourseChapter =
-  | LockedCourseChapter
+  | LockedVideoBasedCourseChapter
+  | LockedTextBasedCourseChapter
   | UnlockedVideoBasedCourseChapter
   | UnlockedTextBasedCourseChapter;
 

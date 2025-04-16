@@ -12,10 +12,13 @@ import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { fakeTutorials } from '../../../fixtures/GDevelopServicesTestData/FakeTutorials';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
+  courseChapter,
   fakeAuthenticatedTeacherFromEducationPlan,
   fakeAuthenticatedUserWithEducationPlan,
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
+  lockedCourseChapter,
+  premiumCourse,
 } from '../../../fixtures/GDevelopServicesTestData';
 import i18nProviderDecorator from '../../I18nProviderDecorator';
 
@@ -43,8 +46,12 @@ export const Default = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[courseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -77,8 +84,12 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[courseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -113,8 +124,12 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[courseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -149,8 +164,12 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[courseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -182,8 +201,12 @@ export const Loading = () => (
       }}
     >
       <LearnSection
-        courseChapters={null}
-        course={null}
+        courseChapters={[courseChapter, lockedCourseChapter]}
+        course={premiumCourse}
+        courses={[premiumCourse]}
+        onSelectCourse={action('onSelectCourse')}
+        previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+        previewedCourse={premiumCourse}
         isCourseTaskCompleted={() => false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}

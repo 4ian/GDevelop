@@ -39,6 +39,11 @@ import {
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { fakeAchievements } from './FakeAchievements';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import {
+  type LockedVideoBasedCourseChapter,
+  type VideoBasedCourseChapter,
+  type Course,
+} from '../../Utils/GDevelopServices/Asset';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -2722,4 +2727,230 @@ export const basicFeaturingMarketingPlan = {
     'zh-CN':
       '确保您的游戏是公开的，并且您已经为gd.games配置了缩略图。您的游戏在平台上可见可能需要几分钟。',
   },
+};
+
+export const courseChapter: VideoBasedCourseChapter = {
+  id: 'objects',
+  title: 'Chapter 2 - Build A Scene With Objects',
+  tasks: [
+    {
+      title: 'Discover the different types of objects',
+      text:
+        'Complete the six tasks below by dragging the premade objects from the object list in to the scene’s default view window to match the image of the scene shown below.',
+      imageUrls: [
+        'https://public-resources.gdevelop.io/staging/course/images/6900ffbe-4a0e-4f1c-9ad8-b9aa495daf17.png',
+      ],
+    },
+    {
+      title: 'Create a background with a Tiled sprite',
+      text:
+        'Drag the **Tiled_Sprite** object into the game scene from the object list, and adjust its width to fill the entire default rectangular game window.\n\n',
+      hint:
+        '(A tiled sprite will repeat the image used in the object instead of stretching when it is scaled. It is also the only object that can be adjusted with an X/Y offset, making it ideal for scrolling backgrounds or repeating images in your game.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/40c07f00-8c66-4b6c-b092-fa4a8e00a3d6.png',
+        ],
+      },
+    },
+    {
+      title: 'Change the animation of a Sprite',
+      text:
+        "Drag the **Sprite** object into the game scene from the object list, and in the properties panel, change the object's animation number to match the character in the image above.\n\n",
+      hint:
+        '(A sprite is the only object that supports multiple image frames for animations. These animations can be played, paused, or switched during gameplay. Each animation can be given a name, but are automatically given a number based on its position in the list (e.g., 0, 1, 2, 3, etc.).)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/22338211-c869-45d2-9d15-0868d9588142.png',
+        ],
+      },
+    },
+    {
+      title: 'Create a dialogue box with a Panel sprite(9-patch)',
+      text:
+        'Drag the **Panel_Sprite(9-patch)** object into the game scene from the object list, and resize it to match the size shown in the image above.\n\n',
+      hint:
+        '(A panel sprite(9 patch) is used for text boxes and any UI elements with repeating patterns and a rectangular border. They’re called 9-patch because images are broken into 9 “patches” that have different rules applied to them when the object is stretched.)',
+      imageUrls: [
+        'https://public-resources.gdevelop.io/staging/course/images/74933b88-cbd9-4690-87e4-b3dfe583a93e.png',
+      ],
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/ffb596da-2200-45f4-ad14-de2c0929f3ab.png',
+        ],
+      },
+    },
+    {
+      title: 'Adding and modifying Text in the game',
+      text:
+        'Open the Text object, change the object’s font to **CantoraOne-Regular from the drop down menu**, set the color to white, adjust the font size, and change the text to match the image above.\n\nDrag the **Text** object into the game scene from the object list to match the position in the image above.\n\n',
+      hint:
+        '(There are three different types of text objects in the engine, each serving a different purpose, and they can all have their text changed while the game is running with the use of events. Which you’ll learn more about in later chapters.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/a73da7b8-dc84-4130-917e-7341ed263f5a.png',
+        ],
+      },
+    },
+    {
+      title: 'Add functionality with a Panel sprite button',
+      text:
+        'Drag the **Button** object into the game scene from the object list, and resize it to match the size shown in the image above.\n\n',
+      hint:
+        '(A panel sprite button is useful because it makes it easy to check if the player has clicked on the button, and automatically handles the animations and state of the button.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/01138252-6128-459c-9cce-c5b728d46479.png',
+        ],
+      },
+    },
+    {
+      title: 'Display values with a Resource bar',
+      text:
+        'Open the Resource_Bar object, change it’s initial value to 4 and the maximum value to 5, and then scroll down to the bottom and change the default width of its background to 450, so the object will match the size and value of the object in the image above when you preview the game.\n\nDrag the **Resource_Bar** object into the game scene from the object list to match the position of the object in the image above.\n\nThen in the effects tab inside of the object, add the “Drop Shadow” effect and set its color to black with the color picker tool, or change the “Color of the shadow” text field to 0;0;0.\n\n',
+      hint:
+        '(When you come across a text field for a color, it will always be presented with a color picker tool next to it. You can pick any color by clicking/tapping the color box, and it will automatically change the text field for you.)',
+      imageUrls: [
+        'https://public-resources.gdevelop.io/staging/course/images/0c7a1d3b-b2ca-45ad-a832-d51649a5b08d.png',
+      ],
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/46aab784-344b-46bb-bd04-3017036a010f.png',
+          'https://public-resources.gdevelop.io/staging/course/images/48e8ea8b-8fcd-45c3-8a5e-5b4f43cc8461.png',
+          'https://public-resources.gdevelop.io/staging/course/images/6ef17077-50f7-46b6-8c03-17dd797d7ffe.png',
+        ],
+      },
+    },
+    {
+      title: 'Discover how instance z-ordering works',
+      text:
+        'When placing new instances of objects into the game scene, their z-order is automatically set to 1 higher than the instance with the highest z-order in the scene.\n\nTo see object z-order in action, open the properties panel, select the background Tiled_Sprite object, and increase its z-order in the properties one at a time to see it rise above the other objects in the scene. (You can lower it’s Z-Order again after trying this.)\n\n',
+      hint:
+        '(Z-order values determine which elements are in front or behind of others on the same layer, which is useful for games where the player character needs to be in front of certain elements but behind others.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/f699f117-23e5-4856-9412-5cad48573a60.png',
+        ],
+      },
+    },
+    {
+      title: 'Change alignments with object points',
+      text:
+        'Switch to the **PointsAndCollisions** game scene from the project manager, preview the game, and observe how this scene’s logic is currently set up for the **Circle** sprite object to follow the cursor whenever the left mouse button or touch is held. \n\nBy default, the Circle object will not be centered on that point because the action positions the object based on its [origin point](https://wiki.gdevelop.io/gdevelop5/objects/sprite/edit-points/), which is located at the top-left of the image.\n\nOpen the Circle object and, through the button in the bottom left corner, change the Circle object’s origin point to be centered in the middle of the image. Then preview the game again to see that the Circle sprite object is now centered on the cursor or point of touch.\n\n',
+      hint:
+        '(Take note that this doesn’t need to be done for every object in your game; typically, you only change an object’s origin point when it is required for positioning, rotation, or z-ordering based on the origin point’s position.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/7a74918f-ebab-4ff2-9263-5628565747fc.png',
+          'https://public-resources.gdevelop.io/staging/course/images/17acd5ef-246e-4137-a104-dde205c9dc50.png',
+        ],
+      },
+    },
+    {
+      title: 'Adjust collision checks with collision masks',
+      text:
+        'Place the **Collision** object into the game scene and, while previewing the game, move the **Circle** object so it touches the Collision object. The Circle object’s animation will change when the collision occurs, but the collision happens before the images appear to overlap.\n\nOpen both the Circle and Collision objects and, through the button in the bottom left corner, adjust the collision masks of both objects so they roughly match their images.(You can add a new point(Vertex) with the “Add a vertex” button.)\n\nThen preview the game again to see how the collision detection has become more accurate.\n\n',
+      hint:
+        '(Take note that only sprite and tilemap objects have adjustable collision masks. Most other objects will use their entire height and width as their collision mask, and some objects, like particles, have no collision mask at all.)',
+      answer: {
+        imageUrls: [
+          'https://public-resources.gdevelop.io/staging/course/images/8e0a7b37-d8f9-448c-9eeb-9d73eac97b07.png',
+          'https://public-resources.gdevelop.io/staging/course/images/547562c4-4c7e-47fd-bf04-0710fd1a4f57.png',
+        ],
+      },
+    },
+  ],
+  templateUrl:
+    'https://resources.gdevelop-app.com/tutorial/templates/chapter1/game.json',
+  videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
+};
+
+export const lockedCourseChapter: LockedVideoBasedCourseChapter = {
+  id: 'game',
+  title: 'Chapter 3 - Build a video game',
+  isLocked: true,
+  videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
+  priceInCredits: 400,
+  productId: 'premium-build_game',
+}
+
+export const premiumCourse: Course = {
+  id: 'premium-course',
+  imageUrlByLocale: {
+    en:
+      'https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg',
+  },
+  titleByLocale: {
+    en: 'Complete GDevelop Master course',
+    'fr-FR': 'Cours complet de maîtrise de GDevelop',
+    'ar-SA': 'دورة احتراف GDevelop الكاملة',
+    'de-DE': 'Kompletter GDevelop-Meisterkurs',
+    'es-ES': 'Curso completo de maestro de GDevelop',
+    'fi-FI': 'Täydellinen GDevelop Master -kurssi',
+    'it-IT': 'Corso completo di GDevelop Master',
+    'ja-JP': 'GDevelopマスター完全コース',
+    'ko-KR': 'GDevelop 마스터 완벽 코스',
+    'pl-PL': 'Kompletny kurs mistrzowski GDevelop',
+    'pt-BR': 'Curso completo de mestre em GDevelop',
+    'ru-RU': 'Полный мастер-курс по GDevelop',
+    'sl-SI': 'Celovit GDevelop mojstrski tečaj',
+    'tr-TR': 'Tam GDevelop Usta Kursu',
+    'uk-UA': 'Повний майстер-курс з GDevelop',
+    'zh-CN': 'GDevelop完整大师课程',
+  },
+  shortDescriptionByLocale: {
+    en:
+      'Master the skills to create, polish and release your own game to the world. This chapter-by-chapter course is designed to let you learn everything you need to know about GDevelop and gamedev.',
+    'fr-FR':
+      'Maîtrisez les compétences pour créer, peaufiner et publier votre propre jeu. Ce cours chapitre par chapitre est conçu pour vous apprendre tout ce qu’il faut savoir sur GDevelop et le développement de jeux.',
+    'ar-SA':
+      'أتقن مهارات إنشاء وتطوير ونشر لعبتك الخاصة. هذا الكورس المُقسم إلى فصول مصمم ليعلمك كل ما تحتاج معرفته عن GDevelop وتطوير الألعاب.',
+    'de-DE':
+      'Meistern Sie die Fähigkeiten, um Ihr eigenes Spiel zu erstellen, zu verfeinern und zu veröffentlichen. Dieser Kurs, der Schritt für Schritt aufgebaut ist, vermittelt Ihnen alles, was Sie über GDevelop und Spieleentwicklung wissen müssen.',
+    'es-ES':
+      'Domina las habilidades para crear, perfeccionar y lanzar tu propio juego al mundo. Este curso por capítulos está diseñado para enseñarte todo lo que necesitas saber sobre GDevelop y el desarrollo de juegos.',
+    'fi-FI':
+      'Hallitse taidot luoda, hiota ja julkaista oma pelisi maailmalle. Tämä luku kerrallaan etenevä kurssi on suunniteltu opettamaan sinulle kaikki tarvittava GDevelopistä ja pelinkehityksestä.',
+    'it-IT':
+      'Padroneggia le competenze per creare, rifinire e pubblicare il tuo gioco. Questo corso capitolo per capitolo è progettato per insegnarti tutto ciò che devi sapere su GDevelop e lo sviluppo di giochi.',
+    'ja-JP':
+      'ゲームを作成し、磨き上げ、世界にリリースするスキルを習得しましょう。この章ごとのコースは、GDevelopとゲーム開発について学べるよう設計されています。',
+    'ko-KR':
+      '게임을 만들고 다듬어 세계에 출시하는 기술을 마스터하세요. 이 챕터별 코스는 GDevelop과 게임 개발에 필요한 모든 것을 학습하도록 설계되었습니다.',
+    'pl-PL':
+      'Opanuj umiejętności tworzenia, dopracowywania i wydawania własnej gry. Ten kurs krok po kroku pozwoli Ci nauczyć się wszystkiego o GDevelop i tworzeniu gier.',
+    'pt-BR':
+      'Domine as habilidades para criar, aprimorar e lançar seu próprio jogo para o mundo. Este curso capítulo por capítulo foi projetado para ensinar tudo o que você precisa saber sobre GDevelop e desenvolvimento de jogos.',
+    'ru-RU':
+      'Освойте навыки создания, доработки и выпуска собственной игры. Этот поэтапный курс поможет вам изучить всё, что нужно знать о GDevelop и разработке игр.',
+    'sl-SI':
+      'Obvladajte veščine za ustvarjanje, izboljšanje in objavo svoje igre. Ta tečaj po poglavjih je zasnovan za učenje vsega, kar morate vedeti o GDevelop in razvoju iger.',
+    'tr-TR':
+      'Kendi oyununuzu oluşturmak, cilalamak ve dünyaya sunmak için gerekli becerileri öğrenin. Bu bölüm bölüm kursu, GDevelop ve oyun geliştirme hakkında bilmeniz gereken her şeyi öğrenmenizi sağlamak üzere tasarlanmıştır.',
+    'uk-UA':
+      'Опануйте навички створення, удосконалення та випуску власної гри. Цей курс по розділах допоможе вам вивчити все про GDevelop і розробку ігор.',
+    'zh-CN':
+      '掌握制作、打磨并发布您自己的游戏的技能。本章节式课程旨在教会您关于GDevelop和游戏开发的所有知识。',
+  },
+  levelByLocale: {
+    en: 'Beginner level',
+    'fr-FR': 'Niveau débutant',
+    'ar-SA': 'مستوى المبتدئين',
+    'de-DE': 'Anfängerstufe',
+    'es-ES': 'Nivel principiante',
+    'fi-FI': 'Aloittelijan taso',
+    'it-IT': 'Livello principiante',
+    'ja-JP': '初心者向けレベル',
+    'ko-KR': '초급 수준',
+    'pl-PL': 'Poziom początkujący',
+    'pt-BR': 'Nível iniciante',
+    'ru-RU': 'Начальный уровень',
+    'sl-SI': 'Začetniška raven',
+    'tr-TR': 'Başlangıç seviyesi',
+    'uk-UA': 'Початковий рівень',
+    'zh-CN': '初级水平',
+  },
+  chaptersTargetCount: 15,
+  durationInWeeks: 2,
+  specializationId: 'game-development',
 };

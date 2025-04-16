@@ -35,7 +35,7 @@ const ImageWithZoom = ({ src, ...props }: Props) => {
       zoomType="click"
       moveType="drag"
       hideHint
-      zoomScale={0.8}
+      zoomScale={1.4}
     />
   );
 };

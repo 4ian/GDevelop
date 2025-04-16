@@ -60,7 +60,7 @@ const TextBasedCourseChapterItems = ({
           if (item.type === 'image') {
             return (
               <ColumnStackLayout key={itemIndex.toString()} alignItems="center">
-                <ImageWithZoom width="80%" alt="" src={item.url} />
+                <ImageWithZoom width="90%" alt="" src={item.url} />
                 {item.caption && (
                   <div style={{ color: gdevelopTheme.text.color.secondary }}>
                     <MarkdownText source={item.caption} />

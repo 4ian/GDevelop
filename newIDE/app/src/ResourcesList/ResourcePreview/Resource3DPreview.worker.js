@@ -3,6 +3,47 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+const isNativeMobileApp = false;
+
+// Copied from Utils/CrossOrigin.js
+const checkIfIsGDevelopCloudBucketUrl = url => {
+  return (
+    url.startsWith('https://project-resources.gdevelop.io/') ||
+    url.startsWith('https://project-resources-dev.gdevelop.io/')
+  );
+};
+
+// Copied from Utils/CrossOrigin.js
+const checkIfCredentialsRequired = url => {
+  // Any resource stored on the GDevelop Cloud buckets needs credentials
+  if (isNativeMobileApp) return false;
+  if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
+
+  // For other resources, use the default way of loading resources
+  return false;
+};
+
+// Copied from PixiResourcesLoader.js
+const removeMetalness = material => {
+  if (material.metalness) {
+    material.metalness = 0;
+  }
+};
+
+// Copied from PixiResourcesLoader.js
+const removeMetalnessFromMesh = node => {
+  if (!node.material) {
+    return;
+  }
+  if (Array.isArray(node.material)) {
+    for (let index = 0; index < node.material.length; index++) {
+      removeMetalness(node.material[index]);
+    }
+  } else {
+    removeMetalness(node.material);
+  }
+};
+
 // Worker message types
 const MESSAGE_TYPES = {
   RENDER_MODEL: 'RENDER_MODEL',
@@ -27,11 +68,9 @@ const initRenderer = () => {
     antialias: true,
     alpha: true,
   });
+  renderer.useLegacyLights = true; // Use legacy lights as in the editor.
 
   renderer.setSize(width, height, false);
-  renderer.setPixelRatio(1); // Use 1 for consistent rendering across devices
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
 
   return true;
 };
@@ -44,16 +83,20 @@ const renderModel = async resourceUrl => {
 
   const scene = new THREE.Scene();
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
-  const mainLight = new THREE.DirectionalLight(0xffffff, 3);
-  hemiLight.position.set(0, 20, 0);
-  mainLight.position.set(5, 10, 7.5);
-  scene.add(ambientLight, hemiLight, mainLight);
+  const light = new THREE.HemisphereLight();
+  light.color = new THREE.Color(1, 1, 1);
+  light.groundColor = new THREE.Color(0.25, 0.25, 0.25);
+  light.position.set(0, 0, 1);
+  const lightGroup = new THREE.Group();
+  lightGroup.rotation.order = 'ZYX';
+  lightGroup.rotation.x = Math.PI / 4;
+  lightGroup.add(light);
+  scene.add(lightGroup);
 
   // Load the model
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
+    loader.withCredentials = checkIfCredentialsRequired(resourceUrl);
 
     loader.load(
       resourceUrl,
@@ -67,6 +110,7 @@ const renderModel = async resourceUrl => {
         }
 
         const model = gltf.scene;
+        model.traverse(removeMetalnessFromMesh);
 
         // We can't just rely on model.boundingBox because it doesn't take into account
         // the model's scale and position.

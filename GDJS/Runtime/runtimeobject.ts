@@ -466,7 +466,7 @@ namespace gdjs {
           return;
         }
 
-        const networkSyncData = behavior.getNetworkSyncData();
+        const networkSyncData = behavior.getNetworkSyncData(syncOptions);
         if (networkSyncData) {
           behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
         }

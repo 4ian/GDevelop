@@ -259,6 +259,7 @@ const browserResourceSources: Array<ResourceSource> = [
     displayTab: 'standalone',
     shouldCreateResource: false,
     shouldGuessAnimationsFromName: false,
+    hideInResourceEditor: true,
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <ProjectResourcesChooser

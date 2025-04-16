@@ -275,7 +275,7 @@ const CoursePreviewBanner = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Paper background="medium">
+        <Paper background="medium" variant="outlined">
           <ButtonBase
             onClick={() => onDisplayCourse(true)}
             component="div"

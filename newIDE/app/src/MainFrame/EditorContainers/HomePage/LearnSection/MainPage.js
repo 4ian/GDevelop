@@ -44,6 +44,7 @@ import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 import CourseCard from './CourseCard';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -170,6 +171,10 @@ const MainPage = ({
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
     InAppTutorialContext
   );
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
+
   const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
     false
   );
@@ -213,7 +218,20 @@ const MainPage = ({
   ].filter(Boolean);
 
   return (
-    <SectionContainer>
+    <SectionContainer
+      title={<Trans>Your learning journey starts here</Trans>}
+      customPaperStyle={{
+        backgroundAttachment: 'local',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top',
+        backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
+        backgroundImage: `url('res/premium/premium_dialog_background.png'),${
+          paletteType === 'dark'
+            ? 'linear-gradient(180deg, #322659 0px, #3F2458 20px, #1D1D26 200px, #1D1D26 100%)'
+            : 'linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, #F5F5F7 200px, #F5F5F7 100%)'
+        }`,
+      }}
+    >
       <SectionRow>
         {!!course && !!courseChapters && (
           <CoursePreviewBanner

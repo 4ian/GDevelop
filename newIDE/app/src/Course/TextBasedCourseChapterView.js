@@ -119,7 +119,15 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
 
         <Column>
           {!courseChapter.isLocked && (
-            <TextBasedCourseChapterItems items={courseChapter.items} />
+            <TextBasedCourseChapterItems
+              items={courseChapter.items}
+              onCompleteTask={(index: number, completed: boolean) =>
+                onCompleteTask(courseChapter.id, index, completed)
+              }
+              isTaskCompleted={(index: number) =>
+                isTaskCompleted(courseChapter.id, index)
+              }
+            />
           )}
         </Column>
       </ColumnStackLayout>

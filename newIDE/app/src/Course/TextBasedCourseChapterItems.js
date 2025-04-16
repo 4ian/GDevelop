@@ -19,9 +19,10 @@ const styles = {
     maxWidth: '80%',
   },
 };
-const TextBasedCourseChapterItems = ({
-  items,
-}: {
+
+type Props = {|
+  onCompleteTask?: (taskIndex: number, completed: boolean) => void,
+  isTaskCompleted?: (taskIndex: number) => boolean,
   items:
     | Array<
         | TextBasedCourseChapterTaskItemType
@@ -34,7 +35,12 @@ const TextBasedCourseChapterItems = ({
         | TextBasedCourseChapterImageItemType
         | TextBasedCourseChapterVideoItemType
       >,
-}) => {
+|};
+const TextBasedCourseChapterItems = ({
+  items,
+  onCompleteTask,
+  isTaskCompleted,
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   // $FlowFixMe - map does not recognize time of items.
@@ -75,13 +81,14 @@ const TextBasedCourseChapterItems = ({
               </ColumnStackLayout>
             );
           }
-          if (item.type === 'task') {
+          if (item.type === 'task' && isTaskCompleted && onCompleteTask) {
+            const isTaskComplete = isTaskCompleted(itemIndex);
             return (
               <TextBasedCourseChapterTaskItem
                 key={itemIndex.toString()}
                 task={item}
-                isComplete={false}
-                onComplete={() => {}}
+                isComplete={isTaskComplete}
+                onComplete={() => onCompleteTask(itemIndex, !isTaskComplete)}
               />
             );
           }

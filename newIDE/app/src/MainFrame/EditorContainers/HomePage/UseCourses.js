@@ -242,7 +242,6 @@ const useCourses = () => {
 
   const getCourseCompletion = React.useCallback(
     (courseId: string): CourseCompletion | null => {
-      console.log(courseId);
       if (!courses) return null;
       const course = courses.find(course => course.id === courseId);
       if (!course) return null;

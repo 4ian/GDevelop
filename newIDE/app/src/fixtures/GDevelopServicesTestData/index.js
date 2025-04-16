@@ -2872,7 +2872,7 @@ export const lockedCourseChapter: LockedVideoBasedCourseChapter = {
   videoUrl: 'https://youtu.be/r_Z8N9asT14?si=gHbjsUUuuWTwO7BR',
   priceInCredits: 400,
   productId: 'premium-build_game',
-}
+};
 
 export const premiumCourse: Course = {
   id: 'premium-course',

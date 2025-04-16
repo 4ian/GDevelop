@@ -3,11 +3,9 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import type {
-  CourseChapter,
-} from '../Utils/GDevelopServices/Asset';
+import type { CourseChapter } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
-import {  LineStackLayout } from '../UI/Layout';
+import { LineStackLayout } from '../UI/Layout';
 import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
@@ -32,14 +30,7 @@ type Props = {|
 |};
 
 const CourseChapterTitle = React.forwardRef<Props, HTMLDivElement>(
-  (
-    {
-      chapterIndex,
-      courseChapter,
-      getChapterCompletion,
-    },
-    ref
-  ) => {
+  ({ chapterIndex, courseChapter, getChapterCompletion }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape } = useResponsiveWindowSize();
     const isMobilePortrait = isMobile && !isLandscape;

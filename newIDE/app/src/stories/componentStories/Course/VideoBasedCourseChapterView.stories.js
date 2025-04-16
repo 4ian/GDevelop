@@ -4,7 +4,10 @@ import { action } from '@storybook/addon-actions';
 import VideoBasedCourseChapterView from '../../../Course/VideoBasedCourseChapterView';
 
 import paperDecorator from '../../PaperDecorator';
-import { courseChapter, lockedCourseChapter } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  courseChapter,
+  lockedCourseChapter,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Course/VideoBasedCourseChapterView',

@@ -216,7 +216,8 @@ const LearnSection = ({
       </Paper>
     );
 
-  if (!tutorials) return <PlaceholderLoader />;
+  if (!tutorials || !courses || !previewedCourseChapters)
+    return <PlaceholderLoader />;
 
   return !selectedCategory ? (
     <MainPage

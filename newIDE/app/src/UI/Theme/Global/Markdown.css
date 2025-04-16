@@ -36,6 +36,11 @@
   margin-bottom: 10px;
 }
 
+.gd-markdown h3 {
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
 .gd-markdown ul {
   word-break: break-word;
   margin-block-start: 8px;

@@ -123,7 +123,6 @@ const CourseSection = ({
       if (alreadyFoundIncompleteChapterId)
         return alreadyFoundIncompleteChapterId;
       const chapterCompletion = getChapterCompletion(chapter.id);
-      console.log(chapterCompletion);
 
       if (
         !chapterCompletion ||
@@ -149,9 +148,9 @@ const CourseSection = ({
   >(new Array(courseChapters.length));
   const [activeChapterId, setActiveChapterId] = React.useState<?string>(null);
 
-  const subtitleHint = allAlertMessages.find(
-    message => message.key === alertMessageKey
-  );
+  const subtitleHint = courseChapters.some(chapter => 'videoUrl' in chapter) // Display hint only if there are some video-based chapters.
+    ? allAlertMessages.find(message => message.key === alertMessageKey)
+    : null;
 
   const tableOfContent = courseChapters.map((chapter, chapterIndex) => {
     const chapterCompletion = getChapterCompletion(chapter.id);
@@ -239,7 +238,6 @@ const CourseSection = ({
   const scrollToChapter = React.useCallback((chapterId: string) => {
     const { current: scrollContainer } = scrollingContainerRef;
     if (!scrollContainer) return;
-    console.log(chapterTitleRefs);
 
     const chapterTitleRef = chapterTitleRefs.current.find(
       chapterTitleRef => chapterTitleRef.chapterId === chapterId
@@ -265,7 +263,6 @@ const CourseSection = ({
 
   React.useEffect(
     () => {
-      console.log(firstIncompleteChapterIdRef);
       if (firstIncompleteChapterIdRef.current) {
         if (firstIncompleteChapterIdRef.current === 'BEGINNER') return;
         scrollToChapter(firstIncompleteChapterIdRef.current);

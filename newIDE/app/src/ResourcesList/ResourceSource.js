@@ -177,6 +177,7 @@ export type ResourceSource = {|
   renderPrimaryAction?: ResourceSourceComponentPrimaryActionProps => React.Node,
   shouldCreateResource: boolean,
   shouldGuessAnimationsFromName: boolean,
+  hideInResourceEditor?: boolean,
 |};
 
 export type ChooseResourceFunction = (

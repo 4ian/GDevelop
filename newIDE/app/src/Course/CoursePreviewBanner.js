@@ -314,10 +314,9 @@ const CoursePreviewBanner = ({
                   <Text noMargin>GDevelop</Text>
                 </LineStackLayout>
                 <img
-                  src="https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg"
-                  alt="Red hero buffed by knowledge"
+                  src={selectMessageByLocale(i18n, course.imageUrlByLocale)}
+                  alt=""
                   style={styles.thumbnail}
-                  onClick={() => onDisplayCourse(true)}
                 />
               </div>
               <ColumnStackLayout expand noMargin>

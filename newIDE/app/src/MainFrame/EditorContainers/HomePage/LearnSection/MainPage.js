@@ -230,39 +230,33 @@ const MainPage = ({
       </SectionRow>
       {courses && (
         <SectionRow>
-          <Text noMargin size="title">
+          <Text size="title">
             <Trans>GameDev official specialization courses</Trans>
           </Text>
-          <GridList
-            cols={getColumnsFromWindowSize(windowSize, isLandscape)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            {courses.map(course => {
-              const completion = getCourseCompletion(course.id);
-              return (
-                <GridListTile key={course.id}>
-                  <CourseCard
-                    description={course.shortDescriptionByLocale}
-                    title={course.titleByLocale}
-                    level={course.levelByLocale}
-                    completion={completion}
-                    durationInWeeks={course.durationInWeeks}
-                    onClick={() => {
-                      onSelectCourse(course.id);
-                      onSelectCategory('course');
-                    }}
-                    imageSource={
-                      course.id === 'premium-course'
-                        ? 'https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg'
-                        : 'https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg'
-                    }
-                  />
-                </GridListTile>
-              );
-            })}
-          </GridList>
+          <Line>
+            <GridList
+              cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={ITEMS_SPACING * 2}
+            >
+              {courses.map(course => {
+                const completion = getCourseCompletion(course.id);
+                return (
+                  <GridListTile key={course.id}>
+                    <CourseCard
+                      course={course}
+                      completion={completion}
+                      onClick={() => {
+                        onSelectCourse(course.id);
+                        onSelectCategory('course');
+                      }}
+                    />
+                  </GridListTile>
+                );
+              })}
+            </GridList>
+          </Line>
         </SectionRow>
       )}
       <SectionRow>

@@ -283,11 +283,15 @@ export type CourseChapter =
 
 export type Course = {|
   id: string,
+  durationInWeeks: number,
+  chaptersTargetCount: number,
+  specializationId: 'game-development' | 'interaction-design';
+  newUntil?: number;
+
+  imageUrlByLocale: MessageByLocale,
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
-  durationInWeeks: number,
-  chaptersTargetCount: number,
 |};
 
 export type UserCourseProgress = {|

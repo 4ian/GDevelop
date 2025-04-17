@@ -111,7 +111,7 @@ namespace gdjs {
       if (channel) {
         this._channel = channel;
       } else {
-        this._channel = -1;
+        this._channel = NaN;
       }
     }
 

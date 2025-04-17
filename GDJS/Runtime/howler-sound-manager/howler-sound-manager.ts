@@ -389,6 +389,7 @@ namespace gdjs {
         initialVolume: this.getVolume(),
         rate: this._rate,
         position: this.getSeek(),
+        channel: this._channel || 0,
       };
     }
   }

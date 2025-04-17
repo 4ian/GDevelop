@@ -118,10 +118,6 @@ namespace gdjs {
         this._oldHeight !== this.owner.getHeight();
       if (objectHasMoved) {
         this._updateAnchorDistances(instanceContainer);
-        this._oldDrawableX = this.owner.getDrawableX();
-        this._oldDrawableY = this.owner.getDrawableY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
       }
       const parentHasResized =
         this._parentOldMinX !== instanceContainer.getUnrotatedViewportMinX() ||
@@ -131,6 +127,11 @@ namespace gdjs {
       if (parentHasResized) {
         this._followAnchor(instanceContainer);
       }
+      
+      this._oldDrawableX = this.owner.getDrawableX();
+      this._oldDrawableY = this.owner.getDrawableY();
+      this._oldWidth = this.owner.getWidth();
+      this._oldHeight = this.owner.getHeight();
     }
 
     /**

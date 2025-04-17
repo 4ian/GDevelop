@@ -327,6 +327,7 @@ const CourseSection = ({
                   ) : (
                     <TextBasedCourseChapterView
                       chapterIndex={index}
+                      // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
                       courseChapter={chapter}
                       onOpenTemplate={(templateId?: string) => {
                         onOpenTemplateFromCourseChapter(chapter, templateId);

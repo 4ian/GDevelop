@@ -245,23 +245,26 @@ export type UnlockedTextBasedCourseChapter = {|
   >,
 |};
 
-interface LockedCourseChapterAttributes {
-  isLocked: true;
-  isFree?: boolean;
-  // If not set, cannot be purchased with credits.
-  priceInCredits?: number;
-  productId: string;
-}
-
 export type LockedVideoBasedCourseChapter = {|
-  ...LockedCourseChapterAttributes,
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
   id: string,
   title: string,
   shortTitle?: string,
-  videoUrl?: string,
+  videoUrl: string,
 |};
+
 export type LockedTextBasedCourseChapter = {|
-  ...LockedCourseChapterAttributes,
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
   id: string,
   title: string,
   shortTitle?: string,

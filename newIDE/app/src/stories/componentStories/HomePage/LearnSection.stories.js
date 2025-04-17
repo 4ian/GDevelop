@@ -237,7 +237,7 @@ export const LoadingCourses = () => (
       <LearnSection
         courseChapters={null}
         course={null}
-        courses={[premiumCourse]} //TODO
+        courses={null}
         onSelectCourse={action('onSelectCourse')}
         previewedCourseChapters={null}
         previewedCourse={null}

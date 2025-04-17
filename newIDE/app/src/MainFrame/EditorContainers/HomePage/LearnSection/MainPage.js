@@ -245,37 +245,42 @@ const MainPage = ({
           }}
         />
       </SectionRow>
-      {courses && (
-        <SectionRow>
-          <Text size="title">
-            <Trans>GameDev official specialization courses</Trans>
-          </Text>
-          <Line>
-            <GridList
-              cols={getColumnsFromWindowSize(windowSize, isLandscape)}
-              style={styles.grid}
-              cellHeight="auto"
-              spacing={ITEMS_SPACING * 2}
-            >
-              {courses.map(course => {
-                const completion = getCourseCompletion(course.id);
-                return (
-                  <GridListTile key={course.id}>
-                    <CourseCard
-                      course={course}
-                      completion={completion}
-                      onClick={() => {
-                        onSelectCourse(course.id);
-                        onSelectCategory('course');
-                      }}
-                    />
+
+      <SectionRow>
+        <Text size="title">
+          <Trans>GameDev official specialization courses</Trans>
+        </Text>
+        <Line>
+          <GridList
+            cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={ITEMS_SPACING * 2}
+          >
+            {courses
+              ? courses.map(course => {
+                  const completion = getCourseCompletion(course.id);
+                  return (
+                    <GridListTile key={course.id}>
+                      <CourseCard
+                        course={course}
+                        completion={completion}
+                        onClick={() => {
+                          onSelectCourse(course.id);
+                          onSelectCategory('course');
+                        }}
+                      />
+                    </GridListTile>
+                  );
+                })
+              : new Array(2).fill(0).map((_, index) => (
+                  <GridListTile key={`skeleton-course-${index}`}>
+                    <CourseCard course={null} completion={null} />
                   </GridListTile>
-                );
-              })}
-            </GridList>
-          </Line>
-        </SectionRow>
-      )}
+                ))}
+          </GridList>
+        </Line>
+      </SectionRow>
       <SectionRow>
         <Line justifyContent="space-between" noMargin alignItems="center">
           <Text noMargin size="title">

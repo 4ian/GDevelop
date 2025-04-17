@@ -195,6 +195,7 @@ const CoursePreviewBanner = ({
                 <Skeleton height={40} />
                 <Skeleton height={20} />
                 <Skeleton height={60} />
+                <LargeSpacer />
               </Column>
             </React.Fragment>
           );

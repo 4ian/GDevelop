@@ -65,7 +65,7 @@ namespace gdjs {
           : behaviorData.useLegacyBottomAndRightAnchors;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.leftEdgeAnchor !== newBehaviorData.leftEdgeAnchor) {
         this._leftEdgeAnchor = newBehaviorData.leftEdgeAnchor;
       }
@@ -96,7 +96,21 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override onActivate(): void {
+      // This only has a side effect on if the camera moved while the behavior was deactivated.
+      // The new position on the viewport is where the object should stay.
+      this._hasJustBeenCreated = true;
+    }
+
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      if (this._hasJustBeenCreated) {
+        this._initializeAnchorDistances(instanceContainer);
+        this._hasJustBeenCreated = false;
+        this._oldDrawableX = this.owner.getDrawableX();
+        this._oldDrawableY = this.owner.getDrawableY();
+        this._oldWidth = this.owner.getWidth();
+        this._oldHeight = this.owner.getHeight();
+      }
       const objectHasMoved =
         this._oldDrawableX !== this.owner.getDrawableX() ||
         this._oldDrawableY !== this.owner.getDrawableY() ||
@@ -104,6 +118,10 @@ namespace gdjs {
         this._oldHeight !== this.owner.getHeight();
       if (objectHasMoved) {
         this._updateAnchorDistances(instanceContainer);
+        this._oldDrawableX = this.owner.getDrawableX();
+        this._oldDrawableY = this.owner.getDrawableY();
+        this._oldWidth = this.owner.getWidth();
+        this._oldHeight = this.owner.getHeight();
       }
       const parentHasResized =
         this._parentOldMinX !== instanceContainer.getUnrotatedViewportMinX() ||
@@ -115,7 +133,13 @@ namespace gdjs {
       }
     }
 
-    private _updateAnchorDistances(
+    /**
+     * Evaluate the anchor distance according to the object position on the
+     * screen.
+     *
+     * The camera is taken into account.
+     */
+    private _initializeAnchorDistances(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const workingPoint: FloatPoint = gdjs.staticArray(
@@ -123,38 +147,39 @@ namespace gdjs {
       ) as FloatPoint;
       const layer = instanceContainer.getLayer(this.owner.getLayer());
 
-      let parentMinX = this._parentOldMinX;
-      let parentMinY = this._parentOldMinY;
-      let parentMaxX = this._parentOldMaxX;
-      let parentMaxY = this._parentOldMaxY;
-      if (this._hasJustBeenCreated) {
-        if (this._relativeToOriginalWindowSize) {
-          parentMinX = instanceContainer.getInitialUnrotatedViewportMinX();
-          parentMinY = instanceContainer.getInitialUnrotatedViewportMinY();
-          parentMaxX = instanceContainer.getInitialUnrotatedViewportMaxX();
-          parentMaxY = instanceContainer.getInitialUnrotatedViewportMaxY();
-        } else {
-          parentMinX = instanceContainer.getUnrotatedViewportMinX();
-          parentMinY = instanceContainer.getUnrotatedViewportMinY();
-          parentMaxX = instanceContainer.getUnrotatedViewportMaxX();
-          parentMaxY = instanceContainer.getUnrotatedViewportMaxY();
-        }
+      if (this._relativeToOriginalWindowSize) {
+        this._parentOldMinX =
+          instanceContainer.getInitialUnrotatedViewportMinX();
+        this._parentOldMinY =
+          instanceContainer.getInitialUnrotatedViewportMinY();
+        this._parentOldMaxX =
+          instanceContainer.getInitialUnrotatedViewportMaxX();
+        this._parentOldMaxY =
+          instanceContainer.getInitialUnrotatedViewportMaxY();
+      } else {
+        this._parentOldMinX = instanceContainer.getUnrotatedViewportMinX();
+        this._parentOldMinY = instanceContainer.getUnrotatedViewportMinY();
+        this._parentOldMaxX = instanceContainer.getUnrotatedViewportMaxX();
+        this._parentOldMaxY = instanceContainer.getUnrotatedViewportMaxY();
       }
+      const parentMinX = this._parentOldMinX;
+      const parentMinY = this._parentOldMinY;
+      const parentMaxX = this._parentOldMaxX;
+      const parentMaxY = this._parentOldMaxY;
+
       const parentCenterX = (parentMaxX + parentMinX) / 2;
       const parentCenterY = (parentMaxY + parentMinY) / 2;
       const parentWidth = parentMaxX - parentMinX;
       const parentHeight = parentMaxY - parentMinY;
 
-      //Calculate the distances from the window's bounds.
-      const topLeftPixel = this._relativeToOriginalWindowSize
-        ? [this.owner.getDrawableX(), this.owner.getDrawableY()]
-        : this._convertInverseCoords(
-            instanceContainer,
-            layer,
-            this.owner.getDrawableX(),
-            this.owner.getDrawableY(),
-            workingPoint
-          );
+      // Calculate the distances from the window's bounds.
+      const topLeftPixel = this._convertInverseCoords(
+        instanceContainer,
+        layer,
+        this.owner.getDrawableX(),
+        this.owner.getDrawableY(),
+        workingPoint
+      );
 
       // Left edge
       if (this._leftEdgeAnchor === HorizontalAnchor.WindowLeft) {
@@ -179,18 +204,13 @@ namespace gdjs {
       }
 
       // It's fine to reuse workingPoint as topLeftPixel is no longer used.
-      const bottomRightPixel = this._relativeToOriginalWindowSize
-        ? [
-            this.owner.getDrawableX() + this.owner.getWidth(),
-            this.owner.getDrawableY() + this.owner.getHeight(),
-          ]
-        : this._convertInverseCoords(
-            instanceContainer,
-            layer,
-            this.owner.getDrawableX() + this.owner.getWidth(),
-            this.owner.getDrawableY() + this.owner.getHeight(),
-            workingPoint
-          );
+      const bottomRightPixel = this._convertInverseCoords(
+        instanceContainer,
+        layer,
+        this.owner.getDrawableX() + this.owner.getWidth(),
+        this.owner.getDrawableY() + this.owner.getHeight(),
+        workingPoint
+      );
 
       // Right edge
       if (this._rightEdgeAnchor === HorizontalAnchor.WindowLeft) {
@@ -215,10 +235,61 @@ namespace gdjs {
       } else if (this._bottomEdgeAnchor === VerticalAnchor.WindowCenter) {
         this._bottomEdgeDistance = bottomRightPixel[1] - parentCenterY;
       }
-
-      this._hasJustBeenCreated = false;
     }
 
+    /**
+     * Update the anchor distance according to the object position change in
+     * the scene.
+     *
+     * The camera is not taken into account. Indeed, a camera scrolling should
+     * not shift the anchored object on screen.
+     */
+    private _updateAnchorDistances(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
+      const parentOldWidth = this._parentOldMaxX - this._parentOldMinX;
+      const parentOldHeight = this._parentOldMaxY - this._parentOldMinY;
+
+      const deltaMinX = this.owner.getDrawableX() - this._oldDrawableX;
+      const deltaMinY = this.owner.getDrawableY() - this._oldDrawableY;
+      const deltaMaxX = deltaMinX + this.owner.getWidth() - this._oldWidth;
+      const deltaMaxY = deltaMinY + this.owner.getHeight() - this._oldHeight;
+
+      // Left edge
+      if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
+        this._leftEdgeDistance += deltaMinX / parentOldWidth;
+      } else {
+        this._leftEdgeDistance += deltaMinX;
+      }
+
+      // Top edge
+      if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
+        this._topEdgeDistance += deltaMinY / parentOldHeight;
+      } else {
+        this._topEdgeDistance += deltaMinY;
+      }
+
+      // Right edge
+      if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
+        this._rightEdgeDistance += deltaMaxX / parentOldWidth;
+      } else {
+        this._rightEdgeDistance += deltaMaxX;
+      }
+
+      // Bottom edge
+      if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
+        this._bottomEdgeDistance += deltaMaxY / parentOldHeight;
+      } else {
+        this._bottomEdgeDistance += deltaMaxY;
+      }
+    }
+
+    /**
+     * Update the object position to keep the object on screen according to the
+     * anchor distances.
+     *
+     * The camera is taken into account.
+     */
     private _followAnchor(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const workingPoint: FloatPoint = gdjs.staticArray(
         gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
@@ -388,11 +459,6 @@ namespace gdjs {
           }
         }
       }
-      this._oldDrawableX = this.owner.getDrawableX();
-      this._oldDrawableY = this.owner.getDrawableY();
-      this._oldWidth = this.owner.getWidth();
-      this._oldHeight = this.owner.getHeight();
-
       this._parentOldMinX = instanceContainer.getUnrotatedViewportMinX();
       this._parentOldMinY = instanceContainer.getUnrotatedViewportMinY();
       this._parentOldMaxX = instanceContainer.getUnrotatedViewportMaxX();

@@ -216,8 +216,7 @@ const LearnSection = ({
       </Paper>
     );
 
-  if (!tutorials || !courses || !previewedCourseChapters)
-    return <PlaceholderLoader />;
+  if (!tutorials) return <PlaceholderLoader />;
 
   return !selectedCategory ? (
     <MainPage
@@ -226,9 +225,9 @@ const LearnSection = ({
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
       courses={courses}
-      course={previewedCourse}
       onSelectCourse={onSelectCourse}
-      courseChapters={previewedCourseChapters}
+      previewedCourse={previewedCourse}
+      previewedCourseChapters={previewedCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
     />

@@ -191,7 +191,7 @@ export const EducationTeacher = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const Loading = () => (
+export const LoadingTutorials = () => (
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -201,12 +201,46 @@ export const Loading = () => (
       }}
     >
       <LearnSection
-        courseChapters={[courseChapter, lockedCourseChapter]}
-        course={premiumCourse}
-        courses={[premiumCourse]}
+        courseChapters={null}
+        course={null}
+        courses={[premiumCourse]} //TODO
         onSelectCourse={action('onSelectCourse')}
-        previewedCourseChapters={[courseChapter, lockedCourseChapter]}
-        previewedCourse={premiumCourse}
+        previewedCourseChapters={null}
+        previewedCourse={null}
+        isCourseTaskCompleted={() => false}
+        onCompleteCourseTask={action('onCompleteCourseTask')}
+        getCourseChapterCompletion={() => null}
+        getCourseCompletion={() => null}
+        selectedCategory={null}
+        onSelectCategory={action('onSelectCategory')}
+        onTabChange={() => {}}
+        selectInAppTutorial={action('selectInAppTutorial')}
+        onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+        onOpenTemplateFromCourseChapter={action(
+          'onOpenTemplateFromCourseChapter'
+        )}
+        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
+      />
+    </TutorialContext.Provider>
+  </PreferencesContext.Provider>
+);
+
+export const LoadingCourses = () => (
+  <PreferencesContext.Provider value={initialPreferences}>
+    <TutorialContext.Provider
+      value={{
+        tutorials: fakeTutorials,
+        fetchTutorials: () => {},
+        error: null,
+      }}
+    >
+      <LearnSection
+        courseChapters={null}
+        course={null}
+        courses={[premiumCourse]} //TODO
+        onSelectCourse={action('onSelectCourse')}
+        previewedCourseChapters={null}
+        previewedCourse={null}
         isCourseTaskCompleted={() => false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}

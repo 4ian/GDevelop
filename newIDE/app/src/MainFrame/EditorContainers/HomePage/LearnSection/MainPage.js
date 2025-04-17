@@ -144,9 +144,9 @@ type Props = {|
   onSelectCategory: (TutorialCategory | null) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
-  course: ?Course,
+  previewedCourse: ?Course,
   courses: ?(Course[]),
-  courseChapters: ?(CourseChapter[]),
+  previewedCourseChapters: ?(CourseChapter[]),
   onSelectCourse: (courseId: string | null) => void,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
@@ -160,9 +160,9 @@ const MainPage = ({
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
-  course,
+  previewedCourse,
   courses,
-  courseChapters,
+  previewedCourseChapters,
   onSelectCourse,
   getCourseCompletion,
   getCourseChapterCompletion,
@@ -233,18 +233,17 @@ const MainPage = ({
       }}
     >
       <SectionRow>
-        {!!course && !!courseChapters && (
-          <CoursePreviewBanner
-            course={course}
-            courseChapters={courseChapters}
-            getCourseCompletion={getCourseCompletion}
-            getCourseChapterCompletion={getCourseChapterCompletion}
-            onDisplayCourse={() => {
-              onSelectCourse(course.id);
-              onSelectCategory('course');
-            }}
-          />
-        )}
+        <CoursePreviewBanner
+          course={previewedCourse}
+          courseChapters={previewedCourseChapters}
+          getCourseCompletion={getCourseCompletion}
+          getCourseChapterCompletion={getCourseChapterCompletion}
+          onDisplayCourse={() => {
+            if (!previewedCourse) return;
+            onSelectCourse(previewedCourse.id);
+            onSelectCategory('course');
+          }}
+        />
       </SectionRow>
       {courses && (
         <SectionRow>

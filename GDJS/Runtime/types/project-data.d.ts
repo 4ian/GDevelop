@@ -329,13 +329,15 @@ declare interface EffectNetworkSyncData {
   };
 }
 
+declare type ScaleMode = 'linear' | 'magnified' | 'nearest';
+
 declare interface ProjectPropertiesData {
   adaptGameResolutionAtRuntime: boolean;
   folderProject: boolean;
   orientation: string;
   packageName: string;
   projectFile: string;
-  scaleMode: 'linear' | 'nearest';
+  scaleMode: ScaleMode;
   pixelsRounding: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;

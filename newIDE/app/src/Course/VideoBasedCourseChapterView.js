@@ -25,24 +25,7 @@ import { rankLabel } from '../Utils/Ordinal';
 import type { CourseChapterCompletion } from '../MainFrame/EditorContainers/HomePage/UseCourses';
 import LockedCourseChapterPreview from './LockedCourseChapterPreview';
 import CourseChapterTitle from './CourseChapterTitle';
-
-const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
-  if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
-
-  try {
-    const url = new URL(youtubeUrl);
-
-    const lastPartOfUrl = url.pathname.split('/').pop();
-    if (!lastPartOfUrl || !lastPartOfUrl.length) {
-      console.error(`The video URL is badly formatted ${youtubeUrl}`);
-      return null;
-    }
-    return lastPartOfUrl;
-  } catch (error) {
-    console.error(`Could not parse youtube url ${youtubeUrl}:`, error);
-    return null;
-  }
-};
+import { getYoutubeVideoIdFromUrl } from '../Utils/Youtube';
 
 const styles = {
   icon: {

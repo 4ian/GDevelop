@@ -12,7 +12,7 @@ import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { fakeTutorials } from '../../../fixtures/GDevelopServicesTestData/FakeTutorials';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
-  courseChapter,
+  videoBasedCourseChapter,
   fakeAuthenticatedTeacherFromEducationPlan,
   fakeAuthenticatedUserWithEducationPlan,
   fakeAuthenticatedUserWithNoSubscription,
@@ -46,11 +46,14 @@ export const Default = () => (
         }}
       >
         <LearnSection
-          courseChapters={[courseChapter, lockedCourseChapter]}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
           course={premiumCourse}
           courses={[premiumCourse]}
           onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -84,11 +87,14 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
-          courseChapters={[courseChapter, lockedCourseChapter]}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
           course={premiumCourse}
           courses={[premiumCourse]}
           onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -124,11 +130,14 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
-          courseChapters={[courseChapter, lockedCourseChapter]}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
           course={premiumCourse}
           courses={[premiumCourse]}
           onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -164,11 +173,14 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
-          courseChapters={[courseChapter, lockedCourseChapter]}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
           course={premiumCourse}
           courses={[premiumCourse]}
           onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[courseChapter, lockedCourseChapter]}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}

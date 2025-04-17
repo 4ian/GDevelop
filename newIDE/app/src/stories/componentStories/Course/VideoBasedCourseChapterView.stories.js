@@ -5,7 +5,7 @@ import VideoBasedCourseChapterView from '../../../Course/VideoBasedCourseChapter
 
 import paperDecorator from '../../PaperDecorator';
 import {
-  courseChapter,
+  videoBasedCourseChapter,
   lockedCourseChapter,
 } from '../../../fixtures/GDevelopServicesTestData';
 
@@ -18,7 +18,7 @@ export default {
 export const Default = () => {
   return (
     <VideoBasedCourseChapterView
-      courseChapter={courseChapter}
+      courseChapter={videoBasedCourseChapter}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}

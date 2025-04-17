@@ -20,24 +20,7 @@ import Coin from '../Credits/Icons/Coin';
 import Lock from '../UI/CustomSvgIcons/Lock';
 import Window from '../Utils/Window';
 import PasswordPromptDialog from '../AssetStore/PasswordPromptDialog';
-
-const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
-  if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
-
-  try {
-    const url = new URL(youtubeUrl);
-
-    const lastPartOfUrl = url.pathname.split('/').pop();
-    if (!lastPartOfUrl || !lastPartOfUrl.length) {
-      console.error(`The video URL is badly formatted ${youtubeUrl}`);
-      return null;
-    }
-    return lastPartOfUrl;
-  } catch (error) {
-    console.error(`Could not parse youtube url ${youtubeUrl}:`, error);
-    return null;
-  }
-};
+import { getYoutubeVideoIdFromUrl } from '../Utils/Youtube';
 
 const styles = {
   videoAndMaterialsContainer: {
@@ -168,9 +151,7 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
               <ResponsiveLineStackLayout
                 noMargin
                 noColumnMargin
-                forceMobileLayout={
-                  windowSize === 'small' || windowSize === 'medium'
-                }
+                forceMobileLayout={windowSize === 'medium'}
               >
                 <RaisedButton
                   primary

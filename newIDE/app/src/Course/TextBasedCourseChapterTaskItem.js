@@ -32,6 +32,7 @@ const styles = {
     flexDirection: 'column',
     zIndex: 2,
   },
+  checkbox: { margin: 0 },
 };
 
 type Props = {|
@@ -93,7 +94,7 @@ const TextBasedCourseChapterTaskItem = ({
               <Checkbox
                 checked={isComplete}
                 onCheck={() => onComplete(!isComplete)}
-                style={{ margin: 0 }}
+                style={styles.checkbox}
               />
             </div>
             <ColumnStackLayout expand noMargin noOverflowParent>

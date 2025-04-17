@@ -50,7 +50,7 @@ const makeMarkdownCustomComponents = (
     }
     return isStandaloneText || allowParagraphs ? (
       shouldFakeListItem ? (
-        <ul className="faked-list-item">
+        <ul className="generated-list-item">
           <li>
             <p>{props.children}</p>
           </li>

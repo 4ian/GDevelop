@@ -18,12 +18,12 @@
 .gd-markdown.standalone-text-container {
   line-height: 1.3;
 }
-.gd-markdown .faked-list-item {
+.gd-markdown .generated-list-item {
   margin-block-start: 0;
   margin-block-end: 0;
   list-style-type: none;
 }
-.gd-markdown .faked-list-item p {
+.gd-markdown .generated-list-item p {
   margin-block-start: 4px;
   margin-block-end: 4px;
 }

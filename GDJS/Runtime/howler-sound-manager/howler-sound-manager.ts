@@ -90,18 +90,29 @@ namespace gdjs {
 
     private _audioResourceName;
 
+    /**
+     * The chanel number on which the sound is played (only necessary for save/loading)
+     */
+    private _channel: float;
+
     constructor(
       howl: Howl,
       volume: float,
       loop: boolean,
       rate: float,
-      audioResourceName: string
+      audioResourceName: string,
+      channel?: float
     ) {
       this._howl = howl;
       this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
       this._audioResourceName = audioResourceName;
+      if (channel) {
+        this._channel = channel;
+      } else {
+        this._channel = -1;
+      }
     }
 
     /**
@@ -375,7 +386,7 @@ namespace gdjs {
       return {
         resourceName: this._audioResourceName,
         loop: this._loop,
-        initialVolume: this._initialVolume,
+        initialVolume: this.getVolume(),
         rate: this._rate,
         position: this.getSeek(),
       };
@@ -597,7 +608,8 @@ namespace gdjs {
       isMusic: boolean,
       volume: float,
       loop: boolean,
-      rate: float
+      rate: float,
+      channel?: float
     ): HowlerSound {
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
       const resource = this._getAudioResource(soundName);
@@ -624,7 +636,7 @@ namespace gdjs {
         );
         cacheContainer.set(resource, howl);
       }
-      return new gdjs.HowlerSound(howl, volume, loop, rate, soundName);
+      return new gdjs.HowlerSound(howl, volume, loop, rate, soundName, channel);
     }
 
     /**
@@ -722,7 +734,13 @@ namespace gdjs {
       this._loadedSounds.clear();
     }
 
-    playSound(soundName: string, loop: boolean, volume: float, pitch: float, position?: float) {
+    playSound(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      position?: float
+    ) {
       const sound = this.createHowlerSound(
         soundName,
         /* isMusic= */ false,
@@ -738,8 +756,7 @@ namespace gdjs {
         }
       });
       sound.play();
-      if(position)
-      {
+      if (position) {
         sound.setSeek(position);
       }
     }
@@ -759,7 +776,8 @@ namespace gdjs {
         /* isMusic= */ false,
         volume / 100,
         loop,
-        pitch
+        pitch,
+        channel
       );
       const spatialPosition = this._cachedSpatialPosition[channel];
       if (spatialPosition) {
@@ -775,8 +793,7 @@ namespace gdjs {
         }
       });
       sound.play();
-      if(position)
-      {
+      if (position) {
         sound.setSeek(position);
       }
     }
@@ -785,7 +802,13 @@ namespace gdjs {
       return this._sounds[channel] || null;
     }
 
-    playMusic(soundName: string, loop: boolean, volume: float, pitch: float, position?:float) {
+    playMusic(
+      soundName: string,
+      loop: boolean,
+      volume: float,
+      pitch: float,
+      position?: float
+    ) {
       const music = this.createHowlerSound(
         soundName,
         /* isMusic= */ true,
@@ -793,18 +816,15 @@ namespace gdjs {
         loop,
         pitch
       );
-      console.log(soundName, loop, volume, pitch);
       this._storeSoundInArray(this._freeMusics, music);
       music.once('play', () => {
-        console.log("le play est fired");
         if (this._paused) {
           music.pause();
           this._pausedSounds.push(music);
         }
       });
       music.play();
-      if(position)
-      {
+      if (position) {
         music.setSeek(position);
       }
     }
@@ -815,7 +835,7 @@ namespace gdjs {
       loop: boolean,
       volume: float,
       pitch: float,
-      position?:float,
+      position?: float
     ) {
       if (this._musics[channel]) this._musics[channel].stop();
 
@@ -824,7 +844,8 @@ namespace gdjs {
         /* isMusic= */ true,
         volume / 100,
         loop,
-        pitch
+        pitch,
+        channel
       );
       // Musics are played with the html5 backend, that is not compatible with spatialization.
       this._musics[channel] = music;
@@ -835,8 +856,7 @@ namespace gdjs {
         }
       });
       music.play();
-      if(position)
-      {
+      if (position) {
         music.setSeek(position);
       }
     }
@@ -1007,7 +1027,6 @@ namespace gdjs {
           freeSoundsSyncData.rate,
           freeSoundsSyncData.position
         );
-        
       }
 
       for (let i = 0; i < syncData.freeMusics.length; i++) {
@@ -1015,7 +1034,7 @@ namespace gdjs {
         this.playMusic(
           freeMusicsSyncData.resourceName,
           freeMusicsSyncData.loop,
-          100,
+          freeMusicsSyncData.initialVolume,
           freeMusicsSyncData.rate,
           freeMusicsSyncData.position
         );
@@ -1025,9 +1044,9 @@ namespace gdjs {
         const soundsSyncData: SoundSyncData = syncData.sounds[i];
         this.playSoundOnChannel(
           soundsSyncData.resourceName,
-          i,
+          soundsSyncData.channel || 0,
           soundsSyncData.loop,
-          100,
+          soundsSyncData.initialVolume,
           soundsSyncData.rate,
           soundsSyncData.position
         );
@@ -1037,9 +1056,9 @@ namespace gdjs {
         const musicsSyncData: SoundSyncData = syncData.musics[i];
         this.playMusicOnChannel(
           musicsSyncData.resourceName,
-          i,
+          musicsSyncData.channel || 0,
           musicsSyncData.loop,
-          100,
+          musicsSyncData.initialVolume,
           musicsSyncData.rate,
           musicsSyncData.position
         );

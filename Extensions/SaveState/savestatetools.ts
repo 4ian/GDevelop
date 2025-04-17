@@ -3,7 +3,11 @@ namespace gdjs {
     export const INDEXED_DB_NAME: string = 'gameSaveDB';
     export const INDEXED_DB_KEY: string = 'game_save';
     export const INDEXED_DB_OBJECT_STORE: string = 'saves';
-    export const saveWholeGame = async function (currentScene: RuntimeScene) {
+    export const saveWholeGame = async function (
+      currentScene: RuntimeScene,
+      sceneVar?: gdjs.Variable,
+      storageName?: string
+    ) {
       let allSyncData: GameSaveState = {
         gameNetworkSyncData: {},
         layoutNetworkSyncDatas: [],
@@ -45,15 +49,33 @@ namespace gdjs {
         });
       }
       const syncDataJson = JSON.stringify(allSyncData);
-      await gdjs.saveToIndexedDB(
-        INDEXED_DB_NAME,
-        INDEXED_DB_KEY,
-        INDEXED_DB_OBJECT_STORE,
-        syncDataJson
-      );
+
+      if (sceneVar) {
+        sceneVar.fromJSObject(JSON.parse(syncDataJson));
+      }
+
+      if (storageName) {
+        await gdjs.saveToIndexedDB(
+          INDEXED_DB_NAME,
+          storageName,
+          INDEXED_DB_OBJECT_STORE,
+          syncDataJson
+        );
+      } else {
+        await gdjs.saveToIndexedDB(
+          INDEXED_DB_NAME,
+          INDEXED_DB_KEY,
+          INDEXED_DB_OBJECT_STORE,
+          syncDataJson
+        );
+      }
     };
 
-    export const loadWholeGame = function (currentScene: RuntimeScene) {
+    export const loadWholeGame = async function (
+      currentScene: RuntimeScene,
+      sceneVar?: gdjs.Variable,
+      storageName?: string
+    ) {
       currentScene.requestLoad(true);
     };
   }

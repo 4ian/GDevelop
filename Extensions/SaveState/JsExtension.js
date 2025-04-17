@@ -35,13 +35,20 @@ module.exports = {
       .addAction(
         'SaveGame',
         _('Save the whole game'),
-        _('Save the whole game'),
-        _('Save the game.'),
+        _('Save the whole game to a scene variable or storage name.'),
+        _('Save the game to _PARAM1_ (scene variable) or to storage _PARAM2_.'),
         '',
         'res/actions/save.svg',
         'res/actions/save.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'scenevar',
+        _('Scene variable to store the save (optional)'),
+        '',
+        true
+      )
+      .addParameter('string', _('Storage name to save to (optional)'), '', true)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.saveWholeGame');
@@ -50,13 +57,27 @@ module.exports = {
       .addAction(
         'LoadGame',
         _('Load game save.'),
-        _('Load a game save.'),
-        _('Load a game save'),
+        _('Load a game save from a scene variable or storage.'),
+        _(
+          'Load the game save from _PARAM1_ (scene variable) or storage _PARAM2_.'
+        ),
         '',
         'res/actions/save.svg',
         'res/actions/save.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
+      .addParameter(
+        'scenevar',
+        _('Scene variable to load from (optional)'),
+        '',
+        true
+      )
+      .addParameter(
+        'string',
+        _('Storage name to load from (optional)'),
+        '',
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.loadWholeGame');

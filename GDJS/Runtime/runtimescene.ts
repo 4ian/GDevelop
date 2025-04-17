@@ -24,6 +24,8 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _isLoadingRequested: boolean = false;
+    _loadStorageName: string = '';
+    _loadVariable: gdjs.Variable;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -62,6 +64,7 @@ namespace gdjs {
       super();
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
+      this._loadVariable = new gdjs.Variable();
       this._variablesByExtensionName = new Map<
         string,
         gdjs.VariablesContainer
@@ -212,7 +215,11 @@ namespace gdjs {
       for (let i = 0; i < gdjs.callbacksRuntimeSceneLoaded.length; ++i) {
         gdjs.callbacksRuntimeSceneLoaded[i](this);
       }
-      if (sceneData.stopSoundsOnStartup && this._runtimeGame && (!options || !options.forceInputClear)) {
+      if (
+        sceneData.stopSoundsOnStartup &&
+        this._runtimeGame &&
+        (!options || !options.forceInputClear)
+      ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
       this._isLoaded = true;
@@ -757,8 +764,18 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoad(request: boolean): void {
+    requestLoad(
+      request: boolean,
+      sceneVar?: gdjs.Variable,
+      storageName?: string
+    ): void {
       this._isLoadingRequested = request;
+      if (storageName) {
+        this._loadStorageName = storageName;
+      }
+      if (sceneVar) {
+        this._loadVariable = sceneVar;
+      }
     }
 
     /**

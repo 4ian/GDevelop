@@ -67,20 +67,16 @@ namespace gdjs {
           this.replace(currentScene.getRequestedScene());
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
-        } else {
-          logger.error('Unrecognized change in scene stack: ' + request);
         }
 
         if (currentScene.getIsLoadingRequest()) {
           currentScene.requestLoad(false);
-          gdjs
-            .loadFromIndexedDB(
-              gdjs.saveState.INDEXED_DB_NAME,
-              gdjs.saveState.INDEXED_DB_OBJECT_STORE,
-              gdjs.saveState.INDEXED_DB_KEY
-            )
-            .then((jsonData) => {
-              const allSyncData: GameSaveState = JSON.parse(jsonData);
+
+          if (currentScene._loadVariable) {
+            try {
+              const allSyncData =
+                currentScene._loadVariable.toJSObject() as GameSaveState;
+
               if (allSyncData) {
                 const options: UpdateFromNetworkSyncDataOptions = {
                   forceInputClear: true,
@@ -93,12 +89,9 @@ namespace gdjs {
                     options
                   );
 
-                this.applyUpdateFromNetworkSyncDataIfAny({
-                  forceInputClear: true,
-                });
+                this.applyUpdateFromNetworkSyncDataIfAny(options);
 
                 const sceneStack = this._stack;
-
                 sceneStack.forEach((scene, index) => {
                   const layoutSyncData =
                     allSyncData.layoutNetworkSyncDatas[index];
@@ -122,10 +115,71 @@ namespace gdjs {
                   }
                 });
               }
-            })
-            .catch((error) => {
-              console.error('Error on loading a save :', error);
-            });
+            } catch (error) {
+              console.error('[SaveState] Failed to load from variable:', error);
+            }
+          } else {
+            const storageKey =
+              currentScene._loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
+
+            gdjs
+              .loadFromIndexedDB(
+                gdjs.saveState.INDEXED_DB_NAME,
+                gdjs.saveState.INDEXED_DB_OBJECT_STORE,
+                storageKey
+              )
+              .then((jsonData) => {
+                const allSyncData = JSON.parse(jsonData) as GameSaveState;
+
+                if (allSyncData) {
+                  const options: UpdateFromNetworkSyncDataOptions = {
+                    forceInputClear: true,
+                  };
+
+                  currentScene
+                    .getGame()
+                    .updateFromNetworkSyncData(
+                      allSyncData.gameNetworkSyncData,
+                      options
+                    );
+
+                  this.applyUpdateFromNetworkSyncDataIfAny(options);
+
+                  const sceneStack = this._stack;
+
+                  sceneStack.forEach((scene, index) => {
+                    const layoutSyncData =
+                      allSyncData.layoutNetworkSyncDatas[index];
+                    if (!layoutSyncData) return;
+
+                    scene.updateFromNetworkSyncData(
+                      layoutSyncData.sceneData,
+                      options
+                    );
+
+                    const objectDatas = layoutSyncData.objectDatas;
+                    for (const id in objectDatas) {
+                      const objectNetworkSyncData = objectDatas[id];
+                      const object = scene.createObject(
+                        objectNetworkSyncData.n
+                      );
+                      if (object) {
+                        object.updateFromNetworkSyncData(
+                          objectNetworkSyncData,
+                          options
+                        );
+                      }
+                    }
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error(
+                  '[SaveState] Error loading from IndexedDB:',
+                  error
+                );
+              });
+          }
         }
       }
 

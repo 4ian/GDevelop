@@ -11,7 +11,6 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import PlaceholderError from '../../UI/PlaceholderError';
 import Tooltip from '@material-ui/core/Tooltip';
 import CreditOutDialog from './CashOutDialog';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -49,7 +48,6 @@ const UserEarningsWidget = ({ size }: Props) => {
 
   const [earningsInMilliUsd, setEarningsInMilliUsd] = React.useState(0);
   const [earningsInCredits, setEarningsInCredits] = React.useState(0);
-  const [error, setError] = React.useState(null);
   const intervalValuesUpdate = React.useRef(null);
 
   const [selectedCashOutType, setSelectedCashOutType] = React.useState<
@@ -58,43 +56,43 @@ const UserEarningsWidget = ({ size }: Props) => {
 
   const animateEarnings = React.useCallback(
     async () => {
-      if (!userEarningsBalance) return;
-
-      try {
-        // Create an animation to show the earnings increasing.
-        const targetMilliUsd = userEarningsBalance.amountInMilliUSDs;
-        const targetCredits = userEarningsBalance.amountInCredits;
-
-        const duration = 500;
-        const steps = 30;
-        const intervalTime = duration / steps;
-
-        const milliUsdIncrement = targetMilliUsd / steps;
-        const creditsIncrement = targetCredits / steps;
-
-        let currentMilliUsd = 0;
-        let currentCredits = 0;
-        let step = 0;
-
-        intervalValuesUpdate.current = setInterval(() => {
-          step++;
-          currentMilliUsd += milliUsdIncrement;
-          currentCredits += creditsIncrement;
-
-          setEarningsInMilliUsd(currentMilliUsd);
-          setEarningsInCredits(currentCredits);
-
-          if (step >= steps) {
-            clearInterval(intervalValuesUpdate.current);
-            // Ensure final values are exactly the target values
-            setEarningsInMilliUsd(targetMilliUsd);
-            setEarningsInCredits(targetCredits);
-          }
-        }, intervalTime);
-      } catch (error) {
-        console.error('Unable to get user earnings balance:', error);
-        setError(error);
+      if (!userEarningsBalance) {
+        // In case the user logs out, reset the earnings.
+        setEarningsInMilliUsd(0);
+        setEarningsInCredits(0);
+        return;
       }
+
+      // Create an animation to show the earnings increasing.
+      const targetMilliUsd = userEarningsBalance.amountInMilliUSDs;
+      const targetCredits = userEarningsBalance.amountInCredits;
+
+      const duration = 500;
+      const steps = 30;
+      const intervalTime = duration / steps;
+
+      const milliUsdIncrement = targetMilliUsd / steps;
+      const creditsIncrement = targetCredits / steps;
+
+      let currentMilliUsd = 0;
+      let currentCredits = 0;
+      let step = 0;
+
+      intervalValuesUpdate.current = setInterval(() => {
+        step++;
+        currentMilliUsd += milliUsdIncrement;
+        currentCredits += creditsIncrement;
+
+        setEarningsInMilliUsd(currentMilliUsd);
+        setEarningsInCredits(currentCredits);
+
+        if (step >= steps) {
+          clearInterval(intervalValuesUpdate.current);
+          // Ensure final values are exactly the target values
+          setEarningsInMilliUsd(targetMilliUsd);
+          setEarningsInCredits(targetCredits);
+        }
+      }, intervalTime);
     },
     [userEarningsBalance]
   );
@@ -127,16 +125,7 @@ const UserEarningsWidget = ({ size }: Props) => {
     userEarningsBalance &&
     earningsInMilliUsd >= userEarningsBalance.minAmountToCashoutInMilliUSDs;
 
-  const content = error ? (
-    <LineStackLayout noMargin alignItems="center">
-      <PlaceholderError onRetry={onRefreshEarningsBalance}>
-        <Trans>
-          Can't load your game earnings. Verify your internet connection or try
-          again later.
-        </Trans>
-      </PlaceholderError>
-    </LineStackLayout>
-  ) : (
+  const content = (
     <ResponsiveLineStackLayout
       noMargin
       alignItems="center"

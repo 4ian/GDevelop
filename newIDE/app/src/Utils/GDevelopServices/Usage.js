@@ -15,6 +15,8 @@ export type Usage = {
   userId: string,
   type: string,
   createdAt: number,
+  description?: string,
+  creditsPaid?: number,
 };
 export type Usages = Array<Usage>;
 
@@ -199,6 +201,14 @@ export type SubscriptionPlanWithPricingSystems = {|
   pricingSystems: SubscriptionPlanPricingSystem[],
 |};
 
+export type GameAdEarning = {|
+  gameId: string,
+  date: string,
+  adEarningsInMilliUSDs: number,
+  adEarningsInCredits: number,
+  updatedAt: number,
+|};
+
 export interface UserEarningsBalance {
   userId: string;
   amountInMilliUSDs: number;
@@ -329,6 +339,40 @@ export const getUserUsages = async (
     },
   });
   return response.data;
+};
+
+export const getGameAdEarnings = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    startIsoDate,
+    endIsoDate,
+  }: {|
+    gameId: string,
+    startIsoDate: string,
+    endIsoDate: string,
+  |}
+): Promise<GameAdEarning[]> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get(`/game-ad-earning`, {
+    params: {
+      userId,
+      gameId,
+      startIsoDate,
+      endIsoDate,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  const gameAdEarnings = response.data;
+  if (!Array.isArray(gameAdEarnings)) {
+    throw new Error('Invalid response from the game ad earnings API');
+  }
+
+  return gameAdEarnings;
 };
 
 export const getUserEarningsBalance = async (

@@ -174,10 +174,7 @@ namespace gdjs {
                 }
               })
               .catch((error) => {
-                logger.error(
-                  'Error loading from IndexedDB:',
-                  error
-                );
+                logger.error('Error loading from IndexedDB:', error);
               });
           }
         }

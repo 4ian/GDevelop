@@ -116,7 +116,7 @@ namespace gdjs {
                 });
               }
             } catch (error) {
-              console.error('[SaveState] Failed to load from variable:', error);
+              logger.error('Failed to load from variable:', error);
             }
           } else {
             const storageKey =
@@ -174,8 +174,8 @@ namespace gdjs {
                 }
               })
               .catch((error) => {
-                console.error(
-                  '[SaveState] Error loading from IndexedDB:',
+                logger.error(
+                  'Error loading from IndexedDB:',
                   error
                 );
               });

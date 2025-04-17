@@ -21,6 +21,7 @@ import Lock from '../UI/CustomSvgIcons/Lock';
 import Window from '../Utils/Window';
 import PasswordPromptDialog from '../AssetStore/PasswordPromptDialog';
 import { getYoutubeVideoIdFromUrl } from '../Utils/Youtube';
+import AlertMessage from '../UI/AlertMessage';
 
 const styles = {
   videoAndMaterialsContainer: {
@@ -84,6 +85,7 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
+    const [error, setError] = React.useState<React.Node>(null);
     const [
       displayPasswordPrompt,
       setDisplayPasswordPrompt,
@@ -98,11 +100,19 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
     const onClickBuyWithCredits = React.useCallback(
       async () => {
         if (!courseChapter.isLocked) return;
-
+        setError(null);
         setDisplayPasswordPrompt(false);
         setIsPurchasing(true);
         try {
           await onBuyWithCredits(courseChapter, password);
+        } catch (error) {
+          console.error('An error occurred while buying this chapter', error);
+          setError(
+            <Trans>
+              An error occurred while buying this chapter. Please try again
+              later.
+            </Trans>
+          );
         } finally {
           setIsPurchasing(false);
         }
@@ -180,6 +190,7 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
                   />
                 )}
               </ResponsiveLineStackLayout>
+              {error && <AlertMessage kind="error">{error}</AlertMessage>}
             </ColumnStackLayout>
           </Paper>
         </div>

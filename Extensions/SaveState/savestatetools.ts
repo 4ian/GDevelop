@@ -58,8 +58,8 @@ namespace gdjs {
         } else {
           await gdjs.saveToIndexedDB(
             INDEXED_DB_NAME,
-            loadStorageName || INDEXED_DB_OBJECT_STORE,
             INDEXED_DB_OBJECT_STORE,
+            loadStorageName || INDEXED_DB_KEY,
             syncDataJson
           );
         }
@@ -68,9 +68,13 @@ namespace gdjs {
 
     export const loadWholeGame = async function (
       currentScene: RuntimeScene,
-      requestOptions?: LoadRequestOptions
+      sceneVar?: gdjs.Variable,
+      storageName?: string
     ) {
-      currentScene.requestLoad(true, requestOptions);
+      currentScene.requestLoad({
+        loadVariable: sceneVar || null,
+        loadStorageName: storageName || INDEXED_DB_OBJECT_STORE,
+      });
     };
   }
 }

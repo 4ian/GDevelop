@@ -68,19 +68,72 @@ namespace gdjs {
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         }
+      }
 
-        if (currentScene.getIsLoadingRequest()) {
-          currentScene.requestLoad(false);
-          const loadRequestionOptions: LoadRequestOptions =
-            currentScene.getLoadRequestOptions();
-          if (
-            loadRequestionOptions.loadVariable &&
-            !loadRequestionOptions.loadVariable.isPrimitive()
-          ) {
-            try {
-              console.log(loadRequestionOptions.loadVariable);
-              const allSyncData =
-                loadRequestionOptions.loadVariable.toJSObject() as GameSaveState;
+      const loadRequestionOptions: LoadRequestOptions | null =
+        currentScene.getLoadRequestOptions();
+      if (loadRequestionOptions) {
+        if (
+          loadRequestionOptions.loadVariable &&
+          !loadRequestionOptions.loadVariable.isPrimitive()
+        ) {
+          try {
+            const allSyncData =
+              loadRequestionOptions.loadVariable.toJSObject() as GameSaveState;
+            currentScene.requestLoad(null);
+            if (allSyncData) {
+              const options: UpdateFromNetworkSyncDataOptions = {
+                forceInputClear: true,
+              };
+              currentScene
+                .getGame()
+                .updateFromNetworkSyncData(
+                  allSyncData.gameNetworkSyncData,
+                  options
+                );
+
+              this.applyUpdateFromNetworkSyncDataIfAny(options);
+
+              const sceneStack = this._stack;
+              sceneStack.forEach((scene, index) => {
+                const layoutSyncData =
+                  allSyncData.layoutNetworkSyncDatas[index];
+                if (!layoutSyncData) return;
+                scene.updateFromNetworkSyncData(
+                  layoutSyncData.sceneData,
+                  options
+                );
+
+                const objectDatas = layoutSyncData.objectDatas;
+                for (const id in objectDatas) {
+                  const objectNetworkSyncData = objectDatas[id];
+                  const object = scene.createObject(
+                    objectNetworkSyncData.n || ''
+                  );
+                  if (object) {
+                    object.updateFromNetworkSyncData(
+                      objectNetworkSyncData,
+                      options
+                    );
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            logger.error('Failed to load from variable:', error);
+          }
+        } else {
+          const storageKey =
+            loadRequestionOptions.loadStorageName ||
+            gdjs.saveState.INDEXED_DB_KEY;
+          gdjs
+            .loadFromIndexedDB(
+              gdjs.saveState.INDEXED_DB_NAME,
+              gdjs.saveState.INDEXED_DB_OBJECT_STORE,
+              storageKey
+            )
+            .then((jsonData) => {
+              const allSyncData = JSON.parse(jsonData) as GameSaveState;
 
               if (allSyncData) {
                 const options: UpdateFromNetworkSyncDataOptions = {
@@ -122,71 +175,12 @@ namespace gdjs {
                   }
                 });
               }
-            } catch (error) {
-              logger.error('Failed to load from variable:', error);
-            }
-          } else {
-            const storageKey =
-              loadRequestionOptions.loadStorageName ||
-              gdjs.saveState.INDEXED_DB_KEY;
-
-            gdjs
-              .loadFromIndexedDB(
-                gdjs.saveState.INDEXED_DB_NAME,
-                gdjs.saveState.INDEXED_DB_OBJECT_STORE,
-                storageKey
-              )
-              .then((jsonData) => {
-                const allSyncData = JSON.parse(jsonData) as GameSaveState;
-
-                if (allSyncData) {
-                  const options: UpdateFromNetworkSyncDataOptions = {
-                    forceInputClear: true,
-                  };
-                  currentScene
-                    .getGame()
-                    .updateFromNetworkSyncData(
-                      allSyncData.gameNetworkSyncData,
-                      options
-                    );
-
-                  this.applyUpdateFromNetworkSyncDataIfAny(options);
-
-                  const sceneStack = this._stack;
-
-                  sceneStack.forEach((scene, index) => {
-                    const layoutSyncData =
-                      allSyncData.layoutNetworkSyncDatas[index];
-                    if (!layoutSyncData) return;
-
-                    scene.updateFromNetworkSyncData(
-                      layoutSyncData.sceneData,
-                      options
-                    );
-
-                    const objectDatas = layoutSyncData.objectDatas;
-                    for (const id in objectDatas) {
-                      const objectNetworkSyncData = objectDatas[id];
-                      const object = scene.createObject(
-                        objectNetworkSyncData.n ? objectNetworkSyncData.n : ''
-                      );
-                      if (object) {
-                        object.updateFromNetworkSyncData(
-                          objectNetworkSyncData,
-                          options
-                        );
-                      }
-                    }
-                  });
-                }
-              })
-              .catch((error) => {
-                logger.error('Error loading from IndexedDB:', error);
-              });
-          }
+            })
+            .catch((error) => {
+              logger.error('Error loading from IndexedDB:', error);
+            });
         }
       }
-
       return true;
     }
 

@@ -218,8 +218,8 @@ declare type SoundSyncData = {
 };
 
 declare type LoadRequestOptions = {
-  loadStorageName?: string;
-  loadVariable?: gdjs.Variable;
+  loadStorageName: string;
+  loadVariable: gdjs.Variable | null;
 };
 
 declare interface GameNetworkSyncData {

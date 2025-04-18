@@ -23,8 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
-    _isLoadingRequested: boolean = false;
-    _loadRequestOptions: LoadRequestOptions = {};
+    _loadRequestOptions: LoadRequestOptions | null = null;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -63,7 +62,6 @@ namespace gdjs {
       super();
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
-      this._loadRequestOptions.loadVariable = new gdjs.Variable();
       this._variablesByExtensionName = new Map<
         string,
         gdjs.VariablesContainer
@@ -464,7 +462,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.endFrame();
       }
-      return !!this.getRequestedChange() || this._isLoadingRequested;
+      return !!this.getRequestedChange();
     }
 
     /**
@@ -660,11 +658,6 @@ namespace gdjs {
     getViewportOriginY(): float {
       return this._cachedGameResolutionHeight / 2;
     }
-
-    getIsLoadingRequest() {
-      return this._isLoadingRequested;
-    }
-
     convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {
       // The result parameter used to be optional.
       const point = result || [0, 0];
@@ -763,16 +756,15 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoad(request: boolean, requestOptions?: LoadRequestOptions): void {
-      this._isLoadingRequested = request;
+    requestLoad(requestOptions: LoadRequestOptions | null): void {
       if (requestOptions) {
-        if (requestOptions.loadStorageName) {
-          this._loadRequestOptions.loadStorageName =
-            requestOptions.loadStorageName;
-        }
-        if (requestOptions.loadVariable) {
-          this._loadRequestOptions.loadVariable = requestOptions.loadVariable;
-        }
+        this._loadRequestOptions = {
+          loadVariable: null,
+          loadStorageName: gdjs.saveState.INDEXED_DB_OBJECT_STORE,
+        };
+        this._loadRequestOptions.loadStorageName =
+          requestOptions.loadStorageName;
+        this._loadRequestOptions.loadVariable = requestOptions.loadVariable;
       }
     }
 
@@ -904,7 +896,7 @@ namespace gdjs {
       return this.networkId;
     }
 
-    getLoadRequestOptions(): LoadRequestOptions {
+    getLoadRequestOptions(): LoadRequestOptions | null {
       return this._loadRequestOptions;
     }
   }

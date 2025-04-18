@@ -57,8 +57,8 @@ namespace gdjs {
 
   export const saveToIndexedDB = async function (
     dbName: string,
-    key: string,
     objectStoreName: string,
+    key: string,
     data: any
   ): Promise<void> {
     return new Promise((resolve, reject) => {

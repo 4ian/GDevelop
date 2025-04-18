@@ -765,9 +765,7 @@ namespace gdjs {
         this._loadRequestOptions.loadStorageName =
           requestOptions.loadStorageName;
         this._loadRequestOptions.loadVariable = requestOptions.loadVariable;
-      }
-      else
-      {
+      } else {
         this._loadRequestOptions = null;
       }
     }

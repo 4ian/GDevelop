@@ -122,6 +122,95 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
             areaMaxZ: 0,
             _initialInnerArea: null,
           },
+          {
+            name: 'MyLayoutedEventsBasedObject',
+            isInnerAreaFollowingParentSize: true,
+            objects: [
+              {
+                name: 'MySprite',
+                type: 'Sprite',
+                variables: [],
+                behaviors: [
+                  {
+                    name: 'AnchorBehavior',
+                    type: 'AnchorBehavior::AnchorBehavior',
+                    bottomEdgeAnchor: 2,
+                    leftEdgeAnchor: 1,
+                    relativeToOriginalWindowSize: true,
+                    rightEdgeAnchor: 2,
+                    topEdgeAnchor: 1,
+                    useLegacyBottomAndRightAnchors: false,
+                  },
+                ],
+                effects: [],
+                // @ts-ignore This is the object configuration.
+                updateIfNotVisible: false,
+                // @ts-ignore This is the object configuration.
+                animations: [
+                  {
+                    name: 'animation',
+                    directions: [
+                      {
+                        sprites: [
+                          {
+                            image: 'base/tests-utils/assets/64x64.jpg',
+                            originPoint: { name: 'Origin', x: 0, y: 0 },
+                            centerPoint: {
+                              name: 'Center',
+                              x: 32,
+                              y: 32,
+                              automatic: true,
+                            },
+                            points: [
+                              { name: 'Center', x: 32, y: 32 },
+                              { name: 'Origin', x: 0, y: 0 },
+                            ],
+                            hasCustomCollisionMask: true,
+                            customCollisionMask: [
+                              [
+                                { x: 64, y: 64 },
+                                { x: 0, y: 64 },
+                                { x: 64, y: 0 },
+                              ],
+                            ],
+                          },
+                        ],
+                        timeBetweenFrames: 0,
+                        looping: false,
+                      },
+                    ],
+                    useMultipleDirections: false,
+                  },
+                ],
+              },
+            ],
+            instances: [
+              {
+                angle: 0,
+                customSize: true,
+                height: 64,
+                layer: '',
+                name: 'MySprite',
+                persistentUuid: '668db48d-4e12-4b6f-aa6b-f73b74bf608e',
+                width: 64,
+                x: 0,
+                y: 0,
+                zOrder: 1,
+                numberProperties: [],
+                stringProperties: [],
+                initialVariables: [],
+                locked: false,
+              },
+            ],
+            layers: [],
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 0,
+            _initialInnerArea: null,
+          },
         ],
         sceneVariables: [],
         globalVariables: [],
@@ -129,8 +218,8 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
     ],
   });
 
-  gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise = new Promise(
-    (resolve) => {
+  gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise =
+    new Promise((resolve) => {
       runtimeGame.loadAllAssets(
         () => {
           console.info('Done loading assets for test game');
@@ -141,8 +230,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
           /* Ignore progress */
         }
       );
-    }
-  );
+    });
   return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
 };
 

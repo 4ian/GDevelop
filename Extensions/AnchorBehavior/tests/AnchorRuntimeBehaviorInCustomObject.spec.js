@@ -18,7 +18,6 @@ describe('gdjs.AnchorRuntimeBehavior', () => {
     customObject.setPosition(500, 250);
     runtimeScene.renderAndStep(1000 / 60);
 
-    console.log('TEST');
     customObject.setWidth(2000);
     customObject.setHeight(3000);
     runtimeScene.renderAndStep(1000 / 60);

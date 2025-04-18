@@ -227,7 +227,7 @@ namespace gdjs {
     }
 
     /**
-     * Update the anchor distance according to the object position change in
+     * Update the anchor distances according to the object position change in
      * the scene.
      *
      * The camera is not taken into account. Indeed, a camera scrolling should

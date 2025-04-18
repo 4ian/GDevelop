@@ -9,13 +9,6 @@ namespace gdjs {
     objectStoreName: string,
     key: string
   ): Promise<any> {
-    if (!indexedDB) {
-      console.error(
-        'Error in opening IndexedDB. If the problem persists, your browser may be too ancient. If you dont think that is the case, please contact Gdevelop staff.'
-      );
-      return;
-    }
-
     return new Promise((resolve, reject) => {
       let request: IDBOpenDBRequest;
 
@@ -68,14 +61,15 @@ namespace gdjs {
     objectStoreName: string,
     data: any
   ): Promise<void> {
-    if (!indexedDB) {
-      console.error(
-        'Error in opening IndexedDB. If the problem persists, your browser may be too ancient. If you dont think that is the case, please contact Gdevelop staff.'
-      );
-      return;
-    }
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
+      let request: IDBOpenDBRequest;
+      try {
+        request = indexedDB.open(dbName, 1);
+      } catch (err) {
+        console.error('Exception thrown while opening IndexedDB:', err);
+        reject(err);
+        return;
+      }
 
       request.onupgradeneeded = function (event) {
         const db = request.result;

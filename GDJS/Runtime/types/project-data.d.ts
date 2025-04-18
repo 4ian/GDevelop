@@ -76,7 +76,7 @@ declare type BasicObjectNetworkSyncData = {
   /** Permanent force on Y */
   pfy: number;
   /* name :*/
-  n: string;
+  n?: string;
 };
 
 /**
@@ -201,7 +201,6 @@ declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 
 declare type SoundManagerSyncData = {
   globalVolume: float;
-  availableResources: Record<string, ResourceData>;
   cachedSpatialPosition: Record<integer, [number, number, number]>;
   freeSounds: SoundSyncData[];
   freeMusics: SoundSyncData[];
@@ -216,6 +215,11 @@ declare type SoundSyncData = {
   resourceName: string;
   position: float;
   channel?: float;
+};
+
+declare type LoadRequestOptions = {
+  loadStorageName?: string;
+  loadVariable?: gdjs.Variable;
 };
 
 declare interface GameNetworkSyncData {

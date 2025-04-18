@@ -3,10 +3,10 @@ namespace gdjs {
     export const INDEXED_DB_NAME: string = 'gameSaveDB';
     export const INDEXED_DB_KEY: string = 'game_save';
     export const INDEXED_DB_OBJECT_STORE: string = 'saves';
+
     export const saveWholeGame = async function (
       currentScene: RuntimeScene,
-      sceneVar?: gdjs.Variable,
-      storageName?: string
+      requestOptions?: LoadRequestOptions
     ) {
       let allSyncData: GameSaveState = {
         gameNetworkSyncData: {},
@@ -50,33 +50,27 @@ namespace gdjs {
       }
       const syncDataJson = JSON.stringify(allSyncData);
 
-      if (sceneVar) {
-        sceneVar.fromJSObject(JSON.parse(syncDataJson));
-      }
+      if (requestOptions) {
+        const { loadVariable, loadStorageName } = requestOptions;
 
-      if (storageName) {
-        await gdjs.saveToIndexedDB(
-          INDEXED_DB_NAME,
-          storageName,
-          INDEXED_DB_OBJECT_STORE,
-          syncDataJson
-        );
-      } else {
-        await gdjs.saveToIndexedDB(
-          INDEXED_DB_NAME,
-          INDEXED_DB_KEY,
-          INDEXED_DB_OBJECT_STORE,
-          syncDataJson
-        );
+        if (loadVariable) {
+          loadVariable.fromJSObject(JSON.parse(syncDataJson));
+        } else {
+          await gdjs.saveToIndexedDB(
+            INDEXED_DB_NAME,
+            loadStorageName || INDEXED_DB_OBJECT_STORE,
+            INDEXED_DB_OBJECT_STORE,
+            syncDataJson
+          );
+        }
       }
     };
 
     export const loadWholeGame = async function (
       currentScene: RuntimeScene,
-      sceneVar?: gdjs.Variable,
-      storageName?: string
+      requestOptions?: LoadRequestOptions
     ) {
-      currentScene.requestLoad(true);
+      currentScene.requestLoad(true, requestOptions);
     };
   }
 }

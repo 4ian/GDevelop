@@ -24,8 +24,7 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _isLoadingRequested: boolean = false;
-    _loadStorageName: string = '';
-    _loadVariable: gdjs.Variable;
+    _loadRequestOptions: LoadRequestOptions = {};
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -64,7 +63,7 @@ namespace gdjs {
       super();
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
-      this._loadVariable = new gdjs.Variable();
+      this._loadRequestOptions.loadVariable = new gdjs.Variable();
       this._variablesByExtensionName = new Map<
         string,
         gdjs.VariablesContainer
@@ -764,17 +763,16 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoad(
-      request: boolean,
-      sceneVar?: gdjs.Variable,
-      storageName?: string
-    ): void {
+    requestLoad(request: boolean, requestOptions?: LoadRequestOptions): void {
       this._isLoadingRequested = request;
-      if (storageName) {
-        this._loadStorageName = storageName;
-      }
-      if (sceneVar) {
-        this._loadVariable = sceneVar;
+      if (requestOptions) {
+        if (requestOptions.loadStorageName) {
+          this._loadRequestOptions.loadStorageName =
+            requestOptions.loadStorageName;
+        }
+        if (requestOptions.loadVariable) {
+          this._loadRequestOptions.loadVariable = requestOptions.loadVariable;
+        }
       }
     }
 
@@ -904,6 +902,10 @@ namespace gdjs {
         this.networkId = newNetworkId;
       }
       return this.networkId;
+    }
+
+    getLoadRequestOptions(): LoadRequestOptions {
+      return this._loadRequestOptions;
     }
   }
 

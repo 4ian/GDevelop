@@ -71,11 +71,16 @@ namespace gdjs {
 
         if (currentScene.getIsLoadingRequest()) {
           currentScene.requestLoad(false);
-
-          if (currentScene._loadVariable) {
+          const loadRequestionOptions: LoadRequestOptions =
+            currentScene.getLoadRequestOptions();
+          if (
+            loadRequestionOptions.loadVariable &&
+            !loadRequestionOptions.loadVariable.isPrimitive()
+          ) {
             try {
+              console.log(loadRequestionOptions.loadVariable);
               const allSyncData =
-                currentScene._loadVariable.toJSObject() as GameSaveState;
+                loadRequestionOptions.loadVariable.toJSObject() as GameSaveState;
 
               if (allSyncData) {
                 const options: UpdateFromNetworkSyncDataOptions = {
@@ -105,7 +110,9 @@ namespace gdjs {
                   const objectDatas = layoutSyncData.objectDatas;
                   for (const id in objectDatas) {
                     const objectNetworkSyncData = objectDatas[id];
-                    const object = scene.createObject(objectNetworkSyncData.n);
+                    const object = scene.createObject(
+                      objectNetworkSyncData.n || ''
+                    );
                     if (object) {
                       object.updateFromNetworkSyncData(
                         objectNetworkSyncData,
@@ -120,7 +127,8 @@ namespace gdjs {
             }
           } else {
             const storageKey =
-              currentScene._loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
+              loadRequestionOptions.loadStorageName ||
+              gdjs.saveState.INDEXED_DB_KEY;
 
             gdjs
               .loadFromIndexedDB(
@@ -135,7 +143,6 @@ namespace gdjs {
                   const options: UpdateFromNetworkSyncDataOptions = {
                     forceInputClear: true,
                   };
-
                   currentScene
                     .getGame()
                     .updateFromNetworkSyncData(
@@ -161,7 +168,7 @@ namespace gdjs {
                     for (const id in objectDatas) {
                       const objectNetworkSyncData = objectDatas[id];
                       const object = scene.createObject(
-                        objectNetworkSyncData.n
+                        objectNetworkSyncData.n ? objectNetworkSyncData.n : ''
                       );
                       if (object) {
                         object.updateFromNetworkSyncData(

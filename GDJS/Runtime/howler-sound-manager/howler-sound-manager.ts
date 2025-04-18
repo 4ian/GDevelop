@@ -93,7 +93,7 @@ namespace gdjs {
     /**
      * The chanel number on which the sound is played (only necessary for save/loading)
      */
-    private _channel: float;
+    private _channel: float | undefined;
 
     constructor(
       howl: Howl,
@@ -101,18 +101,14 @@ namespace gdjs {
       loop: boolean,
       rate: float,
       audioResourceName: string,
-      channel?: float
+      channel: float | undefined
     ) {
       this._howl = howl;
       this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
       this._audioResourceName = audioResourceName;
-      if (channel) {
-        this._channel = channel;
-      } else {
-        this._channel = NaN;
-      }
+      this._channel = channel;
     }
 
     /**
@@ -389,7 +385,7 @@ namespace gdjs {
         initialVolume: this.getVolume(),
         rate: this._rate,
         position: this.getSeek(),
-        channel: this._channel || 0,
+        channel: this._channel || undefined,
       };
     }
   }
@@ -1006,7 +1002,6 @@ namespace gdjs {
       }
       return {
         globalVolume: this._globalVolume,
-        availableResources: this._availableResources,
         cachedSpatialPosition: this._cachedSpatialPosition,
         freeMusics: freeMusicsDatas,
         freeSounds: freeSoundsDatas,
@@ -1017,10 +1012,18 @@ namespace gdjs {
 
     updateFromNetworkSyncData(syncData: SoundManagerSyncData): void {
       this.clearAll();
-      this._globalVolume = syncData.globalVolume;
+
+      if (syncData.globalVolume !== undefined) {
+        this._globalVolume = syncData.globalVolume;
+      }
+
+      if (syncData.cachedSpatialPosition !== undefined) {
+        this._cachedSpatialPosition = syncData.cachedSpatialPosition;
+      }
 
       for (let i = 0; i < syncData.freeSounds.length; i++) {
         const freeSoundsSyncData: SoundSyncData = syncData.freeSounds[i];
+
         this.playSound(
           freeSoundsSyncData.resourceName,
           freeSoundsSyncData.loop,

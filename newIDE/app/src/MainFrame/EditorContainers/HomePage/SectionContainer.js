@@ -61,6 +61,7 @@ type Props = {|
   titleAdornment?: React.Node,
   titleAction?: React.Node,
   subtitleText?: React.Node,
+  customPaperStyle?: Object,
   renderSubtitle?: () => React.Node,
   backAction?: () => void,
   flexBody?: boolean,
@@ -78,6 +79,7 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
       titleAdornment,
       titleAction,
       subtitleText,
+      customPaperStyle,
       renderSubtitle,
       backAction,
       flexBody,
@@ -110,6 +112,7 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
       display: flexBody ? 'flex' : 'block',
       ...containerStyle,
       ...scrollStyle,
+      ...customPaperStyle,
     };
     const childrenContainerStyle = {
       ...styles.childrenContainer,

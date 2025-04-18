@@ -247,7 +247,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}
             >
-              {guidedLessonCards.map((item, index) => (
+              {guidedLessonCards.map(item => (
                 <GridListTile key={item.id}>
                   <InAppTutorialPhaseCard
                     title={item.title}

@@ -31,6 +31,8 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Lock from '../UI/CustomSvgIcons/Lock';
 import LockOpen from '../UI/CustomSvgIcons/LockOpen';
 import EmptyBadge from '../UI/CustomSvgIcons/EmptyBadge';
+import Skeleton from '@material-ui/lab/Skeleton';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const styles = {
   container: { padding: 16, display: 'flex', borderRadius: 8 },
@@ -57,7 +59,7 @@ const styles = {
     color: '#1D1D26',
   },
   gdevelopAvatar: { width: 20, height: 20 },
-  thumbnail: { borderRadius: 4, aspectRatio: '16 / 9' },
+  thumbnail: { borderRadius: 4, aspectRatio: '16 / 9', maxWidth: '100%' },
   statusContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -68,7 +70,11 @@ const styles = {
   },
   emptyBadgeContainer: {
     display: 'flex',
-    opacity: 0.5,
+  },
+  badgeIcon: {
+    height: 28,
+    width: 28,
+    objectFit: 'cover',
   },
 };
 
@@ -151,10 +157,11 @@ const ChapterTile = ({
 };
 
 type Props = {|
-  course: Course,
-  courseChapters: CourseChapter[],
-  getCourseCompletion: () => CourseCompletion | null,
+  course: ?Course,
+  courseChapters: ?(CourseChapter[]),
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
+    courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
   onDisplayCourse: boolean => void,
@@ -168,20 +175,46 @@ const CoursePreviewBanner = ({
   onDisplayCourse,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
-  const courseCompletion = getCourseCompletion();
-
+  const courseCompletion = course ? getCourseCompletion(course.id) : null;
   const numberOfTilesToDisplay = isMobile ? 2 : windowSize === 'xlarge' ? 5 : 4;
 
   const chapterTiles = React.useMemo(
     () => {
+      if (!course || !courseChapters) {
+        return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
+          return (
+            <React.Fragment key={`skeleton-${index}`}>
+              {index > 0 &&
+                (isMobile && !isLandscape ? (
+                  <Column noMargin>
+                    <Divider orientation="horizontal" />
+                  </Column>
+                ) : (
+                  <Line noMargin>
+                    <Divider orientation="vertical" />
+                  </Line>
+                ))}
+              {index > 0 && <Spacer />}
+              <Column expand>
+                <Skeleton height={40} />
+                <Skeleton height={20} />
+                <Skeleton height={60} />
+                <LargeSpacer />
+              </Column>
+            </React.Fragment>
+          );
+        });
+      }
       const completionByChapter = new Array(course.chaptersTargetCount)
         .fill(0)
         .map((_, index) => {
           const chapter = courseChapters[index];
           if (!chapter) return false;
           const chapterCompletion = getCourseChapterCompletion(
-            courseChapters[index].id
+            course.id,
+            chapter.id
           );
           if (!chapterCompletion) return false;
           return chapterCompletion.completedTasks >= chapterCompletion.tasks;
@@ -235,7 +268,7 @@ const CoursePreviewBanner = ({
       });
     },
     [
-      course.chaptersTargetCount,
+      course,
       courseChapters,
       getCourseChapterCompletion,
       numberOfTilesToDisplay,
@@ -245,7 +278,7 @@ const CoursePreviewBanner = ({
     ]
   );
 
-  const renderProgress = () => (
+  const renderProgress = (course: Course) => (
     <LineStackLayout alignItems="center" noMargin expand>
       <Text size="sub-title">
         <Trans>{course.chaptersTargetCount} chapters</Trans>:
@@ -270,10 +303,30 @@ const CoursePreviewBanner = ({
     </LineStackLayout>
   );
 
+  const badgeUrl = React.useMemo(
+    () => {
+      if (!course) return null;
+      const achievementId = `course-${course.id}`;
+      const matchingAchievement =
+        achievementId && achievements
+          ? achievements.find(achievement => achievement.id === achievementId)
+          : null;
+      if (!matchingAchievement) return null;
+      const hasBadge =
+        badges &&
+        matchingAchievement &&
+        !!badges.find(badge => badge.achievementId === matchingAchievement.id);
+      if (!hasBadge) return null;
+
+      return matchingAchievement.iconUrl;
+    },
+    [course, badges, achievements]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
-        <Paper background="medium">
+        <Paper background="medium" variant="outlined">
           <ButtonBase
             onClick={() => onDisplayCourse(true)}
             component="div"
@@ -283,108 +336,158 @@ const CoursePreviewBanner = ({
                 : styles.container
             }
           >
-            <ResponsiveLineStackLayout
-              noResponsiveLandscape
-              noMargin
-              noColumnMargin
-              noOverflowParent
-            >
-              <div
-                style={{
-                  ...styles.leftColumn,
-                  width: isMobile && !isLandscape ? '100%' : 220,
-                }}
+            <Column expand noMargin>
+              <ResponsiveLineStackLayout
+                noResponsiveLandscape
+                noMargin
+                noColumnMargin
+                noOverflowParent
               >
-                <Line noMargin>
-                  <Chip
-                    label={<Trans>Recommended for you</Trans>}
-                    style={styles.chip}
-                  />
-                </Line>
-                <Text noMargin size="block-title">
-                  {selectMessageByLocale(i18n, course.titleByLocale)}
-                </Text>
-                <LineStackLayout noMargin alignItems="center">
-                  <Avatar
-                    src="./res/gdevelop-logo-b-w.png"
-                    style={styles.gdevelopAvatar}
-                  />
-                  <Text noMargin>GDevelop</Text>
-                </LineStackLayout>
-                <img
-                  src="https://public-resources.gdevelop.io/course/gdevelop-premium-course.jpeg"
-                  alt="Red hero buffed by knowledge"
-                  style={styles.thumbnail}
-                  onClick={() => onDisplayCourse(true)}
-                />
-              </div>
-              <ColumnStackLayout expand noMargin>
-                {isMobile && !isLandscape ? (
-                  <Column noMargin>
-                    <Text color="secondary" noMargin>
-                      {selectMessageByLocale(i18n, course.levelByLocale)}
-                      &nbsp;•&nbsp;
-                      <Trans>{course.durationInWeeks} weeks</Trans>
-                    </Text>
-                    {renderProgress()}
-                  </Column>
-                ) : (
-                  <LineStackLayout noMargin alignItems="center" expand>
-                    {renderProgress()}
-                    <Text color="secondary" noMargin>
-                      {selectMessageByLocale(i18n, course.levelByLocale)}
-                      &nbsp;•&nbsp;
-                      <Trans>{course.durationInWeeks} weeks</Trans>
-                    </Text>
-                  </LineStackLayout>
-                )}
-                <ResponsiveLineStackLayout noResponsiveLandscape>
-                  {chapterTiles}
-                </ResponsiveLineStackLayout>
-                <Paper
-                  style={
-                    isMobile && !isLandscape
-                      ? styles.mobileBadgePaper
-                      : styles.badgePaper
-                  }
-                  background="light"
+                <div
+                  style={{
+                    ...styles.leftColumn,
+                    width: isMobile && !isLandscape ? '100%' : 220,
+                  }}
                 >
-                  <ResponsiveLineStackLayout
-                    noResponsiveLandscape
-                    noColumnMargin
-                    alignItems="center"
-                    noMargin
-                    justifyContent="space-between"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <div
-                        style={{
-                          ...styles.emptyBadgeContainer,
-                          color: gdevelopTheme.text.color.secondary,
-                        }}
-                      >
-                        <EmptyBadge />
-                      </div>
-                      <Text noMargin>
-                        <Trans>Earn an exclusive badge</Trans>
+                  <Line noMargin>
+                    <Chip
+                      label={<Trans>Recommended for you</Trans>}
+                      style={styles.chip}
+                    />
+                  </Line>
+                  {course ? (
+                    <Text noMargin size="block-title">
+                      {selectMessageByLocale(i18n, course.titleByLocale)}
+                    </Text>
+                  ) : (
+                    <Skeleton height={40} />
+                  )}
+                  <LineStackLayout noMargin alignItems="center">
+                    <Avatar
+                      src="./res/gdevelop-logo-b-w.png"
+                      style={styles.gdevelopAvatar}
+                    />
+                    <Text noMargin>GDevelop</Text>
+                  </LineStackLayout>
+                  {course ? (
+                    <img
+                      src={selectMessageByLocale(i18n, course.imageUrlByLocale)}
+                      alt=""
+                      style={styles.thumbnail}
+                    />
+                  ) : (
+                    <Skeleton
+                      width={isMobile && !isLandscape ? undefined : 220}
+                      variant="rect"
+                      height={124}
+                    />
+                  )}
+                </div>
+                <ColumnStackLayout expand noMargin>
+                  {isMobile && !isLandscape ? (
+                    course ? (
+                      <Column noMargin>
+                        <Text color="secondary" noMargin>
+                          {selectMessageByLocale(i18n, course.levelByLocale)}
+                          &nbsp;•&nbsp;
+                          <Trans>{course.durationInWeeks} weeks</Trans>
+                        </Text>
+
+                        {renderProgress(course)}
+                      </Column>
+                    ) : (
+                      <Column noMargin>
+                        <Skeleton />
+                        <Skeleton />
+                      </Column>
+                    )
+                  ) : course ? (
+                    <LineStackLayout noMargin alignItems="center" expand>
+                      {renderProgress(course)}
+                      <Text color="secondary" noMargin>
+                        {selectMessageByLocale(i18n, course.levelByLocale)}
+                        &nbsp;•&nbsp;
+                        <Trans>{course.durationInWeeks} weeks</Trans>
                       </Text>
                     </LineStackLayout>
-                    <RaisedButton
-                      primary
-                      label={
-                        !courseCompletion ||
-                        courseCompletion.percentage === 0 ? (
-                          <Trans>Start learning</Trans>
-                        ) : (
-                          <Trans>Keep learning</Trans>
-                        )
-                      }
-                      onClick={() => onDisplayCourse(true)}
-                    />
+                  ) : (
+                    <Column noMargin expand>
+                      <Skeleton height={30} />
+                    </Column>
+                  )}
+                  <ResponsiveLineStackLayout noResponsiveLandscape>
+                    {chapterTiles}
                   </ResponsiveLineStackLayout>
-                </Paper>
-              </ColumnStackLayout>
-            </ResponsiveLineStackLayout>
+                  <Paper
+                    style={
+                      isMobile && !isLandscape
+                        ? styles.mobileBadgePaper
+                        : styles.badgePaper
+                    }
+                    background="light"
+                  >
+                    <ResponsiveLineStackLayout
+                      noResponsiveLandscape
+                      noColumnMargin
+                      alignItems="center"
+                      noMargin
+                      justifyContent="space-between"
+                    >
+                      <LineStackLayout alignItems="center" noMargin>
+                        <div
+                          style={{
+                            ...styles.emptyBadgeContainer,
+                            opacity: badgeUrl ? 1 : 0.5,
+                            color: gdevelopTheme.text.color.secondary,
+                          }}
+                        >
+                          {badgeUrl ? (
+                            <img
+                              src={badgeUrl}
+                              alt="Course badge"
+                              style={styles.badgeIcon}
+                            />
+                          ) : (
+                            <EmptyBadge />
+                          )}
+                        </div>
+                        <Text noMargin>
+                          {badgeUrl ? (
+                            <Trans>Congrats on finishing this course!</Trans>
+                          ) : courseCompletion &&
+                            courseCompletion.percentage === 1 ? (
+                            // If user does not have the badge but has completed the course
+                            // (possible if they finished the course before the badge logic was
+                            // implemented), this copy acts as a hint for the user to undo/redo
+                            // a task to trigger the logic that awards the badge.
+                            <Trans>
+                              Complete all tasks to claim your badge
+                            </Trans>
+                          ) : (
+                            <Trans>Earn an exclusive badge</Trans>
+                          )}
+                        </Text>
+                      </LineStackLayout>
+                      <RaisedButton
+                        primary
+                        disabled={!course || !courseChapters}
+                        label={
+                          !courseCompletion ||
+                          courseCompletion.percentage === 0 ? (
+                            <Trans>Start learning</Trans>
+                          ) : courseCompletion.percentage === 1 ? (
+                            <Trans>Open</Trans>
+                          ) : (
+                            <Trans>Keep learning</Trans>
+                          )
+                        }
+                        onClick={() => onDisplayCourse(true)}
+                      />
+                    </ResponsiveLineStackLayout>
+                  </Paper>
+                </ColumnStackLayout>
+              </ResponsiveLineStackLayout>
+            </Column>
           </ButtonBase>
         </Paper>
       )}

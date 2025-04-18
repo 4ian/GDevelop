@@ -97,7 +97,8 @@ namespace gdjs {
     }
 
     override onActivate(): void {
-      // This only has a side effect on if the camera moved while the behavior was deactivated.
+      // This only has a side effect if the camera moved while the behavior was
+      // deactivated.
       // The new position on the viewport is where the object should stay.
       this._hasJustBeenCreated = true;
     }
@@ -106,28 +107,15 @@ namespace gdjs {
       if (this._hasJustBeenCreated) {
         this._initializeAnchorDistances(instanceContainer);
         this._hasJustBeenCreated = false;
+
         this._oldDrawableX = this.owner.getDrawableX();
         this._oldDrawableY = this.owner.getDrawableY();
         this._oldWidth = this.owner.getWidth();
         this._oldHeight = this.owner.getHeight();
       }
-      const objectHasMoved =
-        this._oldDrawableX !== this.owner.getDrawableX() ||
-        this._oldDrawableY !== this.owner.getDrawableY() ||
-        this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight();
-      if (objectHasMoved) {
-        this._updateAnchorDistances(instanceContainer);
-      }
-      const parentHasResized =
-        this._parentOldMinX !== instanceContainer.getUnrotatedViewportMinX() ||
-        this._parentOldMinY !== instanceContainer.getUnrotatedViewportMinY() ||
-        this._parentOldMaxX !== instanceContainer.getUnrotatedViewportMaxX() ||
-        this._parentOldMaxY !== instanceContainer.getUnrotatedViewportMaxY();
-      if (parentHasResized) {
-        this._followAnchor(instanceContainer);
-      }
-      
+      this._updateAnchorDistances(instanceContainer);
+      this._followAnchor(instanceContainer);
+
       this._oldDrawableX = this.owner.getDrawableX();
       this._oldDrawableY = this.owner.getDrawableY();
       this._oldWidth = this.owner.getWidth();
@@ -248,40 +236,49 @@ namespace gdjs {
     private _updateAnchorDistances(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
-      const parentOldWidth = this._parentOldMaxX - this._parentOldMinX;
-      const parentOldHeight = this._parentOldMaxY - this._parentOldMinY;
+      if (
+        this._oldDrawableX !== this.owner.getDrawableX() ||
+        this._oldWidth !== this.owner.getWidth()
+      ) {
+        const parentOldWidth = this._parentOldMaxX - this._parentOldMinX;
 
-      const deltaMinX = this.owner.getDrawableX() - this._oldDrawableX;
-      const deltaMinY = this.owner.getDrawableY() - this._oldDrawableY;
-      const deltaMaxX = deltaMinX + this.owner.getWidth() - this._oldWidth;
-      const deltaMaxY = deltaMinY + this.owner.getHeight() - this._oldHeight;
+        // Left edge
+        const deltaMinX = this.owner.getDrawableX() - this._oldDrawableX;
+        if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
+          this._leftEdgeDistance += deltaMinX / parentOldWidth;
+        } else {
+          this._leftEdgeDistance += deltaMinX;
+        }
 
-      // Left edge
-      if (this._leftEdgeAnchor === HorizontalAnchor.Proportional) {
-        this._leftEdgeDistance += deltaMinX / parentOldWidth;
-      } else {
-        this._leftEdgeDistance += deltaMinX;
+        // Right edge
+        const deltaMaxX = deltaMinX + this.owner.getWidth() - this._oldWidth;
+        if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
+          this._rightEdgeDistance += deltaMaxX / parentOldWidth;
+        } else {
+          this._rightEdgeDistance += deltaMaxX;
+        }
       }
+      if (
+        this._oldDrawableY !== this.owner.getDrawableY() ||
+        this._oldHeight !== this.owner.getHeight()
+      ) {
+        const parentOldHeight = this._parentOldMaxY - this._parentOldMinY;
 
-      // Top edge
-      if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
-        this._topEdgeDistance += deltaMinY / parentOldHeight;
-      } else {
-        this._topEdgeDistance += deltaMinY;
-      }
+        // Top edge
+        const deltaMinY = this.owner.getDrawableY() - this._oldDrawableY;
+        if (this._topEdgeAnchor === VerticalAnchor.Proportional) {
+          this._topEdgeDistance += deltaMinY / parentOldHeight;
+        } else {
+          this._topEdgeDistance += deltaMinY;
+        }
 
-      // Right edge
-      if (this._rightEdgeAnchor === HorizontalAnchor.Proportional) {
-        this._rightEdgeDistance += deltaMaxX / parentOldWidth;
-      } else {
-        this._rightEdgeDistance += deltaMaxX;
-      }
-
-      // Bottom edge
-      if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
-        this._bottomEdgeDistance += deltaMaxY / parentOldHeight;
-      } else {
-        this._bottomEdgeDistance += deltaMaxY;
+        // Bottom edge
+        const deltaMaxY = deltaMinY + this.owner.getHeight() - this._oldHeight;
+        if (this._bottomEdgeAnchor === VerticalAnchor.Proportional) {
+          this._bottomEdgeDistance += deltaMaxY / parentOldHeight;
+        } else {
+          this._bottomEdgeDistance += deltaMaxY;
+        }
       }
     }
 
@@ -292,15 +289,25 @@ namespace gdjs {
      * The camera is taken into account.
      */
     private _followAnchor(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      let parentMinX = instanceContainer.getUnrotatedViewportMinX();
+      let parentMinY = instanceContainer.getUnrotatedViewportMinY();
+      let parentMaxX = instanceContainer.getUnrotatedViewportMaxX();
+      let parentMaxY = instanceContainer.getUnrotatedViewportMaxY();
+
+      if (
+        this._parentOldMinX === parentMinX &&
+        this._parentOldMinY === parentMinY &&
+        this._parentOldMaxX === parentMaxX &&
+        this._parentOldMaxY === parentMaxY
+      ) {
+        return;
+      }
+
       const workingPoint: FloatPoint = gdjs.staticArray(
         gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
       ) as FloatPoint;
       const layer = instanceContainer.getLayer(this.owner.getLayer());
 
-      let parentMinX = instanceContainer.getUnrotatedViewportMinX();
-      let parentMinY = instanceContainer.getUnrotatedViewportMinY();
-      let parentMaxX = instanceContainer.getUnrotatedViewportMaxX();
-      let parentMaxY = instanceContainer.getUnrotatedViewportMaxY();
       const parentCenterX = (parentMaxX + parentMinX) / 2;
       const parentCenterY = (parentMaxY + parentMinY) / 2;
       const parentWidth = parentMaxX - parentMinX;

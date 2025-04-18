@@ -3,6 +3,9 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import classNames from 'classnames';
+import { icon } from 'classnames';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import {
@@ -21,6 +24,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import InfoIcon from '../UI/CustomSvgIcons/CircledInfo';
 import { buildChartData, daysShownForYear } from './GameAnalyticsEvaluator';
 import {
   BounceRateChart,
@@ -232,6 +236,22 @@ export const GameAnalyticsPanel = ({
                       }{' '}
                       minutes
                     </Trans>
+                    <Tooltip
+                      title={
+                        <Column noMargin>
+                          <Text size="body">
+                            <Trans>
+                              Players who engage with a game for at least X
+                              minutes. This information is crucial for
+                              understanding player retention and game
+                              performance.
+                            </Trans>
+                          </Text>
+                        </Column>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <PlayersDurationPerDayChart
                     chartData={chartData}

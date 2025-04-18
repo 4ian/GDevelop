@@ -73,7 +73,7 @@ namespace gdjs {
     ) {
       currentScene.requestLoad({
         loadVariable: sceneVar || null,
-        loadStorageName: storageName || INDEXED_DB_OBJECT_STORE,
+        loadStorageName: storageName || INDEXED_DB_KEY,
       });
     };
   }

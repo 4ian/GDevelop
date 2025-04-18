@@ -680,12 +680,21 @@ namespace gdjs {
       }
 
       const closestIntersect = this._getClosestIntersectionUnderCursor();
-      if (!closestIntersect) return;
 
       if (this._draggedNewObject instanceof gdjs.RuntimeObject3D) {
-        this._draggedNewObject.setX(closestIntersect.point.x);
-        this._draggedNewObject.setY(-closestIntersect.point.y);
-        this._draggedNewObject.setZ(closestIntersect.point.z);
+        if (closestIntersect) {
+          this._draggedNewObject.setX(closestIntersect.point.x);
+          this._draggedNewObject.setY(-closestIntersect.point.y);
+          this._draggedNewObject.setZ(closestIntersect.point.z);
+        } else {
+          this._draggedNewObject.setX(
+            gdjs.evtTools.input.getCursorX(currentScene, '', 0)
+          );
+          this._draggedNewObject.setY(
+            gdjs.evtTools.input.getCursorY(currentScene, '', 0)
+          );
+          this._draggedNewObject.setZ(0);
+        }
       } else {
         // TODO: handle 2D objects (project on plane).
       }
@@ -752,6 +761,9 @@ namespace gdjs {
         draggedNewObjectPreviousMask =
           this._draggedNewObject.get3DRendererObject().layers.mask;
         this._draggedNewObject.get3DRendererObject().layers.set(1);
+        this._draggedNewObject
+          .get3DRendererObject()
+          .traverse((object) => object.layers.set(1));
       }
 
       currentScene.getAllLayerNames(layerNames);
@@ -794,6 +806,11 @@ namespace gdjs {
       ) {
         this._draggedNewObject.get3DRendererObject().layers.mask =
           draggedNewObjectPreviousMask;
+        this._draggedNewObject
+          .get3DRendererObject()
+          .traverse(
+            (object) => (object.layers.mask = draggedNewObjectPreviousMask)
+          );
       }
 
       let closestIntersect: THREE.Intersection | null = null;

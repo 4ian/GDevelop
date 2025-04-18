@@ -30,6 +30,12 @@ namespace gdjs {
   const Q_KEY = 81;
   const E_KEY = 69;
 
+  const transformControlsModes: ['translate', 'rotate', 'scale'] = [
+    'translate',
+    'rotate',
+    'scale',
+  ];
+
   function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
     return value !== null && value !== undefined;
   }
@@ -143,7 +149,17 @@ namespace gdjs {
   class ObjectMover {
     _objectInitialPositions: Map<
       gdjs.RuntimeObject,
-      { x: float; y: float; z: float }
+      {
+        x: float;
+        y: float;
+        z: float;
+        rotationX: float;
+        rotationY: float;
+        angle: float;
+        width: float;
+        height: float;
+        depth: float;
+      }
     > = new Map();
 
     startMove() {
@@ -157,8 +173,19 @@ namespace gdjs {
     // TODO: add support for snapping to grid.
     move(
       selectedObjects: Array<gdjs.RuntimeObject>,
-      movement: { totalDeltaX: float; totalDeltaY: float; totalDeltaZ: float }
+      movement: {
+        translationX: float;
+        translationY: float;
+        translationZ: float;
+        rotationX: float;
+        rotationY: float;
+        rotationZ: float;
+        scaleX: float;
+        scaleY: float;
+        scaleZ: float;
+      }
     ) {
+      console.log(movement.scaleX);
       selectedObjects.forEach((object) => {
         let initialPosition = this._objectInitialPositions.get(object);
         if (!initialPosition) {
@@ -168,19 +195,36 @@ namespace gdjs {
                   x: object.getX(),
                   y: object.getY(),
                   z: object.getZ(),
+                  rotationX: object.getRotationX(),
+                  rotationY: object.getRotationY(),
+                  angle: object.getAngle(),
+                  width: object.getWidth(),
+                  height: object.getHeight(),
+                  depth: object.getDepth(),
                 }
               : {
                   x: object.getX(),
                   y: object.getY(),
                   z: 0,
+                  rotationX: 0,
+                  rotationY: 0,
+                  angle: object.getAngle(),
+                  width: object.getWidth(),
+                  height: object.getHeight(),
+                  depth: 0,
                 };
           this._objectInitialPositions.set(object, initialPosition);
         }
-
-        object.setX(initialPosition.x + movement.totalDeltaX);
-        object.setY(initialPosition.y + movement.totalDeltaY);
+        object.setX(initialPosition.x + movement.translationX);
+        object.setY(initialPosition.y + movement.translationY);
+        object.setAngle(initialPosition.angle + movement.rotationZ);
+        object.setWidth(initialPosition.width * movement.scaleX);
+        object.setHeight(initialPosition.height * movement.scaleY);
         if (object instanceof gdjs.RuntimeObject3D) {
-          object.setZ(initialPosition.z + movement.totalDeltaZ);
+          object.setZ(initialPosition.z + movement.translationZ);
+          object.setRotationX(initialPosition.rotationX + movement.rotationX);
+          object.setRotationY(initialPosition.rotationY + movement.rotationY);
+          object.setDepth(initialPosition.depth * movement.scaleZ);
         }
       });
     }
@@ -227,10 +271,16 @@ namespace gdjs {
       dummyThreeObject: THREE.Object3D;
       threeTransformControls: THREE_ADDONS.TransformControls;
     } | null = null;
-    private _selectionControlsMovement: {
-      totalDeltaX: float;
-      totalDeltaY: float;
-      totalDeltaZ: float;
+    private _selectionControlsMovementTotalDelta: {
+      translationX: float;
+      translationY: float;
+      translationZ: float;
+      rotationX: float;
+      rotationY: float;
+      rotationZ: float;
+      scaleX: float;
+      scaleY: float;
+      scaleZ: float;
     } | null = null;
     private _wasMovingSelectionLastFrame = false;
 
@@ -379,7 +429,7 @@ namespace gdjs {
       // Finished moving the selection.
       if (
         this._wasMovingSelectionLastFrame &&
-        !this._selectionControlsMovement
+        !this._selectionControlsMovementTotalDelta
       ) {
         this._objectMover.endMove();
         this._sendSelectionUpdate();
@@ -388,20 +438,18 @@ namespace gdjs {
       // Start moving the selection.
       if (
         !this._wasMovingSelectionLastFrame &&
-        this._selectionControlsMovement
+        this._selectionControlsMovementTotalDelta
       ) {
         this._objectMover.startMove();
       }
 
       // Move the selection.
-      if (this._selectionControlsMovement) {
+      if (this._selectionControlsMovementTotalDelta) {
         this._objectMover.move(
           this._selection.getSelectedObjects(),
-          this._selectionControlsMovement
+          this._selectionControlsMovementTotalDelta
         );
       }
-
-      this._wasMovingSelectionLastFrame = !!this._selectionControlsMovement;
     }
 
     private _handleSelection({
@@ -415,17 +463,23 @@ namespace gdjs {
 
       // Left click: select the object under the cursor.
       if (
-        inputManager.isMouseButtonPressed(0) &&
-        !this._selectionControlsMovement
+        inputManager.isMouseButtonReleased(0) &&
+        !this._selectionControlsMovementTotalDelta
         // TODO: add check for space key
       ) {
-        if (!isShiftPressed(inputManager)) {
-          this._selection.clear();
-        }
-
-        if (objectUnderCursor) {
-          this._selection.add(objectUnderCursor);
-          this._sendSelectionUpdate();
+        if (objectUnderCursor && !this._wasMovingSelectionLastFrame) {
+          if (
+            !isShiftPressed(inputManager) &&
+            this._selection.getLastSelectedObject() === objectUnderCursor
+          ) {
+            this._swapTransformControlsMode();
+          } else {
+            if (!isShiftPressed(inputManager)) {
+              this._selection.clear();
+            }
+            this._selection.add(objectUnderCursor);
+            this._sendSelectionUpdate();
+          }
         }
       }
 
@@ -439,6 +493,21 @@ namespace gdjs {
           removedObjects,
         });
       }
+    }
+
+    private _swapTransformControlsMode() {
+      if (!this._selectionControls) {
+        return;
+      }
+      this._selectionControls.threeTransformControls.mode =
+        transformControlsModes[
+          gdjs.evtTools.common.mod(
+            transformControlsModes.indexOf(
+              this._selectionControls.threeTransformControls.mode
+            ) + 1,
+            transformControlsModes.length
+          )
+        ];
     }
 
     private _updateSelectionOutline({
@@ -480,8 +549,10 @@ namespace gdjs {
           // compared to Three.js. This is somehow necessary because the position
           // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
           const container = new THREE.Group();
+          container.rotation.order = 'ZYX';
           container.scale.y = -1;
           const box = new THREE.BoxHelper(threeObject, '#f2a63c');
+          box.rotation.order = 'ZYX';
           box.material.depthTest = false;
           box.material.fog = false;
           threeGroup.add(container);
@@ -534,6 +605,7 @@ namespace gdjs {
           threeCamera,
           this._runtimeGame.getRenderer().getCanvas() || undefined
         );
+        threeTransformControls.rotation.order = 'ZYX';
         threeTransformControls.scale.y = -1;
         threeTransformControls.traverse((obj) => {
           // To be detected correctly by OutlinePass.
@@ -544,8 +616,10 @@ namespace gdjs {
         // The dummy object is an invisible object that is the one moved by the transform
         // controls.
         const dummyThreeObject = new THREE.Object3D();
+        dummyThreeObject.rotation.order = 'ZYX';
         dummyThreeObject.position.copy(threeObject.position);
         dummyThreeObject.rotation.copy(threeObject.rotation);
+        dummyThreeObject.scale.copy(threeObject.scale);
         threeScene.add(dummyThreeObject);
 
         threeTransformControls.attach(dummyThreeObject);
@@ -554,20 +628,40 @@ namespace gdjs {
         // Keep track of the movement so the editor can apply it to the selection.
         const initialPosition = new THREE.Vector3();
         initialPosition.copy(dummyThreeObject.position);
+        const initialRotation = new THREE.Euler();
+        initialRotation.copy(dummyThreeObject.rotation);
+        const initialScale = new THREE.Vector3();
+        initialScale.copy(dummyThreeObject.scale);
+        console.log('dummyThreeObject.scale.x', dummyThreeObject.scale.x);
+        console.log('initialScale.x', initialScale.x);
         threeTransformControls.addEventListener('change', (e) => {
           if (!threeTransformControls.dragging) {
-            this._selectionControlsMovement = null;
+            this._selectionControlsMovementTotalDelta = null;
 
             // Reset the initial position to the current position, so that
             // it's ready to be dragged again.
             initialPosition.copy(dummyThreeObject.position);
+            initialRotation.copy(dummyThreeObject.rotation);
+            initialScale.copy(dummyThreeObject.scale);
             return;
           }
 
-          this._selectionControlsMovement = {
-            totalDeltaX: dummyThreeObject.position.x - initialPosition.x,
-            totalDeltaY: dummyThreeObject.position.y - initialPosition.y,
-            totalDeltaZ: dummyThreeObject.position.z - initialPosition.z,
+          this._selectionControlsMovementTotalDelta = {
+            translationX: dummyThreeObject.position.x - initialPosition.x,
+            translationY: dummyThreeObject.position.y - initialPosition.y,
+            translationZ: dummyThreeObject.position.z - initialPosition.z,
+            rotationX: gdjs.toDegrees(
+              dummyThreeObject.rotation.x - initialRotation.x
+            ),
+            rotationY: gdjs.toDegrees(
+              dummyThreeObject.rotation.y - initialRotation.y
+            ),
+            rotationZ: gdjs.toDegrees(
+              dummyThreeObject.rotation.z - initialRotation.z
+            ),
+            scaleX: dummyThreeObject.scale.x / initialScale.x,
+            scaleY: dummyThreeObject.scale.y / initialScale.y,
+            scaleZ: dummyThreeObject.scale.z / initialScale.z,
           };
         });
 
@@ -852,6 +946,8 @@ namespace gdjs {
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updateSelectionControls();
+      this._wasMovingSelectionLastFrame =
+        !!this._selectionControlsMovementTotalDelta;
     }
   }
 }

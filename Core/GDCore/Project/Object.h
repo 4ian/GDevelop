@@ -82,6 +82,8 @@ class GD_CORE_API Object {
     return gd::make_unique<gd::Object>(*this);
   }
 
+  void CopyWithoutConfiguration(const gd::Object& object);
+
   /**
    * \brief Return the object configuration.
    */

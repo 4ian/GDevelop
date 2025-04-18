@@ -47,7 +47,8 @@ export const installExtension = async (
 export const importExtension = async (
   i18n: I18nType,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  project: gdProject
+  project: gdProject,
+  onWillInstallExtension: (extensionName: string) => void
 ): Promise<string | null> => {
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
   if (!eventsFunctionsExtensionOpener) return null;
@@ -68,6 +69,8 @@ export const importExtension = async (
       );
       if (!answer) return null;
     }
+
+    onWillInstallExtension(serializedExtension.name);
 
     await addSerializedExtensionsToProject(
       eventsFunctionsExtensionsState,

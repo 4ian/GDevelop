@@ -671,6 +671,8 @@ export const listCourseChapters = async (
     });
     return response.data;
   }
-  const response = await client.get(`/course/${courseId}/chapter`);
+  const response = await client.get(`/course/${courseId}/chapter`, {
+    params: { lang },
+  });
   return response.data;
 };

@@ -32,6 +32,7 @@ import Lock from '../UI/CustomSvgIcons/Lock';
 import LockOpen from '../UI/CustomSvgIcons/LockOpen';
 import EmptyBadge from '../UI/CustomSvgIcons/EmptyBadge';
 import Skeleton from '@material-ui/lab/Skeleton';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const styles = {
   container: { padding: 16, display: 'flex', borderRadius: 8 },
@@ -69,7 +70,11 @@ const styles = {
   },
   emptyBadgeContainer: {
     display: 'flex',
-    opacity: 0.5,
+  },
+  badgeIcon: {
+    height: 28,
+    width: 28,
+    objectFit: 'cover',
   },
 };
 
@@ -170,6 +175,7 @@ const CoursePreviewBanner = ({
   onDisplayCourse,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const courseCompletion = course ? getCourseCompletion(course.id) : null;
   const numberOfTilesToDisplay = isMobile ? 2 : windowSize === 'xlarge' ? 5 : 4;
@@ -297,6 +303,26 @@ const CoursePreviewBanner = ({
     </LineStackLayout>
   );
 
+  const badgeUrl = React.useMemo(
+    () => {
+      if (!course) return null;
+      const achievementId = `course-${course.id}`;
+      const matchingAchievement =
+        achievementId && achievements
+          ? achievements.find(achievement => achievement.id === achievementId)
+          : null;
+      if (!matchingAchievement) return null;
+      const hasBadge =
+        badges &&
+        matchingAchievement &&
+        !!badges.find(badge => badge.achievementId === matchingAchievement.id);
+      if (!hasBadge) return null;
+
+      return matchingAchievement.iconUrl;
+    },
+    [course, badges, achievements]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -411,13 +437,35 @@ const CoursePreviewBanner = ({
                         <div
                           style={{
                             ...styles.emptyBadgeContainer,
+                            opacity: badgeUrl ? 1 : 0.5,
                             color: gdevelopTheme.text.color.secondary,
                           }}
                         >
-                          <EmptyBadge />
+                          {badgeUrl ? (
+                            <img
+                              src={badgeUrl}
+                              alt="Course badge"
+                              style={styles.badgeIcon}
+                            />
+                          ) : (
+                            <EmptyBadge />
+                          )}
                         </div>
                         <Text noMargin>
-                          <Trans>Earn an exclusive badge</Trans>
+                          {badgeUrl ? (
+                            <Trans>Congrats on finishing this course!</Trans>
+                          ) : courseCompletion &&
+                            courseCompletion.percentage === 1 ? (
+                            // If user does not have the badge but has completed the course
+                            // (possible if they finished the course before the badge logic was
+                            // implemented), this copy acts as a hint for the user to undo/redo
+                            // a task to trigger the logic that awards the badge.
+                            <Trans>
+                              Complete all tasks to claim your badge
+                            </Trans>
+                          ) : (
+                            <Trans>Earn an exclusive badge</Trans>
+                          )}
                         </Text>
                       </LineStackLayout>
                       <RaisedButton
@@ -427,6 +475,8 @@ const CoursePreviewBanner = ({
                           !courseCompletion ||
                           courseCompletion.percentage === 0 ? (
                             <Trans>Start learning</Trans>
+                          ) : courseCompletion.percentage === 1 ? (
+                            <Trans>Open</Trans>
                           ) : (
                             <Trans>Keep learning</Trans>
                           )

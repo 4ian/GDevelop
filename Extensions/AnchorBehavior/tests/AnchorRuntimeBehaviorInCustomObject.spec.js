@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.AnchorRuntimeBehavior', () => {
+describe.only('gdjs.AnchorRuntimeBehavior', () => {
   it('can fill a custom object with an child', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
@@ -16,11 +16,6 @@ describe('gdjs.AnchorRuntimeBehavior', () => {
     });
     runtimeScene.addObject(customObject);
     customObject.setPosition(500, 250);
-    runtimeScene.renderAndStep(1000 / 60);
-
-    customObject.setWidth(2000);
-    customObject.setHeight(3000);
-    runtimeScene.renderAndStep(1000 / 60);
 
     const childObjects = customObject
       .getChildrenContainer()
@@ -29,6 +24,18 @@ describe('gdjs.AnchorRuntimeBehavior', () => {
       throw new Error("Can't get child objects.");
     }
     const childObject = childObjects[0];
+
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // The child object keeps its initial location.
+    expect(childObject.getX()).to.equal(0);
+    expect(childObject.getY()).to.equal(0);
+    expect(childObject.getWidth()).to.equal(64);
+    expect(childObject.getHeight()).to.equal(64);
+
+    customObject.setWidth(2000);
+    customObject.setHeight(3000);
+    runtimeScene.renderAndStep(1000 / 60);
 
     expect(childObject.getX()).to.equal(0);
     expect(childObject.getY()).to.equal(0);

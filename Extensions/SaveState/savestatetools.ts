@@ -4,9 +4,10 @@ namespace gdjs {
     export const INDEXED_DB_KEY: string = 'game_save';
     export const INDEXED_DB_OBJECT_STORE: string = 'saves';
 
-    export const saveWholeGame = async function (
+    export const saveGamSnapshot = async function (
       currentScene: RuntimeScene,
-      requestOptions?: LoadRequestOptions
+      sceneVar?: gdjs.Variable,
+      storageName?: string
     ) {
       let allSyncData: GameSaveState = {
         gameNetworkSyncData: {},
@@ -19,7 +20,6 @@ namespace gdjs {
       if (gameData) {
         allSyncData.gameNetworkSyncData = gameData;
       }
-
       if (sceneStack) {
         sceneStack.forEach((scene, index) => {
           const sceneDatas = scene.getNetworkSyncData({
@@ -49,30 +49,28 @@ namespace gdjs {
         });
       }
       const syncDataJson = JSON.stringify(allSyncData);
-
-      if (requestOptions) {
-        const { loadVariable, loadStorageName } = requestOptions;
-
-        if (loadVariable) {
-          loadVariable.fromJSObject(JSON.parse(syncDataJson));
-        } else {
-          await gdjs.saveToIndexedDB(
-            INDEXED_DB_NAME,
-            INDEXED_DB_OBJECT_STORE,
-            loadStorageName || INDEXED_DB_KEY,
-            syncDataJson
-          );
-        }
+      if (sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable) {
+        sceneVar.fromJSObject(JSON.parse(syncDataJson));
+      } else {
+        await gdjs.saveToIndexedDB(
+          INDEXED_DB_NAME,
+          INDEXED_DB_OBJECT_STORE,
+          storageName || INDEXED_DB_KEY,
+          syncDataJson
+        );
       }
     };
 
-    export const loadWholeGame = async function (
+    export const loadGameFromSnapshot = async function (
       currentScene: RuntimeScene,
       sceneVar?: gdjs.Variable,
       storageName?: string
     ) {
-      currentScene.requestLoad({
-        loadVariable: sceneVar || null,
+      currentScene.requestLoadSnapshot({
+        loadVariable:
+          sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable
+            ? sceneVar
+            : null,
         loadStorageName: storageName || INDEXED_DB_KEY,
       });
     };

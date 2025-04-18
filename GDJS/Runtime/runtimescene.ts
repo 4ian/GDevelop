@@ -756,7 +756,7 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoad(requestOptions: LoadRequestOptions | null): void {
+    requestLoadSnapshot(requestOptions: LoadRequestOptions | null): void {
       if (requestOptions) {
         this._loadRequestOptions = {
           loadVariable: null,

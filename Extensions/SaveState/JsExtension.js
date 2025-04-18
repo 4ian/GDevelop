@@ -51,7 +51,7 @@ module.exports = {
       .addParameter('string', _('Storage name to save to (optional)'), '', true)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.saveWholeGame');
+      .setFunctionName('gdjs.saveState.saveGamSnapshot');
 
     extension
       .addAction(
@@ -80,7 +80,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.loadWholeGame');
+      .setFunctionName('gdjs.saveState.loadGameFromSnapshot');
 
     return extension;
   },

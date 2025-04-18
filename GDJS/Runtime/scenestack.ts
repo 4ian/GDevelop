@@ -75,12 +75,13 @@ namespace gdjs {
       if (loadRequestionOptions) {
         if (
           loadRequestionOptions.loadVariable &&
-          !loadRequestionOptions.loadVariable.isPrimitive()
+          loadRequestionOptions.loadVariable !==
+            gdjs.VariablesContainer.badVariable
         ) {
           try {
             const allSyncData =
               loadRequestionOptions.loadVariable.toJSObject() as GameSaveState;
-            currentScene.requestLoad(null);
+            currentScene.requestLoadSnapshot(null);
             if (allSyncData) {
               const options: UpdateFromNetworkSyncDataOptions = {
                 forceInputClear: true,
@@ -126,6 +127,8 @@ namespace gdjs {
           const storageKey =
             loadRequestionOptions.loadStorageName ||
             gdjs.saveState.INDEXED_DB_KEY;
+          currentScene.requestLoadSnapshot(null);
+
           gdjs
             .loadFromIndexedDB(
               gdjs.saveState.INDEXED_DB_NAME,

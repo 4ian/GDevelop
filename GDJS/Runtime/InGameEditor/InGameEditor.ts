@@ -796,19 +796,18 @@ namespace gdjs {
           draggedNewObjectPreviousMask;
       }
 
-      let closestIntersect;
+      let closestIntersect: THREE.Intersection | null = null;
       for (const intersect of Object.values(firstIntersectsByLayer)) {
         if (
           intersect &&
-          intersect.intersect &&
           (!closestIntersect ||
-            intersect.intersect.distance < closestIntersect.intersect.distance)
+            intersect.intersect.distance < closestIntersect.distance)
         ) {
           closestIntersect = intersect.intersect;
         }
       }
 
-      return closestIntersect || null;
+      return closestIntersect;
     }
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {

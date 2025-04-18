@@ -227,8 +227,6 @@ const ProfileDialog = ({ onClose }: Props) => {
                 <UserAchievements
                   achievements={authenticatedUser.achievements}
                   badges={authenticatedUser.badges}
-                  displayUnclaimedAchievements
-                  displayNotifications
                 />
               </div>
             )}

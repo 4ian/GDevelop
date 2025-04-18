@@ -15,13 +15,6 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { Column } from '../../UI/Grid';
 
-type Props = {|
-  achievements: ?Array<Achievement>,
-  badges: ?Array<Badge>,
-  displayUnclaimedAchievements: boolean,
-  displayNotifications: boolean,
-|};
-
 const styles = {
   summary: {
     textAlign: 'center',
@@ -38,12 +31,12 @@ const styles = {
   },
 };
 
-const UserAchievements = ({
-  achievements,
-  badges,
-  displayUnclaimedAchievements,
-  displayNotifications,
-}: Props) => {
+type Props = {|
+  achievements: ?Array<Achievement>,
+  badges: ?Array<Badge>,
+|};
+
+const UserAchievements = ({ achievements, badges }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   return (
@@ -81,8 +74,6 @@ const UserAchievements = ({
                   <AchievementList
                     badges={badges}
                     achievements={achievements}
-                    displayUnclaimedAchievements={displayUnclaimedAchievements}
-                    displayNotifications={displayNotifications}
                   />
                 )}
               </div>

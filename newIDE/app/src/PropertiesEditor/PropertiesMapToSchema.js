@@ -292,7 +292,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
-  ['Front', 'Back'],
+  ['Back', 'Front'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -305,6 +305,12 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['JumpSpeed', 'JumpSustainTime'],
   ['XGrabTolerance', 'YGrabOffset'],
   ['MaxSpeed', 'SlopeMaxAngle'],
+  ['Beginning', 'End'],
+  ['Start', 'End'],
+  ['Rear', 'Front'],
+  ['1', '2'],
+  ['3', '4'],
+  ['5', '6'],
 ];
 
 const uncapitalize = str => {

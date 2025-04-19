@@ -26,6 +26,7 @@ declare namespace Jolt {
     size(): number;
   }
   class ArrayVec3 {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): Vec3;
@@ -36,6 +37,7 @@ declare namespace Jolt {
     data(): Vec3MemRef;
   }
   class ArrayQuat {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): Quat;
@@ -46,6 +48,7 @@ declare namespace Jolt {
     data(): QuatMemRef;
   }
   class ArrayMat44 {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): Mat44;
@@ -56,6 +59,7 @@ declare namespace Jolt {
     data(): Mat44MemRef;
   }
   class ArrayBodyID {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): BodyID;
@@ -66,6 +70,7 @@ declare namespace Jolt {
     data(): BodyIDMemRef;
   }
   class ArrayBodyPtr {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): Body;
@@ -431,6 +436,13 @@ declare namespace Jolt {
   function _emscripten_enum_SoftBodySharedSettings_ELRAType_SoftBodySharedSettings_ELRAType_None(): SoftBodySharedSettings_ELRAType;
   function _emscripten_enum_SoftBodySharedSettings_ELRAType_SoftBodySharedSettings_ELRAType_EuclideanDistance(): SoftBodySharedSettings_ELRAType;
   function _emscripten_enum_SoftBodySharedSettings_ELRAType_SoftBodySharedSettings_ELRAType_GeodesicDistance(): SoftBodySharedSettings_ELRAType;
+  const MeshShapeSettings_EBuildQuality_FavorRuntimePerformance: number;
+  const MeshShapeSettings_EBuildQuality_FavorBuildSpeed: number;
+  type MeshShapeSettings_EBuildQuality =
+    | typeof MeshShapeSettings_EBuildQuality_FavorRuntimePerformance
+    | typeof MeshShapeSettings_EBuildQuality_FavorBuildSpeed;
+  function _emscripten_enum_MeshShapeSettings_EBuildQuality_MeshShapeSettings_EBuildQuality_FavorRuntimePerformance(): MeshShapeSettings_EBuildQuality;
+  function _emscripten_enum_MeshShapeSettings_EBuildQuality_MeshShapeSettings_EBuildQuality_FavorBuildSpeed(): MeshShapeSettings_EBuildQuality;
   class Vec3MemRef {}
   class QuatMemRef {}
   class Mat44MemRef {}
@@ -444,6 +456,7 @@ declare namespace Jolt {
     constructor(inV: Float3);
     constructor(inX: number, inY: number, inZ: number);
     sZero(): Vec3;
+    sOne(): Vec3;
     sAxisX(): Vec3;
     sAxisY(): Vec3;
     sAxisZ(): Vec3;
@@ -505,6 +518,7 @@ declare namespace Jolt {
     constructor();
     constructor(inX: number, inY: number, inZ: number);
     sZero(): RVec3;
+    sOne(): RVec3;
     sAxisX(): RVec3;
     sAxisY(): RVec3;
     sAxisZ(): RVec3;
@@ -552,6 +566,7 @@ declare namespace Jolt {
     constructor(inV: Vec3, inW: number);
     constructor(inX: number, inY: number, inZ: number, inW: number);
     sZero(): Vec4;
+    sOne(): Vec4;
     sReplicate(inV: number): Vec4;
     sMin(inLHS: Vec4, inRHS: Vec4): Vec4;
     sMax(inLHS: Vec4, inRHS: Vec4): Vec4;
@@ -1427,6 +1442,9 @@ declare namespace Jolt {
     get_mPerTriangleUserData(): boolean;
     set_mPerTriangleUserData(mPerTriangleUserData: boolean): void;
     mPerTriangleUserData: boolean;
+    get_mBuildQuality(): MeshShapeSettings_EBuildQuality;
+    set_mBuildQuality(mBuildQuality: MeshShapeSettings_EBuildQuality): void;
+    mBuildQuality: MeshShapeSettings_EBuildQuality;
   }
   class MeshShape extends Shape {
     GetTriangleUserData(inSubShapeID: SubShapeID): number;
@@ -2523,6 +2541,8 @@ declare namespace Jolt {
     GetGravityFactor(inBodyID: BodyID): number;
     SetUseManifoldReduction(inBodyID: BodyID, inUseReduction: boolean): void;
     GetUseManifoldReduction(inBodyID: BodyID): boolean;
+    SetCollisionGroup(inBodyID: BodyID, inCollisionGroup: CollisionGroup): void;
+    GetCollisionGroup(inBodyID: BodyID): CollisionGroup;
     AddForce(
       inBodyID: BodyID,
       inForce: Vec3,
@@ -2624,9 +2644,9 @@ declare namespace Jolt {
     get_mLinearCastMaxPenetration(): number;
     set_mLinearCastMaxPenetration(mLinearCastMaxPenetration: number): void;
     mLinearCastMaxPenetration: number;
-    get_mManifoldToleranceSq(): number;
-    set_mManifoldToleranceSq(mManifoldToleranceSq: number): void;
-    mManifoldToleranceSq: number;
+    get_mManifoldTolerance(): number;
+    set_mManifoldTolerance(mManifoldTolerance: number): void;
+    mManifoldTolerance: number;
     get_mMaxPenetrationDistance(): number;
     set_mMaxPenetrationDistance(mMaxPenetrationDistance: number): void;
     mMaxPenetrationDistance: number;
@@ -2983,6 +3003,7 @@ declare namespace Jolt {
     AddHit(inResult: number): void;
   }
   class ArrayRayCastResult {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): RayCastResult;
@@ -3040,6 +3061,7 @@ declare namespace Jolt {
     AddHit(inResult: number): void;
   }
   class ArrayCollidePointResult {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): CollidePointResult;
@@ -3114,6 +3136,7 @@ declare namespace Jolt {
     AddHit(inResult: number): void;
   }
   class ArrayCollideShapeResult {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): CollideShapeResult;
@@ -3188,6 +3211,7 @@ declare namespace Jolt {
     AddHit(inResult: number): void;
   }
   class ArrayShapeCastResult {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): ShapeCastResult;
@@ -3618,6 +3642,7 @@ declare namespace Jolt {
     mMaxDistance: number;
   }
   class ArraySoftBodySharedSettingsVertex {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsVertex;
@@ -3627,6 +3652,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsFace {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsFace;
@@ -3636,6 +3662,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsEdge {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsEdge;
@@ -3645,6 +3672,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsDihedralBend {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsDihedralBend;
@@ -3654,6 +3682,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsVolume {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsVolume;
@@ -3663,6 +3692,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsInvBind {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsInvBind;
@@ -3672,6 +3702,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsSkinned {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsSkinned;
@@ -3681,6 +3712,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArraySoftBodySharedSettingsLRA {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsLRA;
@@ -3708,6 +3740,7 @@ declare namespace Jolt {
     mLRAMaxDistanceMultiplier: number;
   }
   class ArraySoftBodySharedSettingsVertexAttributes {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodySharedSettingsVertexAttributes;
@@ -3856,6 +3889,7 @@ declare namespace Jolt {
     readonly mVelocityOffset: number;
   }
   class ArraySoftBodyVertex {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): SoftBodyVertex;
@@ -3923,8 +3957,18 @@ declare namespace Jolt {
     set_mShape(mShape: Shape): void;
     mShape: Shape;
   }
+  class CharacterID {
+    constructor();
+    GetValue(): number;
+    IsInvalid(): boolean;
+    sNextCharacterID(): CharacterID;
+    sSetNextCharacterID(inNextValue: number): void;
+  }
   class CharacterVirtualSettings extends CharacterBaseSettings {
     constructor();
+    get_mID(): CharacterID;
+    set_mID(mID: CharacterID): void;
+    mID: CharacterID;
     get_mMass(): number;
     set_mMass(mMass: number): void;
     mMass: number;
@@ -3967,6 +4011,9 @@ declare namespace Jolt {
     get_mInnerBodyShape(): Shape;
     set_mInnerBodyShape(mInnerBodyShape: Shape): void;
     mInnerBodyShape: Shape;
+    get_mInnerBodyIDOverride(): BodyID;
+    set_mInnerBodyIDOverride(mInnerBodyIDOverride: BodyID): void;
+    mInnerBodyIDOverride: BodyID;
     get_mInnerBodyLayer(): number;
     set_mInnerBodyLayer(mInnerBodyLayer: number): void;
     mInnerBodyLayer: number;
@@ -4008,6 +4055,19 @@ declare namespace Jolt {
       inContactNormal: number,
       ioSettings: number
     ): void;
+    OnContactPersisted(
+      inCharacter: number,
+      inBodyID2: number,
+      inSubShapeID2: number,
+      inContactPosition: number,
+      inContactNormal: number,
+      ioSettings: number
+    ): void;
+    OnContactRemoved(
+      inCharacter: number,
+      inBodyID2: number,
+      inSubShapeID2: number
+    ): void;
     OnCharacterContactAdded(
       inCharacter: number,
       inOtherCharacter: number,
@@ -4015,6 +4075,19 @@ declare namespace Jolt {
       inContactPosition: number,
       inContactNormal: number,
       ioSettings: number
+    ): void;
+    OnCharacterContactPersisted(
+      inCharacter: number,
+      inOtherCharacter: number,
+      inSubShapeID2: number,
+      inContactPosition: number,
+      inContactNormal: number,
+      ioSettings: number
+    ): void;
+    OnCharacterContactRemoved(
+      inCharacter: number,
+      inOtherCharacter: number,
+      inSubShapeID2: number
     ): void;
     OnContactSolve(
       inCharacter: number,
@@ -4091,9 +4164,9 @@ declare namespace Jolt {
     get_mBodyB(): BodyID;
     set_mBodyB(mBodyB: BodyID): void;
     mBodyB: BodyID;
-    get_mCharacterB(): CharacterVirtual;
-    set_mCharacterB(mCharacterB: CharacterVirtual): void;
-    mCharacterB: CharacterVirtual;
+    get_mCharacterIDB(): CharacterID;
+    set_mCharacterIDB(mCharacterIDB: CharacterID): void;
+    mCharacterIDB: CharacterID;
     get_mSubShapeIDB(): SubShapeID;
     set_mSubShapeIDB(mSubShapeIDB: SubShapeID): void;
     mSubShapeIDB: SubShapeID;
@@ -4103,6 +4176,9 @@ declare namespace Jolt {
     get_mIsSensorB(): boolean;
     set_mIsSensorB(mIsSensorB: boolean): void;
     mIsSensorB: boolean;
+    get_mCharacterB(): CharacterVirtual;
+    set_mCharacterB(mCharacterB: CharacterVirtual): void;
+    mCharacterB: CharacterVirtual;
     get_mUserData(): number;
     set_mUserData(mUserData: number): void;
     mUserData: number;
@@ -4120,6 +4196,7 @@ declare namespace Jolt {
     mCanPushCharacter: boolean;
   }
   class ArrayCharacterVirtualContact {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): CharacterVirtualContact;
@@ -4234,6 +4311,7 @@ declare namespace Jolt {
       inRotation: Quat,
       inSystem: PhysicsSystem
     );
+    GetID(): CharacterID;
     SetListener(inListener: CharacterContactListener): void;
     SetCharacterVsCharacterCollision(
       inCharacterVsCharacterCollision: CharacterVsCharacterCollision
@@ -4265,6 +4343,8 @@ declare namespace Jolt {
     GetUserData(): number;
     SetUserData(inUserData: number): void;
     GetInnerBodyID(): BodyID;
+    StartTrackingContactChanges(): void;
+    FinishTrackingContactChanges(): void;
     CancelVelocityTowardsSteepSlopes(inDesiredVelocity: Vec3): Vec3;
     Update(
       inDeltaTime: number,
@@ -4326,6 +4406,7 @@ declare namespace Jolt {
     SetInnerBodyShape(inShape: Shape): void;
     GetTransformedShape(): TransformedShape;
     HasCollidedWith(inBodyID: BodyID): boolean;
+    HasCollidedWithCharacterID(inCharacterID: CharacterID): boolean;
     HasCollidedWithCharacter(inCharacter: CharacterVirtual): boolean;
     GetActiveContacts(): ArrayCharacterVirtualContact;
   }
@@ -4340,6 +4421,7 @@ declare namespace Jolt {
     GetValue(inX: number): number;
   }
   class ArrayFloat {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): number;
@@ -4350,6 +4432,7 @@ declare namespace Jolt {
     data(): FloatMemRef;
   }
   class ArrayUint {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): number;
@@ -4360,6 +4443,7 @@ declare namespace Jolt {
     data(): UintMemRef;
   }
   class ArrayUint8 {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): number;
@@ -4370,6 +4454,7 @@ declare namespace Jolt {
     data(): Uint8MemRef;
   }
   class ArrayVehicleAntiRollBar {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): VehicleAntiRollBar;
@@ -4378,6 +4463,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArrayWheelSettings {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): WheelSettings;
@@ -4386,6 +4472,7 @@ declare namespace Jolt {
     clear(): void;
   }
   class ArrayVehicleDifferentialSettings {
+    constructor();
     empty(): boolean;
     size(): number;
     at(inIndex: number): VehicleDifferentialSettings;
@@ -4457,6 +4544,7 @@ declare namespace Jolt {
       inWheelRight: Vec3,
       inWheelUp: Vec3
     ): RMat44;
+    GetAntiRollBars(): ArrayVehicleAntiRollBar;
     SetNumStepsBetweenCollisionTestActive(inSteps: number): void;
     GetNumStepsBetweenCollisionTestActive(): number;
     SetNumStepsBetweenCollisionTestInactive(inSteps: number): void;
@@ -4819,9 +4907,6 @@ declare namespace Jolt {
   }
   class VehicleControllerSettings {}
   class VehicleController {
-    GetRefCount(): number;
-    AddRef(): void;
-    Release(): void;
     GetConstraint(): VehicleConstraint;
   }
   class WheeledVehicleController extends VehicleController {

@@ -57,16 +57,18 @@ const CustomTooltip = ({
   payload,
   label,
   customStyle,
+  labelType,
 }: {|
   payload: ?Array<any>,
   label: string,
   customStyle: Object,
+  labelType: ?string,
 |}) =>
   payload ? (
     <Paper style={customStyle} background="light">
       <ColumnStackLayout>
         <Text size="sub-title" noMargin>
-          {label}
+          {label} {labelType ? labelType : ''}
         </Text>
         {payload.length > 0 &&
           payload.map(
@@ -167,7 +169,7 @@ export const BounceRateChart = ({
       <LineChart data={chartData.overTime} margin={chartMargins}>
         <RechartsLine
           name={i18n._(t`Bounce rate`)}
-          unit="%"
+          unit={' %'}
           formatter={minutesFormatter}
           type="monotone"
           dataKey="bounceRatePercent"
@@ -185,6 +187,7 @@ export const BounceRateChart = ({
           style={styles.tickLabel}
         />
         <YAxis
+          unit={' %'}
           dataKey="bounceRatePercent"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
@@ -234,6 +237,7 @@ export const MeanPlayTimeChart = ({
           style={styles.tickLabel}
         />
         <YAxis
+          unit={` ` + i18n._(t`min`)}
           dataKey="meanPlayedDurationInMinutes"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
@@ -272,6 +276,7 @@ export const PlayersRepartitionPerDurationChart = ({
           yAxisId={0}
         />
         <XAxis
+          unit={` ` + i18n._(t`min`)}
           name={i18n._(t`Played time`)}
           dataKey="duration"
           type="number"
@@ -295,6 +300,7 @@ export const PlayersRepartitionPerDurationChart = ({
             CustomTooltip({
               ...props,
               customStyle: styles.tooltipContent,
+              labelType: i18n._(t`minutes`),
             })
           }
         />

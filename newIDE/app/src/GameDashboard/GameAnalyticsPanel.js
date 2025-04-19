@@ -4,8 +4,6 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
-import classNames from 'classnames';
-import { icon } from 'classnames';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import {
@@ -146,6 +144,19 @@ export const GameAnalyticsPanel = ({
                 <Column noMargin alignItems="center" expand>
                   <Text size="block-title" align="center">
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
+                    <Tooltip
+                      title={
+                        <Text>
+                          <Trans>
+                            Number of people who launched the game. A viewer is
+                            a single visitor, and a player is a visitor after 60
+                            seconds of activity in the game.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <SessionsChart
                     chartData={chartData}
@@ -173,6 +184,19 @@ export const GameAnalyticsPanel = ({
                       {Math.round(chartData.overview.bounceRatePercent)}% bounce
                       rate
                     </Trans>
+                    <Tooltip
+                      title={
+                        <Text>
+                          <Trans>
+                            Percentage of people who leave before 60 seconds.
+                            The smaller the number, the better — it means more
+                            people are interested and stay longer.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <BounceRateChart
                     chartData={chartData}
@@ -190,6 +214,17 @@ export const GameAnalyticsPanel = ({
                       )}{' '}
                       minutes per player
                     </Trans>
+                    <Tooltip
+                      title={
+                        <Text>
+                          <Trans>
+                            Is the average time a player spends in the game.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <MeanPlayTimeChart
                     chartData={chartData}
@@ -213,6 +248,20 @@ export const GameAnalyticsPanel = ({
                       }{' '}
                       minutes
                     </Trans>
+                    <Tooltip
+                      title={
+                        <Text>
+                          <Trans>
+                            Average of players still active after 15 minutes.
+                            This graph shows how long players stay in the game
+                            after X minutes. It helps to see if the players quit
+                            quickly or keep playing for a while.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <PlayersRepartitionPerDurationChart
                     chartData={chartData}
@@ -238,16 +287,16 @@ export const GameAnalyticsPanel = ({
                     </Trans>
                     <Tooltip
                       title={
-                        <Column noMargin>
-                          <Text size="body">
-                            <Trans>
-                              Players who engage with a game for at least X
-                              minutes. This information is crucial for
-                              understanding player retention and game
-                              performance.
-                            </Trans>
-                          </Text>
-                        </Column>
+                        <Text>
+                          <Trans>
+                            Shows how long players stay in the game over time.
+                            The percentages are showing people playing for more
+                            than 3, 5, 10, and 15 minutes based on the best day.
+                            A higher value means better player retention on the
+                            day. This helps you understand when players are most
+                            engaged — and when they drop off quickly.
+                          </Trans>
+                        </Text>
                       }
                     >
                       <InfoIcon />

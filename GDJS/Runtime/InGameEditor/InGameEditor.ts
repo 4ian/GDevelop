@@ -185,7 +185,6 @@ namespace gdjs {
         scaleZ: float;
       }
     ) {
-      console.log(movement.scaleX);
       selectedObjects.forEach((object) => {
         let initialPosition = this._objectInitialPositions.get(object);
         if (!initialPosition) {
@@ -282,6 +281,7 @@ namespace gdjs {
       scaleY: float;
       scaleZ: float;
     } | null = null;
+    private _hasSelectionActuallyMoved = false;
     private _wasMovingSelectionLastFrame = false;
 
     // The selected objects.
@@ -464,22 +464,21 @@ namespace gdjs {
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
-        !this._selectionControlsMovementTotalDelta
+        !this._hasSelectionActuallyMoved &&
         // TODO: add check for space key
+        objectUnderCursor
       ) {
-        if (objectUnderCursor && !this._wasMovingSelectionLastFrame) {
-          if (
-            !isShiftPressed(inputManager) &&
-            this._selection.getLastSelectedObject() === objectUnderCursor
-          ) {
-            this._swapTransformControlsMode();
-          } else {
-            if (!isShiftPressed(inputManager)) {
-              this._selection.clear();
-            }
-            this._selection.add(objectUnderCursor);
-            this._sendSelectionUpdate();
+        if (
+          !isShiftPressed(inputManager) &&
+          this._selection.getLastSelectedObject() === objectUnderCursor
+        ) {
+          this._swapTransformControlsMode();
+        } else {
+          if (!isShiftPressed(inputManager)) {
+            this._selection.clear();
           }
+          this._selection.add(objectUnderCursor);
+          this._sendSelectionUpdate();
         }
       }
 
@@ -632,8 +631,6 @@ namespace gdjs {
         initialRotation.copy(dummyThreeObject.rotation);
         const initialScale = new THREE.Vector3();
         initialScale.copy(dummyThreeObject.scale);
-        console.log('dummyThreeObject.scale.x', dummyThreeObject.scale.x);
-        console.log('initialScale.x', initialScale.x);
         threeTransformControls.addEventListener('change', (e) => {
           if (!threeTransformControls.dragging) {
             this._selectionControlsMovementTotalDelta = null;
@@ -663,6 +660,11 @@ namespace gdjs {
             scaleY: dummyThreeObject.scale.y / initialScale.y,
             scaleZ: dummyThreeObject.scale.z / initialScale.z,
           };
+
+          this._hasSelectionActuallyMoved = this._hasSelectionActuallyMoved ||
+            !dummyThreeObject.position.equals(initialPosition) ||
+            !dummyThreeObject.rotation.equals(initialRotation) ||
+            !dummyThreeObject.scale.equals(initialScale);
         });
 
         this._selectionControls = {
@@ -948,6 +950,9 @@ namespace gdjs {
       this._updateSelectionControls();
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;
+      if (!this._selectionControlsMovementTotalDelta) {
+        this._hasSelectionActuallyMoved = false;
+      }
     }
   }
 }

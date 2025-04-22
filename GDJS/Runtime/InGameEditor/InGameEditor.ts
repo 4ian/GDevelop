@@ -618,6 +618,8 @@ namespace gdjs {
         dummyThreeObject.rotation.order = 'ZYX';
         dummyThreeObject.position.copy(threeObject.position);
         dummyThreeObject.rotation.copy(threeObject.rotation);
+        dummyThreeObject.rotation.y = -dummyThreeObject.rotation.y;
+        dummyThreeObject.rotation.z = -dummyThreeObject.rotation.z;
         dummyThreeObject.scale.copy(threeObject.scale);
         threeScene.add(dummyThreeObject);
 
@@ -650,10 +652,10 @@ namespace gdjs {
             rotationX: gdjs.toDegrees(
               dummyThreeObject.rotation.x - initialRotation.x
             ),
-            rotationY: gdjs.toDegrees(
+            rotationY: -gdjs.toDegrees(
               dummyThreeObject.rotation.y - initialRotation.y
             ),
-            rotationZ: gdjs.toDegrees(
+            rotationZ: -gdjs.toDegrees(
               dummyThreeObject.rotation.z - initialRotation.z
             ),
             scaleX: dummyThreeObject.scale.x / initialScale.x,

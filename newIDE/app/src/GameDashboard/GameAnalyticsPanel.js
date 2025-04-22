@@ -145,6 +145,7 @@ export const GameAnalyticsPanel = ({
                   <Text size="block-title" align="center">
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
                     <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
                       title={
                         <Text>
                           <Trans>
@@ -185,6 +186,7 @@ export const GameAnalyticsPanel = ({
                       rate
                     </Trans>
                     <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
                       title={
                         <Text>
                           <Trans>
@@ -216,6 +218,7 @@ export const GameAnalyticsPanel = ({
                       minutes per player
                     </Trans>
                     <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
                       title={
                         <Text>
                           <Trans>
@@ -250,6 +253,7 @@ export const GameAnalyticsPanel = ({
                       minutes
                     </Trans>
                     <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
                       title={
                         <Text>
                           <Trans>
@@ -287,6 +291,7 @@ export const GameAnalyticsPanel = ({
                       minutes
                     </Trans>
                     <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
                       title={
                         <Text>
                           <Trans>

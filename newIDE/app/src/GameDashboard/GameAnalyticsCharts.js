@@ -57,18 +57,18 @@ const CustomTooltip = ({
   payload,
   label,
   customStyle,
-  labelType,
+  labelSuffix,
 }: {|
   payload: ?Array<any>,
   label: string,
   customStyle: Object,
-  labelType: ?string,
+  labelSuffix: ?string,
 |}) =>
   payload ? (
     <Paper style={customStyle} background="light">
       <ColumnStackLayout>
         <Text size="sub-title" noMargin>
-          {label} {labelType ? labelType : ''}
+          {label} {labelSuffix ? labelSuffix : ''}
         </Text>
         {payload.length > 0 &&
           payload.map(
@@ -300,7 +300,7 @@ export const PlayersRepartitionPerDurationChart = ({
             CustomTooltip({
               ...props,
               customStyle: styles.tooltipContent,
-              labelType: i18n._(t`minutes`),
+              labelSuffix: i18n._(t`minutes`),
             })
           }
         />

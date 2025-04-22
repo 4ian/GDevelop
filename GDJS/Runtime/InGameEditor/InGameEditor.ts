@@ -109,11 +109,13 @@ namespace gdjs {
         ...runtimeObject.getRenderer().getObjectPositionFrom3DRendererObject(),
         layer: runtimeObject.getLayer(),
         angle: runtimeObject.getAngle(),
+        rotationY: runtimeObject.getRotationY(),
+        rotationX: runtimeObject.getRotationX(),
+        customSize: runtimeObject.getScale() !== 1,
         width: runtimeObject.getWidth(),
         height: runtimeObject.getHeight(),
         depth: runtimeObject.getDepth(),
         locked: false, // TODO
-        customSize: false, // TODO
         // TODO: how to transmit/should we transmit other properties?
       };
 
@@ -663,7 +665,8 @@ namespace gdjs {
             scaleZ: dummyThreeObject.scale.z / initialScale.z,
           };
 
-          this._hasSelectionActuallyMoved = this._hasSelectionActuallyMoved ||
+          this._hasSelectionActuallyMoved =
+            this._hasSelectionActuallyMoved ||
             !dummyThreeObject.position.equals(initialPosition) ||
             !dummyThreeObject.rotation.equals(initialRotation) ||
             !dummyThreeObject.scale.equals(initialScale);

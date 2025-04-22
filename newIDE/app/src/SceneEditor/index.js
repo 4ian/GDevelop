@@ -304,7 +304,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // and reorganize this.
     const modifiedInstances: gdInitialInstance[] = [];
     changes.updatedInstances.forEach(instanceData => {
-      const { persistentUuid, x, y, z } = instanceData;
+      const { persistentUuid, x, y, z, angle, rotationY, rotationX, customSize, width, height, depth } = instanceData;
       const instance = getInstanceInLayoutWithPersistentUuid(
         this.props.initialInstances,
         persistentUuid
@@ -313,6 +313,17 @@ export default class SceneEditor extends React.Component<Props, State> {
       instance.setX(x);
       instance.setY(y);
       instance.setZ(z);
+      instance.setAngle(angle);
+      instance.setRotationY(rotationY);
+      instance.setRotationX(rotationX);
+      instance.setHasCustomSize(customSize);
+      instance.setHasCustomDepth(customSize);
+      if (customSize) {
+        console.log("customSize", width, height, depth);
+        instance.setCustomWidth(width);
+        instance.setCustomHeight(height);
+        instance.setCustomDepth(depth);
+      }
 
       modifiedInstances.push(instance);
     });

@@ -188,9 +188,10 @@ export const GameAnalyticsPanel = ({
                       title={
                         <Text>
                           <Trans>
-                            Percentage of people who leave before 60 seconds.
-                            The smaller the number, the better — it means more
-                            people are interested and stay longer.
+                            Percentage of people who leave before 60 seconds
+                            including loading screens. The smaller the number,
+                            the better — it means more people are interested and
+                            stay longer.
                           </Trans>
                         </Text>
                       }

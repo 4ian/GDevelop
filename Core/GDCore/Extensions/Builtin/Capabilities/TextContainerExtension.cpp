@@ -30,7 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
       "TextContainerBehavior",
       _("Text capability"),
       "Text",
-      _("Allows an object to contain a text, usually shown on screen, that can be modified.."),
+      _("Allows an object to contain a text, usually shown on screen, that can be modified."),
       "",
       "res/conditions/text24_black.png",
       "TextContainerBehavior",

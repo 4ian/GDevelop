@@ -148,9 +148,9 @@ export const GameAnalyticsPanel = ({
                       title={
                         <Text>
                           <Trans>
-                            Number of people who launched the game. A viewer is
-                            a single visitor, and a player is a visitor after 60
-                            seconds of activity in the game.
+                            Number of people who launched the game. Viewers are
+                            considered players when they stayed at least 60
+                            seconds including loading screens.
                           </Trans>
                         </Text>
                       }

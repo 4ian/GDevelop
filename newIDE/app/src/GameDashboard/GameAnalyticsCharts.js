@@ -169,7 +169,7 @@ export const BounceRateChart = ({
       <LineChart data={chartData.overTime} margin={chartMargins}>
         <RechartsLine
           name={i18n._(t`Bounce rate`)}
-          unit={' %'}
+          unit={'%'}
           formatter={minutesFormatter}
           type="monotone"
           dataKey="bounceRatePercent"
@@ -187,7 +187,7 @@ export const BounceRateChart = ({
           style={styles.tickLabel}
         />
         <YAxis
-          unit={' %'}
+          unit={'%'}
           dataKey="bounceRatePercent"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
@@ -326,7 +326,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over60sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -337,7 +337,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over180sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -348,7 +348,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over300sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -359,7 +359,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over600sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -370,7 +370,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over900sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -389,7 +389,7 @@ export const PlayersDurationPerDayChart = ({
           dataKey="over60sPlayersPercent"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
-          unit={' %'}
+          unit={'%'}
         />
         <Tooltip
           content={props =>

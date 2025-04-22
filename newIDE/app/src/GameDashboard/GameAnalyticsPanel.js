@@ -191,9 +191,7 @@ export const GameAnalyticsPanel = ({
                         <Text>
                           <Trans>
                             Percentage of people who leave before 60 seconds
-                            including loading screens. The smaller the number,
-                            the better — it means more people are interested and
-                            stay longer.
+                            including loading screens.
                           </Trans>
                         </Text>
                       }

@@ -11,7 +11,6 @@ import {
   type FileMetadata,
   type StorageProvider,
 } from '../../../ProjectsStorage';
-import GetStartedSection from './GetStartedSection';
 import LearnSection, { type LearnCategory } from './LearnSection';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
@@ -29,12 +28,6 @@ import TeamProvider from '../../../Profile/Team/TeamProvider';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
-import PreferencesContext from '../../Preferences/PreferencesContext';
-import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
-import {
-  sendUserSurveyHidden,
-  sendUserSurveyStarted,
-} from '../../../Utils/Analytics/EventSender';
 import RouterContext, { type RouteArguments } from '../../RouterContext';
 import { type GameDetailsTab } from '../../../GameDashboard';
 import { canUseClassroomFeature } from '../../../Utils/GDevelopServices/Usage';
@@ -46,6 +39,8 @@ import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
+import { getProgramOpeningCount } from '../../../Utils/Analytics/LocalStats';
+import { isNativeMobileApp } from '../../../Utils/Platform';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -67,8 +62,6 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'play';
   } else if (routeArguments['initial-dialog'] === 'learn') {
     return 'learn';
-  } else if (routeArguments['initial-dialog'] === 'get-started') {
-    return 'get-started';
   }
 
   return null;
@@ -229,8 +222,6 @@ export const HomePage = React.memo<Props>(
         startTimeoutToUnloadIframe,
         loadIframeOrRemoveTimeout,
       } = gamesPlatformFrameTools;
-      const userSurveyStartedRef = React.useRef<boolean>(false);
-      const userSurveyHiddenRef = React.useRef<boolean>(false);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
@@ -280,17 +271,17 @@ export const HomePage = React.memo<Props>(
       );
 
       const { isMobile } = useResponsiveWindowSize();
-      const {
-        values: { showGetStartedSectionByDefault },
-      } = React.useContext(PreferencesContext);
       const tabRequestedAtOpening = React.useRef<HomeTab | null>(
         getRequestedTab(routeArguments)
       );
+      const programOpeningCount = getProgramOpeningCount();
       const initialTab = tabRequestedAtOpening.current
         ? tabRequestedAtOpening.current
-        : showGetStartedSectionByDefault
-        ? 'get-started'
-        : 'create';
+        : isNativeMobileApp()
+        ? 'play'
+        : programOpeningCount > 1
+        ? 'create'
+        : 'learn';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
 
@@ -363,15 +354,6 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      React.useEffect(
-        () => {
-          if (initialTab === 'get-started') {
-            incrementGetStartedSectionViewCount();
-          }
-        },
-        [initialTab]
-      );
-
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {
@@ -380,18 +362,6 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
-      );
-
-      // Only fetch games if the user decides to open the games dashboard tab
-      // or the build tab to enable the context menu on project list items that
-      // redirects to the games dashboard.
-      React.useEffect(
-        () => {
-          if (activeTab === 'create' && !games) {
-            fetchGames();
-          }
-        },
-        [fetchGames, activeTab, games]
       );
 
       // Only fetch courses if the user decides to open the Learn section.
@@ -512,28 +482,6 @@ export const HomePage = React.memo<Props>(
         onSceneEventsModifiedOutsideEditor,
       }));
 
-      const onUserSurveyStarted = React.useCallback(() => {
-        if (userSurveyStartedRef.current) return;
-        sendUserSurveyStarted();
-        userSurveyStartedRef.current = true;
-      }, []);
-      const onUserSurveyHidden = React.useCallback(() => {
-        if (userSurveyHiddenRef.current) return;
-        sendUserSurveyHidden();
-        userSurveyHiddenRef.current = true;
-      }, []);
-
-      React.useEffect(
-        () => {
-          if (!authenticated) {
-            userSurveyStartedRef.current = false;
-            userSurveyHiddenRef.current = false;
-          }
-        },
-        // Reset flag that prevents multiple send of the same event on user change.
-        [authenticated]
-      );
-
       // As the homepage is never unmounted, we need to ensure the games platform
       // iframe is unloaded & loaded from here,
       // allowing to handle when the user navigates to another tab.
@@ -601,16 +549,6 @@ export const HomePage = React.memo<Props>(
                       onChooseProject={onChooseProject}
                       onSaveProject={onSave}
                       canSaveProject={canSave}
-                    />
-                  )}
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      selectInAppTutorial={selectInAppTutorial}
-                      onUserSurveyStarted={onUserSurveyStarted}
-                      onUserSurveyHidden={onUserSurveyHidden}
-                      onOpenProfile={onOpenProfile}
-                      onCreateProjectFromExample={onCreateProjectFromExample}
-                      askToCloseProject={askToCloseProject}
                     />
                   )}
                   {activeTab === 'learn' && (

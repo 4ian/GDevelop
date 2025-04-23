@@ -34,7 +34,6 @@ type ErrorBoundaryScope =
   | 'app'
   | 'editor'
   | 'start-page'
-  | 'start-page-get-started'
   | 'start-page-shop'
   | 'start-page-learn'
   | 'start-page-play'

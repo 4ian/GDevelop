@@ -28,7 +28,7 @@ import {
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
-import { EarnCredits } from '../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnCredits';
+import { EarnCredits } from '../GameDashboard/Wallet/EarnCredits';
 
 const cellSpacing = 2;
 

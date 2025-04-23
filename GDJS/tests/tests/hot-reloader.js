@@ -214,6 +214,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       areaMaxZ: 0,
       _initialInnerArea: null,
       isInnerAreaFollowingParentSize: false,
+      variants: [],
     };
   };
 

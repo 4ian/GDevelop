@@ -16,12 +16,6 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { NumericProperty, UnitAdornment } from '../Physics2Editor';
-import {
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-} from '../../../UI/Accordion';
-import { areAdvancedPropertiesModified } from '../BehaviorPropertiesEditor';
 
 type Props = BehaviorEditorProps;
 

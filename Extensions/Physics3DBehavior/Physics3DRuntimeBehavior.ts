@@ -283,11 +283,11 @@ namespace gdjs {
   gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
     const physics3DSharedData = runtimeScene.physics3DSharedData;
     if (physics3DSharedData) {
-      Jolt.destroy(physics3DSharedData.jolt);
       Jolt.destroy(physics3DSharedData.contactListener);
       Jolt.destroy(physics3DSharedData._tempVec3);
       Jolt.destroy(physics3DSharedData._tempRVec3);
       Jolt.destroy(physics3DSharedData._tempQuat);
+      Jolt.destroy(physics3DSharedData.jolt);
       runtimeScene.physics3DSharedData = null;
     }
   });
@@ -302,9 +302,9 @@ namespace gdjs {
     fixedRotation: boolean;
     private shape: string;
     private shapeOrientation: string;
-    private shapeDimensionA: any;
-    private shapeDimensionB: any;
-    private shapeDimensionC: any;
+    private shapeDimensionA: float;
+    private shapeDimensionB: float;
+    private shapeDimensionC: float;
     private density: float;
     friction: float;
     restitution: float;
@@ -387,7 +387,8 @@ namespace gdjs {
       this.bullet = behaviorData.bullet;
       this.fixedRotation = behaviorData.fixedRotation;
       this.shape = behaviorData.shape;
-      this.shapeOrientation = behaviorData.shapeOrientation;
+      this.shapeOrientation =
+        behaviorData.shape === 'Box' ? 'Z' : behaviorData.shapeOrientation;
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
@@ -424,7 +425,7 @@ namespace gdjs {
       return tempQuat;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.bullet !== newBehaviorData.bullet) {
         this.setBullet(newBehaviorData.bullet);
       }
@@ -477,7 +478,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Physics3DNetworkSyncData {
+    override getNetworkSyncData(): Physics3DNetworkSyncData {
       let bodyProps;
       if (this._body) {
         const position = this._body.GetPosition();
@@ -528,7 +529,9 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: Physics3DNetworkSyncData) {
+    override updateFromNetworkSyncData(
+      networkSyncData: Physics3DNetworkSyncData
+    ) {
       super.updateFromNetworkSyncData(networkSyncData);
 
       const behaviorSpecificProps = networkSyncData.props;
@@ -608,7 +611,7 @@ namespace gdjs {
       }
     }
 
-    onDeActivate() {
+    override onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
       this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
@@ -616,7 +619,7 @@ namespace gdjs {
       this._currentContacts.length = 0;
     }
 
-    onActivate() {
+    override onActivate() {
       this._sharedData.addToBehaviorsList(this);
 
       this._contactsEndedThisFrame.length = 0;
@@ -625,7 +628,7 @@ namespace gdjs {
       this.updateBodyFromObject();
     }
 
-    onDestroy() {
+    override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
     }
@@ -728,15 +731,13 @@ namespace gdjs {
         this._shapeHalfDepth = radius;
       }
       shapeSettings.mDensity = this.density;
-      const rotatedShape = new Jolt.RotatedTranslatedShapeSettings(
+      const rotatedShapeSettings = new Jolt.RotatedTranslatedShapeSettings(
         this.getVec3(0, 0, 0),
         quat,
         shapeSettings
-      )
-        .Create()
-        .Get();
-
-      Jolt.destroy(shapeSettings);
+      );
+      const rotatedShape = rotatedShapeSettings.Create().Get();
+      Jolt.destroy(rotatedShapeSettings);
       return rotatedShape;
     }
 
@@ -822,7 +823,7 @@ namespace gdjs {
         : this.masks;
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // Step the world if not done this frame yet.
       // Don't step at the first frame to allow events to handle overlapping objects.
       if (
@@ -836,7 +837,9 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }
@@ -1765,7 +1768,9 @@ namespace gdjs {
       destroyBody(): void;
     }
 
-    export class DefaultBodyUpdater {
+    export class DefaultBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       behavior: gdjs.Physics3DRuntimeBehavior;
 
       constructor(behavior: gdjs.Physics3DRuntimeBehavior) {

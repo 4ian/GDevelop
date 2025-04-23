@@ -101,9 +101,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): VideoNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): VideoNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         wid: this.getWidth(),
         hei: this.getHeight(),
@@ -116,7 +118,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: VideoNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

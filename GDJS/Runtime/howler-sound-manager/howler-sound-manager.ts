@@ -382,7 +382,7 @@ namespace gdjs {
       return {
         resourceName: this._audioResourceName,
         loop: this._loop,
-        initialVolume: this.getVolume(),
+        volume: this.getVolume(),
         rate: this._rate,
         position: this.getSeek(),
         channel: this._channel || undefined,
@@ -1012,7 +1012,6 @@ namespace gdjs {
 
     updateFromNetworkSyncData(syncData: SoundManagerSyncData): void {
       this.clearAll();
-
       if (syncData.globalVolume !== undefined) {
         this._globalVolume = syncData.globalVolume;
       }
@@ -1027,7 +1026,7 @@ namespace gdjs {
         this.playSound(
           freeSoundsSyncData.resourceName,
           freeSoundsSyncData.loop,
-          freeSoundsSyncData.initialVolume,
+          freeSoundsSyncData.volume * 100,
           freeSoundsSyncData.rate,
           freeSoundsSyncData.position
         );
@@ -1038,7 +1037,7 @@ namespace gdjs {
         this.playMusic(
           freeMusicsSyncData.resourceName,
           freeMusicsSyncData.loop,
-          freeMusicsSyncData.initialVolume,
+          freeMusicsSyncData.volume * 100,
           freeMusicsSyncData.rate,
           freeMusicsSyncData.position
         );
@@ -1050,7 +1049,7 @@ namespace gdjs {
           soundsSyncData.resourceName,
           soundsSyncData.channel || 0,
           soundsSyncData.loop,
-          soundsSyncData.initialVolume,
+          soundsSyncData.volume * 100,
           soundsSyncData.rate,
           soundsSyncData.position
         );
@@ -1062,7 +1061,7 @@ namespace gdjs {
           musicsSyncData.resourceName,
           musicsSyncData.channel || 0,
           musicsSyncData.loop,
-          musicsSyncData.initialVolume,
+          musicsSyncData.volume * 100,
           musicsSyncData.rate,
           musicsSyncData.position
         );

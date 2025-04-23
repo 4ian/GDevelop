@@ -174,7 +174,7 @@ namespace gdjs {
     }
 
     getNetworkSyncData(
-      syncOptions?: GetNetworkSyncDataOptions
+      syncOptions: GetNetworkSyncDataOptions
     ): CustomObjectNetworkSyncDataType {
       return {
         ...super.getNetworkSyncData(syncOptions),
@@ -185,7 +185,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: CustomObjectNetworkSyncDataType,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.ifx !== undefined) {

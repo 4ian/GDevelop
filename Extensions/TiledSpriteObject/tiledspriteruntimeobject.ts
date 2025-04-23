@@ -78,9 +78,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TiledSpriteNetworkSyncData {
+    getNetworkSyncData(
+      syncOptons: GetNetworkSyncDataOptions
+    ): TiledSpriteNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptons),
         xo: this.getXOffset(),
         yo: this.getYOffset(),
         op: this.getOpacity(),
@@ -90,7 +92,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: TiledSpriteNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

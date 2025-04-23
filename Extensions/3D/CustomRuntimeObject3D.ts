@@ -87,7 +87,7 @@ namespace gdjs {
     }
 
     getNetworkSyncData(
-      syncOptions?: GetNetworkSyncDataOptions
+      syncOptions: GetNetworkSyncDataOptions
     ): Custom3DObjectNetworkSyncDataType {
       return {
         ...super.getNetworkSyncData(syncOptions),
@@ -101,7 +101,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Custom3DObjectNetworkSyncDataType,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);

@@ -163,9 +163,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SimpleTileMapNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SimpleTileMapNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         ai: this._atlasImage,
       };
@@ -173,7 +175,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: SimpleTileMapNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

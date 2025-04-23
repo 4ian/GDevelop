@@ -455,7 +455,7 @@ namespace gdjs {
      * @returns The full network sync data.
      */
     getNetworkSyncData(
-      syncOptions?: GetNetworkSyncDataOptions
+      syncOptions: GetNetworkSyncDataOptions
     ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
@@ -504,7 +504,6 @@ namespace gdjs {
           syncOptions && syncOptions.forceSyncEverything
             ? this.name
             : undefined,
-
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
@@ -521,7 +520,7 @@ namespace gdjs {
      */
     updateFromNetworkSyncData(
       networkSyncData: ObjectNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);

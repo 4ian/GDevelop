@@ -256,9 +256,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TextInputNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TextInputNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         opa: this.getOpacity(),
         wid: this.getWidth(),
         hei: this.getHeight(),
@@ -280,7 +282,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: TextInputNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

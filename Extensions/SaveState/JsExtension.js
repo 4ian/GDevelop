@@ -38,8 +38,8 @@ module.exports = {
         _('Save the whole game to a scene variable or storage name.'),
         _('Save the game to _PARAM1_ (scene variable) or to storage _PARAM2_.'),
         '',
-        'res/actions/save.svg',
-        'res/actions/save.svg'
+        'res/actions/Save-single-action-down.svg',
+        'res/actions/Save-single-action-down.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
@@ -62,8 +62,8 @@ module.exports = {
           'Load the game save from _PARAM1_ (scene variable) or storage _PARAM2_.'
         ),
         '',
-        'res/actions/save.svg',
-        'res/actions/save.svg'
+        'res/actions/Save-single-action-up.svg',
+        'res/actions/Save-single-action-up.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(

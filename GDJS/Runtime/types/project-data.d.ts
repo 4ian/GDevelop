@@ -210,7 +210,7 @@ declare type SoundManagerSyncData = {
 
 declare type SoundSyncData = {
   loop: boolean;
-  initialVolume: float;
+  volume: float;
   rate: float;
   resourceName: string;
   position: float;

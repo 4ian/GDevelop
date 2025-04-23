@@ -434,9 +434,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Cube3DObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): Cube3DObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         mt: this._materialType,
         fo: this._facesOrientation,
         bfu: this._backFaceUpThroughWhichAxisRotation,
@@ -449,7 +451,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Cube3DObjectNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

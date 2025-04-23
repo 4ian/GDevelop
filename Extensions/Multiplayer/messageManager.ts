@@ -729,7 +729,9 @@ namespace gdjs {
             behavior.playerNumber = ownerPlayerNumber;
           }
 
-          instance.updateFromNetworkSyncData(messageData);
+          instance.updateFromNetworkSyncData(messageData, {
+            forceInputClear: false,
+          });
 
           setLastClockReceivedForInstanceOnScene({
             sceneNetworkId,

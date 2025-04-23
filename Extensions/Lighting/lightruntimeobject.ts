@@ -87,9 +87,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): LightNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): LightNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         rad: this.getRadius(),
         col: this.getColor(),
       };
@@ -97,7 +99,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: LightNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

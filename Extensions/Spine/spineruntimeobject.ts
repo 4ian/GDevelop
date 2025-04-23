@@ -113,9 +113,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpineNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SpineNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         opa: this._opacity,
         wid: this.getWidth(),
         hei: this.getHeight(),
@@ -133,7 +135,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: SpineNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);
 

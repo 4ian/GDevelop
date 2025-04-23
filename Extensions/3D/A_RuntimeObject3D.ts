@@ -110,9 +110,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Object3DNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): Object3DNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
         d: this.getDepth(),
         rx: this.getRotationX(),
@@ -125,7 +127,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Object3DNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);

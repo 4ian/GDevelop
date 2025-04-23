@@ -113,9 +113,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): PanelSpriteNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): PanelSpriteNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this.getOpacity(),
         color: this.getColor(),
       };
@@ -123,7 +125,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: PanelSpriteNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

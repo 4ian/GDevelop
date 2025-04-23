@@ -155,9 +155,11 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): BitmapTextObjectNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): BitmapTextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         text: this._text,
         opa: this._opacity,
         tint: this._tint,
@@ -173,7 +175,7 @@ namespace gdjs {
 
     override updateFromNetworkSyncData(
       networkSyncData: BitmapTextObjectNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (this._text !== undefined) {

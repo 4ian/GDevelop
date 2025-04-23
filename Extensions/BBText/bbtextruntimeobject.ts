@@ -145,9 +145,11 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): BBTextObjectNetworkSyncData {
+    override getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): BBTextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         text: this._text,
         o: this._opacity,
         c: this._color,
@@ -163,7 +165,7 @@ namespace gdjs {
 
     override updateFromNetworkSyncData(
       networkSyncData: BBTextObjectNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
       if (this._text !== undefined) {

@@ -221,14 +221,16 @@ namespace gdjs {
       this._state = this._falling;
     }
 
-    getNetworkSyncData(): PlatformerObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): PlatformerObjectNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         props: {
           cs: this._currentSpeed,
 

@@ -75,6 +75,10 @@ const Physics3DEditor = (props: Props) => {
 
   const isStatic = properties.get('bodyType').getValue() === 'Static';
 
+  const canShapeBeOriented =
+    properties.get('shape').getValue() !== 'Sphere' &&
+    properties.get('shape').getValue() !== 'Box';
+
   return (
     <Column
       expand
@@ -160,14 +164,15 @@ const Physics3DEditor = (props: Props) => {
           id="physics3d-parameter-shape-orientation"
           fullWidth
           floatingLabelText={properties.get('shapeOrientation').getLabel()}
-          value={properties.get('shapeOrientation').getValue()}
+          value={
+            canShapeBeOriented
+              ? properties.get('shapeOrientation').getValue()
+              : 'Z'
+          }
           onChange={(e, i, newValue: string) =>
             updateBehaviorProperty('shapeOrientation', newValue)
           }
-          disabled={
-            properties.get('shape').getValue() === 'Sphere' ||
-            properties.get('shape').getValue() === 'Box'
-          }
+          disabled={!canShapeBeOriented}
         >
           <SelectOption key={'shape-orientation-z'} value={'Z'} label={t`Z`} />
           <SelectOption key={'shape-orientation-y'} value={'Y'} label={t`Y`} />

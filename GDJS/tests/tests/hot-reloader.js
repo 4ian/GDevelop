@@ -93,6 +93,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
   /** @type {ObjectData & gdjs.CustomObjectConfiguration} */
   const defaultCustomObject = {
     type: 'MyExtension::MyCustomObject',
+    variant: '',
     name: 'MyCustomObject',
     behaviors: [],
     variables: [],

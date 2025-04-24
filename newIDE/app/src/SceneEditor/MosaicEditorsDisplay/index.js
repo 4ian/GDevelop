@@ -88,6 +88,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    eventsBasedObjectVariant,
     updateBehaviorsSharedData,
     layersContainer,
     globalObjectsContainer,
@@ -261,6 +262,10 @@ const MosaicEditorsDisplay = React.forwardRef<
 
   const selectedObjectNames = selectedObjects.map(object => object.getName());
 
+  const isCustomVariant = eventsBasedObject
+    ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+    : false;
+
   const editors = {
     properties: {
       type: 'secondary',
@@ -293,6 +298,8 @@ const MosaicEditorsDisplay = React.forwardRef<
               onSelectTileMapTile={props.onSelectTileMapTile}
               lastSelectionType={props.lastSelectionType}
               onExtensionInstalled={props.onExtensionInstalled}
+              isVariableListLocked={isCustomVariant}
+              isBehaviorListLocked={isCustomVariant}
             />
           )}
         </I18n>
@@ -345,6 +352,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 project={project}
                 layout={layout}
                 eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
                 globalObjectsContainer={globalObjectsContainer}
                 objectsContainer={objectsContainer}
                 layersContainer={layersContainer}
@@ -403,6 +411,9 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               onEditObject={props.onEditObject}
               onOpenEventBasedObjectEditor={props.onOpenEventBasedObjectEditor}
+              onOpenEventBasedObjectVariantEditor={
+                props.onOpenEventBasedObjectVariantEditor
+              }
               onExportAssets={props.onExportAssets}
               onDeleteObjects={(objectWithContext, cb) =>
                 props.onDeleteObjects(i18n, objectWithContext, cb)
@@ -426,6 +437,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               ref={objectsListRef}
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+              isListLocked={isCustomVariant}
             />
           )}
         </I18n>
@@ -456,6 +468,7 @@ const MosaicEditorsDisplay = React.forwardRef<
                 props.canObjectOrGroupBeGlobal(i18n, groupName)
               }
               unsavedChanges={props.unsavedChanges}
+              isListLocked={isCustomVariant}
             />
           )}
         </I18n>

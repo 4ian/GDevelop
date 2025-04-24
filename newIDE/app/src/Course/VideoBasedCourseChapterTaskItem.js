@@ -16,9 +16,6 @@ import AlertMessage from '../UI/AlertMessage';
 const styles = {
   textContainer: { overflow: 'hidden' },
   checkboxContainer: { paddingTop: 6 },
-  image: {
-    maxWidth: '100%',
-  },
 };
 
 type Props = {|
@@ -28,7 +25,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const CourseChapterTaskItem = ({
+const VideoBasedCourseChapterTaskItem = ({
   courseChapterTask,
   isOpen,
   isComplete,
@@ -89,7 +86,7 @@ const CourseChapterTaskItem = ({
             courseChapterTask.imageUrls &&
             courseChapterTask.imageUrls.map(imageUrl => (
               <ImageWithZoom
-                style={styles.image}
+                width="100%"
                 key={imageUrl}
                 alt=""
                 src={imageUrl}
@@ -121,7 +118,7 @@ const CourseChapterTaskItem = ({
                     <ColumnStackLayout noMargin noOverflowParent>
                       {courseChapterTask.answer.imageUrls.map(imageUrl => (
                         <ImageWithZoom
-                          style={styles.image}
+                          width="100%"
                           key={imageUrl}
                           alt=""
                           src={imageUrl}
@@ -138,4 +135,4 @@ const CourseChapterTaskItem = ({
   );
 };
 
-export default CourseChapterTaskItem;
+export default VideoBasedCourseChapterTaskItem;

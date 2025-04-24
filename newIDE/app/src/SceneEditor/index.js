@@ -123,6 +123,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
 
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -134,7 +135,10 @@ type Props = {|
   onOpenMoreSettings?: ?() => void,
   onOpenEvents: (sceneName: string) => void,
   onObjectEdited: (objectWithContext: ObjectWithContext) => void,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
@@ -150,7 +154,17 @@ type Props = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
   onExtensionInstalled: (extensionName: string) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -676,6 +690,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _closeObjectGroupEditorDialog = () => {
+    if (this.state.editedGroup) {
+      // TODO Set the `global` attribute correctly.
+      this.props.onObjectGroupEdited({
+        group: this.state.editedGroup,
+        global: false,
+      });
+    }
     this.setState({ editedGroup: null, isCreatingNewGroup: false });
   };
 
@@ -1118,7 +1139,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, layout, eventsBasedObject } = this.props;
+    const { project, layout, eventsBasedObject, onObjectEdited } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
@@ -1152,6 +1173,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     done(true);
 
+    objectsWithContext.forEach(objectWithContext => {
+      // TODO Avoid to do this N times.
+      onObjectEdited(objectWithContext);
+    });
     // We modified the selection, so force an update of editors dealing with it.
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -1349,6 +1374,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     done: boolean => void
   ) => {
     done(true);
+    this.props.onObjectGroupEdited(groupWithContext);
   };
 
   _onRenameObjectGroup = (
@@ -1396,8 +1422,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         /* isObjectGroup=*/ true
       );
     }
-
     done(true);
+    this.props.onObjectGroupEdited(groupWithContext);
   };
 
   canObjectOrGroupBeGlobal = (
@@ -1717,15 +1743,20 @@ export default class SceneEditor extends React.Component<Props, State> {
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit children`),
-              click: () =>
-                this.props.onOpenEventBasedObjectEditor(
+              click: () => {
+                const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                  object.getConfiguration()
+                );
+                this.props.onOpenEventBasedObjectVariantEditor(
                   gd.PlatformExtension.getExtensionFromFullObjectType(
                     object.getType()
                   ),
                   gd.PlatformExtension.getObjectNameFromFullObjectType(
                     object.getType()
-                  )
-                ),
+                  ),
+                  customObjectConfiguration.getVariantName()
+                );
+              },
             }
           : null,
         { type: 'separator' },
@@ -2055,6 +2086,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout,
       eventsFunctionsExtension,
       eventsBasedObject,
+      eventsBasedObjectVariant,
       initialInstances,
       resourceManagementProps,
       isActive,
@@ -2087,6 +2119,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           )}"). Open the layer panel to make it visible.
         </Trans>
       ) : null;
+
+    const isCustomVariant = eventsBasedObject
+      ? eventsBasedObject.getDefaultVariant() !== eventsBasedObjectVariant
+      : false;
 
     return (
       <ResponsiveWindowMeasurer>
@@ -2121,6 +2157,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
+                eventsBasedObjectVariant={eventsBasedObjectVariant}
                 layersContainer={this.props.layersContainer}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
@@ -2162,6 +2199,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onEditObject={this.editObject}
                 onOpenEventBasedObjectEditor={
                   this.props.onOpenEventBasedObjectEditor
+                }
+                onOpenEventBasedObjectVariantEditor={
+                  this.props.onOpenEventBasedObjectVariantEditor
                 }
                 onRenameObjectFolderOrObjectWithContextFinish={
                   this._onRenameObjectFolderOrObjectWithContextFinish
@@ -2285,6 +2325,17 @@ export default class SceneEditor extends React.Component<Props, State> {
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
                         onExtensionInstalled={this.props.onExtensionInstalled}
+                        onOpenEventBasedObjectEditor={
+                          this.props.onOpenEventBasedObjectEditor
+                        }
+                        onOpenEventBasedObjectVariantEditor={
+                          this.props.onOpenEventBasedObjectVariantEditor
+                        }
+                        onDeleteEventsBasedObjectVariant={
+                          this.props.onDeleteEventsBasedObjectVariant
+                        }
+                        isBehaviorListLocked={isCustomVariant}
+                        isVariableListLocked={isCustomVariant}
                       />
                     )}
                   </React.Fragment>
@@ -2315,6 +2366,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                         objectGroup
                       );
                     }
+                    // TODO Set the `global` attribute correctly.
+                    this.props.onObjectGroupEdited({
+                      group: objectGroup,
+                      global: false,
+                    });
                   }}
                   initialTab={'objects'}
                   onComputeAllVariableNames={() => {
@@ -2329,6 +2385,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                       editedGroup.getName()
                     );
                   }}
+                  isVariableListLocked={isCustomVariant}
+                  isObjectListLocked={isCustomVariant}
                 />
               )}
               {this.state.setupGridOpen && (
@@ -2365,6 +2423,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
+                    isListLocked={true}
                   />
                 )}
               {!!this.state.layerRemoved &&
@@ -2411,22 +2470,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                   resourceManagementProps={this.props.resourceManagementProps}
                 />
               )}
-              {this.state.scenePropertiesDialogOpen && eventsBasedObject && (
-                <EventsBasedObjectScenePropertiesDialog
-                  project={project}
-                  eventsBasedObject={eventsBasedObject}
-                  onClose={() => this.openSceneProperties(false)}
-                  onApply={() => this.openSceneProperties(false)}
-                  getContentAABB={
-                    this.editorDisplay
-                      ? this.editorDisplay.instancesHandlers.getContentAABB
-                      : () => null
-                  }
-                  onEventsBasedObjectChildrenEdited={
-                    this.props.onEventsBasedObjectChildrenEdited
-                  }
-                />
-              )}
+              {this.state.scenePropertiesDialogOpen &&
+                eventsBasedObject &&
+                eventsBasedObjectVariant && (
+                  <EventsBasedObjectScenePropertiesDialog
+                    project={project}
+                    eventsBasedObject={eventsBasedObject}
+                    eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    onClose={() => this.openSceneProperties(false)}
+                    onApply={() => this.openSceneProperties(false)}
+                    getContentAABB={
+                      this.editorDisplay
+                        ? this.editorDisplay.instancesHandlers.getContentAABB
+                        : () => null
+                    }
+                    onEventsBasedObjectChildrenEdited={
+                      this.props.onEventsBasedObjectChildrenEdited
+                    }
+                  />
+                )}
               {!!this.state.layoutVariablesDialogOpen && layout && (
                 <SceneVariablesDialog
                   open
@@ -2437,6 +2499,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }
+                  isListLocked={false}
                 />
               )}
               <I18n>

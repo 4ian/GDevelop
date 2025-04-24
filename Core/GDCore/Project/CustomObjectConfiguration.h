@@ -29,9 +29,9 @@ namespace gd {
  * "resource".
  */
 class CustomObjectConfiguration : public gd::ObjectConfiguration {
- public:
-  CustomObjectConfiguration(const Project& project_, const String& type_)
-      : project(&project_), isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(false) {
+public:
+  CustomObjectConfiguration(const Project &project_, const String &type_)
+      : project(&project_) {
     SetType(type_);
   }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
@@ -65,6 +65,18 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
                                      const gd::String& value) override;
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+
+  /**
+   * \brief Get the name of the events-based object variant used by this custom object.
+   */
+  const gd::String &GetVariantName() const { return variantName; };
+
+  /**
+   * \brief Set the name of the events-based object variant used by this custom object.
+   */
+  void SetVariantName(const gd::String &variantName_) {
+    variantName = variantName_;
+  }
 
   bool IsForcedToOverrideEventsBasedObjectChildrenConfiguration() const;
 
@@ -145,6 +157,7 @@ protected:
   gd::SerializerElement objectContent;
   std::unordered_set<gd::String> unfoldedChildren;
 
+  gd::String variantName = "";
   bool isMarkedAsOverridingEventsBasedObjectChildrenConfiguration = false;
   mutable std::map<gd::String, std::unique_ptr<gd::ObjectConfiguration>> childObjectConfigurations;
 

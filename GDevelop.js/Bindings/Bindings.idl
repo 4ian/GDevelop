@@ -372,6 +372,16 @@ interface ObjectVariableHelper {
         [Ref] ObjectsContainer globalObjectsContainer,
         [Ref] ObjectsContainer objectsContainer,
         [Const, Ref] ObjectGroup objectGroup);
+    void STATIC_ApplyChangesToVariants(
+        [Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString objectName,
+        [Const, Ref] VariablesChangeset changeset);
+};
+
+interface EventsBasedObjectVariantHelper {
+    void STATIC_ComplyVariantsToEventsBasedObject(
+        [Ref, Const] Project project,
+        [Ref] EventsBasedObject eventsBasedObject);
 };
 
 interface ObjectGroupsContainer {
@@ -923,6 +933,8 @@ enum CustomObjectConfiguration_EdgeAnchor {
 interface CustomObjectConfiguration {
     [Value] UniquePtrObjectConfiguration Clone();
 
+    [Const, Ref] DOMString GetVariantName();
+    void SetVariantName([Const] DOMString name);
     boolean IsForcedToOverrideEventsBasedObjectChildrenConfiguration();
     boolean IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration();
     void SetMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
@@ -3147,6 +3159,9 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject MakAsUsingLegacyInstancesRenderer(boolean value);
     boolean IsUsingLegacyInstancesRenderer();
 
+    [Ref] EventsBasedObjectVariant GetDefaultVariant();
+    [Ref] EventsBasedObjectVariantsContainer GetVariants();
+
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
     [Ref] ObjectsContainer GetObjects();
@@ -3169,6 +3184,48 @@ interface EventsBasedObject {
     [Const, Value] DOMString STATIC_GetPropertyToggleActionName([Const] DOMString propertyName);
 };
 EventsBasedObject implements AbstractEventsBasedEntity;
+
+interface EventsBasedObjectVariant {
+    void EventsBasedObjectVariant();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] EventsBasedObjectVariant SetName([Const] DOMString name);
+
+    [Ref] InitialInstancesContainer GetInitialInstances();
+    [Ref] LayersContainer GetLayers();
+    [Ref] ObjectsContainer GetObjects();
+    double GetAreaMinX();
+    double GetAreaMinY();
+    double GetAreaMinZ();
+    double GetAreaMaxX();
+    double GetAreaMaxY();
+    double GetAreaMaxZ();
+    void SetAreaMinX(double value);
+    void SetAreaMinY(double value);
+    void SetAreaMinZ(double value);
+    void SetAreaMaxX(double value);
+    void SetAreaMaxY(double value);
+    void SetAreaMaxZ(double value);
+    void SetAssetStoreAssetId([Const] DOMString assetStoreAssetId);
+    [Const, Ref] DOMString GetAssetStoreAssetId();
+    void SetAssetStoreOriginalName([Const] DOMString assetStoreOriginalName);
+    [Const, Ref] DOMString GetAssetStoreOriginalName();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface EventsBasedObjectVariantsContainer {
+    [Ref] EventsBasedObjectVariant InsertNewVariant([Const] DOMString name, unsigned long pos);
+    [Ref] EventsBasedObjectVariant InsertVariant([Const, Ref] EventsBasedObjectVariant variant, unsigned long pos);
+    boolean HasVariantNamed([Const] DOMString name);
+    [Ref] EventsBasedObjectVariant GetVariant([Const] DOMString name);
+    [Ref] EventsBasedObjectVariant GetVariantAt(unsigned long pos);
+    void RemoveVariant([Const] DOMString name);
+    void MoveVariant(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetVariantsCount();
+    unsigned long GetVariantPosition([Const, Ref] EventsBasedObjectVariant variant);
+};
 
 interface EventsBasedObjectsList {
     [Ref] EventsBasedObject InsertNew([Const] DOMString name, unsigned long pos);
@@ -3250,6 +3307,7 @@ interface EventsFunctionsExtension {
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
     void SerializeTo([Ref] SerializerElement element);
+    void SerializeToExternal([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);

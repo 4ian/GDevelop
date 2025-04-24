@@ -45,6 +45,10 @@ export type ExtensionDependency = {|
 export type ObjectAsset = {|
   object: any /*(serialized gdObjectConfiguration)*/,
   resources: Array<any /*(serialized gdResource)*/>,
+  variants?: Array<{
+    objectType: string,
+    variant: any /*(serialized gdEventsBasedObjectVariant)*/,
+  }>,
   // TODO This can become mandatory after the migration of the asset repository.
   requiredExtensions?: Array<ExtensionDependency>,
 |};
@@ -186,7 +190,7 @@ export type CourseChapterTask = {|
   answer?: { text?: string, imageUrls?: string[] },
 |};
 
-export type UnlockedCourseChapter = {|
+export type UnlockedVideoBasedCourseChapter = {|
   id: string,
   title: string,
   shortTitle?: string,
@@ -196,26 +200,105 @@ export type UnlockedCourseChapter = {|
   templateUrl: string,
   tasks: Array<CourseChapterTask>,
 |};
-export type LockedCourseChapter = {|
+
+export type TextBasedCourseChapterTextItem = {|
+  type: 'text',
+  text: string,
+|};
+
+export type TextBasedCourseChapterImageItem = {|
+  type: 'image',
+  url: string,
+  caption?: string,
+|};
+export type TextBasedCourseChapterVideoItem = {|
+  type: 'video',
+  url: string,
+  caption?: string,
+|};
+
+export type TextBasedCourseChapterTaskItem = {|
+  type: 'task',
+  title: string,
+  items: Array<
+    | TextBasedCourseChapterTextItem
+    | TextBasedCourseChapterImageItem
+    | TextBasedCourseChapterVideoItem
+  >,
+  answer?: {
+    items: Array<
+      | TextBasedCourseChapterTextItem
+      | TextBasedCourseChapterImageItem
+      | TextBasedCourseChapterVideoItem
+    >,
+  },
+|};
+
+export type UnlockedTextBasedCourseChapter = {|
+  id: string,
+  title: string,
+  shortTitle?: string,
+  isLocked?: false,
+  isFree?: boolean,
+  templates: Array<{| url: string, title?: string | null, id: string |}>,
+  items: Array<
+    | TextBasedCourseChapterTextItem
+    | TextBasedCourseChapterImageItem
+    | TextBasedCourseChapterTaskItem
+    | TextBasedCourseChapterVideoItem
+  >,
+|};
+
+export type LockedVideoBasedCourseChapter = {|
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
   id: string,
   title: string,
   shortTitle?: string,
   videoUrl: string,
-  isLocked: true,
-  isFree?: boolean,
-  priceInCredits?: number,
-  productId: string,
 |};
 
-export type CourseChapter = LockedCourseChapter | UnlockedCourseChapter;
+export type LockedTextBasedCourseChapter = {|
+  isLocked: true,
+  isFree?: boolean,
+  // If not set, cannot be purchased with credits.
+  priceInCredits?: number,
+  productId: string,
+
+  id: string,
+  title: string,
+  shortTitle?: string,
+|};
+
+export type VideoBasedCourseChapter =
+  | LockedVideoBasedCourseChapter
+  | UnlockedVideoBasedCourseChapter;
+
+export type TextBasedCourseChapter =
+  | LockedTextBasedCourseChapter
+  | UnlockedTextBasedCourseChapter;
+
+export type CourseChapter =
+  | LockedVideoBasedCourseChapter
+  | LockedTextBasedCourseChapter
+  | UnlockedVideoBasedCourseChapter
+  | UnlockedTextBasedCourseChapter;
 
 export type Course = {|
   id: string,
+  durationInWeeks: number,
+  chaptersTargetCount: number,
+  specializationId: 'game-development' | 'interaction-design',
+  newUntil?: number,
+
+  imageUrlByLocale: MessageByLocale,
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
-  durationInWeeks: number,
-  chaptersTargetCount: number,
 |};
 
 export type UserCourseProgress = {|
@@ -592,6 +675,8 @@ export const listCourseChapters = async (
     });
     return response.data;
   }
-  const response = await client.get(`/course/${courseId}/chapter`);
+  const response = await client.get(`/course/${courseId}/chapter`, {
+    params: { lang },
+  });
   return response.data;
 };

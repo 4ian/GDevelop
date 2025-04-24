@@ -61,7 +61,11 @@ export const CompactTextAreaField = ({
 
   const title = !markdownDescription
     ? label
-    : [label, ' - ', <MarkdownText source={markdownDescription} />];
+    : [
+        label,
+        ' - ',
+        <MarkdownText key="markdown-desc" source={markdownDescription} />,
+      ];
 
   return (
     <I18n>

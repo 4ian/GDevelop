@@ -2,6 +2,7 @@
 declare class gdObjectVariableHelper {
   static mergeVariableContainers(objectsContainersList: gdObjectsContainersList, objectGroup: gdObjectGroup): gdVariablesContainer;
   static fillAnyVariableBetweenObjects(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectGroup: gdObjectGroup): void;
+  static applyChangesToVariants(eventsBasedObject: gdEventsBasedObject, objectName: string, changeset: gdVariablesChangeset): void;
   delete(): void;
   ptr: number;
 };

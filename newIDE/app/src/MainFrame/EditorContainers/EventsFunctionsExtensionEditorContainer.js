@@ -169,7 +169,8 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onOpenCustomObjectEditor={eventsBasedObject => {
             this.props.onOpenCustomObjectEditor(
               eventsFunctionsExtension,
-              eventsBasedObject
+              eventsBasedObject,
+              ''
             );
           }}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}

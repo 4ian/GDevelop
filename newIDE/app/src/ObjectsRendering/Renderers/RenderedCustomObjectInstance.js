@@ -1,6 +1,7 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
 import Rendered3DInstance from './Rendered3DInstance';
+import RenderedUnknownInstance from './RenderedUnknownInstance';
 import PixiResourcesLoader from '../PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -13,6 +14,53 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
+
+const getVariant = (
+  eventBasedObject: gdEventsBasedObject,
+  customObjectConfiguration: gdCustomObjectConfiguration
+): gdEventsBasedObjectVariant => {
+  const variants = eventBasedObject.getVariants();
+  const variantName = customObjectConfiguration.getVariantName();
+  return variants.hasVariantNamed(variantName)
+    ? variants.getVariant(variantName)
+    : eventBasedObject.getDefaultVariant();
+};
+
+type PropertyMappingRule = {
+  targetChild: string,
+  targetProperty: string,
+  sourceProperty: string,
+};
+
+const getPropertyMappingRules = (
+  eventBasedObject: gdEventsBasedObject
+): Array<PropertyMappingRule> => {
+  const properties = eventBasedObject.getPropertyDescriptors();
+  if (!properties.has('_PropertyMapping')) {
+    return [];
+  }
+  const extraInfos = properties
+    .get('_PropertyMapping')
+    .getExtraInfo()
+    .toJSArray();
+  return extraInfos
+    .map(extraInfo => {
+      const mapping = extraInfo.split('=');
+      if (mapping.length < 2) {
+        return null;
+      }
+      const targetPath = mapping[0].split('.');
+      if (mapping.length < 2) {
+        return null;
+      }
+      return {
+        targetChild: targetPath[0],
+        targetProperty: targetPath[1],
+        sourceProperty: mapping[1],
+      };
+    })
+    .filter(Boolean);
+};
 
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
@@ -27,6 +75,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
   layoutedInstances = new Map<number, LayoutedInstance>();
   renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
+  _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
     project: gdProject,
@@ -34,7 +83,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    propertyOverridings: Map<string, string>
   ) {
     super(
       project,
@@ -42,7 +92,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       associatedObjectConfiguration,
       pixiContainer,
       threeGroup,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      propertyOverridings
     );
 
     // Setup the PIXI object:
@@ -71,6 +122,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (!eventBasedObject) {
       return;
     }
+    this._propertyMappingRules = getPropertyMappingRules(eventBasedObject);
     this._isRenderedIn3D = eventBasedObject.isRenderedIn3D();
 
     // Functor used to render an instance
@@ -142,21 +194,58 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   ): RenderedInstance | Rendered3DInstance => {
     let renderedInstance = this.renderedInstances.get(instance.ptr);
     if (!renderedInstance) {
+      // No renderer associated yet, the instance must have been just created!...
+      let childObjectConfiguration = null;
+      const variant = this.getVariant();
+      if (variant) {
+        const childObjects = variant.getObjects();
+        if (childObjects.hasObjectNamed(instance.getObjectName())) {
+          const childObject = childObjects.getObject(instance.getObjectName());
+          childObjectConfiguration = childObject.getConfiguration();
+        }
+      }
+      // Apply property mapping rules on the child instance.
+      const childPropertyOverridings = new Map<string, string>();
       const customObjectConfiguration = gd.asCustomObjectConfiguration(
         this._associatedObjectConfiguration
       );
-      //No renderer associated yet, the instance must have been just created!...
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        instance.getObjectName()
-      );
+      const customObjectProperties = customObjectConfiguration.getProperties();
+      for (const propertyMappingRule of this._propertyMappingRules) {
+        if (propertyMappingRule.targetChild !== instance.getObjectName()) {
+          continue;
+        }
+        const sourceValue = this._propertyOverridings.has(
+          propertyMappingRule.sourceProperty
+        )
+          ? this._propertyOverridings.get(propertyMappingRule.sourceProperty)
+          : customObjectProperties
+              .get(propertyMappingRule.sourceProperty)
+              .getValue();
+        if (sourceValue !== undefined) {
+          childPropertyOverridings.set(
+            propertyMappingRule.targetProperty,
+            sourceValue
+          );
+        }
+      }
       //...so let's create a renderer.
-      renderedInstance = ObjectsRenderingService.createNewInstanceRenderer(
-        this._project,
-        instance,
-        childObjectConfiguration,
-        this._pixiObject,
-        this._threeObject
-      );
+      renderedInstance = childObjectConfiguration
+        ? ObjectsRenderingService.createNewInstanceRenderer(
+            this._project,
+            instance,
+            childObjectConfiguration,
+            this._pixiObject,
+            this._threeObject,
+            childPropertyOverridings
+          )
+        : new RenderedUnknownInstance(
+            this._project,
+            instance,
+            // $FlowFixMe It's not actually used.
+            null,
+            this._pixiObject,
+            PixiResourcesLoader
+          );
       this.renderedInstances.set(instance.ptr, renderedInstance);
     }
     return renderedInstance;
@@ -260,12 +349,20 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       }
       return 'res/unknown32.png';
     }
-    const childObjects = eventBasedObject.getObjects();
+    const variant = getVariant(eventBasedObject, customObjectConfiguration);
+    const childObjects = variant.getObjects();
     for (let i = 0; i < childObjects.getObjectsCount(); i++) {
       const childObject = childObjects.getObjectAt(i);
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        childObject.getName()
-      );
+      const childObjectConfiguration =
+        customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
+        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()
+          ? customObjectConfiguration.getChildObjectConfiguration(
+              childObject.getName()
+            )
+          : variant
+              .getObjects()
+              .getObject(childObject.getName())
+              .getConfiguration();
       const childType = childObjectConfiguration.getType();
       if (
         childType === 'Sprite' ||
@@ -291,12 +388,25 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     });
   }
 
-  update() {
+  getVariant(): gdEventsBasedObjectVariant | null {
     const { eventBasedObject } = this;
     if (!eventBasedObject) {
+      return null;
+    }
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      this._associatedObjectConfiguration
+    );
+    return getVariant(eventBasedObject, customObjectConfiguration);
+  }
+
+  update() {
+    const { eventBasedObject } = this;
+    const variant = this.getVariant();
+    if (!eventBasedObject || !variant) {
       return;
     }
-    const layers = eventBasedObject.getLayers();
+
+    const layers = variant.getLayers();
     for (
       let layerIndex = 0;
       layerIndex < layers.getLayersCount();
@@ -304,13 +414,11 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     ) {
       const layer = layers.getLayerAt(layerIndex);
       if (layer.getVisibility()) {
-        eventBasedObject
-          .getInitialInstances()
-          .iterateOverInstancesWithZOrdering(
-            // $FlowFixMe - gd.castObject is not supporting typings.
-            this.instancesRenderer,
-            layer.getName()
-          );
+        variant.getInitialInstances().iterateOverInstancesWithZOrdering(
+          // $FlowFixMe - gd.castObject is not supporting typings.
+          this.instancesRenderer,
+          layer.getName()
+        );
       }
     }
     this._updatePixiObjectsZOrder();
@@ -346,13 +454,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         threeObject.scale.set(scaleX, scaleY, scaleZ);
       }
 
-      const { eventBasedObject } = this;
       const unscaledCenterX =
-        this.getDefaultWidth() / 2 +
-        (eventBasedObject ? eventBasedObject.getAreaMinX() : 0);
+        this.getDefaultWidth() / 2 + variant.getAreaMinX();
       const unscaledCenterY =
-        this.getDefaultHeight() / 2 +
-        (eventBasedObject ? eventBasedObject.getAreaMinY() : 0);
+        this.getDefaultHeight() / 2 + variant.getAreaMinY();
 
       this._pixiObject.pivot.x = unscaledCenterX;
       this._pixiObject.pivot.y = unscaledCenterY;
@@ -419,57 +524,44 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   getDefaultWidth() {
-    const { eventBasedObject } = this;
-    return eventBasedObject
-      ? eventBasedObject.getAreaMaxX() - eventBasedObject.getAreaMinX()
-      : 48;
+    const variant = this.getVariant();
+    return variant ? variant.getAreaMaxX() - variant.getAreaMinX() : 48;
   }
 
   getDefaultHeight() {
-    const { eventBasedObject } = this;
-    return eventBasedObject
-      ? eventBasedObject.getAreaMaxY() - eventBasedObject.getAreaMinY()
-      : 48;
+    const variant = this.getVariant();
+    return variant ? variant.getAreaMaxY() - variant.getAreaMinY() : 48;
   }
 
   getDefaultDepth() {
-    const { eventBasedObject } = this;
-    return eventBasedObject
-      ? eventBasedObject.getAreaMaxZ() - eventBasedObject.getAreaMinZ()
-      : 48;
+    const variant = this.getVariant();
+    return variant ? variant.getAreaMaxZ() - variant.getAreaMinZ() : 48;
   }
 
   getOriginX(): number {
-    const { eventBasedObject } = this;
-    if (!eventBasedObject) {
+    const variant = this.getVariant();
+    if (!variant) {
       return 0;
     }
-    return (
-      (-eventBasedObject.getAreaMinX() / this.getDefaultWidth()) *
-      this.getWidth()
-    );
+    return (-variant.getAreaMinX() / this.getDefaultWidth()) * this.getWidth();
   }
 
   getOriginY(): number {
-    const { eventBasedObject } = this;
-    if (!eventBasedObject) {
+    const variant = this.getVariant();
+    if (!variant) {
       return 0;
     }
     return (
-      (-eventBasedObject.getAreaMinY() / this.getDefaultHeight()) *
-      this.getHeight()
+      (-variant.getAreaMinY() / this.getDefaultHeight()) * this.getHeight()
     );
   }
 
   getOriginZ(): number {
-    const { eventBasedObject } = this;
-    if (!eventBasedObject) {
+    const variant = this.getVariant();
+    if (!variant) {
       return 0;
     }
-    return (
-      (-eventBasedObject.getAreaMinZ() / this.getDefaultDepth()) *
-      this.getDepth()
-    );
+    return (-variant.getAreaMinZ() / this.getDefaultDepth()) * this.getDepth();
   }
 
   getCenterX() {

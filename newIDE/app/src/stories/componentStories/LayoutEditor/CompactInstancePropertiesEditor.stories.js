@@ -39,6 +39,7 @@ export const InstanceSprite2d = () => (
             editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
+            isVariableListLocked={false}
           />
         </SerializedObjectDisplay>
       )}
@@ -67,6 +68,7 @@ export const InstanceCube3d = () => (
             editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
+            isVariableListLocked={false}
           />
         </SerializedObjectDisplay>
       )}
@@ -95,6 +97,7 @@ export const InstanceTextInput = () => (
             editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
+            isVariableListLocked={false}
           />
         </SerializedObjectDisplay>
       )}

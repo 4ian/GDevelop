@@ -17,6 +17,8 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   isInnerAreaFollowingParentSize(): boolean;
   makAsUsingLegacyInstancesRenderer(value: boolean): gdEventsBasedObject;
   isUsingLegacyInstancesRenderer(): boolean;
+  getDefaultVariant(): gdEventsBasedObjectVariant;
+  getVariants(): gdEventsBasedObjectVariantsContainer;
   getInitialInstances(): gdInitialInstancesContainer;
   getLayers(): gdLayersContainer;
   getObjects(): gdObjectsContainer;

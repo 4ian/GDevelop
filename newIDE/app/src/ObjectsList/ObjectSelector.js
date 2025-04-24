@@ -45,6 +45,7 @@ type Props = {|
   onApply?: () => void,
   value: string,
   errorTextIfInvalid?: React.Node,
+  disabled?: boolean,
 
   fullWidth?: boolean,
   floatingLabelText?: React.Node,
@@ -189,6 +190,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       hintText,
       requiredCapabilitiesBehaviorTypes,
       requiredVisibleBehaviorTypes,
+      disabled,
       ...otherProps
     } = props;
 
@@ -241,7 +243,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       undefined
     );
 
-    return shouldAutofocusInput ? (
+    return disabled ? null : shouldAutofocusInput ? (
       <SemiControlledAutoComplete
         margin={margin}
         hintText={hintText || t`Choose an object`}

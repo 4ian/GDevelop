@@ -2129,6 +2129,26 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
       groups[g].RenameObject(oldName, newName);
     }
   }
+
+  for (auto &variant : eventsBasedObject.GetVariants().GetInternalVector()) {
+    auto &variantObjects = variant->GetObjects();
+    auto &variantObjectGroups = variantObjects.GetObjectGroups();
+    if (isObjectGroup) {
+      if (variantObjectGroups.Has(oldName)) {
+        variantObjectGroups.Get(oldName).SetName(newName);
+      }
+      // Object groups can't have instances or be in other groups
+    }
+    else {
+      if (variantObjects.HasObjectNamed(oldName)) {
+        variantObjects.GetObject(oldName).SetName(newName);
+      }
+      variant->GetInitialInstances().RenameInstancesOfObject(oldName, newName);
+      for (std::size_t g = 0; g < variantObjectGroups.size(); ++g) {
+        variantObjectGroups[g].RenameObject(oldName, newName);
+      }
+    }
+  }
 }
 
 void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(

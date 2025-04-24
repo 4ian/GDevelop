@@ -138,7 +138,6 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';

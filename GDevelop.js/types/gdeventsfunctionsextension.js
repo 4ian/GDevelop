@@ -40,6 +40,7 @@ declare class gdEventsFunctionsExtension {
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
   getEventsBasedObjects(): gdEventsBasedObjectsList;
   serializeTo(element: gdSerializerElement): void;
+  serializeToExternal(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
   delete(): void;

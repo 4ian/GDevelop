@@ -15,6 +15,7 @@ class RenderedInstance {
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: PIXI.DisplayObject | null;
+  _propertyOverridings: Map<string, string>;
   wasUsed: boolean;
 
   /** Set to true when onRemovedFromScene is called. Allows to cancel promises/asynchronous operations (notably: waiting for a resource load). */
@@ -25,7 +26,8 @@ class RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    propertyOverridings: Map<string, string> = new Map<string, string>()
   );
 
   /**

@@ -45,6 +45,10 @@ export type ExtensionDependency = {|
 export type ObjectAsset = {|
   object: any /*(serialized gdObjectConfiguration)*/,
   resources: Array<any /*(serialized gdResource)*/>,
+  variants?: Array<{
+    objectType: string,
+    variant: any /*(serialized gdEventsBasedObjectVariant)*/,
+  }>,
   // TODO This can become mandatory after the migration of the asset repository.
   requiredExtensions?: Array<ExtensionDependency>,
 |};

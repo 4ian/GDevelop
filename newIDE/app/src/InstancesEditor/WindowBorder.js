@@ -7,14 +7,14 @@ import Rectangle from '../Utils/Rectangle';
 type Props = {|
   project: gdProject,
   layout: gdLayout | null,
-  eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
   toCanvasCoordinates: (x: number, y: number) => [number, number],
 |};
 
 export default class WindowBorder {
   project: gdProject;
   layout: gdLayout | null;
-  eventsBasedObject: gdEventsBasedObject | null;
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   pixiRectangle = new PIXI.Graphics();
   windowRectangle: Rectangle = new Rectangle();
@@ -22,12 +22,12 @@ export default class WindowBorder {
   constructor({
     project,
     layout,
-    eventsBasedObject,
+    eventsBasedObjectVariant,
     toCanvasCoordinates,
   }: Props) {
     this.project = project;
     this.layout = layout;
-    this.eventsBasedObject = eventsBasedObject;
+    this.eventsBasedObjectVariant = eventsBasedObjectVariant;
     this.toCanvasCoordinates = toCanvasCoordinates;
 
     this.pixiRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
@@ -38,15 +38,15 @@ export default class WindowBorder {
   }
 
   render() {
-    const { layout, eventsBasedObject } = this;
+    const { layout, eventsBasedObjectVariant } = this;
 
     this.windowRectangle.set(
-      eventsBasedObject
+      eventsBasedObjectVariant
         ? {
-            left: eventsBasedObject.getAreaMinX(),
-            top: eventsBasedObject.getAreaMinY(),
-            right: eventsBasedObject.getAreaMaxX(),
-            bottom: eventsBasedObject.getAreaMaxY(),
+            left: eventsBasedObjectVariant.getAreaMinX(),
+            top: eventsBasedObjectVariant.getAreaMinY(),
+            right: eventsBasedObjectVariant.getAreaMaxX(),
+            bottom: eventsBasedObjectVariant.getAreaMaxY(),
           }
         : {
             left: 0,
@@ -88,7 +88,7 @@ export default class WindowBorder {
       displayedRectangle.width(),
       displayedRectangle.height()
     );
-    if (eventsBasedObject) {
+    if (eventsBasedObjectVariant) {
       const origin = this.toCanvasCoordinates(0, 0);
       this.pixiRectangle.drawRect(origin[0] - 8, origin[1] - 1, 16, 2);
       this.pixiRectangle.drawRect(origin[0] - 1, origin[1] - 8, 2, 16);

@@ -15,6 +15,7 @@ describe('gdjs.CustomRuntimeObject', function () {
     const customObject = new gdjs.CustomRuntimeObject2D(instanceContainer, {
       name: 'MyCustomObject',
       type: 'MyExtension::MyEventsBasedObject',
+      variant: '',
       variables: [],
       behaviors: [],
       effects: [],

@@ -63,7 +63,8 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onOpenCustomObjectEditor: (
     gdEventsFunctionsExtension,
-    gdEventsBasedObject
+    gdEventsBasedObject,
+    variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
 
@@ -143,7 +144,9 @@ export type RenderEditorContainerProps = {|
 
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
     objectWithContext: ObjectWithContext
@@ -158,7 +161,17 @@ export type RenderEditorContainerProps = {|
     extensionName: string,
     eventsBasedObjectName: string
   ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
   onExtensionInstalled: (extensionName: string) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

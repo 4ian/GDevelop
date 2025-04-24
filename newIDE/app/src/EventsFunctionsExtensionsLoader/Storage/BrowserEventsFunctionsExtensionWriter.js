@@ -32,7 +32,10 @@ export default class BrowserEventsFunctionsExtensionWriter {
     extension: gdEventsFunctionsExtension,
     filename: string
   ): Promise<void> => {
-    const serializedObject = serializeToJSObject(extension);
+    const serializedObject = serializeToJSObject(
+      extension,
+      'serializeToExternal'
+    );
     try {
       await downloadStringContentAsFile(
         filename,

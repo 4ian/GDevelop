@@ -43,7 +43,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddCondition("CompareTimer",
                     _("Value of a scene timer"),
                     _("Compare the elapsed time of a scene timer. This "
-                      "condition doesn't start the timer."),
+                      "condition doesn't start the timer and will always be "
+                      "false if the timer was not started previously (whatever "
+                      "the comparison being made)."),
                     _("The timer _PARAM1_ _PARAM2_ _PARAM3_ seconds"),
 
                     "",

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
 import { formatISO, subDays } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import {
@@ -21,6 +22,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import InfoIcon from '../UI/CustomSvgIcons/CircledInfo';
 import { buildChartData, daysShownForYear } from './GameAnalyticsEvaluator';
 import {
   BounceRateChart,
@@ -142,6 +144,20 @@ export const GameAnalyticsPanel = ({
                 <Column noMargin alignItems="center" expand>
                   <Text size="block-title" align="center">
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
+                    <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
+                      title={
+                        <Text>
+                          <Trans>
+                            Number of people who launched the game. Viewers are
+                            considered players when they stayed at least 60
+                            seconds including loading screens.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <SessionsChart
                     chartData={chartData}
@@ -169,6 +185,19 @@ export const GameAnalyticsPanel = ({
                       {Math.round(chartData.overview.bounceRatePercent)}% bounce
                       rate
                     </Trans>
+                    <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
+                      title={
+                        <Text>
+                          <Trans>
+                            Percentage of people who leave before 60 seconds
+                            including loading screens.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <BounceRateChart
                     chartData={chartData}
@@ -186,6 +215,18 @@ export const GameAnalyticsPanel = ({
                       )}{' '}
                       minutes per player
                     </Trans>
+                    <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
+                      title={
+                        <Text>
+                          <Trans>
+                            Is the average time a player spends in the game.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <MeanPlayTimeChart
                     chartData={chartData}
@@ -209,6 +250,21 @@ export const GameAnalyticsPanel = ({
                       }{' '}
                       minutes
                     </Trans>
+                    <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
+                      title={
+                        <Text>
+                          <Trans>
+                            Average of players still active after 15 minutes.
+                            This graph shows how long players stay in the game
+                            after X minutes. It helps to see if the players quit
+                            quickly or keep playing for a while.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <PlayersRepartitionPerDurationChart
                     chartData={chartData}
@@ -232,6 +288,23 @@ export const GameAnalyticsPanel = ({
                       }{' '}
                       minutes
                     </Trans>
+                    <Tooltip
+                      style={{ verticalAlign: 'bottom' }}
+                      title={
+                        <Text>
+                          <Trans>
+                            Shows how long players stay in the game over time.
+                            The percentages are showing people playing for more
+                            than 3, 5, 10, and 15 minutes based on the best day.
+                            A higher value means better player retention on the
+                            day. This helps you understand when players are most
+                            engaged — and when they drop off quickly.
+                          </Trans>
+                        </Text>
+                      }
+                    >
+                      <InfoIcon />
+                    </Tooltip>
                   </Text>
                   <PlayersDurationPerDayChart
                     chartData={chartData}

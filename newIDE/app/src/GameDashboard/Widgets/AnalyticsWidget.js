@@ -119,7 +119,7 @@ const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
               ) : (
                 <Column expand noMargin>
                   <Line alignItems="center" justifyContent="space-between">
-                    <Text size="block-title" noMargin>
+                    <Text size="sub-title" noMargin>
                       <Trans>Sessions</Trans>
                     </Text>
                     <RaisedButton

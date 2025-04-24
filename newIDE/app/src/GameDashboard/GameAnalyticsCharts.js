@@ -57,16 +57,18 @@ const CustomTooltip = ({
   payload,
   label,
   customStyle,
+  labelSuffix,
 }: {|
   payload: ?Array<any>,
   label: string,
   customStyle: Object,
+  labelSuffix: ?string,
 |}) =>
   payload ? (
     <Paper style={customStyle} background="light">
       <ColumnStackLayout>
         <Text size="sub-title" noMargin>
-          {label}
+          {label} {labelSuffix ? labelSuffix : ''}
         </Text>
         {payload.length > 0 &&
           payload.map(
@@ -167,7 +169,7 @@ export const BounceRateChart = ({
       <LineChart data={chartData.overTime} margin={chartMargins}>
         <RechartsLine
           name={i18n._(t`Bounce rate`)}
-          unit="%"
+          unit={'%'}
           formatter={minutesFormatter}
           type="monotone"
           dataKey="bounceRatePercent"
@@ -185,6 +187,7 @@ export const BounceRateChart = ({
           style={styles.tickLabel}
         />
         <YAxis
+          unit={'%'}
           dataKey="bounceRatePercent"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
@@ -234,6 +237,7 @@ export const MeanPlayTimeChart = ({
           style={styles.tickLabel}
         />
         <YAxis
+          unit={` ` + i18n._(t`min`)}
           dataKey="meanPlayedDurationInMinutes"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
@@ -272,6 +276,7 @@ export const PlayersRepartitionPerDurationChart = ({
           yAxisId={0}
         />
         <XAxis
+          unit={` ` + i18n._(t`min`)}
           name={i18n._(t`Played time`)}
           dataKey="duration"
           type="number"
@@ -295,6 +300,7 @@ export const PlayersRepartitionPerDurationChart = ({
             CustomTooltip({
               ...props,
               customStyle: styles.tooltipContent,
+              labelSuffix: i18n._(t`minutes`),
             })
           }
         />
@@ -320,7 +326,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over60sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -331,7 +337,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over180sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -342,7 +348,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over300sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -353,7 +359,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over600sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -364,7 +370,7 @@ export const PlayersDurationPerDayChart = ({
           type="monotone"
           dataKey="over900sPlayersPercent"
           formatter={percentFormatter}
-          unit={' %'}
+          unit={'%'}
           stroke={gdevelopTheme.chart.dataColor1}
           fill={gdevelopTheme.chart.dataColor1}
           fillOpacity={0.15}
@@ -383,7 +389,7 @@ export const PlayersDurationPerDayChart = ({
           dataKey="over60sPlayersPercent"
           stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
-          unit={' %'}
+          unit={'%'}
         />
         <Tooltip
           content={props =>

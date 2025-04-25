@@ -215,6 +215,7 @@ type Props = {|
 
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
   onExtensionInstalled: (extensionName: string) => void,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
@@ -235,6 +236,7 @@ export const CompactObjectPropertiesEditor = ({
   historyHandler,
   objects,
   onEditObject,
+  onObjectsModified,
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
@@ -287,8 +289,10 @@ export const CompactObjectPropertiesEditor = ({
         properties,
         getProperties: ({ object, objectConfiguration }) =>
           objectConfiguration.getProperties(),
-        onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
-          objectConfiguration.updateProperty(name, value),
+        onUpdateProperty: ({ object, objectConfiguration }, name, value) => {
+          objectConfiguration.updateProperty(name, value);
+          onObjectsModified([object]);
+        },
         visibility: 'Basic',
       });
 
@@ -305,6 +309,7 @@ export const CompactObjectPropertiesEditor = ({
       fullEditorLabel,
       object,
       onEditObject,
+      onObjectsModified,
     ]
   );
   const objectAdvancedPropertiesSchema = React.useMemo(

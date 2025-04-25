@@ -61,6 +61,7 @@ export type SceneEditorsDisplayProps = {|
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
   onLayerRenamed: () => void,
   onObjectCreated: gdObject => void,
+  onObjectsModified: (objects: Array<gdObject>) => void,
   onObjectEdited: ObjectWithContext => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext

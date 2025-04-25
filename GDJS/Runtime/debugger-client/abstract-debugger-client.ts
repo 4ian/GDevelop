@@ -269,6 +269,14 @@ namespace gdjs {
           // TODO: if fatal error, should probably reload. The editor should handle this
           // as it knows the current scene to show.
         });
+      } else if (data.command === 'hotReloadObjects') {
+        const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+        if (currentScene) {
+          that._hotReloader.hotReloadRuntimeSceneObjects(
+            data.payload.objects,
+            currentScene
+          );
+        }
       } else if (data.command === 'switchForInGameEdition') {
         if (!this._runtimegame.isInGameEdition()) return;
 

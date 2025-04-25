@@ -399,6 +399,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.editObjectInPropertiesPanel
                       }
                       onEditObject={props.onEditObject}
+                      onObjectsModified={props.onObjectsModified}
                       onInstancesModified={forceUpdateInstancesList}
                       onGetInstanceSize={getInstanceSize}
                       ref={instanceOrObjectPropertiesEditorRef}

@@ -289,6 +289,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               editInstanceVariables={props.editInstanceVariables}
               editObjectInPropertiesPanel={props.editObjectInPropertiesPanel}
               onEditObject={props.onEditObject}
+              onObjectsModified={props.onObjectsModified}
               onInstancesModified={_onInstancesModified}
               onGetInstanceSize={getInstanceSize}
               ref={instanceOrObjectPropertiesEditorRef}

@@ -318,7 +318,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     // and reorganize this.
     const modifiedInstances: gdInitialInstance[] = [];
     changes.updatedInstances.forEach(instanceData => {
-      const { persistentUuid, x, y, z, angle, rotationY, rotationX, customSize, width, height, depth } = instanceData;
+      const {
+        persistentUuid,
+        x,
+        y,
+        z,
+        angle,
+        rotationY,
+        rotationX,
+        customSize,
+        width,
+        height,
+        depth,
+      } = instanceData;
       const instance = getInstanceInLayoutWithPersistentUuid(
         this.props.initialInstances,
         persistentUuid
@@ -333,7 +345,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       instance.setHasCustomSize(customSize);
       instance.setHasCustomDepth(customSize);
       if (customSize) {
-        console.log("customSize", width, height, depth);
         instance.setCustomWidth(width);
         instance.setCustomHeight(height);
         instance.setCustomDepth(depth);
@@ -997,6 +1008,48 @@ export default class SceneEditor extends React.Component<Props, State> {
     // this._exportDataOnly();
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
+  };
+
+  _onObjectsModified = (objects: Array<gdObject>) => {
+    const { layout, previewDebuggerServer } = this.props;
+
+    // TODO: Handle external layout
+    if (previewDebuggerServer && layout) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadObjects',
+          payload: {
+            objects: objects.map(object => serializeToJSObject(object)),
+          },
+        });
+      });
+    }
+  };
+
+  _onObjectEdited = (objectWithContext: ObjectWithContext) => {
+    const { project, layout } = this.props;
+    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
+    this.props.onObjectEdited(objectWithContext);
+    if (layout) {
+      if (objectWithContext.global) {
+        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
+          project,
+          objectWithContext.object.getName()
+        );
+      } else {
+        // TODO EBO Add same refactor for event-based objects
+        gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
+          project,
+          layout,
+          objectWithContext.object.getName()
+        );
+      }
+    }
+    this.updateBehaviorsSharedData();
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
+
+    this._onObjectsModified([objectWithContext.object]);
   };
 
   onSelectTileMapTile = (tileMapTileSelection: ?TileMapTileSelection) => {
@@ -2055,30 +2108,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onObjectEdited = (objectWithContext: ObjectWithContext) => {
-    const { project, layout } = this.props;
-    // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
-    this.props.onObjectEdited(objectWithContext);
-    if (layout) {
-      if (objectWithContext.global) {
-        gd.WholeProjectRefactorer.behaviorsAddedToGlobalObject(
-          project,
-          objectWithContext.object.getName()
-        );
-      } else {
-        // TODO EBO Add same refactor for event-based objects
-        gd.WholeProjectRefactorer.behaviorsAddedToObjectInScene(
-          project,
-          layout,
-          objectWithContext.object.getName()
-        );
-      }
-    }
-    this.updateBehaviorsSharedData();
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-  };
-
   render() {
     const {
       project,
@@ -2208,6 +2237,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectEdited={this._onObjectEdited}
+                onObjectsModified={this._onObjectsModified}
                 onObjectFolderOrObjectWithContextSelected={
                   this._onObjectFolderOrObjectWithContextSelected
                 }

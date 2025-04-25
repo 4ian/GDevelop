@@ -906,6 +906,20 @@ namespace gdjs {
       return;
     }
 
+    hotReloadRuntimeSceneObjects(
+      objects: ObjectData[],
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      const oldObjects = objects.map((objectData) =>
+        runtimeInstanceContainer._objects.get(objectData.name)
+      );
+      this._hotReloadRuntimeSceneObjects(
+        oldObjects,
+        objects,
+        runtimeInstanceContainer
+      );
+    }
+
     _hotReloadRuntimeSceneObjects(
       oldObjects: ObjectData[],
       newObjects: ObjectData[],

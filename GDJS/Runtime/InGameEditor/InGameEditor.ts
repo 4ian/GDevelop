@@ -568,6 +568,22 @@ namespace gdjs {
       });
     }
 
+    private _forceUpdateSelectionControls() {
+      let mode: string | null = null;
+      if (this._selectionControls) {
+        mode = this._selectionControls.threeTransformControls.mode;
+        this._selectionControls.threeTransformControls.detach();
+        this._selectionControls.threeTransformControls.removeFromParent();
+        this._selectionControls.dummyThreeObject.removeFromParent();
+        this._selectionControls = null;
+      }
+      this._updateSelectionControls();
+      if (mode && this._selectionControls) {
+        //@ts-ignore
+        this._selectionControls.threeTransformControls.mode = mode;
+      }
+    }
+
     private _updateSelectionControls() {
       const runtimeGame = this._runtimeGame;
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
@@ -832,6 +848,7 @@ namespace gdjs {
           runtimeObject.extraInitializationFromInitialInstance(instance);
         }
       });
+      this._forceUpdateSelectionControls();
     }
 
     private _getClosestIntersectionUnderCursor(): THREE.Intersection | null {

@@ -92,6 +92,7 @@ namespace gdjs {
         return false;
       }
       const currentScene = this._stack[this._stack.length - 1];
+      currentScene._updateObjectsForInGameEditor();
       currentScene.render();
       return true;
     }

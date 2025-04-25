@@ -575,6 +575,14 @@ namespace gdjs {
       this._cacheOrClearRemovedInstances();
     }
 
+    _updateObjectsForInGameEditor() {
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const obj = allInstancesList[i];
+        obj.update(this);
+      }
+    }
+
     /**
      * Update the objects (update positions, time management...)
      */

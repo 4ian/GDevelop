@@ -946,6 +946,9 @@ namespace gdjs {
     }
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return null;
+
       const closestIntersect = this._getClosestIntersectionUnderCursor();
       if (!closestIntersect) return null;
 
@@ -955,8 +958,21 @@ namespace gdjs {
       let threeObject: THREE.Object3D | null = closestIntersect.object;
       while (true) {
         if (!threeObject) return null;
-        // @ts-ignore
-        if (threeObject.gdjsRuntimeObject) return threeObject.gdjsRuntimeObject;
+        const runtimeObject: gdjs.RuntimeObject | null =
+          // @ts-ignore
+          threeObject.gdjsRuntimeObject;
+        if (runtimeObject) {
+          let rootRuntimeObject = runtimeObject;
+          while (
+            rootRuntimeObject.getInstanceContainer() instanceof
+            gdjs.CustomRuntimeObjectInstanceContainer
+          ) {
+            rootRuntimeObject = (
+              rootRuntimeObject.getInstanceContainer() as gdjs.CustomRuntimeObjectInstanceContainer
+            ).getOwner();
+          }
+          return rootRuntimeObject;
+        }
         threeObject = threeObject.parent || null;
       }
     }

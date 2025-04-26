@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { I18n } from '@lingui/react';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import Paper from '../../../UI/Paper';
@@ -12,6 +14,8 @@ import {
   sendAiRequestFeedback,
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
+  createAiEventGeneration,
+  getAiGeneratedEvent,
 } from '../../../Utils/GDevelopServices/Generation';
 import { delay } from '../../../Utils/Delay';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -30,11 +34,322 @@ import {
 } from '../../../Commands/EditorFunctionCallRunner';
 import { getFunctionCallsToProcess } from './AiRequestUtils';
 import { useStableUpToDateRef } from '../../../Utils/UseStableUpToDateCallback';
+import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
+import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+
+const useEditorFunctionCallResultsPerRequest = () => {
+  const [
+    editorFunctionCallResultsPerRequest,
+    setEditorFunctionCallResultsPerRequest,
+  ] = React.useState<{
+    [aiRequestId: string]: Array<EditorFunctionCallResult>,
+  }>({});
+
+  return {
+    getEditorFunctionCallResults: React.useCallback(
+      (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
+        editorFunctionCallResultsPerRequest[aiRequestId] || null,
+      [editorFunctionCallResultsPerRequest]
+    ),
+    addEditorFunctionCallResults: React.useCallback(
+      (
+        aiRequestId: string,
+        editorFunctionCallResults: EditorFunctionCallResult[]
+      ) => {
+        setEditorFunctionCallResultsPerRequest(
+          editorFunctionCallResultsPerRequest => {
+            const existingEditorFunctionCallResults = (
+              editorFunctionCallResultsPerRequest[aiRequestId] || []
+            ).filter(existingEditorFunctionCallResult => {
+              return !editorFunctionCallResults.some(
+                editorFunctionCallResult => {
+                  return (
+                    editorFunctionCallResult.call_id ===
+                    existingEditorFunctionCallResult.call_id
+                  );
+                }
+              );
+            });
+
+            return {
+              ...editorFunctionCallResultsPerRequest,
+              [aiRequestId]: [
+                ...existingEditorFunctionCallResults,
+                ...editorFunctionCallResults,
+              ],
+            };
+          }
+        );
+      },
+      []
+    ),
+    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
+      setEditorFunctionCallResultsPerRequest(
+        editorFunctionCallResultsPerRequest => ({
+          ...editorFunctionCallResultsPerRequest,
+          [aiRequestId]: null,
+        })
+      );
+    }, []),
+  };
+};
+
+export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+
+  const launchEventsGeneration = React.useCallback(
+    async ({
+      sceneName,
+      eventsDescription,
+      extensionNamesList,
+      objectsList,
+      relatedAiRequestId,
+    }: {|
+      sceneName: string,
+      eventsDescription: string,
+      extensionNamesList: string,
+      objectsList: string,
+      relatedAiRequestId: string,
+    |}) => {
+      if (!project) throw new Error('No project is opened.');
+      if (!profile) throw new Error('Use should be authenticated.');
+
+      let aiGeneratedEvent = await retryIfFailed({ times: 2 }, () =>
+        createAiEventGeneration(getAuthorizationHeader, {
+          userId: profile.id,
+          partialGameProjectJson: JSON.stringify(
+            getSimplifiedProjectJson(project, {
+              scopeToScene: sceneName,
+            }),
+            null,
+            2
+          ),
+          eventsDescription: eventsDescription,
+          extensionNamesList: extensionNamesList,
+          objectsList: objectsList,
+          relatedAiRequestId,
+        })
+      );
+
+      while (aiGeneratedEvent.status === 'working') {
+        await delay(1000);
+        aiGeneratedEvent = await getAiGeneratedEvent(getAuthorizationHeader, {
+          userId: profile.id,
+          aiGeneratedEventId: aiGeneratedEvent.id,
+        });
+      }
+
+      return aiGeneratedEvent;
+    },
+    [getAuthorizationHeader, project, profile]
+  );
+
+  return { launchEventsGeneration };
+};
+
+export const useEnsureExtensionInstalled = ({
+  project,
+  i18n,
+}: {|
+  project: ?gdProject,
+  i18n: I18nType,
+|}) => {
+  const { translatedExtensionShortHeadersByName } = React.useContext(
+    ExtensionStoreContext
+  );
+  const eventsFunctionsExtensionsState = React.useContext(
+    EventsFunctionsExtensionsContext
+  );
+
+  return {
+    ensureExtensionInstalled: React.useCallback(
+      async (extensionName: string) => {
+        if (!project) return;
+        if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
+          return;
+
+        const extensionShortHeader =
+          translatedExtensionShortHeadersByName[extensionName];
+        if (!extensionShortHeader) {
+          throw new Error("Can't find extension with the required name.");
+        }
+
+        await installExtension(
+          i18n,
+          project,
+          eventsFunctionsExtensionsState,
+          extensionShortHeader
+        );
+      },
+      [
+        eventsFunctionsExtensionsState,
+        i18n,
+        project,
+        translatedExtensionShortHeadersByName,
+      ]
+    ),
+  };
+};
+
+type AiRequestSendState = {|
+  isSending: boolean,
+  lastSendError: ?Error,
+|};
+
+export const useAiRequests = () => {
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+
+  const [aiRequests, setAiRequests] = React.useState<{ [string]: AiRequest }>(
+    {}
+  );
+  const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
+    string | null
+  >(null);
+
+  const updateAiRequest = React.useCallback(
+    (aiRequestId: string, aiRequest: AiRequest) => {
+      setAiRequests(aiRequests => ({
+        ...aiRequests,
+        [aiRequestId]: aiRequest,
+      }));
+    },
+    []
+  );
+
+  const refreshAiRequest = React.useCallback(
+    async (aiRequestId: string) => {
+      if (!profile) return;
+
+      try {
+        const updatedAiRequest = await getAiRequest(getAuthorizationHeader, {
+          userId: profile.id,
+          aiRequestId: aiRequestId,
+        });
+        updateAiRequest(updatedAiRequest.id, updatedAiRequest);
+      } catch (error) {
+        console.error(
+          'Error while background refreshing AI request - ignoring:',
+          error
+        );
+      }
+    },
+    [getAuthorizationHeader, profile, updateAiRequest]
+  );
+
+  const selectedAiRequest =
+    (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
+
+  // If the selected AI request is in a "working" state, watch it until it's finished.
+  const status = selectedAiRequest ? selectedAiRequest.status : null;
+  React.useEffect(
+    () => {
+      if (!profile) return;
+      if (!selectedAiRequestId || !status) return;
+
+      let stopWatching = false;
+
+      const watch = async () => {
+        while (true) {
+          await delay(1000);
+          if (stopWatching) return;
+
+          const aiRequest = await getAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId: selectedAiRequestId,
+          });
+          if (stopWatching) return;
+
+          updateAiRequest(selectedAiRequestId, aiRequest);
+        }
+      };
+
+      if (status === 'working') {
+        console.info(`Started watching AI request ${selectedAiRequestId}.`);
+        watch();
+      }
+
+      return () => {
+        if (status === 'working') {
+          console.info(`Stopped watching AI request ${selectedAiRequestId}.`);
+        }
+        stopWatching = true;
+      };
+    },
+    [
+      selectedAiRequestId,
+      status,
+      profile,
+      getAuthorizationHeader,
+      updateAiRequest,
+    ]
+  );
+
+  const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
+    [string]: AiRequestSendState,
+  }>({});
+  const isSendingAiRequest = React.useCallback(
+    (aiRequestId: string | null) =>
+      !!aiRequestSendStates[aiRequestId || ''] &&
+      aiRequestSendStates[aiRequestId || ''].isSending,
+    [aiRequestSendStates]
+  );
+  const getLastSendError = React.useCallback(
+    (aiRequestId: string | null) =>
+      (aiRequestSendStates[aiRequestId || ''] &&
+        aiRequestSendStates[aiRequestId || ''].lastSendError) ||
+      null,
+    [aiRequestSendStates]
+  );
+  const setSendingAiRequest = React.useCallback(
+    (aiRequestId: string | null, isSending: boolean) => {
+      const aiRequestIdToSet: string = aiRequestId || '';
+      setAiRequestSendStates(aiRequestSendStates => ({
+        ...aiRequestSendStates,
+        [aiRequestIdToSet]: {
+          isSending,
+          lastSendError: null,
+        },
+      }));
+    },
+    [setAiRequestSendStates]
+  );
+  const setLastSendError = React.useCallback(
+    (aiRequestId: string | null, lastSendError: ?Error) => {
+      const aiRequestIdToSet: string = aiRequestId || '';
+      setAiRequestSendStates(aiRequestSendStates => ({
+        ...aiRequestSendStates,
+        [aiRequestIdToSet]: {
+          isSending: false,
+          lastSendError,
+        },
+      }));
+    },
+    [setAiRequestSendStates]
+  );
+
+  return {
+    selectedAiRequest,
+    selectedAiRequestId,
+    setSelectedAiRequestId,
+    updateAiRequest,
+    refreshAiRequest,
+    isSendingAiRequest,
+    setSendingAiRequest,
+    setLastSendError,
+    getLastSendError,
+  };
+};
 
 type Props = {|
   isActive: boolean,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  i18n: I18nType,
 |};
 
 const styles = {
@@ -73,20 +388,37 @@ const noop = () => {};
 
 export const AskAi = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
-    ({ isActive, setToolbar, project }: Props, ref) => {
-      const [
-        selectedAiRequest,
-        setSelectedAiRequest,
-      ] = React.useState<AiRequest | null>(null);
-      // Allow long running tasks to check if the selected AI request has changed.
-      const upToDateSelectedAiRequest = useStableUpToDateRef(selectedAiRequest);
+    ({ isActive, setToolbar, project, i18n }: Props, ref) => {
+      const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
+        project,
+        i18n,
+      });
+      const { launchEventsGeneration } = useGenerateEvents({ project });
 
-      const [lastError, setLastError] = React.useState<Error | null>(null);
+      const {
+        selectedAiRequest,
+        selectedAiRequestId,
+        setSelectedAiRequestId,
+        updateAiRequest,
+        refreshAiRequest,
+        setSendingAiRequest,
+        isSendingAiRequest,
+        getLastSendError,
+        setLastSendError,
+      } = useAiRequests();
+      const upToDateSelectedAiRequestId = useStableUpToDateRef(
+        selectedAiRequestId
+      );
+
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
 
-      const onStartNewChat = React.useCallback(() => {
-        setSelectedAiRequest(null);
-      }, []);
+      const canStartNewChat = !!selectedAiRequestId;
+      const onStartNewChat = React.useCallback(
+        () => {
+          setSelectedAiRequestId(null);
+        },
+        [setSelectedAiRequestId]
+      );
 
       const onOpenHistory = React.useCallback(() => {
         setIsHistoryOpen(true);
@@ -96,15 +428,12 @@ export const AskAi = React.memo<Props>(
         setIsHistoryOpen(false);
       }, []);
 
-      // Rename to "appliedFunctionCallOutputs" or something like that?
-      const [
-        appliedFunctionCallOutputs,
-        setAppliedFunctionCallOutputs,
-      ] = React.useState<{
-        [aiRequestId: string]: Array<EditorFunctionCallResult>,
-      }>({});
+      const {
+        getEditorFunctionCallResults,
+        addEditorFunctionCallResults,
+        clearEditorFunctionCallResults,
+      } = useEditorFunctionCallResultsPerRequest();
 
-      const canStartNewChat = !!selectedAiRequest;
       const updateToolbar = React.useCallback(
         () => {
           if (setToolbar) {
@@ -132,10 +461,6 @@ export const AskAi = React.memo<Props>(
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
         null
-      );
-
-      const [isLaunchingAiRequest, setIsLaunchingAiRequest] = React.useState(
-        false
       );
 
       const { openCreditsPackageDialog } = React.useContext(
@@ -172,10 +497,6 @@ export const AskAi = React.memo<Props>(
         [isActive, onRefreshLimits]
       );
 
-      const selectedAiRequestId = selectedAiRequest
-        ? selectedAiRequest.id
-        : null;
-
       const sendUserRequest = React.useCallback(
         async (userRequestText: string) => {
           if (!profile) {
@@ -195,68 +516,47 @@ export const AskAi = React.memo<Props>(
           }
 
           const simplifiedProjectJson = project
-            ? JSON.stringify(getSimplifiedProjectJson(project))
+            ? JSON.stringify(getSimplifiedProjectJson(project, {}))
             : null;
 
           try {
-            setIsLaunchingAiRequest(true);
-            setLastError(null);
+            setSendingAiRequest(selectedAiRequestId, true);
 
-            let aiRequest;
-            try {
-              // Either create a new ai request or continue the existing one with a new message.
-              aiRequest = selectedAiRequestId
-                ? await addUserMessageToAiRequest(getAuthorizationHeader, {
-                    aiRequestId: selectedAiRequestId,
-                    userId: profile.id,
-                    userRequest: userRequestText,
-                    simplifiedProjectJson,
-                    payWithCredits,
-                  })
-                : await createAiRequest(getAuthorizationHeader, {
-                    userRequest: userRequestText,
-                    userId: profile.id,
-                    simplifiedProjectJson,
-                    payWithCredits,
-                  });
-            } finally {
-              if (
-                upToDateSelectedAiRequest.current &&
-                upToDateSelectedAiRequest.current.id !== selectedAiRequestId
-              ) {
-                // Abort watching the request if it has changed.
-                return;
-              }
-              setIsLaunchingAiRequest(false);
-            }
-            setIsLaunchingAiRequest(false);
-            setSelectedAiRequest(aiRequest);
-            if (aiRequestChatRef.current) {
-              aiRequestChatRef.current.resetUserInput();
-            }
-
-            while (aiRequest.status === 'working') {
-              await delay(1000);
-              aiRequest = await getAiRequest(getAuthorizationHeader, {
+            if (selectedAiRequestId) {
+              // User request on an existing AI request.
+              const aiRequest = await addUserMessageToAiRequest(
+                getAuthorizationHeader,
+                {
+                  aiRequestId: selectedAiRequestId,
+                  userId: profile.id,
+                  userRequest: userRequestText,
+                  simplifiedProjectJson,
+                  payWithCredits,
+                }
+              );
+              updateAiRequest(aiRequest.id, aiRequest);
+            } else {
+              // New AI request:
+              const aiRequest = await createAiRequest(getAuthorizationHeader, {
+                userRequest: userRequestText,
                 userId: profile.id,
-                aiRequestId: aiRequest.id,
+                simplifiedProjectJson,
+                payWithCredits,
               });
+              updateAiRequest(aiRequest.id, aiRequest);
 
-              if (
-                upToDateSelectedAiRequest.current &&
-                upToDateSelectedAiRequest.current.id !== selectedAiRequestId
-              ) {
-                // Abort watching the request if it has changed.
-                // TODO: this could be changed by making this into a different effect.
-                // so that watching starts again if we navigate back to a "working"
-                // request.
-                return;
+              // Select the new AI request just created - unless the user switched to another one
+              // in the meantime.
+              if (!upToDateSelectedAiRequestId.current) {
+                setSelectedAiRequestId(aiRequest.id);
               }
-
-              setSelectedAiRequest(aiRequest);
             }
+
+            setSendingAiRequest(selectedAiRequestId, false);
+            if (aiRequestChatRef.current)
+              aiRequestChatRef.current.resetUserInput(selectedAiRequestId);
           } catch (error) {
-            setLastError(error);
+            setLastSendError(selectedAiRequestId, error);
           }
 
           // Refresh the user limits, to ensure quota and credits information
@@ -269,91 +569,85 @@ export const AskAi = React.memo<Props>(
           }
         },
         [
-          profile,
-          quota,
           aiRequestPriceInCredits,
-          project,
-          onOpenCreateAccountDialog,
           availableCredits,
-          openCreditsPackageDialog,
-          selectedAiRequestId,
           getAuthorizationHeader,
+          onOpenCreateAccountDialog,
           onRefreshLimits,
-          upToDateSelectedAiRequest,
+          openCreditsPackageDialog,
+          profile,
+          project,
+          quota,
+          selectedAiRequestId,
+          setLastSendError,
+          setSelectedAiRequestId,
+          setSendingAiRequest,
+          upToDateSelectedAiRequestId,
+          updateAiRequest,
         ]
       );
 
-      // TODO: add button to retry in case of error
-      const onSendPendingFunctionCallOutputs = React.useCallback(
+      console.log('render for ', selectedAiRequestId);
+
+      const onSendEditorFunctionCallResults = React.useCallback(
         async () => {
-          if (!profile || !selectedAiRequestId || isLaunchingAiRequest) return;
+          if (
+            !profile ||
+            !selectedAiRequestId ||
+            isSendingAiRequest(selectedAiRequestId)
+          )
+            return;
+          const editorFunctionCallResults = getEditorFunctionCallResults(
+            selectedAiRequestId
+          );
+          if (!editorFunctionCallResults) return;
+
           try {
-            const aiRequestPendingFunctionCallOutputs =
-              appliedFunctionCallOutputs[selectedAiRequestId];
-
-            if (!aiRequestPendingFunctionCallOutputs) return;
-
-            try {
-              console.info(
-                'Sending pending function call outputs: ',
-                aiRequestPendingFunctionCallOutputs
-              );
-              setIsLaunchingAiRequest(true);
-              setLastError(null);
-
-              let aiRequest;
-              try {
-                aiRequest = await retryIfFailed({ times: 2 }, () =>
-                  addFunctionCallOutputsToAiRequest(getAuthorizationHeader, {
-                    userId: profile.id,
-                    aiRequestId: selectedAiRequestId,
-                    functionCallOutputs: aiRequestPendingFunctionCallOutputs.map(
-                      functionCallOutput => ({
-                        type: 'function_call_output',
-                        call_id: functionCallOutput.call_id,
-                        output: functionCallOutput.output,
-                      })
-                    ),
-                  })
-                );
-              } finally {
-                setIsLaunchingAiRequest(false);
-              }
-              setIsLaunchingAiRequest(false);
-              setAppliedFunctionCallOutputs(appliedFunctionCallOutputs => ({
-                ...appliedFunctionCallOutputs,
-                [selectedAiRequestId]: null,
-              }));
-              setSelectedAiRequest(aiRequest);
-              if (aiRequestChatRef.current) {
-                aiRequestChatRef.current.resetUserInput();
-              }
-
-              while (aiRequest.status === 'working') {
-                await delay(1000);
-                aiRequest = await getAiRequest(getAuthorizationHeader, {
-                  userId: profile.id,
-                  aiRequestId: aiRequest.id,
-                });
-                setSelectedAiRequest(aiRequest);
-              }
-            } catch (error) {
-              setLastError(error);
-            }
-          } catch (error) {
-            console.error(
-              'Error sending pending function call outputs: ',
-              error
+            console.info(
+              'Sending pending function call outputs: ',
+              editorFunctionCallResults
             );
-            // TODO: do something to not send again repeatly?
+            setSendingAiRequest(selectedAiRequestId, true);
+
+            const aiRequest = await retryIfFailed({ times: 2 }, () =>
+              addFunctionCallOutputsToAiRequest(getAuthorizationHeader, {
+                userId: profile.id,
+                aiRequestId: selectedAiRequestId,
+                functionCallOutputs: editorFunctionCallResults
+                  .map(functionCallOutput => {
+                    if (functionCallOutput.status !== 'finished') {
+                      return null;
+                    }
+
+                    return {
+                      type: 'function_call_output',
+                      call_id: functionCallOutput.call_id,
+                      output: JSON.stringify({
+                        success: functionCallOutput.success,
+                        ...functionCallOutput.output,
+                      }),
+                    };
+                  })
+                  .filter(Boolean),
+              })
+            );
+            updateAiRequest(aiRequest.id, aiRequest);
+            setSendingAiRequest(aiRequest.id, false);
+            clearEditorFunctionCallResults(aiRequest.id);
+          } catch (error) {
+            setLastSendError(selectedAiRequestId, error);
           }
         },
         [
           profile,
           selectedAiRequestId,
-          appliedFunctionCallOutputs,
+          isSendingAiRequest,
+          getEditorFunctionCallResults,
+          setSendingAiRequest,
+          updateAiRequest,
+          clearEditorFunctionCallResults,
           getAuthorizationHeader,
-          isLaunchingAiRequest,
+          setLastSendError,
         ]
       );
 
@@ -377,41 +671,78 @@ export const AskAi = React.memo<Props>(
         [getAuthorizationHeader, profile]
       );
 
-      // TODO: update to avoid multiple calls in a short time.
-      const onProcessFunctionCall = React.useCallback(
+      const onProcessFunctionCalls = React.useCallback(
+        async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
+          if (!project || !selectedAiRequest) return;
+
+          addEditorFunctionCallResults(
+            selectedAiRequest.id,
+            functionCalls.map(functionCall => ({
+              status: 'working',
+              call_id: functionCall.call_id,
+            }))
+          );
+
+          const editorFunctionCallResults = await processEditorFunctionCalls({
+            project,
+            functionCalls: functionCalls.map(functionCall => ({
+              name: functionCall.name,
+              arguments: functionCall.arguments,
+              call_id: functionCall.call_id,
+            })),
+            launchEventsGeneration: async options => {
+              return await launchEventsGeneration({
+                ...options,
+                relatedAiRequestId: selectedAiRequest.id,
+              });
+            },
+            onEnsureExtensionInstalled: async ({ extensionName }) => {
+              await ensureExtensionInstalled(extensionName);
+            },
+          });
+
+          addEditorFunctionCallResults(
+            selectedAiRequest.id,
+            editorFunctionCallResults
+          );
+        },
+        [
+          project,
+          selectedAiRequest,
+          addEditorFunctionCallResults,
+          ensureExtensionInstalled,
+          launchEventsGeneration,
+        ]
+      );
+
+      const onProcessAllFunctionCalls = React.useCallback(
         async () => {
           if (!project || !selectedAiRequest) return;
 
           const functionCalls = getFunctionCallsToProcess({
             aiRequest: selectedAiRequest,
-            appliedFunctionCallOutputs:
-              appliedFunctionCallOutputs[selectedAiRequest.id] || [],
+            editorFunctionCallResults:
+              getEditorFunctionCallResults(selectedAiRequest.id) || [],
           });
-          console.info('Processing function calls:', functionCalls);
+          console.log('Will process', functionCalls);
 
-          try {
-            const editorFunctionCallResults = await processEditorFunctionCalls({
-              project,
-              functionCalls: functionCalls.map(functionCall => ({
-                name: functionCall.name,
-                arguments: functionCall.arguments,
-                call_id: functionCall.call_id,
-              })),
-              launchEventsGeneration: async options => {
-                console.log('Generate events');
-              },
-            });
-
-            setAppliedFunctionCallOutputs(appliedFunctionCallOutputs => ({
-              ...appliedFunctionCallOutputs,
-              [selectedAiRequest.id]: editorFunctionCallResults,
-            }));
-          } catch (error) {
-            console.error('Error processing function call: ', error);
-          }
+          await onProcessFunctionCalls(functionCalls);
         },
-        [project, selectedAiRequest, appliedFunctionCallOutputs]
+        [
+          project,
+          selectedAiRequest,
+          getEditorFunctionCallResults,
+          onProcessFunctionCalls,
+        ]
       );
+
+      const hasProcessedAllFunctionCalls = selectedAiRequest
+        ? getFunctionCallsToProcess({
+            aiRequest: selectedAiRequest,
+            editorFunctionCallResults:
+              getEditorFunctionCallResults(selectedAiRequest.id) || [],
+          }).length === 0
+        : false;
 
       return (
         <>
@@ -421,8 +752,8 @@ export const AskAi = React.memo<Props>(
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
                 onSendUserRequest={sendUserRequest}
-                isLaunchingAiRequest={isLaunchingAiRequest}
-                lastSendError={lastError}
+                isLaunchingAiRequest={isSendingAiRequest(selectedAiRequestId)}
+                lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
                 increaseQuotaOffering={
                   !hasValidSubscriptionPlan(subscription)
@@ -431,9 +762,10 @@ export const AskAi = React.memo<Props>(
                     ? 'upgrade'
                     : 'none'
                 }
-                appliedFunctionCallOutputs={
+                onProcessFunctionCalls={onProcessFunctionCalls}
+                editorFunctionCallResults={
                   (selectedAiRequest &&
-                    appliedFunctionCallOutputs[selectedAiRequest.id]) ||
+                    getEditorFunctionCallResults(selectedAiRequest.id)) ||
                   null
                 }
                 aiRequestPriceInCredits={aiRequestPriceInCredits}
@@ -442,13 +774,28 @@ export const AskAi = React.memo<Props>(
                 hasOpenedProject={!!project}
               />
             </div>
-            <button onClick={onProcessFunctionCall}>Process</button>
-            <button onClick={onSendPendingFunctionCallOutputs}>Continue</button>
+            <button
+              disabled={!selectedAiRequest || hasProcessedAllFunctionCalls}
+              onClick={onProcessAllFunctionCalls}
+            >
+              Process all
+            </button>
+            <button
+              disabled={!selectedAiRequest || !hasProcessedAllFunctionCalls}
+              onClick={onSendEditorFunctionCallResults}
+            >
+              Continue
+            </button>
           </Paper>
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
-            onSelectAiRequest={setSelectedAiRequest}
+            onSelectAiRequest={aiRequest => {
+              // Immediately switch the UI and refresh in the background.
+              updateAiRequest(aiRequest.id, aiRequest);
+              setSelectedAiRequestId(aiRequest.id);
+              refreshAiRequest(aiRequest.id);
+            }}
             selectedAiRequestId={selectedAiRequestId}
           />
         </>
@@ -463,10 +810,15 @@ export const AskAi = React.memo<Props>(
 export const renderAskAiContainer = (
   props: RenderEditorContainerPropsWithRef
 ) => (
-  <AskAi
-    ref={props.ref}
-    project={props.project}
-    setToolbar={props.setToolbar}
-    isActive={props.isActive}
-  />
+  <I18n>
+    {({ i18n }) => (
+      <AskAi
+        ref={props.ref}
+        project={props.project}
+        setToolbar={props.setToolbar}
+        isActive={props.isActive}
+        i18n={i18n}
+      />
+    )}
+  </I18n>
 );

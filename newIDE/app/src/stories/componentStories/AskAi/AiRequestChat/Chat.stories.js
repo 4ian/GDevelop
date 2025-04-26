@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
-import paperDecorator from '../../PaperDecorator';
-import { AiRequestChat } from '../../../MainFrame/EditorContainers/AskAi/AiRequestChat';
-import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import paperDecorator from '../../../PaperDecorator';
+import { AiRequestChat } from '../../../../MainFrame/EditorContainers/AskAi/AiRequestChat';
+import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 
 export default {
-  title: 'EventsFunctionsExtensionEditor/AiRequestChat',
+  title: 'EventsFunctionsExtensionEditor/AiRequestChat/Chat',
   component: AiRequestChat,
   decorators: [paperDecorator],
 };
@@ -27,6 +27,7 @@ export const NewAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -48,6 +49,7 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -69,6 +71,7 @@ export const ErrorLaunchingNewAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -90,6 +93,7 @@ export const NewAiRequestQuotaLimitReachedAndNoCredits = () => (
       availableCredits={0}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -111,6 +115,7 @@ export const NewAiRequestQuotaLimitReachedAndSomeCredits = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -132,6 +137,7 @@ export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -153,6 +159,7 @@ export const LaunchingNewAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -198,6 +205,7 @@ export const ErroredNewAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -228,6 +236,7 @@ export const WorkingNewAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -342,6 +351,7 @@ export const ReadyAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -372,6 +382,7 @@ export const ReadyAiRequestWithMoreMessages = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -402,6 +413,7 @@ export const ReadyAiRequestWithEvenMoreMessages = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -432,6 +444,7 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -462,6 +475,7 @@ export const ErrorLaunchingFollowupAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -492,6 +506,7 @@ export const LaunchingFollowupAiRequest = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -522,6 +537,7 @@ export const QuotaLimitReached = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -552,6 +568,7 @@ export const QuotaLimitReachedAndUpgrade = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -582,6 +599,7 @@ export const QuotaLimitReachedAndNoUpgrade = () => (
       availableCredits={400}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );
@@ -611,6 +629,7 @@ export const QuotaLimitReachedAndNoCredits = () => (
       availableCredits={0}
       onSendFeedback={async () => {}}
       hasOpenedProject={false}
+      editorFunctionCallResults={[]}
     />
   </FixedHeightFlexContainer>
 );

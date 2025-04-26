@@ -6,7 +6,10 @@ import {
 } from '../../../UI/Layout';
 import Text from '../../../UI/Text';
 import { Trans, t } from '@lingui/macro';
-import { type AiRequest } from '../../../Utils/GDevelopServices/Generation';
+import {
+  type AiRequest,
+  type AiRequestMessageAssistantFunctionCall,
+} from '../../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../../UI/RaisedButton';
 import { CompactTextAreaField } from '../../../UI/CompactTextAreaField';
 import { Column, Line } from '../../../UI/Grid';
@@ -30,6 +33,8 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
+import { getFunctionCallToFunctionCallOutputMap } from './AiRequestUtils';
+import { FunctionCallRow } from './FunctionCallRow';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -47,7 +52,10 @@ type Props = {
   ) => Promise<void>,
   hasOpenedProject: boolean,
 
-  appliedFunctionCallOutputs: ?Array<EditorFunctionCallResult>,
+  onProcessFunctionCalls: (
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>
+  ) => Promise<void>,
+  editorFunctionCallResults: ?Array<EditorFunctionCallResult>,
 
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
@@ -60,7 +68,7 @@ type Props = {
 };
 
 export type AiRequestChatInterface = {|
-  resetUserInput: () => void,
+  resetUserInput: (aiRequestId: string | null) => void,
 |};
 
 const styles = {
@@ -105,11 +113,16 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequestPriceInCredits,
       availableCredits,
       hasOpenedProject,
-      appliedFunctionCallOutputs,
+      editorFunctionCallResults,
+      onProcessFunctionCalls,
     }: Props,
     ref
   ) => {
-    const [userRequestText, setUserRequestText] = React.useState('');
+    const aiRequestId: string = aiRequest ? aiRequest.id : '';
+    const [
+      userRequestTextPerAiRequestId,
+      setUserRequestTextPerRequestId,
+    ] = React.useState<{ [string]: string }>({});
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
     const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
     const theme = React.useContext(GDevelopThemeContext);
@@ -117,6 +130,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       dislikeFeedbackDialogOpenedFor,
       setDislikeFeedbackDialogOpenedFor,
     ] = React.useState(null);
+    const functionCallToFunctionCallOutput = aiRequest
+      ? getFunctionCallToFunctionCallOutputMap({
+          aiRequest,
+        })
+      : new Map();
 
     const [newChatPlaceholder] = React.useState(() => {
       const newChatPlaceholders: Array<MessageDescriptor> = [
@@ -139,8 +157,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     });
 
     React.useImperativeHandle(ref, () => ({
-      resetUserInput: () => {
-        setUserRequestText('');
+      resetUserInput: (aiRequestId: string | null) => {
+        const aiRequestIdToReset: string = aiRequestId || '';
+        setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
+          ...userRequestTextPerAiRequestId,
+          [aiRequestIdToReset]: '',
+        }));
+
         if (scrollViewRef.current) {
           scrollViewRef.current.scrollToBottom({
             behavior: 'smooth',
@@ -238,10 +261,15 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             <Column noMargin alignItems="stretch" justifyContent="stretch">
               <CompactTextAreaField
                 maxLength={6000}
-                value={userRequestText}
+                value={userRequestTextPerAiRequestId[''] || ''}
                 disabled={isLaunchingAiRequest}
                 onChange={userRequestText =>
-                  setUserRequestText(userRequestText)
+                  setUserRequestTextPerRequestId(
+                    userRequestTextPerAiRequestId => ({
+                      ...userRequestTextPerAiRequestId,
+                      '': userRequestText,
+                    })
+                  )
                 }
                 placeholder={newChatPlaceholder}
                 rows={5}
@@ -263,7 +291,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       style={{ flexShrink: 0 }}
                       disabled={isLaunchingAiRequest}
                       onClick={() => {
-                        onSendUserRequest(userRequestText);
+                        onSendUserRequest(
+                          userRequestTextPerAiRequestId[aiRequestId]
+                        );
                       }}
                     />
                   </LeftLoader>
@@ -404,26 +434,28 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       );
                     }
                     if (messageContent.type === 'function_call') {
-                      const pendingFunctionCallOutput =
-                        appliedFunctionCallOutputs &&
-                        appliedFunctionCallOutputs.find(
+                      const editorFunctionCallResult =
+                        editorFunctionCallResults &&
+                        editorFunctionCallResults.find(
                           functionCallOutput =>
                             functionCallOutput.call_id ===
                             messageContent.call_id
                         );
+                      const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
+                        messageContent
+                      );
                       return (
-                        <Line key={key} justifyContent="flex-start">
-                          <ChatBubble role="assistant">
-                            <ChatMarkdownText
-                              source={JSON.stringify(messageContent)}
-                            />
-                            <ChatMarkdownText
-                              source={
-                                // TODO: read if success or not.
-                                JSON.stringify(pendingFunctionCallOutput)}
-                            />
-                          </ChatBubble>
-                        </Line>
+                        <FunctionCallRow
+                          key={key}
+                          onProcess={() =>
+                            onProcessFunctionCalls([messageContent])
+                          }
+                          functionCall={messageContent}
+                          editorFunctionCallResult={editorFunctionCallResult}
+                          existingFunctionCallOutput={
+                            existingFunctionCallOutput
+                          }
+                        />
                       );
                     }
                     return null;
@@ -432,13 +464,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               ];
             }
             if (message.type === 'function_call_output') {
-              return [
-                <Line key={messageIndex} justifyContent="flex-end">
-                  <ChatBubble role="user">
-                    <ChatMarkdownText source={JSON.stringify(message)} />
-                  </ChatBubble>
-                </Line>,
-              ];
+              return [];
             }
 
             return [];
@@ -484,9 +510,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         )}
         <CompactTextAreaField
           maxLength={6000}
-          value={userRequestText}
+          value={userRequestTextPerAiRequestId[aiRequestId] || ''}
           disabled={isLaunchingAiRequest}
-          onChange={userRequestText => setUserRequestText(userRequestText)}
+          onChange={userRequestText =>
+            setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
+              ...userRequestTextPerAiRequestId,
+              [aiRequestId]: userRequestText,
+            }))
+          }
           placeholder={t`Ask a follow up question`}
           rows={2}
         />
@@ -505,7 +536,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   disabled={aiRequest.status === 'working'}
                   label={<Trans>Send</Trans>}
                   onClick={() => {
-                    onSendUserRequest(userRequestText);
+                    onSendUserRequest(
+                      userRequestTextPerAiRequestId[aiRequestId]
+                    );
                   }}
                 />
               </LeftLoader>

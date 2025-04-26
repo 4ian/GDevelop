@@ -83,6 +83,26 @@ export type AiRequest = {
   output: Array<AiRequestMessage>,
 };
 
+export type AiGeneratedEvent = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
+  userId: string | null, // null for calls made by the API.
+  status: GenerationStatus,
+
+  partialGameProjectJson: string,
+  eventsDescription: string,
+  extensionNamesList: string,
+  objectsList: string,
+
+  generatedEvents: string | null,
+
+  error: {
+    code: string,
+    message: string,
+  } | null,
+};
+
 export const getGeneratedProject = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -307,7 +327,7 @@ export const addFunctionCallOutputsToAiRequest = async (
       GDevelopGenerationApi.baseUrl
     }/ai-request/${aiRequestId}/action/add-function-call-output`,
     {
-      functionCallOutputs
+      functionCallOutputs,
     },
     {
       params: {
@@ -347,6 +367,71 @@ export const sendAiRequestFeedback = async (
       feedback,
       reason,
     },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const createAiEventGeneration = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    partialGameProjectJson,
+    eventsDescription,
+    extensionNamesList,
+    objectsList,
+    relatedAiRequestId,
+  }: {|
+    userId: string,
+    partialGameProjectJson: string,
+    eventsDescription: string,
+    extensionNamesList: string,
+    objectsList: string,
+    relatedAiRequestId: string,
+  |}
+): Promise<AiGeneratedEvent> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
+    {
+      partialGameProjectJson,
+      eventsDescription,
+      extensionNamesList,
+      objectsList,
+      relatedAiRequestId,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getAiGeneratedEvent = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    aiGeneratedEventId,
+  }: {|
+    userId: string,
+    aiGeneratedEventId: string,
+  |}
+): Promise<AiGeneratedEvent> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopGenerationApi.baseUrl}/ai-generated-event/${aiGeneratedEventId}`,
     {
       params: {
         userId,

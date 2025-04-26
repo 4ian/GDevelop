@@ -171,14 +171,22 @@ const getSimplifiedSceneJson = (scene: gdLayout) => {
   };
 };
 
+export type SimplifiedProjectJsonOptions = {|
+  scopeToScene?: string,
+|};
+
 export const getSimplifiedProjectJson = (
-  project: gdProject
+  project: gdProject,
+  options: SimplifiedProjectJsonOptions
 ): SimplifiedProjectJson => {
   const globalObjects = getSimplifiedObjectsJson(project.getObjects());
   const scenes = mapFor(0, project.getLayoutsCount(), i => {
     const scene = project.getLayoutAt(i);
+    if (options.scopeToScene && scene.getName() !== options.scopeToScene)
+      return null;
+
     return getSimplifiedSceneJson(scene);
-  });
+  }).filter(Boolean);
 
   return {
     globalObjects,

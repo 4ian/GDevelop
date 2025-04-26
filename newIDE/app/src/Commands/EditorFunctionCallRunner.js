@@ -2,7 +2,11 @@
 import { getInstancesInLayoutForLayer } from '../Utils/Layout';
 import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 
 const gd: libGDevelop = global.gd;
 
@@ -13,10 +17,17 @@ export type EditorFunctionCall = {|
   call_id: string,
 |};
 
-export type EditorFunctionCallResult = {|
-  call_id: string,
-  output: string,
-|};
+export type EditorFunctionCallResult =
+  | {|
+      status: 'working',
+      call_id: string,
+    |}
+  | {|
+      status: 'finished',
+      call_id: string,
+      success: boolean,
+      output: any,
+    |};
 
 type EditorFunctionGenericOutput = {|
   success: boolean,
@@ -27,16 +38,24 @@ type EditorFunctionGenericOutput = {|
   instances?: any,
 |};
 
+export type EventsGenerationOptions = {|
+  sceneName: string,
+  eventsDescription: string,
+  extensionNamesList: string,
+  objectsList: string,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
 type EditorFunction = (options: {|
   project: gdProject,
   args: any,
-  launchEventsGeneration: ({
-    eventsDescription: string,
-    extensionNamesList: string,
-    objectsList: string,
+  launchEventsGeneration: (
+    options: EventsGenerationOptions
+  ) => Promise<AiGeneratedEvent>,
+  onEnsureExtensionInstalled: (options: {
+    extensionName: string,
   }) => Promise<void>,
 |}) => Promise<EditorFunctionGenericOutput>;
 
@@ -92,7 +111,11 @@ const serializeNamedProperty = (
 /**
  * Creates a new object in the specified scene
  */
-const createObject: EditorFunction = async ({ project, args }) => {
+const createObject: EditorFunction = async ({
+  project,
+  args,
+  onEnsureExtensionInstalled,
+}) => {
   const scene_name = extractRequiredString(args, 'scene_name');
   const object_type = extractRequiredString(args, 'object_type');
   const object_name = extractRequiredString(args, 'object_name');
@@ -115,6 +138,21 @@ const createObject: EditorFunction = async ({ project, args }) => {
     return makeGenericSuccess(
       `Object with name "${object_name}" already exists, no need to re-create it.`
     );
+  }
+
+  if (object_type.includes('::')) {
+    const extensionName = object_type.split('::')[0];
+    try {
+      await onEnsureExtensionInstalled({ extensionName });
+    } catch (error) {
+      console.error(
+        `Could not get extension "${extensionName}" installed:`,
+        error
+      );
+      return makeGenericFailure(
+        `Could not install extension "${extensionName}" - should you consider trying with another object type?`
+      );
+    }
   }
 
   const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -553,37 +591,78 @@ const readSceneEvents: EditorFunction = async ({ project, args }) => {
 /**
  * Adds a new event to a scene's event sheet
  */
-const addSceneEvent: EditorFunction = async ({
+const addSceneEvents: EditorFunction = async ({
   project,
   args,
   launchEventsGeneration,
 }) => {
-  const scene_name = extractRequiredString(args, 'scene_name');
-  const event_description = extractRequiredString(args, 'event_description');
-  const extension_names_list = extractRequiredString(
+  const sceneName = extractRequiredString(args, 'scene_name');
+  const eventsDescription = extractRequiredString(args, 'events_description');
+  const extensionNamesList = extractRequiredString(
     args,
     'extension_names_list'
   );
-  const objects_list = SafeExtractor.extractStringProperty(
-    args,
-    'objects_list'
-  );
+  const objectsList = SafeExtractor.extractStringProperty(args, 'objects_list');
 
-  if (!project.hasLayoutNamed(scene_name)) {
-    return makeGenericFailure(`Scene not found: "${scene_name}".`);
+  if (!project.hasLayoutNamed(sceneName)) {
+    return makeGenericFailure(`Scene not found: "${sceneName}".`);
   }
 
-  const layout = project.getLayout(scene_name);
+  try {
+    const aiGeneratedEvent: AiGeneratedEvent = await launchEventsGeneration({
+      sceneName,
+      eventsDescription,
+      extensionNamesList,
+      objectsList,
+    });
+    console.log('got events:', aiGeneratedEvent);
 
-  const events = await launchEventsGeneration({
-    eventsDescription: event_description,
-    extensionNamesList: extension_names_list,
-    objectsList: objects_list,
-  });
-  console.log('got events:', events);
-  // TODO: add events to the layout.
+    if (aiGeneratedEvent.error) {
+      throw new Error(
+        `Error "${aiGeneratedEvent.error.message}" while generating events.`
+      );
+    }
+    if (!aiGeneratedEvent.generatedEvents) {
+      throw new Error(`No events found in the generated events response.`);
+    }
 
-  return makeGenericSuccess(`Modified or added new event(s)."`);
+    let eventsListContent;
+    try {
+      eventsListContent = JSON.parse(aiGeneratedEvent.generatedEvents);
+    } catch (error) {
+      throw new Error(
+        `Error while parsing generated events: ${error.message}.`
+      );
+    }
+
+    const eventsList = new gd.EventsList();
+    unserializeFromJSObject(
+      eventsList,
+      eventsListContent,
+      'unserializeFrom',
+      project
+    );
+
+    if (!project.hasLayoutNamed(sceneName)) {
+      return makeGenericFailure(`Scene not found: "${sceneName}".`);
+    }
+    const scene = project.getLayout(sceneName);
+
+    scene
+      .getEvents()
+      .insertEvents(
+        eventsList,
+        0,
+        eventsList.getEventsCount(),
+        scene.getEvents().getEventsCount()
+      );
+    eventsList.delete();
+
+    return makeGenericSuccess(`Modified or added new event(s)."`);
+  } catch (error) {
+    console.error('Error while generating events:', error);
+    return makeGenericFailure(`An error happened while generating events.`);
+  }
 };
 
 /**
@@ -635,27 +714,27 @@ const commandsMap: { [string]: EditorFunction } = {
   put_2d_instance: put2dInstance,
   put_3d_instance: put3dInstance,
   read_scene_events: readSceneEvents,
-  add_scene_event: addSceneEvent,
+  add_scene_events: addSceneEvents,
   create_scene: createScene,
   delete_scene: deleteScene,
 };
 
-export type EventsGenerationOptions = {|
-  eventsDescription: string,
-  extensionNamesList: string,
-  objectsList: string,
-|}
-
 export type ProcessEditorFunctionCallsOptions = {|
   project: gdProject,
   functionCalls: Array<EditorFunctionCall>,
-  launchEventsGeneration: (options: EventsGenerationOptions) => Promise<void>,
+  launchEventsGeneration: (
+    options: EventsGenerationOptions
+  ) => Promise<AiGeneratedEvent>,
+  onEnsureExtensionInstalled: (options: {
+    extensionName: string,
+  }) => Promise<void>,
 |};
 
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
   launchEventsGeneration,
+  onEnsureExtensionInstalled,
 }: ProcessEditorFunctionCallsOptions): Promise<
   Array<EditorFunctionCallResult>
 > => {
@@ -671,32 +750,35 @@ export const processEditorFunctionCalls = async ({
       } catch (error) {
         console.error('Error parsing arguments: ', error);
         results.push({
+          status: 'finished',
           call_id,
-          output: JSON.stringify({
-            success: false,
+          success: false,
+          output: {
             message: 'Invalid arguments (not a valid JSON string).',
-          }),
+          },
         });
       }
 
       if (name === null) {
         results.push({
+          status: 'finished',
           call_id,
-          output: JSON.stringify({
-            success: false,
+          success: false,
+          output: {
             message: 'Missing or invalid function name.',
-          }),
+          },
         });
         continue;
       }
 
       if (args === null) {
         results.push({
+          status: 'finished',
           call_id,
-          output: JSON.stringify({
-            success: false,
+          success: false,
+          output: {
             message: `Invalid arguments for function: ${name}.`,
-          }),
+          },
         });
         continue;
       }
@@ -704,11 +786,12 @@ export const processEditorFunctionCalls = async ({
       // Check if the function exists
       if (!commandsMap[name]) {
         results.push({
+          status: 'finished',
           call_id,
-          output: JSON.stringify({
-            success: false,
+          success: false,
+          output: {
             message: `Unknown function: ${name}.`,
-          }),
+          },
         });
         continue;
       }
@@ -718,18 +801,21 @@ export const processEditorFunctionCalls = async ({
         project,
         args,
         launchEventsGeneration,
+        onEnsureExtensionInstalled,
       });
+      const { success, ...output } = result;
       results.push({
+        status: 'finished',
         call_id,
-        output: JSON.stringify(result),
+        success,
+        output,
       });
     } catch (error) {
       results.push({
+        status: 'finished',
         call_id,
-        output: JSON.stringify({
-          success: false,
-          output: error.message || 'Unknown error',
-        }),
+        success: false,
+        output: { message: error.message || 'Unknown error' },
       });
     }
   }

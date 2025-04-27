@@ -27,6 +27,10 @@ export type EditorFunctionCallResult =
       call_id: string,
       success: boolean,
       output: any,
+    |}
+  | {|
+      status: 'ignored',
+      call_id: string,
     |};
 
 type EditorFunctionGenericOutput = {|
@@ -722,6 +726,7 @@ const commandsMap: { [string]: EditorFunction } = {
 export type ProcessEditorFunctionCallsOptions = {|
   project: gdProject,
   functionCalls: Array<EditorFunctionCall>,
+  ignore: boolean,
   launchEventsGeneration: (
     options: EventsGenerationOptions
   ) => Promise<AiGeneratedEvent>,
@@ -734,6 +739,7 @@ export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
   launchEventsGeneration,
+  ignore,
   onEnsureExtensionInstalled,
 }: ProcessEditorFunctionCallsOptions): Promise<
   Array<EditorFunctionCallResult>
@@ -742,6 +748,14 @@ export const processEditorFunctionCalls = async ({
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
+    if (ignore) {
+      results.push({
+        status: 'ignored',
+        call_id,
+      });
+      continue;
+    }
+
     const name = functionCall.name;
     let args;
     try {

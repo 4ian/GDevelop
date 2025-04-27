@@ -20,7 +20,6 @@ export const getFunctionCallToFunctionCallOutputMap = ({
   // Track function calls by their call_id to match with outputs
   const functionCallsByCallId = new Map<string, AiRequestMessageAssistantFunctionCall>();
 
-  console.log("Start");
   // Process messages in a single loop
   for (let i = 0; i < aiRequest.output.length; i++) {
     const message = aiRequest.output[i];
@@ -34,7 +33,6 @@ export const getFunctionCallToFunctionCallOutputMap = ({
 
           // Store function call by call_id for later matching
           functionCallsByCallId.set(content.call_id, content);
-          console.log("Setting", content.call_id, content)
         }
       });
     } else if (message.type === 'function_call_output') {

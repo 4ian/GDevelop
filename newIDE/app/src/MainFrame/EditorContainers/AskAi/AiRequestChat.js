@@ -53,7 +53,8 @@ type Props = {
   hasOpenedProject: boolean,
 
   onProcessFunctionCalls: (
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+    options: ?{| ignore?: boolean |}
   ) => Promise<void>,
   editorFunctionCallResults: ?Array<EditorFunctionCallResult>,
 
@@ -449,6 +450,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                           key={key}
                           onProcess={() =>
                             onProcessFunctionCalls([messageContent])
+                          }
+                          onIgnore={() =>
+                            onProcessFunctionCalls([messageContent], {
+                              ignore: true,
+                            })
                           }
                           functionCall={messageContent}
                           editorFunctionCallResult={editorFunctionCallResult}

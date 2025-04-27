@@ -22,6 +22,7 @@ type Props = {|
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
   onProcess: () => Promise<void>,
+  onIgnore: () => Promise<void>,
 |};
 
 export const FunctionCallRow = ({
@@ -29,8 +30,12 @@ export const FunctionCallRow = ({
   editorFunctionCallResult,
   existingFunctionCallOutput,
   onProcess,
+  onIgnore,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const isIgnored =
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'ignored');
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
@@ -56,12 +61,12 @@ export const FunctionCallRow = ({
         )}
       >
         <div>
-          {isFinished ? (
-            hasJustErrored ? (
-              <Error htmlColor={gdevelopTheme.message.error} />
-            ) : (
-              <Check htmlColor={gdevelopTheme.message.valid} />
-            )
+          {hasJustErrored ? (
+            <Error htmlColor={gdevelopTheme.message.error} />
+          ) : isFinished ? (
+            <Check htmlColor={gdevelopTheme.message.valid} />
+          ) : isIgnored ? (
+            <Check htmlColor={gdevelopTheme.text.color.disabled} />
           ) : (
             <CircularProgress
               size={24}
@@ -86,7 +91,7 @@ export const FunctionCallRow = ({
             {
               label: i18n._(t`Ignore this`),
               click: () => {
-                // TODO: mark as ignored.
+                onIgnore();
               },
             },
           ]}

@@ -208,6 +208,43 @@ export const ReadyAiRequestWithFinishedFunctionCall = () => (
   </FixedHeightFlexContainer>
 );
 
+export const ReadyAiRequestWithIgnoredFunctionCall = () => (
+  <FixedHeightFlexContainer height={500}>
+    <AiRequestChat
+      aiRequest={{
+        createdAt: '',
+        updatedAt: '',
+        id: 'fake-working-new-ai-request',
+        status: 'ready',
+        userId: 'fake-user-id',
+        gameProjectJson: 'FAKE DATA',
+        output: fakeOutputWithFunctionCall,
+        error: null,
+      }}
+      onSendUserRequest={async () => {}}
+      isLaunchingAiRequest={false}
+      quota={{
+        limitReached: false,
+        current: 1,
+        max: 2,
+      }}
+      increaseQuotaOffering="subscribe"
+      aiRequestPriceInCredits={5}
+      lastSendError={null}
+      availableCredits={400}
+      onSendFeedback={async () => {}}
+      hasOpenedProject={false}
+      editorFunctionCallResults={[
+        {
+          status: 'ignored',
+          call_id: fakeFunctionCallId,
+        },
+      ]}
+      onProcessFunctionCalls={async () => {}}
+    />
+  </FixedHeightFlexContainer>
+);
+
 export const ReadyAiRequestWithFailedFunctionCall = () => (
   <FixedHeightFlexContainer height={500}>
     <AiRequestChat

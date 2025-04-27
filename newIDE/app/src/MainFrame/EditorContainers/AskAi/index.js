@@ -587,8 +587,6 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
-      console.log('render for ', selectedAiRequestId);
-
       const onSendEditorFunctionCallResults = React.useCallback(
         async () => {
           if (
@@ -615,18 +613,27 @@ export const AskAi = React.memo<Props>(
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs: editorFunctionCallResults
                   .map(functionCallOutput => {
-                    if (functionCallOutput.status !== 'finished') {
-                      return null;
+                    if (functionCallOutput.status === 'finished') {
+                      return {
+                        type: 'function_call_output',
+                        call_id: functionCallOutput.call_id,
+                        output: JSON.stringify({
+                          success: functionCallOutput.success,
+                          ...functionCallOutput.output,
+                        }),
+                      };
+                    } else if (functionCallOutput.status === 'ignored') {
+                      return {
+                        type: 'function_call_output',
+                        call_id: functionCallOutput.call_id,
+                        output: JSON.stringify({
+                          ignored: true,
+                          message: 'This was marked as ignored by the user.',
+                        }),
+                      };
                     }
 
-                    return {
-                      type: 'function_call_output',
-                      call_id: functionCallOutput.call_id,
-                      output: JSON.stringify({
-                        success: functionCallOutput.success,
-                        ...functionCallOutput.output,
-                      }),
-                    };
+                    return null;
                   })
                   .filter(Boolean),
               })
@@ -672,7 +679,12 @@ export const AskAi = React.memo<Props>(
       );
 
       const onProcessFunctionCalls = React.useCallback(
-        async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
+        async (
+          functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+          options: ?{|
+            ignore?: boolean,
+          |}
+        ) => {
           if (!project || !selectedAiRequest) return;
 
           addEditorFunctionCallResults(
@@ -690,6 +702,7 @@ export const AskAi = React.memo<Props>(
               arguments: functionCall.arguments,
               call_id: functionCall.call_id,
             })),
+            ignore: !!options && !!options.ignore,
             launchEventsGeneration: async options => {
               return await launchEventsGeneration({
                 ...options,

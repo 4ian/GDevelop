@@ -649,7 +649,8 @@ const MainFrame = (props: Props) => {
 
       // Scene editors can have an embedded game, so they redefine manually
       // which components can have clicks/touches.
-      const removePointerEvents = kind === 'layout';
+      const removePointerEvents =
+        kind === 'layout' || 'external layout' || 'custom object';
 
       const closable = kind !== 'start page';
       const extraEditorProps =

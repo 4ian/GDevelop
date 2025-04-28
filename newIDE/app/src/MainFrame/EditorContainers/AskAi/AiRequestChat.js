@@ -281,7 +281,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </form>
             {subscriptionBanner}
           </ColumnStackLayout>
-          <Column justifyContent="center" noMargin>
+          <Column justifyContent="center">
             <Text size="body-small" color="secondary" align="center" noMargin>
               <Trans>
                 The AI is experimental and still being improved.{' '}

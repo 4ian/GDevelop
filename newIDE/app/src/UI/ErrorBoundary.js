@@ -27,6 +27,7 @@ const styles = {
   errorMessage: {
     maxWidth: 600,
     textAlign: 'left',
+    wordBreak: 'break-word',
   },
 };
 

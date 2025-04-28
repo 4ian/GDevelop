@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.AnchorRuntimeBehavior', () => {
+describe('gdjs.AnchorRuntimeBehavior', () => {
   it('can fill a custom object with an child', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
@@ -8,6 +8,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', () => {
     const customObject = new gdjs.CustomRuntimeObject2D(runtimeScene, {
       name: 'MyCustomObject',
       type: 'MyExtension::MyLayoutedEventsBasedObject',
+      variant: '',
       variables: [],
       behaviors: [],
       effects: [],

@@ -983,22 +983,19 @@ namespace gdjs {
     }
 
     getNetworkSyncData(): SoundManagerSyncData {
-      const freeMusicsDatas: SoundSyncData[] = [];
-      for (const sound of Object.values(this._freeMusics)) {
-        freeMusicsDatas.push(sound.getNetworkSyncData());
-      }
-      const freeSoundsDatas: SoundSyncData[] = [];
-      for (const sound of Object.values(this._freeSounds)) {
-        freeSoundsDatas.push(sound.getNetworkSyncData());
-      }
-      const musicsDatas: SoundSyncData[] = [];
-      for (const sound of Object.values(this._musics)) {
-        musicsDatas.push(sound.getNetworkSyncData());
-      }
-      const soundsDatas: SoundSyncData[] = [];
-      for (const sound of Object.values(this._sounds)) {
-        soundsDatas.push(sound.getNetworkSyncData());
-      }
+      const freeMusicsDatas: SoundSyncData[] = this._freeMusics.map(
+        (freeMusic) => freeMusic.getNetworkSyncData()
+      );
+      const freeSoundsDatas: SoundSyncData[] = this._freeSounds.map(
+        (freeSound) => freeSound.getNetworkSyncData()
+      );
+      const musicsDatas: SoundSyncData[] = Object.values(this._musics).map(
+        (music) => music.getNetworkSyncData()
+      );
+      const soundsDatas: SoundSyncData[] = Object.values(this._sounds).map(
+        (sound) => sound.getNetworkSyncData()
+      );
+
       return {
         globalVolume: this._globalVolume,
         cachedSpatialPosition: this._cachedSpatialPosition,

@@ -102,7 +102,9 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
 const serializeNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
-): string => {
+): null | {} => {
+  if (property.isHidden() || property.isDeprecated()) return null;
+
   return {
     name,
     ...serializeToJSObject(property),
@@ -212,7 +214,7 @@ const inspectObjectProperties: EditorFunction = async ({ project, args }) => {
     const propertyDescriptor = objectProperties.get(name);
 
     return serializeNamedProperty(name, propertyDescriptor);
-  });
+  }).filter(Boolean);
 
   return {
     success: true,
@@ -384,7 +386,7 @@ const inspectBehaviorProperties: EditorFunction = async ({ project, args }) => {
     const propertyDescriptor = behaviorProperties.get(name);
 
     return serializeNamedProperty(name, propertyDescriptor);
-  });
+  }).filter(Boolean);
 
   return {
     success: true,

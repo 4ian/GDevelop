@@ -7,7 +7,7 @@ const gd: libGDevelop = global.gd;
 describe('SimplifiedProjectJson', () => {
   it('should create a simplified project JSON with global objects and scenes', () => {
     const { project } = makeTestProject(gd);
-    const simplifiedJson = getSimplifiedProjectJson(project);
+    const simplifiedJson = getSimplifiedProjectJson(project, {});
 
     expect(simplifiedJson).toMatchInlineSnapshot(`
       Object {

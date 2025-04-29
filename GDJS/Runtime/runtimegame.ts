@@ -1391,7 +1391,7 @@ namespace gdjs {
       if (syncData.ss) {
         this._sceneStack.updateFromNetworkSyncData(syncData.ss);
       }
-      if (syncData.sm) {
+      if (options.clearMemory && syncData.sm) {
         this.getSoundManager().updateFromNetworkSyncData(syncData.sm);
       }
       if (syncData.extVar) {

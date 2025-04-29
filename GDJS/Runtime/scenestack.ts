@@ -34,6 +34,36 @@ namespace gdjs {
       }
     }
 
+    _loadGameFromSave(saveState: GameSaveState): void {
+      const options: UpdateFromNetworkSyncDataOptions = {
+        clearMemory: true,
+      };
+
+      this._runtimeGame.updateFromNetworkSyncData(
+        saveState.gameNetworkSyncData,
+        options
+      );
+
+      this.applyUpdateFromNetworkSyncDataIfAny(options);
+
+      const sceneStack = this._stack;
+      sceneStack.forEach((scene, index) => {
+        const layoutSyncData = saveState.layoutNetworkSyncDatas[index];
+        if (!layoutSyncData) return;
+
+        scene.updateFromNetworkSyncData(layoutSyncData.sceneData, options);
+
+        const objectDatas = layoutSyncData.objectDatas;
+        for (const id in objectDatas) {
+          const objectNetworkSyncData = objectDatas[id];
+          const object = scene.createObject(objectNetworkSyncData.n || '');
+          if (object) {
+            object.updateFromNetworkSyncData(objectNetworkSyncData, options);
+          }
+        }
+      });
+    }
+
     step(elapsedTime: float): boolean {
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {
@@ -70,115 +100,46 @@ namespace gdjs {
         }
       }
 
-      const loadRequestOptions: LoadRequestOptions | null =
-        currentScene.getLoadRequestOptions();
-      if (loadRequestOptions) {
-        const options: UpdateFromNetworkSyncDataOptions = {
-          clearMemory: true,
-        };
+      const loadRequestOptions = currentScene.getLoadRequestOptions();
+      if (!loadRequestOptions) return true;
+
+      currentScene.requestLoadSnapshot(null);
+
+      if (loadRequestOptions.loadVariable) {
         if (
-          loadRequestOptions.loadVariable &&
           loadRequestOptions.loadVariable !==
-            gdjs.VariablesContainer.badVariable
+          gdjs.VariablesContainer.badVariable
         ) {
-          try {
-            const allSyncData =
-              loadRequestOptions.loadVariable.toJSObject() as GameSaveState;
-            currentScene.requestLoadSnapshot(null);
-            if (allSyncData) {
-              currentScene
-                .getGame()
-                .updateFromNetworkSyncData(
-                  allSyncData.gameNetworkSyncData,
-                  options
-                );
-
-              this.applyUpdateFromNetworkSyncDataIfAny(options);
-
-              const sceneStack = this._stack;
-              sceneStack.forEach((scene, index) => {
-                const layoutSyncData =
-                  allSyncData.layoutNetworkSyncDatas[index];
-                if (!layoutSyncData) return;
-                scene.updateFromNetworkSyncData(
-                  layoutSyncData.sceneData,
-                  options
-                );
-
-                const objectDatas = layoutSyncData.objectDatas;
-                for (const id in objectDatas) {
-                  const objectNetworkSyncData = objectDatas[id];
-                  const object = scene.createObject(
-                    objectNetworkSyncData.n || ''
-                  );
-                  if (object) {
-                    object.updateFromNetworkSyncData(
-                      objectNetworkSyncData,
-                      options
-                    );
-                  }
-                }
-              });
-            }
-          } catch (error) {
-            logger.error('Failed to load from variable:', error);
-          }
-        } else {
-          const storageKey =
-            loadRequestOptions.loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
-          currentScene.requestLoadSnapshot(null);
-
-          gdjs
-            .loadFromIndexedDB(
-              gdjs.saveState.INDEXED_DB_NAME,
-              gdjs.saveState.INDEXED_DB_OBJECT_STORE,
-              storageKey
-            )
-            .then((jsonData) => {
-              const allSyncData = JSON.parse(jsonData) as GameSaveState;
-
-              if (allSyncData) {
-                currentScene
-                  .getGame()
-                  .updateFromNetworkSyncData(
-                    allSyncData.gameNetworkSyncData,
-                    options
-                  );
-
-                this.applyUpdateFromNetworkSyncDataIfAny(options);
-
-                const sceneStack = this._stack;
-                sceneStack.forEach((scene, index) => {
-                  const layoutSyncData =
-                    allSyncData.layoutNetworkSyncDatas[index];
-                  if (!layoutSyncData) return;
-
-                  scene.updateFromNetworkSyncData(
-                    layoutSyncData.sceneData,
-                    options
-                  );
-
-                  const objectDatas = layoutSyncData.objectDatas;
-                  for (const id in objectDatas) {
-                    const objectNetworkSyncData = objectDatas[id];
-                    const object = scene.createObject(
-                      objectNetworkSyncData.n || ''
-                    );
-                    if (object) {
-                      object.updateFromNetworkSyncData(
-                        objectNetworkSyncData,
-                        options
-                      );
-                    }
-                  }
-                });
-              }
-            })
-            .catch((error) => {
-              logger.error('Error loading from IndexedDB:', error);
-            });
+          throw new Error(
+            'Requested loading save from wrongly defined variable.'
+          );
         }
+        const saveState =
+          loadRequestOptions.loadVariable.toJSObject() as GameSaveState;
+        try {
+          this._loadGameFromSave(saveState);
+        } catch (error) {
+          logger.error('Error loading from variable:', error);
+        }
+      } else {
+        const storageKey =
+          loadRequestOptions.loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
+
+        gdjs
+          .loadFromIndexedDB(
+            gdjs.saveState.INDEXED_DB_NAME,
+            gdjs.saveState.INDEXED_DB_OBJECT_STORE,
+            storageKey
+          )
+          .then((jsonData) => {
+            const saveState = JSON.parse(jsonData) as GameSaveState;
+            this._loadGameFromSave(saveState);
+          })
+          .catch((error) => {
+            logger.error('Error loading from IndexedDB:', error);
+          });
       }
+
       return true;
     }
 

@@ -17,19 +17,13 @@ EventsBasedObject::EventsBasedObject()
     isAnimatable(false),
     isTextContainer(false),
     isInnerAreaFollowingParentSize(false),
-    isUsingLegacyInstancesRenderer(false),
-    areaMinX(0),
-    areaMinY(0),
-    areaMinZ(0),
-    areaMaxX(64),
-    areaMaxY(64),
-    areaMaxZ(64),
-    objectsContainer(gd::ObjectsContainer::SourceType::Object) {
+    isUsingLegacyInstancesRenderer(false) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}
 
-void EventsBasedObject::SerializeTo(SerializerElement& element) const {
+
+void EventsBasedObject::SerializeToExternal(SerializerElement& element) const {
   element.SetAttribute("defaultName", defaultName);
   if (isRenderedIn3D) {
     element.SetBoolAttribute("is3D", true);
@@ -44,20 +38,16 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
     element.SetBoolAttribute("isInnerAreaFollowingParentSize", true);
   }
   element.SetBoolAttribute("isUsingLegacyInstancesRenderer", isUsingLegacyInstancesRenderer);
-  element.SetIntAttribute("areaMinX", areaMinX);
-  element.SetIntAttribute("areaMinY", areaMinY);
-  element.SetIntAttribute("areaMinZ", areaMinZ);
-  element.SetIntAttribute("areaMaxX", areaMaxX);
-  element.SetIntAttribute("areaMaxY", areaMaxY);
-  element.SetIntAttribute("areaMaxZ", areaMaxZ);
 
+  // The EventsBasedObjectVariant SerializeTo method override the name.
+  // AbstractEventsBasedEntity::SerializeTo must be done after.
+  defaultVariant.SerializeTo(element);
   AbstractEventsBasedEntity::SerializeTo(element);
-  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
-  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
-  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+}
 
-  layers.SerializeLayersTo(element.AddChild("layers"));
-  initialInstances.SerializeTo(element.AddChild("instances"));
+void EventsBasedObject::SerializeTo(SerializerElement& element) const {
+  SerializeToExternal(element);
+  variants.SerializeVariantsTo(element.AddChild("variants"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
@@ -68,36 +58,22 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
   isInnerAreaFollowingParentSize =
       element.GetBoolAttribute("isInnerAreaFollowingParentSize", false);
-  areaMinX = element.GetIntAttribute("areaMinX", 0);
-  areaMinY = element.GetIntAttribute("areaMinY", 0);
-  areaMinZ = element.GetIntAttribute("areaMinZ", 0);
-  areaMaxX = element.GetIntAttribute("areaMaxX", 64);
-  areaMaxY = element.GetIntAttribute("areaMaxY", 64);
-  areaMaxZ = element.GetIntAttribute("areaMaxZ", 64);
 
+  defaultVariant.UnserializeFrom(project, element);
+  defaultVariant.SetName("");
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
-  objectsContainer.UnserializeObjectsFrom(project, element.GetChild("objects"));
-  if (element.HasChild("objectsFolderStructure")) {
-    objectsContainer.UnserializeFoldersFrom(project, element.GetChild("objectsFolderStructure", 0));
-  }
-  objectsContainer.AddMissingObjectsInRootFolder();
-  objectsContainer.GetObjectGroups().UnserializeFrom(
-      element.GetChild("objectsGroups"));
 
-  if (element.HasChild("layers")) {
-    layers.UnserializeLayersFrom(element.GetChild("layers"));
-  } else {
-    layers.Reset();
+  if (element.HasChild("variants")) {
+    variants.UnserializeVariantsFrom(project, element.GetChild("variants"));
   }
 
-  initialInstances.UnserializeFrom(element.GetChild("instances"));
   if (element.HasChild("isUsingLegacyInstancesRenderer")) {
     isUsingLegacyInstancesRenderer =
         element.GetBoolAttribute("isUsingLegacyInstancesRenderer", false);
   }
   else {
     // Compatibility with GD <= 5.4.212
-    isUsingLegacyInstancesRenderer = initialInstances.GetInstancesCount() == 0;
+    isUsingLegacyInstancesRenderer = GetInitialInstances().GetInstancesCount() == 0;
     // end of compatibility code
   }
 }

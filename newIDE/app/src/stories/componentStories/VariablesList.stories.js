@@ -24,6 +24,7 @@ export const Default = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -46,6 +47,7 @@ export const Compact = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -69,6 +71,76 @@ export const InstanceWithObjectVariables = () => (
           'VariableFromSomeWhere',
           'InstanceVariable', // already defined variable in testSpriteObjectInstance
         ]}
+        isListLocked={false}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const Locked = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <VariablesList
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        variablesContainer={testProject.testLayout.getVariables()}
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
+        isListLocked={true}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const LockedCompact = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <VariablesList
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        size="compact"
+        variablesContainer={testProject.testLayout.getVariables()}
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
+        isListLocked={true}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const LockedInstanceWithObjectVariables = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <VariablesList
+        projectScopedContainersAccessor={
+          testProject.testSceneProjectScopedContainersAccessor
+        }
+        variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
+        areObjectVariables
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
+        inheritedVariablesContainer={testProject.spriteObject.getVariables()}
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
+        isListLocked={true}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

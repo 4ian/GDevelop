@@ -139,7 +139,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
       title: t`Background and cameras`,
       shortDescription: t`Follow a character with scrolling background.`,
-      description: t`Follow this Castlevania-type chraracter with the camera, while the background scrolls.`,
+      description: t`Follow this Castlevania-type character with the camera, while the background scrolls.`,
       durationInMinutes: 2,
       renderImage: props => <Parallax {...props} />,
     },
@@ -247,7 +247,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}
             >
-              {guidedLessonCards.map((item, index) => (
+              {guidedLessonCards.map(item => (
                 <GridListTile key={item.id}>
                   <InAppTutorialPhaseCard
                     title={item.title}

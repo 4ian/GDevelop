@@ -14,6 +14,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps | null,
   initiallySelectedVariableName?: string,
   shouldCreateInitiallySelectedVariable?: boolean,
+  isListLocked: boolean,
 |};
 
 const GlobalVariablesDialog = ({
@@ -24,6 +25,7 @@ const GlobalVariablesDialog = ({
   hotReloadPreviewButtonProps,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
+  isListLocked,
 }: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
@@ -76,6 +78,7 @@ const GlobalVariablesDialog = ({
       helpPagePath={'/all-features/variables/global-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-variables-dialog"
+      isListLocked={isListLocked}
     />
   );
 };

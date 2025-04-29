@@ -25,6 +25,7 @@ export type SceneEditorsDisplayProps = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -45,6 +46,11 @@ export type SceneEditorsDisplayProps = {|
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string
+  ) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
   ) => void,
   selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,

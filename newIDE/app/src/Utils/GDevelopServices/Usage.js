@@ -430,7 +430,6 @@ export const changeUserSubscription = async (
     '/subscription-v2',
     {
       ...newSubscriptionDetails,
-      prohibitSeamlessUpdate: true,
       cancelImmediately: options.cancelImmediately,
       cancelReasons: options.cancelReasons,
     },

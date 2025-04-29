@@ -1,11 +1,5 @@
 /// <reference path="./jolt-physics.d.ts" />
 
-namespace Jolt {
-  export interface Body {
-    gdjsAssociatedCharacterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior | null;
-  }
-}
-
 namespace gdjs {
   interface PhysicsCharacter3DNetworkSyncDataType {
     fwa: float;
@@ -215,7 +209,7 @@ namespace gdjs {
       return this._physics3D;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
       }
@@ -274,7 +268,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
+    override getNetworkSyncData(): PhysicsCharacter3DNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
       this._dontClearInputsBetweenFrames = false;
@@ -302,7 +296,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: PhysicsCharacter3DNetworkSyncData
     ) {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -395,13 +389,13 @@ namespace gdjs {
       this.owner3D.setAngle(gdjs.toDegrees(euler.z));
     }
 
-    onDeActivate() {
+    override onDeActivate() {
       this.collisionChecker.clearContacts();
     }
 
-    onActivate() {}
+    override onActivate() {}
 
-    onDestroy() {
+    override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
       this._destroyCharacter();
@@ -420,6 +414,7 @@ namespace gdjs {
       if (this.character) {
         if (this._canBePushed) {
           this.charactersManager.removeCharacter(this.character);
+          Jolt.destroy(this.character.GetListener());
         }
         // The body is destroyed with the character.
         Jolt.destroy(this.character);
@@ -443,7 +438,14 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Trigger createAndAddBody()
+      this.getPhysics3D();
+    }
+
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       // Trigger createAndAddBody()
       this.getPhysics3D();
     }
@@ -625,7 +627,7 @@ namespace gdjs {
       this._wasRightKeyPressed = this._hasPressedRightKey;
       this._wasLeftKeyPressed = this._hasPressedLeftKey;
       this._wasJumpKeyPressed = this._hasPressedJumpKey;
-      this._wasStickUsed = this._hasPressedJumpKey;
+      this._wasStickUsed = this._hasUsedStick;
 
       if (!this._dontClearInputsBetweenFrames) {
         this._hasPressedForwardKey = false;
@@ -845,8 +847,6 @@ namespace gdjs {
         Math.abs(groundBody.GetAngularVelocity().GetY()) < rollingSpeedMax;
       return shouldFollow;
     }
-
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onObjectHotReloaded() {}
 
@@ -1486,7 +1486,9 @@ namespace gdjs {
       ).destroy();
     });
 
-    export class CharacterBodyUpdater {
+    export class CharacterBodyUpdater
+      implements gdjs.Physics3DRuntimeBehavior.BodyUpdater
+    {
       characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior;
 
       constructor(characterBehavior: gdjs.PhysicsCharacter3DRuntimeBehavior) {
@@ -1546,9 +1548,20 @@ namespace gdjs {
           behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           _sharedData.physicsSystem
         );
+        Jolt.destroy(settings);
         const body = _sharedData.physicsSystem
           .GetBodyLockInterface()
           .TryGetBody(character.GetInnerBodyID());
+        if (this.characterBehavior.character) {
+          if (this.characterBehavior._canBePushed) {
+            this.characterBehavior.charactersManager.removeCharacter(
+              this.characterBehavior.character
+            );
+            // Character.mListener is a plain pointer, it's not destroyed with the character.
+            Jolt.destroy(this.characterBehavior.character.GetListener());
+          }
+          Jolt.destroy(this.characterBehavior.character);
+        }
         this.characterBehavior.character = character;
 
         if (this.characterBehavior._canBePushed) {

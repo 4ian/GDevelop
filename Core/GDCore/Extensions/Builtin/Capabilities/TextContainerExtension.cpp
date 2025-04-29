@@ -19,7 +19,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
   extension
       .SetExtensionInformation("TextContainerCapability",
                                _("Text capability"),
-                               _("Animate objects."),
+                               _("Allows an object to contain a text, usually shown on screen, that can be modified."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
@@ -30,7 +30,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
       "TextContainerBehavior",
       _("Text capability"),
       "Text",
-      _("Access objects text."),
+      _("Allows an object to contain a text, usually shown on screen, that can be modified."),
       "",
       "res/conditions/text24_black.png",
       "TextContainerBehavior",

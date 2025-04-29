@@ -27,7 +27,11 @@ type Props = {|
 const CompactPropertiesEditorRowField = (props: Props) => {
   const title = !props.markdownDescription
     ? props.label
-    : [props.label, ' - ', <MarkdownText source={props.markdownDescription} />];
+    : [
+        props.label,
+        ' - ',
+        <MarkdownText key="markdown-desc" source={props.markdownDescription} />,
+      ];
   return (
     <LineStackLayout noMargin alignItems="center" expand>
       <div style={styles.leftColumn}>

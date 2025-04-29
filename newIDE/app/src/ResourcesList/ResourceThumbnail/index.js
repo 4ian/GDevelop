@@ -3,6 +3,7 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource';
 import ImageThumbnail from './ImageThumbnail';
+import Model3DPreview from '../ResourcePreview/Model3DPreview';
 
 type Props = {|
   project: gdProject,
@@ -17,7 +18,7 @@ type Props = {|
   size?: number,
 |};
 
-export const resourcesKindsWithThumbnail = ['image'];
+export const resourcesKindsWithThumbnail = ['image', 'model3D'];
 
 /**
  * Display the right thumbnail for any given resource of a project
@@ -46,6 +47,17 @@ const ResourceThumbnail = ({
           selected={selected}
           onSelect={onSelect}
           onContextMenu={onContextMenu}
+          size={size || 100}
+        />
+      );
+    case 'model3D':
+      return (
+        <Model3DPreview
+          modelUrl={ResourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {}
+          )}
           size={size || 100}
         />
       );

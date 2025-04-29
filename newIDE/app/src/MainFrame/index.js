@@ -39,6 +39,7 @@ import {
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
   closeCustomObjectTab,
+  closeEventsBasedObjectVariantTab,
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
@@ -137,7 +138,6 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
@@ -589,7 +589,8 @@ const MainFrame = (props: Props) => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
+          ? name.split('::')[2] ||
+            name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -1271,12 +1272,12 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+  const onInstallExtension = (extensionName: string) => {
     const { currentProject } = state;
     if (!currentProject) return;
 
     // Close the extension tab before updating/reinstalling the extension.
-    const eventsFunctionsExtensionName = extensionShortHeader.name;
+    const eventsFunctionsExtensionName = extensionName;
 
     if (
       currentProject.hasEventsFunctionsExtensionNamed(
@@ -1400,6 +1401,20 @@ const MainFrame = (props: Props) => {
   };
 
   const onExtensionInstalled = (extensionName: string) => {
+    const { currentProject } = state;
+    if (!currentProject) {
+      return;
+    }
+    const eventsBasedObjects = currentProject
+      .getEventsFunctionsExtension(extensionName)
+      .getEventsBasedObjects();
+    for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+      const eventsBasedObject = eventsBasedObjects.getAt(index);
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        currentProject,
+        eventsBasedObject
+      );
+    }
     // TODO Open the closed tabs back
     // It would be safer to close the tabs before the extension is installed
     // but it would make opening them back more complicated.
@@ -1581,6 +1596,29 @@ const MainFrame = (props: Props) => {
         state.editorTabs,
         eventsFunctionsExtension.getName(),
         name
+      ),
+    }));
+  };
+
+  const deleteEventsBasedObjectVariant = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ): void => {
+    const variants = eventBasedObject.getVariants();
+    const variantName = variant.getName();
+    if (!variants.hasVariantNamed(variantName)) {
+      return;
+    }
+    variants.removeVariant(variantName);
+
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsBasedObjectVariantTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        eventBasedObject.getName(),
+        variantName
       ),
     }));
   };
@@ -2108,7 +2146,8 @@ const MainFrame = (props: Props) => {
   const openCustomObjectEditor = React.useCallback(
     (
       eventsFunctionsExtension: gdEventsFunctionsExtension,
-      eventsBasedObject: gdEventsBasedObject
+      eventsBasedObject: gdEventsBasedObject,
+      variantName: string
     ) => {
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
@@ -2116,7 +2155,8 @@ const MainFrame = (props: Props) => {
       const foundTab = getCustomObjectEditor(
         editorTabs,
         eventsFunctionsExtension,
-        eventsBasedObject
+        eventsBasedObject,
+        variantName
       );
       if (foundTab) {
         setState(state => ({
@@ -2133,7 +2173,10 @@ const MainFrame = (props: Props) => {
               name:
                 eventsFunctionsExtension.getName() +
                 '::' +
-                eventsBasedObject.getName(),
+                eventsBasedObject.getName() +
+                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+                  ? '::' + variantName
+                  : ''),
               project: currentProject,
             }),
           }),
@@ -2217,13 +2260,41 @@ const MainFrame = (props: Props) => {
     extensionName: string,
     eventsBasedObjectName: string
   ) => {
-    if (!currentProject) return;
+    if (
+      !currentProject ||
+      !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      return;
+    }
     openEventsFunctionsExtension(
       extensionName,
       null,
       null,
       eventsBasedObjectName
     );
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+      extensionName
+    );
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+      return;
+    }
+    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+
+    // Trigger reloading of extensions as an extension was modified (or even added)
+    // to create the custom object.
+    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+      currentProject
+    );
+  };
+
+  const onOpenEventBasedObjectVariantEditor = (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => {
+    if (!currentProject) return;
     if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
       return;
     }
@@ -2235,7 +2306,11 @@ const MainFrame = (props: Props) => {
       return;
     }
     const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject);
+    openCustomObjectEditor(
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      variantName
+    );
 
     // Trigger reloading of extensions as an extension was modified (or even added)
     // to create the custom object.
@@ -2245,7 +2320,16 @@ const MainFrame = (props: Props) => {
   };
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    () => {
+    (eventsBasedObject: gdEventsBasedObject) => {
+      const project = state.currentProject;
+      if (!project) {
+        return;
+      }
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        project,
+        eventsBasedObject
+      );
+
       for (const editor of state.editorTabs.editors) {
         const { editorRef } = editor;
         if (editorRef) {
@@ -2253,7 +2337,7 @@ const MainFrame = (props: Props) => {
         }
       }
     },
-    [state.editorTabs]
+    [state.editorTabs, state.currentProject]
   );
 
   const onSceneObjectEdited = React.useCallback(
@@ -3290,16 +3374,20 @@ const MainFrame = (props: Props) => {
   );
 
   const openTemplateFromCourseChapter = React.useCallback(
-    async (courseChapter: CourseChapter) => {
+    async (courseChapter: CourseChapter, templateId?: string) => {
       const projectIsClosed = await askToCloseProject();
       if (!projectIsClosed) {
         return;
       }
       try {
-        await createProjectFromCourseChapter(courseChapter, {
-          storageProvider: emptyStorageProvider,
-          saveAsLocation: null,
-          // Remaining will be set by the template.
+        await createProjectFromCourseChapter({
+          courseChapter,
+          templateId,
+          newProjectSetup: {
+            storageProvider: emptyStorageProvider,
+            saveAsLocation: null,
+            // Remaining will be set by the template.
+          },
         });
       } catch (error) {
         showErrorBox({
@@ -3943,6 +4031,8 @@ const MainFrame = (props: Props) => {
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
                     onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
+                    onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                     onExtensionInstalled: onExtensionInstalled,

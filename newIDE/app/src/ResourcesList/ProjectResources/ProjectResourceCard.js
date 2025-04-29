@@ -3,21 +3,16 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ResourcesLoader from '../../ResourcesLoader';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import CheckeredBackground from '../CheckeredBackground';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import Text from '../../UI/Text';
 import { getDefaultResourceThumbnail } from '..';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { isProjectImageResourceSmooth } from '../ResourcePreview/ImagePreview';
+import Model3DPreview from '../ResourcePreview/Model3DPreview';
+import CheckeredBackground from '../CheckeredBackground';
 
 const paddingSize = 10;
 const styles = {
-  previewContainer: {
-    display: 'flex',
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   previewImage: {
     position: 'relative',
     objectFit: 'contain',
@@ -74,17 +69,22 @@ const ImagePreview = ({ resource, project }: ImagePreviewProps) => {
     resourceName
   );
   return (
-    <CorsAwareImage
-      key={resourceName}
-      style={{
-        ...styles.previewImage,
-        maxWidth: 128 - 2 * paddingSize,
-        maxHeight: 128 - 2 * paddingSize,
-        ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
-      }}
-      src={resourceThumbnail}
-      alt={resourceName}
-    />
+    <>
+      <CheckeredBackground />
+      <CorsAwareImage
+        key={resourceName}
+        style={{
+          ...styles.previewImage,
+          maxWidth: 128 - 2 * paddingSize,
+          maxHeight: 128 - 2 * paddingSize,
+          ...(!isImageResourceSmooth
+            ? styles.previewImagePixelated
+            : undefined),
+        }}
+        src={resourceThumbnail}
+        alt={resourceName}
+      />
+    </>
   );
 };
 
@@ -126,6 +126,17 @@ export const ProjectResourceCard = ({
     switch (resource.getKind()) {
       case 'image':
         return <ImagePreview resource={resource} project={project} />;
+      case 'model3D':
+        return (
+          <Model3DPreview
+            modelUrl={ResourcesLoader.getResourceFullUrl(
+              project,
+              resourceName,
+              {}
+            )}
+            fullWidth
+          />
+        );
       default:
         return <DefaultPreview resource={resource} />;
     }
@@ -143,7 +154,6 @@ export const ProjectResourceCard = ({
             : undefined,
         }}
       >
-        <CheckeredBackground />
         {renderResourcePreview()}
         <div style={styles.titleContainer}>
           <Text noMargin style={styles.title}>

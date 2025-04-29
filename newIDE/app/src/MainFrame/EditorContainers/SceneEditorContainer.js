@@ -129,6 +129,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         layout={layout}
         eventsFunctionsExtension={null}
         eventsBasedObject={null}
+        eventsBasedObjectVariant={null}
         globalObjectsContainer={project.getObjects()}
         objectsContainer={layout.getObjects()}
         layersContainer={layout.getLayers()}
@@ -149,10 +150,18 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
         onExtractAsEventBasedObject={this.props.onExtractAsEventBasedObject}
         onOpenEventBasedObjectEditor={this.props.onOpenEventBasedObjectEditor}
+        onOpenEventBasedObjectVariantEditor={
+          this.props.onOpenEventBasedObjectVariantEditor
+        }
         onExtensionInstalled={this.props.onExtensionInstalled}
+        onDeleteEventsBasedObjectVariant={
+          this.props.onDeleteEventsBasedObjectVariant
+        }
         onObjectEdited={objectWithContext =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
+        // It's only used to refresh events-based object variants.
+        onObjectGroupEdited={() => {}}
         // Nothing to do as scenes are not events-based objects.
         onEventsBasedObjectChildrenEdited={() => {}}
       />

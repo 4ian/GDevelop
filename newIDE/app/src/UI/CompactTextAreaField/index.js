@@ -10,6 +10,7 @@ import Text from '../../UI/Text';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { tooltipEnterDelay } from '../../UI/Tooltip';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { shouldSubmit } from '../KeyboardShortcuts/InteractionKeys';
 
 const styles = {
   label: {
@@ -37,6 +38,7 @@ export type CompactTextAreaFieldProps = {|
     },
     preventDefault: () => void,
   }) => void,
+  onSubmit?: () => void,
   id?: string,
   disabled?: boolean,
   errored?: boolean,
@@ -56,12 +58,17 @@ export const CompactTextAreaField = ({
   placeholder,
   rows,
   maxLength,
+  onSubmit,
 }: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription
     ? label
-    : [label, ' - ', <MarkdownText source={markdownDescription} />];
+    : [
+        label,
+        ' - ',
+        <MarkdownText key="markdown-desc" source={markdownDescription} />,
+      ];
 
   return (
     <I18n>
@@ -107,6 +114,13 @@ export const CompactTextAreaField = ({
               value={value === null ? '' : value}
               onChange={e => onChange(e.currentTarget.value)}
               placeholder={i18n._(placeholder)}
+              onKeyDown={
+                onSubmit
+                  ? e => {
+                      if (shouldSubmit(e)) onSubmit();
+                    }
+                  : undefined
+              }
               rows={rows || 3}
               maxLength={maxLength}
             />

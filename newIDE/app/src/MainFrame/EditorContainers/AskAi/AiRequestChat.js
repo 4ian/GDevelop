@@ -26,6 +26,7 @@ import { type Quota } from '../../../Utils/GDevelopServices/Usage';
 import IconButton from '../../../UI/IconButton';
 import Like from '../../../UI/CustomSvgIcons/Like';
 import Dislike from '../../../UI/CustomSvgIcons/Dislike';
+import Copy from '../../../UI/CustomSvgIcons/Copy';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
 import Link from '../../../UI/Link';
@@ -215,18 +216,19 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )
           }
           recommendedPlanIdIfNoSubscription="gdevelop_gold"
+          canHide
         >
           <Line>
             <Column noMargin>
               <Text noMargin>
                 {increaseQuotaOffering === 'subscribe' ? (
                   <Trans>
-                    Get more free AI requests with a GDevelop premium plan.
+                    Unlock AI requests included with a GDevelop premium plan.
                   </Trans>
                 ) : (
                   <Trans>
-                    Upgrade to another premium plan to get more free AI
-                    requests.
+                    Get even more AI requests included with a higher premium
+                    plan.
                   </Trans>
                 )}
               </Text>
@@ -259,52 +261,66 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>What do you want to make?</Trans>
               </Text>
             </Column>
-            <Column noMargin alignItems="stretch" justifyContent="stretch">
-              <CompactTextAreaField
-                maxLength={6000}
-                value={userRequestTextPerAiRequestId[''] || ''}
-                disabled={isLaunchingAiRequest}
-                onChange={userRequestText =>
-                  setUserRequestTextPerRequestId(
-                    userRequestTextPerAiRequestId => ({
-                      ...userRequestTextPerAiRequestId,
-                      '': userRequestText,
-                    })
-                  )
-                }
-                placeholder={newChatPlaceholder}
-                rows={5}
-              />
-            </Column>
-            <Line noMargin>
-              <ResponsiveLineStackLayout
-                noMargin
-                alignItems="flex-start"
-                justifyContent="space-between"
-                expand
-              >
-                {!isMobile && errorOrQuotaOrCreditsExplanation}
-                <Line noMargin justifyContent="flex-end">
-                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
-                    <RaisedButton
-                      color="primary"
-                      label={<Trans>Send</Trans>}
-                      style={{ flexShrink: 0 }}
-                      disabled={isLaunchingAiRequest}
-                      onClick={() => {
-                        onSendUserRequest(
-                          userRequestTextPerAiRequestId[aiRequestId]
-                        );
-                      }}
-                    />
-                  </LeftLoader>
+            <form
+              onSubmit={() => {
+                onSendUserRequest(userRequestTextPerAiRequestId['']);
+              }}
+            >
+              <ColumnStackLayout justifyContent="center" noMargin>
+                <Column noMargin alignItems="stretch" justifyContent="stretch">
+                  <CompactTextAreaField
+                    maxLength={6000}
+                    value={userRequestTextPerAiRequestId[''] || ''}
+                    disabled={isLaunchingAiRequest}
+                    onChange={userRequestText =>
+                      setUserRequestTextPerRequestId(
+                        userRequestTextPerAiRequestId => ({
+                          ...userRequestTextPerAiRequestId,
+                          '': userRequestText,
+                        })
+                      )
+                    }
+                    onSubmit={() => {
+                      onSendUserRequest(userRequestTextPerAiRequestId['']);
+                    }}
+                    placeholder={newChatPlaceholder}
+                    rows={5}
+                  />
+                </Column>
+                <Line noMargin>
+                  <ResponsiveLineStackLayout
+                    noMargin
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    expand
+                  >
+                    {!isMobile && errorOrQuotaOrCreditsExplanation}
+                    <Line noMargin justifyContent="flex-end">
+                      <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                        <RaisedButton
+                          color="primary"
+                          label={<Trans>Send</Trans>}
+                          style={{ flexShrink: 0 }}
+                          disabled={
+                            isLaunchingAiRequest ||
+                            !userRequestTextPerAiRequestId[aiRequestId]
+                          }
+                          onClick={() => {
+                            onSendUserRequest(
+                              userRequestTextPerAiRequestId[aiRequestId]
+                            );
+                          }}
+                        />
+                      </LeftLoader>
+                    </Line>
+                    {isMobile && errorOrQuotaOrCreditsExplanation}
+                  </ResponsiveLineStackLayout>
                 </Line>
-                {isMobile && errorOrQuotaOrCreditsExplanation}
-              </ResponsiveLineStackLayout>
-            </Line>
+              </ColumnStackLayout>
+            </form>
             {subscriptionBanner}
           </ColumnStackLayout>
-          <Column justifyContent="center" noMargin>
+          <Column justifyContent="center">
             <Text size="body-small" color="secondary" align="center" noMargin>
               <Trans>
                 The AI is experimental and still being improved.{' '}
@@ -368,6 +384,17 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                             role="assistant"
                             feedbackButtons={
                               <div className={classes.feedbackButtonsContainer}>
+                                <IconButton
+                                  size="small"
+                                  tooltip={t`Copy`}
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(
+                                      messageContent.text
+                                    );
+                                  }}
+                                >
+                                  <Copy fontSize="small" />
+                                </IconButton>
                                 <IconButton
                                   size="small"
                                   tooltip={t`This was helpful`}
@@ -514,44 +541,56 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         ) : (
           subscriptionBanner
         )}
-        <CompactTextAreaField
-          maxLength={6000}
-          value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-          disabled={isLaunchingAiRequest}
-          onChange={userRequestText =>
-            setUserRequestTextPerRequestId(userRequestTextPerAiRequestId => ({
-              ...userRequestTextPerAiRequestId,
-              [aiRequestId]: userRequestText,
-            }))
-          }
-          placeholder={t`Ask a follow up question`}
-          rows={2}
-        />
-        <Column noMargin alignItems="flex-end">
-          <ResponsiveLineStackLayout
+        <form
+          onSubmit={() => {
+            onSendUserRequest(userRequestTextPerAiRequestId[aiRequestId] || '');
+          }}
+        >
+          <ColumnStackLayout
+            justifyContent="stretch"
+            alignItems="stretch"
             noMargin
-            alignItems="flex-start"
-            justifyContent="space-between"
-            expand
           >
-            {!isMobile && errorOrQuotaOrCreditsExplanation}
-            <Line noMargin justifyContent="flex-end">
-              <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
-                <RaisedButton
-                  color="primary"
-                  disabled={aiRequest.status === 'working'}
-                  label={<Trans>Send</Trans>}
-                  onClick={() => {
-                    onSendUserRequest(
-                      userRequestTextPerAiRequestId[aiRequestId]
-                    );
-                  }}
-                />
-              </LeftLoader>
-            </Line>
-            {isMobile && errorOrQuotaOrCreditsExplanation}
-          </ResponsiveLineStackLayout>
-        </Column>
+            <CompactTextAreaField
+              maxLength={6000}
+              value={userRequestTextPerAiRequestId[aiRequestId] || ''}
+              disabled={isLaunchingAiRequest}
+              onChange={userRequestText =>
+                setUserRequestTextPerRequestId(
+                  userRequestTextPerAiRequestId => ({
+                    ...userRequestTextPerAiRequestId,
+                    [aiRequestId]: userRequestText,
+                  })
+                )
+              }
+              placeholder={t`Ask a follow up question`}
+              rows={2}
+              onSubmit={() => {
+                onSendUserRequest(userRequestTextPerAiRequestId[aiRequestId]);
+              }}
+            />
+            <Column noMargin alignItems="flex-end">
+              <ResponsiveLineStackLayout noMargin>
+                {!isMobile && errorOrQuotaOrCreditsExplanation}
+                <Line noMargin justifyContent="flex-end">
+                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                    <RaisedButton
+                      color="primary"
+                      disabled={aiRequest.status === 'working'}
+                      label={<Trans>Send</Trans>}
+                      onClick={() => {
+                        onSendUserRequest(
+                          userRequestTextPerAiRequestId[aiRequestId]
+                        );
+                      }}
+                    />
+                  </LeftLoader>
+                </Line>
+                {isMobile && errorOrQuotaOrCreditsExplanation}
+              </ResponsiveLineStackLayout>
+            </Column>
+          </ColumnStackLayout>
+        </form>
         {dislikeFeedbackDialogOpenedFor && (
           <DislikeFeedbackDialog
             open

@@ -133,6 +133,7 @@ type Props = {|
   onVariablesUpdated?: () => void,
   toolbarIconStyle?: any,
   onSelectedVariableChange?: (Array<string>) => void,
+  isListLocked: boolean,
 |};
 
 const variableRowStyles = {
@@ -150,6 +151,8 @@ type VariableRowProps = {|
   draggedNodeId: { current: ?string },
   nodeId: string,
   isInherited: boolean,
+  isNameLocked: boolean,
+  isTypeLocked: boolean,
   canDrop: string => boolean,
   dropNode: (string, where: 'after' | 'before') => void,
   isSelected: boolean,
@@ -199,6 +202,8 @@ const VariableRow = React.memo<VariableRowProps>(
     draggedNodeId,
     nodeId,
     isInherited,
+    isNameLocked,
+    isTypeLocked,
     canDrop,
     dropNode,
     isSelected,
@@ -365,7 +370,9 @@ const VariableRow = React.memo<VariableRowProps>(
                           directlyStoreValueChangesWhileEditing
                         }
                         disabled={
-                          isInherited || parentType === gd.Variable.Array
+                          isNameLocked ||
+                          isInherited ||
+                          parentType === gd.Variable.Array
                         }
                         onChange={onChangeName}
                         additionalContext={JSON.stringify({ nodeId, depth })}
@@ -388,6 +395,7 @@ const VariableRow = React.memo<VariableRowProps>(
                             }
                             id={`variable-${index}-type`}
                             errorMessage={typeErrorMessage}
+                            disabled={isTypeLocked}
                           />
                         </Column>
                         <Column expand>
@@ -1054,10 +1062,26 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           current,
           props.variablesContainer
         );
-        const { variable: draggedVariable } = draggedVariableContext;
+        const {
+          variable: draggedVariable,
+          lineage: draggedLineage,
+        } = draggedVariableContext;
         if (!draggedVariable) return false;
 
         if (isAnAncestryOf(draggedVariable, targetLineage)) return false;
+
+        const targetVariableParentVariable = getDirectParentVariable(
+          targetLineage
+        );
+        const draggedVariableParentVariable = getDirectParentVariable(
+          draggedLineage
+        );
+        if (
+          props.isListLocked &&
+          (!targetVariableParentVariable || !draggedVariableParentVariable)
+        ) {
+          return false;
+        }
 
         const movementType = getMovementTypeWithinVariablesContainer(
           draggedVariableContext,
@@ -1081,7 +1105,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
             return false;
         }
       },
-      [props.variablesContainer]
+      [props.isListLocked, props.variablesContainer]
     );
 
     const dropNode = React.useCallback(
@@ -1505,6 +1529,8 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           draggedNodeId={draggedNodeId}
           nodeId={nodeId}
           isInherited={isInherited}
+          isNameLocked={props.isListLocked && isTopLevel}
+          isTypeLocked={props.isListLocked && isTopLevel}
           canDrop={canDrop}
           dropNode={dropNode}
           isSelected={isSelected}
@@ -1833,6 +1859,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
       addVariable,
     }));
 
+    // TODO Allow to past child-variables of existing object variables even when the variable list is locked.
     const toolbar = (
       <VariablesListToolbar
         isNarrow={isNarrow}
@@ -1841,11 +1868,13 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         onPaste={pasteClipboardContent}
         onDelete={deleteSelection}
         canCopy={selectedNodes.length > 0}
-        canPaste={Clipboard.has(CLIPBOARD_KIND)}
+        canPaste={Clipboard.has(CLIPBOARD_KIND) && !props.isListLocked}
         canDelete={
+          !props.isListLocked &&
           selectedNodes.length > 0 &&
           selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix))
         }
+        canAdd={!props.isListLocked}
         onUndo={_undo}
         onRedo={_redo}
         canUndo={_canUndo()}
@@ -1887,15 +1916,30 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
                         <Column noMargin expand justifyContent="center">
                           {props.emptyPlaceholderTitle &&
                           props.emptyPlaceholderDescription ? (
-                            <EmptyPlaceholder
-                              title={props.emptyPlaceholderTitle}
-                              description={props.emptyPlaceholderDescription}
-                              actionLabel={<Trans>Add a variable</Trans>}
-                              helpPagePath={props.helpPagePath || undefined}
-                              tutorialId="intermediate-advanced-variables"
-                              onAction={addVariable}
-                              actionButtonId="add-variable"
-                            />
+                            props.isListLocked ? (
+                              <Column>
+                                <Text size="block-title" align="center">
+                                  {<Trans>No variable</Trans>}
+                                </Text>
+                                <Text align="center" noMargin>
+                                  {
+                                    <Trans>
+                                      There is no variable to set up.
+                                    </Trans>
+                                  }
+                                </Text>
+                              </Column>
+                            ) : (
+                              <EmptyPlaceholder
+                                title={props.emptyPlaceholderTitle}
+                                description={props.emptyPlaceholderDescription}
+                                actionLabel={<Trans>Add a variable</Trans>}
+                                helpPagePath={props.helpPagePath || undefined}
+                                tutorialId="intermediate-advanced-variables"
+                                onAction={addVariable}
+                                actionButtonId="add-variable"
+                              />
+                            )
                           ) : null}
                           {props.compactEmptyPlaceholderText && (
                             <Line justifyContent="center">
@@ -1905,7 +1949,11 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
                                 align="center"
                                 noMargin
                               >
-                                {props.compactEmptyPlaceholderText}
+                                {props.isListLocked ? (
+                                  <Trans>There is no variable to set up.</Trans>
+                                ) : (
+                                  props.compactEmptyPlaceholderText
+                                )}
                               </Text>
                             </Line>
                           )}

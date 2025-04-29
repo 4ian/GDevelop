@@ -12,10 +12,13 @@ import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { fakeTutorials } from '../../../fixtures/GDevelopServicesTestData/FakeTutorials';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
+  videoBasedCourseChapter,
   fakeAuthenticatedTeacherFromEducationPlan,
   fakeAuthenticatedUserWithEducationPlan,
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
+  lockedCourseChapter,
+  premiumCourse,
 } from '../../../fixtures/GDevelopServicesTestData';
 import i18nProviderDecorator from '../../I18nProviderDecorator';
 
@@ -43,8 +46,15 @@ export const Default = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -77,8 +87,15 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -113,8 +130,15 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -149,8 +173,15 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
-          courseChapters={null}
-          course={null}
+          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
+          previewedCourseChapters={[
+            videoBasedCourseChapter,
+            lockedCourseChapter,
+          ]}
+          previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
           getCourseChapterCompletion={() => null}
@@ -172,7 +203,7 @@ export const EducationTeacher = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const Loading = () => (
+export const LoadingTutorials = () => (
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -184,6 +215,44 @@ export const Loading = () => (
       <LearnSection
         courseChapters={null}
         course={null}
+        courses={[premiumCourse]} //TODO
+        onSelectCourse={action('onSelectCourse')}
+        previewedCourseChapters={null}
+        previewedCourse={null}
+        isCourseTaskCompleted={() => false}
+        onCompleteCourseTask={action('onCompleteCourseTask')}
+        getCourseChapterCompletion={() => null}
+        getCourseCompletion={() => null}
+        selectedCategory={null}
+        onSelectCategory={action('onSelectCategory')}
+        onTabChange={() => {}}
+        selectInAppTutorial={action('selectInAppTutorial')}
+        onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
+        onOpenTemplateFromCourseChapter={action(
+          'onOpenTemplateFromCourseChapter'
+        )}
+        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
+      />
+    </TutorialContext.Provider>
+  </PreferencesContext.Provider>
+);
+
+export const LoadingCourses = () => (
+  <PreferencesContext.Provider value={initialPreferences}>
+    <TutorialContext.Provider
+      value={{
+        tutorials: fakeTutorials,
+        fetchTutorials: () => {},
+        error: null,
+      }}
+    >
+      <LearnSection
+        courseChapters={null}
+        course={null}
+        courses={null}
+        onSelectCourse={action('onSelectCourse')}
+        previewedCourseChapters={null}
+        previewedCourse={null}
         isCourseTaskCompleted={() => false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
         getCourseChapterCompletion={() => null}

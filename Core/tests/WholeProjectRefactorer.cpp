@@ -1754,6 +1754,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       eventsBasedObject.GetObjects().InsertNewObject(
           project, "MyExtension::Sprite", "Object2", 0);
 
+      auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+          eventsBasedObject.GetDefaultVariant(), 0);
+
       // Create the objects container for the events function
       gd::ObjectsContainer parametersObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
@@ -1765,6 +1768,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
           project, projectScopedContainers, eventsBasedObject, "Object1",
           "Object3", /* isObjectGroup =*/false);
+
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object1") == false);
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object2") == true);
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object3") == true);
       REQUIRE(eventsBasedObject.GetObjects().GetObjectGroups().size() == 1);
       REQUIRE(eventsBasedObject.GetObjects().GetObjectGroups()[0].Find(
                   "Object1") == false);
@@ -1772,6 +1779,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   "Object2") == true);
       REQUIRE(eventsBasedObject.GetObjects().GetObjectGroups()[0].Find(
                   "Object3") == true);
+
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object1") == false);
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object2") == true);
+      REQUIRE(variant.GetObjects().HasObjectNamed("Object3") == true);
+      REQUIRE(variant.GetObjects().GetObjectGroups().size() == 1);
+      REQUIRE(variant.GetObjects().GetObjectGroups()[0].Find("Object1") ==
+              false);
+      REQUIRE(variant.GetObjects().GetObjectGroups()[0].Find("Object2") ==
+              true);
+      REQUIRE(variant.GetObjects().GetObjectGroups()[0].Find("Object3") ==
+              true);
     }
 
     SECTION("Initial instances") {
@@ -1796,6 +1814,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       eventsBasedObject.GetInitialInstances().InsertInitialInstance(instance1);
       eventsBasedObject.GetInitialInstances().InsertInitialInstance(instance2);
 
+      auto &variant = eventsBasedObject.GetVariants().InsertVariant(
+          eventsBasedObject.GetDefaultVariant(), 0);
+
       // Create the objects container for the events function
       gd::ObjectsContainer parametersObjectsContainer(
           gd::ObjectsContainer::SourceType::Function);
@@ -1807,10 +1828,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
           project, projectScopedContainers, eventsBasedObject, "Object1",
           "Object3", /* isObjectGroup =*/false);
+
       REQUIRE(eventsBasedObject.GetInitialInstances().HasInstancesOfObject(
                   "Object1") == false);
       REQUIRE(eventsBasedObject.GetInitialInstances().HasInstancesOfObject(
                   "Object3") == true);
+
+      REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("Object1") ==
+              false);
+      REQUIRE(variant.GetInitialInstances().HasInstancesOfObject("Object3") ==
+              true);
     }
 
     SECTION("Events") {

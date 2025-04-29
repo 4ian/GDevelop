@@ -27,6 +27,7 @@ type Props = {|
   onObjectGroupUpdated?: () => void,
   onObjectAdded: (objectName: string) => void,
   onObjectRemoved: (objectName: string) => void,
+  isObjectListLocked: boolean,
 |};
 
 const ObjectGroupEditor = ({
@@ -37,6 +38,7 @@ const ObjectGroupEditor = ({
   groupObjectNames,
   onObjectAdded,
   onObjectRemoved,
+  isObjectListLocked,
 }: Props) => {
   const [objectName, setObjectName] = React.useState<string>('');
 
@@ -111,7 +113,13 @@ const ObjectGroupEditor = ({
                 )}
               />
             ) : null;
-          return (
+          return isObjectListLocked ? (
+            <ListItem
+              key={objectName}
+              primaryText={objectName}
+              leftIcon={icon}
+            />
+          ) : (
             <ListItem
               key={objectName}
               primaryText={objectName}
@@ -135,6 +143,7 @@ const ObjectGroupEditor = ({
             noGroups
             hintText={t`Choose an object to add to the group`}
             fullWidth
+            disabled={isObjectListLocked}
           />
         </Column>
       </Paper>

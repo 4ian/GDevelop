@@ -188,18 +188,19 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )
           }
           recommendedPlanIdIfNoSubscription="gdevelop_gold"
+          canHide
         >
           <Line>
             <Column noMargin>
               <Text noMargin>
                 {increaseQuotaOffering === 'subscribe' ? (
                   <Trans>
-                    Get more free AI requests with a GDevelop premium plan.
+                    Unlock AI requests included with a GDevelop premium plan.
                   </Trans>
                 ) : (
                   <Trans>
-                    Upgrade to another premium plan to get more free AI
-                    requests.
+                    Get even more AI requests included with a higher premium
+                    plan.
                   </Trans>
                 )}
               </Text>

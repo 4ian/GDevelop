@@ -499,7 +499,9 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): Physics2NetworkSyncData {
+    getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): Physics2NetworkSyncData {
       const bodyProps = this._body
         ? {
             tpx: this._body.GetTransform().get_p().get_x(),
@@ -520,7 +522,7 @@ namespace gdjs {
             aw: undefined,
           };
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           ...bodyProps,
           layers: this.layers,
@@ -531,7 +533,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: Physics2NetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
 

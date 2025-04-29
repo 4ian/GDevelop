@@ -70,22 +70,22 @@ namespace gdjs {
         }
       }
 
-      const loadRequestionOptions: LoadRequestOptions | null =
+      const loadRequestOptions: LoadRequestOptions | null =
         currentScene.getLoadRequestOptions();
-      if (loadRequestionOptions) {
+      if (loadRequestOptions) {
+        const options: UpdateFromNetworkSyncDataOptions = {
+          clearMemory: true,
+        };
         if (
-          loadRequestionOptions.loadVariable &&
-          loadRequestionOptions.loadVariable !==
+          loadRequestOptions.loadVariable &&
+          loadRequestOptions.loadVariable !==
             gdjs.VariablesContainer.badVariable
         ) {
           try {
             const allSyncData =
-              loadRequestionOptions.loadVariable.toJSObject() as GameSaveState;
+              loadRequestOptions.loadVariable.toJSObject() as GameSaveState;
             currentScene.requestLoadSnapshot(null);
             if (allSyncData) {
-              const options: UpdateFromNetworkSyncDataOptions = {
-                forceInputClear: true,
-              };
               currentScene
                 .getGame()
                 .updateFromNetworkSyncData(
@@ -125,8 +125,7 @@ namespace gdjs {
           }
         } else {
           const storageKey =
-            loadRequestionOptions.loadStorageName ||
-            gdjs.saveState.INDEXED_DB_KEY;
+            loadRequestOptions.loadStorageName || gdjs.saveState.INDEXED_DB_KEY;
           currentScene.requestLoadSnapshot(null);
 
           gdjs
@@ -139,10 +138,6 @@ namespace gdjs {
               const allSyncData = JSON.parse(jsonData) as GameSaveState;
 
               if (allSyncData) {
-                const options: UpdateFromNetworkSyncDataOptions = {
-                  forceInputClear: true,
-                };
-
                 currentScene
                   .getGame()
                   .updateFromNetworkSyncData(
@@ -245,12 +240,16 @@ namespace gdjs {
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
       if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(newSceneName, externalLayoutName, options);
+        return this._loadNewScene(
+          newSceneName,
+          options || {},
+          externalLayoutName
+        );
       }
 
       this._isNextLayoutLoading = true;
       this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName, undefined, options);
+        this._loadNewScene(newSceneName, options || {}, undefined);
         this._isNextLayoutLoading = false;
       });
       return null;
@@ -258,8 +257,8 @@ namespace gdjs {
 
     private _loadNewScene(
       newSceneName: string,
-      externalLayoutName?: string,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions,
+      externalLayoutName?: string
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
       // Load the new one
@@ -274,7 +273,7 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (externalLayoutData && (!options || !options.forceInputClear)) {
+        if (externalLayoutData && !options.clearMemory) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,
@@ -388,7 +387,7 @@ namespace gdjs {
 
       this._sceneStackSyncDataToApply = null;
 
-      if (options && options.forceInputClear) {
+      if (options && options.clearMemory) {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {

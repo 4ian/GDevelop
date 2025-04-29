@@ -16,7 +16,7 @@ namespace gdjs {
 
   export type VideoObjectData = ObjectData & VideoObjectDataType;
 
-  export type VideoNetworkSyncDataType = {
+  export type VideoObjectNetworkSyncDataType = {
     op: float;
     wid: float;
     hei: float;
@@ -27,8 +27,8 @@ namespace gdjs {
     ps: number;
   };
 
-  export type VideoNetworkSyncData = ObjectNetworkSyncData &
-    VideoNetworkSyncDataType;
+  export type VideoObjectNetworkSyncData = ObjectNetworkSyncData &
+    VideoObjectNetworkSyncDataType;
 
   /**
    * An object displaying a video on screen.
@@ -103,7 +103,7 @@ namespace gdjs {
 
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
-    ): VideoNetworkSyncData {
+    ): VideoObjectNetworkSyncData {
       return {
         ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
@@ -117,7 +117,7 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      syncData: VideoNetworkSyncData,
+      syncData: VideoObjectNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(syncData, options);

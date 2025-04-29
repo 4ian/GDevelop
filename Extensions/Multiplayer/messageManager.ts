@@ -730,7 +730,7 @@ namespace gdjs {
           }
 
           instance.updateFromNetworkSyncData(messageData, {
-            forceInputClear: false,
+            clearMemory: false,
           });
 
           setLastClockReceivedForInstanceOnScene({
@@ -1739,7 +1739,7 @@ namespace gdjs {
               return;
             }
 
-            runtimeScene.updateFromNetworkSyncData(messageData);
+            runtimeScene.updateFromNetworkSyncData(messageData, {});
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
@@ -1892,7 +1892,7 @@ namespace gdjs {
           const messageData = message.getData();
           const messageSender = message.getSender();
           if (gdjs.multiplayer.isReadyToSendOrReceiveGameUpdateMessages()) {
-            runtimeScene.getGame().updateFromNetworkSyncData(messageData);
+            runtimeScene.getGame().updateFromNetworkSyncData(messageData, {});
           } else {
             // If the game is not ready to receive game update messages, we need to save the data for later use.
             // This can happen when joining a game that is already running.
@@ -1920,7 +1920,7 @@ namespace gdjs {
       // Reapply the game saved updates.
       lastReceivedGameSyncDataUpdates.getUpdates().forEach((messageData) => {
         debugLogger.info(`Reapplying saved update of game.`);
-        runtimeScene.getGame().updateFromNetworkSyncData(messageData);
+        runtimeScene.getGame().updateFromNetworkSyncData(messageData, {});
       });
       // Game updates are always applied properly, so we can clear them.
       lastReceivedGameSyncDataUpdates.clear();
@@ -1939,7 +1939,7 @@ namespace gdjs {
 
         debugLogger.info(`Reapplying saved update of scene ${sceneNetworkId}.`);
 
-        runtimeScene.updateFromNetworkSyncData(messageData);
+        runtimeScene.updateFromNetworkSyncData(messageData, {});
         // We only remove the message if it was successfully applied, so it can be reapplied later,
         // in case we were not on the right scene.
         lastReceivedSceneSyncDataUpdates.remove(messageData);

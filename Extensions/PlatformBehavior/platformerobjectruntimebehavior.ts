@@ -145,7 +145,7 @@ namespace gdjs {
     // This is useful when the object is synchronized by an external source
     // like in a multiplayer game, and we want to be able to predict the
     // movement of the object, even if the inputs are not updated every frame.
-    _dontClearInputsBetweenFrames: boolean = false;
+    private _clearInputsBetweenFrames: boolean = true;
     // This is useful when the object is synchronized over the network,
     // object is controlled by the network and we want to ensure the current player
     // cannot control it.
@@ -226,7 +226,7 @@ namespace gdjs {
     ): PlatformerObjectNetworkSyncData {
       // This method is called, so we are synchronizing this object.
       // Let's clear the inputs between frames as we control it.
-      this._dontClearInputsBetweenFrames = false;
+      this._clearInputsBetweenFrames = true;
       this._ignoreDefaultControlsAsSyncedByNetwork = false;
 
       return {
@@ -259,7 +259,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       networkSyncData: PlatformerObjectNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       super.updateFromNetworkSyncData(networkSyncData, options);
 
@@ -339,12 +339,8 @@ namespace gdjs {
         this._state.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
       }
 
-      // When the object is synchronized from the network, the inputs must not be cleared UNLESS we have to force clear them for loading a savestate.
-      if (!options || !options.forceInputClear) {
-        this._dontClearInputsBetweenFrames = true;
-      } else {
-        this._dontClearInputsBetweenFrames = false;
-      }
+      // Clear user inputs between frames unless requested otherwise.
+      this._clearInputsBetweenFrames = !!options.clearMemory;
       // And we are not using the default controls.
       this._ignoreDefaultControlsAsSyncedByNetwork = true;
     }
@@ -528,8 +524,9 @@ namespace gdjs {
       this._wasJumpKeyPressed = this._jumpKey;
       this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
       this._wasReleaseLadderKeyPressed = this._releaseLadderKey;
+
       //4) Do not forget to reset pressed keys
-      if (!this._dontClearInputsBetweenFrames) {
+      if (this._clearInputsBetweenFrames) {
         // Reset the keys only if the inputs are not supposed to survive between frames.
         // (Most of the time, except if this object is synchronized by an external source)
         this._leftKey = false;

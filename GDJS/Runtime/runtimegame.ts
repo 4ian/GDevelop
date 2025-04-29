@@ -1382,7 +1382,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: GameNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       this._throwIfDisposed();
       if (syncData.var) {

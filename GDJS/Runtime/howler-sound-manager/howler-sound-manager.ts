@@ -87,11 +87,10 @@ namespace gdjs {
     /**
      * The filepath to the resource
      */
-
-    private _audioResourceName;
+    private _audioResourceName: string;
 
     /**
-     * The chanel number on which the sound is played (only necessary for save/loading)
+     * The channel index on which the sound is played.
      */
     private _channel: float | undefined;
 

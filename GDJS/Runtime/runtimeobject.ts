@@ -500,10 +500,7 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
-        n:
-          syncOptions && syncOptions.forceSyncEverything
-            ? this.name
-            : undefined,
+        n: syncOptions.forceSyncEverything ? this.name : undefined,
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,

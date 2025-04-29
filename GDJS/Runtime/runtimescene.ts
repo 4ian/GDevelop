@@ -185,8 +185,8 @@ namespace gdjs {
         this.registerObject(sceneData.objects[i]);
       }
 
-      //Create initial instances of objects
-      if (!options || !options.forceInputClear)
+      // Create initial instances of objects
+      if (!options || !options.clearMemory)
         this.createObjectsFrom(
           sceneData.instances,
           0,
@@ -215,7 +215,7 @@ namespace gdjs {
       if (
         sceneData.stopSoundsOnStartup &&
         this._runtimeGame &&
-        (!options || !options.forceInputClear)
+        (!options || !options.clearMemory)
       ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
@@ -864,7 +864,7 @@ namespace gdjs {
 
     updateFromNetworkSyncData(
       syncData: LayoutNetworkSyncData,
-      options?: UpdateFromNetworkSyncDataOptions
+      options: UpdateFromNetworkSyncDataOptions
     ) {
       if (syncData.var) {
         this._variables.updateFromNetworkSyncData(syncData.var, options);
@@ -885,7 +885,7 @@ namespace gdjs {
           }
         }
       }
-      if (syncData.timeManager && options && options.forceInputClear) {
+      if (syncData.timeManager && options.clearMemory) {
         this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
       }
     }

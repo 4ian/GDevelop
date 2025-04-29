@@ -1,5 +1,5 @@
 namespace gdjs {
-  type Custom3DObjectNetworkSyncDataType = CustomObjectNetworkSyncDataType & {
+  type CustomObject3DNetworkSyncDataType = CustomObjectNetworkSyncDataType & {
     z: float;
     d: float;
     rx: float;
@@ -88,7 +88,7 @@ namespace gdjs {
 
     getNetworkSyncData(
       syncOptions: GetNetworkSyncDataOptions
-    ): Custom3DObjectNetworkSyncDataType {
+    ): CustomObject3DNetworkSyncDataType {
       return {
         ...super.getNetworkSyncData(syncOptions),
         z: this.getZ(),
@@ -100,7 +100,7 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: Custom3DObjectNetworkSyncDataType,
+      networkSyncData: CustomObject3DNetworkSyncDataType,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);

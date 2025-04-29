@@ -299,6 +299,8 @@ const initialPreviewState: PreviewState = {
   isPreviewOverriden: false,
   overridenPreviewLayoutName: null,
   overridenPreviewExternalLayoutName: null,
+  eventsBasedObjectType: null,
+  eventsBasedObjectVariantName: null,
 };
 
 export type Props = {|
@@ -650,7 +652,9 @@ const MainFrame = (props: Props) => {
       // Scene editors can have an embedded game, so they redefine manually
       // which components can have clicks/touches.
       const removePointerEvents =
-        kind === 'layout' || 'external layout' || 'custom object';
+        kind === 'layout' ||
+        kind === 'external layout' ||
+        kind === 'custom object';
 
       const closable = kind !== 'start page';
       const extraEditorProps =
@@ -1632,16 +1636,25 @@ const MainFrame = (props: Props) => {
     }));
   };
 
-  const setPreviewedLayout = (
-    previewLayoutName: ?string,
-    previewExternalLayoutName?: ?string
-  ) => {
+  const setPreviewedLayout = ({
+    layoutName,
+    externalLayoutName,
+    eventsBasedObjectType,
+    eventsBasedObjectVariantName,
+  }: {
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  }) => {
     setPreviewState(
       previewState =>
         ({
           ...previewState,
-          previewLayoutName,
-          previewExternalLayoutName,
+          previewLayoutName: layoutName,
+          previewExternalLayoutName: externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
         }: PreviewState)
     );
   };
@@ -1772,6 +1785,12 @@ const MainFrame = (props: Props) => {
           // TODO: replace by scene name and external layout name
           layout,
           externalLayout,
+          eventsBasedObjectType: isForInGameEdition
+            ? previewState.eventsBasedObjectType
+            : null,
+          eventsBasedObjectVariantName: isForInGameEdition
+            ? previewState.eventsBasedObjectVariantName
+            : null,
           networkPreview: !!networkPreview,
           hotReload: !!hotReload,
           projectDataOnlyExport: !!projectDataOnlyExport,
@@ -1831,6 +1850,8 @@ const MainFrame = (props: Props) => {
       previewState.previewLayoutName,
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
+      previewState.eventsBasedObjectType,
+      previewState.eventsBasedObjectVariantName,
       autosaveProjectIfNeeded,
       authenticatedUser.profile,
       eventsFunctionsExtensionsState,
@@ -1889,9 +1910,13 @@ const MainFrame = (props: Props) => {
     ({
       sceneName,
       externalLayoutName,
+      eventsBasedObjectType,
+      eventsBasedObjectVariantName,
     }: {|
-      sceneName: string,
-      externalLayoutName: ?string,
+      sceneName: string | null,
+      externalLayoutName: string | null,
+      eventsBasedObjectType: string | null,
+      eventsBasedObjectVariantName: string | null,
     |}) => {
       launchPreview({
         networkPreview: false,
@@ -1900,6 +1925,8 @@ const MainFrame = (props: Props) => {
         isForInGameEdition: {
           forcedSceneName: sceneName,
           forcedExternalLayoutName: externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
         },
         numberOfWindows: 0,
       });

@@ -194,7 +194,13 @@ export default class LocalPreviewLauncher extends React.Component<
   };
 
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout } = previewOptions;
+    const {
+      project,
+      layout,
+      externalLayout,
+      eventsBasedObjectType,
+      eventsBasedObjectVariantName,
+    } = previewOptions;
 
     // Start the debugger server for previews. Even if not used,
     // useful if the user opens the Debugger editor later, or want to
@@ -221,6 +227,12 @@ export default class LocalPreviewLauncher extends React.Component<
     previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
     if (externalLayout) {
       previewExportOptions.setExternalLayoutName(externalLayout.getName());
+    }
+    if (eventsBasedObjectType) {
+      previewExportOptions.setEventsBasedObjectType(eventsBasedObjectType);
+      previewExportOptions.setEventsBasedObjectVariantName(
+        eventsBasedObjectVariantName || ''
+      );
     }
 
     const previewDebuggerServerAddress = getDebuggerServerAddress();

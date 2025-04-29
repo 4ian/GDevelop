@@ -102,7 +102,14 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   };
 
   launchPreview = async (previewOptions: PreviewOptions): Promise<any> => {
-    const { project, layout, externalLayout, numberOfWindows } = previewOptions;
+    const {
+      project,
+      layout,
+      externalLayout,
+      eventsBasedObjectType,
+      eventsBasedObjectVariantName,
+      numberOfWindows,
+    } = previewOptions;
     this.setState({
       error: null,
     });
@@ -164,6 +171,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
       if (externalLayout) {
         previewExportOptions.setExternalLayoutName(externalLayout.getName());
+      }
+      if (eventsBasedObjectType) {
+        previewExportOptions.setEventsBasedObjectType(eventsBasedObjectType);
+        previewExportOptions.setEventsBasedObjectVariantName(
+          eventsBasedObjectVariantName || ''
+        );
       }
 
       if (isNativeMobileApp()) {

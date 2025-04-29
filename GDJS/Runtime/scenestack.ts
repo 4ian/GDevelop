@@ -18,6 +18,7 @@ namespace gdjs {
   export class SceneStack {
     _runtimeGame: gdjs.RuntimeGame;
     _stack: gdjs.RuntimeScene[] = [];
+    _editedRuntimeScene: gdjs.RuntimeScene | null = null;
     _wasFirstSceneLoaded: boolean = false;
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
@@ -88,13 +89,17 @@ namespace gdjs {
     renderWithoutStep(): boolean {
       this._throwIfDisposed();
 
-      if (this._stack.length === 0) {
+      const currentScene = this.getCurrentScene();
+      if (!currentScene) {
         return false;
       }
-      const currentScene = this._stack[this._stack.length - 1];
       currentScene._updateObjectsForInGameEditor();
       currentScene.render();
       return true;
+    }
+
+    setEditedRuntimeScene(editedRuntimeScene: gdjs.RuntimeScene): void {
+      this._editedRuntimeScene = editedRuntimeScene;
     }
 
     pop(popCount = 1): void {
@@ -153,6 +158,8 @@ namespace gdjs {
       if (currentScene) {
         currentScene.onPause();
       }
+
+      this._editedRuntimeScene = null;
 
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
@@ -249,6 +256,9 @@ namespace gdjs {
      */
     getCurrentScene(): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+      if (this._editedRuntimeScene) {
+        return this._editedRuntimeScene;
+      }
       if (this._stack.length === 0) {
         return null;
       }

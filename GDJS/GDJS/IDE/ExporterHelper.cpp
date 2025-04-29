@@ -236,6 +236,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
           .SetBoolValue(true);
     }
   }
+  if (!options.eventsBasedObjectType.empty()) {
+    initialRuntimeGameStatus.AddChild("eventsBasedObjectType")
+        .SetValue(options.eventsBasedObjectType);
+    initialRuntimeGameStatus.AddChild("eventsBasedObjectVariantName")
+        .SetValue(options.eventsBasedObjectVariantName);
+  }
 
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);

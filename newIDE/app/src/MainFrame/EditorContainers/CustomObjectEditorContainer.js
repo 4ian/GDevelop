@@ -12,6 +12,7 @@ import {
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,6 +22,8 @@ const styles = {
     flex: 1,
   },
 };
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 // TODO: move to function component
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
@@ -44,12 +47,22 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidMount() {
     if (this.props.isActive) {
-      // const { projectItemName } = this.props;
-      // const layout = this.getLayout();
-      // this.props.setPreviewedLayout(
-      //   layout ? layout.getName() : null,
-      //   projectItemName
-      // );
+      const { projectItemName } = this.props;
+      this.props.setPreviewedLayout({
+        layoutName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: projectItemName || null,
+        eventsBasedObjectVariantName: this.getVariantName(),
+      });
+
+      if (gameEditorMode === 'embedded-game' && projectItemName) {
+        switchToSceneEdition({
+          sceneName: null,
+          externalLayoutName: null,
+          eventsBasedObjectType: projectItemName || null,
+          eventsBasedObjectVariantName: this.getVariantName(),
+        });
+      }
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
@@ -64,12 +77,22 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      // const { projectItemName } = this.props;
-      // const layout = this.getLayout();
-      // this.props.setPreviewedLayout(
-      //   layout ? layout.getName() : null,
-      //   projectItemName
-      // );
+      const { projectItemName } = this.props;
+      this.props.setPreviewedLayout({
+        layoutName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: projectItemName || null,
+        eventsBasedObjectVariantName: this.getVariantName(),
+      });
+
+      if (gameEditorMode === 'embedded-game' && projectItemName) {
+        switchToSceneEdition({
+          sceneName: null,
+          externalLayoutName: null,
+          eventsBasedObjectType: projectItemName || null,
+          eventsBasedObjectVariantName: this.getVariantName(),
+        });
+      }
     }
   }
 
@@ -222,7 +245,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           getInitialInstancesEditorSettings={() =>
             prepareInstancesEditorSettings(
               {}, // TODO
-              1024 // TODO
+              Math.max(
+                variant.getAreaMaxX() - variant.getAreaMinX(),
+                variant.getAreaMaxY() - variant.getAreaMinY()
+              )
             )
           }
           onOpenEvents={() =>

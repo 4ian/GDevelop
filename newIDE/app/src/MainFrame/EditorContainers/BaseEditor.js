@@ -46,10 +46,12 @@ export type RenderEditorContainerProps = {|
   unsavedChanges: ?UnsavedChanges,
 
   // Preview:
-  setPreviewedLayout: (
-    layoutName: ?string,
-    externalLayoutName?: ?string
-  ) => void,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 

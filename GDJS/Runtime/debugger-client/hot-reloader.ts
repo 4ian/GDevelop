@@ -707,10 +707,16 @@ namespace gdjs {
 
         const mergedChildObjectDataList =
           customObjectConfiguration.childrenContent
-            ? eventsBasedObjectData.objects.map((objectData) => ({
-                ...objectData,
-                ...customObjectConfiguration.childrenContent[objectData.name],
-              }))
+            ? eventsBasedObjectData.objects.map((objectData) =>
+                customObjectConfiguration.childrenContent
+                  ? {
+                      ...objectData,
+                      ...customObjectConfiguration.childrenContent[
+                        objectData.name
+                      ],
+                    }
+                  : objectData
+              )
             : eventsBasedObjectData.objects;
 
         const mergedObjectConfiguration = {

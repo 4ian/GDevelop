@@ -270,7 +270,9 @@ namespace gdjs {
           // as it knows the current scene to show.
         });
       } else if (data.command === 'hotReloadObjects') {
-        const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+        const currentScene = this._runtimegame
+          .getSceneStack()
+          .getCurrentScene();
         if (currentScene) {
           that._hotReloader.hotReloadRuntimeSceneObjects(
             data.payload.objects,
@@ -282,7 +284,10 @@ namespace gdjs {
 
         const sceneName = data.sceneName || null;
         const externalLayoutName = data.externalLayoutName || null;
-        if (!sceneName) {
+        const eventsBasedObjectType = data.eventsBasedObjectType || null;
+        const eventsBasedObjectVariantName =
+          data.eventsBasedObjectVariantName || null;
+        if (!sceneName && !eventsBasedObjectType) {
           logger.warn(
             'No scene name specified, switchForInGameEdition aborted'
           );
@@ -296,18 +301,32 @@ namespace gdjs {
             runtimeGameOptions.initialRuntimeGameStatus.sceneName ===
               sceneName &&
             runtimeGameOptions.initialRuntimeGameStatus
-              .injectedExternalLayoutName === externalLayoutName
+              .injectedExternalLayoutName === externalLayoutName &&
+            runtimeGameOptions.initialRuntimeGameStatus
+              .eventsBasedObjectType === eventsBasedObjectType &&
+            runtimeGameOptions.initialRuntimeGameStatus
+              .eventsBasedObjectVariantName === eventsBasedObjectVariantName
           ) {
             return;
           }
         }
 
-        runtimeGame.getSceneStack().replace({
-          sceneName,
-          externalLayoutName,
-          skipCreatingInstancesFromScene: !!externalLayoutName,
-          clear: true,
-        });
+        if (eventsBasedObjectType) {
+          const runtimeScene = runtimeGame._createSceneWithCustomObject(
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName
+          );
+          if (runtimeScene) {
+            runtimeGame.getSceneStack().setEditedRuntimeScene(runtimeScene);
+          }
+        } else {
+          runtimeGame.getSceneStack().replace({
+            sceneName,
+            externalLayoutName,
+            skipCreatingInstancesFromScene: !!externalLayoutName,
+            clear: true,
+          });
+        }
 
         // Update initialRuntimeGameStatus so that a hard reload
         // will come back to the same state, and so that we can check later
@@ -318,6 +337,8 @@ namespace gdjs {
           sceneName: sceneName,
           injectedExternalLayoutName: externalLayoutName,
           skipCreatingInstancesFromScene: !!externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
         };
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
@@ -353,6 +374,10 @@ namespace gdjs {
               initialRuntimeGameStatus?.injectedExternalLayoutName || null,
             skipCreatingInstancesFromScene:
               initialRuntimeGameStatus?.skipCreatingInstancesFromScene || false,
+            eventsBasedObjectType:
+              initialRuntimeGameStatus?.eventsBasedObjectType || null,
+            eventsBasedObjectVariantName:
+              initialRuntimeGameStatus?.eventsBasedObjectVariantName || null,
           };
 
           reloadUrl.searchParams.set(

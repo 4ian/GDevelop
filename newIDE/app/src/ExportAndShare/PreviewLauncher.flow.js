@@ -16,8 +16,10 @@ export type LaunchPreviewOptions = {
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
   isForInGameEdition?: {|
-    forcedSceneName: string,
-    forcedExternalLayoutName: ?string,
+    forcedSceneName: string | null,
+    forcedExternalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
   |},
   launchCaptureOptions?: LaunchCaptureOptions,
 };
@@ -33,6 +35,8 @@ export type PreviewOptions = {|
   project: gdProject,
   layout: gdLayout,
   externalLayout: ?gdExternalLayout,
+  eventsBasedObjectType: string | null,
+  eventsBasedObjectVariantName: string | null,
   networkPreview: boolean,
   hotReload: boolean,
   projectDataOnlyExport: boolean,

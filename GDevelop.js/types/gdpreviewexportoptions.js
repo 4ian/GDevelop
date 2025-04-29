@@ -9,6 +9,8 @@ declare class gdPreviewExportOptions {
   setFallbackAuthor(id: string, username: string): gdPreviewExportOptions;
   setAuthenticatedPlayer(playerId: string, playerUsername: string, playerToken: string): gdPreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
+  setEventsBasedObjectType(eventsBasedObjectType: string): gdPreviewExportOptions;
+  setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;

@@ -52,6 +52,8 @@ namespace gdjs {
     sceneName: string | null;
     injectedExternalLayoutName: string | null;
     skipCreatingInstancesFromScene: boolean;
+    eventsBasedObjectType: string | null;
+    eventsBasedObjectVariantName: string | null;
   };
 
   /**
@@ -73,6 +75,9 @@ namespace gdjs {
           '' + parsedRuntimeGameStatus.injectedExternalLayoutName,
         skipCreatingInstancesFromScene:
           !!parsedRuntimeGameStatus.skipCreatingInstancesFromScene,
+        eventsBasedObjectType: parsedRuntimeGameStatus.eventsBasedObjectType,
+        eventsBasedObjectVariantName:
+          parsedRuntimeGameStatus.eventsBasedObjectVariantName,
       };
     } catch (e) {
       return null;
@@ -961,15 +966,29 @@ namespace gdjs {
         this._forceGameResolutionUpdate();
 
         // Load the first scene
-        this._sceneStack.push({
-          sceneName: this._getFirstSceneName(),
-          externalLayoutName:
+        if (
+          this._options.initialRuntimeGameStatus &&
+          this._options.initialRuntimeGameStatus.eventsBasedObjectType
+        ) {
+          const runtimeScene = this._createSceneWithCustomObject(
+            this._options.initialRuntimeGameStatus.eventsBasedObjectType,
             this._options.initialRuntimeGameStatus
-              ?.injectedExternalLayoutName || undefined,
-          skipCreatingInstancesFromScene:
-            this._options.initialRuntimeGameStatus
-              ?.skipCreatingInstancesFromScene || false,
-        });
+              .eventsBasedObjectVariantName || ''
+          );
+          if (runtimeScene) {
+            this._sceneStack.setEditedRuntimeScene(runtimeScene);
+          }
+        } else {
+          this._sceneStack.push({
+            sceneName: this._getFirstSceneName(),
+            externalLayoutName:
+              this._options.initialRuntimeGameStatus
+                ?.injectedExternalLayoutName || undefined,
+            skipCreatingInstancesFromScene:
+              this._options.initialRuntimeGameStatus
+                ?.skipCreatingInstancesFromScene || false,
+          });
+        }
         this._watermark.displayAtStartup();
 
         //Uncomment to profile the first x frames of the game.
@@ -1074,6 +1093,150 @@ namespace gdjs {
 
         throw e;
       }
+    }
+
+    _createSceneWithCustomObject(
+      eventsBasedObjectType: string,
+      eventsBasedObjectVariantName: string
+    ): gdjs.RuntimeScene | null {
+      const eventsBasedObjectData = this.getEventsBasedObjectData(
+        eventsBasedObjectType
+      );
+      if (!eventsBasedObjectData) {
+        logger.error(
+          `A CustomRuntimeObject was open in editor referring to an non existing events based object data with type "${eventsBasedObjectType}".`
+        );
+        return null;
+      }
+
+      const runtimeScene = new gdjs.RuntimeScene(this);
+      runtimeScene.loadFromScene({
+        sceneData: {
+          variables: [],
+          instances: [
+            {
+              angle: 0,
+              customSize: false,
+              depth: 0,
+              height: 0,
+              layer: '',
+              name: 'Object',
+              persistentUuid: '12345678-1234-1234-1234-123456789abc',
+              width: 0,
+              x: 0,
+              y: 0,
+              zOrder: 1,
+              numberProperties: [],
+              stringProperties: [],
+              initialVariables: [],
+              locked: false,
+            },
+          ],
+          objects: [
+            {
+              name: 'Object',
+              type: eventsBasedObjectType,
+              //@ts-ignore
+              variant: eventsBasedObjectVariantName,
+              content: {},
+              variables: [],
+              // Add all capabilities just in case events need them.
+              behaviors: [
+                {
+                  name: 'Animation',
+                  type: 'AnimatableCapability::AnimatableBehavior',
+                },
+                { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
+                {
+                  name: 'Flippable',
+                  type: 'FlippableCapability::FlippableBehavior',
+                },
+                {
+                  name: 'Object3D',
+                  type: 'Scene3D::Base3DBehavior',
+                },
+                {
+                  name: 'Opacity',
+                  type: 'OpacityCapability::OpacityBehavior',
+                },
+                {
+                  name: 'Resizable',
+                  type: 'ResizableCapability::ResizableBehavior',
+                },
+                {
+                  name: 'Scale',
+                  type: 'ScalableCapability::ScalableBehavior',
+                },
+                {
+                  name: 'Text',
+                  type: 'TextContainerCapability::TextContainerBehavior',
+                },
+              ],
+              effects: [],
+            },
+          ],
+          layers: [
+            {
+              ambientLightColorB: 200,
+              ambientLightColorG: 200,
+              ambientLightColorR: 200,
+              camera3DFarPlaneDistance: 10000,
+              camera3DFieldOfView: 45,
+              camera3DNearPlaneDistance: 3,
+              followBaseLayerCamera: false,
+              isLightingLayer: false,
+              name: '',
+              renderingType: '',
+              visibility: true,
+              cameras: [
+                {
+                  defaultSize: true,
+                  defaultViewport: true,
+                  height: 0,
+                  viewportBottom: 1,
+                  viewportLeft: 0,
+                  viewportRight: 1,
+                  viewportTop: 0,
+                  width: 0,
+                },
+              ],
+              effects: [
+                {
+                  effectType: 'Scene3D::HemisphereLight',
+                  name: '3D Light',
+                  doubleParameters: {
+                    elevation: 45,
+                    intensity: 1,
+                    rotation: 0,
+                  },
+                  stringParameters: {
+                    groundColor: '64;64;64',
+                    skyColor: '255;255;255',
+                    top: 'Y-',
+                  },
+                  booleanParameters: {},
+                },
+              ],
+            },
+          ],
+          r: 0,
+          v: 0,
+          b: 0,
+          mangledName: 'FakeSceneForCustomObject',
+          name: eventsBasedObjectData.name,
+          stopSoundsOnStartup: true,
+          title: '',
+          behaviorsSharedData: [
+            {
+              name: 'Text',
+              type: 'TextContainerCapability::TextContainerBehavior',
+            },
+          ],
+          usedResources: [],
+        },
+        usedExtensionsWithVariablesData: this._data.eventsFunctionsExtensions,
+      });
+      return runtimeScene;
     }
 
     /**

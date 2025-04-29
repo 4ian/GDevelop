@@ -147,6 +147,26 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the (optional) events-based object to be instantiated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetEventsBasedObjectType(
+      const gd::String &eventsBasedObjectType_) {
+    eventsBasedObjectType = eventsBasedObjectType_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) events-based object variant to be instantiated in the scene
+   * at the beginning of the previewed game.
+   */
+  PreviewExportOptions &SetEventsBasedObjectVariantName(
+      const gd::String &eventsBasedObjectVariantName_) {
+    eventsBasedObjectVariantName = eventsBasedObjectVariantName_;
+    return *this;
+  }
+
+  /**
    * \brief Set the hash associated to an include file. Useful for the preview
    * hot-reload, to know if a file changed.
    */
@@ -303,6 +323,8 @@ struct PreviewExportOptions {
   bool useMinimalDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
+  gd::String eventsBasedObjectType;
+  gd::String eventsBasedObjectVariantName;
   gd::String fallbackAuthorUsername;
   gd::String fallbackAuthorId;
   gd::String playerId;

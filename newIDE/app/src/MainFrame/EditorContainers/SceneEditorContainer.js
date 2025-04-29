@@ -34,10 +34,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   componentDidMount() {
     if (this.props.isActive) {
       const { projectItemName } = this.props;
-      this.props.setPreviewedLayout(projectItemName);
+      this.props.setPreviewedLayout({
+        layoutName: projectItemName || null,
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({ sceneName: projectItemName });
+        switchToSceneEdition({
+          sceneName: projectItemName,
+          externalLayoutName: null,
+          eventsBasedObjectType: null,
+          eventsBasedObjectVariantName: null,
+        });
       }
     }
   }
@@ -45,10 +55,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
       const { projectItemName } = this.props;
-      this.props.setPreviewedLayout(projectItemName);
+      this.props.setPreviewedLayout({
+        layoutName: projectItemName || null,
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+      });
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({ sceneName: projectItemName });
+        switchToSceneEdition({
+          sceneName: projectItemName,
+          externalLayoutName: null,
+          eventsBasedObjectType: null,
+          eventsBasedObjectVariantName: null,
+        });
       }
     }
   }

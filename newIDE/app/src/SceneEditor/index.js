@@ -987,13 +987,10 @@ export default class SceneEditor extends React.Component<Props, State> {
    * (position, rotation, size, something else?)
    */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
-    const { previewDebuggerServer, layout } = this.props;
-    if (!layout) {
-      // TODO: Handle external layout
-      return;
-    }
+    const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
+    // TODO: Handle external layout
     previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
       previewDebuggerServer.sendMessage(debuggerId, {
         command: 'updateInstances',

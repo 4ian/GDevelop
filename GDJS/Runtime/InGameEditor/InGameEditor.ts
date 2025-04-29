@@ -263,6 +263,7 @@ namespace gdjs {
 
   export class InGameEditor {
     private _runtimeGame: RuntimeGame;
+    private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null = null;
     private _tempVector2d = new THREE.Vector2();
     private _raycaster = new THREE.Raycaster();
 
@@ -302,6 +303,14 @@ namespace gdjs {
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
+    }
+
+    setEditedInstanceContainer(editedInstanceContainer: gdjs.RuntimeInstanceContainer | null) {
+      this._editedInstanceContainer = editedInstanceContainer;
+    }
+
+    private _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
+      return this._editedInstanceContainer || this._runtimeGame.getSceneStack().getCurrentScene();
     }
 
     getTempVector2d(x: float, y: float): THREE.Vector2 {
@@ -459,10 +468,10 @@ namespace gdjs {
     }: {
       objectUnderCursor: gdjs.RuntimeObject | null;
     }) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      const inputManager = this._runtimeGame.getInputManager();
-      if (!currentScene) return;
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
 
+      const inputManager = this._runtimeGame.getInputManager();
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
@@ -487,7 +496,7 @@ namespace gdjs {
       if (shouldDeleteSelection(inputManager)) {
         const removedObjects = this._selection.getSelectedObjects();
         removedObjects.forEach((object) => {
-          object.deleteFromScene(currentScene);
+          object.deleteFromScene(editedInstanceContainer);
         });
         this._selection.clear();
         this._sendSelectionUpdate({
@@ -760,11 +769,11 @@ namespace gdjs {
     }
 
     cancelDragNewInstance() {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
 
       if (this._draggedNewObject) {
-        this._draggedNewObject.deleteFromScene(currentScene);
+        this._draggedNewObject.deleteFromScene(editedInstanceContainer);
         this._draggedNewObject = null;
       }
     }
@@ -772,6 +781,8 @@ namespace gdjs {
     dragNewInstance({ name, dropped }: { name: string; dropped: boolean }) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
 
       if (dropped) {
         if (this._draggedNewObject) {
@@ -785,12 +796,12 @@ namespace gdjs {
       }
 
       if (this._draggedNewObject && this._draggedNewObject.getName() !== name) {
-        this._draggedNewObject.deleteFromScene(currentScene);
+        this._draggedNewObject.deleteFromScene(editedInstanceContainer);
         this._draggedNewObject = null;
       }
 
       if (!this._draggedNewObject) {
-        const newObject = currentScene.createObject(name);
+        const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
         newObject.persistentUuid = gdjs.makeUuid();
         this._draggedNewObject = newObject;
@@ -819,13 +830,13 @@ namespace gdjs {
 
     reloadInstances(instances: Array<InstanceData>) {
       console.log(instances);
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) {
-        return;
-      }
+
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
       // TODO: Might be worth indexing instances data and runtime objects by their
       // persistentUuid (See HotReloader.indexByPersistentUuid).
-      currentScene.getAdhocListOfAllInstances().forEach((runtimeObject) => {
+      editedInstanceContainer.getAdhocListOfAllInstances().forEach((runtimeObject) => {
         const instance = instances.find(
           (instance) => instance.persistentUuid === runtimeObject.persistentUuid
         );
@@ -946,8 +957,8 @@ namespace gdjs {
     }
 
     getObjectUnderCursor(): gdjs.RuntimeObject | null {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return null;
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return null;
 
       const closestIntersect = this._getClosestIntersectionUnderCursor();
       if (!closestIntersect) return null;
@@ -965,7 +976,8 @@ namespace gdjs {
           let rootRuntimeObject = runtimeObject;
           while (
             rootRuntimeObject.getInstanceContainer() instanceof
-            gdjs.CustomRuntimeObjectInstanceContainer
+            gdjs.CustomRuntimeObjectInstanceContainer &&
+            rootRuntimeObject.getInstanceContainer() !== editedInstanceContainer
           ) {
             rootRuntimeObject = (
               rootRuntimeObject.getInstanceContainer() as gdjs.CustomRuntimeObjectInstanceContainer

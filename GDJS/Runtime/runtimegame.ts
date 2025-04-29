@@ -970,13 +970,17 @@ namespace gdjs {
           this._options.initialRuntimeGameStatus &&
           this._options.initialRuntimeGameStatus.eventsBasedObjectType
         ) {
-          const runtimeScene = this._createSceneWithCustomObject(
+          const sceneAndCustomObject = this._createSceneWithCustomObject(
             this._options.initialRuntimeGameStatus.eventsBasedObjectType,
             this._options.initialRuntimeGameStatus
               .eventsBasedObjectVariantName || ''
           );
-          if (runtimeScene) {
-            this._sceneStack.setEditedRuntimeScene(runtimeScene);
+          if (sceneAndCustomObject) {
+            const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
+            this._sceneStack.setEditedRuntimeScene(scene);
+            if (this._inGameEditor) {
+              this._inGameEditor.setEditedInstanceContainer(customObjectInstanceContainer);
+            }
           }
         } else {
           this._sceneStack.push({
@@ -988,6 +992,9 @@ namespace gdjs {
               this._options.initialRuntimeGameStatus
                 ?.skipCreatingInstancesFromScene || false,
           });
+          if (this._inGameEditor) {
+            this._inGameEditor.setEditedInstanceContainer(null);
+          }
         }
         this._watermark.displayAtStartup();
 
@@ -1098,7 +1105,7 @@ namespace gdjs {
     _createSceneWithCustomObject(
       eventsBasedObjectType: string,
       eventsBasedObjectVariantName: string
-    ): gdjs.RuntimeScene | null {
+    ): { scene: gdjs.RuntimeScene, customObjectInstanceContainer: gdjs.CustomRuntimeObjectInstanceContainer } | null {
       const eventsBasedObjectData = this.getEventsBasedObjectData(
         eventsBasedObjectType
       );
@@ -1109,15 +1116,14 @@ namespace gdjs {
         return null;
       }
 
-      const runtimeScene = new gdjs.RuntimeScene(this);
-      runtimeScene.loadFromScene({
+      const scene = new gdjs.RuntimeScene(this);
+      scene.loadFromScene({
         sceneData: {
           variables: [],
           instances: [
             {
               angle: 0,
               customSize: false,
-              depth: 0,
               height: 0,
               layer: '',
               name: 'Object',
@@ -1186,7 +1192,7 @@ namespace gdjs {
               followBaseLayerCamera: false,
               isLightingLayer: false,
               name: '',
-              renderingType: '',
+              renderingType: '2d+3d',
               visibility: true,
               cameras: [
                 {
@@ -1219,9 +1225,9 @@ namespace gdjs {
               ],
             },
           ],
-          r: 0,
-          v: 0,
-          b: 0,
+          r: 32,
+          v: 32,
+          b: 32,
           mangledName: 'FakeSceneForCustomObject',
           name: eventsBasedObjectData.name,
           stopSoundsOnStartup: true,
@@ -1236,7 +1242,16 @@ namespace gdjs {
         },
         usedExtensionsWithVariablesData: this._data.eventsFunctionsExtensions,
       });
-      return runtimeScene;
+      const objects = scene.getObjects('Object');
+      const object = objects ? objects[0] : null;
+      if (!object) {
+        return null;
+      }
+      const customObject = object as gdjs.CustomRuntimeObject;
+      if (!customObject._instanceContainer) {
+        return null;
+      }
+      return { scene, customObjectInstanceContainer: customObject._instanceContainer };
     }
 
     /**

@@ -312,12 +312,16 @@ namespace gdjs {
         }
 
         if (eventsBasedObjectType) {
-          const runtimeScene = runtimeGame._createSceneWithCustomObject(
+          const sceneAndCustomObject = runtimeGame._createSceneWithCustomObject(
             eventsBasedObjectType,
             eventsBasedObjectVariantName
           );
-          if (runtimeScene) {
-            runtimeGame.getSceneStack().setEditedRuntimeScene(runtimeScene);
+          if (sceneAndCustomObject) {
+            const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
+            runtimeGame.getSceneStack().setEditedRuntimeScene(scene);
+            if (runtimeGame._inGameEditor) {
+              runtimeGame._inGameEditor.setEditedInstanceContainer(customObjectInstanceContainer);
+            }
           }
         } else {
           runtimeGame.getSceneStack().replace({
@@ -326,6 +330,9 @@ namespace gdjs {
             skipCreatingInstancesFromScene: !!externalLayoutName,
             clear: true,
           });
+          if (runtimeGame._inGameEditor) {
+            runtimeGame._inGameEditor.setEditedInstanceContainer(null);
+          }
         }
 
         // Update initialRuntimeGameStatus so that a hard reload

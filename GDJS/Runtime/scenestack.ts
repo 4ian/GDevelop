@@ -72,10 +72,8 @@ namespace gdjs {
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
-          logger.error('Unrecognized change in scene stack: ' + request);
         }
       }
-
       return true;
     }
 

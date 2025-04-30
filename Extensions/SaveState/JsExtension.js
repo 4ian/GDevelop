@@ -33,33 +33,33 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/snapshotsave.svg');
     extension
       .addAction(
-        'SaveGame',
-        _('Save the whole game'),
-        _('Save the whole game to a scene variable or storage name.'),
-        _('Save the game to _PARAM1_ (scene variable) or to storage _PARAM2_.'),
+        'SaveGameSnapshot',
+        _('Save game'),
+        _('Takes a snapshot of the game and save it to a variable or device storage.'),
+        _('Save the game to variable _PARAM1_ or to storage under key _PARAM2_.'),
         '',
         'res/actions/Save-single-action-down.svg',
         'res/actions/Save-single-action-down.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
-        'scenevar',
-        _('Scene variable to store the save (optional)'),
+        'variable',
+        _('Variable to store the save to (optional)'),
         '',
         true
       )
-      .addParameter('string', _('Storage name to save to (optional)'), '', true)
+      .addParameter('string', _('Storage key to save to (optional)'), '', true)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
-      .setFunctionName('gdjs.saveState.saveGamSnapshot');
+      .setFunctionName('gdjs.saveState.saveGameSnapshot');
 
     extension
       .addAction(
-        'LoadGame',
-        _('Load game save.'),
-        _('Load a game save from a scene variable or storage.'),
+        'LoadGameSnapshot',
+        _('Load game'),
+        _('Load game from snapshot save from a variable or storage.'),
         _(
-          'Load the game save from _PARAM1_ (scene variable) or storage _PARAM2_.'
+          'Load the game from variable _PARAM1_ or from device storage under key _PARAM2_.'
         ),
         '',
         'res/actions/Save-single-action-up.svg',
@@ -67,14 +67,14 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .addParameter(
-        'scenevar',
-        _('Scene variable to load from (optional)'),
+        'variable',
+        _('Variable to load game from (optional)'),
         '',
         true
       )
       .addParameter(
         'string',
-        _('Storage name to load from (optional)'),
+        _('Storage key to load game from (optional)'),
         '',
         true
       )

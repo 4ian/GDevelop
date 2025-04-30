@@ -3882,7 +3882,7 @@
           "actions": [
             {
               "type": {
-                "value": "SaveState::LoadGame"
+                "value": "SaveState::LoadGameSnapshot"
               },
               "parameters": [
                 "",
@@ -3914,7 +3914,7 @@
           "actions": [
             {
               "type": {
-                "value": "SaveState::SaveGame"
+                "value": "SaveState::SaveGameSnapshot"
               },
               "parameters": [
                 "",

@@ -4,7 +4,7 @@ namespace gdjs {
     export const INDEXED_DB_KEY: string = 'game_save';
     export const INDEXED_DB_OBJECT_STORE: string = 'saves';
 
-    export const saveGamSnapshot = async function (
+    export const saveGameSnapshot = async function (
       currentScene: RuntimeScene,
       sceneVar?: gdjs.Variable,
       storageName?: string

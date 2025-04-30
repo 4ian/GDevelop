@@ -1,5 +1,3 @@
-
-
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
@@ -259,10 +257,14 @@ namespace gdjs {
       //       vertexColors: true,
       //     });
       //     this._loadedThreeMaterials.put(cacheKey, material);
-      let tex1 = new THREE.TextureLoader().load("C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/cloudLava.png");
+      let tex1 = new THREE.TextureLoader().load(
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/cloudLava.png'
+      );
       tex1.wrapS = THREE.RepeatWrapping;
       tex1.wrapT = THREE.RepeatWrapping;
-      let text2 = new THREE.TextureLoader().load("C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/tileLava.jpg");
+      let text2 = new THREE.TextureLoader().load(
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/tileLava.jpg'
+      );
       text2.wrapS = THREE.RepeatWrapping;
       text2.wrapT = THREE.RepeatWrapping;
       lavaMaterial = new THREE.ShaderMaterial({
@@ -272,10 +274,9 @@ namespace gdjs {
           fogColor: { value: new THREE.Vector3(0.1, 0.1, 0.1) },
           texture1: { value: tex1 },
           texture2: { value: text2 },
-          uvScale:{value: new THREE.Vector2(1,1)},
+          uvScale: { value: new THREE.Vector2(1, 1) },
         },
-        vertexShader: 
-        `uniform vec2 uvScale;
+        vertexShader: `uniform vec2 uvScale;
         varying vec2 vUv;
     
         void main()
@@ -321,7 +322,7 @@ namespace gdjs {
           fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
     
           gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
-        }`
+        }`,
       });
       return lavaMaterial;
     }

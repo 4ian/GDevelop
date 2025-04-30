@@ -37,7 +37,7 @@ namespace gdjs {
     }
 
     step(elapsedTime: float): boolean {
-      time+= this._stack[0].getTimeManager().getElapsedTime() / 100;
+      time += this._stack[0].getTimeManager().getElapsedTime() / 100;
       lavaMaterial.uniforms.time.value = time;
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {

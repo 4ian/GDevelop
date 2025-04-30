@@ -75,13 +75,11 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0])
+      getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]);
 
       const materials: THREE.Material[] = new Array(6)
         .fill(0)
-        .map((_, index) =>
-          lavaMaterial
-        );
+        .map((_, index) => lavaMaterial);
 
       const boxMesh = new THREE.Mesh(geometry, materials);
 
@@ -124,7 +122,7 @@ namespace gdjs {
         this._cube3DRuntimeObject,
         faceIndex
       );
-      
+
       if (this._cube3DRuntimeObject.isFaceAtIndexVisible(faceIndex)) {
         this.updateTextureUvMapping(faceIndex);
       }

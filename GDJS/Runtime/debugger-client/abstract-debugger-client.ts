@@ -317,10 +317,13 @@ namespace gdjs {
             eventsBasedObjectVariantName
           );
           if (sceneAndCustomObject) {
-            const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
+            const { scene, customObjectInstanceContainer } =
+              sceneAndCustomObject;
             runtimeGame.getSceneStack().setEditedRuntimeScene(scene);
             if (runtimeGame._inGameEditor) {
-              runtimeGame._inGameEditor.setEditedInstanceContainer(customObjectInstanceContainer);
+              runtimeGame._inGameEditor.setEditedInstanceContainer(
+                customObjectInstanceContainer
+              );
             }
           }
         } else {

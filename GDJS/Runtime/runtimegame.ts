@@ -976,10 +976,13 @@ namespace gdjs {
               .eventsBasedObjectVariantName || ''
           );
           if (sceneAndCustomObject) {
-            const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
+            const { scene, customObjectInstanceContainer } =
+              sceneAndCustomObject;
             this._sceneStack.setEditedRuntimeScene(scene);
             if (this._inGameEditor) {
-              this._inGameEditor.setEditedInstanceContainer(customObjectInstanceContainer);
+              this._inGameEditor.setEditedInstanceContainer(
+                customObjectInstanceContainer
+              );
             }
           }
         } else {
@@ -1105,7 +1108,10 @@ namespace gdjs {
     _createSceneWithCustomObject(
       eventsBasedObjectType: string,
       eventsBasedObjectVariantName: string
-    ): { scene: gdjs.RuntimeScene, customObjectInstanceContainer: gdjs.CustomRuntimeObjectInstanceContainer } | null {
+    ): {
+      scene: gdjs.RuntimeScene;
+      customObjectInstanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
+    } | null {
       const eventsBasedObjectData = this.getEventsBasedObjectData(
         eventsBasedObjectType
       );
@@ -1251,7 +1257,10 @@ namespace gdjs {
       if (!customObject._instanceContainer) {
         return null;
       }
-      return { scene, customObjectInstanceContainer: customObject._instanceContainer };
+      return {
+        scene,
+        customObjectInstanceContainer: customObject._instanceContainer,
+      };
     }
 
     /**

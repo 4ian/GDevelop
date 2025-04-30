@@ -139,6 +139,15 @@ namespace gdjs {
       this._selectedObjects = [];
     }
 
+    toggle(object: gdjs.RuntimeObject) {
+      const index = this._selectedObjects.indexOf(object);
+      if (index < 0) {
+        this._selectedObjects.push(object);
+      } else {
+        this._selectedObjects.splice(index);
+      }
+    }
+
     getSelectedObjects() {
       return this._selectedObjects;
     }
@@ -263,7 +272,8 @@ namespace gdjs {
 
   export class InGameEditor {
     private _runtimeGame: RuntimeGame;
-    private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null = null;
+    private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
+      null;
     private _tempVector2d = new THREE.Vector2();
     private _raycaster = new THREE.Raycaster();
 
@@ -305,12 +315,17 @@ namespace gdjs {
       this._runtimeGame = game;
     }
 
-    setEditedInstanceContainer(editedInstanceContainer: gdjs.RuntimeInstanceContainer | null) {
+    setEditedInstanceContainer(
+      editedInstanceContainer: gdjs.RuntimeInstanceContainer | null
+    ) {
       this._editedInstanceContainer = editedInstanceContainer;
     }
 
     private _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
-      return this._editedInstanceContainer || this._runtimeGame.getSceneStack().getCurrentScene();
+      return (
+        this._editedInstanceContainer ||
+        this._runtimeGame.getSceneStack().getCurrentScene()
+      );
     }
 
     getTempVector2d(x: float, y: float): THREE.Vector2 {
@@ -475,9 +490,8 @@ namespace gdjs {
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
-        !this._hasSelectionActuallyMoved &&
+        !this._hasSelectionActuallyMoved
         // TODO: add check for space key
-        objectUnderCursor
       ) {
         if (
           !isShiftPressed(inputManager) &&
@@ -488,7 +502,9 @@ namespace gdjs {
           if (!isShiftPressed(inputManager)) {
             this._selection.clear();
           }
-          this._selection.add(objectUnderCursor);
+          if (objectUnderCursor) {
+            this._selection.toggle(objectUnderCursor);
+          }
           this._sendSelectionUpdate();
         }
       }
@@ -836,29 +852,32 @@ namespace gdjs {
 
       // TODO: Might be worth indexing instances data and runtime objects by their
       // persistentUuid (See HotReloader.indexByPersistentUuid).
-      editedInstanceContainer.getAdhocListOfAllInstances().forEach((runtimeObject) => {
-        const instance = instances.find(
-          (instance) => instance.persistentUuid === runtimeObject.persistentUuid
-        );
-        if (instance) {
-          runtimeObject.setX(instance.x);
-          runtimeObject.setY(instance.y);
-          runtimeObject.setWidth(instance.width);
-          runtimeObject.setHeight(instance.height);
-          runtimeObject.setAngle(instance.angle);
-          runtimeObject.setLayer(instance.layer);
-          if (runtimeObject instanceof gdjs.RuntimeObject3D) {
-            if (instance.z !== undefined) runtimeObject.setZ(instance.z);
-            if (instance.rotationX !== undefined)
-              runtimeObject.setRotationX(instance.rotationX);
-            if (instance.rotationY !== undefined)
-              runtimeObject.setRotationY(instance.rotationY);
-            if (instance.depth !== undefined)
-              runtimeObject.setDepth(instance.depth);
+      editedInstanceContainer
+        .getAdhocListOfAllInstances()
+        .forEach((runtimeObject) => {
+          const instance = instances.find(
+            (instance) =>
+              instance.persistentUuid === runtimeObject.persistentUuid
+          );
+          if (instance) {
+            runtimeObject.setX(instance.x);
+            runtimeObject.setY(instance.y);
+            runtimeObject.setWidth(instance.width);
+            runtimeObject.setHeight(instance.height);
+            runtimeObject.setAngle(instance.angle);
+            runtimeObject.setLayer(instance.layer);
+            if (runtimeObject instanceof gdjs.RuntimeObject3D) {
+              if (instance.z !== undefined) runtimeObject.setZ(instance.z);
+              if (instance.rotationX !== undefined)
+                runtimeObject.setRotationX(instance.rotationX);
+              if (instance.rotationY !== undefined)
+                runtimeObject.setRotationY(instance.rotationY);
+              if (instance.depth !== undefined)
+                runtimeObject.setDepth(instance.depth);
+            }
+            runtimeObject.extraInitializationFromInitialInstance(instance);
           }
-          runtimeObject.extraInitializationFromInitialInstance(instance);
-        }
-      });
+        });
       this._forceUpdateSelectionControls();
     }
 
@@ -976,7 +995,7 @@ namespace gdjs {
           let rootRuntimeObject = runtimeObject;
           while (
             rootRuntimeObject.getInstanceContainer() instanceof
-            gdjs.CustomRuntimeObjectInstanceContainer &&
+              gdjs.CustomRuntimeObjectInstanceContainer &&
             rootRuntimeObject.getInstanceContainer() !== editedInstanceContainer
           ) {
             rootRuntimeObject = (

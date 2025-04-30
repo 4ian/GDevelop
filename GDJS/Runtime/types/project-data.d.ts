@@ -47,6 +47,7 @@ declare type GetNetworkSyncDataOptions = {
 
 declare type UpdateFromNetworkSyncDataOptions = {
   clearMemory?: boolean;
+  keepControl?: boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */

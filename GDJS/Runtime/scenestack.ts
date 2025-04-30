@@ -37,6 +37,7 @@ namespace gdjs {
     _loadGameFromSave(saveState: GameSaveState): void {
       const options: UpdateFromNetworkSyncDataOptions = {
         clearMemory: true,
+        keepControl: true,
       };
 
       this._runtimeGame.updateFromNetworkSyncData(

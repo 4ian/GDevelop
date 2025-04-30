@@ -759,18 +759,8 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    requestLoadSnapshot(requestOptions: LoadRequestOptions | null): void {
-      if (requestOptions) {
-        this._loadRequestOptions = {
-          loadVariable: null,
-          loadStorageName: gdjs.saveState.INDEXED_DB_OBJECT_STORE,
-        };
-        this._loadRequestOptions.loadStorageName =
-          requestOptions.loadStorageName;
-        this._loadRequestOptions.loadVariable = requestOptions.loadVariable;
-      } else {
-        this._loadRequestOptions = null;
-      }
+    requestLoadSnapshot(loadRequestOptions: LoadRequestOptions | null): void {
+      this._loadRequestOptions = loadRequestOptions;
     }
 
     /**

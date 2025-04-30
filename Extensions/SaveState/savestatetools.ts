@@ -49,15 +49,14 @@ namespace gdjs {
         });
       }
       // TODO: Store the save creation datetime.
-      const syncDataJson = JSON.stringify(allSyncData);
       if (sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable) {
-        sceneVar.fromJSObject(JSON.parse(syncDataJson));
+        sceneVar.fromJSObject(allSyncData);
       } else {
         await gdjs.saveToIndexedDB(
           INDEXED_DB_NAME,
           INDEXED_DB_OBJECT_STORE,
           storageName || INDEXED_DB_KEY,
-          syncDataJson
+          allSyncData
         );
       }
     };

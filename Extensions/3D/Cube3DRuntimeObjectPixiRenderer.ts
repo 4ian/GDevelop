@@ -118,6 +118,8 @@ namespace gdjs {
     updateFace(faceIndex: integer) {
       const materialIndex = faceIndexToMaterialIndex[faceIndex];
       if (materialIndex === undefined) return;
+      this._boxMesh.receiveShadow = true;
+      this._boxMesh.castShadow = true;
 
       this._boxMesh.material[materialIndex] = getFaceMaterial(
         this._cube3DRuntimeObject,

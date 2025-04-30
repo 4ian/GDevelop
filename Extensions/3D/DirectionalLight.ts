@@ -26,6 +26,7 @@ namespace gdjs {
 
           constructor() {
             this.light = new THREE.DirectionalLight();
+            this.light.castShadow = true;
             this.light.position.set(1, 0, 0);
             this.rotationObject = new THREE.Group();
             this.rotationObject.add(this.light);

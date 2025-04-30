@@ -26,13 +26,19 @@ namespace gdjs {
       this._runtimeGameRenderer = runtimeGameRenderer;
       this._runtimeScene = runtimeScene;
       this._pixiContainer = new PIXI.Container();
-
+      
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
-
+      
       this._threeRenderer = this._runtimeGameRenderer
-        ? this._runtimeGameRenderer.getThreeRenderer()
-        : null;
+      ? this._runtimeGameRenderer.getThreeRenderer()
+      : null;
+      if(this._threeRenderer)
+        {
+          this._threeRenderer.shadowMap.enabled = true;
+          this._threeRenderer.shadowMap.type = THREE.PCFShadowMap;
+        }
+        
     }
 
     onGameResolutionResized() {

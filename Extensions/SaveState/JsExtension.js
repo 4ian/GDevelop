@@ -31,6 +31,9 @@ module.exports = {
     extension
       .addInstructionOrExpressionGroupMetadata(_('Save State'))
       .setIcon('JsPlatform/Extensions/snapshotsave.svg');
+
+    // TODO: Split save action and load action into 2 different instructions to avoid
+    // having optional and empty parameters.
     extension
       .addAction(
         'SaveGameSnapshot',
@@ -81,6 +84,8 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/SaveState/savestatetools.js')
       .setFunctionName('gdjs.saveState.loadGameFromSnapshot');
+
+    // TODO: Add condition and expression to get the last save creation datetime.
 
     return extension;
   },

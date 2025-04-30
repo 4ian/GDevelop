@@ -1,8 +1,8 @@
 namespace gdjs {
   export namespace saveState {
-    export const INDEXED_DB_NAME: string = 'gameSaveDB';
-    export const INDEXED_DB_KEY: string = 'game_save';
-    export const INDEXED_DB_OBJECT_STORE: string = 'saves';
+    export const INDEXED_DB_NAME: string = 'gd-game-snapshot-saves';
+    export const INDEXED_DB_KEY: string = 'game_save'; // TODO: use game id to change the key.
+    export const INDEXED_DB_OBJECT_STORE: string = 'saves'; // TODO: should a store be used per game on the user device?
 
     export const saveGameSnapshot = async function (
       currentScene: RuntimeScene,
@@ -48,6 +48,7 @@ namespace gdjs {
           }
         });
       }
+      // TODO: Store the save creation datetime.
       const syncDataJson = JSON.stringify(allSyncData);
       if (sceneVar && sceneVar !== gdjs.VariablesContainer.badVariable) {
         sceneVar.fromJSObject(JSON.parse(syncDataJson));

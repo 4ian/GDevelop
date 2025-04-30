@@ -47,7 +47,10 @@ declare type GetNetworkSyncDataOptions = {
 
 declare type UpdateFromNetworkSyncDataOptions = {
   clearMemory?: boolean;
+  syncSounds?: boolean;
+  syncTimers?: boolean;
   keepControl?: boolean;
+  ignoreVariableOwnership?: boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */

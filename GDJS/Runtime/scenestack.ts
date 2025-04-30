@@ -38,6 +38,9 @@ namespace gdjs {
       const options: UpdateFromNetworkSyncDataOptions = {
         clearMemory: true,
         keepControl: true,
+        syncSounds: true,
+        syncTimers: true,
+        ignoreVariableOwnership: true,
       };
 
       this._runtimeGame.updateFromNetworkSyncData(
@@ -202,16 +205,12 @@ namespace gdjs {
       // Avoid a risk of displaying an intermediate loading screen
       // during 1 frame.
       if (this._runtimeGame.areSceneAssetsReady(newSceneName)) {
-        return this._loadNewScene(
-          newSceneName,
-          options || {},
-          externalLayoutName
-        );
+        return this._loadNewScene(newSceneName, externalLayoutName, options);
       }
 
       this._isNextLayoutLoading = true;
       this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
-        this._loadNewScene(newSceneName, options || {}, undefined);
+        this._loadNewScene(newSceneName, undefined, options);
         this._isNextLayoutLoading = false;
       });
       return null;
@@ -219,15 +218,21 @@ namespace gdjs {
 
     private _loadNewScene(
       newSceneName: string,
-      options: UpdateFromNetworkSyncDataOptions,
-      externalLayoutName?: string
+      externalLayoutName?: string,
+      options?: UpdateFromNetworkSyncDataOptions
     ): gdjs.RuntimeScene {
       this._throwIfDisposed();
+      const preventInitialInstancesCreation = !!options;
+      const preventSoundManagerClearing = !!options;
+
       // Load the new one
       const newScene = new gdjs.RuntimeScene(this._runtimeGame);
       newScene.loadFromScene(
         this._runtimeGame.getSceneAndExtensionsData(newSceneName),
-        options
+        {
+          preventInitialInstancesCreation,
+          preventSoundManagerClearing,
+        }
       );
       this._wasFirstSceneLoaded = true;
 
@@ -235,7 +240,7 @@ namespace gdjs {
       if (externalLayoutName) {
         const externalLayoutData =
           this._runtimeGame.getExternalLayoutData(externalLayoutName);
-        if (externalLayoutData && !options.clearMemory) {
+        if (externalLayoutData && !preventInitialInstancesCreation) {
           newScene.createObjectsFrom(
             externalLayoutData.instances,
             0,

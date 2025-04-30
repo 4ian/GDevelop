@@ -374,7 +374,7 @@ namespace gdjs {
         // - If we are not the owner of the variable, then assume that we missed the ownership change message, so update the variable's
         //   ownership and then update the variable.
         const syncedVariableOwner = variableSyncData.owner;
-        if (!options.clearMemory) {
+        if (!options.ignoreVariableOwnership) {
           const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerNumber();
 
           const currentVariableOwner = variable.getPlayerOwnership();

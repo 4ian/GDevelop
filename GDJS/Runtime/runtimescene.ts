@@ -127,7 +127,10 @@ namespace gdjs {
      */
     loadFromScene(
       sceneAndExtensionsData: SceneAndExtensionsData | null,
-      options?: UpdateFromNetworkSyncDataOptions
+      options?: {
+        preventInitialInstancesCreation: boolean;
+        preventSoundManagerClearing: boolean;
+      }
     ) {
       if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
@@ -186,7 +189,7 @@ namespace gdjs {
       }
 
       // Create initial instances of objects
-      if (!options || !options.clearMemory)
+      if (!options || !options.preventInitialInstancesCreation)
         this.createObjectsFrom(
           sceneData.instances,
           0,
@@ -215,7 +218,7 @@ namespace gdjs {
       if (
         sceneData.stopSoundsOnStartup &&
         this._runtimeGame &&
-        (!options || !options.clearMemory)
+        (!options || !options.preventSoundManagerClearing)
       ) {
         this._runtimeGame.getSoundManager().clearAll();
       }
@@ -885,7 +888,7 @@ namespace gdjs {
           }
         }
       }
-      if (syncData.timeManager && options.clearMemory) {
+      if (syncData.timeManager && options.syncTimers) {
         this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
       }
     }

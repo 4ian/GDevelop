@@ -1,7 +1,6 @@
 let time = 0.0;
 
 namespace gdjs {
-  const logger = new gdjs.Logger('Scene stack');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
   /**

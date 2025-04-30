@@ -304,6 +304,16 @@ const addBehavior: EditorFunction = async ({ project, args }) => {
     );
   }
 
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    project.getCurrentPlatform(),
+    behavior_type
+  );
+  if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+    return makeGenericFailure(
+      `Type "${behavior_type}" does not exist for behaviors.`
+    );
+  }
+
   // Add the behavior
   object.addNewBehavior(project, behavior_type, behavior_name);
 

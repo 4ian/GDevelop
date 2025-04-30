@@ -33,7 +33,10 @@ import {
   type EditorFunctionCallResult,
 } from '../../../Commands/EditorFunctionCallRunner';
 import { getFunctionCallsToProcess } from './AiRequestUtils';
-import { useStableUpToDateRef } from '../../../Utils/UseStableUpToDateCallback';
+import {
+  useStableUpToDateCallback,
+  useStableUpToDateRef,
+} from '../../../Utils/UseStableUpToDateCallback';
 import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -595,14 +598,50 @@ export const AskAi = React.memo<Props>(
             isSendingAiRequest(selectedAiRequestId)
           )
             return;
+
+          // Read the results from the editor that applied the function calls.
           const editorFunctionCallResults = getEditorFunctionCallResults(
             selectedAiRequestId
           );
           if (!editorFunctionCallResults) return;
 
+          // Transform them into the output that will be stored on the AI request.
+          let hasUnfinishedResult = false;
+          const functionCallOutputs = editorFunctionCallResults
+            .map(functionCallOutput => {
+              if (functionCallOutput.status === 'finished') {
+                return {
+                  type: 'function_call_output',
+                  call_id: functionCallOutput.call_id,
+                  output: JSON.stringify({
+                    success: functionCallOutput.success,
+                    ...functionCallOutput.output,
+                  }),
+                };
+              } else if (functionCallOutput.status === 'ignored') {
+                return {
+                  type: 'function_call_output',
+                  call_id: functionCallOutput.call_id,
+                  output: JSON.stringify({
+                    ignored: true,
+                    message: 'This was marked as ignored by the user.',
+                  }),
+                };
+              }
+
+              hasUnfinishedResult = true;
+              return null;
+            })
+            .filter(Boolean);
+
+          // If anything is not finished yet, stop there (we only send all
+          // results at once).
+          if (hasUnfinishedResult || editorFunctionCallResults.length === 0)
+            return;
+
           try {
             console.info(
-              'Sending pending function call outputs: ',
+              'Sending editor function call results:',
               editorFunctionCallResults
             );
             setSendingAiRequest(selectedAiRequestId, true);
@@ -611,37 +650,14 @@ export const AskAi = React.memo<Props>(
               addFunctionCallOutputsToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
-                functionCallOutputs: editorFunctionCallResults
-                  .map(functionCallOutput => {
-                    if (functionCallOutput.status === 'finished') {
-                      return {
-                        type: 'function_call_output',
-                        call_id: functionCallOutput.call_id,
-                        output: JSON.stringify({
-                          success: functionCallOutput.success,
-                          ...functionCallOutput.output,
-                        }),
-                      };
-                    } else if (functionCallOutput.status === 'ignored') {
-                      return {
-                        type: 'function_call_output',
-                        call_id: functionCallOutput.call_id,
-                        output: JSON.stringify({
-                          ignored: true,
-                          message: 'This was marked as ignored by the user.',
-                        }),
-                      };
-                    }
-
-                    return null;
-                  })
-                  .filter(Boolean),
+                functionCallOutputs,
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);
             setSendingAiRequest(aiRequest.id, false);
             clearEditorFunctionCallResults(aiRequest.id);
           } catch (error) {
+            // TODO: add button to send again.
             setLastSendError(selectedAiRequestId, error);
           }
         },
@@ -656,6 +672,9 @@ export const AskAi = React.memo<Props>(
           getAuthorizationHeader,
           setLastSendError,
         ]
+      );
+      const upToDateSendEditorFunctionCallResults = useStableUpToDateCallback(
+        onSendEditorFunctionCallResults
       );
 
       const onSendFeedback = React.useCallback(
@@ -678,6 +697,34 @@ export const AskAi = React.memo<Props>(
         [getAuthorizationHeader, profile]
       );
 
+      // TODO: Move all of the next functions into a hook
+      const [
+        sendEditorFunctionCallResultTrigger,
+        setSendEditorFunctionCallResultTrigger,
+      ] = React.useState(0);
+      const triggerSendEditorFunctionCallResults = React.useCallback(() => {
+        console.log("Asking to send the editor function call results.");
+        setSendEditorFunctionCallResultTrigger(
+          sendEditorFunctionCallResultTrigger =>
+            sendEditorFunctionCallResultTrigger + 1
+        );
+      }, []);
+
+      React.useEffect(
+        () => {
+          console.log("CALLING THE UPTODATE SendEditorFunctionCallResults");
+          upToDateSendEditorFunctionCallResults();
+        },
+        [
+          sendEditorFunctionCallResultTrigger,
+          upToDateSendEditorFunctionCallResults,
+        ]
+      );
+
+      const [
+        isAutoProcessingFunctionCalls,
+        setAutoProcessFunctionCalls,
+      ] = React.useState(true); // TODO: make it per ai request id.
       const onProcessFunctionCalls = React.useCallback(
         async (
           functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -718,6 +765,10 @@ export const AskAi = React.memo<Props>(
             selectedAiRequest.id,
             editorFunctionCallResults
           );
+
+          // We may have processed everything, so try to send the results
+          // to the backend.
+          triggerSendEditorFunctionCallResults();
         },
         [
           project,
@@ -725,37 +776,54 @@ export const AskAi = React.memo<Props>(
           addEditorFunctionCallResults,
           ensureExtensionInstalled,
           launchEventsGeneration,
+          triggerSendEditorFunctionCallResults,
         ]
       );
 
-      const onProcessAllFunctionCalls = React.useCallback(
-        async () => {
-          if (!project || !selectedAiRequest) return;
-
-          const functionCalls = getFunctionCallsToProcess({
-            aiRequest: selectedAiRequest,
-            editorFunctionCallResults:
-              getEditorFunctionCallResults(selectedAiRequest.id) || [],
-          });
-          console.log('Will process', functionCalls);
-
-          await onProcessFunctionCalls(functionCalls);
-        },
-        [
-          project,
-          selectedAiRequest,
-          getEditorFunctionCallResults,
-          onProcessFunctionCalls,
-        ]
+      const allFunctionCallsToProcess = React.useMemo(
+        () =>
+          selectedAiRequest
+            ? getFunctionCallsToProcess({
+                aiRequest: selectedAiRequest,
+                editorFunctionCallResults:
+                  getEditorFunctionCallResults(selectedAiRequest.id) || [],
+              })
+            : [],
+        [selectedAiRequest, getEditorFunctionCallResults]
       );
 
       const hasProcessedAllFunctionCalls = selectedAiRequest
-        ? getFunctionCallsToProcess({
-            aiRequest: selectedAiRequest,
-            editorFunctionCallResults:
-              getEditorFunctionCallResults(selectedAiRequest.id) || [],
-          }).length === 0
+        ? allFunctionCallsToProcess.length === 0
         : false;
+
+      React.useEffect(
+        () => {
+          (async () => {
+            console.log('Checking if should auto process function calls.');
+            if (isAutoProcessingFunctionCalls) {
+              if (allFunctionCallsToProcess.length === 0) {
+                console.log('No function calls to process.');
+                return;
+              }
+              console.log('Yes!');
+              await onProcessFunctionCalls(allFunctionCallsToProcess);
+
+              console.log(
+                'Sending, just now the editor function call results.'
+              );
+            } else {
+              console.log('no');
+            }
+          })();
+        },
+        [
+          isAutoProcessingFunctionCalls,
+          onProcessFunctionCalls,
+          allFunctionCallsToProcess,
+        ]
+      );
+
+      //TODO: end of the functions to move in a hook.
 
       return (
         <>
@@ -785,20 +853,16 @@ export const AskAi = React.memo<Props>(
                 availableCredits={availableCredits}
                 onSendFeedback={onSendFeedback}
                 hasOpenedProject={!!project}
+                isAutoProcessingFunctionCalls={isAutoProcessingFunctionCalls}
+                setAutoProcessFunctionCalls={setAutoProcessFunctionCalls}
+                i18n={i18n}
               />
             </div>
-            <button
-              disabled={!selectedAiRequest || hasProcessedAllFunctionCalls}
-              onClick={onProcessAllFunctionCalls}
-            >
-              Process all
-            </button>
-            <button
-              disabled={!selectedAiRequest || !hasProcessedAllFunctionCalls}
-              onClick={onSendEditorFunctionCallResults}
-            >
-              Continue
-            </button>
+            {JSON.stringify({
+              allFunctionCallsToProcess,
+              hasProcessedAllFunctionCalls,
+              isAutoProcessingFunctionCalls,
+            })}
           </Paper>
           <AskAiHistory
             open={isHistoryOpen}

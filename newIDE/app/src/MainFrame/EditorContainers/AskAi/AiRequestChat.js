@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
+import { I18n as I18nType } from '@lingui/core';
 import {
   ColumnStackLayout,
+  LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import Text from '../../../UI/Text';
@@ -36,11 +38,14 @@ import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
 import { getFunctionCallToFunctionCallOutputMap } from './AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
+import { CompactToggleField } from '../../../UI/CompactToggleField';
+import CircularProgress from '../../../UI/CircularProgress';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
 
 type Props = {
+  i18n: I18nType,
   aiRequest: AiRequest | null,
 
   isLaunchingAiRequest: boolean,
@@ -52,6 +57,8 @@ type Props = {
     reason?: string
   ) => Promise<void>,
   hasOpenedProject: boolean,
+  isAutoProcessingFunctionCalls: boolean,
+  setAutoProcessFunctionCalls: (boolean) => void,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -117,6 +124,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       hasOpenedProject,
       editorFunctionCallResults,
       onProcessFunctionCalls,
+      i18n,
     }: Props,
     ref
   ) => {
@@ -551,6 +559,32 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
+            <Paper background="dark" variant="outlined" square>
+              <Column>
+                <LineStackLayout
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <LineStackLayout alignItems="center" noMargin>
+                    <CircularProgress variant="indeterminate" size={10} />
+                    <Text size="body" color="secondary" noMargin>
+                      <Trans>The AI is building your request.</Trans>
+                    </Text>
+                  </LineStackLayout>
+                  <Text size="body" noMargin>
+                    <Link
+                      href={'#'}
+                      color="secondary"
+                      onClick={() => {
+                        // TODO
+                      }}
+                    >
+                      <Trans>Pause</Trans>
+                    </Link>
+                  </Text>
+                </LineStackLayout>
+              </Column>
+            </Paper>
             <CompactTextAreaField
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}

@@ -322,7 +322,7 @@ namespace gdjs {
       this._timeSinceCurrentJumpStart = behaviorSpecificProps.tscjs;
       this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
 
-      // Clear user inputs between frames unless requested otherwise.
+      // Clear user inputs between frames only if requested.
       this._clearInputsBetweenFrames = !!options.clearMemory;
     }
 

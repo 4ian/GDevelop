@@ -852,6 +852,9 @@ namespace gdjs {
         extVar: extensionsVariablesSyncData,
         id: this.getOrCreateNetworkId(),
         timeManager: this._timeManager.getNetworkSyncData(),
+        tweenManager: gdjs.evtTools.tween
+          .getTweensMap(this)
+          .getNetworkSyncData(),
       };
     }
 
@@ -880,6 +883,13 @@ namespace gdjs {
       }
       if (syncData.timeManager && options.syncTimers) {
         this._timeManager.updateFromNetworkSyncData(syncData.timeManager);
+      }
+      if (syncData.tweenManager && options.syncTweens) {
+        gdjs.evtTools.tween.getTweensMap(this).updateFromNetworkSyncData(
+          syncData.tweenManager,
+          // TODO: Use correct time source identifier.
+          (timeSourceIdentifier) => this
+        );
       }
     }
 

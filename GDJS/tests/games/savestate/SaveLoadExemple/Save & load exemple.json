@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 224,
+    "build": 229,
     "major": 5,
     "minor": 5,
     "revision": 0
@@ -239,6 +239,90 @@
         "origin": {
           "identifier": "https://asset-resources.gdevelop.io/public-resources/Ragnar Random/Fakebit Chiptune Music/dfcdb6ef0ded864b301b5cc57940b190e803b1ea53d057338043f3b8bcd2a138_04 - Castle Nosferatu (Sega-style FM Synth Remix).aac",
           "name": "gdevelop-asset-store"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Aerial Attack.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Aerial Attack.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/1f9088295b372e57cc2217444a5bb5247eb8806100ab49169be5eedfb0b5a43c_Chi Chi the Bird_Aerial Attack.png",
+          "name": "Chi Chi the Bird_Aerial Attack.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Falling.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Falling.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/9dc7356e0994b87b58e91451c48ba58ed2c5a02e2e20991714760cdff61db268_Chi Chi the Bird_Falling.png",
+          "name": "Chi Chi the Bird_Falling.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Flapping Wings_1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Flapping Wings_1.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/0695fb9e00620c3e49978a912115b8ec5e4c63bfc2950b7b7ea3bb540cef0b70_Chi Chi the Bird_Flapping Wings_1.png",
+          "name": "Chi Chi the Bird_Flapping Wings_1.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Flapping Wings_2.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Flapping Wings_2.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/aabf824203cc1da9650615de5a5302affe154a7d8f254fec183e8fdee2ce709c_Chi Chi the Bird_Flapping Wings_2.png",
+          "name": "Chi Chi the Bird_Flapping Wings_2.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Flapping Wings_3.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Flapping Wings_3.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/d4f211f8211c81ffbaae748150b236c67a07206f1d9536e3ba86d291e2570c8b_Chi Chi the Bird_Flapping Wings_3.png",
+          "name": "Chi Chi the Bird_Flapping Wings_3.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Hurt.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Hurt.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/f3a2cfe7ffc611d674d316e4797b4f973de5c018d79629d825bc89681e788f24_Chi Chi the Bird_Hurt.png",
+          "name": "Chi Chi the Bird_Hurt.png"
+        }
+      },
+      {
+        "file": "assets/Chi Chi the Bird_Standing.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Chi Chi the Bird_Standing.png",
+        "smoothed": false,
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/GrafxKid Pack/Character Pack 1/Chi Chi the Bird/db7b414f5e1e6c385b901b1394fa14ee3892cd006a2c05ab96c9acd7c0790963_Chi Chi the Bird_Standing.png",
+          "name": "Chi Chi the Bird_Standing.png"
         }
       }
     ],
@@ -595,6 +679,23 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 6,
+          "height": 94,
+          "keepRatio": true,
+          "layer": "",
+          "name": "ChiChiTheBird",
+          "persistentUuid": "5a2186ac-508e-4905-a4ab-6068772db57b",
+          "width": 94,
+          "x": 881,
+          "y": 375,
+          "zOrder": 32,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -913,6 +1014,7 @@
           "assetStoreId": "e71bd69f896d6c7531b48c65ceb5da25071d4fbdeb518aeceecba8d21f34ed8d",
           "name": "Joystick",
           "type": "SpriteMultitouchJoystick::SpriteMultitouchJoystick",
+          "variant": "",
           "variables": [],
           "effects": [],
           "behaviors": [],
@@ -1223,6 +1325,335 @@
             "characterSize": 50,
             "color": "255;255;255"
           }
+        },
+        {
+          "adaptCollisionMaskAutomatically": true,
+          "assetStoreId": "445c46c6f04f1551e12d8ccea31a4e75ca6dda1aea141a0d7b8aa0ba337df4bc",
+          "name": "ChiChiTheBird",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
+          "animations": [
+            {
+              "name": "Hurt",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Hurt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Aerial Attack",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Aerial Attack.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Falling",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Falling.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Flapping Wings",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.3333,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Flapping Wings_1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Flapping Wings_2.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Flapping Wings_3.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Standing",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.025,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Chi Chi the Bird_Standing.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 1
+                          },
+                          {
+                            "x": 16,
+                            "y": 15
+                          },
+                          {
+                            "x": 0,
+                            "y": 15
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "objectsFolderStructure": {
@@ -1265,6 +1696,9 @@
           },
           {
             "objectName": "NewTiledSprite"
+          },
+          {
+            "objectName": "ChiChiTheBird"
           }
         ]
       },
@@ -1414,6 +1848,53 @@
                 "",
                 ""
               ]
+            },
+            {
+              "type": {
+                "value": "Tween::TweenBehavior::AddObjectPositionTween2"
+              },
+              "parameters": [
+                "ChiChiTheBird",
+                "Tween",
+                "\"position\"",
+                "2000",
+                "ChiChiTheBird.Y()",
+                "\"linear\"",
+                "30",
+                ""
+              ]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "Platformer_Character",
+                    "SmoothCamera",
+                    "no"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "Tween::TweenCameraPosition2"
+                  },
+                  "parameters": [
+                    "",
+                    "\"cameraPosition\"",
+                    "2000",
+                    "CameraCenterY()",
+                    "",
+                    "\"linear\"",
+                    "30"
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -1553,6 +2034,7 @@
       "category": "User interface",
       "extensionNamespace": "",
       "fullName": "Button states and effects",
+      "gdevelopVersion": "",
       "helpPath": "/objects/button",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdlc3R1cmUtdGFwLWJ1dHRvbiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMyA1QzE1LjIxIDUgMTcgNi43OSAxNyA5QzE3IDEwLjUgMTYuMiAxMS43NyAxNSAxMi40NlYxMS4yNEMxNS42MSAxMC42OSAxNiA5Ljg5IDE2IDlDMTYgNy4zNCAxNC42NiA2IDEzIDZTMTAgNy4zNCAxMCA5QzEwIDkuODkgMTAuMzkgMTAuNjkgMTEgMTEuMjRWMTIuNDZDOS44IDExLjc3IDkgMTAuNSA5IDlDOSA2Ljc5IDEwLjc5IDUgMTMgNU0yMCAyMC41QzE5Ljk3IDIxLjMyIDE5LjMyIDIxLjk3IDE4LjUgMjJIMTNDMTIuNjIgMjIgMTIuMjYgMjEuODUgMTIgMjEuNTdMOCAxNy4zN0w4Ljc0IDE2LjZDOC45MyAxNi4zOSA5LjIgMTYuMjggOS41IDE2LjI4SDkuN0wxMiAxOFY5QzEyIDguNDUgMTIuNDUgOCAxMyA4UzE0IDguNDUgMTQgOVYxMy40N0wxNS4yMSAxMy42TDE5LjE1IDE1Ljc5QzE5LjY4IDE2LjAzIDIwIDE2LjU2IDIwIDE3LjE0VjIwLjVNMjAgMkg0QzIuOSAyIDIgMi45IDIgNFYxMkMyIDEzLjExIDIuOSAxNCA0IDE0SDhWMTJMNCAxMkw0IDRIMjBMMjAgMTJIMThWMTRIMjBWMTMuOTZMMjAuMDQgMTRDMjEuMTMgMTQgMjIgMTMuMDkgMjIgMTJWNEMyMiAyLjkgMjEuMTEgMiAyMCAyWiIgLz48L3N2Zz4=",
       "name": "ButtonStates",
@@ -7693,6 +8175,7 @@
       "category": "Input",
       "extensionNamespace": "",
       "fullName": "Multitouch joystick and buttons (sprite)",
+      "gdevelopVersion": "",
       "helpPath": "/objects/multitouch-joystick",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMTYiIGN5PSIxNiIgcj0iMTMiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjI4LjQsMTIgMjAsMTIgMjAsMy42ICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMjAsMjguNCAyMCwyMCAyOC40LDIwICIvPg0KPHBvbHlsaW5lIGNsYXNzPSJzdDAiIHBvaW50cz0iMy42LDIwIDEyLDIwIDEyLDI4LjQgIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMiwzLjYgMTIsMTIgMy42LDEyICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxNiw2IDE2LjcsNyAxNS4zLDcgIi8+DQo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjE2LDI2IDE1LjMsMjUgMTYuNywyNSAiLz4NCjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNiwxNiA3LDE1LjMgNywxNi43ICIvPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIyNiwxNiAyNSwxNi43IDI1LDE1LjMgIi8+DQo8L3N2Zz4NCg==",
       "name": "SpriteMultitouchJoystick",
@@ -11428,6 +11911,110 @@
           "fullName": "Multitouch Joystick",
           "isUsingLegacyInstancesRenderer": true,
           "name": "SpriteMultitouchJoystick",
+          "objects": [
+            {
+              "adaptCollisionMaskAutomatically": false,
+              "assetStoreId": "",
+              "name": "Thumb",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [],
+              "animations": [
+                {
+                  "name": "Idle",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 0.08,
+                      "sprites": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "adaptCollisionMaskAutomatically": false,
+              "assetStoreId": "",
+              "name": "Border",
+              "type": "Sprite",
+              "updateIfNotVisible": false,
+              "variables": [],
+              "effects": [],
+              "behaviors": [
+                {
+                  "name": "MultitouchJoystick",
+                  "type": "SpriteMultitouchJoystick::MultitouchJoystick",
+                  "ControllerIdentifier": 1,
+                  "JoystickIdentifier": "Primary",
+                  "FloatingEnabled": false,
+                  "DeadZoneRadius": 0.4,
+                  "JoystickAngle": 0,
+                  "JoystickForce": 0,
+                  "TouchId": 0,
+                  "TouchIndex": 0
+                }
+              ],
+              "animations": [
+                {
+                  "name": "Idle",
+                  "useMultipleDirections": false,
+                  "directions": [
+                    {
+                      "looping": false,
+                      "timeBetweenFrames": 0.08,
+                      "sprites": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Thumb"
+              },
+              {
+                "objectName": "Border"
+              }
+            ]
+          },
+          "objectsGroups": [],
+          "layers": [
+            {
+              "ambientLightColorB": 200,
+              "ambientLightColorG": 200,
+              "ambientLightColorR": 200,
+              "camera3DFarPlaneDistance": 10000,
+              "camera3DFieldOfView": 45,
+              "camera3DNearPlaneDistance": 3,
+              "cameraType": "",
+              "followBaseLayerCamera": false,
+              "isLightingLayer": false,
+              "isLocked": false,
+              "name": "",
+              "renderingType": "",
+              "visibility": true,
+              "cameras": [
+                {
+                  "defaultSize": true,
+                  "defaultViewport": true,
+                  "height": 0,
+                  "viewportBottom": 1,
+                  "viewportLeft": 0,
+                  "viewportRight": 1,
+                  "viewportTop": 0,
+                  "width": 0
+                }
+              ],
+              "effects": []
+            }
+          ],
+          "instances": [],
           "eventsFunctions": [
             {
               "fullName": "",
@@ -12387,110 +12974,7 @@
               "name": "ParentOrigin"
             }
           ],
-          "objects": [
-            {
-              "adaptCollisionMaskAutomatically": false,
-              "assetStoreId": "",
-              "name": "Thumb",
-              "type": "Sprite",
-              "updateIfNotVisible": false,
-              "variables": [],
-              "effects": [],
-              "behaviors": [],
-              "animations": [
-                {
-                  "name": "Idle",
-                  "useMultipleDirections": false,
-                  "directions": [
-                    {
-                      "looping": false,
-                      "timeBetweenFrames": 0.08,
-                      "sprites": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "adaptCollisionMaskAutomatically": false,
-              "assetStoreId": "",
-              "name": "Border",
-              "type": "Sprite",
-              "updateIfNotVisible": false,
-              "variables": [],
-              "effects": [],
-              "behaviors": [
-                {
-                  "name": "MultitouchJoystick",
-                  "type": "SpriteMultitouchJoystick::MultitouchJoystick",
-                  "ControllerIdentifier": 1,
-                  "JoystickIdentifier": "Primary",
-                  "FloatingEnabled": false,
-                  "DeadZoneRadius": 0.4,
-                  "JoystickAngle": 0,
-                  "JoystickForce": 0,
-                  "TouchId": 0,
-                  "TouchIndex": 0
-                }
-              ],
-              "animations": [
-                {
-                  "name": "Idle",
-                  "useMultipleDirections": false,
-                  "directions": [
-                    {
-                      "looping": false,
-                      "timeBetweenFrames": 0.08,
-                      "sprites": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "objectsFolderStructure": {
-            "folderName": "__ROOT",
-            "children": [
-              {
-                "objectName": "Thumb"
-              },
-              {
-                "objectName": "Border"
-              }
-            ]
-          },
-          "objectsGroups": [],
-          "layers": [
-            {
-              "ambientLightColorB": 200,
-              "ambientLightColorG": 200,
-              "ambientLightColorR": 200,
-              "camera3DFarPlaneDistance": 10000,
-              "camera3DFieldOfView": 45,
-              "camera3DNearPlaneDistance": 3,
-              "cameraType": "",
-              "followBaseLayerCamera": false,
-              "isLightingLayer": false,
-              "isLocked": false,
-              "name": "",
-              "renderingType": "",
-              "visibility": true,
-              "cameras": [
-                {
-                  "defaultSize": true,
-                  "defaultViewport": true,
-                  "height": 0,
-                  "viewportBottom": 1,
-                  "viewportLeft": 0,
-                  "viewportRight": 1,
-                  "viewportTop": 0,
-                  "width": 0
-                }
-              ],
-              "effects": []
-            }
-          ],
-          "instances": []
+          "variants": []
         }
       ]
     },
@@ -12499,6 +12983,7 @@
       "category": "Camera",
       "extensionNamespace": "",
       "fullName": "Smooth Camera",
+      "gdevelopVersion": "",
       "helpPath": "/tutorials/follow-player-with-camera/",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwO30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjQsMTNoLTZjLTEuMSwwLTItMC45LTItMlY1YzAtMS4xLDAuOS0yLDItMmg2YzEuMSwwLDIsMC45LDIsMnY2QzI2LDEyLjEsMjUuMSwxMywyNCwxM3oiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yNiw4djEwYzAsMS4xLTAuOSwyLTIsMkg4Yy0xLjEsMC0yLTAuOS0yLTJWOGMwLTEuMSwwLjktMiwyLTJoOCIvPg0KPGNpcmNsZSBjbGFzcz0ic3QwIiBjeD0iMjEiIGN5PSI4IiByPSIyIi8+DQo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIxMSIgY3k9IjE2IiByPSIxIi8+DQo8cmVjdCB4PSI5IiB5PSI5IiBjbGFzcz0ic3QwIiB3aWR0aD0iNCIgaGVpZ2h0PSIzIi8+DQo8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIyMSwyOSAyMSwyOSAxMSwyOSAxMSwyOSAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjE4LDIwIDE4LDI5IDE0LDI5IDE0LDIwICIvPg0KPHJlY3QgeD0iNyIgeT0iMyIgY2xhc3M9InN0MCIgd2lkdGg9IjQiIGhlaWdodD0iMyIvPg0KPC9zdmc+DQo=",
       "name": "SmoothCamera",

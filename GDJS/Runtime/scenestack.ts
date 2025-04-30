@@ -40,6 +40,7 @@ namespace gdjs {
         keepControl: true,
         syncSounds: true,
         syncTimers: true,
+        syncTweens: true,
         ignoreVariableOwnership: true,
       };
 
@@ -136,7 +137,7 @@ namespace gdjs {
             storageKey
           )
           .then((jsonData) => {
-            const saveState = JSON.parse(jsonData) as GameSaveState;
+            const saveState = jsonData as GameSaveState;
             this._loadGameFromSave(saveState);
           })
           .catch((error) => {

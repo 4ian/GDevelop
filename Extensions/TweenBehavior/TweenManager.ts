@@ -1,6 +1,214 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace tween {
+      /*!
+       * All equations are adapted from Thomas Fuchs'
+       * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js).
+       *
+       * Based on Easing Equations (c) 2003 [Robert
+       * Penner](http://www.robertpenner.com/), all rights reserved. This work is
+       * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
+       */
+
+      /*!
+       *  TERMS OF USE - EASING EQUATIONS
+       *  Open source under the BSD License.
+       *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
+       */
+
+      /*! Shifty 3.0.3 - https://github.com/jeremyckahn/shifty */
+      export const easingFunctions: Record<string, EasingFunction> = {
+        linear: (pos: number) => pos,
+
+        easeInQuad: (pos: number) => Math.pow(pos, 2),
+
+        easeOutQuad: (pos: number) => -(Math.pow(pos - 1, 2) - 1),
+
+        easeInOutQuad: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? 0.5 * Math.pow(pos, 2)
+            : -0.5 * ((pos -= 2) * pos - 2),
+
+        easeInCubic: (pos: number) => Math.pow(pos, 3),
+
+        easeOutCubic: (pos: number) => Math.pow(pos - 1, 3) + 1,
+
+        easeInOutCubic: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? 0.5 * Math.pow(pos, 3)
+            : 0.5 * (Math.pow(pos - 2, 3) + 2),
+
+        easeInQuart: (pos: number) => Math.pow(pos, 4),
+
+        easeOutQuart: (pos: number) => -(Math.pow(pos - 1, 4) - 1),
+
+        easeInOutQuart: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? 0.5 * Math.pow(pos, 4)
+            : -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2),
+
+        easeInQuint: (pos: number) => Math.pow(pos, 5),
+
+        easeOutQuint: (pos: number) => Math.pow(pos - 1, 5) + 1,
+
+        easeInOutQuint: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? 0.5 * Math.pow(pos, 5)
+            : 0.5 * (Math.pow(pos - 2, 5) + 2),
+
+        easeInSine: (pos: number) => -Math.cos(pos * (Math.PI / 2)) + 1,
+
+        easeOutSine: (pos: number) => Math.sin(pos * (Math.PI / 2)),
+
+        easeInOutSine: (pos: number) => -0.5 * (Math.cos(Math.PI * pos) - 1),
+
+        easeInExpo: (pos: number) =>
+          pos === 0 ? 0 : Math.pow(2, 10 * (pos - 1)),
+
+        easeOutExpo: (pos: number) =>
+          pos === 1 ? 1 : -Math.pow(2, -10 * pos) + 1,
+
+        easeInOutExpo: (pos: number) => {
+          if (pos === 0) {
+            return 0;
+          }
+
+          if (pos === 1) {
+            return 1;
+          }
+
+          if ((pos /= 0.5) < 1) {
+            return 0.5 * Math.pow(2, 10 * (pos - 1));
+          }
+
+          return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
+        },
+
+        easeInCirc: (pos: number) => -(Math.sqrt(1 - pos * pos) - 1),
+
+        easeOutCirc: (pos: number) => Math.sqrt(1 - Math.pow(pos - 1, 2)),
+
+        easeInOutCirc: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? -0.5 * (Math.sqrt(1 - pos * pos) - 1)
+            : 0.5 * (Math.sqrt(1 - (pos -= 2) * pos) + 1),
+
+        easeOutBounce: (pos: number) => {
+          if (pos < 1 / 2.75) {
+            return 7.5625 * pos * pos;
+          } else if (pos < 2 / 2.75) {
+            return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
+          } else if (pos < 2.5 / 2.75) {
+            return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
+          } else {
+            return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
+          }
+        },
+
+        easeInBack: (pos: number) => {
+          const s = 1.70158;
+          return pos * pos * ((s + 1) * pos - s);
+        },
+
+        easeOutBack: (pos: number) => {
+          const s = 1.70158;
+          return (pos = pos - 1) * pos * ((s + 1) * pos + s) + 1;
+        },
+
+        easeInOutBack: (pos: number) => {
+          let s = 1.70158;
+          if ((pos /= 0.5) < 1) {
+            return 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s));
+          }
+          return 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
+        },
+
+        elastic: (pos: number) =>
+          -1 *
+            Math.pow(4, -8 * pos) *
+            Math.sin(((pos * 6 - 1) * (2 * Math.PI)) / 2) +
+          1,
+
+        swingFromTo: (pos: number) => {
+          let s = 1.70158;
+          return (pos /= 0.5) < 1
+            ? 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s))
+            : 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
+        },
+
+        swingFrom: (pos: number) => {
+          const s = 1.70158;
+          return pos * pos * ((s + 1) * pos - s);
+        },
+
+        swingTo: (pos: number) => {
+          const s = 1.70158;
+          return (pos -= 1) * pos * ((s + 1) * pos + s) + 1;
+        },
+
+        bounce: (pos: number) => {
+          if (pos < 1 / 2.75) {
+            return 7.5625 * pos * pos;
+          } else if (pos < 2 / 2.75) {
+            return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
+          } else if (pos < 2.5 / 2.75) {
+            return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
+          } else {
+            return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
+          }
+        },
+
+        bouncePast: (pos: number) => {
+          if (pos < 1 / 2.75) {
+            return 7.5625 * pos * pos;
+          } else if (pos < 2 / 2.75) {
+            return 2 - (7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75);
+          } else if (pos < 2.5 / 2.75) {
+            return 2 - (7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375);
+          } else {
+            return 2 - (7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375);
+          }
+        },
+
+        easeFromTo: (pos: number) =>
+          (pos /= 0.5) < 1
+            ? 0.5 * Math.pow(pos, 4)
+            : -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2),
+
+        easeFrom: (pos: number) => Math.pow(pos, 4),
+
+        easeTo: (pos: number) => Math.pow(pos, 0.25),
+      };
+
+      export interface TweenInstanceNetworkSyncData<T> {
+        initialValue: T;
+        targetedValue: T;
+        elapsedTime: float;
+        totalDuration: float;
+        easingIdentifier: keyof typeof easingFunctions;
+        timeSourceIdentifier:
+          | { type: 'scene' }
+          | { type: 'layer'; layerName: string }
+          | { type: 'object' };
+        interpolate: 'linear' | 'exponential';
+        isPaused: boolean;
+      }
+
+      export interface TweenManagerNetworkSyncData {
+        tweens: Record<
+          string,
+          | TweenInstanceNetworkSyncData<float>
+          | TweenInstanceNetworkSyncData<Array<float>>
+        >;
+      }
+
+      type GetTimeSourceFunction = (
+        timeSourceType:
+          | { type: 'scene' }
+          | { type: 'layer'; layerName: string }
+          | { type: 'object' }
+      ) => TimeSource;
+
       /**
        * A tween manager that is used for layout tweens or object tweens.
        * @ignore
@@ -9,11 +217,16 @@ namespace gdjs {
         /**
          * All the tweens of a layout or a behavior.
          */
-        private _tweens = new Map<string, TweenInstance>();
+        private _tweens = new Map<
+          string,
+          TweenInstance<float> | TweenInstance<Array<float>>
+        >();
         /**
          * Allow fast iteration on tween that are active.
          */
-        private _activeTweens = new Array<TweenInstance>();
+        private _activeTweens = new Array<
+          TweenInstance<float> | TweenInstance<Array<float>>
+        >();
 
         constructor() {}
 
@@ -194,11 +407,15 @@ namespace gdjs {
           this._tweens.delete(identifier);
         }
 
-        _addActiveTween(tween: TweenInstance): void {
+        _addActiveTween(
+          tween: TweenInstance<float> | TweenInstance<Array<float>>
+        ): void {
           this._activeTweens.push(tween);
         }
 
-        _removeActiveTween(tween: TweenInstance): void {
+        _removeActiveTween(
+          tween: TweenInstance<float> | TweenInstance<Array<float>>
+        ): void {
           const index = this._activeTweens.findIndex(
             (activeTween) => activeTween === tween
           );
@@ -233,6 +450,75 @@ namespace gdjs {
           }
           return tween.getValue();
         }
+
+        getNetworkSyncData(): TweenManagerNetworkSyncData {
+          const syncData = {
+            tweens: {},
+          };
+          this._tweens.forEach((tween, identifier) => {
+            syncData.tweens[identifier] = tween.getNetworkSyncData();
+          });
+          return syncData;
+        }
+
+        updateFromNetworkSyncData(
+          syncData: TweenManagerNetworkSyncData,
+          getTimeSource: GetTimeSourceFunction
+        ) {
+          Object.entries(syncData.tweens).forEach(
+            ([identifier, tweenSyncData]) => {
+              if (
+                typeof tweenSyncData.initialValue === 'number' &&
+                typeof tweenSyncData.targetedValue === 'number'
+              ) {
+                this.addSimpleTween(
+                  identifier,
+                  getTimeSource(tweenSyncData.timeSourceIdentifier),
+                  tweenSyncData.totalDuration,
+                  tweenSyncData.easingIdentifier,
+                  tweenSyncData.interpolate === 'exponential'
+                    ? gdjs.evtTools.common.exponentialInterpolation
+                    : gdjs.evtTools.common.lerp,
+                  tweenSyncData.initialValue,
+                  tweenSyncData.targetedValue,
+                  (value) => {
+                    // TODO: Use the correct setter.
+                    console.log(value);
+                  },
+                  // TODO: Find a way to restore the onFinished callback.
+                  () => {}
+                );
+                if (tweenSyncData.isPaused) {
+                  this.pauseTween(identifier);
+                }
+              } else if (
+                Array.isArray(tweenSyncData.initialValue) &&
+                Array.isArray(tweenSyncData.targetedValue)
+              ) {
+                this.addMultiTween(
+                  identifier,
+                  getTimeSource(tweenSyncData.timeSourceIdentifier),
+                  tweenSyncData.totalDuration,
+                  tweenSyncData.easingIdentifier,
+                  tweenSyncData.interpolate === 'exponential'
+                    ? gdjs.evtTools.common.exponentialInterpolation
+                    : gdjs.evtTools.common.lerp,
+                  tweenSyncData.initialValue,
+                  tweenSyncData.targetedValue,
+                  (value) => {
+                    // TODO: Use the correct setter.
+                    console.log(value);
+                  },
+                  // TODO: Find a way to restore the onFinished callback.
+                  () => {}
+                );
+                if (tweenSyncData.isPaused) {
+                  this.pauseTween(identifier);
+                }
+              }
+            }
+          );
+        }
       }
 
       export interface TimeSource {
@@ -255,7 +541,7 @@ namespace gdjs {
        * A tween.
        * @ignore
        */
-      export interface TweenInstance {
+      export interface TweenInstance<T> {
         /**
          * Step toward the end.
          * @param timeDelta the duration from the previous step in seconds
@@ -269,13 +555,19 @@ namespace gdjs {
         pause(): void;
         getProgress(): float;
         getValue(): float;
+        getNetworkSyncData(): TweenInstanceNetworkSyncData<T>;
+        updateFromNetworkSyncData(
+          syncData: TweenInstanceNetworkSyncData<T>
+        ): void;
       }
 
       /**
        * A tween.
        * @ignore
        */
-      export abstract class AbstractTweenInstance implements TweenInstance {
+      export abstract class AbstractTweenInstance<T>
+        implements TweenInstance<T>
+      {
         protected elapsedTime: float;
         protected totalDuration: float;
         protected easing: (progress: float) => float;
@@ -339,13 +631,18 @@ namespace gdjs {
         getProgress(): float {
           return this.elapsedTime / this.totalDuration;
         }
+
+        abstract getNetworkSyncData(): TweenInstanceNetworkSyncData<T>;
+        abstract updateFromNetworkSyncData(
+          syncData: TweenInstanceNetworkSyncData<T>
+        );
       }
 
       /**
        * A tween with only one value.
        * @ignore
        */
-      export class SimpleTweenInstance extends AbstractTweenInstance {
+      export class SimpleTweenInstance extends AbstractTweenInstance<float> {
         initialValue: float;
         targetedValue: float;
         setValue: (value: float) => void;
@@ -385,13 +682,32 @@ namespace gdjs {
         getValue(): float {
           return this.currentValue;
         }
+
+        getNetworkSyncData() {
+          return {
+            initialValue: this.initialValue,
+            targetedValue: this.targetedValue,
+            elapsedTime: this.elapsedTime,
+            totalDuration: this.totalDuration,
+            easingIdentifier: 'linear',
+            timeSourceIdentifier: { type: 'scene' }, // TODO: Use correct time source identifier.
+            interpolate:
+              this.interpolate === gdjs.evtTools.common.exponentialInterpolation
+                ? 'exponential'
+                : 'linear',
+            isPaused: this.isPaused,
+          };
+        }
+        updateFromNetworkSyncData() {}
       }
 
       /**
        * A tween with multiple values.
        * @ignore
        */
-      export class MultiTweenInstance extends AbstractTweenInstance {
+      export class MultiTweenInstance extends AbstractTweenInstance<
+        Array<float>
+      > {
         initialValue: Array<float>;
         targetedValue: Array<float>;
         setValue: (value: Array<float>) => void;
@@ -434,6 +750,23 @@ namespace gdjs {
         getValue(): float {
           return 0;
         }
+
+        getNetworkSyncData() {
+          return <TweenInstanceNetworkSyncData<Array<float>>>{
+            initialValue: this.initialValue,
+            targetedValue: this.targetedValue,
+            elapsedTime: this.elapsedTime,
+            totalDuration: this.totalDuration,
+            easingIdentifier: 'linear',
+            timeSourceIdentifier: { type: 'scene' },
+            interpolate:
+              this.interpolate === gdjs.evtTools.common.exponentialInterpolation
+                ? 'exponential'
+                : 'linear',
+            isPaused: this.isPaused,
+          };
+        }
+        updateFromNetworkSyncData() {}
       }
 
       export const rgbToHsl = (r: number, g: number, b: number): number[] => {
@@ -494,185 +827,6 @@ namespace gdjs {
       };
 
       export type EasingFunction = (progress: float) => float;
-
-      /*!
-       * All equations are adapted from Thomas Fuchs'
-       * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js).
-       *
-       * Based on Easing Equations (c) 2003 [Robert
-       * Penner](http://www.robertpenner.com/), all rights reserved. This work is
-       * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
-       */
-
-      /*!
-       *  TERMS OF USE - EASING EQUATIONS
-       *  Open source under the BSD License.
-       *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
-       */
-
-      /*! Shifty 3.0.3 - https://github.com/jeremyckahn/shifty */
-      export const easingFunctions: Record<string, EasingFunction> = {
-        linear: (pos: number) => pos,
-
-        easeInQuad: (pos: number) => Math.pow(pos, 2),
-
-        easeOutQuad: (pos: number) => -(Math.pow(pos - 1, 2) - 1),
-
-        easeInOutQuad: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? 0.5 * Math.pow(pos, 2)
-            : -0.5 * ((pos -= 2) * pos - 2),
-
-        easeInCubic: (pos: number) => Math.pow(pos, 3),
-
-        easeOutCubic: (pos: number) => Math.pow(pos - 1, 3) + 1,
-
-        easeInOutCubic: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? 0.5 * Math.pow(pos, 3)
-            : 0.5 * (Math.pow(pos - 2, 3) + 2),
-
-        easeInQuart: (pos: number) => Math.pow(pos, 4),
-
-        easeOutQuart: (pos: number) => -(Math.pow(pos - 1, 4) - 1),
-
-        easeInOutQuart: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? 0.5 * Math.pow(pos, 4)
-            : -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2),
-
-        easeInQuint: (pos: number) => Math.pow(pos, 5),
-
-        easeOutQuint: (pos: number) => Math.pow(pos - 1, 5) + 1,
-
-        easeInOutQuint: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? 0.5 * Math.pow(pos, 5)
-            : 0.5 * (Math.pow(pos - 2, 5) + 2),
-
-        easeInSine: (pos: number) => -Math.cos(pos * (Math.PI / 2)) + 1,
-
-        easeOutSine: (pos: number) => Math.sin(pos * (Math.PI / 2)),
-
-        easeInOutSine: (pos: number) => -0.5 * (Math.cos(Math.PI * pos) - 1),
-
-        easeInExpo: (pos: number) =>
-          pos === 0 ? 0 : Math.pow(2, 10 * (pos - 1)),
-
-        easeOutExpo: (pos: number) =>
-          pos === 1 ? 1 : -Math.pow(2, -10 * pos) + 1,
-
-        easeInOutExpo: (pos: number) => {
-          if (pos === 0) {
-            return 0;
-          }
-
-          if (pos === 1) {
-            return 1;
-          }
-
-          if ((pos /= 0.5) < 1) {
-            return 0.5 * Math.pow(2, 10 * (pos - 1));
-          }
-
-          return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
-        },
-
-        easeInCirc: (pos: number) => -(Math.sqrt(1 - pos * pos) - 1),
-
-        easeOutCirc: (pos: number) => Math.sqrt(1 - Math.pow(pos - 1, 2)),
-
-        easeInOutCirc: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? -0.5 * (Math.sqrt(1 - pos * pos) - 1)
-            : 0.5 * (Math.sqrt(1 - (pos -= 2) * pos) + 1),
-
-        easeOutBounce: (pos: number) => {
-          if (pos < 1 / 2.75) {
-            return 7.5625 * pos * pos;
-          } else if (pos < 2 / 2.75) {
-            return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
-          } else if (pos < 2.5 / 2.75) {
-            return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
-          } else {
-            return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
-          }
-        },
-
-        easeInBack: (pos: number) => {
-          const s = 1.70158;
-          return pos * pos * ((s + 1) * pos - s);
-        },
-
-        easeOutBack: (pos: number) => {
-          const s = 1.70158;
-          return (pos = pos - 1) * pos * ((s + 1) * pos + s) + 1;
-        },
-
-        easeInOutBack: (pos: number) => {
-          let s = 1.70158;
-          if ((pos /= 0.5) < 1) {
-            return 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s));
-          }
-          return 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
-        },
-
-        elastic: (pos: number) =>
-          -1 *
-            Math.pow(4, -8 * pos) *
-            Math.sin(((pos * 6 - 1) * (2 * Math.PI)) / 2) +
-          1,
-
-        swingFromTo: (pos: number) => {
-          let s = 1.70158;
-          return (pos /= 0.5) < 1
-            ? 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s))
-            : 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
-        },
-
-        swingFrom: (pos: number) => {
-          const s = 1.70158;
-          return pos * pos * ((s + 1) * pos - s);
-        },
-
-        swingTo: (pos: number) => {
-          const s = 1.70158;
-          return (pos -= 1) * pos * ((s + 1) * pos + s) + 1;
-        },
-
-        bounce: (pos: number) => {
-          if (pos < 1 / 2.75) {
-            return 7.5625 * pos * pos;
-          } else if (pos < 2 / 2.75) {
-            return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
-          } else if (pos < 2.5 / 2.75) {
-            return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
-          } else {
-            return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
-          }
-        },
-
-        bouncePast: (pos: number) => {
-          if (pos < 1 / 2.75) {
-            return 7.5625 * pos * pos;
-          } else if (pos < 2 / 2.75) {
-            return 2 - (7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75);
-          } else if (pos < 2.5 / 2.75) {
-            return 2 - (7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375);
-          } else {
-            return 2 - (7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375);
-          }
-        },
-
-        easeFromTo: (pos: number) =>
-          (pos /= 0.5) < 1
-            ? 0.5 * Math.pow(pos, 4)
-            : -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2),
-
-        easeFrom: (pos: number) => Math.pow(pos, 4),
-
-        easeTo: (pos: number) => Math.pow(pos, 0.25),
-      };
     }
   }
 }

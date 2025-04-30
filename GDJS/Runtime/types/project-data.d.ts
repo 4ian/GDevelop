@@ -49,6 +49,7 @@ declare type UpdateFromNetworkSyncDataOptions = {
   clearMemory?: boolean;
   syncSounds?: boolean;
   syncTimers?: boolean;
+  syncTweens?: boolean;
   keepControl?: boolean;
   ignoreVariableOwnership?: boolean;
 };
@@ -194,6 +195,7 @@ declare interface LayoutNetworkSyncData {
     [extensionName: string]: VariableNetworkSyncData[];
   };
   timeManager?: TimeManagerSyncData;
+  tweenManager?: gdjs.evtTools.tween.TweenManagerNetworkSyncData;
 }
 
 declare interface SceneStackSceneNetworkSyncData {

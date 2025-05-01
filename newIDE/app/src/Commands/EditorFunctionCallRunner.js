@@ -210,11 +210,13 @@ const inspectObjectProperties: EditorFunction = async ({ project, args }) => {
   const objectProperties = objectConfiguration.getProperties();
 
   const propertyNames = objectProperties.keys().toJSArray();
-  const properties = propertyNames.map(name => {
-    const propertyDescriptor = objectProperties.get(name);
+  const properties = propertyNames
+    .map(name => {
+      const propertyDescriptor = objectProperties.get(name);
 
-    return serializeNamedProperty(name, propertyDescriptor);
-  }).filter(Boolean);
+      return serializeNamedProperty(name, propertyDescriptor);
+    })
+    .filter(Boolean);
 
   return {
     success: true,
@@ -392,11 +394,13 @@ const inspectBehaviorProperties: EditorFunction = async ({ project, args }) => {
   const behavior = object.getBehavior(behavior_name);
   const behaviorProperties = behavior.getProperties();
   const propertyNames = behaviorProperties.keys().toJSArray();
-  const properties = propertyNames.map(name => {
-    const propertyDescriptor = behaviorProperties.get(name);
+  const properties = propertyNames
+    .map(name => {
+      const propertyDescriptor = behaviorProperties.get(name);
 
-    return serializeNamedProperty(name, propertyDescriptor);
-  }).filter(Boolean);
+      return serializeNamedProperty(name, propertyDescriptor);
+    })
+    .filter(Boolean);
 
   return {
     success: true,
@@ -716,6 +720,133 @@ const deleteScene: EditorFunction = async ({ project, args }) => {
   return makeGenericSuccess(`Deleted scene "${scene_name}".`);
 };
 
+const addOrEditVariable: EditorFunction = async ({ project, args }) => {
+  const variable_name_or_path = extractRequiredString(
+    args,
+    'variable_name_or_path'
+  );
+  const value = extractRequiredString(args, 'value');
+  const variable_type = SafeExtractor.extractStringProperty(
+    args,
+    'variable_type'
+  );
+  const variable_scope = extractRequiredString(args, 'variable_scope');
+  const object_name = SafeExtractor.extractStringProperty(args, 'object_name');
+  const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+
+  let variablesContainer;
+  if (variable_scope === 'scene') {
+    if (!scene_name) {
+      return makeGenericFailure(
+        `Missing "scene_name" argument, required to edit a scene variable.`
+      );
+    }
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericFailure(`Scene not found: "${scene_name}".`);
+    }
+    variablesContainer = project.getLayout(scene_name).getVariables();
+  } else if (variable_scope === 'object') {
+    let objectsContainer;
+    if (scene_name) {
+      if (!project.hasLayoutNamed(scene_name)) {
+        return makeGenericFailure(`Scene not found: "${scene_name}".`);
+      }
+      objectsContainer = project.getLayout(scene_name).getObjects();
+      if (!objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in scene "${scene_name}".`
+        );
+      }
+    } else {
+      objectsContainer = project.getObjects();
+      if (!objectsContainer.hasObjectNamed(object_name)) {
+        return makeGenericFailure(
+          `Object not found: "${object_name}" in project.`
+        );
+      }
+    }
+
+    variablesContainer = objectsContainer.getObject(object_name).getVariables();
+  } else if (variable_scope === 'global') {
+    variablesContainer = project.getVariables();
+  } else {
+    return makeGenericFailure(
+      `Invalid "variable_scope" argument: "${variable_scope}". Valid values are \`scene\`, \`object\` or \`global\`.`
+    );
+  }
+
+  const variableNames = variable_name_or_path.split('.');
+  if (variable_name_or_path.length === 0) {
+    return makeGenericFailure(
+      `Invalid "variable_name_or_path" argument: "${variable_name_or_path}". It should be the name of the variable, or a dot separated path to the variable (for structures).`
+    );
+  }
+
+  let addedNewVariable = false;
+  const firstVariableName = variableNames[0];
+  let variable = null;
+  if (!variablesContainer.has(firstVariableName)) {
+    variable = variablesContainer.insertNew(firstVariableName, 0);
+    addedNewVariable = true;
+  } else {
+    variable = variablesContainer.get(firstVariableName);
+  }
+
+  for (let i = 1; i < variableNames.length; i++) {
+    const childVariableName = variableNames[i];
+
+    variable.castTo('Structure');
+    if (!variable.hasChild(childVariableName)) {
+      addedNewVariable = true;
+    }
+
+    variable = variable.getChild(childVariableName);
+  }
+
+  const readOrInferVariableType = (
+    specifiedType: string | null,
+    value: string
+  ): string => {
+    if (specifiedType) {
+      const lowercaseSpecifiedType = specifiedType.toLowerCase();
+      if (lowercaseSpecifiedType === 'string') {
+        return 'String';
+      } else if (lowercaseSpecifiedType === 'number') {
+        return 'Number';
+      } else if (lowercaseSpecifiedType === 'boolean') {
+        return 'Boolean';
+      }
+    }
+
+    if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+      return 'Boolean';
+    }
+
+    const numberValue = parseFloat(value);
+    if (!Number.isNaN(numberValue)) {
+      return 'Number';
+    }
+
+    return 'String';
+  };
+
+  const variableType = readOrInferVariableType(variable_type, value);
+
+  if (variableType === 'String') {
+    variable.setString(value);
+  } else if (variableType === 'Number') {
+    variable.setValue(parseFloat(value));
+  } else if (variableType === 'Boolean') {
+    variable.setBool(value.toLowerCase() === 'true');
+  }
+
+  return makeGenericSuccess(
+    addedNewVariable
+      ? `Properly added variable "${variable_name_or_path}" of type "${variableType}".`
+      : `Properly edited variable "${variable_name_or_path}".`
+  );
+};
+
 // Map of available commands
 // TODO: rename
 const commandsMap: { [string]: EditorFunction } = {
@@ -733,6 +864,7 @@ const commandsMap: { [string]: EditorFunction } = {
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   delete_scene: deleteScene,
+  add_or_edit_variable: addOrEditVariable,
 };
 
 export type ProcessEditorFunctionCallsOptions = {|

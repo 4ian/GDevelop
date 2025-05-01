@@ -137,6 +137,12 @@ export type SceneEditorsDisplayProps = {|
 
 export type SceneEditorsDisplayInterface = {|
   getName: () => 'mosaic' | 'swipeableDrawer',
+  getInstanceEditorArea: () => {
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+  },
   forceUpdateInstancesList: () => void,
   forceUpdatePropertiesEditor: () => void,
   forceUpdateObjectsList: () => void,

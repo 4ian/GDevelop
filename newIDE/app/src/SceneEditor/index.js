@@ -1544,17 +1544,69 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   zoomToInitialPosition = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomToInitialPosition();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToInitialPosition();
+
+    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
+    if (this.state.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomToInitialPosition',
+          payload: {
+            visibleScreenArea,
+          },
+        });
+      });
+    }
   };
 
   zoomToFitContent = () => {
-    if (this.editorDisplay) this.editorDisplay.viewControls.zoomToFitContent();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToFitContent();
+
+    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
+    if (this.state.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomToFitContent',
+          payload: {
+            visibleScreenArea,
+          },
+        });
+      });
+    }
   };
 
   zoomToFitSelection = () => {
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.zoomToFitSelection();
+    const { editorDisplay } = this;
+    if (!editorDisplay) {
+      return;
+    }
+    editorDisplay.viewControls.zoomToFitSelection();
+
+    const visibleScreenArea = editorDisplay.getInstanceEditorArea();
+    if (this.state.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomToFitSelection',
+          payload: {
+            visibleScreenArea,
+          },
+        });
+      });
+    }
   };
 
   getContextMenuZoomItems = (i18n: I18nType) => {
@@ -1688,11 +1740,37 @@ export default class SceneEditor extends React.Component<Props, State> {
   zoomIn = () => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomInFactor);
+
+    if (this.state.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomBy',
+          payload: {
+            zoomInFactor,
+          },
+        });
+      });
+    }
   };
 
   zoomOut = () => {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomOutFactor);
+
+    if (this.state.gameEditorMode === 'embedded-game') {
+      const { previewDebuggerServer } = this.props;
+      if (!previewDebuggerServer) return;
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'zoomBy',
+          payload: {
+            zoomOutFactor,
+          },
+        });
+      });
+    }
   };
 
   _onContextMenu = (

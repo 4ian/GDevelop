@@ -8,6 +8,7 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic, {
   type EditorMosaicInterface,
+  getNodeArea,
 } from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
@@ -191,10 +192,26 @@ const MosaicEditorsDisplay = React.forwardRef<
     [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
   );
 
+  const getInstanceEditorArea = React.useCallback(
+    () => {
+      const root = getDefaultEditorMosaicNode('scene-editor');
+      return (
+        getNodeArea(root, 'instances-editor') || {
+          minX: 0,
+          minY: 0,
+          maxX: 1,
+          maxY: 1,
+        }
+      );
+    },
+    [getDefaultEditorMosaicNode]
+  );
+
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
     return {
       getName: () => 'mosaic',
+      getInstanceEditorArea,
       forceUpdateInstancesList,
       forceUpdatePropertiesEditor,
       forceUpdateObjectsList,

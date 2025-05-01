@@ -334,6 +334,186 @@ namespace gdjs {
       return this._tempVector2d;
     }
 
+    zoomToInitialPosition(visibleScreenArea: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    }) {
+      this.zoomToFitArea(
+        {
+          minX: 0,
+          minY: 0,
+          maxX: this._runtimeGame.getOriginalWidth(),
+          maxY: this._runtimeGame.getOriginalHeight(),
+        },
+        visibleScreenArea
+      );
+    }
+
+    zoomToFitContent(visibleScreenArea: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    }) {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      this.zoomToFitObjects(
+        editedInstanceContainer.getAdhocListOfAllInstances(),
+        visibleScreenArea
+      );
+    }
+
+    zoomToFitSelection(visibleScreenArea: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    }) {
+      this.zoomToFitObjects(
+        this._selection.getSelectedObjects(),
+        visibleScreenArea
+      );
+    }
+
+    zoomToFitObjects(
+      objects: Array<RuntimeObject>,
+      visibleScreenArea: {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+      }
+    ) {
+      if (objects.length === 0) {
+        this.zoomToFitArea(
+          {
+            minX: 0,
+            minY: 0,
+            maxX: this._runtimeGame.getOriginalWidth(),
+            maxY: this._runtimeGame.getOriginalHeight(),
+          },
+          visibleScreenArea
+        );
+      }
+      let minX = Number.POSITIVE_INFINITY;
+      let minY = Number.POSITIVE_INFINITY;
+      let maxX = Number.NEGATIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      for (const object of objects) {
+        const aabb = object.getAABB();
+        minX = Math.min(minX, aabb.min[0]);
+        minY = Math.min(minY, aabb.min[1]);
+        maxX = Math.max(maxX, aabb.max[0]);
+        maxY = Math.max(maxY, aabb.max[1]);
+      }
+      this.zoomToFitArea(
+        {
+          minX,
+          minY,
+          maxX,
+          maxY,
+        },
+        visibleScreenArea
+      );
+    }
+
+    zoomToFitArea(
+      sceneArea: {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+      },
+      visibleScreenArea: {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+      }
+    ) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const sceneAreaWidth = sceneArea.maxX - sceneArea.minX;
+      const sceneAreaHeight = sceneArea.maxY - sceneArea.minY;
+
+      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
+      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
+      const editorWidth =
+        (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedWidth;
+      const editorHeight =
+        (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedHeight;
+      const isContentWider =
+        editorWidth * sceneAreaHeight < sceneAreaWidth * editorHeight;
+      const zoom =
+        0.8 *
+        (isContentWider
+          ? editorWidth / sceneAreaWidth
+          : editorHeight / sceneAreaHeight);
+
+      const sceneAreaCenterX = (sceneArea.maxX + sceneArea.minX) / 2;
+      const sceneAreaCenterY = (sceneArea.maxY + sceneArea.minY) / 2;
+      const cameraX =
+        sceneAreaCenterX +
+        (renderedWidth *
+          (0.5 * (-visibleScreenArea.minX + (1 - visibleScreenArea.maxX)))) /
+          zoom;
+      const cameraY =
+        sceneAreaCenterY +
+        (renderedHeight *
+          (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
+          zoom;
+
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const layer = currentScene.getLayer(layerName);
+
+        layer.setCameraX(cameraX);
+        layer.setCameraY(cameraY);
+        layer.setCameraZoom(zoom);
+        gdjs.scene3d.camera.setCameraRotationX(currentScene, 0, layerName, 0);
+        gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
+        layer.setCameraRotation(0);
+      }
+    }
+
+    zoomBy(zoomInFactor: float) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const layer = currentScene.getLayer(layerName);
+
+        const layerRenderer = layer.getRenderer();
+        const threeCamera = layerRenderer.getThreeCamera();
+        // TODO Handle a 2D zoom when the camera is not rotated?
+        if (!threeCamera) return;
+
+        const { forward } = getCameraVectors(threeCamera);
+
+        // TODO Factorize
+        const moveCameraByVector = (vector: THREE.Vector3, scale: number) => {
+          layer.setCameraX(layer.getCameraX() + vector.x * scale);
+          layer.setCameraY(layer.getCameraY() + vector.y * scale);
+          gdjs.scene3d.camera.setCameraZ(
+            currentScene,
+            gdjs.scene3d.camera.getCameraZ(currentScene, layerName, 0) +
+              vector.z * scale,
+            layerName,
+            0
+          );
+        };
+
+        moveCameraByVector(forward, zoomInFactor > 1 ? 200 : -200);
+      }
+    }
+
     private _handleCameraMovement() {
       const inputManager = this._runtimeGame.getInputManager();
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
@@ -344,15 +524,8 @@ namespace gdjs {
       layerNames.forEach((layerName) => {
         const layer = currentScene.getLayer(layerName);
 
-        // TODO: factor this?
-        const assumedFovIn2D = 45;
         const layerRenderer = layer.getRenderer();
         const threeCamera = layerRenderer.getThreeCamera();
-        const fov = threeCamera
-          ? threeCamera instanceof THREE.OrthographicCamera
-            ? null
-            : threeCamera.fov
-          : assumedFovIn2D;
         if (!threeCamera) return;
 
         const { right, up, forward } = getCameraVectors(threeCamera);
@@ -360,7 +533,13 @@ namespace gdjs {
         const moveCameraByVector = (vector: THREE.Vector3, scale: number) => {
           layer.setCameraX(layer.getCameraX() + vector.x * scale);
           layer.setCameraY(layer.getCameraY() + vector.y * scale);
-          layer.setCameraZ(layer.getCameraZ(fov) + vector.z * scale, fov);
+          gdjs.scene3d.camera.setCameraZ(
+            currentScene,
+            gdjs.scene3d.camera.getCameraZ(currentScene, layerName, 0) +
+              vector.z * scale,
+            layerName,
+            0
+          );
         };
 
         // Mouse wheel: movement on the plane or forward/backward movement.

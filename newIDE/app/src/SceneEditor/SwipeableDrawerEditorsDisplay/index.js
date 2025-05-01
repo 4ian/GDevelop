@@ -174,11 +174,17 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     else editor.pauseSceneRendering();
   }, []);
 
+  const getInstanceEditorArea = React.useCallback(
+    () => ({ minX: 0, minY: 0, maxX: 1, maxY: 1 }),
+    []
+  );
+
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
 
     return {
       getName: () => 'swipeableDrawer',
+      getInstanceEditorArea,
       forceUpdateInstancesList,
       forceUpdatePropertiesEditor,
       forceUpdateObjectsList,

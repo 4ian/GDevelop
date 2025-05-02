@@ -18,6 +18,7 @@ import {
   installRequiredExtensions,
   installPublicAsset,
   type RequiredExtensionInstallation,
+  complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -226,6 +227,7 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
+        complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded(createdObjects);
       } catch (error) {
         setAreAssetsBeingInstalled(false);

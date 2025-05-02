@@ -188,18 +188,19 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             )
           }
           recommendedPlanIdIfNoSubscription="gdevelop_gold"
+          canHide
         >
           <Line>
             <Column noMargin>
               <Text noMargin>
                 {increaseQuotaOffering === 'subscribe' ? (
                   <Trans>
-                    Get more free AI requests with a GDevelop premium plan.
+                    Unlock AI requests included with a GDevelop premium plan.
                   </Trans>
                 ) : (
                   <Trans>
-                    Upgrade to another premium plan to get more free AI
-                    requests.
+                    Get even more AI requests included with a higher premium
+                    plan.
                   </Trans>
                 )}
               </Text>
@@ -232,45 +233,56 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>What do you want to make?</Trans>
               </Text>
             </Column>
-            <Column noMargin alignItems="stretch" justifyContent="stretch">
-              <CompactTextAreaField
-                maxLength={6000}
-                value={userRequestText}
-                disabled={isLaunchingAiRequest}
-                onChange={userRequestText =>
-                  setUserRequestText(userRequestText)
-                }
-                placeholder={newChatPlaceholder}
-                rows={5}
-              />
-            </Column>
-            <Line noMargin>
-              <ResponsiveLineStackLayout
-                noMargin
-                alignItems="flex-start"
-                justifyContent="space-between"
-                expand
-              >
-                {!isMobile && errorOrQuotaOrCreditsExplanation}
-                <Line noMargin justifyContent="flex-end">
-                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
-                    <RaisedButton
-                      color="primary"
-                      label={<Trans>Send</Trans>}
-                      style={{ flexShrink: 0 }}
-                      disabled={isLaunchingAiRequest}
-                      onClick={() => {
-                        onSendUserRequest(userRequestText);
-                      }}
-                    />
-                  </LeftLoader>
+            <form
+              onSubmit={() => {
+                onSendUserRequest(userRequestText);
+              }}
+            >
+              <ColumnStackLayout justifyContent="center" noMargin>
+                <Column noMargin alignItems="stretch" justifyContent="stretch">
+                  <CompactTextAreaField
+                    maxLength={6000}
+                    value={userRequestText}
+                    disabled={isLaunchingAiRequest}
+                    onChange={userRequestText =>
+                      setUserRequestText(userRequestText)
+                    }
+                    onSubmit={() => {
+                      onSendUserRequest(userRequestText);
+                    }}
+                    placeholder={newChatPlaceholder}
+                    rows={5}
+                  />
+                </Column>
+                <Line noMargin>
+                  <ResponsiveLineStackLayout
+                    noMargin
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    expand
+                  >
+                    {!isMobile && errorOrQuotaOrCreditsExplanation}
+                    <Line noMargin justifyContent="flex-end">
+                      <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                        <RaisedButton
+                          color="primary"
+                          label={<Trans>Send</Trans>}
+                          style={{ flexShrink: 0 }}
+                          disabled={isLaunchingAiRequest || !userRequestText}
+                          onClick={() => {
+                            onSendUserRequest(userRequestText);
+                          }}
+                        />
+                      </LeftLoader>
+                    </Line>
+                    {isMobile && errorOrQuotaOrCreditsExplanation}
+                  </ResponsiveLineStackLayout>
                 </Line>
-                {isMobile && errorOrQuotaOrCreditsExplanation}
-              </ResponsiveLineStackLayout>
-            </Line>
+              </ColumnStackLayout>
+            </form>
             {subscriptionBanner}
           </ColumnStackLayout>
-          <Column justifyContent="center" noMargin>
+          <Column justifyContent="center">
             <Text size="body-small" color="secondary" align="center" noMargin>
               <Trans>
                 The AI is experimental and still being improved.{' '}
@@ -458,37 +470,52 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         ) : (
           subscriptionBanner
         )}
-        <CompactTextAreaField
-          maxLength={6000}
-          value={userRequestText}
-          disabled={isLaunchingAiRequest}
-          onChange={userRequestText => setUserRequestText(userRequestText)}
-          placeholder={t`Ask a follow up question`}
-          rows={2}
-        />
-        <Column noMargin alignItems="flex-end">
-          <ResponsiveLineStackLayout
+        <form
+          onSubmit={() => {
+            onSendUserRequest(userRequestText);
+          }}
+        >
+          <ColumnStackLayout
+            justifyContent="stretch"
+            alignItems="stretch"
             noMargin
-            alignItems="flex-start"
-            justifyContent="space-between"
-            expand
           >
-            {!isMobile && errorOrQuotaOrCreditsExplanation}
-            <Line noMargin justifyContent="flex-end">
-              <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
-                <RaisedButton
-                  color="primary"
-                  disabled={aiRequest.status === 'working'}
-                  label={<Trans>Send</Trans>}
-                  onClick={() => {
-                    onSendUserRequest(userRequestText);
-                  }}
-                />
-              </LeftLoader>
-            </Line>
-            {isMobile && errorOrQuotaOrCreditsExplanation}
-          </ResponsiveLineStackLayout>
-        </Column>
+            <CompactTextAreaField
+              maxLength={6000}
+              value={userRequestText}
+              disabled={isLaunchingAiRequest}
+              onChange={userRequestText => setUserRequestText(userRequestText)}
+              placeholder={t`Ask a follow up question`}
+              rows={2}
+              onSubmit={() => {
+                onSendUserRequest(userRequestText);
+              }}
+            />
+            <Column noMargin alignItems="flex-end">
+              <ResponsiveLineStackLayout
+                noMargin
+                alignItems="flex-start"
+                justifyContent="space-between"
+                expand
+              >
+                {!isMobile && errorOrQuotaOrCreditsExplanation}
+                <Line noMargin justifyContent="flex-end">
+                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                    <RaisedButton
+                      color="primary"
+                      disabled={aiRequest.status === 'working'}
+                      label={<Trans>Send</Trans>}
+                      onClick={() => {
+                        onSendUserRequest(userRequestText);
+                      }}
+                    />
+                  </LeftLoader>
+                </Line>
+                {isMobile && errorOrQuotaOrCreditsExplanation}
+              </ResponsiveLineStackLayout>
+            </Column>
+          </ColumnStackLayout>
+        </form>
         {dislikeFeedbackDialogOpenedFor && (
           <DislikeFeedbackDialog
             open

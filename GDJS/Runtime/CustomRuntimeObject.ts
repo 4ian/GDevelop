@@ -105,7 +105,14 @@ namespace gdjs {
         return;
       }
 
-      let usedVariantData: EventsBasedObjectVariantData = eventsBasedObjectData;
+      if (!eventsBasedObjectData.defaultVariant) {
+        eventsBasedObjectData.defaultVariant = {
+          ...eventsBasedObjectData,
+          name: '',
+        };
+      }
+      let usedVariantData: EventsBasedObjectVariantData =
+        eventsBasedObjectData.defaultVariant;
       if (customObjectData.variant) {
         for (
           let variantIndex = 0;

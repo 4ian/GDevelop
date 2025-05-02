@@ -79,7 +79,7 @@ const getVariantName = (
     ? customObjectConfiguration.getVariantName()
     : '';
 
-const getVariant = (
+export const getVariant = (
   eventBasedObject: gdEventsBasedObject,
   customObjectConfiguration: gdCustomObjectConfiguration
 ): gdEventsBasedObjectVariant => {

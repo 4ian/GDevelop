@@ -212,6 +212,9 @@ declare interface EventsBasedObjectData
   name: string;
   isInnerAreaFollowingParentSize: boolean;
   variants: Array<EventsBasedObjectVariantData>;
+  /** Added at runtime to have the default variant with an empty name instead
+   * of the events-based object name. */
+  defaultVariant?: EventsBasedObjectVariantData;
 }
 
 declare interface EventsBasedObjectVariantData extends InstanceContainerData {

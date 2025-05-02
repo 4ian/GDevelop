@@ -80,7 +80,11 @@ namespace gdjs {
         ++i
       ) {
         const childObjectData = eventsBasedObjectVariantData.objects[i];
-        if (customObjectData.childrenContent) {
+        // The children configuration override only applies to the default variant.
+        if (
+          customObjectData.childrenContent &&
+          !eventsBasedObjectVariantData.name
+        ) {
           this.registerObject({
             ...childObjectData,
             // The custom object overrides its events-based object configuration.

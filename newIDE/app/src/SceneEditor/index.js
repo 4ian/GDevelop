@@ -1059,21 +1059,41 @@ export default class SceneEditor extends React.Component<Props, State> {
     multiSelect: boolean,
     targetPosition?: 'center' | 'upperCenter'
   ) => {
+    const { previewDebuggerServer } = this.props;
     this.instancesSelection.selectInstances({
       instances,
       multiSelect,
       layersLocks: null,
       ignoreSeal: true,
     });
-    if (this.editorDisplay) {
+    const { editorDisplay } = this;
+    if (editorDisplay) {
       let offset = null;
-      const { viewControls } = this.editorDisplay;
+      const { viewControls } = editorDisplay;
       const viewPosition = viewControls.getViewPosition();
       if (viewPosition && targetPosition === 'upperCenter') {
         offset = [0, viewPosition.toSceneScale(viewPosition.getHeight() / 4)];
       }
 
       viewControls.centerViewOnLastInstance(instances, offset);
+
+      const visibleScreenArea = editorDisplay.getInstanceEditorArea();
+      if (previewDebuggerServer) {
+        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setSelectedInstances',
+            payload: {
+              instanceUuids: this.instancesSelection
+                .getSelectedInstances()
+                .map(instance => instance.getPersistentUuid()),
+            },
+          });
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'centerViewOnLastSelectedInstance',
+            payload: { visibleScreenArea },
+          });
+        });
+      }
     }
     this.setState({ lastSelectionType: 'instance' });
     this.updateToolbar();

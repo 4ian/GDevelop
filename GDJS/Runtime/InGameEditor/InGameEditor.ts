@@ -514,6 +514,74 @@ namespace gdjs {
       }
     }
 
+    setSelectedObjects(persistentUuids: Array<string>) {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      const persistentUuidsSet = new Set<string>(persistentUuids);
+      const selectedObjectsMap = new Map<string, gdjs.RuntimeObject>();
+      for (const object of editedInstanceContainer.getAdhocListOfAllInstances()) {
+        if (
+          object.persistentUuid &&
+          persistentUuidsSet.has(object.persistentUuid)
+        ) {
+          // We can't add the object to the selection directly because they
+          // would be out of order.
+          selectedObjectsMap.set(object.persistentUuid, object);
+        }
+      }
+      this._selection.clear();
+      for (const instanceUuid of persistentUuids) {
+        const object = selectedObjectsMap.get(instanceUuid);
+        if (object) {
+          this._selection.add(object);
+        }
+      }
+    }
+
+    centerViewOnLastSelectedInstance(visibleScreenArea: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    }) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const object = this._selection.getLastSelectedObject();
+      if (!object) {
+        return;
+      }
+
+      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
+      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
+      const zoom = currentScene.getLayer('').getCameraZoom();
+
+      const cameraX =
+        object.getCenterXInScene() +
+        (renderedWidth *
+          (0.5 * (-visibleScreenArea.minX + (1 - visibleScreenArea.maxX)))) /
+          zoom;
+      const cameraY =
+        object.getCenterYInScene() +
+        (renderedHeight *
+          (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
+          zoom;
+
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const layer = currentScene.getLayer(layerName);
+
+        layer.setCameraX(cameraX);
+        layer.setCameraY(cameraY);
+        layer.setCameraZoom(zoom);
+        gdjs.scene3d.camera.setCameraRotationX(currentScene, 0, layerName, 0);
+        gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
+        layer.setCameraRotation(0);
+      }
+    }
+
     private _handleCameraMovement() {
       const inputManager = this._runtimeGame.getInputManager();
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();

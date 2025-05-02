@@ -389,6 +389,18 @@ namespace gdjs {
         if (runtimeGame._inGameEditor) {
           runtimeGame._inGameEditor.zoomBy(data.payload.zoomInFactor);
         }
+      } else if (data.command === 'setSelectedInstances') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.setSelectedObjects(
+            data.payload.instanceUuids
+          );
+        }
+      } else if (data.command === 'centerViewOnLastSelectedInstance') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.centerViewOnLastSelectedInstance(
+            data.payload.visibleScreenArea
+          );
+        }
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.

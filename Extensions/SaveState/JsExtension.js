@@ -38,8 +38,12 @@ module.exports = {
       .addAction(
         'SaveGameSnapshot',
         _('Save game'),
-        _('Takes a snapshot of the game and save it to a variable or device storage.'),
-        _('Save the game to variable _PARAM1_ or to storage under key _PARAM2_.'),
+        _(
+          'Takes a snapshot of the game and save it to a variable or device storage.'
+        ),
+        _(
+          'Save the game to variable _PARAM1_ or to storage under key _PARAM2_.'
+        ),
         '',
         'res/actions/Save-single-action-down.svg',
         'res/actions/Save-single-action-down.svg'

@@ -19,6 +19,7 @@ import {
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -370,6 +371,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       project.hasEventsBasedObject(object.getType())
         ? {
             label: i18n._(t`Edit children`),
+            enabled:
+              getVariant(
+                project.getEventsBasedObject(object.getType()),
+                gd.asCustomObjectConfiguration(object.getConfiguration())
+              ).getAssetStoreAssetId() === '',
             click: () => {
               const customObjectConfiguration = gd.asCustomObjectConfiguration(
                 object.getConfiguration()

@@ -600,3 +600,21 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
 
   return checkRequiredExtensionsUpdate({ requiredExtensions, project });
 };
+
+export const complyVariantsToEventsBasedObjectOf = (
+  project: gdProject,
+  createdObjects: gdObject
+) => {
+  const installedVariantObjectTypes = new Set<string>();
+  for (const createdObject of createdObjects) {
+    if (project.hasEventsBasedObject(createdObject.getType())) {
+      installedVariantObjectTypes.add(createdObject.getType());
+    }
+  }
+  for (const installedVariantObjectType of installedVariantObjectTypes) {
+    gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+      project,
+      project.getEventsBasedObject(installedVariantObjectType)
+    );
+  }
+};

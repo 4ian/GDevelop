@@ -195,20 +195,29 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     let renderedInstance = this.renderedInstances.get(instance.ptr);
     if (!renderedInstance) {
       // No renderer associated yet, the instance must have been just created!...
+
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        this._associatedObjectConfiguration
+      );
+
       let childObjectConfiguration = null;
       const variant = this.getVariant();
       if (variant) {
         const childObjects = variant.getObjects();
         if (childObjects.hasObjectNamed(instance.getObjectName())) {
           const childObject = childObjects.getObject(instance.getObjectName());
-          childObjectConfiguration = childObject.getConfiguration();
+          childObjectConfiguration =
+            this.eventBasedObject &&
+            customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() &&
+            variant === this.eventBasedObject.getDefaultVariant()
+              ? customObjectConfiguration.getChildObjectConfiguration(
+                  instance.getObjectName()
+                )
+              : childObject.getConfiguration();
         }
       }
       // Apply property mapping rules on the child instance.
       const childPropertyOverridings = new Map<string, string>();
-      const customObjectConfiguration = gd.asCustomObjectConfiguration(
-        this._associatedObjectConfiguration
-      );
       const customObjectProperties = customObjectConfiguration.getProperties();
       for (const propertyMappingRule of this._propertyMappingRules) {
         if (propertyMappingRule.targetChild !== instance.getObjectName()) {

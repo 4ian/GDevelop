@@ -603,7 +603,7 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
 
 export const complyVariantsToEventsBasedObjectOf = (
   project: gdProject,
-  createdObjects: gdObject
+  createdObjects: Array<gdObject>
 ) => {
   const installedVariantObjectTypes = new Set<string>();
   for (const createdObject of createdObjects) {

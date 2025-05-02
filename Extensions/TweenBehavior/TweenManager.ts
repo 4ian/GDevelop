@@ -283,7 +283,7 @@ namespace gdjs {
             targetedValue,
             setValue,
             onFinish
-          );
+          ) as TweenInstance<number>;
           this._tweens.set(identifier, tween);
           this._addActiveTween(tween);
         }

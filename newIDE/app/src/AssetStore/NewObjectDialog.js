@@ -20,6 +20,7 @@ import {
   checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
   type InstallAssetOutput,
+  complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
 import {
   type Asset,
@@ -217,6 +218,10 @@ export const useInstallAsset = ({
           openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
         assetPackKind: isPrivate ? 'private' : 'public',
       });
+      complyVariantsToEventsBasedObjectOf(
+        project,
+        installOutput.createdObjects
+      );
 
       await resourceManagementProps.onFetchNewlyAddedResources();
       return installOutput;

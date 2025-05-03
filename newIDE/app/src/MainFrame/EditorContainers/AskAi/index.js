@@ -131,7 +131,10 @@ const useProcessFunctionCalls = ({
     [string]: boolean,
   }>({});
   const isAutoProcessingFunctionCalls = React.useCallback(
-    (aiRequestId: string) => !!aiRequestAutoProcessState[aiRequestId],
+    (aiRequestId: string) =>
+      aiRequestAutoProcessState[aiRequestId] !== undefined
+        ? aiRequestAutoProcessState[aiRequestId]
+        : true,
     [aiRequestAutoProcessState]
   );
 
@@ -215,7 +218,9 @@ const useProcessFunctionCalls = ({
   React.useEffect(
     () => {
       (async () => {
-        if (isAutoProcessingFunctionCalls) {
+        if (!selectedAiRequest) return;
+
+        if (isAutoProcessingFunctionCalls(selectedAiRequest.id)) {
           if (allFunctionCallsToProcess.length === 0) {
             return;
           }
@@ -225,6 +230,7 @@ const useProcessFunctionCalls = ({
       })();
     },
     [
+      selectedAiRequest,
       isAutoProcessingFunctionCalls,
       onProcessFunctionCalls,
       allFunctionCallsToProcess,

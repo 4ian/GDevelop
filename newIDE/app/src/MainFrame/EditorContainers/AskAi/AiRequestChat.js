@@ -356,6 +356,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       message => message.type === 'message' && message.role === 'user'
     ).length;
 
+    const hasWorkingFunctionCalls =
+      editorFunctionCallResults &&
+      editorFunctionCallResults.some(
+        functionCallOutput => functionCallOutput.status === 'working'
+      );
+
     return (
       <ColumnStackLayout
         expand
@@ -560,34 +566,37 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            {isAutoProcessingFunctionCalls && (
-              <Paper background="dark" variant="outlined" square>
-                <Column>
-                  <LineStackLayout
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <LineStackLayout alignItems="center" noMargin>
-                      <CircularProgress variant="indeterminate" size={10} />
-                      <Text size="body" color="secondary" noMargin>
-                        <Trans>The AI is building your request.</Trans>
+            {isAutoProcessingFunctionCalls &&
+              (hasWorkingFunctionCalls ||
+                isLaunchingAiRequest ||
+                aiRequest.status === 'working') && (
+                <Paper background="dark" variant="outlined" square>
+                  <Column>
+                    <LineStackLayout
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <LineStackLayout alignItems="center" noMargin>
+                        <CircularProgress variant="indeterminate" size={10} />
+                        <Text size="body" color="secondary" noMargin>
+                          <Trans>The AI is building your request.</Trans>
+                        </Text>
+                      </LineStackLayout>
+                      <Text size="body" noMargin>
+                        <Link
+                          href={'#'}
+                          color="secondary"
+                          onClick={() => {
+                            setAutoProcessFunctionCalls(false);
+                          }}
+                        >
+                          <Trans>Pause</Trans>
+                        </Link>
                       </Text>
                     </LineStackLayout>
-                    <Text size="body" noMargin>
-                      <Link
-                        href={'#'}
-                        color="secondary"
-                        onClick={() => {
-                          setAutoProcessFunctionCalls(false);
-                        }}
-                      >
-                        <Trans>Pause</Trans>
-                      </Link>
-                    </Text>
-                  </LineStackLayout>
-                </Column>
-              </Paper>
-            )}
+                  </Column>
+                </Paper>
+              )}
             <CompactTextAreaField
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}

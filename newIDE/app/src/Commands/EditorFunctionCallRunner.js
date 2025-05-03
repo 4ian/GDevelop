@@ -10,7 +10,6 @@ import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 
 const gd: libGDevelop = global.gd;
 
-// TODO: factor with Generation?
 export type EditorFunctionCall = {|
   name: string,
   arguments: string,

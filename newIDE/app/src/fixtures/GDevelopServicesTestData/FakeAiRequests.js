@@ -687,3 +687,210 @@ export const agentAiRequest = {
     finalModelPublicId: 'g2f1-g',
   },
 };
+
+export const agentAiRequestWithFunctionCallToDo = {
+  id: '01JTBDS436B6M695G44BMTHW5D',
+  createdAt: '2025-05-03T15:55:59.462Z',
+  updatedAt: '2025-05-03T15:58:09.737Z',
+  status: 'ready',
+  userId: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+  output: [
+    {
+      role: 'user',
+      type: 'message',
+      content: [
+        {
+          type: 'user_request',
+          status: 'completed',
+          text: 'Make a platformer game',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'create_scene',
+          arguments: '{"scene_name":"MyScene"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_create_scene',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output: '{"success":true,"message":"Created new scene \\"MyScene\\"."}',
+      call_id: 'tool_0_create_scene',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            "Okay, I've created a new scene called \"MyScene\". Now, I'll add a player object to the scene. I'll use a `Sprite` object for the player.\n",
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'create_object',
+          arguments:
+            '{"description":"Player character","object_type":"Sprite","scene_name":"MyScene","object_name":"Player"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_create_object',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"message":"Created object \\"Player\\" of type \\"Sprite\\" in scene \\"MyScene\\"."}',
+      call_id: 'tool_0_create_object',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            'Okay, I apologize for the mistake. I will add the [PlatformBehavior::PlatformerObjectBehavior](object_type:PlatformBehavior::PlatformerObjectBehavior) behavior to the player object.\n',
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_behavior',
+          arguments:
+            '{"behavior_name":"PlatformerBehavior","object_name":"Player","behavior_type":"PlatformBehavior::PlatformerObjectBehavior","scene_name":"MyScene"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_behavior',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"message":"Added behavior \\"PlatformerBehavior\\" of type \\"PlatformBehavior::PlatformerObjectBehavior\\" to object \\"Player\\"."}',
+      call_id: 'tool_0_add_behavior',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            "Now I'll add a platform object so the player can jump on it. I'll use a `Sprite` object for the platform and add the [PlatformBehavior::PlatformBehavior](object_type:PlatformBehavior::PlatformBehavior) behavior to it.\n",
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'create_object',
+          arguments:
+            '{"object_name":"Platform","object_type":"Sprite","scene_name":"MyScene","description":"Platform"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_create_object',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"message":"Created object \\"Platform\\" of type \\"Sprite\\" in scene \\"MyScene\\"."}',
+      call_id: 'tool_0_create_object',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_behavior',
+          arguments:
+            '{"behavior_type":"PlatformBehavior::PlatformBehavior","object_name":"Platform","scene_name":"MyScene","behavior_name":"PlatformBehavior"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_behavior',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"message":"Added behavior \\"PlatformBehavior\\" of type \\"PlatformBehavior::PlatformBehavior\\" to object \\"Platform\\"."}',
+      call_id: 'tool_0_add_behavior',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            'Now I will add the instances of the player and the platform to the scene.\n',
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'put_2d_instance',
+          arguments:
+            '{"object_name":"Player","layer_name":"","y":400,"scene_name":"MyScene","x":100}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_put_2d_instance',
+        },
+      ],
+      status: 'completed',
+    },
+  ],
+  mode: 'agent',
+  toolsVersion: 'v1',
+  stats: {
+    lastRunUserPromptTemplateHash:
+      '281ae340b8fc94b8915a4243beee520355a2c9873dd495a4ed174b667e98094e',
+    lastOutputRetriesCount: 0,
+    remainingMissingPrefixedTypes: [],
+    lastRunSystemPromptHash:
+      '0c5d381cf49bf2877bab7ef0bdfa0e8928757272105c42500071ea537cf43069',
+    finalModelPublicId: 'g2f1-g',
+  },
+};

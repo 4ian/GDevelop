@@ -55,14 +55,14 @@ export const getFunctionCallsToProcess = ({
   editorFunctionCallResults,
 }: {|
   aiRequest: AiRequest,
-  editorFunctionCallResults: Array<EditorFunctionCallResult>,
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
 |}): Array<AiRequestMessageAssistantFunctionCall> => {
   const functionCallsToProcess: AiRequestMessageAssistantFunctionCall[] = [];
   const appliedFunctionCallIds = new Set<string>();
   const alreadyProcessedFunctionCallIds = new Set<string>();
 
   // Track already applied function calls
-  editorFunctionCallResults.forEach(functionCallOutput => {
+  (editorFunctionCallResults || []).forEach(functionCallOutput => {
     appliedFunctionCallIds.add(functionCallOutput.call_id);
   });
 

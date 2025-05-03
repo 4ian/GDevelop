@@ -208,8 +208,9 @@ const useProcessFunctionCalls = ({
       selectedAiRequest
         ? getFunctionCallsToProcess({
             aiRequest: selectedAiRequest,
-            editorFunctionCallResults:
-              getEditorFunctionCallResults(selectedAiRequest.id) || [],
+            editorFunctionCallResults: getEditorFunctionCallResults(
+              selectedAiRequest.id
+            ),
           })
         : [],
     [selectedAiRequest, getEditorFunctionCallResults]

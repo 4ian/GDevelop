@@ -36,7 +36,10 @@ import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
-import { getFunctionCallToFunctionCallOutputMap } from './AiRequestUtils';
+import {
+  getFunctionCallsToProcess,
+  getFunctionCallToFunctionCallOutputMap,
+} from './AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import CircularProgress from '../../../UI/CircularProgress';
 
@@ -63,7 +66,7 @@ type Props = {
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
     options: ?{| ignore?: boolean |}
   ) => Promise<void>,
-  editorFunctionCallResults: ?Array<EditorFunctionCallResult>,
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
 
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
@@ -361,6 +364,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       editorFunctionCallResults.some(
         functionCallOutput => functionCallOutput.status === 'working'
       );
+    const allFunctionCallsToProcess = getFunctionCallsToProcess({
+      aiRequest,
+      editorFunctionCallResults,
+    });
 
     return (
       <ColumnStackLayout
@@ -567,36 +574,66 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             noMargin
           >
             {isAutoProcessingFunctionCalls &&
-              (hasWorkingFunctionCalls ||
-                isLaunchingAiRequest ||
-                aiRequest.status === 'working') && (
-                <Paper background="dark" variant="outlined" square>
-                  <Column>
-                    <LineStackLayout
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <LineStackLayout alignItems="center" noMargin>
-                        <CircularProgress variant="indeterminate" size={10} />
-                        <Text size="body" color="secondary" noMargin>
-                          <Trans>The AI is building your request.</Trans>
-                        </Text>
-                      </LineStackLayout>
-                      <Text size="body" noMargin>
-                        <Link
-                          href={'#'}
-                          color="secondary"
-                          onClick={() => {
-                            setAutoProcessFunctionCalls(false);
-                          }}
-                        >
-                          <Trans>Pause</Trans>
-                        </Link>
+            (hasWorkingFunctionCalls ||
+              isLaunchingAiRequest ||
+              aiRequest.status === 'working') ? (
+              <Paper background="dark" variant="outlined" square>
+                <Column>
+                  <LineStackLayout
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <LineStackLayout alignItems="center" noMargin>
+                      <CircularProgress variant="indeterminate" size={10} />
+                      <Text size="body" color="secondary" noMargin>
+                        <Trans>The AI is building your request.</Trans>
                       </Text>
                     </LineStackLayout>
-                  </Column>
-                </Paper>
-              )}
+                    <Text size="body" noMargin>
+                      <Link
+                        href={'#'}
+                        color="secondary"
+                        onClick={() => {
+                          setAutoProcessFunctionCalls(false);
+                        }}
+                      >
+                        <Trans>Pause</Trans>
+                      </Link>
+                    </Text>
+                  </LineStackLayout>
+                </Column>
+              </Paper>
+            ) : !isAutoProcessingFunctionCalls &&
+              allFunctionCallsToProcess.length > 0 ? (
+              <Paper background="dark" variant="outlined" square>
+                <Column>
+                  <LineStackLayout
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <LineStackLayout alignItems="center" noMargin>
+                      <Text size="body" color="secondary" noMargin>
+                        <Trans>The AI agent is paused.</Trans>
+                      </Text>
+                    </LineStackLayout>
+                    <Text size="body" noMargin>
+                      <Link
+                        href={'#'}
+                        color="secondary"
+                        onClick={() => {
+                          setAutoProcessFunctionCalls(true);
+                          onProcessFunctionCalls(allFunctionCallsToProcess);
+                        }}
+                      >
+                        <Trans>
+                          Apply everything and continue autonomously
+                        </Trans>
+                      </Link>
+                    </Text>
+                  </LineStackLayout>
+                </Column>
+              </Paper>
+            ) : null}
             <CompactTextAreaField
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}

@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../MainFrame/EditorContainers/AskAi/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
+import { agentAiRequest, agentAiRequestWithFunctionCallToDo } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Agent',
@@ -99,7 +100,7 @@ const fakeOutputWithFunctionCallAndOutput = [
   },
 ];
 
-export const ReadyAiRequestWithFunctionCall = () => (
+export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
       {({ i18n }) => (
@@ -130,7 +131,7 @@ export const ReadyAiRequestWithFunctionCall = () => (
           hasOpenedProject={false}
           editorFunctionCallResults={[]}
           onProcessFunctionCalls={async () => {}}
-          isAutoProcessingFunctionCalls={true}
+          isAutoProcessingFunctionCalls={false}
           setAutoProcessFunctionCalls={() => {}}
         />
       )}
@@ -405,6 +406,66 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
           editorFunctionCallResults={[]}
           onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
+          setAutoProcessFunctionCalls={() => {}}
+        />
+      )}
+    </I18n>
+  </FixedHeightFlexContainer>
+);
+
+export const RealLifeAgentAiRequest = () => (
+  <FixedHeightFlexContainer height={500}>
+    <I18n>
+      {({ i18n }) => (
+        <AiRequestChat
+          i18n={i18n}
+          aiRequest={agentAiRequest}
+          onSendUserRequest={async () => {}}
+          isLaunchingAiRequest={false}
+          quota={{
+            limitReached: false,
+            current: 1,
+            max: 2,
+          }}
+          increaseQuotaOffering="subscribe"
+          aiRequestPriceInCredits={5}
+          lastSendError={null}
+          availableCredits={400}
+          onSendFeedback={async () => {}}
+          hasOpenedProject={false}
+          editorFunctionCallResults={[]}
+          onProcessFunctionCalls={async () => {}}
+          isAutoProcessingFunctionCalls={true}
+          setAutoProcessFunctionCalls={() => {}}
+        />
+      )}
+    </I18n>
+  </FixedHeightFlexContainer>
+);
+
+export const RealLifeAgentAiRequestWithFunctionCall = () => (
+  <FixedHeightFlexContainer height={500}>
+    <I18n>
+      {({ i18n }) => (
+        <AiRequestChat
+          i18n={i18n}
+          aiRequest={agentAiRequestWithFunctionCallToDo}
+          onSendUserRequest={async () => {}}
+          isLaunchingAiRequest={false}
+          quota={{
+            limitReached: false,
+            current: 1,
+            max: 2,
+          }}
+          increaseQuotaOffering="subscribe"
+          aiRequestPriceInCredits={5}
+          lastSendError={null}
+          availableCredits={400}
+          onSendFeedback={async () => {}}
+          hasOpenedProject={false}
+          editorFunctionCallResults={[]}
+          onProcessFunctionCalls={async () => {}}
+          isAutoProcessingFunctionCalls={false}
           setAutoProcessFunctionCalls={() => {}}
         />
       )}

@@ -16,6 +16,7 @@ import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import Check from '../../../UI/CustomSvgIcons/Check';
 import Error from '../../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import classes from './FunctionCallRow.module.css';
 
 type Props = {|
   functionCall: AiRequestMessageAssistantFunctionCall,
@@ -34,8 +35,7 @@ export const FunctionCallRow = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isIgnored =
-    (!!editorFunctionCallResult &&
-      editorFunctionCallResult.status === 'ignored');
+    !!editorFunctionCallResult && editorFunctionCallResult.status === 'ignored';
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
@@ -50,11 +50,7 @@ export const FunctionCallRow = ({
     editorFunctionCallResult.status === 'working';
 
   return (
-    <LineStackLayout
-      key={functionCall.call_id}
-      justifyContent="flex-start"
-      alignItems="center"
-    >
+    <div className={classes.functionCallContainer}>
       <Tooltip
         title={JSON.stringify(
           existingFunctionCallOutput || editorFunctionCallResult
@@ -76,11 +72,9 @@ export const FunctionCallRow = ({
           )}
         </div>
       </Tooltip>
-
       <Tooltip title={JSON.stringify(functionCall)}>
         <Text>{functionCall.name || 'Unknown function'}</Text>
       </Tooltip>
-
       {!isFinished && (
         <RaisedButtonWithSplitMenu
           primary
@@ -104,6 +98,6 @@ export const FunctionCallRow = ({
           label={<Trans>Retry</Trans>}
         />
       )}
-    </LineStackLayout>
+    </div>
   );
 };

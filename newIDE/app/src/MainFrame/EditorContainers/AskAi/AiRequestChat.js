@@ -38,7 +38,6 @@ import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
 import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
 import { getFunctionCallToFunctionCallOutputMap } from './AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
-import { CompactToggleField } from '../../../UI/CompactToggleField';
 import CircularProgress from '../../../UI/CircularProgress';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
@@ -58,7 +57,7 @@ type Props = {
   ) => Promise<void>,
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
-  setAutoProcessFunctionCalls: (boolean) => void,
+  setAutoProcessFunctionCalls: boolean => void,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -124,6 +123,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       hasOpenedProject,
       editorFunctionCallResults,
       onProcessFunctionCalls,
+      isAutoProcessingFunctionCalls,
+      setAutoProcessFunctionCalls,
       i18n,
     }: Props,
     ref
@@ -559,32 +560,34 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            <Paper background="dark" variant="outlined" square>
-              <Column>
-                <LineStackLayout
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <LineStackLayout alignItems="center" noMargin>
-                    <CircularProgress variant="indeterminate" size={10} />
-                    <Text size="body" color="secondary" noMargin>
-                      <Trans>The AI is building your request.</Trans>
+            {isAutoProcessingFunctionCalls && (
+              <Paper background="dark" variant="outlined" square>
+                <Column>
+                  <LineStackLayout
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <LineStackLayout alignItems="center" noMargin>
+                      <CircularProgress variant="indeterminate" size={10} />
+                      <Text size="body" color="secondary" noMargin>
+                        <Trans>The AI is building your request.</Trans>
+                      </Text>
+                    </LineStackLayout>
+                    <Text size="body" noMargin>
+                      <Link
+                        href={'#'}
+                        color="secondary"
+                        onClick={() => {
+                          setAutoProcessFunctionCalls(false);
+                        }}
+                      >
+                        <Trans>Pause</Trans>
+                      </Link>
                     </Text>
                   </LineStackLayout>
-                  <Text size="body" noMargin>
-                    <Link
-                      href={'#'}
-                      color="secondary"
-                      onClick={() => {
-                        // TODO
-                      }}
-                    >
-                      <Trans>Pause</Trans>
-                    </Link>
-                  </Text>
-                </LineStackLayout>
-              </Column>
-            </Paper>
+                </Column>
+              </Paper>
+            )}
             <CompactTextAreaField
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}

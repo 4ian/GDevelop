@@ -46,7 +46,6 @@ export const getFunctionCallToFunctionCallOutputMap = ({
       }
     }
   }
-  console.log(functionCallsToOutputs.entries());
 
   return functionCallsToOutputs;
 };

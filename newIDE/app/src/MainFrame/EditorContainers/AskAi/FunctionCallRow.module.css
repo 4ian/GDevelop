@@ -1,0 +1,21 @@
+@keyframes function-call-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  /* Start after the bubble container and when the bubble content is almost finished animating. */
+  60% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.functionCallContainer {
+  animation: function-call-appear 0.5s;
+  display: flex;
+  align-items: center;
+}

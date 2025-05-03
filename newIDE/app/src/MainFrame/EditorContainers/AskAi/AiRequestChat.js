@@ -613,7 +613,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
                     <RaisedButton
                       color="primary"
-                      disabled={aiRequest.status === 'working'}
+                      disabled={
+                        aiRequest.status === 'working' || isLaunchingAiRequest
+                      }
                       label={<Trans>Send</Trans>}
                       onClick={() => {
                         onSendUserRequest(

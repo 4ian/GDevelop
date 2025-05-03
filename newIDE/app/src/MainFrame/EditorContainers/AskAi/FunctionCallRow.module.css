@@ -18,4 +18,5 @@
   animation: function-call-appear 0.5s;
   display: flex;
   align-items: center;
+  gap: 8px;
 }

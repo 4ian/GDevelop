@@ -33,13 +33,11 @@ import {
   type EditorFunctionCallResult,
 } from '../../../Commands/EditorFunctionCallRunner';
 import { getFunctionCallsToProcess } from './AiRequestUtils';
-import {
-  useStableUpToDateCallback,
-  useStableUpToDateRef,
-} from '../../../Utils/UseStableUpToDateCallback';
+import { useStableUpToDateRef } from '../../../Utils/UseStableUpToDateCallback';
 import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { useTriggerAtNextRender } from '../../../Utils/useTriggerAtNextRender';
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -95,6 +93,148 @@ const useEditorFunctionCallResultsPerRequest = () => {
         })
       );
     }, []),
+  };
+};
+
+const useProcessFunctionCalls = ({
+  i18n,
+  project,
+  selectedAiRequest,
+  onSendEditorFunctionCallResults,
+  getEditorFunctionCallResults,
+  addEditorFunctionCallResults,
+}: {|
+  i18n: I18nType,
+  project: ?gdProject,
+  selectedAiRequest: ?AiRequest,
+  onSendEditorFunctionCallResults: () => Promise<void>,
+  getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
+  addEditorFunctionCallResults: (
+    string,
+    Array<EditorFunctionCallResult>
+  ) => void,
+|}) => {
+  const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
+    project,
+    i18n,
+  });
+  const { launchEventsGeneration } = useGenerateEvents({ project });
+
+  const triggerSendEditorFunctionCallResults = useTriggerAtNextRender(
+    onSendEditorFunctionCallResults
+  );
+
+  const [
+    aiRequestAutoProcessState,
+    setAiRequestAutoprocessState,
+  ] = React.useState<{
+    [string]: boolean,
+  }>({});
+  const isAutoProcessingFunctionCalls = React.useCallback(
+    (aiRequestId: string) => !!aiRequestAutoProcessState[aiRequestId],
+    [aiRequestAutoProcessState]
+  );
+
+  const setAutoProcessFunctionCalls = React.useCallback(
+    (aiRequestId: string, shouldAutoProcess: boolean) => {
+      setAiRequestAutoprocessState(aiRequestAutoProcessState => ({
+        ...aiRequestAutoProcessState,
+        [aiRequestId]: shouldAutoProcess,
+      }));
+    },
+    [setAiRequestAutoprocessState]
+  );
+
+  const onProcessFunctionCalls = React.useCallback(
+    async (
+      functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+      options: ?{|
+        ignore?: boolean,
+      |}
+    ) => {
+      if (!project || !selectedAiRequest) return;
+
+      addEditorFunctionCallResults(
+        selectedAiRequest.id,
+        functionCalls.map(functionCall => ({
+          status: 'working',
+          call_id: functionCall.call_id,
+        }))
+      );
+
+      const editorFunctionCallResults = await processEditorFunctionCalls({
+        project,
+        functionCalls: functionCalls.map(functionCall => ({
+          name: functionCall.name,
+          arguments: functionCall.arguments,
+          call_id: functionCall.call_id,
+        })),
+        ignore: !!options && !!options.ignore,
+        launchEventsGeneration: async options => {
+          return await launchEventsGeneration({
+            ...options,
+            relatedAiRequestId: selectedAiRequest.id,
+          });
+        },
+        onEnsureExtensionInstalled: async ({ extensionName }) => {
+          await ensureExtensionInstalled(extensionName);
+        },
+      });
+
+      addEditorFunctionCallResults(
+        selectedAiRequest.id,
+        editorFunctionCallResults
+      );
+
+      // We may have processed everything, so try to send the results
+      // to the backend.
+      triggerSendEditorFunctionCallResults();
+    },
+    [
+      project,
+      selectedAiRequest,
+      addEditorFunctionCallResults,
+      ensureExtensionInstalled,
+      launchEventsGeneration,
+      triggerSendEditorFunctionCallResults,
+    ]
+  );
+
+  const allFunctionCallsToProcess = React.useMemo(
+    () =>
+      selectedAiRequest
+        ? getFunctionCallsToProcess({
+            aiRequest: selectedAiRequest,
+            editorFunctionCallResults:
+              getEditorFunctionCallResults(selectedAiRequest.id) || [],
+          })
+        : [],
+    [selectedAiRequest, getEditorFunctionCallResults]
+  );
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (isAutoProcessingFunctionCalls) {
+          if (allFunctionCallsToProcess.length === 0) {
+            return;
+          }
+          console.info('Automatically processing AI function calls...');
+          await onProcessFunctionCalls(allFunctionCallsToProcess);
+        }
+      })();
+    },
+    [
+      isAutoProcessingFunctionCalls,
+      onProcessFunctionCalls,
+      allFunctionCallsToProcess,
+    ]
+  );
+
+  return {
+    isAutoProcessingFunctionCalls,
+    setAutoProcessFunctionCalls,
+    onProcessFunctionCalls,
   };
 };
 
@@ -392,12 +532,6 @@ const noop = () => {};
 export const AskAi = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
     ({ isActive, setToolbar, project, i18n }: Props, ref) => {
-      const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
-        project,
-        i18n,
-      });
-      const { launchEventsGeneration } = useGenerateEvents({ project });
-
       const {
         selectedAiRequest,
         selectedAiRequestId,
@@ -673,9 +807,6 @@ export const AskAi = React.memo<Props>(
           setLastSendError,
         ]
       );
-      const upToDateSendEditorFunctionCallResults = useStableUpToDateCallback(
-        onSendEditorFunctionCallResults
-      );
 
       const onSendFeedback = React.useCallback(
         async (aiRequestId, messageIndex, feedback, reason) => {
@@ -697,133 +828,18 @@ export const AskAi = React.memo<Props>(
         [getAuthorizationHeader, profile]
       );
 
-      // TODO: Move all of the next functions into a hook
-      const [
-        sendEditorFunctionCallResultTrigger,
-        setSendEditorFunctionCallResultTrigger,
-      ] = React.useState(0);
-      const triggerSendEditorFunctionCallResults = React.useCallback(() => {
-        console.log("Asking to send the editor function call results.");
-        setSendEditorFunctionCallResultTrigger(
-          sendEditorFunctionCallResultTrigger =>
-            sendEditorFunctionCallResultTrigger + 1
-        );
-      }, []);
-
-      React.useEffect(
-        () => {
-          console.log("CALLING THE UPTODATE SendEditorFunctionCallResults");
-          upToDateSendEditorFunctionCallResults();
-        },
-        [
-          sendEditorFunctionCallResultTrigger,
-          upToDateSendEditorFunctionCallResults,
-        ]
-      );
-
-      const [
+      const {
         isAutoProcessingFunctionCalls,
         setAutoProcessFunctionCalls,
-      ] = React.useState(true); // TODO: make it per ai request id.
-      const onProcessFunctionCalls = React.useCallback(
-        async (
-          functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-          options: ?{|
-            ignore?: boolean,
-          |}
-        ) => {
-          if (!project || !selectedAiRequest) return;
-
-          addEditorFunctionCallResults(
-            selectedAiRequest.id,
-            functionCalls.map(functionCall => ({
-              status: 'working',
-              call_id: functionCall.call_id,
-            }))
-          );
-
-          const editorFunctionCallResults = await processEditorFunctionCalls({
-            project,
-            functionCalls: functionCalls.map(functionCall => ({
-              name: functionCall.name,
-              arguments: functionCall.arguments,
-              call_id: functionCall.call_id,
-            })),
-            ignore: !!options && !!options.ignore,
-            launchEventsGeneration: async options => {
-              return await launchEventsGeneration({
-                ...options,
-                relatedAiRequestId: selectedAiRequest.id,
-              });
-            },
-            onEnsureExtensionInstalled: async ({ extensionName }) => {
-              await ensureExtensionInstalled(extensionName);
-            },
-          });
-
-          addEditorFunctionCallResults(
-            selectedAiRequest.id,
-            editorFunctionCallResults
-          );
-
-          // We may have processed everything, so try to send the results
-          // to the backend.
-          triggerSendEditorFunctionCallResults();
-        },
-        [
-          project,
-          selectedAiRequest,
-          addEditorFunctionCallResults,
-          ensureExtensionInstalled,
-          launchEventsGeneration,
-          triggerSendEditorFunctionCallResults,
-        ]
-      );
-
-      const allFunctionCallsToProcess = React.useMemo(
-        () =>
-          selectedAiRequest
-            ? getFunctionCallsToProcess({
-                aiRequest: selectedAiRequest,
-                editorFunctionCallResults:
-                  getEditorFunctionCallResults(selectedAiRequest.id) || [],
-              })
-            : [],
-        [selectedAiRequest, getEditorFunctionCallResults]
-      );
-
-      const hasProcessedAllFunctionCalls = selectedAiRequest
-        ? allFunctionCallsToProcess.length === 0
-        : false;
-
-      React.useEffect(
-        () => {
-          (async () => {
-            console.log('Checking if should auto process function calls.');
-            if (isAutoProcessingFunctionCalls) {
-              if (allFunctionCallsToProcess.length === 0) {
-                console.log('No function calls to process.');
-                return;
-              }
-              console.log('Yes!');
-              await onProcessFunctionCalls(allFunctionCallsToProcess);
-
-              console.log(
-                'Sending, just now the editor function call results.'
-              );
-            } else {
-              console.log('no');
-            }
-          })();
-        },
-        [
-          isAutoProcessingFunctionCalls,
-          onProcessFunctionCalls,
-          allFunctionCallsToProcess,
-        ]
-      );
-
-      //TODO: end of the functions to move in a hook.
+        onProcessFunctionCalls,
+      } = useProcessFunctionCalls({
+        project,
+        selectedAiRequest,
+        onSendEditorFunctionCallResults,
+        getEditorFunctionCallResults,
+        addEditorFunctionCallResults,
+        i18n,
+      });
 
       return (
         <>
@@ -853,16 +869,21 @@ export const AskAi = React.memo<Props>(
                 availableCredits={availableCredits}
                 onSendFeedback={onSendFeedback}
                 hasOpenedProject={!!project}
-                isAutoProcessingFunctionCalls={isAutoProcessingFunctionCalls}
-                setAutoProcessFunctionCalls={setAutoProcessFunctionCalls}
+                isAutoProcessingFunctionCalls={
+                  selectedAiRequest
+                    ? isAutoProcessingFunctionCalls(selectedAiRequest.id)
+                    : false
+                }
+                setAutoProcessFunctionCalls={shouldAutoProcess => {
+                  if (!selectedAiRequest) return;
+                  setAutoProcessFunctionCalls(
+                    selectedAiRequest.id,
+                    shouldAutoProcess
+                  );
+                }}
                 i18n={i18n}
               />
             </div>
-            {JSON.stringify({
-              allFunctionCallsToProcess,
-              hasProcessedAllFunctionCalls,
-              isAutoProcessingFunctionCalls,
-            })}
           </Paper>
           <AskAiHistory
             open={isHistoryOpen}

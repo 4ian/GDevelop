@@ -271,7 +271,11 @@ const changeObjectProperty: EditorFunction = async ({ project, args }) => {
 /**
  * Adds a behavior to an object in a scene
  */
-const addBehavior: EditorFunction = async ({ project, args }) => {
+const addBehavior: EditorFunction = async ({
+  project,
+  args,
+  onEnsureExtensionInstalled,
+}) => {
   const scene_name = extractRequiredString(args, 'scene_name');
   const object_name = extractRequiredString(args, 'object_name');
   const behavior_type = extractRequiredString(args, 'behavior_type');
@@ -304,6 +308,21 @@ const addBehavior: EditorFunction = async ({ project, args }) => {
     return makeGenericSuccess(
       `Behavior with name "${behavior_name}" already exists on object "${object_name}", no need to re-create it.`
     );
+  }
+
+  if (behavior_type.includes('::')) {
+    const extensionName = behavior_type.split('::')[0];
+    try {
+      await onEnsureExtensionInstalled({ extensionName });
+    } catch (error) {
+      console.error(
+        `Could not get extension "${extensionName}" installed:`,
+        error
+      );
+      return makeGenericFailure(
+        `Could not install extension "${extensionName}" - should you consider trying with another behavior type?`
+      );
+    }
   }
 
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(

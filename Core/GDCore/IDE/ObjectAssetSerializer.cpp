@@ -131,13 +131,14 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
   const auto *customObjectConfiguration =
       dynamic_cast<const gd::CustomObjectConfiguration *>(
           &object.GetConfiguration());
-  if (customObjectConfiguration
-          ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
-      customObjectConfiguration
-          ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration()) {
+  const auto &variantName = customObjectConfiguration->GetVariantName();
+  if (variantName.empty() &&
+      (customObjectConfiguration
+           ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
+       customObjectConfiguration
+           ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration())) {
     return;
   }
-  const auto &variantName = customObjectConfiguration->GetVariantName();
   const auto &variantIdentifier =
       object.GetType() + gd::PlatformExtension::GetNamespaceSeparator() +
       variantName;
@@ -154,7 +155,7 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
     pairElement.SetAttribute("objectType", object.GetType());
     SerializerElement &variantElement = pairElement.AddChild("variant");
     variant.SerializeTo(variantElement);
-    // TODO Recursivity
+
     for (auto &object : variant.GetObjects().GetObjects()) {
       gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
           project, *object, variantsElement, alreadyUsedVariantIdentifiers);

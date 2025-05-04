@@ -10,7 +10,10 @@ export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,
 }: {|
   aiRequest: AiRequest,
-|}): Map<AiRequestMessageAssistantFunctionCall, AiRequestFunctionCallOutput | null> => {
+|}): Map<
+  AiRequestMessageAssistantFunctionCall,
+  AiRequestFunctionCallOutput | null
+> => {
   // Maps each function call to its corresponding output (or null if no output)
   const functionCallsToOutputs = new Map<
     AiRequestMessageAssistantFunctionCall,
@@ -18,7 +21,10 @@ export const getFunctionCallToFunctionCallOutputMap = ({
   >();
 
   // Track function calls by their call_id to match with outputs
-  const functionCallsByCallId = new Map<string, AiRequestMessageAssistantFunctionCall>();
+  const functionCallsByCallId = new Map<
+    string,
+    AiRequestMessageAssistantFunctionCall
+  >();
 
   // Process messages in a single loop
   for (let i = 0; i < aiRequest.output.length; i++) {
@@ -106,4 +112,47 @@ export const getFunctionCallsToProcess = ({
   }
 
   return functionCallsToProcess;
+};
+
+export const getFunctionCallOutputsFromEditorFunctionCallResults = (
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null
+): {|
+  hasUnfinishedResult: boolean,
+  functionCallOutputs: Array<AiRequestFunctionCallOutput>,
+|} => {
+  if (!editorFunctionCallResults)
+    return { hasUnfinishedResult: false, functionCallOutputs: [] };
+
+  let hasUnfinishedResult = false;
+  const functionCallOutputs = editorFunctionCallResults
+    .map(functionCallOutput => {
+      if (functionCallOutput.status === 'finished') {
+        return {
+          type: 'function_call_output',
+          call_id: functionCallOutput.call_id,
+          output: JSON.stringify({
+            success: functionCallOutput.success,
+            ...functionCallOutput.output,
+          }),
+        };
+      } else if (functionCallOutput.status === 'ignored') {
+        return {
+          type: 'function_call_output',
+          call_id: functionCallOutput.call_id,
+          output: JSON.stringify({
+            ignored: true,
+            message: 'This was marked as ignored by the user.',
+          }),
+        };
+      }
+
+      hasUnfinishedResult = true;
+      return null;
+    })
+    .filter(Boolean);
+
+  return {
+    functionCallOutputs,
+    hasUnfinishedResult,
+  };
 };

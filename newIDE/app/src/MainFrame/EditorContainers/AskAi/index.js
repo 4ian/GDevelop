@@ -32,7 +32,10 @@ import {
   processEditorFunctionCalls,
   type EditorFunctionCallResult,
 } from '../../../Commands/EditorFunctionCallRunner';
-import { getFunctionCallsToProcess } from './AiRequestUtils';
+import {
+  getFunctionCallOutputsFromEditorFunctionCallResults,
+  getFunctionCallsToProcess,
+} from './AiRequestUtils';
 import { useStableUpToDateRef } from '../../../Utils/UseStableUpToDateCallback';
 import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
@@ -277,9 +280,9 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
             null,
             2
           ),
-          eventsDescription: eventsDescription,
-          extensionNamesList: extensionNamesList,
-          objectsList: objectsList,
+          eventsDescription,
+          extensionNamesList,
+          objectsList,
           relatedAiRequestId,
         })
       );
@@ -731,6 +734,7 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
+      // TODO: factor with other callback.
       const onSendEditorFunctionCallResults = React.useCallback(
         async () => {
           if (
@@ -741,49 +745,22 @@ export const AskAi = React.memo<Props>(
             return;
 
           // Read the results from the editor that applied the function calls.
-          const editorFunctionCallResults = getEditorFunctionCallResults(
-            selectedAiRequestId
+          // and transform them into the output that will be stored on the AI request.
+          const {
+            hasUnfinishedResult,
+            functionCallOutputs,
+          } = getFunctionCallOutputsFromEditorFunctionCallResults(
+            getEditorFunctionCallResults(selectedAiRequestId)
           );
-          if (!editorFunctionCallResults) return;
-
-          // Transform them into the output that will be stored on the AI request.
-          let hasUnfinishedResult = false;
-          const functionCallOutputs = editorFunctionCallResults
-            .map(functionCallOutput => {
-              if (functionCallOutput.status === 'finished') {
-                return {
-                  type: 'function_call_output',
-                  call_id: functionCallOutput.call_id,
-                  output: JSON.stringify({
-                    success: functionCallOutput.success,
-                    ...functionCallOutput.output,
-                  }),
-                };
-              } else if (functionCallOutput.status === 'ignored') {
-                return {
-                  type: 'function_call_output',
-                  call_id: functionCallOutput.call_id,
-                  output: JSON.stringify({
-                    ignored: true,
-                    message: 'This was marked as ignored by the user.',
-                  }),
-                };
-              }
-
-              hasUnfinishedResult = true;
-              return null;
-            })
-            .filter(Boolean);
 
           // If anything is not finished yet, stop there (we only send all
           // results at once).
-          if (hasUnfinishedResult || editorFunctionCallResults.length === 0)
-            return;
+          if (hasUnfinishedResult || functionCallOutputs.length === 0) return;
 
           try {
             console.info(
               'Sending editor function call results:',
-              editorFunctionCallResults
+              functionCallOutputs
             );
             setSendingAiRequest(selectedAiRequestId, true);
 

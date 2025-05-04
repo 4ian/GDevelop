@@ -158,7 +158,7 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
             "MyEventsExtension::MyEventsBasedObject");
   }
 
-  SECTION("Can serialize custom objects as assets with children override") {
+  SECTION("Can serialize custom objects as assets with children overriding") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);

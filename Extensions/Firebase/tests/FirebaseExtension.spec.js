@@ -50,6 +50,11 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     .replace('.', '-')}-${Date.now()}`;
 
   before(async function setupFirebase() {
+    // Delete any existing Firebase app before setup
+    if (firebase.apps.length !== 0) {
+      await firebase.app().delete();
+    }
+
     await gdjs.evtTools.firebaseTools._setupFirebase({
       getGame: () => ({
         getExtensionProperty: () => JSON.stringify(firebaseConfig),

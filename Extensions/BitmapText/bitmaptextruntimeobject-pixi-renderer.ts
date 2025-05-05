@@ -4,7 +4,8 @@ namespace gdjs {
    */
   export class BitmapTextRuntimeObjectPixiRenderer {
     _object: gdjs.BitmapTextRuntimeObject;
-    _pixiObject: PIXI.BitmapText;
+    _pixiObject: PIXI.Container;
+    _text: PIXI.BitmapText;
 
     /**
      * @param runtimeObject The object to render
@@ -24,10 +25,12 @@ namespace gdjs {
           runtimeObject._bitmapFontResourceName,
           runtimeObject._textureAtlasResourceName
         );
-      this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
+      this._pixiObject = new PIXI.Container();
+      this._text = new PIXI.BitmapText(runtimeObject._text, {
         fontName: bitmapFont.font,
         fontSize: bitmapFont.size,
       });
+      this._pixiObject.addChild(this._text);
 
       // Set the object on the scene
       instanceContainer
@@ -54,13 +57,13 @@ namespace gdjs {
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(this._text.fontName);
 
       this._pixiObject.destroy();
     }
 
     getFontSize() {
-      return this._pixiObject.fontSize;
+      return this._text.fontSize;
     }
 
     updateFont(): void {
@@ -79,21 +82,21 @@ namespace gdjs {
         .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
+        .releaseBitmapFont(this._text.fontName);
 
       // Update the font used by the object:
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
+      this._text.fontName = bitmapFont.font;
+      this._text.fontSize = bitmapFont.size;
       this.updatePosition();
     }
 
     updateTint(): void {
-      this._pixiObject.tint = gdjs.rgbToHexNumber(
+      this._text.tint = gdjs.rgbToHexNumber(
         this._object._tint[0],
         this._object._tint[1],
         this._object._tint[2]
       );
-      this._pixiObject.dirty = true;
+      this._text.dirty = true;
     }
 
     /**
@@ -111,7 +114,7 @@ namespace gdjs {
     }
 
     updateScale(): void {
-      this._pixiObject.scale.set(
+      this._text.scale.set(
         Math.max(this._object._scaleX, 0),
         Math.max(this._object._scaleY, 0)
       );
@@ -119,29 +122,29 @@ namespace gdjs {
     }
 
     getScale() {
-      return Math.max(this._pixiObject.scale.x, this._pixiObject.scale.y);
+      return Math.max(this._text.scale.x, this._text.scale.y);
     }
 
     updateWrappingWidth(): void {
       if (this._object._wrapping) {
-        this._pixiObject.maxWidth =
+        this._text.maxWidth =
           this._object._wrappingWidth / this._object._scaleX;
-        this._pixiObject.dirty = true;
+        this._text.dirty = true;
       } else {
-        this._pixiObject.maxWidth = 0;
-        this._pixiObject.dirty = true;
+        this._text.maxWidth = 0;
+        this._text.dirty = true;
       }
       this.updatePosition();
     }
 
     updateTextContent(): void {
-      this._pixiObject.text = this._object._text;
+      this._text.text = this._object._text;
       this.updatePosition();
     }
 
     updateAlignment(): void {
       // @ts-ignore - assume align is always a valid value.
-      this._pixiObject.align = this._object._textAlign;
+      this._text.align = this._object._textAlign;
       this.updatePosition();
     }
 
@@ -153,31 +156,27 @@ namespace gdjs {
             : this._object._textAlign === 'center'
               ? 0.5
               : 0;
-
         const width = this._object.getWrappingWidth();
-
-        // A vector from the custom size center to the renderer center.
-        const centerToCenterX =
-          (width - this._pixiObject.width) * (alignmentX - 0.5);
-
         this._pixiObject.position.x = this._object.x + width / 2;
-        this._pixiObject.anchor.x =
-          0.5 - centerToCenterX / this._pixiObject.width;
+        this._text.position.x = width * (alignmentX - 0.5);
+        this._text.anchor.x = alignmentX;
       } else {
+        this._text.anchor.x = 0.5;
+        const renderedWidth = this.getWidth();
         this._pixiObject.position.x =
-          this._object.x + this._pixiObject.width / 2;
-        this._pixiObject.anchor.x = 0.5;
+          this._object.x + renderedWidth / 2;
+        this._text.position.x = 0;
       }
-
       const alignmentY =
         this._object._verticalTextAlignment === 'bottom'
           ? 1
           : this._object._verticalTextAlignment === 'center'
             ? 0.5
             : 0;
+      this._text.anchor.y = 0.5;
       this._pixiObject.position.y =
-        this._object.y + this._pixiObject.height * (0.5 - alignmentY);
-      this._pixiObject.anchor.y = 0.5;
+        this._object.y + this.getHeight() * (0.5 - alignmentY);
+      this._text.position.y = 0;
     }
 
     updateAngle(): void {
@@ -185,15 +184,15 @@ namespace gdjs {
     }
 
     updateOpacity(): void {
-      this._pixiObject.alpha = this._object._opacity / 255;
+      this._text.alpha = this._object._opacity / 255;
     }
 
     getWidth(): float {
-      return this._pixiObject.textWidth * this.getScale();
+      return this._text.textWidth * this.getScale();
     }
 
     getHeight(): float {
-      return this._pixiObject.textHeight * this.getScale();
+      return this._text.textHeight * this.getScale();
     }
   }
   export const BitmapTextRuntimeObjectRenderer =

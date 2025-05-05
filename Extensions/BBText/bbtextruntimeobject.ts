@@ -376,7 +376,7 @@ namespace gdjs {
     }
 
     override getWidth(): float {
-      return this._renderer.getWidth();
+      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     override getHeight(): float {

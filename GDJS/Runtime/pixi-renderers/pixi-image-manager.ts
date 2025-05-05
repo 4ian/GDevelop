@@ -234,28 +234,29 @@ namespace gdjs {
         vertexColors: boolean;
       }
     ): THREE.Material {
-      const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
-        forceBasicMaterial ? 1 : 0
-      }|${vertexColors ? 1 : 0}`;
+      // const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
+      //   forceBasicMaterial ? 1 : 0
+      // }|${vertexColors ? 1 : 0}`;
 
-      const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
-      if (loadedThreeMaterial) return loadedThreeMaterial;
+      // const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
+      // if (loadedThreeMaterial) return loadedThreeMaterial;
 
-      const material = forceBasicMaterial
-        ? new THREE.MeshBasicMaterial({
-            map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
-            vertexColors,
-          })
-        : new THREE.MeshStandardMaterial({
-            map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
-            metalness: 0,
-            vertexColors,
-          });
-      this._loadedThreeMaterials.put(cacheKey, material);
+      // const material = forceBasicMaterial
+      //   ? new THREE.MeshBasicMaterial({
+      //       map: this.getThreeTexture(resourceName),
+      //       side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      //       transparent: useTransparentTexture,
+      //       vertexColors,
+      //     })
+      //   : new THREE.MeshStandardMaterial({
+      //       map: this.getThreeTexture(resourceName),
+      //       side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      //       transparent: useTransparentTexture,
+      //       metalness: 0,
+      //       vertexColors,
+      //     });
+      // this._loadedThreeMaterials.put(cacheKey, material);
+      const material = new THREE.MeshToonMaterial({map:this.getThreeTexture(resourceName)})
       return material;
     }
 

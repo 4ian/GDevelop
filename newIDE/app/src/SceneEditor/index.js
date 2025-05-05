@@ -1054,10 +1054,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ tileMapTileSelection });
   };
 
-  _onSelectInstances = (
+  _setSelectedInstances = (
     instances: Array<gdInitialInstance>,
-    multiSelect: boolean,
-    targetPosition?: 'center' | 'upperCenter'
+    multiSelect: boolean
   ) => {
     const { previewDebuggerServer } = this.props;
     this.instancesSelection.selectInstances({
@@ -1066,6 +1065,30 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
       ignoreSeal: true,
     });
+
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setSelectedInstances',
+          payload: {
+            instanceUuids: this.instancesSelection
+              .getSelectedInstances()
+              .map(instance => instance.getPersistentUuid()),
+          },
+        });
+      });
+    }
+    this.setState({ lastSelectionType: 'instance' });
+    this.updateToolbar();
+  };
+
+  _onSelectInstances = (
+    instances: Array<gdInitialInstance>,
+    multiSelect: boolean,
+    targetPosition?: 'center' | 'upperCenter'
+  ) => {
+    const { previewDebuggerServer } = this.props;
+    this._setSelectedInstances(instances, multiSelect);
     const { editorDisplay } = this;
     if (editorDisplay) {
       let offset = null;
@@ -1081,22 +1104,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       if (previewDebuggerServer) {
         previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
           previewDebuggerServer.sendMessage(debuggerId, {
-            command: 'setSelectedInstances',
-            payload: {
-              instanceUuids: this.instancesSelection
-                .getSelectedInstances()
-                .map(instance => instance.getPersistentUuid()),
-            },
-          });
-          previewDebuggerServer.sendMessage(debuggerId, {
             command: 'centerViewOnLastSelectedInstance',
             payload: { visibleScreenArea },
           });
         });
       }
     }
-    this.setState({ lastSelectionType: 'instance' });
-    this.updateToolbar();
   };
 
   /**
@@ -2109,12 +2122,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       initialInstances,
       objectName
     );
-    this.instancesSelection.selectInstances({
-      instances: instancesToSelect,
-      ignoreSeal: true,
-      multiSelect: false,
-      layersLocks: null,
-    });
+    this._setSelectedInstances(instancesToSelect, false);
     this.forceUpdateInstancesList();
     this._onInstancesSelected(instancesToSelect);
   };

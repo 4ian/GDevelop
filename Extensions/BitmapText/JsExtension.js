@@ -646,13 +646,15 @@ module.exports = {
         this._currentBitmapFontResourceName = '';
         this._currentTextureAtlasResourceName = '';
 
-        this._pixiObject = new PIXI.BitmapText('', {
+        this._pixiObject = new PIXI.Container();
+        this._text = new PIXI.BitmapText('', {
           // Use a default font. The proper font will be loaded in `update` method.
           fontName: getDefaultBitmapFont().font,
         });
+        this._text.anchor.x = 0.5;
+        this._text.anchor.y = 0.5;
+        this._pixiObject.addChild(this._text);
 
-        this._pixiObject.anchor.x = 0.5;
-        this._pixiObject.anchor.y = 0.5;
         this._pixiContainer.addChild(this._pixiObject);
         this.update();
       }
@@ -665,19 +667,19 @@ module.exports = {
 
         // Update the rendered text properties (note: Pixi is only
         // applying changes if there were changed).
-        this._pixiObject.text = this._propertyOverridings.has('Text')
+        this._text.text = this._propertyOverridings.has('Text')
           ? this._propertyOverridings.get('Text')
           : object.content.text;
 
         const align = object.content.align;
-        this._pixiObject.align = align;
+        this._text.align = align;
 
         const color = object.content.tint;
-        this._pixiObject.tint =
+        this._text.tint =
           objectsRenderingService.rgbOrHexToHexNumber(color);
 
         const scale = object.content.scale;
-        this._pixiObject.scale.set(scale);
+        this._text.scale.set(scale);
 
         // Track the changes in font to load the new requested font.
         const bitmapFontResourceName = object.content.bitmapFontResourceName;
@@ -689,12 +691,12 @@ module.exports = {
           this._currentTextureAtlasResourceName !== textureAtlasResourceName
         ) {
           // Release the old font (if it was installed).
-          releaseBitmapFont(this._pixiObject.fontName);
+          releaseBitmapFont(this._text.fontName);
 
           // Temporarily go back to the default font, as the PIXI.BitmapText
           // object does not support being displayed with a font not installed at all.
           // It will be replaced as soon as the proper font is loaded.
-          this._pixiObject.fontName = getDefaultBitmapFont().font;
+          this._text.fontName = getDefaultBitmapFont().font;
 
           this._currentBitmapFontResourceName = bitmapFontResourceName;
           this._currentTextureAtlasResourceName = textureAtlasResourceName;
@@ -706,19 +708,19 @@ module.exports = {
           ).then((bitmapFont) => {
             if (this._wasDestroyed) return;
 
-            this._pixiObject.fontName = bitmapFont.font;
-            this._pixiObject.fontSize = bitmapFont.size;
-            this._pixiObject.dirty = true;
+            this._text.fontName = bitmapFont.font;
+            this._text.fontSize = bitmapFont.size;
+            this._text.dirty = true;
           });
         }
 
         // Set up the wrapping width if enabled.
-        const oldMaxWidth = this._pixiObject.maxWidth;
-        this._pixiObject.maxWidth = this._instance.hasCustomSize()
-          ? this.getCustomWidth() / this._pixiObject.scale.x
+        const oldMaxWidth = this._text.maxWidth;
+        this._text.maxWidth = this._instance.hasCustomSize()
+          ? this.getCustomWidth() / this._text.scale.x
           : 0;
-        if (oldMaxWidth !== this._pixiObject.maxWidth) {
-          this._pixiObject.dirty = true;
+        if (oldMaxWidth !== this._text.maxWidth) {
+          this._text.dirty = true;
         }
 
         if (this._instance.hasCustomSize()) {
@@ -728,20 +730,16 @@ module.exports = {
               : object.content.align === 'center'
                 ? 0.5
                 : 0;
-
           const width = this.getCustomWidth();
-
-          // A vector from the custom size center to the renderer center.
-          const centerToCenterX =
-            (width - this._pixiObject.width) * (alignmentX - 0.5);
-
           this._pixiObject.position.x = this._instance.getX() + width / 2;
-          this._pixiObject.anchor.x =
-            0.5 - centerToCenterX / this._pixiObject.width;
+          this._text.position.x = width * (alignmentX - 0.5);
+          this._text.anchor.x = alignmentX;
         } else {
+          this._text.anchor.x = 0.5;
+          const renderedWidth = this._text.width;
           this._pixiObject.position.x =
-            this._instance.getX() + this._pixiObject.width / 2;
-          this._pixiObject.anchor.x = 0.5;
+            this._instance.getX() + renderedWidth / 2;
+          this._text.position.x = 0;
         }
         const alignmentY =
           object.content.verticalTextAlignment === 'bottom'
@@ -749,9 +747,10 @@ module.exports = {
             : object.content.verticalTextAlignment === 'center'
               ? 0.5
               : 0;
+        this._text.anchor.y = 0.5;
         this._pixiObject.position.y =
-          this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
-        this._pixiObject.anchor.y = 0.5;
+          this._instance.getY() + this._text.height * (0.5 - alignmentY);
+        this._text.position.y = 0;
 
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
@@ -768,17 +767,17 @@ module.exports = {
       onRemovedFromScene() {
         RenderedInstance.prototype.onRemovedFromScene.call(this);
 
-        const fontName = this._pixiObject.fontName;
+        const fontName = this._text.fontName;
         this._pixiObject.destroy();
         releaseBitmapFont(fontName);
       }
 
       getDefaultWidth() {
-        return this._pixiObject.width;
+        return this._text.width;
       }
 
       getDefaultHeight() {
-        return this._pixiObject.height;
+        return this._text.height;
       }
 
       getOriginY() {

@@ -721,7 +721,7 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        if (this._instance.hasCustomSize()) {
+        if (this._instance.hasCustomSize() && this.getDefaultWidth() !== 0) {
           const alignmentX =
             object.content.align === 'right'
               ? 1
@@ -737,10 +737,10 @@ module.exports = {
 
           this._pixiObject.position.x = this._instance.getX() + width / 2;
           this._pixiObject.anchor.x =
-            0.5 - centerToCenterX / this._pixiObject.width;
+            0.5 - centerToCenterX / this.getDefaultWidth();
         } else {
           this._pixiObject.position.x =
-            this._instance.getX() + this._pixiObject.width / 2;
+            this._instance.getX() + this.getDefaultWidth() / 2;
           this._pixiObject.anchor.x = 0.5;
         }
         const alignmentY =
@@ -750,7 +750,7 @@ module.exports = {
               ? 0.5
               : 0;
         this._pixiObject.position.y =
-          this._instance.getY() + this._pixiObject.height * (0.5 - alignmentY);
+          this._instance.getY() + this.getDefaultHeight() * (0.5 - alignmentY);
         this._pixiObject.anchor.y = 0.5;
 
         this._pixiObject.rotation = RenderedInstance.toRad(
@@ -774,11 +774,11 @@ module.exports = {
       }
 
       getDefaultWidth() {
-        return this._pixiObject.width;
+        return this._pixiObject.textWidth * this._pixiObject.scale.x;
       }
 
       getDefaultHeight() {
-        return this._pixiObject.height;
+        return this._pixiObject.textHeight * this._pixiObject.scale.y;
       }
 
       getOriginY() {

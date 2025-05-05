@@ -41,7 +41,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.66 && ./emsdk activate 3.1.66 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -118,7 +118,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.66 && ./emsdk activate 3.1.66 && cd ..
 
       - run:
           name: Install system dependencies for Electron builder
@@ -197,7 +197,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.66 && ./emsdk activate 3.1.66 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:

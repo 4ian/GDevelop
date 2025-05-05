@@ -1,15 +1,15 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+//
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_ERROR_ERROR_H_
@@ -42,7 +42,7 @@ RAPIDJSON_DIAG_OFF(padded)
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ERROR_STRING
 
-//! Macro for converting string literial to \ref RAPIDJSON_ERROR_CHARTYPE[].
+//! Macro for converting string literal to \ref RAPIDJSON_ERROR_CHARTYPE[].
 /*! \ingroup RAPIDJSON_ERRORS
     By default this conversion macro does nothing.
     On Windows, user can define this macro as \c _T(x) for supporting both
@@ -104,6 +104,8 @@ enum ParseErrorCode {
     \see GenericReader::Parse, GenericDocument::Parse
 */
 struct ParseResult {
+    //!! Unspecified boolean type
+    typedef bool (ParseResult::*BooleanType)() const;
 public:
     //! Default constructor, no error.
     ParseResult() : code_(kParseErrorNone), offset_(0) {}
@@ -115,14 +117,18 @@ public:
     //! Get the error offset, if \ref IsError(), 0 otherwise.
     size_t Offset() const { return offset_; }
 
-    //! Conversion to \c bool, returns \c true, iff !\ref IsError().
-    operator bool() const { return !IsError(); }
+    //! Explicit conversion to \c bool, returns \c true, iff !\ref IsError().
+    operator BooleanType() const { return !IsError() ? &ParseResult::IsError : NULL; }
     //! Whether the result is an error.
     bool IsError() const { return code_ != kParseErrorNone; }
 
     bool operator==(const ParseResult& that) const { return code_ == that.code_; }
     bool operator==(ParseErrorCode code) const { return code_ == code; }
     friend bool operator==(ParseErrorCode code, const ParseResult & err) { return code == err.code_; }
+
+    bool operator!=(const ParseResult& that) const { return !(*this == that); }
+    bool operator!=(ParseErrorCode code) const { return !(*this == code); }
+    friend bool operator!=(ParseErrorCode code, const ParseResult & err) { return err != code; }
 
     //! Reset error code.
     void Clear() { Set(kParseErrorNone); }
@@ -145,6 +151,130 @@ private:
 \endcode
 */
 typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
+
+///////////////////////////////////////////////////////////////////////////////
+// ValidateErrorCode
+
+//! Error codes when validating.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericSchemaValidator
+*/
+enum ValidateErrorCode {
+    kValidateErrors    = -1,                   //!< Top level error code when kValidateContinueOnErrorsFlag set.
+    kValidateErrorNone = 0,                    //!< No error.
+
+    kValidateErrorMultipleOf,                  //!< Number is not a multiple of the 'multipleOf' value.
+    kValidateErrorMaximum,                     //!< Number is greater than the 'maximum' value.
+    kValidateErrorExclusiveMaximum,            //!< Number is greater than or equal to the 'maximum' value.
+    kValidateErrorMinimum,                     //!< Number is less than the 'minimum' value.
+    kValidateErrorExclusiveMinimum,            //!< Number is less than or equal to the 'minimum' value.
+
+    kValidateErrorMaxLength,                   //!< String is longer than the 'maxLength' value.
+    kValidateErrorMinLength,                   //!< String is longer than the 'maxLength' value.
+    kValidateErrorPattern,                     //!< String does not match the 'pattern' regular expression.
+
+    kValidateErrorMaxItems,                    //!< Array is longer than the 'maxItems' value.
+    kValidateErrorMinItems,                    //!< Array is shorter than the 'minItems' value.
+    kValidateErrorUniqueItems,                 //!< Array has duplicate items but 'uniqueItems' is true.
+    kValidateErrorAdditionalItems,             //!< Array has additional items that are not allowed by the schema.
+
+    kValidateErrorMaxProperties,               //!< Object has more members than 'maxProperties' value.
+    kValidateErrorMinProperties,               //!< Object has less members than 'minProperties' value.
+    kValidateErrorRequired,                    //!< Object is missing one or more members required by the schema.
+    kValidateErrorAdditionalProperties,        //!< Object has additional members that are not allowed by the schema.
+    kValidateErrorPatternProperties,           //!< See other errors.
+    kValidateErrorDependencies,                //!< Object has missing property or schema dependencies.
+
+    kValidateErrorEnum,                        //!< Property has a value that is not one of its allowed enumerated values.
+    kValidateErrorType,                        //!< Property has a type that is not allowed by the schema.
+
+    kValidateErrorOneOf,                       //!< Property did not match any of the sub-schemas specified by 'oneOf'.
+    kValidateErrorOneOfMatch,                  //!< Property matched more than one of the sub-schemas specified by 'oneOf'.
+    kValidateErrorAllOf,                       //!< Property did not match all of the sub-schemas specified by 'allOf'.
+    kValidateErrorAnyOf,                       //!< Property did not match any of the sub-schemas specified by 'anyOf'.
+    kValidateErrorNot,                         //!< Property matched the sub-schema specified by 'not'.
+
+    kValidateErrorReadOnly,                    //!< Property is read-only but has been provided when validation is for writing
+    kValidateErrorWriteOnly                    //!< Property is write-only but has been provided when validation is for reading
+};
+
+//! Function pointer type of GetValidateError().
+/*! \ingroup RAPIDJSON_ERRORS
+
+    This is the prototype for \c GetValidateError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
+\code
+    GetValidateErrorFunc GetValidateError = GetValidateError_En; // or whatever
+    const RAPIDJSON_ERROR_CHARTYPE* s = GetValidateError(validator.GetInvalidSchemaCode());
+\endcode
+*/
+typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetValidateErrorFunc)(ValidateErrorCode);
+
+///////////////////////////////////////////////////////////////////////////////
+// SchemaErrorCode
+
+//! Error codes when validating.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericSchemaValidator
+*/
+enum SchemaErrorCode {
+    kSchemaErrorNone = 0,                      //!< No error.
+
+    kSchemaErrorStartUnknown,                  //!< Pointer to start of schema does not resolve to a location in the document
+    kSchemaErrorRefPlainName,                  //!< $ref fragment must be a JSON pointer
+    kSchemaErrorRefInvalid,                    //!< $ref must not be an empty string
+    kSchemaErrorRefPointerInvalid,             //!< $ref fragment is not a valid JSON pointer at offset
+    kSchemaErrorRefUnknown,                    //!< $ref does not resolve to a location in the target document
+    kSchemaErrorRefCyclical,                   //!< $ref is cyclical
+    kSchemaErrorRefNoRemoteProvider,           //!< $ref is remote but there is no remote provider
+    kSchemaErrorRefNoRemoteSchema,             //!< $ref is remote but the remote provider did not return a schema
+    kSchemaErrorRegexInvalid,                  //!< Invalid regular expression in 'pattern' or 'patternProperties'
+    kSchemaErrorSpecUnknown,                   //!< JSON schema draft or OpenAPI version is not recognized
+    kSchemaErrorSpecUnsupported,               //!< JSON schema draft or OpenAPI version is not supported
+    kSchemaErrorSpecIllegal,                   //!< Both JSON schema draft and OpenAPI version found in document
+    kSchemaErrorReadOnlyAndWriteOnly           //!< Property must not be both 'readOnly' and 'writeOnly'
+};
+
+//! Function pointer type of GetSchemaError().
+/*! \ingroup RAPIDJSON_ERRORS
+
+    This is the prototype for \c GetSchemaError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
+\code
+    GetSchemaErrorFunc GetSchemaError = GetSchemaError_En; // or whatever
+    const RAPIDJSON_ERROR_CHARTYPE* s = GetSchemaError(validator.GetInvalidSchemaCode());
+\endcode
+*/
+typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetSchemaErrorFunc)(SchemaErrorCode);
+
+///////////////////////////////////////////////////////////////////////////////
+// PointerParseErrorCode
+
+//! Error code of JSON pointer parsing.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
+*/
+enum PointerParseErrorCode {
+    kPointerParseErrorNone = 0,                     //!< The parse is successful
+
+    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
+    kPointerParseErrorInvalidEscape,                //!< Invalid escape
+    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
+    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
+};
+
+//! Function pointer type of GetPointerParseError().
+/*! \ingroup RAPIDJSON_ERRORS
+
+    This is the prototype for \c GetPointerParseError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
+\code
+    GetPointerParseErrorFunc GetPointerParseError = GetPointerParseError_En; // or whatever
+    const RAPIDJSON_ERROR_CHARTYPE* s = GetPointerParseError(pointer.GetParseErrorCode());
+\endcode
+*/
+typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetPointerParseErrorFunc)(PointerParseErrorCode);
+
 
 RAPIDJSON_NAMESPACE_END
 

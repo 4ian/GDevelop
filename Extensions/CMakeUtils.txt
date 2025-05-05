@@ -67,7 +67,7 @@ function(gd_add_extension_target target_name source_files)
 	if(WIN32) # GD extensions have special suffix in their filenames.
 		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgdwe")
 	elseif(EMSCRIPTEN)
-		set_target_properties(${target_name} PROPERTIES SUFFIX ".bc")
+		# set_target_properties(${target_name} PROPERTIES SUFFIX ".bc")
 	else()
 		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgde")
 	endif()

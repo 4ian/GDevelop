@@ -128,11 +128,14 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
   if (!project.HasEventsBasedObject(object.GetType())) {
     return;
   }
+  const auto &eventsBasedObject =
+      project.GetEventsBasedObject(object.GetType());
+  const auto &variants = eventsBasedObject.GetVariants();
   const auto *customObjectConfiguration =
       dynamic_cast<const gd::CustomObjectConfiguration *>(
           &object.GetConfiguration());
   const auto &variantName = customObjectConfiguration->GetVariantName();
-  if (variantName.empty() &&
+  if (!variants.HasVariantNamed(variantName) &&
       (customObjectConfiguration
            ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
        customObjectConfiguration
@@ -144,9 +147,6 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
       variantName;
   auto insertResult = alreadyUsedVariantIdentifiers.insert(variantIdentifier);
   if (insertResult.second) {
-    const auto &eventsBasedObject =
-        project.GetEventsBasedObject(object.GetType());
-    const auto &variants = eventsBasedObject.GetVariants();
     const auto &variant = variants.HasVariantNamed(variantName)
                               ? variants.GetVariant(variantName)
                               : eventsBasedObject.GetDefaultVariant();

@@ -733,12 +733,10 @@ module.exports = {
           const renderedWidth = this.getDefaultWidth();
 
           // A vector from the custom size center to the renderer center.
-          const centerToCenterX =
-            (width - renderedWidth) * (alignmentX - 0.5);
+          const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
 
           this._pixiObject.position.x = this._instance.getX() + width / 2;
-          this._pixiObject.anchor.x =
-            0.5 - centerToCenterX / renderedWidth;
+          this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;
         } else {
           this._pixiObject.position.x =
             this._instance.getX() + this.getDefaultWidth() / 2;

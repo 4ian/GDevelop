@@ -158,8 +158,7 @@ namespace gdjs {
         const renderedWidth = this.getWidth();
 
         // A vector from the custom size center to the renderer center.
-        const centerToCenterX =
-          (width - renderedWidth) * (alignmentX - 0.5);
+        const centerToCenterX = (width - renderedWidth) * (alignmentX - 0.5);
 
         this._pixiObject.position.x = this._object.x + width / 2;
         this._pixiObject.anchor.x = 0.5 - centerToCenterX / renderedWidth;

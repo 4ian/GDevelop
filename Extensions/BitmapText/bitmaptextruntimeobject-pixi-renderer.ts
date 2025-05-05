@@ -162,7 +162,7 @@ namespace gdjs {
         this._text.anchor.x = alignmentX;
       } else {
         this._text.anchor.x = 0.5;
-        const renderedWidth = this._text.width;
+        const renderedWidth = this.getWidth();
         this._pixiObject.position.x =
           this._object.x + renderedWidth / 2;
         this._text.position.x = 0;
@@ -175,7 +175,7 @@ namespace gdjs {
             : 0;
       this._text.anchor.y = 0.5;
       this._pixiObject.position.y =
-        this._object.y + this._text.height * (0.5 - alignmentY);
+        this._object.y + this.getHeight() * (0.5 - alignmentY);
       this._text.position.y = 0;
     }
 

@@ -736,7 +736,7 @@ module.exports = {
           this._text.anchor.x = alignmentX;
         } else {
           this._text.anchor.x = 0.5;
-          const renderedWidth = this._text.width;
+          const renderedWidth = this.getDefaultWidth();
           this._pixiObject.position.x =
             this._instance.getX() + renderedWidth / 2;
           this._text.position.x = 0;
@@ -749,7 +749,7 @@ module.exports = {
               : 0;
         this._text.anchor.y = 0.5;
         this._pixiObject.position.y =
-          this._instance.getY() + this._text.height * (0.5 - alignmentY);
+          this._instance.getY() + this.getDefaultHeight() * (0.5 - alignmentY);
         this._text.position.y = 0;
 
         this._pixiObject.rotation = RenderedInstance.toRad(
@@ -773,11 +773,11 @@ module.exports = {
       }
 
       getDefaultWidth() {
-        return this._text.width;
+        return this._text.textWidth * this._text.scale.x;
       }
 
       getDefaultHeight() {
-        return this._text.height;
+        return this._text.textHeight * this._text.scale.y;
       }
 
       getOriginY() {

@@ -128,24 +128,25 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
   if (!project.HasEventsBasedObject(object.GetType())) {
     return;
   }
+  const auto &eventsBasedObject =
+      project.GetEventsBasedObject(object.GetType());
+  const auto &variants = eventsBasedObject.GetVariants();
   const auto *customObjectConfiguration =
       dynamic_cast<const gd::CustomObjectConfiguration *>(
           &object.GetConfiguration());
-  if (customObjectConfiguration
-          ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
-      customObjectConfiguration
-          ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration()) {
+  const auto &variantName = customObjectConfiguration->GetVariantName();
+  if (!variants.HasVariantNamed(variantName) &&
+      (customObjectConfiguration
+           ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
+       customObjectConfiguration
+           ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration())) {
     return;
   }
-  const auto &variantName = customObjectConfiguration->GetVariantName();
   const auto &variantIdentifier =
       object.GetType() + gd::PlatformExtension::GetNamespaceSeparator() +
       variantName;
   auto insertResult = alreadyUsedVariantIdentifiers.insert(variantIdentifier);
   if (insertResult.second) {
-    const auto &eventsBasedObject =
-        project.GetEventsBasedObject(object.GetType());
-    const auto &variants = eventsBasedObject.GetVariants();
     const auto &variant = variants.HasVariantNamed(variantName)
                               ? variants.GetVariant(variantName)
                               : eventsBasedObject.GetDefaultVariant();
@@ -154,7 +155,7 @@ void ObjectAssetSerializer::SerializeUsedVariantsTo(
     pairElement.SetAttribute("objectType", object.GetType());
     SerializerElement &variantElement = pairElement.AddChild("variant");
     variant.SerializeTo(variantElement);
-    // TODO Recursivity
+
     for (auto &object : variant.GetObjects().GetObjects()) {
       gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
           project, *object, variantsElement, alreadyUsedVariantIdentifiers);

@@ -47,6 +47,8 @@ namespace gdjs {
 
   const setBasicMaterialTo = (node: THREE.Object3D): void => {
     const mesh = node as THREE.Mesh;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     if (!mesh.material) {
       return;
     }

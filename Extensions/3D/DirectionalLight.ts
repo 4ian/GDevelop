@@ -27,7 +27,15 @@ namespace gdjs {
           constructor() {
             this.light = new THREE.DirectionalLight();
             this.light.castShadow = true;
-            this.light.position.set(1, 0, 0);
+            this.light.shadow.mapSize.width = 1024;
+            this.light.shadow.mapSize.height = 1024;
+            this.light.shadow.camera.near = 0.1;
+            this.light.shadow.camera.far = 10;
+            this.light.shadow.camera.right = 10;
+            this.light.shadow.camera.left = 10;
+            this.light.shadow.camera.top = 10;
+            this.light.shadow.camera.bottom = 10;
+            this.light.position.set(0, 20, 0);
             this.rotationObject = new THREE.Group();
             this.rotationObject.add(this.light);
             this.updateRotation();
@@ -55,6 +63,13 @@ namespace gdjs {
               return false;
             }
             scene.add(this.rotationObject);
+            const helper = new THREE.DirectionalLightHelper(this.light);
+            scene.add(helper);
+            const cameraHelper = new THREE.CameraHelper(
+              this.light.shadow.camera
+            );
+            scene.add(cameraHelper);
+
             this._isEnabled = true;
             return true;
           }

@@ -225,6 +225,7 @@ export default class InstancesEditor extends Component<Props, State> {
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
       });
+      threeRenderer.shadowMap.enabled = true;
       threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
       threeRenderer.setSize(this.props.width, this.props.height);

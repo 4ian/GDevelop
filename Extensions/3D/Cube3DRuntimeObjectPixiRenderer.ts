@@ -83,6 +83,8 @@ namespace gdjs {
         );
 
       const boxMesh = new THREE.Mesh(geometry, materials);
+      boxMesh.receiveShadow = true;
+      boxMesh.castShadow = true;
 
       super(runtimeObject, instanceContainer, boxMesh);
       this._boxMesh = boxMesh;

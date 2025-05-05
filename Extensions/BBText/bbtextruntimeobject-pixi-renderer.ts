@@ -103,7 +103,7 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      if (this._object.isWrapping()) {
+      if (this._object.isWrapping() && this._pixiObject.width !== 0) {
         const alignmentX =
           this._object._textAlign === 'right'
             ? 1

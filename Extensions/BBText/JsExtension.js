@@ -618,7 +618,7 @@ module.exports = {
           this._pixiObject.dirty = true;
         }
 
-        if (this._instance.hasCustomSize()) {
+        if (this._instance.hasCustomSize() && this._pixiObject.width !== 0) {
           const alignmentX =
             object.content.align === 'right'
               ? 1

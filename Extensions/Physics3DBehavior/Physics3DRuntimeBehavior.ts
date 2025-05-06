@@ -1470,11 +1470,11 @@ namespace gdjs {
       const deltaX = towardX - body.GetPosition().GetX();
       const deltaY = towardY - body.GetPosition().GetY();
       const deltaZ = towardZ - body.GetPosition().GetZ();
-      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-      if (distance === 0) {
+      const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distanceSq === 0) {
         return;
       }
-      const ratio = length / distance;
+      const ratio = length / Math.sqrt(distanceSq);
 
       this._sharedData.bodyInterface.AddForce(
         body.GetID(),
@@ -1540,11 +1540,11 @@ namespace gdjs {
       const deltaX = towardX - originX;
       const deltaY = towardY - originY;
       const deltaZ = towardZ - originZ;
-      const distance = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-      if (distance === 0) {
+      const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+      if (distanceSq === 0) {
         return;
       }
-      const ratio = length / distance;
+      const ratio = length / Math.sqrt(distanceSq);
 
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),

@@ -270,24 +270,26 @@ namespace gdjs {
           // as it knows the current scene to show.
         });
       } else if (data.command === 'hotReloadObjects') {
-        const currentScene = this._runtimegame
-          .getSceneStack()
-          .getCurrentScene();
-        if (currentScene) {
-          that._hotReloader.hotReloadRuntimeSceneObjects(
-            data.payload.objects,
-            currentScene
-          );
+        if (runtimeGame._inGameEditor) {
+          const editedInstanceContainer =
+            runtimeGame._inGameEditor._getEditedInstanceContainer();
+          if (editedInstanceContainer) {
+            that._hotReloader.hotReloadRuntimeSceneObjects(
+              data.payload.objects,
+              editedInstanceContainer
+            );
+          }
         }
       } else if (data.command === 'hotReloadLayers') {
-        const currentScene = this._runtimegame
-          .getSceneStack()
-          .getCurrentScene();
-        if (currentScene) {
-          that._hotReloader.hotReloadRuntimeSceneLayers(
-            data.payload.layers,
-            currentScene
-          );
+        if (runtimeGame._inGameEditor) {
+          const editedInstanceContainer =
+            runtimeGame._inGameEditor._getEditedInstanceContainer();
+          if (editedInstanceContainer) {
+            that._hotReloader.hotReloadRuntimeSceneLayers(
+              data.payload.layers,
+              editedInstanceContainer
+            );
+          }
         }
       } else if (data.command === 'switchForInGameEdition') {
         if (!this._runtimegame.isInGameEdition()) return;

@@ -321,7 +321,7 @@ namespace gdjs {
       this._editedInstanceContainer = editedInstanceContainer;
     }
 
-    private _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
+    _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
       return (
         this._editedInstanceContainer ||
         this._runtimeGame.getSceneStack().getCurrentScene()

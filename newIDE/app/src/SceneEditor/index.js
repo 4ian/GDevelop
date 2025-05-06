@@ -991,7 +991,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
-    // TODO: Handle external layout
     previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
       previewDebuggerServer.sendMessage(debuggerId, {
         command: 'updateInstances',
@@ -1009,10 +1008,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
-    const { layout, previewDebuggerServer } = this.props;
+    const { previewDebuggerServer } = this.props;
 
-    // TODO: Handle external layout
-    if (previewDebuggerServer && layout) {
+    if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadObjects',

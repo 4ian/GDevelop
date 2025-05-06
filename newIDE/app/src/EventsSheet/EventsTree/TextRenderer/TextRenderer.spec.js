@@ -39,10 +39,7 @@ describe('EventsTree/TextRenderer', () => {
                   type: {
                     value: 'BuiltinCommonInstructions::And',
                   },
-                  parameters: [
-                    'GroupOfSpriteObjectsWithBehaviors',
-                    'PlatformerObject',
-                  ],
+                  parameters: [],
                   subInstructions: [
                     {
                       type: {
@@ -65,6 +62,13 @@ describe('EventsTree/TextRenderer', () => {
                       ],
                     },
                   ],
+                },
+                {
+                  type: {
+                    value: 'BuiltinCommonInstructions::And',
+                  },
+                  parameters: [],
+                  subInstructions: [],
                 },
               ],
               actions: [
@@ -163,6 +167,11 @@ describe('EventsTree/TextRenderer', () => {
                     },
                   ],
                 },
+                {
+                  type: 'BuiltinCommonInstructions::Standard',
+                  conditions: [],
+                  actions: [],
+                },
               ],
             },
           ],
@@ -189,8 +198,10 @@ describe('EventsTree/TextRenderer', () => {
           <event-0.0>
            Conditions:
            - If all of these conditions are true:
-            - (inverted) GroupOfSpriteObjectsWithBehaviors is falling
-            - (inverted) GroupOfSpriteObjectsWithBehaviors is falling
+             - (inverted) GroupOfSpriteObjectsWithBehaviors is falling
+             - (inverted) GroupOfSpriteObjectsWithBehaviors is falling
+           - If all of these conditions are true:
+             (no conditions)
            Actions:
            - Change the number of the animation of MySpriteObject: = 1
            - Hide GroupOfObjects
@@ -224,6 +235,12 @@ describe('EventsTree/TextRenderer', () => {
              - Change the number of the animation of MySpriteObject: = 1
              - Show GroupOfObjects
             </event-0.3.0>
+            <event-0.3.1>
+             Conditions:
+             (no conditions)
+             Actions:
+             (no actions)
+            </event-0.3.1>
           </event-0.3>
         </event-0>"
       `);

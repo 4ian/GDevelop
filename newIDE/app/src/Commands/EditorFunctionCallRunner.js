@@ -7,6 +7,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,6 +36,7 @@ export type EditorFunctionCallResult =
 type EditorFunctionGenericOutput = {|
   success: boolean,
   message?: string,
+  eventsAsText?: string,
   objectName?: string,
   behaviorName?: string,
   properties?: any,
@@ -46,6 +48,7 @@ export type EventsGenerationOptions = {|
   eventsDescription: string,
   extensionNamesList: string,
   objectsList: string,
+  existingEventsAsText: string,
 |};
 
 /**
@@ -613,16 +616,18 @@ const readSceneEvents: EditorFunction = async ({ project, args }) => {
     return makeGenericFailure(`Scene not found: "${scene_name}".`);
   }
 
-  const layout = project.getLayout(scene_name);
-  const events = layout.getEvents();
+  const scene = project.getLayout(scene_name);
+  const events = scene.getEvents();
 
-  // Convert events to a more readable format
-  // This is a simplified implementation - in a real implementation
-  // you would traverse the events tree and convert it to a user-friendly format
+  const eventsAsText = renderEventsAsText({
+    eventsList: events,
+    parentPath: '',
+    padding: '',
+  });
 
   return {
     success: true,
-    events: 'Events structure would be generated here',
+    eventsAsText,
   };
 };
 
@@ -645,6 +650,14 @@ const addSceneEvents: EditorFunction = async ({
   if (!project.hasLayoutNamed(sceneName)) {
     return makeGenericFailure(`Scene not found: "${sceneName}".`);
   }
+  const scene = project.getLayout(sceneName);
+  const events = scene.getEvents();
+
+  const existingEventsAsText = renderEventsAsText({
+    eventsList: events,
+    parentPath: '',
+    padding: '',
+  });
 
   try {
     const aiGeneratedEvent: AiGeneratedEvent = await launchEventsGeneration({
@@ -652,8 +665,8 @@ const addSceneEvents: EditorFunction = async ({
       eventsDescription,
       extensionNamesList,
       objectsList,
+      existingEventsAsText,
     });
-    console.log('got events:', aiGeneratedEvent);
 
     if (aiGeneratedEvent.error) {
       throw new Error(

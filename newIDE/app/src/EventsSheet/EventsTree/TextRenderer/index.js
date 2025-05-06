@@ -35,18 +35,29 @@ const renderInstructionsAsText = ({
       return value;
     }).join('');
 
-    return `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`;
+    return {
+      text: `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`,
+      canHaveSubInstructions: metadata.canHaveSubInstructions(),
+    };
   };
+
+  if (instructionsList.size() === 0) {
+    return areConditions
+      ? `${padding}(no conditions)`
+      : `${padding}(no actions)`;
+  }
 
   return mapFor(0, instructionsList.size(), i => {
     const instruction = instructionsList.get(i);
-    const text = renderInstruction(instruction);
+    const { text, canHaveSubInstructions } = renderInstruction(instruction);
 
-    const subInstructionsText = renderInstructionsAsText({
-      instructionsList: instruction.getSubInstructions(),
-      padding: padding + ' ',
-      areConditions,
-    });
+    const subInstructionsText = canHaveSubInstructions
+      ? renderInstructionsAsText({
+          instructionsList: instruction.getSubInstructions(),
+          padding: padding + '  ',
+          areConditions,
+        })
+      : '';
 
     return [text, subInstructionsText].filter(Boolean).join('\n');
   }).join('\n');

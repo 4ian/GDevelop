@@ -83,6 +83,13 @@ export type AiRequest = {
   output: Array<AiRequestMessage>,
 };
 
+export type AiGeneratedEventEventsChanges = {
+  insertAndReplaceEvents: Array<string>;
+  insertBeforeEvents: Array<string>;
+  insertAsSubEvents: Array<string>;
+  deleteEvents: Array<string>;
+};
+
 export type AiGeneratedEvent = {
   id: string,
   createdAt: string,
@@ -96,6 +103,7 @@ export type AiGeneratedEvent = {
   objectsList: string,
 
   generatedEvents: string | null,
+  eventsChanges: AiGeneratedEventEventsChanges | null,
 
   error: {
     code: string,
@@ -387,6 +395,7 @@ export const createAiEventGeneration = async (
     eventsDescription,
     extensionNamesList,
     objectsList,
+    existingEventsAsText,
     relatedAiRequestId,
   }: {|
     userId: string,
@@ -394,6 +403,7 @@ export const createAiEventGeneration = async (
     eventsDescription: string,
     extensionNamesList: string,
     objectsList: string,
+    existingEventsAsText: string,
     relatedAiRequestId: string,
   |}
 ): Promise<AiGeneratedEvent> => {
@@ -405,6 +415,7 @@ export const createAiEventGeneration = async (
       eventsDescription,
       extensionNamesList,
       objectsList,
+      existingEventsAsText,
       relatedAiRequestId,
     },
     {

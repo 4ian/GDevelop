@@ -336,6 +336,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}
+          onLayersModified={props.onLayersModified}
           onRemoveLayer={props.onRemoveLayer}
           onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdatePropertiesEditor}

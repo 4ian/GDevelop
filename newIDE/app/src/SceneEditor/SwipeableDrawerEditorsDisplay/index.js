@@ -477,6 +477,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}
+                  onLayersModified={props.onLayersModified}
                   onEditLayer={props.editLayer}
                   onRemoveLayer={props.onRemoveLayer}
                   onLayerRenamed={props.onLayerRenamed}

@@ -1197,6 +1197,22 @@ namespace gdjs {
       );
     }
 
+    hotReloadRuntimeSceneLayers(
+      newLayers: LayerData[],
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      const layerNames = [];
+      runtimeInstanceContainer.getAllLayerNames(layerNames);
+      const oldLayers = layerNames.map(layerName => 
+        runtimeInstanceContainer.getLayer(layerName)._initialLayerData
+      );
+      this._hotReloadRuntimeSceneLayers(
+        oldLayers,
+        newLayers,
+        runtimeInstanceContainer
+      );
+    }
+
     _hotReloadRuntimeSceneLayers(
       oldLayers: LayerData[],
       newLayers: LayerData[],
@@ -1278,6 +1294,8 @@ namespace gdjs {
         newLayer.effects,
         runtimeLayer
       );
+
+      runtimeLayer._initialLayerData = newLayer;
     }
 
     _hotReloadRuntimeLayerEffects(

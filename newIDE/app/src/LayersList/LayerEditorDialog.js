@@ -40,7 +40,8 @@ type Props = {|
 
   initialTab: 'properties' | 'effects',
 
-  onClose: () => void,
+  onCancel: () => void,
+  onApply: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -54,7 +55,8 @@ const LayerEditorDialog = ({
   eventsBasedObject,
   layer,
   initialInstances,
-  onClose,
+  onCancel,
+  onApply,
   hotReloadPreviewButtonProps,
   resourceManagementProps,
 }: Props) => {
@@ -64,7 +66,7 @@ const LayerEditorDialog = ({
     notifyOfChange,
   } = useSerializableObjectCancelableEditor({
     serializableObject: layer,
-    onCancel: onClose,
+    onCancel,
   });
   const [
     camera3DFieldOfViewError,
@@ -197,12 +199,12 @@ const LayerEditorDialog = ({
         <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          onClick={onClose}
+          onClick={onApply}
           key={'Apply'}
         />,
       ]}
       onRequestClose={onCancelChanges}
-      onApply={onClose}
+      onApply={onApply}
       fullHeight
       flexColumnBody
       fixedContent={

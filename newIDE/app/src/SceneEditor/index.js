@@ -1218,6 +1218,23 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
+  _onLayersModified = () => {
+    const { previewDebuggerServer, layersContainer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadLayers',
+          payload: {
+            layers: mapFor(0, layersContainer.getLayersCount(), i => {
+              const layer = layersContainer.getLayerAt(i);
+              return serializeToJSObject(layer);
+            }),
+          },
+        });
+      });
+    }
+  };
+
   _onDeleteObjects = (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],
@@ -2317,6 +2334,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   selectedObjectFolderOrObjectsWithContext
                 }
                 onLayerRenamed={this._onLayerRenamed}
+                onLayersModified={this._onLayersModified}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })
@@ -2587,7 +2605,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                   layer={this.state.editedLayer}
                   initialInstances={initialInstances}
                   initialTab={this.state.editedLayerInitialTab}
-                  onClose={() =>
+                  onApply={() => {
+                    this._onLayersModified();
+                    this.setState({
+                      editedLayer: null,
+                    });
+                  }}
+                  onCancel={() =>
                     this.setState({
                       editedLayer: null,
                     })

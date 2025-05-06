@@ -279,6 +279,16 @@ namespace gdjs {
             currentScene
           );
         }
+      } else if (data.command === 'hotReloadLayers') {
+        const currentScene = this._runtimegame
+          .getSceneStack()
+          .getCurrentScene();
+        if (currentScene) {
+          that._hotReloader.hotReloadRuntimeSceneLayers(
+            data.payload.layers,
+            currentScene
+          );
+        }
       } else if (data.command === 'switchForInGameEdition') {
         if (!this._runtimegame.isInGameEdition()) return;
 

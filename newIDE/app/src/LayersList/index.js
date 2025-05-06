@@ -37,6 +37,7 @@ type LayersListBodyProps = {|
   onLayerRenamed: () => void,
   onEditEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
+  onLayersModified: () => void,
   width: number,
 |};
 
@@ -63,6 +64,7 @@ const LayersListBody = ({
   unsavedChanges,
   selectedLayer,
   onSelectLayer,
+  onLayersModified,
 }: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -71,12 +73,13 @@ const LayersListBody = ({
   }>({});
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
-  const onLayerModified = React.useCallback(
+  const triggerOnLayersModified = React.useCallback(
     () => {
+      onLayersModified();
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       forceUpdate();
     },
-    [forceUpdate, unsavedChanges]
+    [forceUpdate, onLayersModified, unsavedChanges]
   );
 
   const onDropLayer = React.useCallback(
@@ -89,11 +92,11 @@ const LayersListBody = ({
           draggedLayerIndex,
           targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
         );
-        onLayerModified();
+        triggerOnLayersModified();
       }
       draggedLayerIndexRef.current = null;
     },
-    [layersContainer, onLayerModified]
+    [layersContainer, triggerOnLayersModified]
   );
 
   const layersCount = layersContainer.getLayersCount();
@@ -149,7 +152,7 @@ const LayersListBody = ({
               );
             }
             onLayerRenamed();
-            onLayerModified();
+            triggerOnLayersModified();
           }
         }}
         onRemove={() => {
@@ -157,18 +160,18 @@ const LayersListBody = ({
             if (!doRemove) return;
 
             layersContainer.removeLayer(layerName);
-            onLayerModified();
+            triggerOnLayersModified();
           });
         }}
         isVisible={layer.getVisibility()}
         onChangeVisibility={visible => {
           layer.setVisibility(visible);
-          onLayerModified();
+          triggerOnLayersModified();
         }}
         isLocked={layer.isLocked()}
         onChangeLockState={isLocked => {
           layer.setLocked(isLocked);
-          onLayerModified();
+          triggerOnLayersModified();
         }}
         width={width}
       />
@@ -198,7 +201,7 @@ const LayersListBody = ({
               {layout && (
                 <BackgroundColorRow
                   layout={layout}
-                  onBackgroundColorChanged={onLayerModified}
+                  onBackgroundColorChanged={triggerOnLayersModified}
                 />
               )}
             </div>
@@ -219,6 +222,7 @@ type Props = {|
   layersContainer: gdLayersContainer,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
+  onLayersModified: () => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
   onCreateLayer: () => void,
@@ -279,6 +283,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
 
     const onLayerModified = () => {
       if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+      props.onLayersModified();
       forceUpdate();
     };
 
@@ -306,6 +311,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
+                onLayersModified={props.onLayersModified}
                 onRemoveLayer={props.onRemoveLayer}
                 onLayerRenamed={props.onLayerRenamed}
                 unsavedChanges={props.unsavedChanges}

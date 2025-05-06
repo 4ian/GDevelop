@@ -28,6 +28,7 @@ export const Default = () => {
         selectedLayer={selectedLayer}
         onSelectLayer={setSelectedLayer}
         onEditLayerEffects={action('onEditLayerEffects')}
+        onLayersModified={action('onLayersModified')}
         onEditLayer={action('onEditLayer')}
         onRemoveLayer={(layerName, cb) => {
           cb(true);
@@ -55,6 +56,7 @@ export const SmallWidthAndHeight = () => {
           selectedLayer={selectedLayer}
           onSelectLayer={setSelectedLayer}
           onEditLayerEffects={action('onEditLayerEffects')}
+          onLayersModified={action('onLayersModified')}
           onEditLayer={action('onEditLayer')}
           onRemoveLayer={(layerName, cb) => {
             cb(true);

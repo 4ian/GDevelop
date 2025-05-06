@@ -354,7 +354,7 @@ declare interface ProjectPropertiesData {
   pixelsRounding: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
-  sizeOnStartupMode: string;
+  sizeOnStartupMode: '' | 'scaleOuter' | 'adaptWidth' | 'adaptHeight';
   version: string;
   name: string;
   author: string;

@@ -755,6 +755,16 @@ namespace gdjs {
       );
     }
 
+    sendOpenContextMenu(cursorX: float, cursorY: float): void {
+      console.log('sendOpenContextMenu');
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'openContextMenu',
+          payload: { cursorX, cursorY },
+        })
+      );
+    }
+
     /**
      * Send profiling results.
      * @param framesAverageMeasures The measures made for each frames.

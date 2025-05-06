@@ -1031,6 +1031,38 @@ namespace gdjs {
       });
     }
 
+    private _isLeftButtonPressed = false;
+    private _pressedOriginalCursorX = 0;
+    private _pressedOriginalCursorY = 0;
+
+    private _handleContextMenu() {
+      const inputManager = this._runtimeGame.getInputManager();
+      if (inputManager.isMouseButtonPressed(1) && !this._isLeftButtonPressed) {
+        this._isLeftButtonPressed = true;
+        this._pressedOriginalCursorX = inputManager.getCursorX();
+        this._pressedOriginalCursorY = inputManager.getCursorY();
+      }
+      if (inputManager.isMouseButtonReleased(1) && this._isLeftButtonPressed) {
+        this._isLeftButtonPressed = false;
+        if (
+          this._pressedOriginalCursorX === inputManager.getCursorX() &&
+          this._pressedOriginalCursorY === inputManager.getCursorY()
+        ) {
+          this._sendOpenContextMenu(
+            inputManager.getCursorX(),
+            inputManager.getCursorY()
+          );
+        }
+      }
+    }
+
+    private _sendOpenContextMenu(cursorX: float, cursorY: float) {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+
+      debuggerClient.sendOpenContextMenu(cursorX, cursorY);
+    }
+
     cancelDragNewInstance() {
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -1264,6 +1296,7 @@ namespace gdjs {
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updateSelectionControls();
+      this._handleContextMenu();
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;
       if (!this._selectionControlsMovementTotalDelta) {

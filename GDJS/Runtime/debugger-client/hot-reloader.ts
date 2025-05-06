@@ -1203,8 +1203,9 @@ namespace gdjs {
     ): void {
       const layerNames = [];
       runtimeInstanceContainer.getAllLayerNames(layerNames);
-      const oldLayers = layerNames.map(layerName => 
-        runtimeInstanceContainer.getLayer(layerName)._initialLayerData
+      const oldLayers = layerNames.map(
+        (layerName) =>
+          runtimeInstanceContainer.getLayer(layerName)._initialLayerData
       );
       this._hotReloadRuntimeSceneLayers(
         oldLayers,

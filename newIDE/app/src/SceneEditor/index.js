@@ -293,6 +293,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           onHandleParsedMessage: ({ id, parsedMessage }) => {
             if (parsedMessage.command === 'updateInstances') {
               this.onReceiveInstanceChanges(parsedMessage.payload);
+            } else if (parsedMessage.command === 'openContextMenu') {
+              this._onContextMenu(
+                parsedMessage.payload.cursorX,
+                parsedMessage.payload.cursorY
+              );
             }
           },
         }
@@ -1822,15 +1827,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  // TODO Call it from a command
   _onContextMenu = (
     x: number,
     y: number,
     ignoreSelectedObjectsForContextMenu?: boolean = false
   ) => {
-    if (this.contextMenu)
+    console.log('_onContextMenu', x, y);
+    if (this.contextMenu) {
       this.contextMenu.open(x, y, {
         ignoreSelectedObjectsForContextMenu: !!ignoreSelectedObjectsForContextMenu,
       });
+    }
   };
 
   isInstanceOf3DObject = (instance: gdInitialInstance) => {

@@ -185,7 +185,13 @@ namespace gdjs {
     _gameResolutionHeight: integer;
     _originalWidth: float;
     _originalHeight: float;
-    _resizeMode: 'adaptWidth' | 'adaptHeight' | string;
+    _resizeMode:
+      | ''
+      | 'scaleOuter'
+      | 'adaptWidth'
+      | 'adaptHeight'
+      | 'native'
+      | string;
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
@@ -298,7 +304,9 @@ namespace gdjs {
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
       this._originalHeight = this._gameResolutionHeight;
-      this._resizeMode = this._data.properties.sizeOnStartupMode;
+      this._resizeMode = this._isInGameEdition
+        ? 'native'
+        : this._data.properties.sizeOnStartupMode;
       this._adaptGameResolutionAtRuntime =
         this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
@@ -668,6 +676,9 @@ namespace gdjs {
               );
               this._gameResolutionHeight = this._originalHeight;
             }
+          } else if (this._resizeMode === 'native') {
+            this._gameResolutionWidth = windowInnerWidth;
+            this._gameResolutionHeight = windowInnerHeight;
           }
         }
       }

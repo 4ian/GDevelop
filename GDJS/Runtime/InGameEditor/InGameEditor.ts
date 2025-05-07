@@ -102,11 +102,6 @@ namespace gdjs {
     if (runtimeObject instanceof gdjs.RuntimeObject3D) {
       if (!runtimeObject.persistentUuid) return null;
 
-      console.log(
-        runtimeObject.getOriginalWidth(),
-        runtimeObject.getOriginalHeight(),
-        runtimeObject.getOriginalDepth()
-      );
       const instanceData: InstanceData = {
         name: runtimeObject.getName(),
         zOrder: runtimeObject.getZOrder(),

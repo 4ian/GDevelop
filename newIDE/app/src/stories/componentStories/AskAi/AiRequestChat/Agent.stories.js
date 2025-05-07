@@ -4,7 +4,10 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../MainFrame/EditorContainers/AskAi/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
-import { agentAiRequest, agentAiRequestWithFunctionCallToDo } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
+import {
+  agentAiRequest,
+  agentAiRequestWithFunctionCallToDo,
+} from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Agent',

@@ -1,0 +1,355 @@
+// @flow
+import { unserializeFromJSObject } from '../Utils/Serializer';
+import { type AiGeneratedEventEventsChanges } from '../Utils/GDevelopServices/Generation';
+
+const gd: libGDevelop = global.gd;
+
+/**
+ * Parses an event path string (e.g., "event-0.1.2") into an array of 0-based indices (e.g., [0, 1, 2]).
+ * Throws an error for invalid formats or non-positive indices.
+ */
+const parseEventPath = (pathString: string): Array<number> => {
+  const originalPathString = pathString;
+  if (!pathString.startsWith('event-')) {
+    // Fallback for paths that might not have the "event-" prefix, like "1.2.3"
+    // This is a lenient parsing, primary expectation is "event-" prefix.
+    const partsNoPrefix = pathString.split('.');
+    if (
+      partsNoPrefix.length > 0 &&
+      partsNoPrefix.every(s => s !== '' && !isNaN(parseInt(s, 10)))
+    ) {
+      console.warn(
+        `Event path string "${originalPathString}" does not start with "event-". Parsed as direct indices.`
+      );
+      pathString = pathString; // Use the string as is for parts splitting
+    } else {
+      throw new Error(
+        `Invalid event path string format: "${originalPathString}". Expected "event-X.Y.Z" or "X.Y.Z".`
+      );
+    }
+  } else {
+    pathString = pathString.substring('event-'.length);
+  }
+
+  const parts = pathString.split('.');
+  if (
+    parts.length === 0 ||
+    parts.some(s => s === '' || isNaN(parseInt(s, 10)))
+  ) {
+    throw new Error(
+      `Invalid event path string content: "${originalPathString}". Ensure numbers are separated by dots.`
+    );
+  }
+  return parts.map(s => {
+    const num = parseInt(s, 10);
+    if (num < 0) {
+      throw new Error(
+        `Event path indices must be positive in string "${originalPathString}", but found ${num}.`
+      );
+    }
+    return num;
+  });
+};
+
+/**
+ * Navigates an event tree to find the parent EventsList and the 0-based index
+ * for an event targeted by the given path.
+ */
+const getParentListAndIndex = (
+  rootEventsList: gdEventsList,
+  path: Array<number>,
+  operationTypeForErrorMessage: 'access' | 'insertion'
+): { parentList: gdEventsList, eventIndexInParentList: number } => {
+  if (path.length === 0) {
+    throw new Error('Path cannot be empty for getParentListAndIndex.');
+  }
+
+  let currentList = rootEventsList;
+  const pathForErrorMessage = path.join('.');
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const eventIndex = path[i];
+    if (eventIndex < 0 || eventIndex >= currentList.getEventsCount()) {
+      throw new Error(
+        `Invalid event path: index ${eventIndex} out of bounds at depth ${i +
+          1} (max: ${currentList.getEventsCount() -
+          1}). Path: ${pathForErrorMessage}`
+      );
+    }
+    const event = currentList.getEventAt(eventIndex);
+    if (!event.canHaveSubEvents()) {
+      throw new Error(
+        `Event at path segment ${i +
+          1} (index ${eventIndex}) cannot have sub-events. Path: ${pathForErrorMessage}`
+      );
+    }
+    currentList = event.getSubEvents();
+  }
+
+  const finalIndex = path[path.length - 1];
+  if (finalIndex < 0) {
+    throw new Error(
+      `Invalid event path: final index ${finalIndex} is negative. Path: ${pathForErrorMessage}.`
+    );
+  }
+
+  // For insertion, index can be equal to count (to append). For access, it must be less than count.
+  if (
+    operationTypeForErrorMessage === 'insertion' &&
+    finalIndex > currentList.getEventsCount()
+  ) {
+    throw new Error(
+      `Invalid event path for insertion: final index ${finalIndex} is out of bounds. Max allowed for insertion: ${currentList.getEventsCount()}. Path: ${pathForErrorMessage}`
+    );
+  } else if (
+    operationTypeForErrorMessage === 'access' &&
+    finalIndex >= currentList.getEventsCount()
+  ) {
+    throw new Error(
+      `Invalid event path for access: final index ${finalIndex} is out of bounds. Max allowed for access: ${currentList.getEventsCount() -
+        1}. Path: ${pathForErrorMessage}`
+    );
+  }
+
+  return { parentList: currentList, eventIndexInParentList: finalIndex };
+};
+
+/**
+ * Retrieves an event at a specific path from a root EventsList.
+ */
+const getEventByPath = (
+  rootEventsList: gdEventsList,
+  path: Array<number>
+): gdBaseEvent => {
+  const { parentList, eventIndexInParentList } = getParentListAndIndex(
+    rootEventsList,
+    path,
+    'access'
+  );
+  // Bounds check already done by getParentListAndIndex for 'access'
+  return parentList.getEventAt(eventIndexInParentList);
+};
+
+type EventOperationType = 'delete' | 'insert' | 'insertAsSub';
+type EventOperation = {|
+  type: EventOperationType,
+  path: Array<number>,
+  eventsToInsert?: gdEventsList,
+|};
+
+const comparePathsReverseLexicographically = (
+  p1: Array<number>,
+  p2: Array<number>
+): number => {
+  const maxLength = Math.max(p1.length, p2.length);
+  for (let i = 0; i < maxLength; i++) {
+    const val1 = i < p1.length ? p1[i] : -1;
+    const val2 = i < p2.length ? p2[i] : -1;
+    if (val1 > val2) return -1;
+    if (val1 < val2) return 1;
+  }
+  return 0;
+};
+
+export const applyEventsChanges = (
+  project: gdProject,
+  sceneEvents: gdEventsList,
+  generatedEventsJson: string | null, // JSON string of *new* events for insertion/replacement
+  eventsChanges: AiGeneratedEventEventsChanges
+): void => {
+  let newEventsListForInsertion: gdEventsList | null = null;
+  let hasInsertionOperation =
+    (eventsChanges.insertAndReplaceEvents &&
+      eventsChanges.insertAndReplaceEvents.length > 0) ||
+    (eventsChanges.insertBeforeEvents &&
+      eventsChanges.insertBeforeEvents.length > 0) ||
+    (eventsChanges.insertAsSubEvents &&
+      eventsChanges.insertAsSubEvents.length > 0);
+
+  if (hasInsertionOperation) {
+    if (!generatedEventsJson) {
+      throw new Error(
+        'Specified event changes involving insertions, but did not provide the events content (generatedEvents is null/empty).'
+      );
+    }
+    try {
+      const eventsListContent = JSON.parse(generatedEventsJson);
+      newEventsListForInsertion = new gd.EventsList();
+      unserializeFromJSObject(
+        newEventsListForInsertion,
+        eventsListContent,
+        'unserializeFrom',
+        project
+      );
+      if (newEventsListForInsertion.isEmpty() && hasInsertionOperation) {
+        console.warn(
+          'Generated events for insertion are empty. Insertion operations might not add any events.'
+        );
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to parse generatedEvents JSON for AI changes, which is required for insertion operations: ${
+          error.message
+        }`
+      );
+    }
+  }
+
+  const operations: Array<EventOperation> = [];
+  let totalInsertionPaths = 0;
+
+  (eventsChanges.deleteEvents || []).forEach(pathStr => {
+    try {
+      operations.push({ type: 'delete', path: parseEventPath(pathStr) });
+    } catch (e) {
+      console.warn(`Skipping invalid delete path "${pathStr}": ${e.message}`);
+    }
+  });
+
+  (eventsChanges.insertAndReplaceEvents || []).forEach(pathStr => {
+    totalInsertionPaths++;
+    try {
+      const parsedPath = parseEventPath(pathStr);
+      operations.push({ type: 'delete', path: parsedPath }); // Delete first
+      operations.push({
+        type: 'insert',
+        path: parsedPath, // Insert at the same path
+        eventsToInsert: newEventsListForInsertion || undefined, // Should be non-null if we are here
+      });
+    } catch (e) {
+      console.warn(
+        `Skipping invalid insertAndReplace path "${pathStr}": ${e.message}`
+      );
+      totalInsertionPaths--; // Decrement if path parsing failed for this
+    }
+  });
+
+  (eventsChanges.insertBeforeEvents || []).forEach(pathStr => {
+    totalInsertionPaths++;
+    try {
+      const parsedPath = parseEventPath(pathStr);
+      operations.push({
+        type: 'insert',
+        path: parsedPath,
+        eventsToInsert: newEventsListForInsertion || undefined,
+      });
+    } catch (e) {
+      console.warn(
+        `Skipping invalid insertBefore path "${pathStr}": ${e.message}`
+      );
+      totalInsertionPaths--;
+    }
+  });
+
+  (eventsChanges.insertAsSubEvents || []).forEach(pathStr => {
+    totalInsertionPaths++;
+    try {
+      const parsedParentPath = parseEventPath(pathStr);
+      operations.push({
+        type: 'insertAsSub',
+        path: parsedParentPath, // This path is to the parent event
+        eventsToInsert: newEventsListForInsertion || undefined,
+      });
+    } catch (e) {
+      console.warn(
+        `Skipping invalid insertAsSub path "${pathStr}": ${e.message}`
+      );
+      totalInsertionPaths--;
+    }
+  });
+
+  if (totalInsertionPaths > 1) {
+    // This check is after collecting all, to correctly sum up paths from all three insert-related arrays.
+    if (newEventsListForInsertion) newEventsListForInsertion.delete(); // Clean up
+    throw new Error(
+      `Multiple insertion operations specified (${totalInsertionPaths} paths found across insertAndReplaceEvents, insertBeforeEvents, insertAsSubEvents). Only one total insertion path is allowed.`
+    );
+  }
+  if (totalInsertionPaths > 0 && !newEventsListForInsertion) {
+    // Should have been caught earlier by the generatedEventsJson check, but as a safeguard:
+    throw new Error(
+      'Insertion operation was processed, but newEventsListForInsertion is not available. This indicates an internal logic error.'
+    );
+  }
+
+  operations.sort((opA, opB) => {
+    const pathComparison = comparePathsReverseLexicographically(
+      opA.path,
+      opB.path
+    );
+    if (pathComparison !== 0) return pathComparison;
+    if (opA.type === 'delete' && opB.type !== 'delete') return -1;
+    if (opA.type !== 'delete' && opB.type === 'delete') return 1;
+    return 0;
+  });
+
+  operations.forEach(op => {
+    const pathForLog = op.path.join('.');
+    try {
+      if (op.type === 'delete') {
+        const { parentList, eventIndexInParentList } = getParentListAndIndex(
+          sceneEvents,
+          op.path,
+          'access' // Deleting an existing event, so 'access'
+        );
+        // Check already done by getParentListAndIndex for 'access'
+        parentList.removeEventAt(eventIndexInParentList);
+      } else if (op.type === 'insert') {
+        const {
+          parentList,
+          eventIndexInParentList: insertionIndex,
+        } = getParentListAndIndex(
+          sceneEvents,
+          op.path,
+          'insertion' // Path is for insertion point
+        );
+        // Check already done by getParentListAndIndex for 'insertion'
+        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
+          parentList.insertEvents(
+            op.eventsToInsert,
+            0,
+            op.eventsToInsert.getEventsCount(),
+            insertionIndex
+          );
+        } else {
+          console.warn(
+            `Insert operation for path [${pathForLog}] skipped: no events to insert or events list is empty.`
+          );
+        }
+      } else if (op.type === 'insertAsSub') {
+        // op.path is the path to the PARENT event
+        const parentEvent = getEventByPath(sceneEvents, op.path);
+        if (!parentEvent.canHaveSubEvents()) {
+          console.warn(
+            `Cannot insert sub-events: Event at path [${pathForLog}] does not support sub-events. Skipping.`
+          );
+          return;
+        }
+        const subEventsList = parentEvent.getSubEvents();
+        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
+          subEventsList.insertEvents(
+            op.eventsToInsert,
+            0,
+            op.eventsToInsert.getEventsCount(),
+            subEventsList.getEventsCount() // Insert at the end of sub-events
+          );
+        } else {
+          console.warn(
+            `InsertAsSub operation for parent path [${pathForLog}] skipped: no events to insert or events list is empty.`
+          );
+        }
+      }
+    } catch (error) {
+      console.error(
+        `Error applying event operation type ${
+          op.type
+        } for path [${pathForLog}]:`,
+        error
+      );
+    }
+  });
+
+  if (newEventsListForInsertion) {
+    newEventsListForInsertion.delete();
+  }
+};

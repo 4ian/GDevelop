@@ -95,19 +95,16 @@ ${actions}`;
     const whileConditions = renderInstructionsAsText({
       instructionsList: whileEvent.getWhileConditions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: true,
     });
     const conditions = renderInstructionsAsText({
       instructionsList: whileEvent.getConditions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: true,
     });
     const actions = renderInstructionsAsText({
       instructionsList: whileEvent.getActions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: false,
     });
 
@@ -124,13 +121,11 @@ ${actions}`;
     const conditions = renderInstructionsAsText({
       instructionsList: repeatEvent.getConditions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: true,
     });
     const actions = renderInstructionsAsText({
       instructionsList: repeatEvent.getActions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: false,
     });
 
@@ -147,13 +142,11 @@ ${actions}`;
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: true,
     });
     const actions = renderInstructionsAsText({
       instructionsList: forEachEvent.getActions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: false,
     });
 
@@ -171,13 +164,11 @@ ${actions}`;
     const conditions = renderInstructionsAsText({
       instructionsList: forEachChildVariableEvent.getConditions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: true,
     });
     const actions = renderInstructionsAsText({
       instructionsList: forEachChildVariableEvent.getActions(),
       padding: padding + ' ',
-      depth: 0,
       areConditions: false,
     });
 

@@ -84,10 +84,20 @@ export type AiRequest = {
 };
 
 export type AiGeneratedEventEventsChanges = {
-  insertAndReplaceEvents: Array<string>;
-  insertBeforeEvents: Array<string>;
-  insertAsSubEvents: Array<string>;
-  deleteEvents: Array<string>;
+  insertAndReplaceEvents: Array<string>,
+  insertBeforeEvents: Array<string>,
+  insertAsSubEvents: Array<string>,
+  deleteEvents: Array<string>,
+};
+
+export type AiGeneratedEventStats = {
+  retriesCount: number,
+  finalMissingTypes: string[],
+  finalAreEventsValid: boolean,
+  systemPromptTemplateHash: string,
+  userPromptTemplateHash: string,
+  allFeaturesSummaryContentHash: string,
+  finalModelPublicId: string,
 };
 
 export type AiGeneratedEvent = {
@@ -109,6 +119,8 @@ export type AiGeneratedEvent = {
     code: string,
     message: string,
   } | null,
+
+  stats: AiGeneratedEventStats | null,
 };
 
 export const getGeneratedProject = async (

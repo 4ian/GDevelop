@@ -2,12 +2,13 @@
 import { getInstancesInLayoutForLayer } from '../Utils/Layout';
 import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
+import { serializeToJSObject } from '../Utils/Serializer';
 import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+  type AiGeneratedEvent,
+  type AiGeneratedEventEventsChanges,
+} from '../Utils/GDevelopServices/Generation';
 import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
+import { applyEventsChanges } from './ApplyEventsChanges';
 
 const gd: libGDevelop = global.gd;
 
@@ -645,16 +646,20 @@ const addSceneEvents: EditorFunction = async ({
     args,
     'extension_names_list'
   );
-  const objectsList = SafeExtractor.extractStringProperty(args, 'objects_list');
+  const objectsListArgument = SafeExtractor.extractStringProperty(
+    args,
+    'objects_list'
+  );
+  const objectsList = objectsListArgument === null ? '' : objectsListArgument;
 
   if (!project.hasLayoutNamed(sceneName)) {
     return makeGenericFailure(`Scene not found: "${sceneName}".`);
   }
   const scene = project.getLayout(sceneName);
-  const events = scene.getEvents();
+  const currentSceneEvents = scene.getEvents();
 
   const existingEventsAsText = renderEventsAsText({
-    eventsList: events,
+    eventsList: currentSceneEvents,
     parentPath: '',
     padding: '',
   });
@@ -670,49 +675,55 @@ const addSceneEvents: EditorFunction = async ({
 
     if (aiGeneratedEvent.error) {
       throw new Error(
-        `Error "${aiGeneratedEvent.error.message}" while generating events.`
-      );
-    }
-    if (!aiGeneratedEvent.generatedEvents) {
-      throw new Error(`No events found in the generated events response.`);
-    }
-
-    let eventsListContent;
-    try {
-      eventsListContent = JSON.parse(aiGeneratedEvent.generatedEvents);
-    } catch (error) {
-      throw new Error(
-        `Error while parsing generated events: ${error.message}.`
+        `Error "${aiGeneratedEvent.error.code ||
+          '(Unknown)'}": ${aiGeneratedEvent.error.message ||
+          'Unknown error when generating events. Consider trying again or a different approach.'}`
       );
     }
 
-    const eventsList = new gd.EventsList();
-    unserializeFromJSObject(
-      eventsList,
-      eventsListContent,
-      'unserializeFrom',
-      project
+    if (aiGeneratedEvent.stats && !aiGeneratedEvent.stats.finalAreEventsValid) {
+      return makeGenericFailure(
+        `Generated events are not valid - this means what you asked for is not possible or does not work like this. Consider a different approach.`
+      );
+    }
+
+    if (!aiGeneratedEvent.eventsChanges && !aiGeneratedEvent.generatedEvents) {
+      return makeGenericSuccess('No changes or new events to be applied.');
+    }
+
+    const eventsChanges: AiGeneratedEventEventsChanges =
+      aiGeneratedEvent.eventsChanges &&
+      ((aiGeneratedEvent.eventsChanges.deleteEvents &&
+        aiGeneratedEvent.eventsChanges.deleteEvents.length > 0) ||
+        (aiGeneratedEvent.eventsChanges.insertAndReplaceEvents &&
+          aiGeneratedEvent.eventsChanges.insertAndReplaceEvents.length > 0) ||
+        (aiGeneratedEvent.eventsChanges.insertBeforeEvents &&
+          aiGeneratedEvent.eventsChanges.insertBeforeEvents.length > 0) ||
+        (aiGeneratedEvent.eventsChanges.insertAsSubEvents &&
+          aiGeneratedEvent.eventsChanges.insertAsSubEvents.length > 0))
+        ? aiGeneratedEvent.eventsChanges
+        : // If not specified, events are inserted at the end of the event sheet.
+          {
+            insertAndReplaceEvents: [],
+            insertBeforeEvents: [
+              `event-${currentSceneEvents.getEventsCount()}`,
+            ],
+            insertAsSubEvents: [],
+            deleteEvents: [],
+          };
+
+    applyEventsChanges(
+      project,
+      currentSceneEvents,
+      aiGeneratedEvent.generatedEvents,
+      eventsChanges
     );
-
-    if (!project.hasLayoutNamed(sceneName)) {
-      return makeGenericFailure(`Scene not found: "${sceneName}".`);
-    }
-    const scene = project.getLayout(sceneName);
-
-    scene
-      .getEvents()
-      .insertEvents(
-        eventsList,
-        0,
-        eventsList.getEventsCount(),
-        scene.getEvents().getEventsCount()
-      );
-    eventsList.delete();
-
-    return makeGenericSuccess(`Modified or added new event(s)."`);
+    return makeGenericSuccess('Properly modified or added new event(s).');
   } catch (error) {
-    console.error('Error while generating events:', error);
-    return makeGenericFailure(`An error happened while generating events.`);
+    console.error('Error in addSceneEvents with AI generation:', error);
+    return makeGenericFailure(
+      `An error happened while adding generated events: ${error.message}. Consider a different approach.`
+    );
   }
 };
 
@@ -721,17 +732,36 @@ const addSceneEvents: EditorFunction = async ({
  */
 const createScene: EditorFunction = async ({ project, args }) => {
   const scene_name = extractRequiredString(args, 'scene_name');
+  const include_ui_layer = SafeExtractor.extractBooleanProperty(
+    args,
+    'include_ui_layer'
+  );
 
   if (project.hasLayoutNamed(scene_name)) {
+    const scene = project.getLayout(scene_name);
+    if (include_ui_layer && !scene.hasLayerNamed('UI')) {
+      scene.insertNewLayer('UI', 0);
+      return makeGenericSuccess(
+        `Scene with name "${scene_name}" already exists, no need to re-create it. A layer called "UI" was added to it.`
+      );
+    }
+
     return makeGenericSuccess(
       `Scene with name "${scene_name}" already exists, no need to re-create it.`
     );
   }
 
   const scenesCount = project.getLayoutsCount();
-  project.insertNewLayout(scene_name, scenesCount);
+  const scene = project.insertNewLayout(scene_name, scenesCount);
+  if (include_ui_layer) {
+    scene.insertNewLayer('UI', 0);
+  }
 
-  return makeGenericSuccess(`Created new scene "${scene_name}".`);
+  return makeGenericSuccess(
+    include_ui_layer
+      ? `Created new scene "${scene_name}" with the base layer and a layer called "UI".`
+      : `Created new scene "${scene_name}".`
+  );
 };
 
 /**
@@ -878,9 +908,7 @@ const addOrEditVariable: EditorFunction = async ({ project, args }) => {
   );
 };
 
-// Map of available commands
-// TODO: rename
-const commandsMap: { [string]: EditorFunction } = {
+const editorFunctions: { [string]: EditorFunction } = {
   create_object: createObject,
   inspect_object_properties: inspectObjectProperties,
   change_object_property: changeObjectProperty,
@@ -973,7 +1001,7 @@ export const processEditorFunctionCalls = async ({
       }
 
       // Check if the function exists
-      if (!commandsMap[name]) {
+      if (!editorFunctions[name]) {
         results.push({
           status: 'finished',
           call_id,
@@ -986,7 +1014,7 @@ export const processEditorFunctionCalls = async ({
       }
 
       // Execute the function
-      const result: EditorFunctionGenericOutput = await commandsMap[name]({
+      const result: EditorFunctionGenericOutput = await editorFunctions[name]({
         project,
         args,
         launchEventsGeneration,

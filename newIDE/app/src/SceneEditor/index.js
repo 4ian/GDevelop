@@ -336,6 +336,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         width,
         height,
         depth,
+        defaultWidth,
+        defaultHeight,
+        defaultDepth,
       } = instanceData;
       const instance = getInstanceInLayoutWithPersistentUuid(
         this.props.initialInstances,
@@ -355,6 +358,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         instance.setCustomHeight(height);
         instance.setCustomDepth(depth);
       }
+      instance.setDefaultWidth(defaultWidth);
+      instance.setDefaultHeight(defaultHeight);
+      instance.setDefaultDepth(defaultDepth);
 
       modifiedInstances.push(instance);
     });

@@ -102,6 +102,11 @@ namespace gdjs {
     if (runtimeObject instanceof gdjs.RuntimeObject3D) {
       if (!runtimeObject.persistentUuid) return null;
 
+      console.log(
+        runtimeObject.getOriginalWidth(),
+        runtimeObject.getOriginalHeight(),
+        runtimeObject.getOriginalDepth()
+      );
       const instanceData: InstanceData = {
         name: runtimeObject.getName(),
         zOrder: runtimeObject.getZOrder(),
@@ -115,6 +120,10 @@ namespace gdjs {
         width: runtimeObject.getWidth(),
         height: runtimeObject.getHeight(),
         depth: runtimeObject.getDepth(),
+        // @ts-ignore
+        defaultWidth: runtimeObject.getOriginalWidth(),
+        defaultHeight: runtimeObject.getOriginalHeight(),
+        defaultDepth: runtimeObject.getOriginalDepth(),
         locked: false, // TODO
         // TODO: how to transmit/should we transmit other properties?
       };

@@ -1165,6 +1165,12 @@ export class InitialInstance extends EmscriptenObject {
   getCustomHeight(): number;
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
+  getDefaultWidth(): number;
+  getDefaultHeight(): number;
+  getDefaultDepth(): number;
+  setDefaultWidth(width: number): void;
+  setDefaultHeight(height: number): void;
+  setDefaultDepth(depth: number): void;
   resetPersistentUuid(): InitialInstance;
   getPersistentUuid(): string;
   updateCustomProperty(name: string, value: string, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;

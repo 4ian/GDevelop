@@ -526,6 +526,20 @@ namespace gdjs {
       return this._unrotatedAABB.max[1];
     }
 
+    getOriginalWidth(): float {
+      return (
+        this._instanceContainer.getInitialUnrotatedViewportMaxX() -
+        this._instanceContainer.getInitialUnrotatedViewportMinX()
+      );
+    }
+
+    getOriginalHeight(): float {
+      return (
+        this._instanceContainer.getInitialUnrotatedViewportMaxY() -
+        this._instanceContainer.getInitialUnrotatedViewportMinY()
+      );
+    }
+
     /**
      * @return the internal width of the object according to its children.
      */

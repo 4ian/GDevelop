@@ -144,9 +144,13 @@ const MosaicEditorsDisplay = React.forwardRef<
     if (layersListRef.current) layersListRef.current.forceUpdate();
   }, []);
   const getInstanceSize = React.useCallback((instance: gdInitialInstance) => {
-    if (!editorRef.current) return [0, 0, 0];
-
-    return editorRef.current.getInstanceSize(instance);
+    return editorRef.current
+      ? editorRef.current.getInstanceSize(instance)
+      : [
+          instance.getDefaultWidth(),
+          instance.getDefaultHeight(),
+          instance.getDefaultDepth(),
+        ];
   }, []);
   const _onInstancesModified = React.useCallback(
     instances => {

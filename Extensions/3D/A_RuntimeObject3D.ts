@@ -334,6 +334,18 @@ namespace gdjs {
       this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
+    override getOriginalWidth(): float {
+      return this._originalWidth;
+    }
+
+    override getOriginalHeight(): float {
+      return this._originalHeight;
+    }
+
+    getOriginalDepth(): float {
+      return this._originalDepth;
+    }
+
     getWidth(): float {
       return this._width;
     }

@@ -284,6 +284,14 @@ namespace gdjs {
       return this._maxZ - this._minZ;
     }
 
+    getOriginalDepth(): float {
+      const initialInnerArea = this._instanceContainer._initialInnerArea;
+      return (
+        (initialInnerArea ? initialInnerArea.min[2] : 0) -
+        (initialInnerArea ? initialInnerArea.min[2] : 0)
+      );
+    }
+
     override _updateUntransformedHitBoxes(): void {
       super._updateUntransformedHitBoxes();
 

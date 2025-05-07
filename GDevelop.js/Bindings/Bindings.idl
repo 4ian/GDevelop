@@ -1403,6 +1403,13 @@ interface InitialInstance {
     void SetCustomDepth(double depth);
     double GetCustomDepth();
 
+    double GetDefaultWidth();
+    double GetDefaultHeight();
+    double GetDefaultDepth();
+    void SetDefaultWidth(double width);
+    void SetDefaultHeight(double height);
+    void SetDefaultDepth(double depth);
+
     [Ref] InitialInstance ResetPersistentUuid();
     [Const, Value] DOMString GetPersistentUuid();
 

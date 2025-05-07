@@ -849,6 +849,14 @@ namespace gdjs {
       this.setHeight(newHeight);
     }
 
+    override getOriginalWidth(): float {
+      return this._renderer.getUnscaledWidth() * this._preScale;
+    }
+
+    override getOriginalHeight(): float {
+      return this._renderer.getUnscaledHeight() * this._preScale;
+    }
+
     /**
      * Change the scale on X and Y axis of the object.
      *

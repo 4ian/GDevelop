@@ -60,6 +60,18 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   } else {
     SetHasCustomDepth(false);
   }
+  if (element.HasChild("defaultWidth") ||
+      element.HasAttribute("defaultWidth")) {
+    defaultWidth = element.GetDoubleAttribute("defaultWidth");
+  }
+  if (element.HasChild("defaultHeight") ||
+      element.HasAttribute("defaultHeight")) {
+    defaultHeight = element.GetDoubleAttribute("defaultHeight");
+  }
+  if (element.HasChild("defaultDepth") ||
+      element.HasAttribute("defaultDepth")) {
+    defaultDepth = element.GetDoubleAttribute("defaultDepth");
+  }
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
   SetOpacity(element.GetIntAttribute("opacity", 255));
   SetLayer(element.GetStringAttribute("layer"));
@@ -139,6 +151,8 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("width", GetCustomWidth());
   element.SetAttribute("height", GetCustomHeight());
   if (HasCustomDepth()) element.SetAttribute("depth", GetCustomDepth());
+  // defaultWidth, defaultHeight and defaultDepth are not serialized
+  // because they are evaluated by InGameEditor.
   if (IsLocked()) element.SetAttribute("locked", IsLocked());
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
   if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());

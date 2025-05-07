@@ -24,7 +24,7 @@ namespace gdjs {
      *
      * @see gdjs.CustomRuntimeObject._innerArea
      **/
-    private _initialInnerArea: {
+    _initialInnerArea: {
       min: [float, float, float];
       max: [float, float, float];
     } | null = null;

@@ -115,6 +115,11 @@ namespace gdjs {
      * Rotations around X and Y are not taken into account.
      */
     getUnrotatedAABBMaxZ(): number;
+
+    /**
+     * Get the object size on the Z axis (called "depth") for a scale of 1.
+     */
+    getOriginalDepth(): float;
   }
 
   export interface Object3DDataContent {
@@ -242,6 +247,10 @@ namespace gdjs {
 
     getUnrotatedAABBMaxZ(): number {
       return this.object.getUnrotatedAABBMaxZ();
+    }
+
+    getOriginalDepth(): float {
+      return this.object.getOriginalDepth();
     }
   }
 

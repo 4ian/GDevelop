@@ -32,14 +32,6 @@ namespace gdjs {
       );
     }
 
-    getObjectPositionFrom3DRendererObject() {
-      return {
-        x: this._threeObject3D.position.x - this._object.getWidth() / 2,
-        y: this._threeObject3D.position.y - this._object.getHeight() / 2,
-        z: this._threeObject3D.position.z - this._object.getDepth() / 2,
-      };
-    }
-
     updateRotation() {
       this._threeObject3D.rotation.set(
         gdjs.toRad(this._object.getRotationX()),

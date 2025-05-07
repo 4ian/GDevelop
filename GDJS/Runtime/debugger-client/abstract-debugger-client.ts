@@ -756,7 +756,6 @@ namespace gdjs {
     }
 
     sendOpenContextMenu(cursorX: float, cursorY: float): void {
-      console.log('sendOpenContextMenu');
       this._sendMessage(
         circularSafeStringify({
           command: 'openContextMenu',

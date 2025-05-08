@@ -9,6 +9,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { applyEventsChanges } from './ApplyEventsChanges';
+import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 
 const gd: libGDevelop = global.gd;
 
@@ -335,6 +336,25 @@ const addBehavior: EditorFunction = async ({
   if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
     return makeGenericFailure(
       `Type "${behavior_type}" does not exist for behaviors.`
+    );
+  }
+
+  if (isBehaviorDefaultCapability(behaviorMetadata)) {
+    const alreadyHasDefaultCapability = object
+      .getAllBehaviorNames()
+      .toJSArray()
+      .some(behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
+        return behavior.getTypeName() === behavior_type;
+      });
+    if (alreadyHasDefaultCapability) {
+      return makeGenericSuccess(
+        `Behavior "${behavior_name}" of type "${behavior_type}" is a default capability and is already available on object "${object_name}". There is no need to add it (and it can't be removed).`
+      );
+    }
+
+    return makeGenericFailure(
+      `Behavior "${behavior_name}" of type "${behavior_type}" is a default capability and cannot be added to object "${object_name}".`
     );
   }
 
@@ -722,7 +742,9 @@ const addSceneEvents: EditorFunction = async ({
   } catch (error) {
     console.error('Error in addSceneEvents with AI generation:', error);
     return makeGenericFailure(
-      `An error happened while adding generated events: ${error.message}. Consider a different approach.`
+      `An error happened while adding generated events: ${
+        error.message
+      }. Consider a different approach.`
     );
   }
 };

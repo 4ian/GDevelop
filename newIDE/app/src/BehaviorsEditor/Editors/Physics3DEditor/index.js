@@ -16,6 +16,12 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { NumericProperty, UnitAdornment } from '../Physics2Editor';
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+} from '../../../UI/Accordion';
+import { areAdvancedPropertiesModified } from '../BehaviorPropertiesEditor';
 
 type Props = BehaviorEditorProps;
 
@@ -56,6 +62,11 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
 const Physics3DEditor = (props: Props) => {
   const { behavior, onBehaviorUpdated } = props;
   const forceUpdate = useForceUpdate();
+
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => areAdvancedPropertiesModified(behavior),
+    [behavior]
+  );
 
   const updateBehaviorProperty = React.useCallback(
     (property, value) => {
@@ -245,6 +256,18 @@ const Physics3DEditor = (props: Props) => {
           }
         />
         <NumericProperty
+          id="physics3d-parameter-mass-override"
+          properties={properties}
+          propertyName={'massOverride'}
+          step={0.1}
+          onUpdate={newValue =>
+            updateBehaviorProperty(
+              'massOverride',
+              parseFloat(newValue) > 0 ? newValue : '0'
+            )
+          }
+        />
+        <NumericProperty
           properties={properties}
           propertyName={'gravityScale'}
           step={0.1}
@@ -356,6 +379,72 @@ const Physics3DEditor = (props: Props) => {
           disabled={isStatic}
         />
       </Line>
+      <Accordion
+        defaultExpanded={areAdvancedPropertiesExpandedByDefault}
+        noMargin
+      >
+        <AccordionHeader noMargin>
+          <Text size="sub-title">
+            <Trans>Advanced properties</Trans>
+          </Text>
+        </AccordionHeader>
+        <AccordionBody disableGutters>
+          <Column expand noMargin>
+            <ResponsiveLineStackLayout>
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetX'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetX', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetY'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetY', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetZ'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetZ', newValue)
+                }
+              />
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout>
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetX'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetX', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetY'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetY', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetZ'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetZ', newValue)
+                }
+              />
+            </ResponsiveLineStackLayout>
+          </Column>
+        </AccordionBody>
+      </Accordion>
     </Column>
   );
 };

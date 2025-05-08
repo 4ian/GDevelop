@@ -81,6 +81,7 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
+import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -1577,6 +1578,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit children`),
+              enabled:
+                getVariant(
+                  project.getEventsBasedObject(object.getType()),
+                  gd.asCustomObjectConfiguration(object.getConfiguration())
+                ).getAssetStoreAssetId() === '',
               click: () => {
                 const customObjectConfiguration = gd.asCustomObjectConfiguration(
                   object.getConfiguration()

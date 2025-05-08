@@ -23,7 +23,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
           "held, customizable gravity... It can be used for the player, but "
           "also for other objects moving on platforms. In this case though, "
           "it's recommended to first check if there is a simpler behavior that "
-          "could be used.",
+          "could be used. Default controls for keyboards are included. For "
+          "touch or gamepads, use the \"Multitouch Joystick\" objects and the "
+          "associated \"mapper\" behaviors.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
@@ -33,16 +35,16 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIcon("CppPlatform/Extensions/platformerobjecticon.png");
 
   {
-    gd::BehaviorMetadata& aut = extension.AddBehavior(
-        "PlatformerObjectBehavior",
-        _("Platformer character"),
-        "PlatformerObject",
-        _("Jump and run on platforms."),
-        "",
-        "CppPlatform/Extensions/platformerobjecticon.png",
-        "PlatformerObjectBehavior",
-        std::make_shared<PlatformerObjectBehavior>(),
-        std::make_shared<gd::BehaviorsSharedData>());
+    gd::BehaviorMetadata& aut =
+        extension.AddBehavior("PlatformerObjectBehavior",
+                              _("Platformer character"),
+                              "PlatformerObject",
+                              _("Jump and run on platforms."),
+                              "",
+                              "CppPlatform/Extensions/platformerobjecticon.png",
+                              "PlatformerObjectBehavior",
+                              std::make_shared<PlatformerObjectBehavior>(),
+                              std::make_shared<gd::BehaviorsSharedData>());
 
     // Deprecated, use IsMovingEvenALittle instead
     aut.AddCondition("IsMoving",
@@ -59,14 +61,15 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsSimple()
         .SetFunctionName("IsMoving");
 
-    aut.AddScopedCondition("IsMovingEvenALittle",
-                     _("Is moving"),
-                     _("Check if the object is moving (whether it is on the "
-                       "floor or in the air)."),
-                     _("_PARAM0_ is moving"),
-                     _("Platformer state"),
-                     "CppPlatform/Extensions/platformerobjecticon.png",
-                     "CppPlatform/Extensions/platformerobjecticon.png")
+    aut.AddScopedCondition(
+           "IsMovingEvenALittle",
+           _("Is moving"),
+           _("Check if the object is moving (whether it is on the "
+             "floor or in the air)."),
+           _("_PARAM0_ is moving"),
+           _("Platformer state"),
+           "CppPlatform/Extensions/platformerobjecticon.png",
+           "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple();
@@ -525,14 +528,14 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("SimulateLadderKey");
 
-    aut.AddAction(
-           "SimulateReleaseLadderKey",
-           _("Simulate release ladder key press"),
-           _("Simulate a press of the Release Ladder key (used to get off a ladder)."),
-           _("Simulate pressing Release Ladder key for _PARAM0_"),
-           _("Platformer controls"),
-           "res/conditions/keyboard24.png",
-           "res/conditions/keyboard.png")
+    aut.AddAction("SimulateReleaseLadderKey",
+                  _("Simulate release ladder key press"),
+                  _("Simulate a press of the Release Ladder key (used to get "
+                    "off a ladder)."),
+                  _("Simulate pressing Release Ladder key for _PARAM0_"),
+                  _("Platformer controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsAdvanced();
@@ -550,7 +553,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction("SimulateReleasePlatformKey",
                   _("Simulate release platform key press"),
-                  _("Simulate a press of the release platform key (used when grabbing a "
+                  _("Simulate a press of the release platform key (used when "
+                    "grabbing a "
                     "platform ledge)."),
                   _("Simulate pressing Release Platform key for _PARAM0_"),
                   _("Platformer controls"),
@@ -561,7 +565,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SimulateReleasePlatformKey");
 
     // Support for deprecated names:
-    aut.AddDuplicatedAction("SimulateReleaseKey", "SimulateReleasePlatformKey").SetHidden();
+    aut.AddDuplicatedAction("SimulateReleaseKey", "SimulateReleasePlatformKey")
+        .SetHidden();
 
     aut.AddAction("SimulateControl",
                   _("Simulate control"),
@@ -574,23 +579,27 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .AddParameter("stringWithSelector",
-                    _("Key"),
-                    "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release Ladder\", \"Up\", \"Down\"]")
+                      _("Key"),
+                      "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release "
+                      "Ladder\", \"Up\", \"Down\"]")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateControl");
 
-    aut.AddScopedCondition("IsUsingControl",
-                  _("Control pressed or simulated"),
-                  _("A control was applied from a default control or simulated by an action."),
-                  _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
-                  _("Platformer state"),
-                  "res/conditions/keyboard24.png",
-                  "res/conditions/keyboard.png")
+    aut.AddScopedCondition(
+           "IsUsingControl",
+           _("Control pressed or simulated"),
+           _("A control was applied from a default control or simulated by an "
+             "action."),
+           _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
+           _("Platformer state"),
+           "res/conditions/keyboard24.png",
+           "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .AddParameter("stringWithSelector",
-                    _("Key"),
-                    "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release Ladder\", \"Up\", \"Down\"]")
+                      _("Key"),
+                      "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release "
+                      "Ladder\", \"Up\", \"Down\"]")
         .MarkAsAdvanced();
 
     aut.AddAction("IgnoreDefaultControls",
@@ -792,59 +801,65 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetJumpSpeed");
 
-    aut.AddExpression("JumpSustainTime",
-                      _("Jump sustain time"),
-                      _("Return the jump sustain time of the object (in seconds)."
-                        "This is the time during which keeping the jump button held "
-                        "allow the initial jump speed to be maintained."),
-                      _("Platformer configuration"),
-                      "CppPlatform/Extensions/platformerobjecticon.png")
+    aut.AddExpression(
+           "JumpSustainTime",
+           _("Jump sustain time"),
+           _("Return the jump sustain time of the object (in seconds)."
+             "This is the time during which keeping the jump button held "
+             "allow the initial jump speed to be maintained."),
+           _("Platformer configuration"),
+           "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
 
-    aut.AddExpression("CurrentFallSpeed",
-                      _("Current fall speed"),
-                      _("Return the current fall speed of the object "
-                        "(in pixels per second). Its value is always positive."),
-                      _("Platformer state"),
-                      "CppPlatform/Extensions/platformerobjecticon.png")
+    aut.AddExpression(
+           "CurrentFallSpeed",
+           _("Current fall speed"),
+           _("Return the current fall speed of the object "
+             "(in pixels per second). Its value is always positive."),
+           _("Platformer state"),
+           "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetCurrentFallSpeed");
 
-    aut.AddExpression("CurrentSpeed",
-                      _("Current horizontal speed"),
-                      _("Return the current horizontal speed of the object "
-                     "(in pixels per second). The object moves to the left "
-                     "with negative values and to the right with positive ones"),
-                      _("Platformer state"),
-                      "CppPlatform/Extensions/platformerobjecticon.png")
+    aut.AddExpression(
+           "CurrentSpeed",
+           _("Current horizontal speed"),
+           _("Return the current horizontal speed of the object "
+             "(in pixels per second). The object moves to the left "
+             "with negative values and to the right with positive ones"),
+           _("Platformer state"),
+           "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetCurrentSpeed");
 
-    aut.AddExpression("CurrentJumpSpeed",
-                      _("Current jump speed"),
-                      _("Return the current jump speed of the object "
-                        "(in pixels per second). Its value is always positive."),
-                      _("Platformer state"),
-                      "CppPlatform/Extensions/platformerobjecticon.png")
+    aut.AddExpression(
+           "CurrentJumpSpeed",
+           _("Current jump speed"),
+           _("Return the current jump speed of the object "
+             "(in pixels per second). Its value is always positive."),
+           _("Platformer state"),
+           "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .SetFunctionName("GetCurrentJumpSpeed");
   }
   {
-    gd::BehaviorMetadata& aut = extension.AddBehavior(
-        "PlatformBehavior",
-        _("Platform"),
-        "Platform",
-        _("Flag objects as being platforms which characters can run on."),
-        "",
-        "CppPlatform/Extensions/platformicon.png",
-        "PlatformBehavior",
-        std::make_shared<PlatformBehavior>(),
-        std::make_shared<gd::BehaviorsSharedData>())
-        .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+    gd::BehaviorMetadata& aut =
+        extension
+            .AddBehavior("PlatformBehavior",
+                         _("Platform"),
+                         "Platform",
+                         _("Flag objects as being platforms which characters "
+                           "can run on."),
+                         "",
+                         "CppPlatform/Extensions/platformicon.png",
+                         "PlatformBehavior",
+                         std::make_shared<PlatformBehavior>(),
+                         std::make_shared<gd::BehaviorsSharedData>())
+            .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
     aut.AddAction("ChangePlatformType",
                   _("Platform type"),
@@ -857,21 +872,23 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformBehavior")
         .AddParameter("stringWithSelector",
-              _("Platform type"),
-              "[\"Platform\",\"Jumpthru\",\"Ladder\"]")
+                      _("Platform type"),
+                      "[\"Platform\",\"Jumpthru\",\"Ladder\"]")
         .MarkAsAdvanced()
         .SetFunctionName("ChangePlatformType");
   }
 
-  extension.AddCondition("IsObjectOnGivenFloor",
-                         _("Character is on given platform"),
-                         _("Check if a platformer character is on a given platform."),
-                         _("_PARAM0_ is on platform _PARAM2_"),
-                         _("Collision"),
-                         "CppPlatform/Extensions/platformicon.png",
-                         "CppPlatform/Extensions/platformicon.png")
-           .AddParameter("objectList", _("Object"), "", false)
-           .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-           .AddParameter("objectList", _("Platforms"), "", false)
-           .AddCodeOnlyParameter("conditionInverted", "");
+  extension
+      .AddCondition(
+          "IsObjectOnGivenFloor",
+          _("Character is on given platform"),
+          _("Check if a platformer character is on a given platform."),
+          _("_PARAM0_ is on platform _PARAM2_"),
+          _("Collision"),
+          "CppPlatform/Extensions/platformicon.png",
+          "CppPlatform/Extensions/platformicon.png")
+      .AddParameter("objectList", _("Object"), "", false)
+      .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+      .AddParameter("objectList", _("Platforms"), "", false)
+      .AddCodeOnlyParameter("conditionInverted", "");
 }

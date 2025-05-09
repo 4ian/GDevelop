@@ -2,7 +2,67 @@
 import { roundPositionsToGrid } from '../Utils/GridHelpers';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+
 const gd: libGDevelop = global.gd;
+
+export const addSerializedInstances = ({
+  instancesContainer,
+  copyReferential,
+  serializedInstances,
+  addInstancesInTheForeground = false,
+  doesObjectExistInContext,
+}: {|
+  instancesContainer: gdInitialInstancesContainer,
+  copyReferential: [number, number],
+  serializedInstances: Array<Object>,
+  addInstancesInTheForeground?: boolean,
+  doesObjectExistInContext: string => boolean,
+|}): Array<gdInitialInstance> => {
+  const zOrderFinder = new gd.HighestZOrderFinder();
+  zOrderFinder.reset();
+  instancesContainer.iterateOverInstances(zOrderFinder);
+  const sceneForegroundZOrder = zOrderFinder.getHighestZOrder() + 1;
+  zOrderFinder.delete();
+
+  let addedInstancesLowestZOrder = null;
+
+  const newInstances = serializedInstances
+    .map(serializedInstance => {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      if (!doesObjectExistInContext(instance.getObjectName())) return null;
+      instance.setX(instance.getX() - copyReferential[0]);
+      instance.setY(instance.getY() - copyReferential[1]);
+      if (addInstancesInTheForeground) {
+        if (
+          addedInstancesLowestZOrder === null ||
+          addedInstancesLowestZOrder > instance.getZOrder()
+        ) {
+          addedInstancesLowestZOrder = instance.getZOrder();
+        }
+      }
+      const newInstance = instancesContainer
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+      return newInstance;
+    })
+    .filter(Boolean);
+
+  if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
+    newInstances.forEach(instance => {
+      instance.setZOrder(
+        instance.getZOrder() -
+          // Flow is not happy with addedInstancesLowestZOrder possible null value
+          // so 0 is used as a fallback.
+          (addedInstancesLowestZOrder || 0) +
+          sceneForegroundZOrder
+      );
+    });
+  }
+
+  return newInstances;
+};
 
 type Props = {|
   instances: gdInitialInstancesContainer,
@@ -42,48 +102,17 @@ export default class InstancesAdder {
     addInstancesInTheForeground?: boolean,
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
-    this._zOrderFinder.reset();
-    this._instances.iterateOverInstances(this._zOrderFinder);
-    const sceneForegroundZOrder = this._zOrderFinder.getHighestZOrder() + 1;
-
-    let addedInstancesLowestZOrder = null;
-
-    const newInstances = serializedInstances
-      .map(serializedInstance => {
-        const instance = new gd.InitialInstance();
-        unserializeFromJSObject(instance, serializedInstance);
-        if (!doesObjectExistInContext(instance.getObjectName())) return null;
-        instance.setX(instance.getX() - copyReferential[0] + position[0]);
-        instance.setY(instance.getY() - copyReferential[1] + position[1]);
-        if (addInstancesInTheForeground) {
-          if (
-            addedInstancesLowestZOrder === null ||
-            addedInstancesLowestZOrder > instance.getZOrder()
-          ) {
-            addedInstancesLowestZOrder = instance.getZOrder();
-          }
-        }
-        const newInstance = this._instances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-        instance.delete();
-        return newInstance;
-      })
-      .filter(Boolean);
-
-    if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
-      newInstances.forEach(instance => {
-        instance.setZOrder(
-          instance.getZOrder() -
-            // Flow is not happy with addedInstancesLowestZOrder possible null value
-            // so 0 is used as a fallback.
-            (addedInstancesLowestZOrder || 0) +
-            sceneForegroundZOrder
-        );
-      });
+    const instances = addSerializedInstances(
+      this._instances,
+      copyReferential,
+      serializedInstances,
+      (addInstancesInTheForeground = false),
+      doesObjectExistInContext
+    );
+    for (const instance of instances) {
+      instance.setX(instance.getX() + position[0]);
+      instance.setY(instance.getY() + position[1]);
     }
-
-    return newInstances;
   };
 
   /**

@@ -85,6 +85,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
 import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 
 const gd: libGDevelop = global.gd;
 
@@ -2026,11 +2027,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
     const { editorDisplay } = this;
-    if (!editorDisplay) return;
-
-    const position = useLastCursorPosition
-      ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
-      : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
 
     const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
     const instancesContent = SafeExtractor.extractArrayProperty(
@@ -2045,25 +2041,18 @@ export default class SceneEditor extends React.Component<Props, State> {
         'pasteInTheForeground'
       ) || false;
     if (x === null || y === null || instancesContent === null) return;
-    const viewPosition = editorDisplay.viewControls.getViewPosition();
-    if (!viewPosition) return;
 
-    const newInstances = editorDisplay.instancesHandlers.addSerializedInstances(
-      {
-        position: viewPosition.containsPoint(position[0], position[1])
-          ? position
-          : [viewPosition.getViewX(), viewPosition.getViewY()],
-        copyReferential: [x, y],
-        serializedInstances: instancesContent,
-        addInstancesInTheForeground: pasteInTheForeground,
-        doesObjectExistInContext: objectName =>
-          this.props.projectScopedContainersAccessor
-            .get()
-            .getObjectsContainersList()
-            .hasObjectNamed(objectName),
-      }
-    );
-    editorDisplay.instancesHandlers.snapSelection(newInstances);
+    const newInstances = addSerializedInstances({
+      instancesContainer: this.props.initialInstances,
+      copyReferential: [x, y],
+      serializedInstances: instancesContent,
+      addInstancesInTheForeground: pasteInTheForeground,
+      doesObjectExistInContext: objectName =>
+        this.props.projectScopedContainersAccessor
+          .get()
+          .getObjectsContainersList()
+          .hasObjectNamed(objectName),
+    });
 
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
@@ -2072,6 +2061,43 @@ export default class SceneEditor extends React.Component<Props, State> {
       multiSelect: true,
       layersLocks: null,
     });
+
+    if (editorDisplay) {
+      const viewPosition = editorDisplay.viewControls.getViewPosition();
+      if (viewPosition) {
+        const lastPosition = useLastCursorPosition
+          ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
+          : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
+        const position = viewPosition.containsPoint(
+          lastPosition[0],
+          lastPosition[1]
+        )
+          ? lastPosition
+          : [viewPosition.getViewX(), viewPosition.getViewY()];
+        for (const instance of newInstances) {
+          instance.setX(instance.getX() + position[0]);
+          instance.setY(instance.getY() + position[1]);
+        }
+        editorDisplay.instancesHandlers.snapSelection(newInstances);
+      }
+    }
+
+    const { previewDebuggerServer } = this.props;
+
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'addInstances',
+          payload: {
+            instances: newInstances.map(instance =>
+              serializeToJSObject(instance)
+            ),
+            moveUnderCursor: true,
+          },
+        });
+      });
+    }
+
     this.forceUpdatePropertiesEditor();
   };
 

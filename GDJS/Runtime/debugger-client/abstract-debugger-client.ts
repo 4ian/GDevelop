@@ -365,6 +365,16 @@ namespace gdjs {
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
+      } else if (data.command === 'addInstances') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.addInstances(data.payload.instances);
+          runtimeGame._inGameEditor.setSelectedObjects(
+            data.payload.instances.map((instance) => instance.persistentUuid)
+          );
+          if (data.payload.moveUnderCursor) {
+            runtimeGame._inGameEditor.moveSelectionUnderCursor();
+          }
+        }
       } else if (data.command === 'dragNewInstance') {
         const gameCoords = runtimeGame
           .getRenderer()

@@ -545,6 +545,51 @@ namespace gdjs {
       }
     }
 
+    moveSelectionUnderCursor() {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const closestIntersect = this._getClosestIntersectionUnderCursor();
+      let cursorX = 0;
+      let cursorY = 0;
+      let cursorZ = 0;
+      if (closestIntersect) {
+        cursorX = closestIntersect.point.x;
+        cursorY = -closestIntersect.point.y;
+        cursorZ = closestIntersect.point.z;
+      } else {
+        cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
+        cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
+        cursorZ = 0;
+      }
+
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let minZ = Number.MAX_VALUE;
+      let maxX = Number.MIN_VALUE;
+      let maxY = Number.MIN_VALUE;
+      for (const object of this._selection.getSelectedObjects()) {
+        minX = Math.min(minX, object.getAABBLeft());
+        minY = Math.min(minY, object.getAABBTop());
+        if (object instanceof gdjs.RuntimeObject3D) {
+          minZ = Math.min(minZ, object.getUnrotatedAABBMinZ());
+        }
+        maxX = Math.max(maxX, object.getAABBRight());
+        maxY = Math.max(maxY, object.getAABBBottom());
+      }
+      const deltaX = cursorX - (maxX + minX) / 2;
+      const deltaY = cursorY - (maxY + minY) / 2;
+      const deltaZ = cursorZ - minZ;
+      for (const object of this._selection.getSelectedObjects()) {
+        object.setX(object.getX() + deltaX);
+        object.setY(object.getY() + deltaY);
+        if (object instanceof gdjs.RuntimeObject3D) {
+          object.setZ(object.getZ() + deltaZ);
+        }
+      }
+      this._sendSelectionUpdate();
+    }
+
     centerViewOnLastSelectedInstance(visibleScreenArea: {
       minX: number;
       minY: number;
@@ -1130,8 +1175,6 @@ namespace gdjs {
     }
 
     reloadInstances(instances: Array<InstanceData>) {
-      console.log(instances);
-
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
@@ -1164,6 +1207,13 @@ namespace gdjs {
           }
         });
       this._forceUpdateSelectionControls();
+    }
+
+    addInstances(instances: Array<InstanceData>) {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      editedInstanceContainer.createObjectsFrom(instances, 0, 0, 0, true);
     }
 
     private _getClosestIntersectionUnderCursor(): THREE.Intersection | null {

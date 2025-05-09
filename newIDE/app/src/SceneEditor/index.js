@@ -2009,7 +2009,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         position: [0, 0],
         copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
         serializedInstances: serializedSelection,
-        preventSnapToGrid: true,
         doesObjectExistInContext:
           // Instance duplication can only be done in the same scene, so no need to check
           () => true,
@@ -2064,6 +2063,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             .hasObjectNamed(objectName),
       }
     );
+    editorDisplay.instancesHandlers.snapSelection(newInstances);
 
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();

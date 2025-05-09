@@ -1,6 +1,6 @@
 // @flow
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { type AiGeneratedEventEventsChanges } from '../Utils/GDevelopServices/Generation';
+import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,7 +21,6 @@ const parseEventPath = (pathString: string): Array<number> => {
       console.warn(
         `Event path string "${originalPathString}" does not start with "event-". Parsed as direct indices.`
       );
-      pathString = pathString; // Use the string as is for parts splitting
     } else {
       throw new Error(
         `Invalid event path string format: "${originalPathString}". Expected "event-X.Y.Z" or "X.Y.Z".`
@@ -154,123 +153,136 @@ const comparePathsReverseLexicographically = (
 export const applyEventsChanges = (
   project: gdProject,
   sceneEvents: gdEventsList,
-  generatedEventsJson: string | null, // JSON string of *new* events for insertion/replacement
-  eventsChanges: AiGeneratedEventEventsChanges
+  eventOperationsInput: Array<AiGeneratedEventChange>
 ): void => {
-  let newEventsListForInsertion: gdEventsList | null = null;
-  let hasInsertionOperation =
-    (eventsChanges.insertAndReplaceEvents &&
-      eventsChanges.insertAndReplaceEvents.length > 0) ||
-    (eventsChanges.insertBeforeEvents &&
-      eventsChanges.insertBeforeEvents.length > 0) ||
-    (eventsChanges.insertAsSubEvents &&
-      eventsChanges.insertAsSubEvents.length > 0);
-
-  if (hasInsertionOperation) {
-    if (!generatedEventsJson) {
-      throw new Error(
-        'Specified event changes involving insertions, but did not provide the events content (generatedEvents is null/empty).'
-      );
-    }
-    try {
-      const eventsListContent = JSON.parse(generatedEventsJson);
-      newEventsListForInsertion = new gd.EventsList();
-      unserializeFromJSObject(
-        newEventsListForInsertion,
-        eventsListContent,
-        'unserializeFrom',
-        project
-      );
-      if (newEventsListForInsertion.isEmpty() && hasInsertionOperation) {
-        console.warn(
-          'Generated events for insertion are empty. Insertion operations might not add any events.'
-        );
-      }
-    } catch (error) {
-      throw new Error(
-        `Failed to parse generatedEvents JSON for AI changes, which is required for insertion operations: ${
-          error.message
-        }`
-      );
-    }
-  }
-
   const operations: Array<EventOperation> = [];
-  let totalInsertionPaths = 0;
 
-  (eventsChanges.deleteEvents || []).forEach(pathStr => {
-    try {
-      operations.push({ type: 'delete', path: parseEventPath(pathStr) });
-    } catch (e) {
-      console.warn(`Skipping invalid delete path "${pathStr}": ${e.message}`);
-    }
-  });
+  eventOperationsInput.forEach(change => {
+    const {
+      operationName,
+      operationTargetEvent,
+      generatedEvents,
+    } = change;
+    let parsedPath: Array<number> | null = null;
+    let localEventsToInsert: gdEventsList | null = null;
 
-  (eventsChanges.insertAndReplaceEvents || []).forEach(pathStr => {
-    totalInsertionPaths++;
     try {
-      const parsedPath = parseEventPath(pathStr);
-      operations.push({ type: 'delete', path: parsedPath }); // Delete first
-      operations.push({
-        type: 'insert',
-        path: parsedPath, // Insert at the same path
-        eventsToInsert: newEventsListForInsertion || undefined, // Should be non-null if we are here
-      });
+      if (operationTargetEvent) {
+        parsedPath = parseEventPath(operationTargetEvent);
+      } else if (operationName !== 'insert_at_end') {
+        // Path is generally required, except for 'insert_at_end'.
+        console.warn(
+          `Skipping operation "${operationName}" due to missing operationTargetEvent path.`
+        );
+        return;
+      }
+
+      if (generatedEvents && operationName !== 'delete_event') {
+        const eventsListContent = JSON.parse(generatedEvents);
+        localEventsToInsert = new gd.EventsList();
+        unserializeFromJSObject(
+          localEventsToInsert,
+          eventsListContent,
+          'unserializeFrom',
+          project
+        );
+        if (localEventsToInsert.isEmpty()) {
+          console.warn(
+            `Generated events for operation "${operationName}" (path: ${operationTargetEvent ||
+              'N/A'}) are empty. Insertion might not add any events.`
+          );
+        }
+      }
+
+      switch (operationName) {
+        case 'insert_and_replace_event':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_and_replace_event" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({ type: 'delete', path: parsedPath });
+          operations.push({
+            type: 'insert',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          // localEventsToInsert is now "owned" by the 'insert' operation,
+          // it should not be deleted here in the switch case.
+          break;
+        case 'insert_before_event':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_before_event" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insert',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'insert_as_sub_event':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "insert_as_sub_event" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insertAsSub',
+            path: parsedPath, // This path is to the parent event
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'delete_event':
+          if (!parsedPath) {
+            console.warn(
+              `Skipping "delete_event" due to missing or invalid path.`
+            );
+            // No localEventsToInsert expected or created for delete_event.
+            return;
+          }
+          // Ensure no events were accidentally parsed for delete.
+          if (localEventsToInsert) {
+            console.warn(
+              'Internal warning: localEventsToInsert was populated for a "delete_event". Cleaning up.'
+            );
+            localEventsToInsert.delete();
+          }
+          operations.push({ type: 'delete', path: parsedPath });
+          break;
+        case 'insert_at_end':
+          // Path for insert_at_end is synthetic, representing the end of the root list.
+          operations.push({
+            type: 'insert',
+            path: [sceneEvents.getEventsCount()],
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        default:
+          console.warn(
+            `Unknown operationName: "${operationName}". Skipping operation.`
+          );
+          // Clean up localEventsToInsert if it was created for an unknown operation
+          if (localEventsToInsert) localEventsToInsert.delete();
+      }
     } catch (e) {
       console.warn(
-        `Skipping invalid insertAndReplace path "${pathStr}": ${e.message}`
+        `Error processing event change (operation: "${operationName}", path: "${operationTargetEvent ||
+          'N/A'}"): ${e.message}. Skipping this change.`
       );
-      totalInsertionPaths--; // Decrement if path parsing failed for this
+      // Ensure cleanup if parsing/unserialization failed mid-way
+      if (localEventsToInsert) {
+        localEventsToInsert.delete();
+      }
     }
   });
-
-  (eventsChanges.insertBeforeEvents || []).forEach(pathStr => {
-    totalInsertionPaths++;
-    try {
-      const parsedPath = parseEventPath(pathStr);
-      operations.push({
-        type: 'insert',
-        path: parsedPath,
-        eventsToInsert: newEventsListForInsertion || undefined,
-      });
-    } catch (e) {
-      console.warn(
-        `Skipping invalid insertBefore path "${pathStr}": ${e.message}`
-      );
-      totalInsertionPaths--;
-    }
-  });
-
-  (eventsChanges.insertAsSubEvents || []).forEach(pathStr => {
-    totalInsertionPaths++;
-    try {
-      const parsedParentPath = parseEventPath(pathStr);
-      operations.push({
-        type: 'insertAsSub',
-        path: parsedParentPath, // This path is to the parent event
-        eventsToInsert: newEventsListForInsertion || undefined,
-      });
-    } catch (e) {
-      console.warn(
-        `Skipping invalid insertAsSub path "${pathStr}": ${e.message}`
-      );
-      totalInsertionPaths--;
-    }
-  });
-
-  if (totalInsertionPaths > 1) {
-    // This check is after collecting all, to correctly sum up paths from all three insert-related arrays.
-    if (newEventsListForInsertion) newEventsListForInsertion.delete(); // Clean up
-    throw new Error(
-      `Multiple insertion operations specified (${totalInsertionPaths} paths found across insertAndReplaceEvents, insertBeforeEvents, insertAsSubEvents). Only one total insertion path is allowed.`
-    );
-  }
-  if (totalInsertionPaths > 0 && !newEventsListForInsertion) {
-    // Should have been caught earlier by the generatedEventsJson check, but as a safeguard:
-    throw new Error(
-      'Insertion operation was processed, but newEventsListForInsertion is not available. This indicates an internal logic error.'
-    );
-  }
 
   operations.sort((opA, opB) => {
     const pathComparison = comparePathsReverseLexicographically(
@@ -346,10 +358,11 @@ export const applyEventsChanges = (
         } for path [${pathForLog}]:`,
         error
       );
+    } finally {
+      // Clean up the gd.EventsList associated with this operation, if any.
+      if (op.eventsToInsert) {
+        op.eventsToInsert.delete();
+      }
     }
   });
-
-  if (newEventsListForInsertion) {
-    newEventsListForInsertion.delete();
-  }
 };

@@ -5,7 +5,6 @@ import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type AiGeneratedEvent,
-  type AiGeneratedEventEventsChanges,
 } from '../Utils/GDevelopServices/Generation';
 import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { applyEventsChanges } from './ApplyEventsChanges';
@@ -42,6 +41,7 @@ type EditorFunctionGenericOutput = {|
   objectName?: string,
   behaviorName?: string,
   properties?: any,
+  sharedProperties?: any,
   instances?: any,
 |};
 
@@ -51,6 +51,7 @@ export type EventsGenerationOptions = {|
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
+  placementHint: string,
 |};
 
 /**
@@ -283,7 +284,10 @@ const addBehavior: EditorFunction = async ({
   const scene_name = extractRequiredString(args, 'scene_name');
   const object_name = extractRequiredString(args, 'object_name');
   const behavior_type = extractRequiredString(args, 'behavior_type');
-  const behavior_name = extractRequiredString(args, 'behavior_name');
+  const optionalBehaviorName = SafeExtractor.extractStringProperty(
+    args,
+    'behavior_name'
+  );
 
   if (!project.hasLayoutNamed(scene_name)) {
     return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -300,20 +304,7 @@ const addBehavior: EditorFunction = async ({
 
   const object = objectsContainer.getObject(object_name);
 
-  // Check if behavior with this name already exists
-  if (object.hasBehaviorNamed(behavior_name)) {
-    const behavior = object.getBehavior(behavior_name);
-    if (behavior.getTypeName() !== behavior_type) {
-      return makeGenericFailure(
-        `Behavior with name "${behavior_name}" already exists on object "${object_name}" but with a different type ("${behavior_type}").`
-      );
-    }
-
-    return makeGenericSuccess(
-      `Behavior with name "${behavior_name}" already exists on object "${object_name}", no need to re-create it.`
-    );
-  }
-
+  // Ensure the extension for this behavior is installed.
   if (behavior_type.includes('::')) {
     const extensionName = behavior_type.split('::')[0];
     try {
@@ -339,6 +330,25 @@ const addBehavior: EditorFunction = async ({
     );
   }
 
+  // In almost all cases, we should use the behavior default name (especially because it
+  // allows to share the same behavior shared data between objects).
+  const behaviorName =
+    optionalBehaviorName || behaviorMetadata.getDefaultName();
+
+  // Check if behavior with this name already exists
+  if (object.hasBehaviorNamed(behaviorName)) {
+    const behavior = object.getBehavior(behaviorName);
+    if (behavior.getTypeName() !== behavior_type) {
+      return makeGenericFailure(
+        `Behavior with name "${behaviorName}" already exists on object "${object_name}" but with a different type ("${behavior_type}").`
+      );
+    }
+
+    return makeGenericSuccess(
+      `Behavior with name "${behaviorName}" already exists on object "${object_name}", no need to re-create it.`
+    );
+  }
+
   if (isBehaviorDefaultCapability(behaviorMetadata)) {
     const alreadyHasDefaultCapability = object
       .getAllBehaviorNames()
@@ -349,21 +359,20 @@ const addBehavior: EditorFunction = async ({
       });
     if (alreadyHasDefaultCapability) {
       return makeGenericSuccess(
-        `Behavior "${behavior_name}" of type "${behavior_type}" is a default capability and is already available on object "${object_name}". There is no need to add it (and it can't be removed).`
+        `Behavior "${behaviorName}" of type "${behavior_type}" is a default capability and is already available on object "${object_name}". There is no need to add it (and it can't be removed).`
       );
     }
 
     return makeGenericFailure(
-      `Behavior "${behavior_name}" of type "${behavior_type}" is a default capability and cannot be added to object "${object_name}".`
+      `Behavior "${behaviorName}" of type "${behavior_type}" is a default capability and cannot be added to object "${object_name}".`
     );
   }
 
   // Add the behavior
-  object.addNewBehavior(project, behavior_type, behavior_name);
+  object.addNewBehavior(project, behavior_type, behaviorName);
 
-  // TODO: send back the properties?
   return makeGenericSuccess(
-    `Added behavior "${behavior_name}" of type "${behavior_type}" to object "${object_name}".`
+    `Added behavior called "${behaviorName}" with type "${behavior_type}" to object "${object_name}".`
   );
 };
 
@@ -444,10 +453,31 @@ const inspectBehaviorProperties: EditorFunction = async ({ project, args }) => {
     })
     .filter(Boolean);
 
+  const allBehaviorSharedDataNames = layout
+    .getAllBehaviorSharedDataNames()
+    .toJSArray();
+
+  let sharedProperties = undefined;
+  if (allBehaviorSharedDataNames.includes(behavior_name)) {
+    const behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
+    const behaviorSharedDataProperties = behaviorSharedData.getProperties();
+    const behaviorSharedDataPropertyNames = behaviorSharedDataProperties
+      .keys()
+      .toJSArray();
+    sharedProperties = behaviorSharedDataPropertyNames
+      .map(name => {
+        const propertyDescriptor = behaviorSharedDataProperties.get(name);
+
+        return serializeNamedProperty(name, propertyDescriptor);
+      })
+      .filter(Boolean);
+  }
+
   return {
     success: true,
     behaviorName: behavior_name,
     properties: properties,
+    sharedProperties,
   };
 };
 
@@ -485,21 +515,46 @@ const changeBehaviorProperty: EditorFunction = async ({ project, args }) => {
   const behavior = object.getBehavior(behavior_name);
   const behaviorProperties = behavior.getProperties();
 
-  if (!behaviorProperties.has(property_name)) {
-    throw new Error(
-      `Property not found: ${property_name} on behavior "${object_name}".`
-    );
+  const allBehaviorSharedDataNames = layout
+    .getAllBehaviorSharedDataNames()
+    .toJSArray();
+
+  let behaviorSharedData = null;
+  let behaviorSharedDataProperties = null;
+  if (allBehaviorSharedDataNames.includes(behavior_name)) {
+    behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
+    behaviorSharedDataProperties = behaviorSharedData.getProperties();
   }
 
-  if (!behavior.updateProperty(property_name, new_value)) {
+  if (behaviorProperties.has(property_name)) {
+    if (!behavior.updateProperty(property_name, new_value)) {
+      return makeGenericFailure(
+        `Could not change property "${property_name}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+      );
+    }
+
+    return makeGenericSuccess(
+      `Changed property "${property_name}" of behavior "${behavior_name}" to "${new_value}".`
+    );
+  } else if (
+    behaviorSharedData &&
+    behaviorSharedDataProperties &&
+    behaviorSharedDataProperties.has(property_name)
+  ) {
+    if (!behaviorSharedData.updateProperty(property_name, new_value)) {
+      return makeGenericFailure(
+        `Could not change shared property "${property_name}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+      );
+    }
+
+    return makeGenericSuccess(
+      `Changed property "${property_name}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${new_value}".`
+    );
+  } else {
     return makeGenericFailure(
-      `Could not change property "${property_name}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+      `Property "${property_name}" not found on behavior "${behavior_name}" of object "${object_name}".`
     );
   }
-
-  return makeGenericSuccess(
-    `Changed property "${property_name}" of behavior "${behavior_name}" to "${new_value}".`
-  );
 };
 
 /**
@@ -671,6 +726,10 @@ const addSceneEvents: EditorFunction = async ({
     'objects_list'
   );
   const objectsList = objectsListArgument === null ? '' : objectsListArgument;
+  const placementHint = SafeExtractor.extractStringProperty(
+    args,
+    'placement_hint'
+  ) || '';
 
   if (!project.hasLayoutNamed(sceneName)) {
     return makeGenericFailure(`Scene not found: "${sceneName}".`);
@@ -691,6 +750,7 @@ const addSceneEvents: EditorFunction = async ({
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      placementHint,
     });
 
     if (aiGeneratedEvent.error) {
@@ -701,43 +761,23 @@ const addSceneEvents: EditorFunction = async ({
       );
     }
 
-    if (aiGeneratedEvent.stats && !aiGeneratedEvent.stats.finalAreEventsValid) {
+    const changes = aiGeneratedEvent.changes;
+    if (!changes || changes.length === 0) {
+      throw new Error(
+        `No generated events could be found. Consider trying again or a different approach.'}`
+      );
+    }
+
+    if (
+      changes.some(change => change.isEventsJsonValid === false) ||
+      changes.some(change => change.areEventsValid === false)
+    ) {
       return makeGenericFailure(
         `Generated events are not valid - this means what you asked for is not possible or does not work like this. Consider a different approach.`
       );
     }
 
-    if (!aiGeneratedEvent.eventsChanges && !aiGeneratedEvent.generatedEvents) {
-      return makeGenericSuccess('No changes or new events to be applied.');
-    }
-
-    const eventsChanges: AiGeneratedEventEventsChanges =
-      aiGeneratedEvent.eventsChanges &&
-      ((aiGeneratedEvent.eventsChanges.deleteEvents &&
-        aiGeneratedEvent.eventsChanges.deleteEvents.length > 0) ||
-        (aiGeneratedEvent.eventsChanges.insertAndReplaceEvents &&
-          aiGeneratedEvent.eventsChanges.insertAndReplaceEvents.length > 0) ||
-        (aiGeneratedEvent.eventsChanges.insertBeforeEvents &&
-          aiGeneratedEvent.eventsChanges.insertBeforeEvents.length > 0) ||
-        (aiGeneratedEvent.eventsChanges.insertAsSubEvents &&
-          aiGeneratedEvent.eventsChanges.insertAsSubEvents.length > 0))
-        ? aiGeneratedEvent.eventsChanges
-        : // If not specified, events are inserted at the end of the event sheet.
-          {
-            insertAndReplaceEvents: [],
-            insertBeforeEvents: [
-              `event-${currentSceneEvents.getEventsCount()}`,
-            ],
-            insertAsSubEvents: [],
-            deleteEvents: [],
-          };
-
-    applyEventsChanges(
-      project,
-      currentSceneEvents,
-      aiGeneratedEvent.generatedEvents,
-      eventsChanges
-    );
+    applyEventsChanges(project, currentSceneEvents, changes);
     return makeGenericSuccess('Properly modified or added new event(s).');
   } catch (error) {
     console.error('Error in addSceneEvents with AI generation:', error);

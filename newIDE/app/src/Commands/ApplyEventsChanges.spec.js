@@ -1,6 +1,6 @@
 // @flow
 import { applyEventsChanges } from './ApplyEventsChanges';
-import { type AiGeneratedEventEventsChanges } from '../Utils/GDevelopServices/Generation';
+import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -45,13 +45,17 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
     ]);
     // Path "event-1" targets index 1 (the second event)
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: ['event-1'],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: [],
-      insertAsSubEvents: [],
-    };
-    applyEventsChanges(project, sceneEventsList, null, changes);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+      },
+    ];
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     expect(sceneEventsList.getEventsCount()).toBe(2);
     expect(sceneEventsList.getEventAt(0).getType()).toBe(
       'BuiltinCommonInstructions::Standard'
@@ -75,13 +79,17 @@ describe('applyEventsChanges', () => {
     subEvents.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1); // sub-event 1 (to delete)
 
     // Path "event-0.1" targets parent at index 0, sub-event at its index 1
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: ['event-0.1'],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: [],
-      insertAsSubEvents: [],
-    };
-    applyEventsChanges(project, sceneEventsList, null, changes);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-0.1',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+      },
+    ];
+    applyEventsChanges(project, sceneEventsList, eventOperations);
 
     const finalParentEvent = sceneEventsList.getEventAt(0);
     expect(finalParentEvent.getSubEvents().getEventsCount()).toBe(1);
@@ -99,17 +107,20 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Repeat',
     ]);
     // Path "event-1" means insert at index 1 (before Repeat)
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: ['event-1'],
-      insertAsSubEvents: [],
-    };
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_before_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+      },
+    ];
     applyEventsChanges(
       project,
       sceneEventsList,
-      newEventsForInsertionJson,
-      changes
+      eventOperations
     );
     // Expected: S0, NewS, NewS, R1
     expect(sceneEventsList.getEventsCount()).toBe(4);
@@ -126,18 +137,20 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
       'BuiltinCommonInstructions::Repeat',
     ]); // S0, R1. Count = 2
-    // Path "event-2" (count) will insert at index 2 (end of list)
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: ['event-2'],
-      insertAsSubEvents: [],
-    };
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_at_end',
+        operationTargetEvent: null,
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+      },
+    ];
     applyEventsChanges(
       project,
       sceneEventsList,
-      newEventsForInsertionJson,
-      changes
+      eventOperations
     );
     // Expected: S0, R1, NewS, NewS
     expect(sceneEventsList.getEventsCount()).toBe(4);
@@ -155,17 +168,20 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Group',
     ]); // S0, G1
     // Path "event-1" targets parent at index 1 ('Group')
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: [],
-      insertAsSubEvents: ['event-1'],
-    };
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_as_sub_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+      },
+    ];
     applyEventsChanges(
       project,
       sceneEventsList,
-      newEventsForInsertionJson,
-      changes
+      eventOperations
     );
     const parentEvent = sceneEventsList.getEventAt(1);
     expect(parentEvent.getSubEvents().getEventsCount()).toBe(2);
@@ -182,17 +198,20 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::While',
     ]);
     // Path "event-1" targets index 1 ('Repeat') for replacement
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: ['event-1'],
-      insertBeforeEvents: [],
-      insertAsSubEvents: [],
-    };
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+      },
+    ];
     applyEventsChanges(
       project,
       sceneEventsList,
-      newEventsForInsertionJson,
-      changes
+      eventOperations
     );
     // Expected: S0, NewS, NewS, W2 (original R1 is gone, 2 new events inserted)
     expect(sceneEventsList.getEventsCount()).toBe(4);
@@ -213,17 +232,28 @@ describe('applyEventsChanges', () => {
     ]);
     // Delete W2 (idx 2, path "event-2")
     // Insert new before R1 (idx 1, path "event-1")
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: ['event-2'],
-      insertBeforeEvents: ['event-1'],
-      insertAndReplaceEvents: [],
-      insertAsSubEvents: [],
-    };
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-2',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+      },
+      {
+        operationName: 'insert_before_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+      },
+    ];
     applyEventsChanges(
       project,
       sceneEventsList,
-      newEventsForInsertionJson,
-      changes
+      eventOperations
     );
     // Initial: S0, R1, W2, F3
     // After del W2: S0, R1, F3
@@ -238,35 +268,32 @@ describe('applyEventsChanges', () => {
     ]);
   });
 
-  it('should throw error if multiple insertion operations are specified', () => {
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: ['event-1'],
-      insertBeforeEvents: ['event-2'],
-      insertAsSubEvents: [],
-    };
-    expect(() =>
-      applyEventsChanges(
-        project,
-        sceneEventsList,
-        newEventsForInsertionJson,
-        changes
-      )
-    ).toThrow(/Multiple insertion operations specified/);
-  });
+  it('should warn and skip insert if no generatedEvents provided for an insert operation', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+    const consoleWarnSpy = jest
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
 
-  it('should throw error if insertion operation is specified but no generatedEventsJson', () => {
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: ['event-1'],
-      insertAsSubEvents: [],
-    };
-    expect(() =>
-      applyEventsChanges(project, sceneEventsList, null, changes)
-    ).toThrow(
-      /Specified event changes involving insertions, but did not provide the events content/
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_before_event',
+        operationTargetEvent: 'event-1', // Insert at index 1 (append)
+        generatedEvents: null, // No events provided
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+      },
+    ];
+
+    applyEventsChanges(project, sceneEventsList, eventOperations);
+
+    expect(sceneEventsList.getEventsCount()).toBe(1); // No events added
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Insert operation for path [1] skipped: no events to insert or events list is empty'
+      )
     );
+    consoleWarnSpy.mockRestore();
   });
 
   it('should skip invalid delete path (out of bounds) gracefully and log error', () => {
@@ -274,13 +301,17 @@ describe('applyEventsChanges', () => {
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: ['event-5'], // Path "event-5" targets index 5, out of bounds
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: [],
-      insertAsSubEvents: [],
-    };
-    applyEventsChanges(project, sceneEventsList, null, changes);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-5', // Path "event-5" targets index 5, out of bounds
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+      },
+    ];
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     expect(sceneEventsList.getEventsCount()).toBe(1); // No change
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining(
@@ -289,28 +320,5 @@ describe('applyEventsChanges', () => {
       expect.any(Error)
     );
     consoleErrorSpy.mockRestore();
-  });
-
-  it('should skip insert if generatedEventsJson results in no actual events after unserialization', () => {
-    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
-    const consoleWarnSpy = jest
-      .spyOn(console, 'warn')
-      .mockImplementation(() => {});
-    const emptyNewEventsJson = '[]';
-
-    const changes: AiGeneratedEventEventsChanges = {
-      deleteEvents: [],
-      insertAndReplaceEvents: [],
-      insertBeforeEvents: ['event-1'], // Insert at index 1 (append)
-      insertAsSubEvents: [],
-    };
-    applyEventsChanges(project, sceneEventsList, emptyNewEventsJson, changes);
-    expect(sceneEventsList.getEventsCount()).toBe(1); // No events added
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Insert operation for path [1] skipped: no events to insert or events list is empty'
-      )
-    );
-    consoleWarnSpy.mockRestore();
   });
 });

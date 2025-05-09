@@ -260,6 +260,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      placementHint,
       relatedAiRequestId,
     }: {|
       sceneName: string,
@@ -267,6 +268,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       extensionNamesList: string,
       objectsList: string,
       existingEventsAsText: string,
+      placementHint: string,
       relatedAiRequestId: string,
     |}) => {
       if (!project) throw new Error('No project is opened.');
@@ -286,6 +288,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
           extensionNamesList,
           objectsList,
           existingEventsAsText,
+          placementHint,
           relatedAiRequestId,
         })
       );

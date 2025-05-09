@@ -76,7 +76,7 @@ export const filterEnumeratedBehaviorMetadata = (
 };
 
 export const isBehaviorDefaultCapability = (
-  behaviorMetadata: BehaviorMetadata
+  behaviorMetadata: gdBehaviorMetadata
 ) => {
   return (
     behaviorMetadata.getName().includes('Capability') ||

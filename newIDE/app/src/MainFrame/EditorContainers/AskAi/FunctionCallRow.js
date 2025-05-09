@@ -9,7 +9,6 @@ import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionC
 import CircularProgress from '../../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../../UI/Text';
-import { LineStackLayout } from '../../../UI/Layout';
 import RaisedButton from '../../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';

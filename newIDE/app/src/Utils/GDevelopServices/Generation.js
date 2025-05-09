@@ -83,21 +83,22 @@ export type AiRequest = {
   output: Array<AiRequestMessage>,
 };
 
-export type AiGeneratedEventEventsChanges = {
-  insertAndReplaceEvents: Array<string>,
-  insertBeforeEvents: Array<string>,
-  insertAsSubEvents: Array<string>,
-  deleteEvents: Array<string>,
+export type AiGeneratedEventStats = {
+  retriesCount: number;
+  finalMissingTypes: string[];
+  systemPromptTemplateHash: string;
+  userPromptTemplateHash: string;
+  allFeaturesSummaryContentHash: string;
+  finalModelPublicId: string;
 };
 
-export type AiGeneratedEventStats = {
-  retriesCount: number,
-  finalMissingTypes: string[],
-  finalAreEventsValid: boolean,
-  systemPromptTemplateHash: string,
-  userPromptTemplateHash: string,
-  allFeaturesSummaryContentHash: string,
-  finalModelPublicId: string,
+export type AiGeneratedEventChange = {
+  operationName: string,
+  operationTargetEvent: string | null,
+  isEventsJsonValid: boolean | null,
+  generatedEvents: string | null,
+  areEventsValid: boolean | null,
+  diagnosticLines: string[],
 };
 
 export type AiGeneratedEvent = {
@@ -111,9 +112,9 @@ export type AiGeneratedEvent = {
   eventsDescription: string,
   extensionNamesList: string,
   objectsList: string,
+  existingEventsAsText: string,
 
-  generatedEvents: string | null,
-  eventsChanges: AiGeneratedEventEventsChanges | null,
+  changes: Array<AiGeneratedEventChange> | null,
 
   error: {
     code: string,
@@ -408,6 +409,7 @@ export const createAiEventGeneration = async (
     extensionNamesList,
     objectsList,
     existingEventsAsText,
+    placementHint,
     relatedAiRequestId,
   }: {|
     userId: string,
@@ -416,6 +418,7 @@ export const createAiEventGeneration = async (
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
+    placementHint: string | null,
     relatedAiRequestId: string,
   |}
 ): Promise<AiGeneratedEvent> => {
@@ -428,6 +431,7 @@ export const createAiEventGeneration = async (
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      placementHint,
       relatedAiRequestId,
     },
     {

@@ -478,7 +478,9 @@ namespace gdjs {
       return true;
     }
 
-    override getNetworkSyncData(): Physics3DNetworkSyncData {
+    override getNetworkSyncData(
+      options: GetNetworkSyncDataOptions
+    ): Physics3DNetworkSyncData {
       let bodyProps;
       if (this._body) {
         const position = this._body.GetPosition();
@@ -520,7 +522,7 @@ namespace gdjs {
         };
       }
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(options),
         props: {
           ...bodyProps,
           layers: this.layers,
@@ -530,9 +532,10 @@ namespace gdjs {
     }
 
     override updateFromNetworkSyncData(
-      networkSyncData: Physics3DNetworkSyncData
+      networkSyncData: Physics3DNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ) {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       const behaviorSpecificProps = networkSyncData.props;
       if (

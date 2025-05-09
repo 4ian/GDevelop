@@ -454,14 +454,19 @@ namespace gdjs {
      * This can be redefined by objects to send more information.
      * @returns The full network sync data.
      */
-    getNetworkSyncData(): ObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): ObjectNetworkSyncData {
       const behaviorNetworkSyncData = {};
       this._behaviors.forEach((behavior) => {
-        if (!behavior.isSyncedOverNetwork()) {
+        if (
+          !behavior.isSyncedOverNetwork() &&
+          (!syncOptions || !syncOptions.forceSyncEverything)
+        ) {
           return;
         }
 
-        const networkSyncData = behavior.getNetworkSyncData();
+        const networkSyncData = behavior.getNetworkSyncData(syncOptions);
         if (networkSyncData) {
           behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
         }
@@ -486,6 +491,8 @@ namespace gdjs {
       return {
         x: this.x,
         y: this.y,
+        w: this.getWidth(),
+        h: this.getHeight(),
         zo: this.zOrder,
         a: this.angle,
         hid: this.hidden,
@@ -493,6 +500,7 @@ namespace gdjs {
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
+        n: syncOptions.forceSyncEverything ? this.name : undefined,
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
@@ -507,12 +515,21 @@ namespace gdjs {
      * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+    updateFromNetworkSyncData(
+      networkSyncData: ObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ) {
       if (networkSyncData.x !== undefined) {
         this.setX(networkSyncData.x);
       }
       if (networkSyncData.y !== undefined) {
         this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.w !== undefined) {
+        this.setWidth(networkSyncData.w);
+      }
+      if (networkSyncData.h !== undefined) {
+        this.setHeight(networkSyncData.h);
       }
       if (networkSyncData.zo !== undefined) {
         this.setZOrder(networkSyncData.zo);
@@ -561,13 +578,13 @@ namespace gdjs {
         const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
         const behavior = this.getBehavior(behaviorName);
         if (behavior) {
-          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData, options);
         }
       }
 
       // If variables are synchronized, update them.
       if (networkSyncData.var) {
-        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+        this._variables.updateFromNetworkSyncData(networkSyncData.var, options);
       }
 
       // If effects are synchronized, update them.

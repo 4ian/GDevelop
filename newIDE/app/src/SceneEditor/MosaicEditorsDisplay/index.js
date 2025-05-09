@@ -229,6 +229,7 @@ const MosaicEditorsDisplay = React.forwardRef<
         addSerializedInstances: editor
           ? editor.addSerializedInstances
           : () => [],
+        snapSelection: editor ? editor.snapSelection : noop,
       },
     };
   });

@@ -1,5 +1,37 @@
 // @flow
 
+import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
+
+export const roundPositionsToGrid = (
+  pos: [number, number],
+  instancesEditorSettings: InstancesEditorSettings,
+  noGridSnap?: boolean = false
+): [number, number] => {
+  const newPos = pos;
+
+  if (
+    instancesEditorSettings.grid &&
+    instancesEditorSettings.snap &&
+    !noGridSnap
+  ) {
+    roundPosition(
+      newPos,
+      instancesEditorSettings.gridWidth,
+      instancesEditorSettings.gridHeight,
+      instancesEditorSettings.gridOffsetX,
+      instancesEditorSettings.gridOffsetY,
+      instancesEditorSettings.gridType
+    );
+  } else {
+    // Without a grid, the position is still rounded to the nearest pixel.
+    // The size of the instance (or selection of instances) might not be round,
+    // so the magnet corner is still relevant.
+    newPos[0] = Math.round(newPos[0]);
+    newPos[1] = Math.round(newPos[1]);
+  }
+  return newPos;
+};
+
 export const roundPosition = (
   pos: [number, number],
   gridWidth: number,

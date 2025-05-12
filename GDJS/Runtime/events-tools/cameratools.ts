@@ -224,8 +224,7 @@ namespace gdjs {
         let yOffset = 0;
         if (anticipateMove && !object.hasNoForces()) {
           const objectAverageForce = object.getAverageForce();
-          const elapsedTimeInSeconds =
-            object.getElapsedTime(instanceContainer) / 1000;
+          const elapsedTimeInSeconds = object.getElapsedTime() / 1000;
           xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
           yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
         }

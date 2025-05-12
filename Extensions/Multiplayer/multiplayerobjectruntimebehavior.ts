@@ -99,7 +99,7 @@ namespace gdjs {
           debugLogger.info(
             `Lobby game is running on a synced scene and object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
           );
-          owner.deleteFromScene(instanceContainer);
+          owner.deleteFromScene();
         }
       }, this._timeBeforeDestroyingObjectWithoutNetworkIdInMs);
     }
@@ -262,7 +262,7 @@ namespace gdjs {
         debugLogger.info(
           `Player number ${this.playerNumber} does not exist in the lobby at the moment. Destroying the object.`
         );
-        this.owner.deleteFromScene(this.owner.getInstanceContainer());
+        this.owner.deleteFromScene();
         return;
       }
 

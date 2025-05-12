@@ -375,6 +375,10 @@ namespace gdjs {
             runtimeGame._inGameEditor.moveSelectionUnderCursor();
           }
         }
+      } else if (data.command === 'deleteSelection') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.deleteSelection();
+        }
       } else if (data.command === 'dragNewInstance') {
         const gameCoords = runtimeGame
           .getRenderer()

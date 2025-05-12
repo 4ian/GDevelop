@@ -1602,6 +1602,16 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.forceUpdatePropertiesEditor();
       }
     );
+
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'deleteSelection',
+          payload: {},
+        });
+      });
+    }
   };
 
   zoomToInitialPosition = () => {
@@ -1999,14 +2009,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   duplicateSelection = ({
     useLastCursorPosition,
   }: CopyCutPasteOptions = {}) => {
-    const { editorDisplay } = this;
-    if (!editorDisplay) return;
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const newInstances = editorDisplay.instancesHandlers.addSerializedInstances(
+    const newInstances = addSerializedInstances(
       {
+        instancesContainer: this.props.initialInstances,
         position: [0, 0],
         copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
         serializedInstances: serializedSelection,
@@ -2022,12 +2031,26 @@ export default class SceneEditor extends React.Component<Props, State> {
       multiSelect: true,
       layersLocks: null,
     });
+
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'addInstances',
+          payload: {
+            instances: newInstances.map(instance =>
+              serializeToJSObject(instance)
+            ),
+            moveUnderCursor: false,
+          },
+        });
+      });
+    }
+
     this.forceUpdatePropertiesEditor();
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const { editorDisplay } = this;
-
     const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
     const instancesContent = SafeExtractor.extractArrayProperty(
       clipboardContent,
@@ -2062,6 +2085,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
     });
 
+    const { editorDisplay } = this;
     if (editorDisplay) {
       const viewPosition = editorDisplay.viewControls.getViewPosition();
       if (viewPosition) {
@@ -2083,7 +2107,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     const { previewDebuggerServer } = this.props;
-
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {

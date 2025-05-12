@@ -1216,6 +1216,16 @@ namespace gdjs {
       editedInstanceContainer.createObjectsFrom(instances, 0, 0, 0, true);
     }
 
+    deleteSelection() {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      for (const object of this._selection.getSelectedObjects()) {
+        object.deleteFromScene(editedInstanceContainer);
+      }
+      this._selection.clear();
+    }
+
     private _getClosestIntersectionUnderCursor(): THREE.Intersection | null {
       const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {

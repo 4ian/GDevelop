@@ -9,9 +9,9 @@ const gdjs = {
   },
   evtTools: {
     common: {
-      isMobile: () => false
-    }
-  }
+      isMobile: () => false,
+    },
+  },
 };
 
-module.exports = gdjs; 
+module.exports = gdjs;

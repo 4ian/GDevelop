@@ -9,20 +9,37 @@ jest.mock('../../../../GDJS/Runtime/runtimegame', () => {
       constructor() {
         this.logger = new gdjs.Logger('Game manager');
       }
-      getGameResolutionWidth() { return 800; }
-      getGameResolutionHeight() { return 600; }
-      getScaleMode() { return 'nearest'; }
-      getPixelsRounding() { return true; }
-      getAntialiasingMode() { return 'none'; }
-      isAntialisingEnabledOnMobile() { return false; }
-      getAdditionalOptions() { return {}; }
-    }
+      getGameResolutionWidth() {
+        return 800;
+      }
+      getGameResolutionHeight() {
+        return 600;
+      }
+      getScaleMode() {
+        return 'nearest';
+      }
+      getPixelsRounding() {
+        return true;
+      }
+      getAntialiasingMode() {
+        return 'none';
+      }
+      isAntialisingEnabledOnMobile() {
+        return false;
+      }
+      getAdditionalOptions() {
+        return {};
+      }
+    },
   };
 });
 
-jest.mock('../../../../GDJS/Runtime/pixi-renderers/runtimegame-pixi-renderer', () => {
-  return require('../__mocks__/runtimegame-pixi-renderer');
-});
+jest.mock(
+  '../../../../GDJS/Runtime/pixi-renderers/runtimegame-pixi-renderer',
+  () => {
+    return require('../__mocks__/runtimegame-pixi-renderer');
+  }
+);
 
 describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
   let renderer;
@@ -51,26 +68,32 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       webkitFullscreenElement: null,
       mozFullScreenElement: null,
       addEventListener: jest.fn((event, listener) => {
-        if (event === 'fullscreenchange' || 
-            event === 'webkitfullscreenchange' || 
-            event === 'mozfullscreenchange') {
+        if (
+          event === 'fullscreenchange' ||
+          event === 'webkitfullscreenchange' ||
+          event === 'mozfullscreenchange'
+        ) {
           fullscreenChangeListeners.push(listener);
         }
       }),
       removeEventListener: jest.fn((event, listener) => {
-        if (event === 'fullscreenchange' || 
-            event === 'webkitfullscreenchange' || 
-            event === 'mozfullscreenchange') {
+        if (
+          event === 'fullscreenchange' ||
+          event === 'webkitfullscreenchange' ||
+          event === 'mozfullscreenchange'
+        ) {
           const index = fullscreenChangeListeners.indexOf(listener);
           if (index > -1) {
             fullscreenChangeListeners.splice(index, 1);
           }
         }
       }),
-      dispatchEvent: jest.fn((event) => {
-        if (event.type === 'fullscreenchange' || 
-            event.type === 'webkitfullscreenchange' || 
-            event.type === 'mozfullscreenchange') {
+      dispatchEvent: jest.fn(event => {
+        if (
+          event.type === 'fullscreenchange' ||
+          event.type === 'webkitfullscreenchange' ||
+          event.type === 'mozfullscreenchange'
+        ) {
           fullscreenChangeListeners.forEach(listener => listener());
         }
       }),
@@ -92,7 +115,7 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       it('should detect when entering fullscreen in Chrome', () => {
         // Simulate entering fullscreen
         mockDocument.fullscreenElement = document.documentElement;
-        
+
         // Trigger the fullscreenchange event
         const fullscreenChangeEvent = new Event('fullscreenchange');
         document.dispatchEvent(fullscreenChangeEvent);
@@ -120,7 +143,7 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       it('should detect when entering fullscreen in Safari', () => {
         // Simulate entering fullscreen
         mockDocument.webkitFullscreenElement = document.documentElement;
-        
+
         // Trigger the webkitfullscreenchange event
         const webkitFullscreenChangeEvent = new Event('webkitfullscreenchange');
         document.dispatchEvent(webkitFullscreenChangeEvent);
@@ -148,7 +171,7 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       it('should detect when entering fullscreen in Firefox', () => {
         // Simulate entering fullscreen
         mockDocument.mozFullScreenElement = document.documentElement;
-        
+
         // Trigger the mozfullscreenchange event
         const mozFullscreenChangeEvent = new Event('mozfullscreenchange');
         document.dispatchEvent(mozFullscreenChangeEvent);
@@ -171,7 +194,7 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
         expect(renderer.isFullScreen()).toBe(false);
       });
     });
-/*
+    /*
     // This test is intentionally failing to verify our test suite is running
     it('THIS TEST SHOULD FAIL - Fullscreen state should not persist after browser refresh', () => {
       // Enter fullscreen
@@ -235,11 +258,11 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       mockDocument.fullscreenElement = null;
       mockDocument.webkitFullscreenElement = null;
       mockDocument.mozFullScreenElement = null;
-      
+
       fullscreenChangeHandler();
       webkitFullscreenChangeHandler();
       mozFullscreenChangeHandler();
-      
+
       expect(renderer.isFullScreen()).toBe(false);
     });
   });
@@ -268,11 +291,11 @@ describe('RuntimeGamePixiRenderer - Fullscreen Tests', () => {
       mockDocument.fullscreenElement = null;
       mockDocument.webkitFullscreenElement = null;
       mockDocument.mozFullScreenElement = null;
-      
+
       document.dispatchEvent(fullscreenChangeEvent);
       document.dispatchEvent(webkitFullscreenChangeEvent);
       document.dispatchEvent(mozFullscreenChangeEvent);
-      
+
       expect(renderer._isFullscreen).toBe(false);
     });
 

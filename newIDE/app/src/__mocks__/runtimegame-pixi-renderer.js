@@ -7,9 +7,18 @@ class RuntimeGamePixiRenderer {
   }
 
   _setupFullscreenListeners() {
-    document.addEventListener('fullscreenchange', this._onFullscreenChange.bind(this));
-    document.addEventListener('webkitfullscreenchange', this._onFullscreenChange.bind(this));
-    document.addEventListener('mozfullscreenchange', this._onFullscreenChange.bind(this));
+    document.addEventListener(
+      'fullscreenchange',
+      this._onFullscreenChange.bind(this)
+    );
+    document.addEventListener(
+      'webkitfullscreenchange',
+      this._onFullscreenChange.bind(this)
+    );
+    document.addEventListener(
+      'mozfullscreenchange',
+      this._onFullscreenChange.bind(this)
+    );
   }
 
   _onFullscreenChange() {
@@ -30,9 +39,15 @@ class RuntimeGamePixiRenderer {
 
   dispose() {
     document.removeEventListener('fullscreenchange', this._onFullscreenChange);
-    document.removeEventListener('webkitfullscreenchange', this._onFullscreenChange);
-    document.removeEventListener('mozfullscreenchange', this._onFullscreenChange);
+    document.removeEventListener(
+      'webkitfullscreenchange',
+      this._onFullscreenChange
+    );
+    document.removeEventListener(
+      'mozfullscreenchange',
+      this._onFullscreenChange
+    );
   }
 }
 
-export { RuntimeGamePixiRenderer }; 
+export { RuntimeGamePixiRenderer };

@@ -313,6 +313,7 @@ namespace gdjs {
 
     private _lastCursorX: number = 0;
     private _lastCursorY: number = 0;
+    private _wasMouseRightButtonPressed = false;
 
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
@@ -725,7 +726,11 @@ namespace gdjs {
         }
 
         // Right click: rotate the camera.
-        if (inputManager.isMouseButtonPressed(1)) {
+        if (
+          inputManager.isMouseButtonPressed(1) &&
+          // The camera should not move the 1st frame
+          this._wasMouseRightButtonPressed
+        ) {
           const xDelta = inputManager.getCursorX() - this._lastCursorX;
           const yDelta = inputManager.getCursorY() - this._lastCursorY;
 
@@ -1368,6 +1373,8 @@ namespace gdjs {
       if (!this._selectionControlsMovementTotalDelta) {
         this._hasSelectionActuallyMoved = false;
       }
+      const inputManager = this._runtimeGame.getInputManager();
+      this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
     }
   }
 }

@@ -659,7 +659,7 @@ namespace gdjs {
         return this.createShapeWithoutMassCenterOffset();
       }
       const rotatedShapeSettings =
-        this._createShapeSettingsWithoutMassCenterOffset();
+        this._createNewShapeSettingsWithoutMassCenterOffset();
       const shapeScale = this.shapeScale * this._sharedData.worldInvScale;
       const offsetCenterShapeSettings =
         new Jolt.OffsetCenterOfMassShapeSettings(
@@ -677,13 +677,13 @@ namespace gdjs {
 
     createShapeWithoutMassCenterOffset(): Jolt.Shape {
       const rotatedShapeSettings =
-        this._createShapeSettingsWithoutMassCenterOffset();
+        this._createNewShapeSettingsWithoutMassCenterOffset();
       const shape = rotatedShapeSettings.Create().Get();
       Jolt.destroy(rotatedShapeSettings);
       return shape;
     }
 
-    private _createShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
+    private _createNewShapeSettingsWithoutMassCenterOffset(): Jolt.RotatedTranslatedShapeSettings {
       let width = this.owner3D.getWidth() * this._sharedData.worldInvScale;
       let height = this.owner3D.getHeight() * this._sharedData.worldInvScale;
       let depth = this.owner3D.getDepth() * this._sharedData.worldInvScale;
@@ -996,7 +996,7 @@ namespace gdjs {
       );
     }
 
-    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+    _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       result.Set(
         this.owner3D.getCenterXInScene() * this._sharedData.worldInvScale,
         this.owner3D.getCenterYInScene() * this._sharedData.worldInvScale,
@@ -1005,7 +1005,7 @@ namespace gdjs {
       return result;
     }
 
-    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+    _getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
       const threeObject = this.owner3D.get3DRendererObject();
       result.Set(
         threeObject.quaternion.x,
@@ -1016,7 +1016,7 @@ namespace gdjs {
       return result;
     }
 
-    moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
+    _moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       this.owner3D.setCenterXInScene(
         physicsPosition.GetX() * this._sharedData.worldScale
       );
@@ -1028,7 +1028,7 @@ namespace gdjs {
       );
     }
 
-    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+    _moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
       const threeObject = this.owner3D.get3DRendererObject();
       threeObject.quaternion.x = physicsRotation.GetX();
       threeObject.quaternion.y = physicsRotation.GetY();
@@ -1859,8 +1859,8 @@ namespace gdjs {
         const shape = behavior.createShape();
         const bodyCreationSettings = new Jolt.BodyCreationSettings(
           shape,
-          behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
-          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           behavior.bodyType === 'Static'
             ? Jolt.EMotionType_Static
             : behavior.bodyType === 'Kinematic'
@@ -1905,8 +1905,8 @@ namespace gdjs {
         // If the body is null, we just don't do anything
         // (but still run the physics simulation - this is independent).
         if (_body !== null && _body.IsActive()) {
-          behavior.moveObjectToPhysicsPosition(_body.GetPosition());
-          behavior.moveObjectToPhysicsRotation(_body.GetRotation());
+          behavior._moveObjectToPhysicsPosition(_body.GetPosition());
+          behavior._moveObjectToPhysicsRotation(_body.GetRotation());
         }
       }
 
@@ -1928,8 +1928,8 @@ namespace gdjs {
         ) {
           _sharedData.bodyInterface.SetPositionAndRotationWhenChanged(
             body.GetID(),
-            this.behavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
-            this.behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+            this.behavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+            this.behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
             Jolt.EActivation_Activate
           );
         }

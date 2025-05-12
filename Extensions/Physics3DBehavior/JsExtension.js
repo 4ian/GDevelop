@@ -3239,7 +3239,7 @@ module.exports = {
           'PhysicsCar3D',
           _('3D physics car'),
           'PhysicsCar3D',
-          _('Simulate a realistic car.'),
+          _('Simulate a realistic car using the 3D physics engine.'),
           '',
           'JsPlatform/Extensions/physics_car3d.svg',
           'PhysicsCar3D',

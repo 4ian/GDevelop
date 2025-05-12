@@ -309,7 +309,7 @@ namespace gdjs {
       this._dontClearInputsBetweenFrames = true;
     }
 
-    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+    _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       const physics3D = this.getPhysics3D();
       if (!physics3D) {
         result.Set(0, 0, 0);
@@ -356,7 +356,7 @@ namespace gdjs {
       this._sharedData.physicsSystem.RemoveConstraint(constraint);
       // The controller is destroyed with the constraint.
       this._vehicleController = null;
-      // VehicleConstraint.mVehicleCollisionTester is a RefConst.
+      // VehicleConstraint.mVehicleCollisionTester is a RefConst (smart pointer).
       // It is destroyed with the constraint.
       this._vehicleCollisionTester = null;
       if (this._physics3D) {
@@ -935,8 +935,8 @@ namespace gdjs {
         // Create car body
         const carBodySettings = new Jolt.BodyCreationSettings(
           carShape,
-          this.carBehavior.getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
-          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          this.carBehavior._getPhysicsPosition(_sharedData.getRVec3(0, 0, 0)),
+          behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           Jolt.EMotionType_Dynamic,
           behavior.getBodyLayer()
         );
@@ -977,6 +977,8 @@ namespace gdjs {
             wheelS.mSteeringAxis = this.getVec3(0, 0, 1);
           };
 
+          // vehicle.mWheels is a Array of Ref (smart pointer).
+          // They are destroyed automatically.
           vehicle.mWheels.clear();
 
           const fl = new Jolt.WheelSettingsWV();
@@ -1008,6 +1010,8 @@ namespace gdjs {
           this.carBehavior._engineTorqueMax;
         controllerSettings.mEngine.mMaxRPM = this.carBehavior._engineSpeedMax;
         controllerSettings.mEngine.mInertia = this.carBehavior._engineInertia;
+        // vehicle.mController is a Ref (smart pointer).
+        // It is destroyed with the vehicle.
         vehicle.mController = controllerSettings;
 
         const fourWheelDrive =
@@ -1053,7 +1057,7 @@ namespace gdjs {
         const constraint = new Jolt.VehicleConstraint(carBody, vehicle);
         Jolt.destroy(vehicle);
 
-        // VehicleConstraint.mVehicleCollisionTester is a RefConst
+        // VehicleConstraint.mVehicleCollisionTester is a RefConst (smart pointer)
         // previously created ones are destroyed automatically.
         const vehicleCollisionTester =
           new Jolt.VehicleCollisionTesterCastCylinder(

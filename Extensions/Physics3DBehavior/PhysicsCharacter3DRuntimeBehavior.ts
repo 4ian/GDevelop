@@ -323,7 +323,7 @@ namespace gdjs {
       this._dontClearInputsBetweenFrames = true;
     }
 
-    getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
+    _getPhysicsPosition(result: Jolt.RVec3): Jolt.RVec3 {
       const physics3D = this.getPhysics3D();
       if (!physics3D) {
         result.Set(0, 0, 0);
@@ -343,7 +343,7 @@ namespace gdjs {
       return result;
     }
 
-    getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
+    _getPhysicsRotation(result: Jolt.Quat): Jolt.Quat {
       // Characters body should not rotate around X and Y.
       const rotation = result.sEulerAngles(
         this.getVec3(0, 0, gdjs.toRad(this.owner3D.getAngle()))
@@ -358,7 +358,7 @@ namespace gdjs {
       return result;
     }
 
-    moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
+    _moveObjectToPhysicsPosition(physicsPosition: Jolt.RVec3): void {
       const physics3D = this.getPhysics3D();
       if (!physics3D) {
         return;
@@ -376,7 +376,7 @@ namespace gdjs {
       );
     }
 
-    moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
+    _moveObjectToPhysicsRotation(physicsRotation: Jolt.Quat): void {
       const threeObject = this.owner3D.get3DRendererObject();
       threeObject.quaternion.x = physicsRotation.GetX();
       threeObject.quaternion.y = physicsRotation.GetY();
@@ -1543,10 +1543,10 @@ namespace gdjs {
         );
         const character = new Jolt.CharacterVirtual(
           settings,
-          this.characterBehavior.getPhysicsPosition(
+          this.characterBehavior._getPhysicsPosition(
             _sharedData.getRVec3(0, 0, 0)
           ),
-          behavior.getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
+          behavior._getPhysicsRotation(_sharedData.getQuat(0, 0, 0, 1)),
           _sharedData.physicsSystem
         );
         Jolt.destroy(settings);
@@ -1693,10 +1693,10 @@ namespace gdjs {
           return;
         }
         // We can't rely on the body position because of mCharacterPadding.
-        this.characterBehavior.moveObjectToPhysicsPosition(
+        this.characterBehavior._moveObjectToPhysicsPosition(
           character.GetPosition()
         );
-        this.characterBehavior.moveObjectToPhysicsRotation(
+        this.characterBehavior._moveObjectToPhysicsRotation(
           character.GetRotation()
         );
       }
@@ -1724,7 +1724,7 @@ namespace gdjs {
           behavior._objectOldRotationZ !== owner3D.getAngle()
         ) {
           character.SetRotation(
-            this.characterBehavior.getPhysicsRotation(
+            this.characterBehavior._getPhysicsRotation(
               _sharedData.getQuat(0, 0, 0, 1)
             )
           );
@@ -1737,7 +1737,7 @@ namespace gdjs {
           return;
         }
         character.SetPosition(
-          this.characterBehavior.getPhysicsPosition(
+          this.characterBehavior._getPhysicsPosition(
             _sharedData.getRVec3(0, 0, 0)
           )
         );

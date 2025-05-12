@@ -282,7 +282,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+  }
 
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+    if (this.unregisterDebuggerCallback) {
+      this.unregisterDebuggerCallback();
+    }
+  }
+
+  onEditorShown() {
     if (this.props.previewDebuggerServer) {
       this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
         {
@@ -305,10 +316,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
   }
-  componentWillUnmount() {
-    unregisterOnResourceExternallyChangedCallback(
-      this.resourceExternallyChangedCallbackId
-    );
+
+  onEditorHidden() {
     if (this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback();
     }
@@ -2013,17 +2022,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const newInstances = addSerializedInstances(
-      {
-        instancesContainer: this.props.initialInstances,
-        position: [0, 0],
-        copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
-        serializedInstances: serializedSelection,
-        doesObjectExistInContext:
-          // Instance duplication can only be done in the same scene, so no need to check
-          () => true,
-      }
-    );
+    const newInstances = addSerializedInstances({
+      instancesContainer: this.props.initialInstances,
+      position: [0, 0],
+      copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
+      serializedInstances: serializedSelection,
+      doesObjectExistInContext:
+        // Instance duplication can only be done in the same scene, so no need to check
+        () => true,
+    });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({

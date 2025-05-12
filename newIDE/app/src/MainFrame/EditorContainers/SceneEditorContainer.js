@@ -73,6 +73,18 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onEditorShown() {
+    if (this.editor) {
+      this.editor.onEditorShown();
+    }
+  }
+
+  onEditorHidden() {
+    if (this.editor) {
+      this.editor.onEditorHidden();
+    }
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }

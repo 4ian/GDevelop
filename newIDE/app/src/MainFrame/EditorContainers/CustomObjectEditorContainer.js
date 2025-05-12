@@ -96,6 +96,18 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
+  onEditorShown() {
+    if (this.editor) {
+      this.editor.onEditorShown();
+    }
+  }
+
+  onEditorHidden() {
+    if (this.editor) {
+      this.editor.onEditorHidden();
+    }
+  }
+
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
     const { editor } = this;
     if (editor) {

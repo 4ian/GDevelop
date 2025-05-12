@@ -38,6 +38,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No updates to be done.
   }
 
+  onEditorShown() {}
+
+  onEditorHidden() {}
+
   onEventsBasedObjectChildrenEdited() {
     // No thing to be done.
   }

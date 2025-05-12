@@ -190,10 +190,19 @@ export const changeCurrentTab = (
   state: EditorTabsState,
   newTabId: number
 ): EditorTabsState => {
-  return {
+  const oldEditor = state.editors[state.currentTab].editorRef;
+  if (oldEditor) {
+    oldEditor.onEditorHidden();
+  }
+  const newState = {
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
   };
+  const newEditor = newState.editors[newState.currentTab].editorRef;
+  if (newEditor) {
+    newEditor.onEditorShown();
+  }
+  return newState;
 };
 
 export const isStartPageTabPresent = (state: EditorTabsState): boolean => {

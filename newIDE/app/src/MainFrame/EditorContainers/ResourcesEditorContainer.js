@@ -25,6 +25,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     return null;
   }
 
+  onEditorShown() {}
+
+  onEditorHidden() {}
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }

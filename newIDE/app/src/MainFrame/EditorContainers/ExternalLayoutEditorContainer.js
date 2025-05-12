@@ -116,6 +116,18 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
+  onEditorShown() {
+    if (this.editor) {
+      this.editor.onEditorShown();
+    }
+  }
+
+  onEditorHidden() {
+    if (this.editor) {
+      this.editor.onEditorHidden();
+    }
+  }
+
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
     const { editor } = this;
     if (editor) {

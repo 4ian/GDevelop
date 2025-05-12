@@ -46,6 +46,8 @@ import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFram
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
 
+const noop = () => {};
+
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
     routeArguments['initial-dialog'] === 'asset-store' || // Compatibility with old links
@@ -169,6 +171,8 @@ export type HomePageEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onEditorShown: () => void,
+  onEditorHidden: () => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -488,6 +492,8 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
+        onEditorShown: noop,
+        onEditorHidden: noop,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

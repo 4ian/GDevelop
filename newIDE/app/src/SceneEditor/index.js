@@ -2024,7 +2024,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const newInstances = addSerializedInstances({
       instancesContainer: this.props.initialInstances,
-      position: [0, 0],
       copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
       serializedInstances: serializedSelection,
       doesObjectExistInContext:

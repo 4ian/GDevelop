@@ -102,17 +102,18 @@ export default class InstancesAdder {
     addInstancesInTheForeground?: boolean,
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
-    const instances = addSerializedInstances(
-      this._instances,
+    const instances = addSerializedInstances({
+      instancesContainer: this._instances,
       copyReferential,
       serializedInstances,
-      (addInstancesInTheForeground = false),
-      doesObjectExistInContext
-    );
+      addInstancesInTheForeground: false,
+      doesObjectExistInContext,
+    });
     for (const instance of instances) {
       instance.setX(instance.getX() + position[0]);
       instance.setY(instance.getY() + position[1]);
     }
+    return instances;
   };
 
   /**

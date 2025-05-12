@@ -770,11 +770,14 @@ export default class InstancesEditor extends Component<Props, State> {
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
-    preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     return this._instancesAdder.addSerializedInstances(options);
+  };
+
+  snapSelection = (instances: gdInitialInstance[]) => {
+    this.instancesMover.snapSelection(instances);
   };
 
   /**

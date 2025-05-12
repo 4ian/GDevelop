@@ -183,9 +183,9 @@ export type SceneEditorsDisplayInterface = {|
       position: [number, number],
       copyReferential: [number, number],
       serializedInstances: Array<Object>,
-      preventSnapToGrid?: boolean,
       addInstancesInTheForeground?: boolean,
       doesObjectExistInContext: string => boolean,
     |}) => Array<gdInitialInstance>,
+    snapSelection: (instances: gdInitialInstance[]) => void,
   |},
 |};

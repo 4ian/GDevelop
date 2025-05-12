@@ -66,9 +66,18 @@ namespace gdjs {
     }
 
     private _setupFullscreenListeners(): void {
-      document.addEventListener('fullscreenchange', this._onFullscreenChange.bind(this)); 
-      document.addEventListener('webkitfullscreenchange', this._onFullscreenChange.bind(this));
-      document.addEventListener('mozfullscreenchange', this._onFullscreenChange.bind(this));
+      document.addEventListener(
+        'fullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
+      document.addEventListener(
+        'webkitfullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
+      document.addEventListener(
+        'mozfullscreenchange',
+        this._onFullscreenChange.bind(this)
+      );
     }
 
     private _applyFullscreenPatch(): void {
@@ -94,10 +103,10 @@ namespace gdjs {
         doc.webkitFullscreenElement ||
         doc.mozFullScreenElement
       );
-      
+
       // Force a resize of the canvas to update UI elements
       this._resizeCanvas();
-      
+
       // Notify the game that the window size has changed
       this._game.onWindowInnerSizeChanged();
     }
@@ -487,7 +496,7 @@ namespace gdjs {
           // Use HTML5 Fullscreen API
           const doc = document as any;
           const docElement = document.documentElement as any;
-          
+
           if (this._isFullscreen) {
             if (docElement.requestFullscreen) {
               docElement.requestFullscreen();
@@ -1087,5 +1096,3 @@ namespace gdjs {
   export type RuntimeGameRenderer = RuntimeGamePixiRenderer;
   export const RuntimeGameRenderer = RuntimeGamePixiRenderer;
 }
-
-

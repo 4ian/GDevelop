@@ -99,7 +99,7 @@ namespace gdjs {
   const getInstanceDataFromRuntimeObject = (
     runtimeObject: gdjs.RuntimeObject
   ): InstanceData | null => {
-    if (runtimeObject instanceof gdjs.RuntimeObject3D) {
+    if (gdjs.Base3DHandler.is3D(runtimeObject)) {
       if (!runtimeObject.persistentUuid) return null;
 
       const instanceData: InstanceData = {
@@ -353,6 +353,7 @@ namespace gdjs {
           minY: 0,
           maxX: this._runtimeGame.getOriginalWidth(),
           maxY: this._runtimeGame.getOriginalHeight(),
+          maxZ: 0,
         },
         visibleScreenArea
       );
@@ -401,20 +402,26 @@ namespace gdjs {
             minY: 0,
             maxX: this._runtimeGame.getOriginalWidth(),
             maxY: this._runtimeGame.getOriginalHeight(),
+            maxZ: 0,
           },
           visibleScreenArea
         );
       }
-      let minX = Number.POSITIVE_INFINITY;
-      let minY = Number.POSITIVE_INFINITY;
-      let maxX = Number.NEGATIVE_INFINITY;
-      let maxY = Number.NEGATIVE_INFINITY;
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let maxX = Number.MIN_VALUE;
+      let maxY = Number.MIN_VALUE;
+      let maxZ = Number.MIN_VALUE;
       for (const object of objects) {
         const aabb = object.getAABB();
         minX = Math.min(minX, aabb.min[0]);
         minY = Math.min(minY, aabb.min[1]);
         maxX = Math.max(maxX, aabb.max[0]);
         maxY = Math.max(maxY, aabb.max[1]);
+        maxZ = Math.max(
+          maxZ,
+          gdjs.Base3DHandler.is3D(object) ? object.getUnrotatedAABBMaxZ() : 0
+        );
       }
       this.zoomToFitArea(
         {
@@ -422,6 +429,7 @@ namespace gdjs {
           minY,
           maxX,
           maxY,
+          maxZ,
         },
         visibleScreenArea
       );
@@ -433,6 +441,7 @@ namespace gdjs {
         minY: number;
         maxX: number;
         maxY: number;
+        maxZ: number;
       },
       visibleScreenArea: {
         minX: number;
@@ -452,11 +461,11 @@ namespace gdjs {
       const editorWidth =
         (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedWidth;
       const editorHeight =
-        (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedHeight;
+        (visibleScreenArea.maxY - visibleScreenArea.minY) * renderedHeight;
       const isContentWider =
         editorWidth * sceneAreaHeight < sceneAreaWidth * editorHeight;
       const zoom =
-        0.8 *
+        0.6 *
         (isContentWider
           ? editorWidth / sceneAreaWidth
           : editorHeight / sceneAreaHeight);
@@ -482,6 +491,13 @@ namespace gdjs {
         layer.setCameraX(cameraX);
         layer.setCameraY(cameraY);
         layer.setCameraZoom(zoom);
+        gdjs.scene3d.camera.setCameraZ(
+          currentScene,
+          gdjs.scene3d.camera.getCameraZ(currentScene, layerName, 0) +
+            sceneArea.maxZ,
+          layerName,
+          0
+        );
         gdjs.scene3d.camera.setCameraRotationX(currentScene, 0, layerName, 0);
         gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
         layer.setCameraRotation(0);
@@ -619,6 +635,9 @@ namespace gdjs {
         (renderedHeight *
           (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
           zoom;
+      const maxZ = gdjs.Base3DHandler.is3D(object)
+        ? object.getUnrotatedAABBMaxZ()
+        : 0;
 
       const layerNames = [];
       currentScene.getAllLayerNames(layerNames);
@@ -628,6 +647,12 @@ namespace gdjs {
         layer.setCameraX(cameraX);
         layer.setCameraY(cameraY);
         layer.setCameraZoom(zoom);
+        gdjs.scene3d.camera.setCameraZ(
+          currentScene,
+          gdjs.scene3d.camera.getCameraZ(currentScene, layerName, 0) + maxZ,
+          layerName,
+          0
+        );
         gdjs.scene3d.camera.setCameraRotationX(currentScene, 0, layerName, 0);
         gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
         layer.setCameraRotation(0);
@@ -1160,7 +1185,7 @@ namespace gdjs {
 
       const closestIntersect = this._getClosestIntersectionUnderCursor();
 
-      if (this._draggedNewObject instanceof gdjs.RuntimeObject3D) {
+      if (gdjs.Base3DHandler.is3D(this._draggedNewObject)) {
         if (closestIntersect) {
           this._draggedNewObject.setX(closestIntersect.point.x);
           this._draggedNewObject.setY(-closestIntersect.point.y);
@@ -1199,7 +1224,7 @@ namespace gdjs {
             runtimeObject.setHeight(instance.height);
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
-            if (runtimeObject instanceof gdjs.RuntimeObject3D) {
+            if (gdjs.Base3DHandler.is3D(runtimeObject)) {
               if (instance.z !== undefined) runtimeObject.setZ(instance.z);
               if (instance.rotationX !== undefined)
                 runtimeObject.setRotationX(instance.rotationX);
@@ -1254,14 +1279,15 @@ namespace gdjs {
       let draggedNewObjectPreviousMask = 0;
       if (
         this._draggedNewObject &&
-        this._draggedNewObject instanceof gdjs.RuntimeObject3D
+        gdjs.Base3DHandler.is3D(this._draggedNewObject)
       ) {
-        draggedNewObjectPreviousMask =
-          this._draggedNewObject.get3DRendererObject().layers.mask;
-        this._draggedNewObject.get3DRendererObject().layers.set(1);
-        this._draggedNewObject
-          .get3DRendererObject()
-          .traverse((object) => object.layers.set(1));
+        const draggedRendererObject =
+          this._draggedNewObject.get3DRendererObject();
+        if (draggedRendererObject) {
+          draggedNewObjectPreviousMask = draggedRendererObject.layers.mask;
+          draggedRendererObject.layers.set(1);
+          draggedRendererObject.traverse((object) => object.layers.set(1));
+        }
       }
 
       currentScene.getAllLayerNames(layerNames);
@@ -1300,15 +1326,16 @@ namespace gdjs {
       // Also reset the layer of the object being added.
       if (
         this._draggedNewObject &&
-        this._draggedNewObject instanceof gdjs.RuntimeObject3D
+        gdjs.Base3DHandler.is3D(this._draggedNewObject)
       ) {
-        this._draggedNewObject.get3DRendererObject().layers.mask =
-          draggedNewObjectPreviousMask;
-        this._draggedNewObject
-          .get3DRendererObject()
-          .traverse(
+        const draggedRendererObject =
+          this._draggedNewObject.get3DRendererObject();
+        if (draggedRendererObject) {
+          draggedRendererObject.layers.mask = draggedNewObjectPreviousMask;
+          draggedRendererObject.traverse(
             (object) => (object.layers.mask = draggedNewObjectPreviousMask)
           );
+        }
       }
 
       let closestIntersect: THREE.Intersection | null = null;

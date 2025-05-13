@@ -136,7 +136,11 @@ namespace gdjs {
   export namespace Base3DHandler {
     export const is3D = (
       object: gdjs.RuntimeObject
-    ): object is gdjs.RuntimeObject & gdjs.Base3DHandler => {
+    ): object is gdjs.RuntimeObject &
+      gdjs.Base3DHandler &
+      gdjs.Resizable &
+      gdjs.Scalable &
+      gdjs.Flippable => {
       //@ts-ignore We are checking if the methods are present.
       return object.getZ && object.setZ;
     };

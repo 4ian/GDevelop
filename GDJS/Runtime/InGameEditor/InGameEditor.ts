@@ -368,7 +368,8 @@ namespace gdjs {
           maxY: this._runtimeGame.getOriginalHeight(),
           maxZ: 0,
         },
-        visibleScreenArea
+        visibleScreenArea,
+        0.1
       );
     }
 
@@ -383,7 +384,8 @@ namespace gdjs {
 
       this.zoomToFitObjects(
         editedInstanceContainer.getAdhocListOfAllInstances(),
-        visibleScreenArea
+        visibleScreenArea,
+        0.01
       );
     }
 
@@ -395,7 +397,8 @@ namespace gdjs {
     }) {
       this.zoomToFitObjects(
         this._selection.getSelectedObjects(),
-        visibleScreenArea
+        visibleScreenArea,
+        0.2
       );
     }
 
@@ -406,7 +409,8 @@ namespace gdjs {
         minY: number;
         maxX: number;
         maxY: number;
-      }
+      },
+      margin: float,
     ) {
       if (objects.length === 0) {
         this.zoomToFitArea(
@@ -417,7 +421,8 @@ namespace gdjs {
             maxY: this._runtimeGame.getOriginalHeight(),
             maxZ: 0,
           },
-          visibleScreenArea
+          visibleScreenArea,
+          0.1,
         );
       }
       let minX = Number.MAX_VALUE;
@@ -441,7 +446,8 @@ namespace gdjs {
           maxY,
           maxZ,
         },
-        visibleScreenArea
+        visibleScreenArea,
+        margin,
       );
     }
 
@@ -458,7 +464,8 @@ namespace gdjs {
         minY: number;
         maxX: number;
         maxY: number;
-      }
+      },
+      margin: float,
     ) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
@@ -475,7 +482,7 @@ namespace gdjs {
       const isContentWider =
         editorWidth * sceneAreaHeight < sceneAreaWidth * editorHeight;
       const zoom =
-        0.6 *
+        (1 - 2 * margin) *
         (isContentWider
           ? editorWidth / sceneAreaWidth
           : editorHeight / sceneAreaHeight);

@@ -190,9 +190,13 @@ export const changeCurrentTab = (
   state: EditorTabsState,
   newTabId: number
 ): EditorTabsState => {
-  const oldEditor = state.editors[state.currentTab].editorRef;
-  if (oldEditor) {
-    oldEditor.onEditorHidden();
+  const oldTab = state.editors[state.currentTab];
+  // oldTab can be undefined when another project is open.
+  if (oldTab) {
+    const oldEditor = oldTab.editorRef;
+    if (oldEditor) {
+      oldEditor.onEditorHidden();
+    }
   }
   const newState = {
     ...state,

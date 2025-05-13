@@ -3,9 +3,7 @@ import { getInstancesInLayoutForLayer } from '../Utils/Layout';
 import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
-import {
-  type AiGeneratedEvent,
-} from '../Utils/GDevelopServices/Generation';
+import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { applyEventsChanges } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
@@ -37,6 +35,7 @@ export type EditorFunctionCallResult =
 type EditorFunctionGenericOutput = {|
   success: boolean,
   message?: string,
+  eventsForSceneNamed?: string,
   eventsAsText?: string,
   objectName?: string,
   behaviorName?: string,
@@ -703,6 +702,7 @@ const readSceneEvents: EditorFunction = async ({ project, args }) => {
 
   return {
     success: true,
+    eventsForSceneNamed: scene_name,
     eventsAsText,
   };
 };
@@ -726,10 +726,8 @@ const addSceneEvents: EditorFunction = async ({
     'objects_list'
   );
   const objectsList = objectsListArgument === null ? '' : objectsListArgument;
-  const placementHint = SafeExtractor.extractStringProperty(
-    args,
-    'placement_hint'
-  ) || '';
+  const placementHint =
+    SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
   if (!project.hasLayoutNamed(sceneName)) {
     return makeGenericFailure(`Scene not found: "${sceneName}".`);

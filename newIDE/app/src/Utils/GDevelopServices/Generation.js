@@ -84,12 +84,12 @@ export type AiRequest = {
 };
 
 export type AiGeneratedEventStats = {
-  retriesCount: number;
-  finalMissingTypes: string[];
-  systemPromptTemplateHash: string;
-  userPromptTemplateHash: string;
-  allFeaturesSummaryContentHash: string;
-  finalModelPublicId: string;
+  retriesCount: number,
+  finalMissingTypes: string[],
+  systemPromptTemplateHash: string,
+  userPromptTemplateHash: string,
+  allFeaturesSummaryContentHash: string,
+  finalModelPublicId: string,
 };
 
 export type AiGeneratedEventChange = {
@@ -330,15 +330,17 @@ export const addUserMessageToAiRequest = async (
   return response.data;
 };
 
-export const addFunctionCallOutputsToAiRequest = async (
+export const addMessageToAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
     aiRequestId,
     functionCallOutputs,
+    userMessage,
   }: {|
     userId: string,
     aiRequestId: string,
+    userMessage: string,
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
   |}
 ): Promise<AiRequest> => {
@@ -346,9 +348,10 @@ export const addFunctionCallOutputsToAiRequest = async (
   const response = await axios.post(
     `${
       GDevelopGenerationApi.baseUrl
-    }/ai-request/${aiRequestId}/action/add-function-call-output`,
+    }/ai-request/${aiRequestId}/action/add-message`,
     {
       functionCallOutputs,
+      userMessage,
     },
     {
       params: {

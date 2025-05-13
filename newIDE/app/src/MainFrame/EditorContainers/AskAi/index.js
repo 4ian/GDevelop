@@ -8,7 +8,7 @@ import Paper from '../../../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addUserMessageToAiRequest,
-  addFunctionCallOutputsToAiRequest,
+  addMessageToAiRequest,
   createAiRequest,
   getAiRequest,
   sendAiRequestFeedback,
@@ -740,7 +740,8 @@ export const AskAi = React.memo<Props>(
         ]
       );
 
-      // TODO: factor with other callback.
+      // TODO: factor with other callback, and allow to send a user message with the function
+      // call outputs.
       const onSendEditorFunctionCallResults = React.useCallback(
         async () => {
           if (
@@ -771,10 +772,11 @@ export const AskAi = React.memo<Props>(
             setSendingAiRequest(selectedAiRequestId, true);
 
             const aiRequest = await retryIfFailed({ times: 2 }, () =>
-              addFunctionCallOutputsToAiRequest(getAuthorizationHeader, {
+              addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
+                userMessage: '', // TODO
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);

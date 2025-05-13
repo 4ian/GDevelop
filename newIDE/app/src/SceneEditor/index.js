@@ -294,7 +294,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   onEditorShown() {
-    if (this.props.previewDebuggerServer) {
+    if (this.props.previewDebuggerServer && !this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
         {
           onErrorReceived: () => {},

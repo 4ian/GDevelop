@@ -155,10 +155,9 @@ export const openEditorTab = (
     editor => editor.key === key
   );
   if (existingEditorId !== -1) {
-    return {
-      ...state,
-      currentTab: dontFocusTab ? state.currentTab : existingEditorId,
-    };
+    return dontFocusTab
+      ? { ...state }
+      : changeCurrentTab(state, existingEditorId);
   }
 
   const editorTab: EditorTab = {
@@ -175,15 +174,18 @@ export const openEditorTab = (
     removePointerEvents: !!removePointerEvents,
   };
 
-  return {
+  let newState = {
     ...state,
     editors:
       // Make sure the home page is always the first tab.
       key === 'start page'
         ? [editorTab, ...state.editors]
         : [...state.editors, editorTab],
-    currentTab: dontFocusTab ? state.currentTab : state.editors.length,
   };
+  if (!dontFocusTab) {
+    newState = changeCurrentTab(newState, newState.editors.length);
+  }
+  return newState;
 };
 
 export const changeCurrentTab = (
@@ -494,6 +496,7 @@ export const moveTabToPosition = (
   else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabNewIndex -= 1;
   else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabNewIndex += 1;
 
+  // The index changes but the tab is the same so there is no need to call changeCurrentTab.
   return { editors: currentEditorTabs, currentTab: currentTabNewIndex };
 };
 

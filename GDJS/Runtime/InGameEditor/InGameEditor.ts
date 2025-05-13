@@ -40,6 +40,16 @@ namespace gdjs {
     return value !== null && value !== undefined;
   }
 
+  const is3D = (
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject &
+    gdjs.Base3DHandler &
+    gdjs.Resizable &
+    gdjs.Scalable &
+    gdjs.Flippable => {
+    return typeof THREE !== 'undefined' && gdjs.Base3DHandler.is3D(object);
+  };
+
   // TODO: factor this?
   const isMacLike =
     typeof navigator !== 'undefined' &&
@@ -205,30 +215,29 @@ namespace gdjs {
       selectedObjects.forEach((object) => {
         let initialPosition = this._objectInitialPositions.get(object);
         if (!initialPosition) {
-          initialPosition =
-            object instanceof gdjs.RuntimeObject3D
-              ? {
-                  x: object.getX(),
-                  y: object.getY(),
-                  z: object.getZ(),
-                  rotationX: object.getRotationX(),
-                  rotationY: object.getRotationY(),
-                  angle: object.getAngle(),
-                  width: object.getWidth(),
-                  height: object.getHeight(),
-                  depth: object.getDepth(),
-                }
-              : {
-                  x: object.getX(),
-                  y: object.getY(),
-                  z: 0,
-                  rotationX: 0,
-                  rotationY: 0,
-                  angle: object.getAngle(),
-                  width: object.getWidth(),
-                  height: object.getHeight(),
-                  depth: 0,
-                };
+          initialPosition = is3D(object)
+            ? {
+                x: object.getX(),
+                y: object.getY(),
+                z: object.getZ(),
+                rotationX: object.getRotationX(),
+                rotationY: object.getRotationY(),
+                angle: object.getAngle(),
+                width: object.getWidth(),
+                height: object.getHeight(),
+                depth: object.getDepth(),
+              }
+            : {
+                x: object.getX(),
+                y: object.getY(),
+                z: 0,
+                rotationX: 0,
+                rotationY: 0,
+                angle: object.getAngle(),
+                width: object.getWidth(),
+                height: object.getHeight(),
+                depth: 0,
+              };
           this._objectInitialPositions.set(object, initialPosition);
         }
         object.setX(initialPosition.x + movement.translationX);
@@ -236,7 +245,7 @@ namespace gdjs {
         object.setAngle(initialPosition.angle + movement.rotationZ);
         object.setWidth(initialPosition.width * movement.scaleX);
         object.setHeight(initialPosition.height * movement.scaleY);
-        if (object instanceof gdjs.RuntimeObject3D) {
+        if (is3D(object)) {
           object.setZ(initialPosition.z + movement.translationZ);
           object.setRotationX(initialPosition.rotationX + movement.rotationX);
           object.setRotationY(initialPosition.rotationY + movement.rotationY);
@@ -280,8 +289,12 @@ namespace gdjs {
     private _runtimeGame: RuntimeGame;
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
-    private _tempVector2d = new THREE.Vector2();
-    private _raycaster = new THREE.Raycaster();
+    //@ts-ignore
+    private _tempVector2d: THREE.Vector2 =
+      typeof THREE === 'undefined' ? null : new THREE.Vector2();
+    //@ts-ignore
+    private _raycaster: THREE.Raycaster =
+      typeof THREE === 'undefined' ? null : new THREE.Raycaster();
 
     // The controls shown to manipulate the selection.
     private _selectionControls: {
@@ -418,10 +431,7 @@ namespace gdjs {
         minY = Math.min(minY, aabb.min[1]);
         maxX = Math.max(maxX, aabb.max[0]);
         maxY = Math.max(maxY, aabb.max[1]);
-        maxZ = Math.max(
-          maxZ,
-          gdjs.Base3DHandler.is3D(object) ? object.getUnrotatedAABBMaxZ() : 0
-        );
+        maxZ = Math.max(maxZ, is3D(object) ? object.getUnrotatedAABBMaxZ() : 0);
       }
       this.zoomToFitArea(
         {
@@ -588,7 +598,7 @@ namespace gdjs {
       for (const object of this._selection.getSelectedObjects()) {
         minX = Math.min(minX, object.getAABBLeft());
         minY = Math.min(minY, object.getAABBTop());
-        if (object instanceof gdjs.RuntimeObject3D) {
+        if (is3D(object)) {
           minZ = Math.min(minZ, object.getUnrotatedAABBMinZ());
         }
         maxX = Math.max(maxX, object.getAABBRight());
@@ -600,7 +610,7 @@ namespace gdjs {
       for (const object of this._selection.getSelectedObjects()) {
         object.setX(object.getX() + deltaX);
         object.setY(object.getY() + deltaY);
-        if (object instanceof gdjs.RuntimeObject3D) {
+        if (is3D(object)) {
           object.setZ(object.getZ() + deltaZ);
         }
       }
@@ -635,9 +645,7 @@ namespace gdjs {
         (renderedHeight *
           (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
           zoom;
-      const maxZ = gdjs.Base3DHandler.is3D(object)
-        ? object.getUnrotatedAABBMaxZ()
-        : 0;
+      const maxZ = is3D(object) ? object.getUnrotatedAABBMaxZ() : 0;
 
       const layerNames = [];
       currentScene.getAllLayerNames(layerNames);
@@ -875,10 +883,7 @@ namespace gdjs {
 
       const selected3DObjects = this._selection
         .getSelectedObjects()
-        .filter(
-          (obj): obj is gdjs.RuntimeObject3D =>
-            obj instanceof gdjs.RuntimeObject3D
-        );
+        .filter((obj): obj is gdjs.RuntimeObject3D => is3D(obj));
 
       // Remove boxes for deselected objects
       this._selectionBoxes.forEach(({ container }, object) => {
@@ -1185,7 +1190,7 @@ namespace gdjs {
 
       const closestIntersect = this._getClosestIntersectionUnderCursor();
 
-      if (gdjs.Base3DHandler.is3D(this._draggedNewObject)) {
+      if (is3D(this._draggedNewObject)) {
         if (closestIntersect) {
           this._draggedNewObject.setX(closestIntersect.point.x);
           this._draggedNewObject.setY(-closestIntersect.point.y);
@@ -1224,7 +1229,7 @@ namespace gdjs {
             runtimeObject.setHeight(instance.height);
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
-            if (gdjs.Base3DHandler.is3D(runtimeObject)) {
+            if (is3D(runtimeObject)) {
               if (instance.z !== undefined) runtimeObject.setZ(instance.z);
               if (instance.rotationX !== undefined)
                 runtimeObject.setRotationX(instance.rotationX);
@@ -1277,10 +1282,7 @@ namespace gdjs {
       this._raycaster.layers.set(0);
       this._selectionBoxes.forEach(({ box }) => box.layers.set(1));
       let draggedNewObjectPreviousMask = 0;
-      if (
-        this._draggedNewObject &&
-        gdjs.Base3DHandler.is3D(this._draggedNewObject)
-      ) {
+      if (this._draggedNewObject && is3D(this._draggedNewObject)) {
         const draggedRendererObject =
           this._draggedNewObject.get3DRendererObject();
         if (draggedRendererObject) {
@@ -1324,10 +1326,7 @@ namespace gdjs {
       // Reset selection boxes layers so they are properly displayed.
       this._selectionBoxes.forEach(({ box }) => box.layers.set(0));
       // Also reset the layer of the object being added.
-      if (
-        this._draggedNewObject &&
-        gdjs.Base3DHandler.is3D(this._draggedNewObject)
-      ) {
+      if (this._draggedNewObject && is3D(this._draggedNewObject)) {
         const draggedRendererObject =
           this._draggedNewObject.get3DRendererObject();
         if (draggedRendererObject) {

@@ -31,14 +31,16 @@ type ExtensionModulesLoadedErrorDialogProps = {|
   onClose: () => void,
 |};
 
-const ExtensionModulesLoadedErrorDialog = ({
+export const ExtensionModulesLoadedErrorDialog = ({
   erroredExtensionModulesLoaded,
   genericError,
   onClose,
 }: ExtensionModulesLoadedErrorDialogProps) => {
   return (
     <Dialog
-      title={<Trans>Extension modules loaded with errors</Trans>}
+      title={
+        <Trans>GDevelop installation is corrupted and can't be used</Trans>
+      }
       actions={[
         Window.isDev() ? (
           <FlatButton
@@ -57,14 +59,13 @@ const ExtensionModulesLoadedErrorDialog = ({
       <ColumnStackLayout noMargin expand>
         <Text>
           <Trans>
-            There were errors when loading the following extension modules. Do
-            not continue using GDevelop as you may affect your project when
-            saving.
+            There were errors when loading extension modules. You cannot
+            continue using GDevelop.
           </Trans>
         </Text>
         <Text>
           <Trans>
-            Please re-install GDevelop by downloading the latest version from{' '}
+            Please re-install it by downloading the latest version from{' '}
             <Link
               href={downloadUrl}
               onClick={() => Window.openExternalURL(downloadUrl)}

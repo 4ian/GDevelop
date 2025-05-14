@@ -75,6 +75,9 @@ export type AiRequest = {
   userId: string,
   gameProjectJson: string,
   status: GenerationStatus,
+  mode?: 'chat' | 'agent',
+  toolsVersion?: string,
+
   error: {
     code: string,
     message: string,
@@ -264,11 +267,24 @@ export const createAiRequest = async (
     userRequest,
     simplifiedProjectJson,
     payWithCredits,
+    mode,
+    gameId,
+    fileMetadata,
+    storageProviderName,
   }: {|
     userId: string,
     userRequest: string,
     simplifiedProjectJson: string | null,
     payWithCredits: boolean,
+    mode: 'chat' | 'agent',
+    gameId: string | null,
+    fileMetadata: ?{
+      fileIdentifier: string,
+      version?: string,
+      lastModifiedDate?: number,
+      gameId?: string,
+    },
+    storageProviderName: ?string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -278,45 +294,10 @@ export const createAiRequest = async (
       userRequest,
       gameProjectJson: simplifiedProjectJson,
       payWithCredits,
-      mode: 'agent',
-    },
-    {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return response.data;
-};
-
-export const addUserMessageToAiRequest = async (
-  getAuthorizationHeader: () => Promise<string>,
-  {
-    userId,
-    aiRequestId,
-    userRequest,
-    simplifiedProjectJson,
-    payWithCredits,
-  }: {|
-    userId: string,
-    aiRequestId: string,
-    userRequest: string,
-    simplifiedProjectJson: string | null,
-    payWithCredits: boolean,
-  |}
-): Promise<AiRequest> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      GDevelopGenerationApi.baseUrl
-    }/ai-request/${aiRequestId}/action/add-user-message`,
-    {
-      userRequest,
-      gameProjectJson: simplifiedProjectJson,
-      payWithCredits,
+      mode,
+      gameId,
+      fileMetadata,
+      storageProviderName,
     },
     {
       params: {
@@ -337,11 +318,13 @@ export const addMessageToAiRequest = async (
     aiRequestId,
     functionCallOutputs,
     userMessage,
+    payWithCredits,
   }: {|
     userId: string,
     aiRequestId: string,
     userMessage: string,
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
+    payWithCredits: boolean,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -352,6 +335,7 @@ export const addMessageToAiRequest = async (
     {
       functionCallOutputs,
       userMessage,
+      payWithCredits,
     },
     {
       params: {

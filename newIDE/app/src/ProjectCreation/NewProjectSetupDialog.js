@@ -84,6 +84,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   openQuickCustomizationDialog?: boolean,
+  dontOpenAnySceneOrProjectManager?: boolean,
 |};
 
 type Props = {|

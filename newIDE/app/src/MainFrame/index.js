@@ -1193,15 +1193,17 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      options.openAllScenes || options.openQuickCustomizationDialog
-        ? openAllScenes({
-            currentProject: project,
-            editorTabs,
-          })
-        : openSceneOrProjectManager({
-            currentProject: project,
-            editorTabs: editorTabs,
-          });
+      if (!options.dontOpenAnySceneOrProjectManager) {
+        options.openAllScenes || options.openQuickCustomizationDialog
+          ? openAllScenes({
+              currentProject: project,
+              editorTabs,
+            })
+          : openSceneOrProjectManager({
+              currentProject: project,
+              editorTabs: editorTabs,
+            });
+      }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
@@ -3985,6 +3987,7 @@ const MainFrame = (props: Props) => {
                         preventBackHome: true,
                       });
                     },
+                    onCreateEmptyProject: createEmptyProject,
                     onCreateProjectFromExample: createProjectFromExample,
                     onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),

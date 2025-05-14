@@ -117,11 +117,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
       },
     ];
-    applyEventsChanges(
-      project,
-      sceneEventsList,
-      eventOperations
-    );
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     // Expected: S0, NewS, NewS, R1
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -147,11 +143,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
       },
     ];
-    applyEventsChanges(
-      project,
-      sceneEventsList,
-      eventOperations
-    );
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     // Expected: S0, R1, NewS, NewS
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -178,11 +170,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
       },
     ];
-    applyEventsChanges(
-      project,
-      sceneEventsList,
-      eventOperations
-    );
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     const parentEvent = sceneEventsList.getEventAt(1);
     expect(parentEvent.getSubEvents().getEventsCount()).toBe(2);
     expect(getEventTypes(parentEvent.getSubEvents())).toEqual([
@@ -208,11 +196,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
       },
     ];
-    applyEventsChanges(
-      project,
-      sceneEventsList,
-      eventOperations
-    );
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     // Expected: S0, NewS, NewS, W2 (original R1 is gone, 2 new events inserted)
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -250,11 +234,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
       },
     ];
-    applyEventsChanges(
-      project,
-      sceneEventsList,
-      eventOperations
-    );
+    applyEventsChanges(project, sceneEventsList, eventOperations);
     // Initial: S0, R1, W2, F3
     // After del W2: S0, R1, F3
     // After insert new before R1: S0, NewS, NewS, R1, F3

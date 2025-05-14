@@ -17,6 +17,9 @@ const commonProps = {
     current: 0,
     max: 2,
   },
+  onStartNewAiRequest: async () => {},
+  onSendMessage: async () => {},
+  isSending: false,
   aiRequestPriceInCredits: 5,
   lastSendError: null,
   availableCredits: 400,
@@ -33,13 +36,7 @@ export const NewAiRequest = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
       {({ i18n }) => (
-        <AiRequestChat
-          i18n={i18n}
-          aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          {...commonProps}
-        />
+        <AiRequestChat i18n={i18n} aiRequest={null} {...commonProps} />
       )}
     </I18n>
   </FixedHeightFlexContainer>
@@ -52,8 +49,6 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           increaseQuotaOffering="upgrade"
         />
@@ -69,8 +64,6 @@ export const ErrorLaunchingNewAiRequest = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           lastSendError={new Error('Fake error while sending request')}
         />
@@ -86,8 +79,6 @@ export const NewAiRequestQuotaLimitReachedAndNoCredits = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -108,8 +99,6 @@ export const NewAiRequestQuotaLimitReachedAndSomeCredits = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -130,8 +119,6 @@ export const NewAiRequestQuotaLimitReachedAndUpgrade = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -153,8 +140,7 @@ export const LaunchingNewAiRequest = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={null}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={true}
+          isSending={true}
           {...commonProps}
         />
       )}
@@ -193,8 +179,6 @@ export const ErroredNewAiRequest = () => (
             output: fakeOutputWithUserRequestOnly,
             error: { code: 'internal-error', message: 'Some error happened' },
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
         />
       )}
@@ -218,8 +202,6 @@ export const WorkingNewAiRequest = () => (
             output: fakeOutputWithUserRequestOnly,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
         />
       )}
@@ -327,8 +309,6 @@ export const ReadyAiRequest = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
         />
       )}
@@ -352,8 +332,6 @@ export const ReadyAiRequestWithMoreMessages = () => (
             output: fakeOutputWithMoreAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
         />
       )}
@@ -377,8 +355,6 @@ export const ReadyAiRequestWithEvenMoreMessages = () => (
             output: fakeOutputWithEvenMoreAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
         />
       )}
@@ -402,8 +378,6 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           quota={{
             limitReached: false,
             current: 1,
@@ -433,8 +407,6 @@ export const ErrorLaunchingFollowupAiRequest = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           lastSendError={new Error('fake error while sending request')}
         />
@@ -459,8 +431,7 @@ export const LaunchingFollowupAiRequest = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={true}
+          isSending={true}
           {...commonProps}
         />
       )}
@@ -484,8 +455,6 @@ export const QuotaLimitReached = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -514,8 +483,6 @@ export const QuotaLimitReachedAndUpgrade = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -545,8 +512,6 @@ export const QuotaLimitReachedAndNoUpgrade = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           {...commonProps}
           quota={{
             limitReached: true,
@@ -575,8 +540,6 @@ export const QuotaLimitReachedAndNoCredits = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
           quota={{
             limitReached: true,
             current: 2,

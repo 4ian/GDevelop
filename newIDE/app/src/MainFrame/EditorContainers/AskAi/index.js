@@ -7,7 +7,6 @@ import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
 import Paper from '../../../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
-  addUserMessageToAiRequest,
   addMessageToAiRequest,
   createAiRequest,
   getAiRequest,
@@ -41,6 +40,15 @@ import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/Extens
 import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { useTriggerAtNextRender } from '../../../Utils/useTriggerAtNextRender';
+import {
+  generateProjectName,
+  type NewProjectSetup,
+} from '../../../ProjectCreation/NewProjectSetupDialog';
+import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
+import {
+  type FileMetadata,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -507,8 +515,11 @@ export const useAiRequests = () => {
 type Props = {|
   isActive: boolean,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  storageProvider: ?StorageProvider,
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
+  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
 |};
 
 const styles = {
@@ -543,11 +554,27 @@ export type AskAiEditorInterface = {|
   ) => void,
 |};
 
+export type NewAiRequestOptions = {|
+  mode: 'chat' | 'agent',
+  userRequest: string,
+|};
+
 const noop = () => {};
 
 export const AskAi = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
-    ({ isActive, setToolbar, project, i18n }: Props, ref) => {
+    (
+      {
+        isActive,
+        setToolbar,
+        project,
+        fileMetadata,
+        storageProvider,
+        i18n,
+        onCreateEmptyProject,
+      }: Props,
+      ref
+    ) => {
       const {
         selectedAiRequest,
         selectedAiRequestId,
@@ -562,6 +589,11 @@ export const AskAi = React.memo<Props>(
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
         selectedAiRequestId
       );
+
+      const [
+        newAiRequestOptions,
+        startNewAiRequest,
+      ] = React.useState<NewAiRequestOptions | null>(null);
 
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
 
@@ -650,52 +682,83 @@ export const AskAi = React.memo<Props>(
         [isActive, onRefreshLimits]
       );
 
-      const sendUserRequest = React.useCallback(
-        async (userRequestText: string) => {
-          if (!profile) {
-            onOpenCreateAccountDialog();
-            return;
-          }
+      // Trigger the start of the new AI request if the user has requested it
+      // (or if triggered automatically by setting `newAiRequestOptions`, for example
+      // after waiting for the project to be created for an AI agent request).
+      React.useEffect(
+        () => {
+          (async () => {
+            if (!newAiRequestOptions) return;
+            console.info('Starting a new AI request...');
 
-          let payWithCredits = false;
-          if (quota && quota.limitReached && aiRequestPriceInCredits) {
-            payWithCredits = true;
-            if (availableCredits < aiRequestPriceInCredits) {
-              openCreditsPackageDialog({
-                missingCredits: aiRequestPriceInCredits - availableCredits,
-              });
+            if (!profile) {
+              onOpenCreateAccountDialog();
               return;
             }
-          }
 
-          const simplifiedProjectJson = project
-            ? JSON.stringify(getSimplifiedProjectJson(project, {}))
-            : null;
+            // Read the options and reset them (to avoid launching the same request twice).
+            const { mode, userRequest } = newAiRequestOptions;
+            startNewAiRequest(null);
 
-          try {
-            setSendingAiRequest(selectedAiRequestId, true);
+            // If no project is opened, create a new empty one if the request is for
+            // the AI agent.
+            if (mode === 'agent' && !project) {
+              try {
+                console.info('No project opened, creating a new empty one.');
+                await onCreateEmptyProject({
+                  projectName: generateProjectName('AI starter'),
+                  storageProvider: UrlStorageProvider,
+                  saveAsLocation: null,
+                  dontOpenAnySceneOrProjectManager: true,
+                });
+                startNewAiRequest({
+                  mode,
+                  userRequest,
+                });
+              } catch (error) {
+                console.error('Error creating a new empty project:', error);
+              }
+              return;
+            }
 
-            if (selectedAiRequestId) {
-              // User request on an existing AI request.
-              const aiRequest = await addUserMessageToAiRequest(
-                getAuthorizationHeader,
-                {
-                  aiRequestId: selectedAiRequestId,
-                  userId: profile.id,
-                  userRequest: userRequestText,
-                  simplifiedProjectJson,
-                  payWithCredits,
-                }
-              );
-              updateAiRequest(aiRequest.id, aiRequest);
-            } else {
-              // New AI request:
+            console.log({ project, fileMetadata, storageProvider });
+
+            // Ensure the user has enough credits to pay for the request, or ask them
+            // to buy some more.
+            let payWithCredits = false;
+            if (quota && quota.limitReached && aiRequestPriceInCredits) {
+              payWithCredits = true;
+              if (availableCredits < aiRequestPriceInCredits) {
+                openCreditsPackageDialog({
+                  missingCredits: aiRequestPriceInCredits - availableCredits,
+                });
+                return;
+              }
+            }
+
+            // Request is now ready to be started.
+            try {
+              const simplifiedProjectJson = project
+                ? JSON.stringify(getSimplifiedProjectJson(project, {}))
+                : null;
+
+              setSendingAiRequest(null, true);
+
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
-                userRequest: userRequestText,
+                userRequest: userRequest,
                 userId: profile.id,
                 simplifiedProjectJson,
                 payWithCredits,
+                gameId: project ? project.getProjectUuid() : null,
+                fileMetadata,
+                storageProviderName: storageProvider
+                  ? storageProvider.internalName
+                  : null,
+                mode,
               });
+
+              console.info('Successfully created a new AI request:', aiRequest);
+              setSendingAiRequest(null, false);
               updateAiRequest(aiRequest.id, aiRequest);
 
               // Select the new AI request just created - unless the user switched to another one
@@ -703,23 +766,23 @@ export const AskAi = React.memo<Props>(
               if (!upToDateSelectedAiRequestId.current) {
                 setSelectedAiRequestId(aiRequest.id);
               }
+
+              if (aiRequestChatRef.current)
+                aiRequestChatRef.current.resetUserInput(selectedAiRequestId);
+            } catch (error) {
+              console.error('Error starting a new AI request:', error);
+              setLastSendError(null, error);
             }
 
-            setSendingAiRequest(selectedAiRequestId, false);
-            if (aiRequestChatRef.current)
-              aiRequestChatRef.current.resetUserInput(selectedAiRequestId);
-          } catch (error) {
-            setLastSendError(selectedAiRequestId, error);
-          }
-
-          // Refresh the user limits, to ensure quota and credits information
-          // is up-to-date after an AI request.
-          await delay(500);
-          try {
-            await retryIfFailed({ times: 2 }, onRefreshLimits);
-          } catch (error) {
-            // Ignore limits refresh error.
-          }
+            // Refresh the user limits, to ensure quota and credits information
+            // is up-to-date after an AI request.
+            await delay(500);
+            try {
+              await retryIfFailed({ times: 2 }, onRefreshLimits);
+            } catch (error) {
+              // Ignore limits refresh error.
+            }
+          })();
         },
         [
           aiRequestPriceInCredits,
@@ -730,6 +793,8 @@ export const AskAi = React.memo<Props>(
           openCreditsPackageDialog,
           profile,
           project,
+          fileMetadata,
+          storageProvider,
           quota,
           selectedAiRequestId,
           setLastSendError,
@@ -737,13 +802,14 @@ export const AskAi = React.memo<Props>(
           setSendingAiRequest,
           upToDateSelectedAiRequestId,
           updateAiRequest,
+          onCreateEmptyProject,
+          newAiRequestOptions,
         ]
       );
 
-      // TODO: factor with other callback, and allow to send a user message with the function
-      // call outputs.
-      const onSendEditorFunctionCallResults = React.useCallback(
-        async () => {
+      // Send the results of the function call outputs, if any, and the user message (if any).
+      const onSendMessage = React.useCallback(
+        async ({ userMessage }: {| userMessage: string |}) => {
           if (
             !profile ||
             !selectedAiRequestId ||
@@ -761,14 +827,25 @@ export const AskAi = React.memo<Props>(
           );
 
           // If anything is not finished yet, stop there (we only send all
-          // results at once).
-          if (hasUnfinishedResult || functionCallOutputs.length === 0) return;
+          // results at once, AI do not support partial results).
+          if (hasUnfinishedResult) return;
+
+          // If nothing to send, stop there.
+          if (functionCallOutputs.length === 0 && !userMessage) return;
+
+          // Paying with credits is only when a user message is sent (and quota is exhausted).
+          let payWithCredits = false;
+          if (userMessage && quota && quota.limitReached && aiRequestPriceInCredits) {
+            payWithCredits = true;
+            if (availableCredits < aiRequestPriceInCredits) {
+              openCreditsPackageDialog({
+                missingCredits: aiRequestPriceInCredits - availableCredits,
+              });
+              return;
+            }
+          }
 
           try {
-            console.info(
-              'Sending editor function call results:',
-              functionCallOutputs
-            );
             setSendingAiRequest(selectedAiRequestId, true);
 
             const aiRequest = await retryIfFailed({ times: 2 }, () =>
@@ -776,15 +853,27 @@ export const AskAi = React.memo<Props>(
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
-                userMessage: '', // TODO
+                payWithCredits,
+                userMessage,
               })
             );
             updateAiRequest(aiRequest.id, aiRequest);
             setSendingAiRequest(aiRequest.id, false);
             clearEditorFunctionCallResults(aiRequest.id);
           } catch (error) {
-            // TODO: add button to send again.
+            // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);
+          }
+
+          // Refresh the user limits, to ensure quota and credits information
+          // is up-to-date after an AI request.
+          if (userMessage) {
+            await delay(500);
+            try {
+              await retryIfFailed({ times: 2 }, onRefreshLimits);
+            } catch (error) {
+              // Ignore limits refresh error.
+            }
           }
         },
         [
@@ -797,7 +886,15 @@ export const AskAi = React.memo<Props>(
           clearEditorFunctionCallResults,
           getAuthorizationHeader,
           setLastSendError,
+          onRefreshLimits,
         ]
+      );
+      const onSendEditorFunctionCallResults = React.useCallback(
+        () =>
+          onSendMessage({
+            userMessage: '',
+          }),
+        [onSendMessage]
       );
 
       const onSendFeedback = React.useCallback(
@@ -840,8 +937,9 @@ export const AskAi = React.memo<Props>(
               <AiRequestChat
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
-                onSendUserRequest={sendUserRequest}
-                isLaunchingAiRequest={isSendingAiRequest(selectedAiRequestId)}
+                onStartNewAiRequest={startNewAiRequest}
+                onSendMessage={onSendMessage}
+                isSending={isSendingAiRequest(selectedAiRequestId)}
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
                 increaseQuotaOffering={
@@ -904,10 +1002,13 @@ export const renderAskAiContainer = (
     {({ i18n }) => (
       <AskAi
         ref={props.ref}
+        i18n={i18n}
         project={props.project}
+        fileMetadata={props.fileMetadata}
+        storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
-        i18n={i18n}
+        onCreateEmptyProject={props.onCreateEmptyProject}
       />
     )}
   </I18n>

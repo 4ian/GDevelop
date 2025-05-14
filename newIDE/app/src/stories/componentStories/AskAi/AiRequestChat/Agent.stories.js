@@ -15,6 +15,27 @@ export default {
   decorators: [paperDecorator],
 };
 
+const commonProps = {
+  quota: {
+    limitReached: false,
+    current: 1,
+    max: 2,
+  },
+  onStartNewAiRequest: async () => {},
+  onSendMessage: async () => {},
+  isSending: false,
+  aiRequestPriceInCredits: 5,
+  lastSendError: null,
+  availableCredits: 400,
+  onSendFeedback: async () => {},
+  hasOpenedProject: false,
+  editorFunctionCallResults: [],
+  increaseQuotaOffering: 'subscribe',
+  onProcessFunctionCalls: async () => {},
+  setAutoProcessFunctionCalls: () => {},
+  isAutoProcessingFunctionCalls: false,
+};
+
 const fakeOutputWithUserRequestOnly = [
   {
     type: 'message',
@@ -119,23 +140,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
-          editorFunctionCallResults={[]}
-          onProcessFunctionCalls={async () => {}}
-          isAutoProcessingFunctionCalls={false}
-          setAutoProcessFunctionCalls={() => {}}
+          {...commonProps}
         />
       )}
     </I18n>
@@ -158,28 +163,14 @@ export const ReadyAiRequestWithWorkingFunctionCall = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
+          {...commonProps}
           editorFunctionCallResults={[
             {
               status: 'working',
               call_id: fakeFunctionCallId,
             },
           ]}
-          onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -201,19 +192,8 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={true}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
+          {...commonProps}
+          isSending={true}
           editorFunctionCallResults={[
             {
               status: 'finished',
@@ -226,9 +206,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
               },
             },
           ]}
-          onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -251,19 +229,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
+          {...commonProps}
           editorFunctionCallResults={[
             {
               status: 'finished',
@@ -276,9 +242,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = () => (
               },
             },
           ]}
-          onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -301,28 +265,14 @@ export const ReadyAiRequestWithIgnoredFunctionCall = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
+          {...commonProps}
           editorFunctionCallResults={[
             {
               status: 'ignored',
               call_id: fakeFunctionCallId,
             },
           ]}
-          onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -345,19 +295,7 @@ export const ReadyAiRequestWithFailedFunctionCall = () => (
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
+          {...commonProps}
           editorFunctionCallResults={[
             {
               status: 'finished',
@@ -368,9 +306,7 @@ export const ReadyAiRequestWithFailedFunctionCall = () => (
               },
             },
           ]}
-          onProcessFunctionCalls={async () => {}}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -393,23 +329,8 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
             output: fakeOutputWithFunctionCallAndOutput,
             error: null,
           }}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
-          editorFunctionCallResults={[]}
-          onProcessFunctionCalls={async () => {}}
+          {...commonProps}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -423,23 +344,8 @@ export const RealLifeAgentAiRequest = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={agentAiRequest}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
-          editorFunctionCallResults={[]}
-          onProcessFunctionCalls={async () => {}}
+          {...commonProps}
           isAutoProcessingFunctionCalls={true}
-          setAutoProcessFunctionCalls={() => {}}
         />
       )}
     </I18n>
@@ -453,23 +359,7 @@ export const RealLifeAgentAiRequestWithFunctionCall = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={agentAiRequestWithFunctionCallToDo}
-          onSendUserRequest={async () => {}}
-          isLaunchingAiRequest={false}
-          quota={{
-            limitReached: false,
-            current: 1,
-            max: 2,
-          }}
-          increaseQuotaOffering="subscribe"
-          aiRequestPriceInCredits={5}
-          lastSendError={null}
-          availableCredits={400}
-          onSendFeedback={async () => {}}
-          hasOpenedProject={false}
-          editorFunctionCallResults={[]}
-          onProcessFunctionCalls={async () => {}}
-          isAutoProcessingFunctionCalls={false}
-          setAutoProcessFunctionCalls={() => {}}
+          {...commonProps}
         />
       )}
     </I18n>

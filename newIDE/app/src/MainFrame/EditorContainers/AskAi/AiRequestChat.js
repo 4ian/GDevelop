@@ -14,7 +14,7 @@ import {
 } from '../../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../../UI/RaisedButton';
 import { CompactTextAreaField } from '../../../UI/CompactTextAreaField';
-import { Column, Line } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import LeftLoader from '../../../UI/LeftLoader';
 import Paper from '../../../UI/Paper';
 import { ChatMarkdownText } from './ChatMarkdownText';
@@ -42,6 +42,9 @@ import {
 } from './AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import CircularProgress from '../../../UI/CircularProgress';
+import TwoStatesButton from '../../../UI/TwoStatesButton';
+import Help from '../../../UI/CustomSvgIcons/Help';
+import Hammer from '../../../UI/CustomSvgIcons/Hammer';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -50,8 +53,14 @@ type Props = {
   i18n: I18nType,
   aiRequest: AiRequest | null,
 
-  isLaunchingAiRequest: boolean,
-  onSendUserRequest: string => Promise<void>,
+  isSending: boolean,
+  onStartNewAiRequest: (options: {|
+    userRequest: string,
+    mode: 'chat' | 'agent',
+  |}) => void,
+  onSendMessage: (options: {|
+    userMessage: string,
+  |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
@@ -111,12 +120,85 @@ const ChatBubble = ({ children, feedbackButtons, role }: ChatBubbleProps) => {
   );
 };
 
+const getQuotaOrCreditsExplanation = ({
+  newAiRequestMode,
+  quota,
+  increaseQuotaOffering,
+  aiRequestPriceInCredits,
+  availableCredits,
+}: {|
+  newAiRequestMode: 'chat' | 'agent',
+  quota: Quota | null,
+  increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
+  aiRequestPriceInCredits: number | null,
+  availableCredits: number,
+|}) => {
+  if (!quota) return null;
+
+  if (newAiRequestMode === 'agent') {
+    const quotaOrCreditsExplanation = !quota.limitReached ? (
+      increaseQuotaOffering === 'subscribe' ? (
+        <Trans>
+          You still have {quota.max - quota.current} free AI agent builds.
+        </Trans>
+      ) : (
+        <Trans>
+          You still have {quota.max - quota.current} free AI agent builds with
+          your membership (refreshed every month).
+        </Trans>
+      )
+    ) : aiRequestPriceInCredits ? (
+      availableCredits ? (
+        <Trans>
+          Launch a build with the AI agent for{' '}
+          <b>{aiRequestPriceInCredits} credits</b> – you have {availableCredits}{' '}
+          credits.
+        </Trans>
+      ) : (
+        <Trans>
+          Launch a build with the AI agent for{' '}
+          <b>{aiRequestPriceInCredits} credits.</b>
+        </Trans>
+      )
+    ) : null;
+
+    return quotaOrCreditsExplanation;
+  }
+
+  const quotaOrCreditsExplanation = !quota.limitReached ? (
+    increaseQuotaOffering === 'subscribe' ? (
+      <Trans>
+        You still have {quota.max - quota.current} free answers from the AI.
+      </Trans>
+    ) : (
+      <Trans>
+        You still have {quota.max - quota.current} free answers with your
+        membership (refreshed every month).
+      </Trans>
+    )
+  ) : aiRequestPriceInCredits ? (
+    availableCredits ? (
+      <Trans>
+        Use an AI request for <b>{aiRequestPriceInCredits} credits</b> – you
+        have {availableCredits} credits.
+      </Trans>
+    ) : (
+      <Trans>
+        Use an AI request for <b>{aiRequestPriceInCredits} credits.</b>
+      </Trans>
+    )
+  ) : null;
+
+  return quotaOrCreditsExplanation;
+};
+
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiRequest,
-      isLaunchingAiRequest,
-      onSendUserRequest,
+      isSending,
+      onStartNewAiRequest,
+      onSendMessage,
       onSendFeedback,
       quota,
       increaseQuotaOffering,
@@ -132,6 +214,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }: Props,
     ref
   ) => {
+    // TODO: store the default mode in the user preferences?
+    const [newAiRequestMode, setNewAiRequestMode] = React.useState<
+      'chat' | 'agent'
+    >('agent');
     const aiRequestId: string = aiRequest ? aiRequest.id : '';
     const [
       userRequestTextPerAiRequestId,
@@ -150,25 +236,41 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         })
       : new Map();
 
-    const [newChatPlaceholder] = React.useState(() => {
-      const newChatPlaceholders: Array<MessageDescriptor> = [
-        t`How to add a leaderboard?`,
-        t`How to display the health of my player?`,
-        t`How to add an explosion when an enemy is destroyed?`,
-        t`How to create a main menu for my game?`,
-        ...(hasOpenedProject
-          ? [
-              t`What would you add to my game?`,
-              t`How to make my game more fun?`,
-              t`What is a good GDevelop feature I could use in my game?`,
-            ]
-          : []),
-      ];
+    const newChatPlaceholder = React.useMemo(
+      () => {
+        const newChatPlaceholders: Array<MessageDescriptor> =
+          newAiRequestMode === 'agent'
+            ? hasOpenedProject
+              ? [
+                  t`Add an enemy that spawns periodically`,
+                  t`Display the score on the screen`,
+                  t`Show an explosion when the player is hit`,
+                ]
+              : [
+                  t`Build a platformer game with a score and coins to collect`,
+                  t`Make a quizz game with a question and 4 answers`,
+                  t`Make a game where the player must avoid obstacles`,
+                ]
+            : [
+                t`How to add a leaderboard?`,
+                t`How to display the health of my player?`,
+                t`How to add an explosion when an enemy is destroyed?`,
+                t`How to create a main menu for my game?`,
+                ...(hasOpenedProject
+                  ? [
+                      t`What would you add to my game?`,
+                      t`How to make my game more fun?`,
+                      t`What is a good GDevelop feature I could use in my game?`,
+                    ]
+                  : []),
+              ];
 
-      return newChatPlaceholders[
-        Math.floor(Math.random() * newChatPlaceholders.length)
-      ];
-    });
+        return newChatPlaceholders[
+          Math.floor(Math.random() * newChatPlaceholders.length)
+        ];
+      },
+      [newAiRequestMode, hasOpenedProject]
+    );
 
     React.useImperativeHandle(ref, () => ({
       resetUserInput: (aiRequestId: string | null) => {
@@ -188,29 +290,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const { isMobile } = useResponsiveWindowSize();
 
-    const quotaOrCreditsExplanation = !quota ? null /* User is probably not even logged in. */ : !quota.limitReached ? (
-      increaseQuotaOffering === 'subscribe' ? (
-        <Trans>
-          You still have {quota.max - quota.current} free answers from the AI.
-        </Trans>
-      ) : (
-        <Trans>
-          You still have {quota.max - quota.current} free answers with your
-          membership (refreshed every month).
-        </Trans>
-      )
-    ) : aiRequestPriceInCredits ? (
-      availableCredits ? (
-        <Trans>
-          Use an AI request for <b>{aiRequestPriceInCredits} credits</b> – you
-          have {availableCredits} credits.
-        </Trans>
-      ) : (
-        <Trans>
-          Use an AI request for <b>{aiRequestPriceInCredits} credits.</b>
-        </Trans>
-      )
-    ) : null;
+    const quotaOrCreditsExplanation = getQuotaOrCreditsExplanation({
+      newAiRequestMode,
+      quota,
+      increaseQuotaOffering,
+      aiRequestPriceInCredits,
+      availableCredits,
+    });
 
     const subscriptionBanner =
       quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
@@ -270,20 +356,49 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Line>
             <Column noMargin alignItems="center">
               <Text size="bold-title">
-                <Trans>What do you want to make?</Trans>
+                {newAiRequestMode === 'agent' ? (
+                  <Trans>What do you want to make?</Trans>
+                ) : (
+                  <Trans>Ask any gamedev question</Trans>
+                )}
               </Text>
             </Column>
+            <Line noMargin justifyContent="center">
+              <TwoStatesButton
+                value={newAiRequestMode}
+                leftButton={{
+                  icon: <Hammer fontSize="small" />,
+                  label: <Trans>Build for me</Trans>,
+                  value: 'agent',
+                }}
+                rightButton={{
+                  icon: <Help fontSize="small" />,
+                  label: <Trans>Ask a question</Trans>,
+                  value: 'chat',
+                }}
+                onChange={value => {
+                  if (value !== 'chat' && value !== 'agent') {
+                    return;
+                  }
+                  setNewAiRequestMode(value);
+                }}
+              />
+            </Line>
             <form
               onSubmit={() => {
-                onSendUserRequest(userRequestTextPerAiRequestId['']);
+                onStartNewAiRequest({
+                  mode: newAiRequestMode,
+                  userRequest: userRequestTextPerAiRequestId[''],
+                });
               }}
             >
               <ColumnStackLayout justifyContent="center" noMargin>
                 <Column noMargin alignItems="stretch" justifyContent="stretch">
+                  <Spacer />
                   <CompactTextAreaField
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
-                    disabled={isLaunchingAiRequest}
+                    disabled={isSending}
                     onChange={userRequestText =>
                       setUserRequestTextPerRequestId(
                         userRequestTextPerAiRequestId => ({
@@ -293,7 +408,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       )
                     }
                     onSubmit={() => {
-                      onSendUserRequest(userRequestTextPerAiRequestId['']);
+                      onStartNewAiRequest({
+                        mode: newAiRequestMode,
+                        userRequest: userRequestTextPerAiRequestId[''],
+                      });
                     }}
                     placeholder={newChatPlaceholder}
                     rows={5}
@@ -308,19 +426,30 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   >
                     {!isMobile && errorOrQuotaOrCreditsExplanation}
                     <Line noMargin justifyContent="flex-end">
-                      <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                      <LeftLoader reserveSpace isLoading={isSending}>
                         <RaisedButton
                           color="primary"
-                          label={<Trans>Send</Trans>}
+                          label={
+                            newAiRequestMode === 'agent' ? (
+                              hasOpenedProject ? (
+                                <Trans>Build this on my game</Trans>
+                              ) : (
+                                <Trans>Start building the game</Trans>
+                              )
+                            ) : (
+                              <Trans>Send question</Trans>
+                            )
+                          }
                           style={{ flexShrink: 0 }}
                           disabled={
-                            isLaunchingAiRequest ||
+                            isSending ||
                             !userRequestTextPerAiRequestId[aiRequestId]
                           }
                           onClick={() => {
-                            onSendUserRequest(
-                              userRequestTextPerAiRequestId[aiRequestId]
-                            );
+                            onStartNewAiRequest({
+                              mode: newAiRequestMode,
+                              userRequest: userRequestTextPerAiRequestId[''],
+                            });
                           }}
                         />
                       </LeftLoader>
@@ -565,7 +694,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         )}
         <form
           onSubmit={() => {
-            onSendUserRequest(userRequestTextPerAiRequestId[aiRequestId] || '');
+            onSendMessage({
+              userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
+            });
           }}
         >
           <ColumnStackLayout
@@ -575,7 +706,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           >
             {isAutoProcessingFunctionCalls &&
             (hasWorkingFunctionCalls ||
-              isLaunchingAiRequest ||
+              isSending ||
               aiRequest.status === 'working') ? (
               <Paper background="dark" variant="outlined" square>
                 <Column>
@@ -637,7 +768,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             <CompactTextAreaField
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-              disabled={isLaunchingAiRequest}
+              disabled={isSending}
               onChange={userRequestText =>
                 setUserRequestTextPerRequestId(
                   userRequestTextPerAiRequestId => ({
@@ -646,27 +777,32 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   })
                 )
               }
-              placeholder={t`Ask a follow up question`}
+              placeholder={
+                aiRequest.mode === 'agent'
+                  ? t`Specify something more to the AI to build`
+                  : t`Ask a follow up question`
+              }
               rows={2}
               onSubmit={() => {
-                onSendUserRequest(userRequestTextPerAiRequestId[aiRequestId]);
+                onSendMessage({
+                  userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
+                });
               }}
             />
             <Column noMargin alignItems="flex-end">
               <ResponsiveLineStackLayout noMargin>
                 {!isMobile && errorOrQuotaOrCreditsExplanation}
                 <Line noMargin justifyContent="flex-end">
-                  <LeftLoader reserveSpace isLoading={isLaunchingAiRequest}>
+                  <LeftLoader reserveSpace isLoading={isSending}>
                     <RaisedButton
                       color="primary"
-                      disabled={
-                        aiRequest.status === 'working' || isLaunchingAiRequest
-                      }
+                      disabled={aiRequest.status === 'working' || isSending}
                       label={<Trans>Send</Trans>}
                       onClick={() => {
-                        onSendUserRequest(
-                          userRequestTextPerAiRequestId[aiRequestId]
-                        );
+                        onSendMessage({
+                          userMessage:
+                            userRequestTextPerAiRequestId[aiRequestId] || '',
+                        });
                       }}
                     />
                   </LeftLoader>

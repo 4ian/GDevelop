@@ -44,7 +44,11 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options: { openAllScenes: boolean, openQuickCustomizationDialog: boolean },
+    options: {
+      openAllScenes: boolean,
+      openQuickCustomizationDialog: boolean,
+      dontOpenAnySceneOrProjectManager: boolean,
+    },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -266,6 +270,7 @@ const useCreateProject = ({
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
+            dontOpenAnySceneOrProjectManager: !!newProjectSetup.dontOpenAnySceneOrProjectManager,
           },
         });
       } catch (rawError) {

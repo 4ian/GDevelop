@@ -158,11 +158,7 @@ export const applyEventsChanges = (
   const operations: Array<EventOperation> = [];
 
   eventOperationsInput.forEach(change => {
-    const {
-      operationName,
-      operationTargetEvent,
-      generatedEvents,
-    } = change;
+    const { operationName, operationTargetEvent, generatedEvents } = change;
     let parsedPath: Array<number> | null = null;
     let localEventsToInsert: gdEventsList | null = null;
 

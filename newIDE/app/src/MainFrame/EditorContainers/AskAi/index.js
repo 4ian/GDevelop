@@ -721,8 +721,6 @@ export const AskAi = React.memo<Props>(
               return;
             }
 
-            console.log({ project, fileMetadata, storageProvider });
-
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
             let payWithCredits = false;
@@ -835,7 +833,12 @@ export const AskAi = React.memo<Props>(
 
           // Paying with credits is only when a user message is sent (and quota is exhausted).
           let payWithCredits = false;
-          if (userMessage && quota && quota.limitReached && aiRequestPriceInCredits) {
+          if (
+            userMessage &&
+            quota &&
+            quota.limitReached &&
+            aiRequestPriceInCredits
+          ) {
             payWithCredits = true;
             if (availableCredits < aiRequestPriceInCredits) {
               openCreditsPackageDialog({
@@ -865,9 +868,12 @@ export const AskAi = React.memo<Props>(
             setLastSendError(selectedAiRequestId, error);
           }
 
-          // Refresh the user limits, to ensure quota and credits information
-          // is up-to-date after an AI request.
           if (userMessage) {
+            if (aiRequestChatRef.current)
+              aiRequestChatRef.current.resetUserInput(selectedAiRequestId);
+
+            // Refresh the user limits, to ensure quota and credits information
+            // is up-to-date after an AI request.
             await delay(500);
             try {
               await retryIfFailed({ times: 2 }, onRefreshLimits);
@@ -881,6 +887,10 @@ export const AskAi = React.memo<Props>(
           selectedAiRequestId,
           isSendingAiRequest,
           getEditorFunctionCallResults,
+          quota,
+          aiRequestPriceInCredits,
+          availableCredits,
+          openCreditsPackageDialog,
           setSendingAiRequest,
           updateAiRequest,
           clearEditorFunctionCallResults,

@@ -101,6 +101,7 @@ export type AiGeneratedEventChange = {
   isEventsJsonValid: boolean | null,
   generatedEvents: string | null,
   areEventsValid: boolean | null,
+  extensionNames: string[] | null,
   diagnosticLines: string[],
 };
 

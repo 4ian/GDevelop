@@ -714,6 +714,7 @@ const addSceneEvents: EditorFunction = async ({
   project,
   args,
   launchEventsGeneration,
+  onEnsureExtensionInstalled,
 }) => {
   const sceneName = extractRequiredString(args, 'scene_name');
   const eventsDescription = extractRequiredString(args, 'events_description');
@@ -773,6 +774,12 @@ const addSceneEvents: EditorFunction = async ({
       return makeGenericFailure(
         `Generated events are not valid - this means what you asked for is not possible or does not work like this. Consider a different approach.`
       );
+    }
+
+    for (const change of changes) {
+      for (const extensionName of change.extensionNames || []) {
+        await onEnsureExtensionInstalled({ extensionName });
+      }
     }
 
     applyEventsChanges(project, currentSceneEvents, changes);

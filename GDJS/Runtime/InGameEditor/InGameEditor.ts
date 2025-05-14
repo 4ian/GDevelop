@@ -410,7 +410,7 @@ namespace gdjs {
         maxX: number;
         maxY: number;
       },
-      margin: float,
+      margin: float
     ) {
       if (objects.length === 0) {
         this.zoomToFitArea(
@@ -422,7 +422,7 @@ namespace gdjs {
             maxZ: 0,
           },
           visibleScreenArea,
-          0.1,
+          0.1
         );
       }
       let minX = Number.MAX_VALUE;
@@ -447,7 +447,7 @@ namespace gdjs {
           maxZ,
         },
         visibleScreenArea,
-        margin,
+        margin
       );
     }
 
@@ -465,7 +465,7 @@ namespace gdjs {
         maxX: number;
         maxY: number;
       },
-      margin: float,
+      margin: float
     ) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
@@ -1172,8 +1172,60 @@ namespace gdjs {
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
+      // TODO Actually get the active layer of the editor.
+      const activeLayer = currentScene.getLayer('');
+
       if (dropped) {
         if (this._draggedNewObject) {
+          const isLayer3D = activeLayer.getRenderer().getThreeGroup();
+          if (isLayer3D) {
+            const cameraX = activeLayer.getCameraX();
+            const cameraY = activeLayer.getCameraY();
+            const cameraZ = gdjs.scene3d.camera.getCameraZ(
+              currentScene,
+              activeLayer.getName(),
+              0
+            );
+
+            const closestIntersect = this._getClosestIntersectionUnderCursor();
+            if (closestIntersect && !is3D(this._draggedNewObject)) {
+              // Avoid to create a 2D object hidden under a 3D one.
+              this.cancelDragNewInstance();
+              return;
+            }
+
+            let cursorX;
+            let cursorY;
+            let cursorZ;
+            if (closestIntersect) {
+              cursorX = closestIntersect.point.x;
+              cursorY = -closestIntersect.point.y;
+              cursorZ = closestIntersect.point.z;
+            } else {
+              const projectedCursor = this._getProjectedCursor();
+              if (!projectedCursor) {
+                // Avoid to create an object behind the camera when it's dropped over the horizon.
+                this.cancelDragNewInstance();
+                return;
+              }
+              cursorX = projectedCursor[0];
+              cursorY = projectedCursor[1];
+              cursorZ = 0;
+            }
+
+            const cursorDistance = Math.hypot(
+              cursorX - cameraX,
+              cursorY - cameraY,
+              cursorZ - cameraZ
+            );
+            if (
+              cursorDistance > activeLayer.getInitialCamera3DFarPlaneDistance()
+            ) {
+              // Avoid to create an object outside of the rendered area.
+              this.cancelDragNewInstance();
+              return;
+            }
+          }
           this._sendSelectionUpdate({
             addedObjects: [this._draggedNewObject],
           });
@@ -1192,28 +1244,77 @@ namespace gdjs {
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
         newObject.persistentUuid = gdjs.makeUuid();
+        newObject.setLayer(activeLayer.getName());
         this._draggedNewObject = newObject;
       }
 
-      const closestIntersect = this._getClosestIntersectionUnderCursor();
-
       if (is3D(this._draggedNewObject)) {
+        const closestIntersect = this._getClosestIntersectionUnderCursor();
         if (closestIntersect) {
           this._draggedNewObject.setX(closestIntersect.point.x);
           this._draggedNewObject.setY(-closestIntersect.point.y);
           this._draggedNewObject.setZ(closestIntersect.point.z);
         } else {
-          this._draggedNewObject.setX(
-            gdjs.evtTools.input.getCursorX(currentScene, '', 0)
-          );
-          this._draggedNewObject.setY(
-            gdjs.evtTools.input.getCursorY(currentScene, '', 0)
-          );
-          this._draggedNewObject.setZ(0);
+          const projectedCursor = this._getProjectedCursor();
+          if (projectedCursor) {
+            this._draggedNewObject.setX(projectedCursor[0]);
+            this._draggedNewObject.setY(projectedCursor[1]);
+            this._draggedNewObject.setZ(0);
+          }
         }
       } else {
-        // TODO: handle 2D objects (project on plane).
+        const projectedCursor = this._getProjectedCursor();
+        if (projectedCursor) {
+          this._draggedNewObject.setX(projectedCursor[0]);
+          this._draggedNewObject.setY(projectedCursor[1]);
+        }
       }
+    }
+
+    /**
+     * @returns The cursor projected on the plane Z = 0 or `null` if the cursor is in the sky.
+     */
+    _getProjectedCursor(): FloatPoint | null {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return null;
+      // TODO Actually get the active layer of the editor.
+      const activeLayer = currentScene.getLayer('');
+
+      const cameraX = activeLayer.getCameraX();
+      const cameraY = activeLayer.getCameraY();
+      const cameraZ = gdjs.scene3d.camera.getCameraZ(
+        currentScene,
+        activeLayer.getName(),
+        0
+      );
+
+      const cursorX = gdjs.evtTools.input.getCursorX(
+        currentScene,
+        activeLayer.getName(),
+        0
+      );
+      const cursorY = gdjs.evtTools.input.getCursorY(
+        currentScene,
+        activeLayer.getName(),
+        0
+      );
+
+      const deltaX = cursorX - cameraX;
+      const deltaY = cursorY - cameraY;
+      const deltaZ = 0 - cameraZ;
+
+      const threeCamera = activeLayer.getRenderer().getThreeCamera();
+      if (!threeCamera) {
+        return [cursorX, cursorY];
+      }
+      const { forward } = getCameraVectors(threeCamera);
+      // It happens when the cursor is over the horizon and projected on the plane Z = 0.
+      const isCursorBehindTheCamera =
+        forward.dot(new THREE.Vector3(deltaX, deltaY, deltaZ)) < 1;
+      if (isCursorBehindTheCamera) {
+        return null;
+      }
+      return [cursorX, cursorY];
     }
 
     reloadInstances(instances: Array<InstanceData>) {

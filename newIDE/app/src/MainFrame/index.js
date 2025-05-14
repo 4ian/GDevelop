@@ -371,9 +371,10 @@ const MainFrame = (props: Props) => {
     chooseResourceOptions,
     setChooseResourceOptions,
   ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?(
-    Array<gdResource>
-  ) => void>(null);
+  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -3321,9 +3322,11 @@ const MainFrame = (props: Props) => {
     (options: ChooseResourceOptions) => {
       return new Promise(resolve => {
         setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => (
-          Promise<Array<gdResource>> | Array<gdResource>
-        ) => void = () => resolve;
+        const onResourceChosenSetter: () => ({|
+          selectedResources: Array<gdResource>,
+          selectedSourceName: string,
+        |}) => void = () => resolve;
+
         setOnResourceChosen(onResourceChosenSetter);
       });
     },
@@ -4098,15 +4101,18 @@ const MainFrame = (props: Props) => {
           getStorageProvider={getStorageProvider}
           i18n={i18n}
           resourceSources={resourceSources}
-          onChooseResources={resources => {
+          onChooseResources={resourcesOptions => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen(resources);
+            onResourceChosen(resourcesOptions);
           }}
           onClose={() => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen([]);
+            onResourceChosen({
+              selectedResources: [],
+              selectedSourceName: '',
+            });
           }}
           options={chooseResourceOptions}
         />

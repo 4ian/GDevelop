@@ -56,6 +56,15 @@ export const CompactResourceSelectorWithThumbnail = ({
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
+  const storageProvider = resourceManagementProps.getStorageProvider();
+  const resourceSources = resourceManagementProps.resourceSources
+    .filter(source => source.kind === resourceKind)
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
+
   // TODO: move in a hook?
   const { showConfirmation } = useAlertDialog();
   const abortControllerRef = React.useRef<?AbortController>(null);
@@ -72,22 +81,30 @@ export const CompactResourceSelectorWithThumbnail = ({
 
   // TODO: move in a hook?
   const addFrom = React.useCallback(
-    async (source: ResourceSource) => {
+    async (initialResourceSource: ResourceSource) => {
       try {
-        if (!source) return;
+        if (!initialResourceSource) return;
 
-        const resources = await resourceManagementProps.onChooseResource({
-          initialSourceName: source.name,
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
           multiSelection: false,
           resourceKind: resourceKind,
         });
 
-        if (!resources.length) return;
-        const resource = resources[0];
+        if (!selectedResources.length) return;
+        const selectedResourceSource = resourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        const resource = selectedResources[0];
 
         const resourceName: string = resource.getName();
 
-        if (source.shouldCreateResource) {
+        if (selectedResourceSource.shouldCreateResource) {
           applyResourceDefaults(project, resource);
 
           // addResource will check if a resource with the same name exists, and if it is
@@ -96,7 +113,7 @@ export const CompactResourceSelectorWithThumbnail = ({
 
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-          resources.forEach(resource => resource.delete());
+          selectedResources.forEach(resource => resource.delete());
 
           await resourceManagementProps.onFetchNewlyAddedResources();
           triggerResourcesHaveChanged();
@@ -114,6 +131,7 @@ export const CompactResourceSelectorWithThumbnail = ({
       resourceKind,
       onChange,
       triggerResourcesHaveChanged,
+      resourceSources,
     ]
   );
 
@@ -214,17 +232,6 @@ export const CompactResourceSelectorWithThumbnail = ({
   const externalEditors = resourceManagementProps.resourceExternalEditors.filter(
     externalEditor => externalEditor.kind === resourceKind
   );
-
-  const storageProvider = resourceManagementProps.getStorageProvider();
-
-  // TODO: move in a hook?
-  const resourceSources = resourceManagementProps.resourceSources
-    .filter(source => source.kind === resourceKind)
-    .filter(
-      ({ onlyForStorageProvider }) =>
-        !onlyForStorageProvider ||
-        onlyForStorageProvider === storageProvider.internalName
-    );
 
   const isResourceSetButInvalid =
     resourceName && !project.getResourcesManager().hasResource(resourceName);

@@ -176,33 +176,42 @@ export const UrlChooser = ({
 };
 
 const browserResourceSources: Array<ResourceSource> = [
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `upload-${kind}`,
-    displayName: t`File(s) from your device`,
-    displayTab: 'import',
-    shouldCreateResource: true,
-    shouldGuessAnimationsFromName: true,
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <FileToCloudProjectResourceUploader
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        fileMetadata={props.fileMetadata}
-        getStorageProvider={props.getStorageProvider}
-        key={`url-chooser-${kind}`}
-        automaticallyOpenInput={!!props.automaticallyOpenIfPossible}
-      />
-    ),
-  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
+    const sourceName = `upload-${kind}`;
+    return {
+      name: sourceName,
+      displayName: t`File(s) from your device`,
+      displayTab: 'import',
+      shouldCreateResource: true,
+      shouldGuessAnimationsFromName: true,
+      kind,
+      renderComponent: (props: ResourceSourceComponentProps) => (
+        <FileToCloudProjectResourceUploader
+          createNewResource={createNewResource}
+          onChooseResources={(resources: Array<gdResource>) =>
+            props.onChooseResources({
+              selectedResources: resources,
+              selectedSourceName: sourceName,
+            })
+          }
+          options={props.options}
+          fileMetadata={props.fileMetadata}
+          getStorageProvider={props.getStorageProvider}
+          key={`url-chooser-${kind}`}
+          automaticallyOpenInput={!!props.automaticallyOpenIfPossible}
+        />
+      ),
+    };
+  }),
   ...resourcesKindSupportedByResourceStore
     .map(kind => {
       const source = allResourceKindsAndMetadata.find(
         resourceSource => resourceSource.kind === kind
       );
       if (!source) return null;
+      const sourceName = `resource-store-${kind}`;
       return {
-        name: `resource-store-${kind}`,
+        name: sourceName,
         displayName: t`Choose from asset store`,
         displayTab: 'standalone',
         shouldCreateResource: true,
@@ -246,70 +255,87 @@ const browserResourceSources: Array<ResourceSource> = [
               newResource.setName(resourceCleanedName);
               newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
 
-              onChooseResources([newResource]);
+              onChooseResources({
+                selectedResources: [newResource],
+                selectedSourceName: sourceName,
+              });
             }}
           />
         ),
       };
     })
     .filter(Boolean),
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `project-resources-${kind}`,
-    displayName: t`Project resources`,
-    displayTab: 'standalone',
-    shouldCreateResource: false,
-    shouldGuessAnimationsFromName: false,
-    hideInResourceEditor: true,
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ProjectResourcesChooser
-        project={props.project}
-        onResourcesSelected={props.onResourcesSelected}
-        resourceKind={kind}
-        key={`project-resources-${kind}`}
-        multiSelection={props.options.multiSelection}
-      />
-    ),
-    renderPrimaryAction: ({
-      selectedResources,
-      onChooseResources,
-    }: ResourceSourceComponentPrimaryActionProps) => (
-      <DialogPrimaryButton
-        primary
-        key="select-resources"
-        label={
-          !selectedResources ||
-          !selectedResources.length ||
-          selectedResources.length === 1 ? (
-            <Trans>Select resource</Trans>
-          ) : (
-            <Trans>Select {selectedResources.length} resources</Trans>
-          )
-        }
-        disabled={!selectedResources || !selectedResources.length}
-        onClick={() => {
-          if (!selectedResources || !selectedResources.length) return;
-          onChooseResources(selectedResources);
-        }}
-      />
-    ),
-  })),
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `url-chooser-${kind}`,
-    displayName: t`Use a public URL`,
-    displayTab: 'import-advanced',
-    shouldCreateResource: true,
-    shouldGuessAnimationsFromName: false,
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <UrlChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`url-chooser-${kind}`}
-      />
-    ),
-  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
+    const sourceName = `project-resources-${kind}`;
+    return {
+      name: sourceName,
+      displayName: t`Project resources`,
+      displayTab: 'standalone',
+      shouldCreateResource: false,
+      shouldGuessAnimationsFromName: false,
+      hideInResourceEditor: true,
+      kind,
+      renderComponent: (props: ResourceSourceComponentProps) => (
+        <ProjectResourcesChooser
+          project={props.project}
+          onResourcesSelected={props.onResourcesSelected}
+          resourceKind={kind}
+          key={`project-resources-${kind}`}
+          multiSelection={props.options.multiSelection}
+        />
+      ),
+      renderPrimaryAction: ({
+        selectedResources,
+        onChooseResources,
+      }: ResourceSourceComponentPrimaryActionProps) => (
+        <DialogPrimaryButton
+          primary
+          key="select-resources"
+          label={
+            !selectedResources ||
+            !selectedResources.length ||
+            selectedResources.length === 1 ? (
+              <Trans>Select resource</Trans>
+            ) : (
+              <Trans>Select {selectedResources.length} resources</Trans>
+            )
+          }
+          disabled={!selectedResources || !selectedResources.length}
+          onClick={() => {
+            if (!selectedResources || !selectedResources.length) return;
+            onChooseResources({
+              selectedResources,
+              selectedSourceName: sourceName,
+            });
+          }}
+        />
+      ),
+    };
+  }),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
+    const sourceName = `url-chooser-${kind}`;
+    return {
+      name: sourceName,
+      displayName: t`Use a public URL`,
+      displayTab: 'import-advanced',
+      shouldCreateResource: true,
+      shouldGuessAnimationsFromName: false,
+      kind,
+      renderComponent: (props: ResourceSourceComponentProps) => (
+        <UrlChooser
+          createNewResource={createNewResource}
+          onChooseResources={(resources: Array<gdResource>) =>
+            props.onChooseResources({
+              selectedResources: resources,
+              selectedSourceName: sourceName,
+            })
+          }
+          options={props.options}
+          key={`url-chooser-${kind}`}
+        />
+      ),
+    };
+  }),
 ];
 
 export default browserResourceSources;

@@ -22,14 +22,14 @@ import Paper from '../UI/Paper';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../UI/RaisedButton';
 
-type FileToCloudProjectResourceUploaderProps = {
+type FileToCloudProjectResourceUploaderProps = {|
   options: ChooseResourceOptions,
   fileMetadata: ?FileMetadata,
   getStorageProvider: () => StorageProvider,
   onChooseResources: (resources: Array<gdResource>) => void,
   createNewResource: () => gdResource,
   automaticallyOpenInput: boolean,
-};
+|};
 
 const resourceKindToInputAcceptedMimes = {
   audio: ['audio/aac', 'audio/x-wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg'],

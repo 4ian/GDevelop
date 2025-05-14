@@ -442,34 +442,41 @@ const AnimationList = React.forwardRef<
     );
 
     const importImages = React.useCallback(
-      async (resourceSource: ResourceSource) => {
-        const resources = await resourceManagementProps.onChooseResource({
-          initialSourceName: resourceSource.name,
+      async (initialResourceSource: ResourceSource) => {
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
           multiSelection: true,
           resourceKind: 'image',
         });
-        if (resources.length === 0) {
-          return;
-        }
-        if (resourceSource.shouldCreateResource) {
-          resources.forEach(resource => {
+
+        if (!selectedResources.length) return;
+        const selectedResourceSource = resourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        if (selectedResourceSource.shouldCreateResource) {
+          selectedResources.forEach(resource => {
             applyResourceDefaults(project, resource);
             project.getResourcesManager().addResource(resource);
           });
 
-          const resourcesByAnimation = resourceSource.shouldGuessAnimationsFromName
-            ? groupResourcesByAnimations(resources)
+          const resourcesByAnimation = selectedResourceSource.shouldGuessAnimationsFromName
+            ? groupResourcesByAnimations(selectedResources)
             : new Map<string, Array<gdResource>>();
           addAnimations(resourcesByAnimation);
 
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-          resources.forEach(resource => resource.delete());
+          selectedResources.forEach(resource => resource.delete());
 
           await resourceManagementProps.onFetchNewlyAddedResources();
         } else {
           const resourcesByAnimation = new Map<string, Array<gdResource>>();
-          resourcesByAnimation.set('default', resources);
+          resourcesByAnimation.set('default', selectedResources);
           addAnimations(resourcesByAnimation);
         }
 
@@ -485,6 +492,7 @@ const AnimationList = React.forwardRef<
         adaptCollisionMaskIfNeeded,
         onObjectUpdated,
         project,
+        resourceSources,
       ]
     );
 

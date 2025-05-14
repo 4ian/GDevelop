@@ -112,6 +112,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
           eventsBasedObjectType: null,
           eventsBasedObjectVariantName: null,
         });
+        if (this.editor) {
+          this.editor.onEditorReloaded();
+        }
       }
     }
   }

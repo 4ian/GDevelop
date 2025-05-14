@@ -69,6 +69,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
           eventsBasedObjectType: null,
           eventsBasedObjectVariantName: null,
         });
+        if (this.editor) {
+          this.editor.onEditorReloaded();
+        }
       }
     }
   }

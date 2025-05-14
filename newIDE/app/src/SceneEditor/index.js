@@ -323,6 +323,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
+  onEditorReloaded() {
+    this._sendSelectedInstances();
+  }
+
   getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
   }
@@ -1077,7 +1081,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     instances: Array<gdInitialInstance>,
     multiSelect: boolean
   ) => {
-    const { previewDebuggerServer } = this.props;
     this.instancesSelection.selectInstances({
       instances,
       multiSelect,
@@ -1085,6 +1088,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       ignoreSeal: true,
     });
 
+    this._sendSelectedInstances();
+    this.setState({ lastSelectionType: 'instance' });
+    this.updateToolbar();
+  };
+
+  _sendSelectedInstances = () => {
+    const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
@@ -1097,8 +1107,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       });
     }
-    this.setState({ lastSelectionType: 'instance' });
-    this.updateToolbar();
   };
 
   _onSelectInstances = (

@@ -92,6 +92,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           eventsBasedObjectType: projectItemName || null,
           eventsBasedObjectVariantName: this.getVariantName(),
         });
+        if (this.editor) {
+          this.editor.onEditorReloaded();
+        }
       }
     }
   }

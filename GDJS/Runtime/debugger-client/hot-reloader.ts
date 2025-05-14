@@ -924,6 +924,10 @@ namespace gdjs {
         objects,
         runtimeInstanceContainer
       );
+      // Update the GameData
+      for (let index = 0; index < objects.length; index++) {
+        Object.assign(oldObjects[index], objects[index]);
+      }
     }
 
     _hotReloadRuntimeSceneObjects(
@@ -1212,6 +1216,10 @@ namespace gdjs {
         newLayers,
         runtimeInstanceContainer
       );
+      // Update the GameData
+      for (let index = 0; index < newLayers.length; index++) {
+        Object.assign(oldLayers[index], newLayers[index]);
+      }
     }
 
     _hotReloadRuntimeSceneLayers(

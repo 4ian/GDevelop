@@ -2,16 +2,16 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../PaperDecorator';
-import { ExtensionModulesLoadedErrorDialog } from '../../Utils/UseExtensionModulesLoadedErrorDialog';
+import { ExtensionLoadErrorDialog } from '../../Utils/UseExtensionLoadErrorDialog';
 
 export default {
-  title: 'UI Building Blocks/ExtensionModulesLoadedErrorDialog',
-  component: ExtensionModulesLoadedErrorDialog,
+  title: 'UI Building Blocks/ExtensionLoadErrorDialog',
+  component: ExtensionLoadErrorDialog,
   decorators: [paperDecorator],
 };
 
 export const WithSingleExtensionError = () => {
-  const erroredExtensionModulesLoaded = [
+  const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
       result: {
@@ -23,8 +23,8 @@ export const WithSingleExtensionError = () => {
   ];
 
   return (
-    <ExtensionModulesLoadedErrorDialog
-      erroredExtensionModulesLoaded={erroredExtensionModulesLoaded}
+    <ExtensionLoadErrorDialog
+      erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
     />
@@ -32,7 +32,7 @@ export const WithSingleExtensionError = () => {
 };
 
 export const WithMultipleExtensionErrors = () => {
-  const erroredExtensionModulesLoaded = [
+  const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
       result: {
@@ -60,8 +60,8 @@ export const WithMultipleExtensionErrors = () => {
   ];
 
   return (
-    <ExtensionModulesLoadedErrorDialog
-      erroredExtensionModulesLoaded={erroredExtensionModulesLoaded}
+    <ExtensionLoadErrorDialog
+      erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
     />
@@ -69,14 +69,14 @@ export const WithMultipleExtensionErrors = () => {
 };
 
 export const WithGenericError = () => {
-  const erroredExtensionModulesLoaded = [];
+  const erroredExtensionLoadingResults = [];
   const genericError = new Error(
     'Some extension modules could not be loaded. Please check the console for more details.'
   );
 
   return (
-    <ExtensionModulesLoadedErrorDialog
-      erroredExtensionModulesLoaded={erroredExtensionModulesLoaded}
+    <ExtensionLoadErrorDialog
+      erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}
     />
@@ -84,7 +84,7 @@ export const WithGenericError = () => {
 };
 
 export const WithBothExtensionAndGenericErrors = () => {
-  const erroredExtensionModulesLoaded = [
+  const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
       result: {
@@ -99,8 +99,8 @@ export const WithBothExtensionAndGenericErrors = () => {
   );
 
   return (
-    <ExtensionModulesLoadedErrorDialog
-      erroredExtensionModulesLoaded={erroredExtensionModulesLoaded}
+    <ExtensionLoadErrorDialog
+      erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}
     />

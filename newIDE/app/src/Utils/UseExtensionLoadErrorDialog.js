@@ -20,22 +20,22 @@ import { sendErrorMessage } from './Analytics/EventSender';
 
 const downloadUrl = 'https://gdevelop.io/download';
 
-type ExtensionModulesLoaded = Array<{|
+type ExtensionLoadingResultWithPath = {|
   extensionModulePath: string,
   result: ExtensionLoadingResult,
-|}>;
+|};
 
-type ExtensionModulesLoadedErrorDialogProps = {|
-  erroredExtensionModulesLoaded: ExtensionModulesLoaded,
+type ExtensionLoadErrorDialogProps = {|
+  erroredExtensionLoadingResults: Array<ExtensionLoadingResultWithPath>,
   genericError: ?Error,
   onClose: () => void,
 |};
 
-export const ExtensionModulesLoadedErrorDialog = ({
-  erroredExtensionModulesLoaded,
+export const ExtensionLoadErrorDialog = ({
+  erroredExtensionLoadingResults,
   genericError,
   onClose,
-}: ExtensionModulesLoadedErrorDialogProps) => {
+}: ExtensionLoadErrorDialogProps) => {
   return (
     <Dialog
       title={
@@ -59,8 +59,8 @@ export const ExtensionModulesLoadedErrorDialog = ({
       <ColumnStackLayout noMargin expand>
         <Text>
           <Trans>
-            There were errors when loading extension modules. You cannot
-            continue using GDevelop.
+            There were errors when loading extensions. You cannot continue using
+            GDevelop.
           </Trans>
         </Text>
         <Text>
@@ -89,7 +89,7 @@ export const ExtensionModulesLoadedErrorDialog = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {erroredExtensionModulesLoaded.map(
+            {erroredExtensionLoadingResults.map(
               ({ extensionModulePath, result: { message, rawError } }) => (
                 <TableRow key={extensionModulePath}>
                   <TableRowColumn>{extensionModulePath}</TableRowColumn>
@@ -120,39 +120,39 @@ export const ExtensionModulesLoadedErrorDialog = ({
   );
 };
 
-type UseExtensionModulesLoadedErrorDialogOutput = {|
-  setExtensionModulesLoadedParams: ({|
-    results: ExtensionModulesLoaded,
+type UseExtensionLoadErrorDialogOutput = {|
+  setExtensionLoadingResults: ({|
+    results: Array<ExtensionLoadingResultWithPath>,
     expectedNumberOfJSExtensionModulesLoaded: number,
   |}) => void,
-  hasExtensionModulesLoadedErrors: boolean,
-  renderExtensionModulesLoadedErrorDialog: () => React.Node,
+  hasExtensionLoadErrors: boolean,
+  renderExtensionLoadErrorDialog: () => React.Node,
 |};
 
-export const useExtensionModulesLoadedErrorDialog = (): UseExtensionModulesLoadedErrorDialogOutput => {
+export const useExtensionLoadErrorDialog = (): UseExtensionLoadErrorDialogOutput => {
   const [
-    erroredExtensionModulesLoaded,
-    setErroredExtensionModulesLoaded,
-  ] = React.useState<?ExtensionModulesLoaded>(null);
+    erroredExtensionLoadingResults,
+    setErroredExtensionLoadingResults,
+  ] = React.useState<?Array<ExtensionLoadingResultWithPath>>(null);
   const [genericError, setGenericError] = React.useState<?Error>(null);
   const [isForcedHidden, setIsForcedHidden] = React.useState(false);
 
-  const setExtensionModulesLoadedParams = React.useCallback(
-    (extensionModulesLoadedParams: {|
-      results: ExtensionModulesLoaded,
+  const setExtensionLoadingResults = React.useCallback(
+    (extensionLoadingResults: {|
+      results: Array<ExtensionLoadingResultWithPath>,
       expectedNumberOfJSExtensionModulesLoaded: number,
     |}) => {
-      const erroredExtensionModulesLoaded = extensionModulesLoadedParams.results.filter(
+      const erroredExtensionLoadingResults = extensionLoadingResults.results.filter(
         ({ result }) => result.error
       );
-      setErroredExtensionModulesLoaded(erroredExtensionModulesLoaded);
+      setErroredExtensionLoadingResults(erroredExtensionLoadingResults);
       const hasMissingExtensionModules =
-        extensionModulesLoadedParams.expectedNumberOfJSExtensionModulesLoaded !==
-        extensionModulesLoadedParams.results.length;
+        extensionLoadingResults.expectedNumberOfJSExtensionModulesLoaded !==
+        extensionLoadingResults.results.length;
       if (hasMissingExtensionModules) {
         setGenericError(
           new Error(
-            'Some extension modules could not be loaded. Please check the console for more details.'
+            'Some extensions could not be loaded. Please check the console for more details.'
           )
         );
       } else {
@@ -163,22 +163,22 @@ export const useExtensionModulesLoadedErrorDialog = (): UseExtensionModulesLoade
     []
   );
 
-  const hasExtensionModulesLoadedErrors = React.useMemo(
+  const hasExtensionLoadErrors = React.useMemo(
     () =>
       !isForcedHidden &&
-      ((!!erroredExtensionModulesLoaded &&
-        erroredExtensionModulesLoaded.length > 0) ||
+      ((!!erroredExtensionLoadingResults &&
+        erroredExtensionLoadingResults.length > 0) ||
         !!genericError),
-    [isForcedHidden, erroredExtensionModulesLoaded, genericError]
+    [isForcedHidden, erroredExtensionLoadingResults, genericError]
   );
 
   React.useEffect(
     () => {
-      if (hasExtensionModulesLoadedErrors) {
-        let message = 'Extension modules loaded with errors: \n';
+      if (hasExtensionLoadErrors) {
+        let message = 'Extensions loaded with errors: \n';
         if (genericError) message += genericError.toString();
-        if (erroredExtensionModulesLoaded)
-          message += erroredExtensionModulesLoaded
+        if (erroredExtensionLoadingResults)
+          message += erroredExtensionLoadingResults
             .map(({ extensionModulePath, result }) => {
               return `${extensionModulePath}: ${result.message}`;
             })
@@ -188,29 +188,25 @@ export const useExtensionModulesLoadedErrorDialog = (): UseExtensionModulesLoade
           message,
           'error-boundary_extension-loader',
           null,
-          'extension-modules-loaded-with-errors'
+          'extension-loaded-with-errors'
         );
       }
     },
-    [
-      hasExtensionModulesLoadedErrors,
-      genericError,
-      erroredExtensionModulesLoaded,
-    ]
+    [hasExtensionLoadErrors, genericError, erroredExtensionLoadingResults]
   );
 
   const renderErrorDialog = React.useCallback(
     () => {
       if (
         isForcedHidden ||
-        !erroredExtensionModulesLoaded ||
-        (!erroredExtensionModulesLoaded.length && !genericError)
+        !erroredExtensionLoadingResults ||
+        (!erroredExtensionLoadingResults.length && !genericError)
       )
         return null;
 
       return (
-        <ExtensionModulesLoadedErrorDialog
-          erroredExtensionModulesLoaded={erroredExtensionModulesLoaded}
+        <ExtensionLoadErrorDialog
+          erroredExtensionLoadingResults={erroredExtensionLoadingResults}
           onClose={() => {
             setIsForcedHidden(true);
           }}
@@ -218,23 +214,23 @@ export const useExtensionModulesLoadedErrorDialog = (): UseExtensionModulesLoade
         />
       );
     },
-    [isForcedHidden, erroredExtensionModulesLoaded, genericError]
+    [isForcedHidden, erroredExtensionLoadingResults, genericError]
   );
 
   return React.useMemo(
     () => ({
-      setExtensionModulesLoadedParams,
-      hasExtensionModulesLoadedErrors:
+      setExtensionLoadingResults,
+      hasExtensionLoadErrors:
         !isForcedHidden &&
-        ((!!erroredExtensionModulesLoaded &&
-          erroredExtensionModulesLoaded.length > 0) ||
+        ((!!erroredExtensionLoadingResults &&
+          erroredExtensionLoadingResults.length > 0) ||
           !!genericError),
-      renderExtensionModulesLoadedErrorDialog: renderErrorDialog,
+      renderExtensionLoadErrorDialog: renderErrorDialog,
     }),
     [
-      erroredExtensionModulesLoaded,
+      erroredExtensionLoadingResults,
       renderErrorDialog,
-      setExtensionModulesLoadedParams,
+      setExtensionLoadingResults,
       genericError,
       isForcedHidden,
     ]

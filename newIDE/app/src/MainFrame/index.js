@@ -203,7 +203,7 @@ import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
-import { useExtensionModulesLoadedErrorDialog } from '../Utils/UseExtensionModulesLoadedErrorDialog';
+import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -554,10 +554,10 @@ const MainFrame = (props: Props) => {
   });
 
   const {
-    setExtensionModulesLoadedParams,
-    hasExtensionModulesLoadedErrors,
-    renderExtensionModulesLoadedErrorDialog,
-  } = useExtensionModulesLoadedErrorDialog();
+    setExtensionLoadingResults,
+    hasExtensionLoadErrors,
+    renderExtensionLoadErrorDialog,
+  } = useExtensionLoadErrorDialog();
 
   /**
    * This reference is useful to get the current opened project,
@@ -830,7 +830,7 @@ const MainFrame = (props: Props) => {
             }/${expectedNumberOfJSExtensionModulesLoaded} JS extensions.`
           );
 
-          setExtensionModulesLoadedParams({
+          setExtensionLoadingResults({
             expectedNumberOfJSExtensionModulesLoaded,
             results: loadingResults,
           });
@@ -2715,7 +2715,7 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
-      if (hasExtensionModulesLoadedErrors) return;
+      if (hasExtensionLoadErrors) return;
 
       saveUiSettings(state.editorTabs);
 
@@ -2934,7 +2934,7 @@ const MainFrame = (props: Props) => {
       showAlert,
       showConfirmation,
       gamesList,
-      hasExtensionModulesLoadedErrors,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -2948,7 +2948,7 @@ const MainFrame = (props: Props) => {
       }
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
-      if (hasExtensionModulesLoadedErrors) return;
+      if (hasExtensionLoadErrors) return;
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2975,7 +2975,7 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       canSaveProjectAs,
-      hasExtensionModulesLoadedErrors,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -2984,7 +2984,7 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
-      if (hasExtensionModulesLoadedErrors) return;
+      if (hasExtensionLoadErrors) return;
 
       if (!currentFileMetadata) {
         return saveProjectAs();
@@ -3145,7 +3145,7 @@ const MainFrame = (props: Props) => {
       showConfirmation,
       checkedOutVersionStatus,
       gamesList,
-      hasExtensionModulesLoadedErrors,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -4214,7 +4214,7 @@ const MainFrame = (props: Props) => {
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
       {renderSaveReminder()}
-      {renderExtensionModulesLoadedErrorDialog()}
+      {renderExtensionLoadErrorDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

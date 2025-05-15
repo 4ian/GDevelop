@@ -655,7 +655,8 @@ export default class LayerRenderer {
 
     threePlaneTexture.generateMipmaps = false;
     const filter =
-      this.project.getScaleMode() === 'nearest'
+      this.project.getScaleMode() === 'nearest' ||
+      this.project.getScaleMode() === 'magnified'
         ? THREE.NearestFilter
         : THREE.LinearFilter;
     threePlaneTexture.minFilter = filter;

@@ -77,7 +77,7 @@ namespace gdjs {
     private _hasPressedBackwardKey: boolean = false;
     private _hasPressedRightKey: boolean = false;
     private _hasPressedLeftKey: boolean = false;
-    private _hasPressedHandBreakKey: boolean = false;
+    private _hasPressedHandBrakeKey: boolean = false;
     private _acceleratorStickForce: float = 0;
     private _steeringStickForce: float = 0;
 
@@ -88,7 +88,7 @@ namespace gdjs {
     private _wasRightKeyPressed: boolean = false;
     private _wasForwardKeyPressed: boolean = false;
     private _wasBackwardKeyPressed: boolean = false;
-    private _wasHandBreakKeyPressed: boolean = false;
+    private _wasHandBrakeKeyPressed: boolean = false;
     private _previousAcceleratorStickForce: float = 0;
     private _previousSteeringStickForce: float = 0;
 
@@ -278,7 +278,7 @@ namespace gdjs {
           rik: this._wasRightKeyPressed,
           upk: this._wasForwardKeyPressed,
           dok: this._wasBackwardKeyPressed,
-          hbk: this._wasHandBreakKeyPressed,
+          hbk: this._wasHandBrakeKeyPressed,
           asf: this._previousAcceleratorStickForce,
           ssf: this._previousSteeringStickForce,
           etm: this._engineTorqueMax,
@@ -298,7 +298,7 @@ namespace gdjs {
       this._hasPressedBackwardKey = behaviorSpecificProps.dok;
       this._hasPressedLeftKey = behaviorSpecificProps.lek;
       this._hasPressedRightKey = behaviorSpecificProps.rik;
-      this._hasPressedHandBreakKey = behaviorSpecificProps.hbk;
+      this._hasPressedHandBrakeKey = behaviorSpecificProps.hbk;
       this._acceleratorStickForce = behaviorSpecificProps.asf;
       this._steeringStickForce = behaviorSpecificProps.ssf;
       this._engineTorqueMax = behaviorSpecificProps.etm;
@@ -445,7 +445,7 @@ namespace gdjs {
       }
 
       let handBrake = 0;
-      if (this._hasPressedHandBreakKey) {
+      if (this._hasPressedHandBrakeKey) {
         forward = 0.0;
         handBrake = 1.0;
       }
@@ -469,7 +469,7 @@ namespace gdjs {
       this._wasBackwardKeyPressed = this._hasPressedBackwardKey;
       this._wasRightKeyPressed = this._hasPressedRightKey;
       this._wasLeftKeyPressed = this._hasPressedLeftKey;
-      this._wasHandBreakKeyPressed = this._hasPressedHandBreakKey;
+      this._wasHandBrakeKeyPressed = this._hasPressedHandBrakeKey;
       this._previousAcceleratorStickForce = this._acceleratorStickForce;
       this._previousSteeringStickForce = this._steeringStickForce;
 
@@ -478,7 +478,7 @@ namespace gdjs {
         this._hasPressedBackwardKey = false;
         this._hasPressedRightKey = false;
         this._hasPressedLeftKey = false;
-        this._hasPressedHandBreakKey = false;
+        this._hasPressedHandBrakeKey = false;
         this._acceleratorStickForce = 0;
         this._steeringStickForce = 0;
       }
@@ -518,12 +518,12 @@ namespace gdjs {
       return this._wasLeftKeyPressed;
     }
 
-    simulateHandBreakKey(): void {
-      this._hasPressedHandBreakKey = true;
+    simulateHandBrakeKey(): void {
+      this._hasPressedHandBrakeKey = true;
     }
 
-    wasHandBreakKeyPressed(): boolean {
-      return this._wasHandBreakKeyPressed;
+    wasHandBrakeKeyPressed(): boolean {
+      return this._wasHandBrakeKeyPressed;
     }
 
     simulateAcceleratorStick(stickForce: float): void {

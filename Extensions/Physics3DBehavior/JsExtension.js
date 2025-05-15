@@ -227,7 +227,7 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('object3D')
-          .setValue(behaviorContent.getChild('Object3D').getStringValue())
+          .setValue(behaviorContent.getChild('object3D').getStringValue())
           .setType('Behavior')
           .setLabel('3D capability')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)

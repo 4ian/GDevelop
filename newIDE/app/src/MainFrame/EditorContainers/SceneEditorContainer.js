@@ -79,6 +79,20 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onSceneObjectsDeleted(scene: gdLayout) {
+    const layout = this.getLayout();
+    if (!layout) {
+      return;
+    }
+    if (layout !== scene) {
+      return;
+    }
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+    }
+  }
+
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
     if (
@@ -160,8 +174,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onObjectEdited={objectWithContext =>
           this.props.onSceneObjectEdited(layout, objectWithContext)
         }
+        onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
+        onObjectGroupsDeleted={() => {}}
         // Nothing to do as scenes are not events-based objects.
         onEventsBasedObjectChildrenEdited={() => {}}
       />

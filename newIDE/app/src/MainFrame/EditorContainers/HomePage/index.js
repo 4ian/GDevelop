@@ -169,6 +169,7 @@ export type HomePageEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -482,12 +483,17 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
+        // No thing to be done.
+      }, []);
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
+        onSceneObjectsDeleted,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

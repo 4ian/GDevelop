@@ -119,6 +119,9 @@ type Props = {|
     eventsBasedObject: gdEventsBasedObject
   ) => void,
 
+  onObjectsDeleted: () => void,
+  onObjectGroupsDeleted: () => void,
+
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
   isActive: boolean,
@@ -973,7 +976,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, layout, eventsBasedObject, onObjectEdited } = this.props;
+    const { project, layout, eventsBasedObject, onObjectsDeleted } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
@@ -1005,12 +1008,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
 
+    // Note: done() actually does the deletion of the objects,
+    // so ensure objectsWithContext are not used after this call.
     done(true);
+    onObjectsDeleted();
 
-    objectsWithContext.forEach(objectWithContext => {
-      // TODO Avoid to do this N times.
-      onObjectEdited(objectWithContext);
-    });
     // We modified the selection, so force an update of editors dealing with it.
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -1207,8 +1209,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
+    // done() actually does the deletion of the object group,
+    // so ensure groupWithContext is not used after this call.
     done(true);
-    this.props.onObjectGroupEdited(groupWithContext);
+    this.props.onObjectGroupsDeleted();
   };
 
   _onRenameObjectGroup = (

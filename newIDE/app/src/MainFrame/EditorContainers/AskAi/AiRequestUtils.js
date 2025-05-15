@@ -4,7 +4,7 @@ import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
 } from '../../../Utils/GDevelopServices/Generation';
-import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../../../EditorFunctions/EditorFunctionCallRunner';
 
 export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,

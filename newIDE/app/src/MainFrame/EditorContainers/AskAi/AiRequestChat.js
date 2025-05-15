@@ -35,7 +35,8 @@ import Link from '../../../UI/Link';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
 import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
-import { type EditorFunctionCallResult } from '../../../Commands/EditorFunctionCallRunner';
+import { type EditorFunctionCallResult } from '../../../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorCallbacks } from '../../../EditorFunctions';
 import {
   getFunctionCallsToProcess,
   getFunctionCallToFunctionCallOutputMap,
@@ -50,6 +51,7 @@ const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
 
 type Props = {
+  project: gdProject | null,
   i18n: I18nType,
   aiRequest: AiRequest | null,
 
@@ -76,7 +78,7 @@ type Props = {
     options: ?{| ignore?: boolean |}
   ) => Promise<void>,
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
-
+  editorCallbacks: EditorCallbacks,
   // Error that occurred while sending the last request.
   lastSendError: ?Error,
 
@@ -195,6 +197,7 @@ const getQuotaOrCreditsExplanation = ({
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
+      project,
       aiRequest,
       isSending,
       onStartNewAiRequest,
@@ -211,6 +214,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       isAutoProcessingFunctionCalls,
       setAutoProcessFunctionCalls,
       i18n,
+      editorCallbacks,
     }: Props,
     ref
   ) => {
@@ -625,6 +629,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       );
                       return (
                         <FunctionCallRow
+                          project={project}
                           key={key}
                           onProcess={() =>
                             onProcessFunctionCalls([messageContent])
@@ -639,6 +644,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                           existingFunctionCallOutput={
                             existingFunctionCallOutput
                           }
+                          editorCallbacks={editorCallbacks}
                         />
                       );
                     }

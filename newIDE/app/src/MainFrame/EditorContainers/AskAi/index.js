@@ -30,7 +30,8 @@ import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/
 import {
   processEditorFunctionCalls,
   type EditorFunctionCallResult,
-} from '../../../Commands/EditorFunctionCallRunner';
+} from '../../../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorCallbacks } from '../../../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
@@ -520,6 +521,7 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  editorCallbacks: EditorCallbacks,
 |};
 
 const styles = {
@@ -572,6 +574,7 @@ export const AskAi = React.memo<Props>(
         storageProvider,
         i18n,
         onCreateEmptyProject,
+        editorCallbacks,
       }: Props,
       ref
     ) => {
@@ -945,6 +948,7 @@ export const AskAi = React.memo<Props>(
           <Paper square background="dark" style={styles.paper}>
             <div style={styles.chatContainer}>
               <AiRequestChat
+                project={project || null}
                 ref={aiRequestChatRef}
                 aiRequest={selectedAiRequest}
                 onStartNewAiRequest={startNewAiRequest}
@@ -982,6 +986,7 @@ export const AskAi = React.memo<Props>(
                   );
                 }}
                 i18n={i18n}
+                editorCallbacks={editorCallbacks}
               />
             </div>
           </Paper>
@@ -1019,6 +1024,10 @@ export const renderAskAiContainer = (
         setToolbar={props.setToolbar}
         isActive={props.isActive}
         onCreateEmptyProject={props.onCreateEmptyProject}
+        editorCallbacks={{
+          onOpenLayout: props.onOpenLayout,
+          onOpenEvents: props.onOpenEvents,
+        }}
       />
     )}
   </I18n>

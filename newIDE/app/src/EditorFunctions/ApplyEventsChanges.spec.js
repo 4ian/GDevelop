@@ -1,10 +1,6 @@
 // @flow
 import { applyEventsChanges } from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,6 +49,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: null,
         areEventsValid: null,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -87,6 +84,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: null,
         areEventsValid: null,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -115,6 +113,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: true,
         areEventsValid: true,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -141,6 +140,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: true,
         areEventsValid: true,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -168,6 +168,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: true,
         areEventsValid: true,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -194,6 +195,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: true,
         areEventsValid: true,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -224,6 +226,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: null,
         areEventsValid: null,
         diagnosticLines: [],
+        extensionNames: [],
       },
       {
         operationName: 'insert_before_event',
@@ -232,6 +235,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: true,
         areEventsValid: true,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);
@@ -262,6 +266,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: null,
         areEventsValid: null,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
 
@@ -289,6 +294,7 @@ describe('applyEventsChanges', () => {
         isEventsJsonValid: null,
         areEventsValid: null,
         diagnosticLines: [],
+        extensionNames: [],
       },
     ];
     applyEventsChanges(project, sceneEventsList, eventOperations);

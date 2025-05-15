@@ -39,7 +39,7 @@ export const ExtensionLoadErrorDialog = ({
   return (
     <Dialog
       title={
-        <Trans>GDevelop installation is corrupted and can't be used</Trans>
+        <Trans>GDevelop's installation is corrupted and can't be used</Trans>
       }
       actions={[
         Window.isDev() ? (
@@ -65,7 +65,14 @@ export const ExtensionLoadErrorDialog = ({
         </Text>
         <Text>
           <Trans>
-            Please re-install it by downloading the latest version from{' '}
+            If you are in a browser, ensure you close all GDevelop tabs or
+            restart the browser.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans>
+            If you are on desktop, please re-install it by downloading the
+            latest version from{' '}
             <Link
               href={downloadUrl}
               onClick={() => Window.openExternalURL(downloadUrl)}

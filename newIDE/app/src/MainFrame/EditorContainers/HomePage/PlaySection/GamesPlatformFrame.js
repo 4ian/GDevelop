@@ -47,21 +47,17 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
   const url = new URL(
     gameId.current
       ? `/app-embedded/${gamesPlatformEmbeddedVersion}/games/${gameId.current}`
-      : isMobile
-      ? // On mobile, go directly to a random game if none is specified.
-        `/app-embedded/${gamesPlatformEmbeddedVersion}/games/random`
-      : // On desktop, access the homepage.
-        `/app-embedded/${gamesPlatformEmbeddedVersion}/${paletteType}`,
+      : `/app-embedded/${gamesPlatformEmbeddedVersion}/${paletteType}`,
     gdGamesHost
   );
-  if (gameId.current || isMobile) url.searchParams.set('theme', paletteType);
+  if (gameId.current) url.searchParams.set('theme', paletteType);
 
   const src = loaded ? url.toString() : '';
 
   React.useEffect(
     () => {
-      if (!loaded && initialGameId) {
-        // Every time the frame is unloaded on a gameId, we reset it for the next load.
+      if (!loaded) {
+        // Every time the frame is unloaded, we reset it for the next load.
         gameId.current = initialGameId;
       }
     },

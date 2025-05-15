@@ -3309,17 +3309,17 @@ module.exports = {
 
       aut
         .addScopedAction(
-          'SimulateHandBreakKey',
-          _('Simulate hand break key press'),
-          _('Simulate a press of the hand break key.'),
-          _('Simulate pressing hand break key for _PARAM0_'),
+          'SimulateHandBrakeKey',
+          _('Simulate hand brake key press'),
+          _('Simulate a press of the hand brake key.'),
+          _('Simulate pressing hand brake key for _PARAM0_'),
           _('Car controls'),
           'JsPlatform/Extensions/physics_car3d.svg',
           'JsPlatform/Extensions/physics_car3d.svg'
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'PhysicsCar3D')
-        .setFunctionName('simulateHandBreakKey');
+        .setFunctionName('simulateHandBrakeKey');
 
       aut
         .addScopedAction(

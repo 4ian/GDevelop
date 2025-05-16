@@ -554,6 +554,7 @@ export type AskAiEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -645,6 +646,7 @@ export const AskAi = React.memo<Props>(
         forceUpdateEditor: noop,
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
+        onSceneObjectsDeleted: noop,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(

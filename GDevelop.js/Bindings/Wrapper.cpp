@@ -830,6 +830,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPixel GetPixel
 #define STATIC_GetPixelSpeed GetPixelSpeed
 #define STATIC_GetPixelAcceleration GetPixelAcceleration
+#define STATIC_GetAngularSpeed GetAngularSpeed
 #define STATIC_GetNewton GetNewton
 #define STATIC_GetDefaultMeasurementUnitsCount GetDefaultMeasurementUnitsCount
 #define STATIC_GetDefaultMeasurementUnitAtIndex GetDefaultMeasurementUnitAtIndex

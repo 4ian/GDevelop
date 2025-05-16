@@ -203,6 +203,7 @@ import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
+import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -371,9 +372,10 @@ const MainFrame = (props: Props) => {
     chooseResourceOptions,
     setChooseResourceOptions,
   ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?(
-    Array<gdResource>
-  ) => void>(null);
+  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -550,6 +552,12 @@ const MainFrame = (props: Props) => {
     project: currentProject,
     gamesList,
   });
+
+  const {
+    setExtensionLoadingResults,
+    hasExtensionLoadErrors,
+    renderExtensionLoadErrorDialog,
+  } = useExtensionLoadErrorDialog();
 
   /**
    * This reference is useful to get the current opened project,
@@ -808,36 +816,26 @@ const MainFrame = (props: Props) => {
 
     return extensionsLoader
       .loadAllExtensions(getNotNullTranslationFunction(i18n))
-      .then(loadingResults => {
-        const successLoadingResults = loadingResults.filter(
-          loadingResult => !loadingResult.result.error
-        );
-        const failLoadingResults = loadingResults.filter(
-          loadingResult =>
-            loadingResult.result.error && !loadingResult.result.dangerous
-        );
-        const dangerousLoadingResults = loadingResults.filter(
-          loadingResult =>
-            loadingResult.result.error && loadingResult.result.dangerous
-        );
-        console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
-        if (failLoadingResults.length) {
-          console.error(
-            `⚠️ Unable to load ${
-              failLoadingResults.length
-            } JS extensions. Please check these errors:`,
-            failLoadingResults
+      .then(
+        ({
+          expectedNumberOfJSExtensionModulesLoaded,
+          results: loadingResults,
+        }) => {
+          const successLoadingResults = loadingResults.filter(
+            loadingResult => !loadingResult.result.error
           );
-        }
-        if (dangerousLoadingResults.length) {
-          console.error(
-            `💣 Dangerous exceptions while loading ${
-              dangerousLoadingResults.length
-            } JS extensions. 🔥 Please check these errors as they will CRASH GDevelop:`,
-            dangerousLoadingResults
+          console.info(
+            `Loaded ${
+              successLoadingResults.length
+            }/${expectedNumberOfJSExtensionModulesLoaded} JS extensions.`
           );
+
+          setExtensionLoadingResults({
+            expectedNumberOfJSExtensionModulesLoaded,
+            results: loadingResults,
+          });
         }
-      });
+      );
   };
 
   useDiscordRichPresence(currentProject);
@@ -2354,6 +2352,18 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const onSceneObjectsDeleted = React.useCallback(
+    (scene: gdLayout) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneObjectsDeleted(scene);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -2717,6 +2727,9 @@ const MainFrame = (props: Props) => {
       |}
     ) => {
       if (!currentProject) return;
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
 
       saveUiSettings(state.editorTabs);
 
@@ -2935,6 +2948,7 @@ const MainFrame = (props: Props) => {
       showAlert,
       showConfirmation,
       gamesList,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -2946,6 +2960,9 @@ const MainFrame = (props: Props) => {
       if (!canSaveProjectAs) {
         return;
       }
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2972,12 +2989,17 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       canSaveProjectAs,
+      hasExtensionLoadErrors,
     ]
   );
 
   const saveProject = React.useCallback(
     async () => {
       if (!currentProject) return;
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
+
       if (!currentFileMetadata) {
         return saveProjectAs();
       }
@@ -3137,6 +3159,7 @@ const MainFrame = (props: Props) => {
       showConfirmation,
       checkedOutVersionStatus,
       gamesList,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -3323,9 +3346,11 @@ const MainFrame = (props: Props) => {
     (options: ChooseResourceOptions) => {
       return new Promise(resolve => {
         setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => (
-          Promise<Array<gdResource>> | Array<gdResource>
-        ) => void = () => resolve;
+        const onResourceChosenSetter: () => ({|
+          selectedResources: Array<gdResource>,
+          selectedSourceName: string,
+        |}) => void = () => resolve;
+
         setOnResourceChosen(onResourceChosenSetter);
       });
     },
@@ -4038,6 +4063,7 @@ const MainFrame = (props: Props) => {
                     onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    onSceneObjectsDeleted: onSceneObjectsDeleted,
                     onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                     gamesPlatformFrameTools,
@@ -4101,15 +4127,18 @@ const MainFrame = (props: Props) => {
           getStorageProvider={getStorageProvider}
           i18n={i18n}
           resourceSources={resourceSources}
-          onChooseResources={resources => {
+          onChooseResources={resourcesOptions => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen(resources);
+            onResourceChosen(resourcesOptions);
           }}
           onClose={() => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen([]);
+            onResourceChosen({
+              selectedResources: [],
+              selectedSourceName: '',
+            });
           }}
           options={chooseResourceOptions}
         />
@@ -4201,6 +4230,7 @@ const MainFrame = (props: Props) => {
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
       {renderSaveReminder()}
+      {renderExtensionLoadErrorDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

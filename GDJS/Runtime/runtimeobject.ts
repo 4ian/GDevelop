@@ -382,10 +382,8 @@ namespace gdjs {
      * in milliseconds, for the object.
      *
      * Objects can have different elapsed time if they are on layers with different time scales.
-     *
-     * @param instanceContainer The instance container the object belongs to (deprecated - can be omitted).
      */
-    getElapsedTime(instanceContainer?: gdjs.RuntimeInstanceContainer): float {
+    getElapsedTime(): float {
       const theLayer = this._runtimeScene.getLayer(this.layer);
       return theLayer.getElapsedTime();
     }
@@ -599,11 +597,10 @@ namespace gdjs {
      * Remove an object from a scene.
      *
      * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
-     * @param instanceContainer The container owning the object.
      */
-    deleteFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    deleteFromScene(): void {
       if (this._livingOnScene) {
-        instanceContainer.markObjectForDeletion(this);
+        this._runtimeScene.markObjectForDeletion(this);
         this._livingOnScene = false;
       }
     }
@@ -620,11 +617,9 @@ namespace gdjs {
      * Called when the object is destroyed (because it is removed from a scene or the scene
      * is being unloaded). If you redefine this function, **make sure to call the original method**
      * (`RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
-     *
-     * @param instanceContainer The container owning the object.
      */
-    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      const theLayer = instanceContainer.getLayer(this.layer);
+    onDeletedFromScene(): void {
+      const theLayer = this._runtimeScene.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
@@ -797,12 +792,7 @@ namespace gdjs {
       return this.getY();
     }
 
-    rotateTowardPosition(
-      x: float,
-      y: float,
-      speed: float,
-      scene: gdjs.RuntimeScene
-    ): void {
+    rotateTowardPosition(x: float, y: float, speed: float): void {
       this.rotateTowardAngle(
         gdjs.toDegrees(
           Math.atan2(
@@ -810,21 +800,15 @@ namespace gdjs {
             x - (this.getDrawableX() + this.getCenterX())
           )
         ),
-        speed,
-        scene
+        speed
       );
     }
 
     /**
      * @param angle The targeted direction angle.
      * @param speed The rotation speed.
-     * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
      */
-    rotateTowardAngle(
-      angle: float,
-      speed: float,
-      instanceContainer?: gdjs.RuntimeInstanceContainer
-    ): void {
+    rotateTowardAngle(angle: float, speed: float): void {
       if (speed === 0) {
         this.setAngle(angle);
         return;
@@ -863,10 +847,7 @@ namespace gdjs {
      * @param speed The speed, in degrees per second.
      * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
      */
-    rotate(
-      speed: float,
-      instanceContainer?: gdjs.RuntimeInstanceContainer
-    ): void {
+    rotate(speed: float): void {
       this.setAngle(this.getAngle() + (speed * this.getElapsedTime()) / 1000);
     }
 

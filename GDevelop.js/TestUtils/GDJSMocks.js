@@ -388,7 +388,8 @@ class VariablesContainer {
 }
 
 class RuntimeObject {
-  constructor(runtimeScene, objectData) {
+  constructor(instanceContainer, objectData) {
+    this._runtimeScene = instanceContainer;
     this.name = objectData.name || '';
     this._variables = new VariablesContainer(objectData.variables);
     this._livingOnScene = true;
@@ -466,10 +467,9 @@ class RuntimeObject {
     array.pushValue(value);
   }
 
-  /** @param {RuntimeScene} runtimeScene */
-  deleteFromScene(runtimeScene) {
+  deleteFromScene() {
     if (this._livingOnScene) {
-      runtimeScene.markObjectForDeletion(this);
+      this._runtimeScene.markObjectForDeletion(this);
       this._livingOnScene = false;
     }
   }

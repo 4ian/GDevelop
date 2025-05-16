@@ -24,7 +24,7 @@ describe('Physics2RuntimeBehavior', () => {
 
     doStepPreEvents(runtimeScene) {
       if (this.shouldDeleteInPreEvent) {
-        this.owner.deleteFromScene(runtimeScene);
+        this.owner.deleteFromScene();
       }
     }
   }
@@ -159,7 +159,7 @@ describe('Physics2RuntimeBehavior', () => {
       );
 
       // Delete object from scene
-      object.deleteFromScene(runtimeScene);
+      object.deleteFromScene();
       expect(behavior.destroyedDuringFrameLogic).to.be(true);
       expect(behavior.getBody()).to.be(null);
       expect(behavior._sharedData._registeredBehaviors.size).to.be(0);
@@ -194,7 +194,7 @@ describe('Physics2RuntimeBehavior', () => {
         false
       );
 
-      object.deleteFromScene(runtimeScene);
+      object.deleteFromScene();
 
       expect(behavior.destroyedDuringFrameLogic).to.be(true);
       expect(behavior.getBody()).to.be(null);
@@ -712,7 +712,7 @@ describe('Physics2RuntimeBehavior', () => {
 
       // Destroy (handled by postEvent).
       runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
-        movingObject.deleteFromScene(runtimeScene);
+        movingObject.deleteFromScene();
       });
 
       // Collision should be reset on destroyed object and

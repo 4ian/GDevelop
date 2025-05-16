@@ -954,18 +954,16 @@ namespace gdjs {
     //Other :
     /**
      * @param obj The target object
-     * @param scene The scene containing the object
      * @deprecated
      */
-    turnTowardObject(obj: gdjs.RuntimeObject | null, scene: gdjs.RuntimeScene) {
+    turnTowardObject(obj: gdjs.RuntimeObject | null) {
       if (obj === null) {
         return;
       }
       this.rotateTowardPosition(
         obj.getDrawableX() + obj.getCenterX(),
         obj.getDrawableY() + obj.getCenterY(),
-        0,
-        scene
+        0
       );
     }
   }

@@ -686,7 +686,7 @@ namespace gdjs {
       }
 
       // Notify the object it was removed from the container
-      obj.onDeletedFromScene(this);
+      obj.onDeletedFromScene();
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {

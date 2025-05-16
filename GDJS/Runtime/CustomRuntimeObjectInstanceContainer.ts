@@ -187,7 +187,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDeletedFromScene(this);
+        object.onDeletedFromScene();
         // The object can free all its resource directly...
         object.onDestroyed();
       }

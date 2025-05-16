@@ -206,13 +206,13 @@ namespace gdjs {
       }
     }
 
-    override onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    override onDeletedFromScene(): void {
       // Let subclasses do something before the object is destroyed.
-      this.onDestroy(parent);
+      this.onDestroy(this._runtimeScene);
       // Let behaviors do something before the object is destroyed.
-      super.onDeletedFromScene(parent);
+      super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(parent);
+      this._instanceContainer.onDestroyFromScene(this._runtimeScene);
     }
 
     override update(parent: gdjs.RuntimeInstanceContainer): void {

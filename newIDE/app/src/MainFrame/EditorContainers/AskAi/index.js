@@ -59,6 +59,7 @@ export type AskAiEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
   onEditorShown: () => void,
   onEditorHidden: () => void,
 |};
@@ -111,6 +112,7 @@ export const AskAi = React.memo<Props>(
         forceUpdateEditor: noop,
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
+        onSceneObjectsDeleted: noop,
         onEditorShown: noop,
         onEditorHidden: noop,
       }));

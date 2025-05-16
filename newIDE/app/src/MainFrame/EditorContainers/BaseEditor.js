@@ -153,6 +153,7 @@ export type RenderEditorContainerProps = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (

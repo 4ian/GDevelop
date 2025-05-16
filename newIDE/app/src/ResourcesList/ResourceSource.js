@@ -151,7 +151,10 @@ export type ChooseResourceProps = {|
 
 export type ResourceSourceComponentProps = {|
   ...ChooseResourceProps,
-  onChooseResources: (Array<gdResource>) => void,
+  onChooseResources: ({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void,
   selectedResourceIndex?: ?number,
   onSelectResource?: (?number) => void,
   selectedResources?: ?Array<gdResource>,
@@ -161,7 +164,10 @@ export type ResourceSourceComponentProps = {|
 export type ResourceSourceComponentPrimaryActionProps = {|
   resource: ?(ResourceV2 | Resource),
   selectedResources: ?Array<gdResource>,
-  onChooseResources: (resources: Array<gdResource>) => void,
+  onChooseResources: ({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void,
 |};
 
 export type ResourceSource = {|
@@ -182,7 +188,10 @@ export type ResourceSource = {|
 
 export type ChooseResourceFunction = (
   options: ChooseResourceOptions
-) => Promise<Array<gdResource>>;
+) => Promise<{|
+  selectedResources: Array<gdResource>,
+  selectedSourceName: string,
+|}>;
 
 export type ResourceManagementProps = {|
   resourceSources: Array<ResourceSource>,

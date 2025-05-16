@@ -1420,7 +1420,7 @@ namespace gdjs {
         ) {
           // Instance was deleted (or object name changed, in which case it will be re-created later)
           if (runtimeObject) {
-            runtimeObject.deleteFromScene(runtimeInstanceContainer);
+            runtimeObject.deleteFromScene();
           }
         } else {
         }

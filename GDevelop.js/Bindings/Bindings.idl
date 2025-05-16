@@ -1196,6 +1196,7 @@ interface MeasurementUnit {
   [Const, Ref] MeasurementUnit STATIC_GetPixel();
   [Const, Ref] MeasurementUnit STATIC_GetPixelSpeed();
   [Const, Ref] MeasurementUnit STATIC_GetPixelAcceleration();
+  [Const, Ref] MeasurementUnit STATIC_GetAngularSpeed();
   [Const, Ref] MeasurementUnit STATIC_GetNewton();
 
   long STATIC_GetDefaultMeasurementUnitsCount();

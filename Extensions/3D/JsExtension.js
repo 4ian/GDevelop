@@ -2409,6 +2409,8 @@ module.exports = {
           getTransparentMaterial(),
         ];
         this._threeObject = new THREE.Mesh(geometry, materials);
+        this._threeObject.castShadow = true;
+        this._threeObject.receiveShadow = true;
         this._threeObject.rotation.order = 'ZYX';
         this._threeGroup.add(this._threeObject);
 

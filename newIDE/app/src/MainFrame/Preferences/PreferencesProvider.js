@@ -149,9 +149,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
-      this
-    ),
     setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(
       this
     ),
@@ -347,18 +344,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showEffectParameterNames,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          showGetStartedSectionByDefault,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

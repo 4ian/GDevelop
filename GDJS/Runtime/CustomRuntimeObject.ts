@@ -104,27 +104,19 @@ namespace gdjs {
         );
         return;
       }
-
-      if (!eventsBasedObjectData.defaultVariant) {
-        eventsBasedObjectData.defaultVariant = {
-          ...eventsBasedObjectData,
-          name: '',
-        };
-      }
-      let usedVariantData: EventsBasedObjectVariantData =
-        eventsBasedObjectData.defaultVariant;
-      if (customObjectData.variant) {
-        for (
-          let variantIndex = 0;
-          variantIndex < eventsBasedObjectData.variants.length;
-          variantIndex++
-        ) {
-          const variantData = eventsBasedObjectData.variants[variantIndex];
-          if (variantData.name === customObjectData.variant) {
-            usedVariantData = variantData;
-            break;
-          }
-        }
+      const usedVariantData: EventsBasedObjectVariantData | null =
+        this.getRuntimeScene()
+          .getGame()
+          .getEventsBasedObjectVariantData(
+            customObjectData.type,
+            customObjectData.variant
+          );
+      if (!usedVariantData) {
+        // This can't actually happen.
+        logger.error(
+          `Unknown variant "${customObjectData.variant}" for object "${customObjectData.type}".`
+        );
+        return;
       }
 
       this._isInnerAreaFollowingParentSize =

@@ -127,12 +127,15 @@ namespace gdjs {
         width: runtimeObject.getWidth(),
         height: runtimeObject.getHeight(),
         depth: runtimeObject.getDepth(),
+        locked: false, // TODO
+        // TODO: how to transmit/should we transmit other properties?
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
         // @ts-ignore
         defaultWidth: runtimeObject.getOriginalWidth(),
         defaultHeight: runtimeObject.getOriginalHeight(),
         defaultDepth: runtimeObject.getOriginalDepth(),
-        locked: false, // TODO
-        // TODO: how to transmit/should we transmit other properties?
       };
 
       return instanceData;
@@ -160,7 +163,7 @@ namespace gdjs {
       if (index < 0) {
         this._selectedObjects.push(object);
       } else {
-        this._selectedObjects.splice(index);
+        this._selectedObjects.splice(index, 1);
       }
     }
 
@@ -289,6 +292,7 @@ namespace gdjs {
     private _runtimeGame: RuntimeGame;
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
+    private _editedInstanceDataList: InstanceData[] = [];
     //@ts-ignore
     private _tempVector2d: THREE.Vector2 =
       typeof THREE === 'undefined' ? null : new THREE.Vector2();
@@ -328,11 +332,19 @@ namespace gdjs {
     private _lastCursorY: number = 0;
     private _wasMouseRightButtonPressed = false;
 
+    private _isLeftButtonPressed = false;
+    private _pressedOriginalCursorX = 0;
+    private _pressedOriginalCursorY = 0;
+
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
+    }
+
+    setEditedInstanceDataList(editedInstanceDataList: InstanceData[]) {
+      this._editedInstanceDataList = editedInstanceDataList;
     }
 
     setEditedInstanceContainer(
@@ -855,7 +867,7 @@ namespace gdjs {
       if (shouldDeleteSelection(inputManager)) {
         const removedObjects = this._selection.getSelectedObjects();
         removedObjects.forEach((object) => {
-          object.deleteFromScene(editedInstanceContainer);
+          object.deleteFromScene();
         });
         this._selection.clear();
         this._sendSelectionUpdate({
@@ -1101,7 +1113,19 @@ namespace gdjs {
 
       const updatedInstances = this._selection
         .getSelectedObjects()
-        .map((object) => getInstanceDataFromRuntimeObject(object))
+        .map((object) => {
+          const instance = getInstanceDataFromRuntimeObject(object);
+          if (instance) {
+            // Avoid to clear these properties when assigning it to the old InstanceData.
+            // @ts-ignore
+            delete instance.initialVariables;
+            // @ts-ignore
+            delete instance.numberProperties;
+            // @ts-ignore
+            delete instance.stringProperties;
+          }
+          return instance;
+        })
         .filter(isDefined);
 
       const addedInstances =
@@ -1111,22 +1135,56 @@ namespace gdjs {
               .filter(isDefined)
           : [];
 
+      const removedInstances =
+        options && options.removedObjects ? options.removedObjects : [];
+
+      this._removeInstances(removedInstances);
+      this._updateInstances(updatedInstances);
+      this._addInstances(addedInstances);
+
       debuggerClient.sendInstanceChanges({
         updatedInstances,
         addedInstances,
         selectedInstances: getPersistentUuidsFromObjects(
           this._selection.getSelectedObjects()
         ),
-        removedInstances:
-          options && options.removedObjects
-            ? getPersistentUuidsFromObjects(options.removedObjects)
-            : [],
+        removedInstances: getPersistentUuidsFromObjects(removedInstances),
       });
     }
 
-    private _isLeftButtonPressed = false;
-    private _pressedOriginalCursorX = 0;
-    private _pressedOriginalCursorY = 0;
+    private _removeInstances(
+      removedInstances: Array<{ persistentUuid: string | null }>
+    ) {
+      for (const removedInstance of removedInstances) {
+        // TODO: Might be worth indexing instances data
+        const instanceIndex = this._editedInstanceDataList.findIndex(
+          (instance) =>
+            instance.persistentUuid === removedInstance.persistentUuid
+        );
+        if (instanceIndex >= 0) {
+          this._editedInstanceDataList.splice(instanceIndex, 1);
+        }
+      }
+    }
+
+    private _updateInstances(updatedInstances: Array<InstanceData>) {
+      for (const updatedInstance of updatedInstances) {
+        // TODO: Might be worth indexing instances data
+        const oldInstance = this._editedInstanceDataList.find(
+          (oldInstance) =>
+            oldInstance.persistentUuid === updatedInstance.persistentUuid
+        );
+        if (oldInstance) {
+          Object.assign(oldInstance, updatedInstance);
+        }
+      }
+    }
+
+    private _addInstances(addedInstances: Array<InstanceData>) {
+      for (const addedInstance of addedInstances) {
+        this._editedInstanceDataList.push(addedInstance);
+      }
+    }
 
     private _handleContextMenu() {
       const inputManager = this._runtimeGame.getInputManager();
@@ -1161,7 +1219,7 @@ namespace gdjs {
       if (!editedInstanceContainer) return;
 
       if (this._draggedNewObject) {
-        this._draggedNewObject.deleteFromScene(editedInstanceContainer);
+        this._draggedNewObject.deleteFromScene();
         this._draggedNewObject = null;
       }
     }
@@ -1236,7 +1294,7 @@ namespace gdjs {
       }
 
       if (this._draggedNewObject && this._draggedNewObject.getName() !== name) {
-        this._draggedNewObject.deleteFromScene(editedInstanceContainer);
+        this._draggedNewObject.deleteFromScene();
         this._draggedNewObject = null;
       }
 
@@ -1349,6 +1407,7 @@ namespace gdjs {
             runtimeObject.extraInitializationFromInitialInstance(instance);
           }
         });
+      this._updateInstances(instances);
       this._forceUpdateSelectionControls();
     }
 
@@ -1357,14 +1416,16 @@ namespace gdjs {
       if (!editedInstanceContainer) return;
 
       editedInstanceContainer.createObjectsFrom(instances, 0, 0, 0, true);
+      this._addInstances(instances);
     }
 
     deleteSelection() {
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
+      this._removeInstances(this._selection.getSelectedObjects());
       for (const object of this._selection.getSelectedObjects()) {
-        object.deleteFromScene(editedInstanceContainer);
+        object.deleteFromScene();
       }
       this._selection.clear();
     }

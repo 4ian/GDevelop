@@ -306,62 +306,12 @@ namespace gdjs {
           return;
         }
 
-        const runtimeGameOptions = this._runtimegame.getAdditionalOptions();
-        if (runtimeGameOptions.initialRuntimeGameStatus) {
-          // Skip changing the scene if we're already on the state that is being requested.
-          if (
-            runtimeGameOptions.initialRuntimeGameStatus.sceneName ===
-              sceneName &&
-            runtimeGameOptions.initialRuntimeGameStatus
-              .injectedExternalLayoutName === externalLayoutName &&
-            runtimeGameOptions.initialRuntimeGameStatus
-              .eventsBasedObjectType === eventsBasedObjectType &&
-            runtimeGameOptions.initialRuntimeGameStatus
-              .eventsBasedObjectVariantName === eventsBasedObjectVariantName
-          ) {
-            return;
-          }
-        }
-
-        if (eventsBasedObjectType) {
-          const sceneAndCustomObject = runtimeGame._createSceneWithCustomObject(
-            eventsBasedObjectType,
-            eventsBasedObjectVariantName
-          );
-          if (sceneAndCustomObject) {
-            const { scene, customObjectInstanceContainer } =
-              sceneAndCustomObject;
-            runtimeGame.getSceneStack().setEditedRuntimeScene(scene);
-            if (runtimeGame._inGameEditor) {
-              runtimeGame._inGameEditor.setEditedInstanceContainer(
-                customObjectInstanceContainer
-              );
-            }
-          }
-        } else {
-          runtimeGame.getSceneStack().replace({
-            sceneName,
-            externalLayoutName,
-            skipCreatingInstancesFromScene: !!externalLayoutName,
-            clear: true,
-          });
-          if (runtimeGame._inGameEditor) {
-            runtimeGame._inGameEditor.setEditedInstanceContainer(null);
-          }
-        }
-
-        // Update initialRuntimeGameStatus so that a hard reload
-        // will come back to the same state, and so that we can check later
-        // if the game is already on the state that is being requested.
-        runtimeGameOptions.initialRuntimeGameStatus = {
-          isPaused: runtimeGame.isPaused(),
-          isInGameEdition: runtimeGame.isInGameEdition(),
-          sceneName: sceneName,
-          injectedExternalLayoutName: externalLayoutName,
-          skipCreatingInstancesFromScene: !!externalLayoutName,
+        this._runtimegame._switchToSceneOrVariant(
+          sceneName,
+          externalLayoutName,
           eventsBasedObjectType,
-          eventsBasedObjectVariantName,
-        };
+          eventsBasedObjectVariantName
+        )
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);

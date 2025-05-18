@@ -1,4 +1,7 @@
-export const agentAiRequest = {
+// @flow
+import type { AiRequest } from '../../Utils/GDevelopServices/Generation';
+
+export const agentAiRequest: AiRequest = {
   id: '01JT3FTKKTTR99BW00PW7VA0TS',
   createdAt: '2025-04-30T13:57:49.818Z',
   updatedAt: '2025-04-30T14:01:41.683Z',
@@ -675,6 +678,7 @@ export const agentAiRequest = {
       status: 'completed',
     },
   ],
+  error: null,
   mode: 'agent',
   toolsVersion: 'v1',
   stats: {
@@ -688,7 +692,7 @@ export const agentAiRequest = {
   },
 };
 
-export const agentAiRequestWithFunctionCallToDo = {
+export const agentAiRequestWithFunctionCallToDo: AiRequest = {
   id: '01JTBDS436B6M695G44BMTHW5D',
   createdAt: '2025-05-03T15:55:59.462Z',
   updatedAt: '2025-05-03T15:58:09.737Z',
@@ -882,6 +886,7 @@ export const agentAiRequestWithFunctionCallToDo = {
       status: 'completed',
     },
   ],
+  error: null,
   mode: 'agent',
   toolsVersion: 'v1',
   stats: {
@@ -891,6 +896,233 @@ export const agentAiRequestWithFunctionCallToDo = {
     remainingMissingPrefixedTypes: [],
     lastRunSystemPromptHash:
       '0c5d381cf49bf2877bab7ef0bdfa0e8928757272105c42500071ea537cf43069',
+    finalModelPublicId: 'g2f1-g',
+  },
+};
+
+export const agentAiRequestWithFailedAndIgnoredFunctionCallOutputs: AiRequest = {
+  id: '01JVHV6WW8M30ZZN0B3DSJZVAG',
+  createdAt: '2025-05-18T14:01:50.728Z',
+  updatedAt: '2025-05-18T14:10:14.372Z',
+  status: 'ready',
+  userId: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+  output: [
+    {
+      role: 'user',
+      type: 'message',
+      content: [
+        {
+          type: 'user_request',
+          status: 'completed',
+          text: 'some request here',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'create_scene',
+          arguments: '{"scene_name":"ShooterScene"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_create_scene',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output: '{"ignored":true,"message":"This was ignored."}',
+      call_id: 'tool_0_create_scene',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            "Now, let's add some events to the `ShooterScene` to make the game work. I'll add events to:\n- Create the player\n- Make the player shoot bullets\n- Create enemies\n- Handle collisions between bullets and enemies\n",
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_scene_events',
+          arguments:
+            '{"events_description":"At the beginning of the scene, create the Player at position 100, 100. Every 0.5 seconds, create an Enemy at a random position. When the Player presses the space key, fire a Bullet. When a Bullet collides with an Enemy, delete both objects.","scene_name":"ShooterScene","extension_names_list":"TopDownMovementBehavior, FireBullet::FireBullet, LinearMovement::LinearMovementByAngle, DestroyOutsideBehavior","objects_list":"Player, Bullet, Enemy"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_scene_events',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"message":"Properly modified or added new event(s)."}',
+      call_id: 'tool_0_add_scene_events',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            'I have created the basic structure of a shooter game. I have created a scene, added a player that can move and shoot, a bullet, and an enemy. I have also added events to create the player and enemies, make the player shoot, and handle collisions between bullets and enemies.\n\nTo continue improving the game, you could:\n- Add score\n- Add different types of enemies\n- Add power-ups\n- Improve the graphics\n- Add sound effects\n',
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'user',
+      type: 'message',
+      content: [
+        {
+          type: 'user_request',
+          status: 'completed',
+          text: 'Delete all events',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'read_scene_events',
+          arguments: '{"scene_name":"ShooterScene"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_read_scene_events',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":true,"eventsForSceneNamed":"ShooterScene","eventsAsText":"<event-0>\\n Conditions:\\n - At the beginning of the scene\\n Actions:\\n - Create object Player at position 100;100 (layer: )\\n</event-0>\\n<event-1>\\n Conditions:\\n - The timer \\"EnemySpawnTimer\\" > 0.5 seconds\\n Actions:\\n - Create object Enemy at position Random(800);Random(600) (layer: )\\n - Start (or reset) the timer \\"EnemySpawnTimer\\"\\n</event-1>\\n<event-2>\\n Conditions:\\n - \\"Space\\" key is pressed\\n Actions:\\n - Fire Bullet from Player, at position Player.X(); Player.Y(), toward angle Player.Angle() and speed 400 px/s\\n</event-2>\\n<event-3>\\n Conditions:\\n - Bullet is in collision with Enemy\\n Actions:\\n - Delete Bullet\\n - Delete Enemy\\n</event-3>"}',
+      call_id: 'tool_0_read_scene_events',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_scene_events',
+          arguments:
+            '{"events_description":"","scene_name":"ShooterScene","extension_names_list":"","objects_list":""}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_scene_events',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":false,"message":"Error when launching or completing events generation ([\\"eventsDescription is a required field\\"]). Consider trying again or a different approach."}',
+      call_id: 'tool_0_add_scene_events',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            "I can't delete all events with an empty `events_description`. I will try to delete each event by replacing it with an empty event.\n",
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_scene_events',
+          arguments:
+            '{"placement_hint":"replace event named `<event-0>`","events_description":"","objects_list":"Player","extension_names_list":"Sprite","scene_name":"ShooterScene"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_scene_events',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      type: 'function_call_output',
+      output:
+        '{"success":false,"message":"Error when launching or completing events generation ([\\"eventsDescription is a required field\\"]). Consider trying again or a different approach."}',
+      call_id: 'tool_0_add_scene_events',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          annotations: [],
+          text:
+            'I will try to add an event that does nothing to replace the existing events.\n',
+          type: 'output_text',
+          status: 'completed',
+        },
+      ],
+      status: 'completed',
+    },
+    {
+      role: 'assistant',
+      type: 'message',
+      content: [
+        {
+          name: 'add_scene_events',
+          arguments:
+            '{"events_description":"Do nothing","objects_list":"","scene_name":"ShooterScene","extension_names_list":"","placement_hint":"replace event named `<event-0>`"}',
+          type: 'function_call',
+          status: 'completed',
+          call_id: 'tool_0_add_scene_events',
+        },
+      ],
+      status: 'completed',
+    },
+  ],
+  error: null,
+  mode: 'agent',
+  toolsVersion: 'v1',
+  gameId: '5742919b-25fa-448c-9fe2-668839ffa63f',
+  fileMetadata: {
+    name: 'Sassy Hill (AI starter)',
+    gameId: '5742919b-25fa-448c-9fe2-668839ffa63f',
+    lastModifiedDate: 1747490933026,
+    fileIdentifier: '/Users/florian/Downloads/test aigen.json',
+  },
+  storageProviderName: 'LocalFile',
+  stats: {
+    lastRunUserPromptTemplateHash:
+      '281ae340b8fc94b8915a4243beee520355a2c9873dd495a4ed174b667e98094e',
+    lastOutputRetriesCount: 0,
+    remainingMissingPrefixedTypes: [],
+    lastRunSystemPromptHash:
+      'a1c039caba27a4190b2a1674607ba306294828f3781c3a33cbcc908929840b48',
     finalModelPublicId: 'g2f1-g',
   },
 };

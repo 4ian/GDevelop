@@ -45,16 +45,33 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
   editorCallbacks,
 }: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  let existingParsedOutput;
+  try {
+    if (existingFunctionCallOutput) {
+      // While this could be slightly expensive in a component to render, the component
+      // is memoized, so this won't impact rendering of large chats.
+      existingParsedOutput = JSON.parse(existingFunctionCallOutput.output);
+    }
+  } catch (error) {
+    existingParsedOutput = null;
+  }
+
   const isIgnored =
-    !!editorFunctionCallResult && editorFunctionCallResult.status === 'ignored';
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'ignored') ||
+    (existingParsedOutput && !!existingParsedOutput.ignored);
   const isFinished =
     !!existingFunctionCallOutput ||
     (!!editorFunctionCallResult &&
       editorFunctionCallResult.status === 'finished');
-  const hasJustErrored =
+  const functionCallResultIsErrored =
     editorFunctionCallResult &&
     editorFunctionCallResult.status === 'finished' &&
     editorFunctionCallResult.success === false;
+  const hasErrored =
+    functionCallResultIsErrored ||
+    (existingParsedOutput && existingParsedOutput.success === false);
   const isWorking =
     !isFinished &&
     !!editorFunctionCallResult &&
@@ -94,12 +111,12 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
         )}
       >
         <div>
-          {hasJustErrored ? (
+          {hasErrored ? (
             <Error htmlColor={gdevelopTheme.message.error} />
-          ) : isFinished ? (
-            <Check htmlColor={gdevelopTheme.message.valid} />
           ) : isIgnored ? (
             <Check htmlColor={gdevelopTheme.text.color.disabled} />
+          ) : isFinished ? (
+            <Check htmlColor={gdevelopTheme.message.valid} />
           ) : (
             <CircularProgress
               size={24}
@@ -128,7 +145,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
           ]}
         />
       )}
-      {hasJustErrored && (
+      {functionCallResultIsErrored && (
         <RaisedButton
           color="primary"
           onClick={() => onProcessFunctionCalls([functionCall])}

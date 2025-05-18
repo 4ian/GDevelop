@@ -6,6 +6,7 @@ import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import {
   agentAiRequest,
+  agentAiRequestWithFailedAndIgnoredFunctionCallOutputs,
   agentAiRequestWithFunctionCallToDo,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
 
@@ -342,7 +343,21 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
   </FixedHeightFlexContainer>
 );
 
-export const RealLifeAgentAiRequest = () => (
+export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = () => (
+  <FixedHeightFlexContainer height={500}>
+    <I18n>
+      {({ i18n }) => (
+        <AiRequestChat
+          i18n={i18n}
+          aiRequest={agentAiRequestWithFailedAndIgnoredFunctionCallOutputs}
+          {...commonProps}
+        />
+      )}
+    </I18n>
+  </FixedHeightFlexContainer>
+);
+
+export const LongReadyAiRequest = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
       {({ i18n }) => (
@@ -357,7 +372,7 @@ export const RealLifeAgentAiRequest = () => (
   </FixedHeightFlexContainer>
 );
 
-export const RealLifeAgentAiRequestWithFunctionCall = () => (
+export const LongReadyAiRequestWithFunctionCallToDo = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
       {({ i18n }) => (
@@ -370,3 +385,4 @@ export const RealLifeAgentAiRequestWithFunctionCall = () => (
     </I18n>
   </FixedHeightFlexContainer>
 );
+

@@ -1780,6 +1780,8 @@ export class BaseEvent extends EmscriptenObject {
   setFolded(folded: boolean): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  getAiGeneratedEventId(): string;
+  setAiGeneratedEventId(aiGeneratedEventId: string): void;
 }
 
 export class StandardEvent extends BaseEvent {

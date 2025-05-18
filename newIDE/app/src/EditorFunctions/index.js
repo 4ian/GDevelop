@@ -47,6 +47,16 @@ type EditorFunctionGenericOutput = {|
   instances?: any,
 |};
 
+export type EventsGenerationResult =
+  | {|
+      generationCompleted: true,
+      aiGeneratedEvent: AiGeneratedEvent,
+    |}
+  | {|
+      generationCompleted: false,
+      errorMessage: string,
+    |};
+
 export type EventsGenerationOptions = {|
   sceneName: string,
   eventsDescription: string,
@@ -75,7 +85,7 @@ export type EditorFunction = {|
     args: any,
     launchEventsGeneration: (
       options: EventsGenerationOptions
-    ) => Promise<AiGeneratedEvent>,
+    ) => Promise<EventsGenerationResult>,
     onEnsureExtensionInstalled: (options: {
       extensionName: string,
     }) => Promise<void>,
@@ -1035,7 +1045,7 @@ const addSceneEvents: EditorFunction = {
     });
 
     try {
-      const aiGeneratedEvent: AiGeneratedEvent = await launchEventsGeneration({
+      const eventsGenerationResult = await launchEventsGeneration({
         sceneName,
         eventsDescription,
         extensionNamesList,
@@ -1044,18 +1054,27 @@ const addSceneEvents: EditorFunction = {
         placementHint,
       });
 
+      if (!eventsGenerationResult.generationCompleted) {
+        return makeGenericFailure(
+          `Error when launching or completing events generation (${
+            eventsGenerationResult.errorMessage
+          }). Consider trying again or a different approach.`
+        );
+      }
+
+      const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
       if (aiGeneratedEvent.error) {
-        throw new Error(
-          `Error "${aiGeneratedEvent.error.code ||
-            '(Unknown)'}": ${aiGeneratedEvent.error.message ||
-            'Unknown error when generating events. Consider trying again or a different approach.'}`
+        return makeGenericFailure(
+          `Error when generating events (${
+            aiGeneratedEvent.error.message
+          }). Consider trying again or a different approach.`
         );
       }
 
       const changes = aiGeneratedEvent.changes;
       if (!changes || changes.length === 0) {
-        throw new Error(
-          `No generated events could be found. Consider trying again or a different approach.'}`
+        return makeGenericFailure(
+          `No generated events could be found. Consider trying again or a different approach`
         );
       }
 
@@ -1074,12 +1093,17 @@ const addSceneEvents: EditorFunction = {
         }
       }
 
-      applyEventsChanges(project, currentSceneEvents, changes);
+      applyEventsChanges(
+        project,
+        currentSceneEvents,
+        changes,
+        aiGeneratedEvent.id
+      );
       return makeGenericSuccess('Properly modified or added new event(s).');
     } catch (error) {
       console.error('Error in addSceneEvents with AI generation:', error);
       return makeGenericFailure(
-        `An error happened while adding generated events: ${
+        `An unexpected error happened while adding generated events: ${
           error.message
         }. Consider a different approach.`
       );

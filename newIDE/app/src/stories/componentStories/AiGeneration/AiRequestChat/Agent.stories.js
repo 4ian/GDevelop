@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
-import { AiRequestChat } from '../../../../MainFrame/EditorContainers/AskAi/AiRequestChat';
+import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import {
   agentAiRequest,
@@ -16,12 +16,17 @@ export default {
 };
 
 const commonProps = {
+  editorCallbacks: {
+    onOpenLayout: () => {},
+    onOpenEvents: () => {},
+  },
+  project: null,
   quota: {
     limitReached: false,
     current: 1,
     max: 2,
   },
-  onStartNewAiRequest: async () => {},
+  onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
   isSending: false,
   aiRequestPriceInCredits: 5,

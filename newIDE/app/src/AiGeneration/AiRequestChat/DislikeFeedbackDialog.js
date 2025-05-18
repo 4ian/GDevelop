@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
-import { ColumnStackLayout } from '../../../UI/Layout';
-import Text from '../../../UI/Text';
+import { ColumnStackLayout } from '../../UI/Layout';
+import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
-import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FlatButton from '../../../UI/FlatButton';
+import FlatButton from '../../UI/FlatButton';
 
 type DislikeFeedbackDialogProps = {|
   open: boolean,

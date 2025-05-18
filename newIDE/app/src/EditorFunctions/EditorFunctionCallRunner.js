@@ -1,5 +1,5 @@
 // @flow
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
   type EditorFunction,
@@ -41,7 +41,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   ignore: boolean,
   launchEventsGeneration: (
     options: EventsGenerationOptions
-  ) => Promise<AiGeneratedEvent>,
+  ) => Promise<EventsGenerationResult>,
   onEnsureExtensionInstalled: (options: {
     extensionName: string,
   }) => Promise<void>,

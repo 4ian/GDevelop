@@ -5,47 +5,37 @@ import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../../UI/Layout';
-import Text from '../../../UI/Text';
+} from '../../UI/Layout';
+import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
-} from '../../../Utils/GDevelopServices/Generation';
-import RaisedButton from '../../../UI/RaisedButton';
-import { CompactTextAreaField } from '../../../UI/CompactTextAreaField';
-import { Column, Line, Spacer } from '../../../UI/Grid';
-import LeftLoader from '../../../UI/LeftLoader';
-import Paper from '../../../UI/Paper';
-import { ChatMarkdownText } from './ChatMarkdownText';
-import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
-import AlertMessage from '../../../UI/AlertMessage';
+} from '../../Utils/GDevelopServices/Generation';
+import RaisedButton from '../../UI/RaisedButton';
+import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import LeftLoader from '../../UI/LeftLoader';
+import Paper from '../../UI/Paper';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
+import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
-import RobotIcon from '../../../ProjectCreation/RobotIcon';
-import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
-import GetSubscriptionCard from '../../../Profile/Subscription/GetSubscriptionCard';
-import { type Quota } from '../../../Utils/GDevelopServices/Usage';
-import IconButton from '../../../UI/IconButton';
-import Like from '../../../UI/CustomSvgIcons/Like';
-import Dislike from '../../../UI/CustomSvgIcons/Dislike';
-import Copy from '../../../UI/CustomSvgIcons/Copy';
-import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
-import { type MessageDescriptor } from '../../../Utils/i18n/MessageDescriptor.flow';
-import Link from '../../../UI/Link';
-import { getHelpLink } from '../../../Utils/HelpLink';
-import Window from '../../../Utils/Window';
-import { DislikeFeedbackDialog } from './DislikeFeedbackDialog';
-import { type EditorFunctionCallResult } from '../../../EditorFunctions/EditorFunctionCallRunner';
-import { type EditorCallbacks } from '../../../EditorFunctions';
-import {
-  getFunctionCallsToProcess,
-  getFunctionCallToFunctionCallOutputMap,
-} from './AiRequestUtils';
-import { FunctionCallRow } from './FunctionCallRow';
-import CircularProgress from '../../../UI/CircularProgress';
-import TwoStatesButton from '../../../UI/TwoStatesButton';
-import Help from '../../../UI/CustomSvgIcons/Help';
-import Hammer from '../../../UI/CustomSvgIcons/Hammer';
+import RobotIcon from '../../ProjectCreation/RobotIcon';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import GetSubscriptionCard from '../../Profile/Subscription/GetSubscriptionCard';
+import { type Quota } from '../../Utils/GDevelopServices/Usage';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import Link from '../../UI/Link';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
+import { type EditorCallbacks } from '../../EditorFunctions';
+import { getFunctionCallsToProcess } from './AiRequestUtils';
+import CircularProgress from '../../UI/CircularProgress';
+import TwoStatesButton from '../../UI/TwoStatesButton';
+import Help from '../../UI/CustomSvgIcons/Help';
+import Hammer from '../../UI/CustomSvgIcons/Hammer';
+import { ChatMessages } from './ChatMessages';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -92,35 +82,6 @@ type Props = {
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
-
-const styles = {
-  chatBubble: {
-    paddingTop: 5,
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingBottom: 5,
-  },
-};
-
-type ChatBubbleProps = {|
-  children: React.Node,
-  feedbackButtons?: React.Node,
-  role: 'assistant' | 'user',
-|};
-
-const ChatBubble = ({ children, feedbackButtons, role }: ChatBubbleProps) => {
-  return (
-    <div className={classes.chatBubbleContainer}>
-      <Paper
-        background={role === 'user' ? 'light' : 'medium'}
-        style={styles.chatBubble}
-      >
-        <div className={classes.chatBubbleContent}>{children}</div>
-        {feedbackButtons}
-      </Paper>
-    </div>
-  );
-};
 
 const getQuotaOrCreditsExplanation = ({
   newAiRequestMode,
@@ -228,17 +189,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
-    const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
-    const theme = React.useContext(GDevelopThemeContext);
-    const [
-      dislikeFeedbackDialogOpenedFor,
-      setDislikeFeedbackDialogOpenedFor,
-    ] = React.useState(null);
-    const functionCallToFunctionCallOutput = aiRequest
-      ? getFunctionCallToFunctionCallOutputMap({
-          aiRequest,
-        })
-      : new Map();
 
     const newChatPlaceholder = React.useMemo(
       () => {
@@ -510,176 +460,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         useFullHeight
       >
         <ScrollView ref={scrollViewRef}>
-          {aiRequest.output.flatMap((message, messageIndex) => {
-            if (message.type === 'message' && message.role === 'user') {
-              return [
-                <Line key={messageIndex} justifyContent="flex-end">
-                  <ChatBubble role="user">
-                    <ChatMarkdownText
-                      source={message.content
-                        .map(messageContent => messageContent.text)
-                        .join('\n')}
-                    />
-                  </ChatBubble>
-                </Line>,
-              ];
-            }
-            if (message.type === 'message' && message.role === 'assistant') {
-              return [
-                ...message.content
-                  .map((messageContent, messageContentIndex) => {
-                    const key = `messageIndex${messageIndex}-${messageContentIndex}`;
-                    if (messageContent.type === 'output_text') {
-                      const feedbackKey = `${messageIndex}-${messageContentIndex}`;
-                      const currentFeedback = messageFeedbacks[feedbackKey];
-
-                      return (
-                        <Line key={key} justifyContent="flex-start">
-                          <ChatBubble
-                            role="assistant"
-                            feedbackButtons={
-                              <div className={classes.feedbackButtonsContainer}>
-                                <IconButton
-                                  size="small"
-                                  tooltip={t`Copy`}
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(
-                                      messageContent.text
-                                    );
-                                  }}
-                                >
-                                  <Copy fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  tooltip={t`This was helpful`}
-                                  onClick={() => {
-                                    setMessageFeedbacks({
-                                      ...messageFeedbacks,
-                                      [feedbackKey]: 'like',
-                                    });
-                                    onSendFeedback(
-                                      aiRequest.id,
-                                      messageIndex,
-                                      'like'
-                                    );
-                                  }}
-                                >
-                                  <Like
-                                    fontSize="small"
-                                    htmlColor={
-                                      currentFeedback === 'like'
-                                        ? theme.message.valid
-                                        : undefined
-                                    }
-                                  />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  tooltip={t`This needs improvement`}
-                                  onClick={() => {
-                                    setMessageFeedbacks({
-                                      ...messageFeedbacks,
-                                      [feedbackKey]: 'dislike',
-                                    });
-                                    setDislikeFeedbackDialogOpenedFor({
-                                      aiRequestId: aiRequest.id,
-                                      messageIndex,
-                                    });
-                                  }}
-                                >
-                                  <Dislike
-                                    fontSize="small"
-                                    htmlColor={
-                                      currentFeedback === 'dislike'
-                                        ? theme.message.warning
-                                        : undefined
-                                    }
-                                  />
-                                </IconButton>
-                              </div>
-                            }
-                          >
-                            <ChatMarkdownText source={messageContent.text} />
-                          </ChatBubble>
-                        </Line>
-                      );
-                    }
-                    if (messageContent.type === 'reasoning') {
-                      return (
-                        <Line key={key} justifyContent="flex-start">
-                          <ChatBubble role="assistant">
-                            <ChatMarkdownText
-                              source={messageContent.summary.text}
-                            />
-                          </ChatBubble>
-                        </Line>
-                      );
-                    }
-                    if (messageContent.type === 'function_call') {
-                      const editorFunctionCallResult =
-                        editorFunctionCallResults &&
-                        editorFunctionCallResults.find(
-                          functionCallOutput =>
-                            functionCallOutput.call_id ===
-                            messageContent.call_id
-                        );
-                      const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
-                        messageContent
-                      );
-                      return (
-                        <FunctionCallRow
-                          project={project}
-                          key={key}
-                          onProcess={() =>
-                            onProcessFunctionCalls([messageContent])
-                          }
-                          onIgnore={() =>
-                            onProcessFunctionCalls([messageContent], {
-                              ignore: true,
-                            })
-                          }
-                          functionCall={messageContent}
-                          editorFunctionCallResult={editorFunctionCallResult}
-                          existingFunctionCallOutput={
-                            existingFunctionCallOutput
-                          }
-                          editorCallbacks={editorCallbacks}
-                        />
-                      );
-                    }
-                    return null;
-                  })
-                  .filter(Boolean),
-              ];
-            }
-            if (message.type === 'function_call_output') {
-              return [];
-            }
-
-            return [];
-          })}
-
-          {aiRequest.status === 'error' ? (
-            <Line justifyContent="flex-start">
-              <AlertMessage kind="error">
-                <Trans>
-                  The AI encountered an error while handling your request - this
-                  was request was not counted in your AI usage. Try again later.
-                </Trans>
-              </AlertMessage>
-            </Line>
-          ) : aiRequest.status === 'working' ? (
-            <Line justifyContent="flex-start">
-              <div className={classes.thinkingText}>
-                <LeftLoader isLoading>
-                  <Text noMargin displayInlineAsSpan>
-                    <Trans>Thinking about your request...</Trans>
-                  </Text>
-                </LeftLoader>
-              </div>
-            </Line>
-          ) : null}
+          <ChatMessages
+            aiRequest={aiRequest}
+            onSendFeedback={onSendFeedback}
+            editorFunctionCallResults={editorFunctionCallResults}
+            editorCallbacks={editorCallbacks}
+            project={project}
+            onProcessFunctionCalls={onProcessFunctionCalls}
+          />
         </ScrollView>
         {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
           <AlertMessage
@@ -818,20 +606,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Column>
           </ColumnStackLayout>
         </form>
-        {dislikeFeedbackDialogOpenedFor && (
-          <DislikeFeedbackDialog
-            open
-            onClose={() => setDislikeFeedbackDialogOpenedFor(null)}
-            onSendFeedback={(reason: string) => {
-              onSendFeedback(
-                dislikeFeedbackDialogOpenedFor.aiRequestId,
-                dislikeFeedbackDialogOpenedFor.messageIndex,
-                'dislike',
-                reason
-              );
-            }}
-          />
-        )}
       </ColumnStackLayout>
     );
   }

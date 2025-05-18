@@ -4,43 +4,46 @@ import { t } from '@lingui/macro';
 import {
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
-} from '../../../Utils/GDevelopServices/Generation';
-import { type EditorFunctionCallResult } from '../../../EditorFunctions/EditorFunctionCallRunner';
-import CircularProgress from '../../../UI/CircularProgress';
+} from '../../Utils/GDevelopServices/Generation';
+import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
+import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
-import Text from '../../../UI/Text';
-import RaisedButton from '../../../UI/RaisedButton';
+import Text from '../../UI/Text';
+import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
-import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
-import Check from '../../../UI/CustomSvgIcons/Check';
-import Error from '../../../UI/CustomSvgIcons/Error';
-import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
+import Check from '../../UI/CustomSvgIcons/Check';
+import Error from '../../UI/CustomSvgIcons/Error';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import classes from './FunctionCallRow.module.css';
 import {
   editorFunctions,
   type EditorFunction,
   type EditorCallbacks,
-} from '../../../EditorFunctions';
+} from '../../EditorFunctions';
 
 type Props = {|
   project: gdProject | null,
   functionCall: AiRequestMessageAssistantFunctionCall,
   editorFunctionCallResult: ?EditorFunctionCallResult,
   existingFunctionCallOutput: ?AiRequestFunctionCallOutput,
-  onProcess: () => Promise<void>,
-  onIgnore: () => Promise<void>,
+  onProcessFunctionCalls: (
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+    options: ?{|
+      ignore?: boolean,
+    |}
+  ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
 |};
 
-export const FunctionCallRow = ({
+export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
   project,
   functionCall,
   editorFunctionCallResult,
   existingFunctionCallOutput,
-  onProcess,
-  onIgnore,
+  onProcessFunctionCalls,
   editorCallbacks,
-}: Props) => {
+}: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isIgnored =
     !!editorFunctionCallResult && editorFunctionCallResult.status === 'ignored';
@@ -111,13 +114,15 @@ export const FunctionCallRow = ({
         <RaisedButtonWithSplitMenu
           primary
           disabled={isWorking}
-          onClick={onProcess}
+          onClick={() => onProcessFunctionCalls([functionCall])}
           label={<Trans>Apply</Trans>}
           buildMenuTemplate={i18n => [
             {
               label: i18n._(t`Ignore this`),
               click: () => {
-                onIgnore();
+                onProcessFunctionCalls([functionCall], {
+                  ignore: true,
+                });
               },
             },
           ]}
@@ -126,10 +131,10 @@ export const FunctionCallRow = ({
       {hasJustErrored && (
         <RaisedButton
           color="primary"
-          onClick={onProcess}
+          onClick={() => onProcessFunctionCalls([functionCall])}
           label={<Trans>Retry</Trans>}
         />
       )}
     </div>
   );
-};
+});

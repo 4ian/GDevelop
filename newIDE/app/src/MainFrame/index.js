@@ -58,7 +58,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
-import { renderAskAiContainer } from './EditorContainers/AskAi';
+import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
@@ -221,7 +221,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'ask-ai': renderAskAiContainer,
+  'ask-ai': renderAskAiEditorContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -3964,16 +3964,16 @@ const MainFrame = (props: Props) => {
                         openSceneEditor: false,
                       });
                     },
+                    onOpenLayout: (sceneName: string) => {
+                      openLayout(sceneName, {
+                        openEventsEditor: false,
+                        openSceneEditor: true,
+                      });
+                    },
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
-                    onOpenLayout: name => {
-                      openLayout(name, {
-                        openEventsEditor: true,
-                        openSceneEditor: false,
-                      });
-                    },
                     resourceManagementProps,
                     onSave: saveProject,
                     canSave,

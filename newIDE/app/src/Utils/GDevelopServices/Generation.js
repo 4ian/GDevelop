@@ -388,7 +388,17 @@ export const sendAiRequestFeedback = async (
   return response.data;
 };
 
-export const createAiEventGeneration = async (
+export type CreateAiGeneratedEventResult =
+  | {|
+      creationSucceeded: true,
+      aiGeneratedEvent: AiGeneratedEvent,
+    |}
+  | {|
+      creationSucceeded: false,
+      errorMessage: string,
+    |};
+
+export const createAiGeneratedEvent = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
@@ -409,7 +419,7 @@ export const createAiEventGeneration = async (
     placementHint: string | null,
     relatedAiRequestId: string,
   |}
-): Promise<AiGeneratedEvent> => {
+): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.post(
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
@@ -429,9 +439,29 @@ export const createAiEventGeneration = async (
       headers: {
         Authorization: authorizationHeader,
       },
+      validateStatus: status => true,
     }
   );
-  return response.data;
+
+  if (response.status === 200) {
+    return {
+      creationSucceeded: true,
+      aiGeneratedEvent: response.data,
+    };
+  } else if (response.status === 400) {
+    // Report the failure to give a chance to the caller to save this message
+    // and retry the generation in a different way.
+    return {
+      creationSucceeded: false,
+      errorMessage: JSON.stringify(response.data),
+    };
+  }
+
+  // Unexpected error: throw an exception as this can be something like a network error
+  // or a server error.
+  throw new Error(
+    `Error while running AI event generation: ${response.statusText}`
+  );
 };
 
 export const getAiGeneratedEvent = async (

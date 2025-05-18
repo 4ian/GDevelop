@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import Window from '../../../Utils/Window';
-import memoize from '../../../Utils/Memoize';
-import { useRefWithInit } from '../../../Utils/UseRefInitHook';
-import { getHelpLink } from '../../../Utils/HelpLink';
-import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { IconContainer } from '../../../UI/IconContainer';
+import Window from '../../Utils/Window';
+import memoize from '../../Utils/Memoize';
+import { useRefWithInit } from '../../Utils/UseRefInitHook';
+import { getHelpLink } from '../../Utils/HelpLink';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { IconContainer } from '../../UI/IconContainer';
 import {
   type ExtensionShortHeader,
   type EventsFunctionInsideExtensionShortHeader,
-} from '../../../Utils/GDevelopServices/Extension';
-import { mapFor } from '../../../Utils/MapFor';
+} from '../../Utils/GDevelopServices/Extension';
+import { mapFor } from '../../Utils/MapFor';
 import classes from './ChatMarkdownText.module.css';
 import classNames from 'classnames';
 import Tooltip from '@material-ui/core/Tooltip';
-import { MarkdownText } from '../../../UI/MarkdownText';
-import Text from '../../../UI/Text';
+import { MarkdownText } from '../../UI/MarkdownText';
+import Text from '../../UI/Text';
 
 const gd: libGDevelop = global.gd;
 

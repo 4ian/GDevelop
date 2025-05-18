@@ -8,6 +8,7 @@ describe('applyEventsChanges', () => {
   let project: gdProject;
   let sceneEventsList: gdEventsList;
   let newEventsForInsertionJson = ` [{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]},{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]`;
+  const fakeGeneratedEventId = 'fakeGeneratedEventId';
 
   beforeEach(() => {
     project = new gd.ProjectHelper.createNewGDJSProject();
@@ -52,7 +53,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     expect(sceneEventsList.getEventsCount()).toBe(2);
     expect(sceneEventsList.getEventAt(0).getType()).toBe(
       'BuiltinCommonInstructions::Standard'
@@ -87,7 +93,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
 
     const finalParentEvent = sceneEventsList.getEventAt(0);
     expect(finalParentEvent.getSubEvents().getEventsCount()).toBe(1);
@@ -116,7 +127,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     // Expected: S0, NewS, NewS, R1
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -143,7 +159,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     // Expected: S0, R1, NewS, NewS
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -171,7 +192,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     const parentEvent = sceneEventsList.getEventAt(1);
     expect(parentEvent.getSubEvents().getEventsCount()).toBe(2);
     expect(getEventTypes(parentEvent.getSubEvents())).toEqual([
@@ -198,7 +224,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     // Expected: S0, NewS, NewS, W2 (original R1 is gone, 2 new events inserted)
     expect(sceneEventsList.getEventsCount()).toBe(4);
     expect(getEventTypes(sceneEventsList)).toEqual([
@@ -238,7 +269,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     // Initial: S0, R1, W2, F3
     // After del W2: S0, R1, F3
     // After insert new before R1: S0, NewS, NewS, R1, F3
@@ -270,7 +306,12 @@ describe('applyEventsChanges', () => {
       },
     ];
 
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
 
     expect(sceneEventsList.getEventsCount()).toBe(1); // No events added
     expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -297,7 +338,12 @@ describe('applyEventsChanges', () => {
         extensionNames: [],
       },
     ];
-    applyEventsChanges(project, sceneEventsList, eventOperations);
+    applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
     expect(sceneEventsList.getEventsCount()).toBe(1); // No change
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining(

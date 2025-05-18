@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
-import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
-import { type ObjectWithContext } from '../../../ObjectsList/EnumerateObjects';
-import Paper from '../../../UI/Paper';
+import { type RenderEditorContainerPropsWithRef } from '../MainFrame/EditorContainers/BaseEditor';
+import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addMessageToAiRequest,
@@ -13,43 +13,43 @@ import {
   sendAiRequestFeedback,
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
-  createAiEventGeneration,
   getAiGeneratedEvent,
-} from '../../../Utils/GDevelopServices/Generation';
-import { delay } from '../../../Utils/Delay';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+  createAiGeneratedEvent,
+} from '../Utils/GDevelopServices/Generation';
+import { delay } from '../Utils/Delay';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
-import { getSimplifiedProjectJson } from '../../../Utils/SimplifiedProjectJson';
+import { getSimplifiedProjectJson } from '../Utils/SimplifiedProjectJson';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
-} from '../../../Utils/GDevelopServices/Usage';
-import { retryIfFailed } from '../../../Utils/RetryIfFailed';
-import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+} from '../Utils/GDevelopServices/Usage';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import {
   processEditorFunctionCalls,
   type EditorFunctionCallResult,
-} from '../../../EditorFunctions/EditorFunctionCallRunner';
-import { type EditorCallbacks } from '../../../EditorFunctions';
+} from '../EditorFunctions/EditorFunctionCallRunner';
+import {
+  type EditorCallbacks,
+  type EventsGenerationResult,
+} from '../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
-} from './AiRequestUtils';
-import { useStableUpToDateRef } from '../../../Utils/UseStableUpToDateCallback';
-import { ExtensionStoreContext } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { installExtension } from '../../../AssetStore/ExtensionStore/InstallExtension';
-import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { useTriggerAtNextRender } from '../../../Utils/useTriggerAtNextRender';
+} from './AiRequestChat/AiRequestUtils';
+import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import {
   generateProjectName,
   type NewProjectSetup,
-} from '../../../ProjectCreation/NewProjectSetupDialog';
-import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
-import {
-  type FileMetadata,
-  type StorageProvider,
-} from '../../../ProjectsStorage';
+} from '../ProjectCreation/NewProjectSetupDialog';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -279,12 +279,12 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       existingEventsAsText: string,
       placementHint: string,
       relatedAiRequestId: string,
-    |}) => {
+    |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
-      if (!profile) throw new Error('Use should be authenticated.');
+      if (!profile) throw new Error('User should be authenticated.');
 
-      let aiGeneratedEvent = await retryIfFailed({ times: 2 }, () =>
-        createAiEventGeneration(getAuthorizationHeader, {
+      const createResult = await retryIfFailed({ times: 2 }, () =>
+        createAiGeneratedEvent(getAuthorizationHeader, {
           userId: profile.id,
           partialGameProjectJson: JSON.stringify(
             getSimplifiedProjectJson(project, {
@@ -302,15 +302,40 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
         })
       );
 
-      while (aiGeneratedEvent.status === 'working') {
-        await delay(1000);
-        aiGeneratedEvent = await getAiGeneratedEvent(getAuthorizationHeader, {
-          userId: profile.id,
-          aiGeneratedEventId: aiGeneratedEvent.id,
-        });
+      if (!createResult.creationSucceeded) {
+        return {
+          generationCompleted: false,
+          errorMessage: createResult.errorMessage,
+        };
       }
 
-      return aiGeneratedEvent;
+      let remainingAttempts = 50;
+      let aiGeneratedEvent = createResult.aiGeneratedEvent;
+      while (aiGeneratedEvent.status === 'working') {
+        remainingAttempts--;
+        await delay(1000);
+
+        try {
+          aiGeneratedEvent = await getAiGeneratedEvent(getAuthorizationHeader, {
+            userId: profile.id,
+            aiGeneratedEventId: aiGeneratedEvent.id,
+          });
+        } catch (error) {
+          console.warn(
+            'Error while checking status of AI generated event - continuing...',
+            error
+          );
+        }
+        if (remainingAttempts <= 0) {
+          return {
+            generationCompleted: false,
+            errorMessage:
+              'Event generation started but failed to complete in time.',
+          };
+        }
+      }
+
+      return { generationCompleted: true, aiGeneratedEvent };
     },
     [getAuthorizationHeader, project, profile]
   );
@@ -513,17 +538,6 @@ export const useAiRequests = () => {
   };
 };
 
-type Props = {|
-  isActive: boolean,
-  project: ?gdProject,
-  fileMetadata: ?FileMetadata,
-  storageProvider: ?StorageProvider,
-  setToolbar: (?React.Node) => void,
-  i18n: I18nType,
-  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
-  editorCallbacks: EditorCallbacks,
-|};
-
 const styles = {
   paper: {
     flex: 1,
@@ -545,6 +559,18 @@ const styles = {
   },
 };
 
+type Props = {|
+  isActive: boolean,
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  storageProvider: ?StorageProvider,
+  setToolbar: (?React.Node) => void,
+  i18n: I18nType,
+  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  onOpenLayout: (sceneName: string) => void,
+  onOpenEvents: (sceneName: string) => void,
+|};
+
 export type AskAiEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
@@ -564,7 +590,7 @@ export type NewAiRequestOptions = {|
 
 const noop = () => {};
 
-export const AskAi = React.memo<Props>(
+export const AskAiEditor = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
     (
       {
@@ -575,10 +601,19 @@ export const AskAi = React.memo<Props>(
         storageProvider,
         i18n,
         onCreateEmptyProject,
-        editorCallbacks,
+        onOpenLayout,
+        onOpenEvents,
       }: Props,
       ref
     ) => {
+      const editorCallbacks: EditorCallbacks = React.useMemo(
+        () => ({
+          onOpenLayout,
+          onOpenEvents,
+        }),
+        [onOpenLayout, onOpenEvents]
+      );
+
       const {
         selectedAiRequest,
         selectedAiRequestId,
@@ -1012,12 +1047,12 @@ export const AskAi = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderAskAiContainer = (
+export const renderAskAiEditorContainer = (
   props: RenderEditorContainerPropsWithRef
 ) => (
   <I18n>
     {({ i18n }) => (
-      <AskAi
+      <AskAiEditor
         ref={props.ref}
         i18n={i18n}
         project={props.project}
@@ -1026,10 +1061,8 @@ export const renderAskAiContainer = (
         setToolbar={props.setToolbar}
         isActive={props.isActive}
         onCreateEmptyProject={props.onCreateEmptyProject}
-        editorCallbacks={{
-          onOpenLayout: props.onOpenLayout,
-          onOpenEvents: props.onOpenEvents,
-        }}
+        onOpenLayout={props.onOpenLayout}
+        onOpenEvents={props.onOpenEvents}
       />
     )}
   </I18n>

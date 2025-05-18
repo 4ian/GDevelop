@@ -1,6 +1,7 @@
 // @flow
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import { mapFor } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -153,7 +154,8 @@ const comparePathsReverseLexicographically = (
 export const applyEventsChanges = (
   project: gdProject,
   sceneEvents: gdEventsList,
-  eventOperationsInput: Array<AiGeneratedEventChange>
+  eventOperationsInput: Array<AiGeneratedEventChange>,
+  aiGeneratedEventId: string
 ): void => {
   const operations: Array<EventOperation> = [];
 
@@ -188,6 +190,12 @@ export const applyEventsChanges = (
               'N/A'}) are empty. Insertion might not add any events.`
           );
         }
+        mapFor(0, localEventsToInsert.getEventsCount(), i => {
+          if (!localEventsToInsert) return;
+
+          const event = localEventsToInsert.getEventAt(i);
+          event.setAiGeneratedEventId(aiGeneratedEventId);
+        });
       }
 
       switch (operationName) {

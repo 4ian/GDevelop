@@ -293,6 +293,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     if (this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback();
+      this.unregisterDebuggerCallback = null;
     }
   }
 
@@ -323,6 +324,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   onEditorHidden() {
     if (this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback();
+      this.unregisterDebuggerCallback = null;
     }
   }
 

@@ -175,15 +175,23 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
                   );
                 }
                 if (messageContent.type === 'function_call') {
-                  const editorFunctionCallResult =
-                    editorFunctionCallResults &&
-                    editorFunctionCallResults.find(
-                      functionCallOutput =>
-                        functionCallOutput.call_id === messageContent.call_id
-                    );
                   const existingFunctionCallOutput = functionCallToFunctionCallOutput.get(
                     messageContent
                   );
+                  // If there is already an existing function call output,
+                  // there can't be an editor function call result.
+                  // Indeed, sometimes, two functions will
+                  // have the same call_id (because of the way some LLM APIs are implemented).
+                  // The editorFunctionCallResult always applies to the last function call,
+                  // which has no function call output associated to it yet.
+                  const editorFunctionCallResult =
+                    (!existingFunctionCallOutput &&
+                      editorFunctionCallResults &&
+                      editorFunctionCallResults.find(
+                        functionCallOutput =>
+                          functionCallOutput.call_id === messageContent.call_id
+                      )) ||
+                    null;
                   return (
                     <FunctionCallRow
                       project={project}

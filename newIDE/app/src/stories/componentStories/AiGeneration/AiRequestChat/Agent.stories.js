@@ -130,6 +130,31 @@ const fakeOutputWithFunctionCallAndOutput = [
   },
 ];
 
+const fakeOutputWithFunctionCallWithSameCallId = [
+  ...fakeOutputWithFunctionCallAndOutput,
+  {
+    type: 'message',
+    status: 'completed',
+    role: 'assistant',
+    content: [
+      {
+        type: 'output_text',
+        status: 'completed',
+        text:
+          'This is another message and now a function call with the same call_id (as done by some LLM APIs):',
+        annotations: [],
+      },
+      {
+        type: 'function_call',
+        status: 'completed',
+        call_id: fakeFunctionCallId,
+        name: 'describe_instances',
+        arguments: '{"scene_name": "Game"}',
+      },
+    ],
+  },
+];
+
 export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
@@ -343,6 +368,40 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
   </FixedHeightFlexContainer>
 );
 
+export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
+  <FixedHeightFlexContainer height={500}>
+    <I18n>
+      {({ i18n }) => (
+        <AiRequestChat
+          i18n={i18n}
+          aiRequest={{
+            createdAt: '',
+            updatedAt: '',
+            id: 'fake-working-new-ai-request',
+            status: 'ready',
+            userId: 'fake-user-id',
+            gameProjectJson: 'FAKE DATA',
+            output: fakeOutputWithFunctionCallWithSameCallId,
+            error: null,
+          }}
+          {...commonProps}
+          editorFunctionCallResults={[
+            {
+              status: 'finished',
+              call_id: fakeFunctionCallId,
+              success: false,
+              output: {
+                message: 'Something bad happened.',
+              },
+            },
+          ]}
+          isAutoProcessingFunctionCalls={true}
+        />
+      )}
+    </I18n>
+  </FixedHeightFlexContainer>
+);
+
 export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = () => (
   <FixedHeightFlexContainer height={500}>
     <I18n>
@@ -385,4 +444,3 @@ export const LongReadyAiRequestWithFunctionCallToDo = () => (
     </I18n>
   </FixedHeightFlexContainer>
 );
-

@@ -40,13 +40,13 @@ namespace gdjs {
     return value !== null && value !== undefined;
   }
 
-  const is3D = (
-    object: gdjs.RuntimeObject
-  ): object is gdjs.RuntimeObject &
-    gdjs.Base3DHandler &
-    gdjs.Resizable &
-    gdjs.Scalable &
-    gdjs.Flippable => {
+  type RuntimeObjectWith3D = RuntimeObject &
+    Base3DHandler &
+    Resizable &
+    Scalable &
+    Flippable;
+
+  const is3D = (object: gdjs.RuntimeObject): object is RuntimeObjectWith3D => {
     return typeof THREE !== 'undefined' && gdjs.Base3DHandler.is3D(object);
   };
 
@@ -325,7 +325,7 @@ namespace gdjs {
     // The selected objects.
     private _selection = new Selection();
     private _selectionBoxes: Map<
-      gdjs.RuntimeObject3D,
+      RuntimeObjectWith3D,
       { container: THREE.Group; box: THREE.BoxHelper }
     > = new Map();
     private _objectMover = new ObjectMover();
@@ -963,47 +963,68 @@ namespace gdjs {
 
       const selected3DObjects = this._selection
         .getSelectedObjects()
-        .filter((obj): obj is gdjs.RuntimeObject3D => is3D(obj));
-
-      // Remove boxes for deselected objects
-      this._selectionBoxes.forEach(({ container }, object) => {
-        if (!selected3DObjects.includes(object)) {
-          container.removeFromParent();
-          this._selectionBoxes.delete(object);
-        }
-      });
+        .filter((obj) => is3D(obj));
 
       // Add/update boxes for selected objects
-      selected3DObjects.forEach((object) => {
-        const threeObject = object.get3DRendererObject();
-        if (!threeObject) return;
+      selected3DObjects.forEach((object) =>
+        this._createBoundingBoxIfNeeded(object)
+      );
+      if (
+        objectUnderCursor &&
+        is3D(objectUnderCursor) &&
+        !this._selectionBoxes.has(objectUnderCursor)
+      ) {
+        this._createBoundingBoxIfNeeded(objectUnderCursor);
+      }
 
-        const layer = currentScene.getLayer(object.getLayer());
-        const threeGroup = layer.getRenderer().getThreeGroup();
-        if (!threeGroup) return;
-
-        let containerAndBox = this._selectionBoxes.get(object);
-        if (!containerAndBox) {
-          // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
-          // compared to Three.js. This is somehow necessary because the position
-          // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
-          const container = new THREE.Group();
-          container.rotation.order = 'ZYX';
-          container.scale.y = -1;
-          const box = new THREE.BoxHelper(threeObject, '#f2a63c');
-          box.rotation.order = 'ZYX';
-          box.material.depthTest = false;
-          box.material.fog = false;
-          threeGroup.add(container);
-
-          this._selectionBoxes.set(object, { container, box });
-          container.add(box);
+      // Remove boxes for deselected objects
+      this._selectionBoxes.forEach(({ container, box }, object) => {
+        const isHovered = object === objectUnderCursor;
+        const isInSelection = selected3DObjects.includes(object);
+        if (!isInSelection && !isHovered) {
+          container.removeFromParent();
+          this._selectionBoxes.delete(object);
+        } else {
+          box.material.color = new THREE.Color(
+            isHovered ? (isInSelection ? '#ffd200' : '#aaaaaa') : '#f2a63c'
+          );
         }
       });
 
       this._selectionBoxes.forEach(({ box }) => {
         box.update();
       });
+    }
+
+    private _createBoundingBoxIfNeeded(object: RuntimeObjectWith3D): void {
+      if (this._selectionBoxes.has(object)) {
+        return;
+      }
+      const runtimeGame = this._runtimeGame;
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const threeObject = object.get3DRendererObject();
+      if (!threeObject) return;
+
+      const layer = currentScene.getLayer(object.getLayer());
+      const threeGroup = layer.getRenderer().getThreeGroup();
+      if (!threeGroup) return;
+
+      // Use a group to invert the Y-axis as the GDevelop Y axis is inverted
+      // compared to Three.js. This is somehow necessary because the position
+      // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
+      const container = new THREE.Group();
+      container.rotation.order = 'ZYX';
+      container.scale.y = -1;
+      const box = new THREE.BoxHelper(threeObject, '#f2a63c');
+      box.rotation.order = 'ZYX';
+      box.material.depthTest = false;
+      box.material.fog = false;
+      threeGroup.add(container);
+
+      container.add(box);
+      this._selectionBoxes.set(object, { container, box });
     }
 
     private _forceUpdateSelectionControls() {

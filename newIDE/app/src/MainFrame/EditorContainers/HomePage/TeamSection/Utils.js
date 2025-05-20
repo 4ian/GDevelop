@@ -20,7 +20,9 @@ export const groupMembersByGroupId = ({
   inactive: User[],
 |} => {
   if (!(groups && members && memberships)) return null;
-  const membersByGroupId = {};
+  const membersByGroupId = {
+    NONE: { group: { id: 'none', name: 'none' }, members: [] },
+  };
   const deactivatedMembers = [];
   members.forEach(member => {
     const membership = memberships.find(

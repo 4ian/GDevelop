@@ -320,6 +320,8 @@ namespace gdjs {
     private _hasSelectionActuallyMoved = false;
     private _wasMovingSelectionLastFrame = false;
 
+    private _selectionBox: THREE_ADDONS.SelectionBox | null = null;
+
     // The selected objects.
     private _selection = new Selection();
     private _selectionBoxes: Map<
@@ -328,13 +330,12 @@ namespace gdjs {
     > = new Map();
     private _objectMover = new ObjectMover();
 
-    private _lastCursorX: number = 0;
-    private _lastCursorY: number = 0;
+    private _lastCursorX: float = 0;
+    private _lastCursorY: float = 0;
     private _wasMouseRightButtonPressed = false;
-
-    private _isLeftButtonPressed = false;
-    private _pressedOriginalCursorX = 0;
-    private _pressedOriginalCursorY = 0;
+    private _wasMouseLeftButtonPressed = false;
+    private _pressedOriginalCursorX: float = 0;
+    private _pressedOriginalCursorY: float = 0;
 
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
@@ -833,6 +834,66 @@ namespace gdjs {
       }
     }
 
+    private _updateSelectionBox() {
+      const inputManager = this._runtimeGame.getInputManager();
+      const runtimeGame = this._runtimeGame;
+      const threeRenderer = runtimeGame.getRenderer().getThreeRenderer();
+      if (!threeRenderer) return;
+      const currentScene = runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+      // TODO Loop on all 3D layers
+      const layerName = '';
+      const runtimeLayerRender = currentScene.getLayer(layerName).getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      const threeScene = runtimeLayerRender.getThreeScene();
+      if (!threeCamera || !threeScene) return;
+
+      const cursorX = inputManager.getCursorX();
+      const cursorY = inputManager.getCursorY();
+
+      if (inputManager.isMouseButtonPressed(0)) {
+        if (this._wasMouseLeftButtonPressed && this._selectionBox) {
+          this._selectionBox.endPoint.set(
+            this._getNormalizedScreenX(cursorX),
+            this._getNormalizedScreenY(cursorY),
+            0.5
+          );
+        } else {
+          this._selectionBox = new THREE_ADDONS.SelectionBox(
+            threeCamera,
+            threeScene
+          );
+          this._selectionBox.startPoint.set(
+            this._getNormalizedScreenX(cursorX),
+            this._getNormalizedScreenY(cursorY),
+            0.5
+          );
+        }
+      }
+      if (
+        inputManager.isMouseButtonReleased(0) &&
+        this._selectionBox &&
+        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
+      ) {
+        const objects = new Set<gdjs.RuntimeObject>();
+        for (const selectThreeObject of this._selectionBox.select()) {
+          // TODO Select the object if all its meshes are inside the rectangle
+          // instead of if any is.
+          const object = this._getObject(selectThreeObject);
+          if (object) {
+            objects.add(object);
+          }
+        }
+        if (!isShiftPressed(inputManager)) {
+          this._selection.clear();
+        }
+        for (const object of objects) {
+          this._selection.add(object);
+        }
+        this._selectionBox = null;
+      }
+    }
+
     private _handleSelection({
       objectUnderCursor,
     }: {
@@ -845,7 +906,7 @@ namespace gdjs {
       // Left click: select the object under the cursor.
       if (
         inputManager.isMouseButtonReleased(0) &&
-        !this._hasSelectionActuallyMoved
+        this._hasCursorStayedStillWhilePressed()
         // TODO: add check for space key
       ) {
         if (
@@ -1188,23 +1249,23 @@ namespace gdjs {
 
     private _handleContextMenu() {
       const inputManager = this._runtimeGame.getInputManager();
-      if (inputManager.isMouseButtonPressed(1) && !this._isLeftButtonPressed) {
-        this._isLeftButtonPressed = true;
-        this._pressedOriginalCursorX = inputManager.getCursorX();
-        this._pressedOriginalCursorY = inputManager.getCursorY();
+      if (
+        inputManager.isMouseButtonReleased(1) &&
+        this._hasCursorStayedStillWhilePressed()
+      ) {
+        this._sendOpenContextMenu(
+          inputManager.getCursorX(),
+          inputManager.getCursorY()
+        );
       }
-      if (inputManager.isMouseButtonReleased(1) && this._isLeftButtonPressed) {
-        this._isLeftButtonPressed = false;
-        if (
-          this._pressedOriginalCursorX === inputManager.getCursorX() &&
-          this._pressedOriginalCursorY === inputManager.getCursorY()
-        ) {
-          this._sendOpenContextMenu(
-            inputManager.getCursorX(),
-            inputManager.getCursorY()
-          );
-        }
-      }
+    }
+
+    private _hasCursorStayedStillWhilePressed() {
+      const inputManager = this._runtimeGame.getInputManager();
+      return (
+        this._pressedOriginalCursorX === inputManager.getCursorX() &&
+        this._pressedOriginalCursorY === inputManager.getCursorY()
+      );
     }
 
     private _sendOpenContextMenu(cursorX: float, cursorY: float) {
@@ -1475,8 +1536,8 @@ namespace gdjs {
         // if lots of 3D objects are shown. We consider that if this needs improvements,
         // this must be handled by the game engine culling
         const normalizedDeviceCoordinates = this.getTempVector2d(
-          (cursorX / runtimeGame.getGameResolutionWidth()) * 2 - 1,
-          -(cursorY / runtimeGame.getGameResolutionHeight()) * 2 + 1
+          this._getNormalizedScreenX(cursorX),
+          this._getNormalizedScreenY(cursorY)
         );
         this._raycaster.setFromCamera(normalizedDeviceCoordinates, threeCamera);
         const intersects = this._raycaster.intersectObjects(
@@ -1520,19 +1581,31 @@ namespace gdjs {
       return closestIntersect;
     }
 
-    getObjectUnderCursor(): gdjs.RuntimeObject | null {
-      const editedInstanceContainer = this._getEditedInstanceContainer();
-      if (!editedInstanceContainer) return null;
+    private _getNormalizedScreenX(x: float): float {
+      return (x / this._runtimeGame.getGameResolutionWidth()) * 2 - 1;
+    }
 
+    private _getNormalizedScreenY(y: float): float {
+      return -(y / this._runtimeGame.getGameResolutionHeight()) * 2 + 1;
+    }
+
+    getObjectUnderCursor(): gdjs.RuntimeObject | null {
       const closestIntersect = this._getClosestIntersectionUnderCursor();
       if (!closestIntersect) return null;
+      return this._getObject(closestIntersect.object);
+    }
+
+    private _getObject(
+      initialThreeObject: THREE.Object3D
+    ): gdjs.RuntimeObject | null {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return null;
 
       // Walk back up the object hierarchy to find the runtime object.
       // We sadly need to do that because the intersection can be found on a Mesh or other
       // child Three.js object, instead of the one exposed by the gdjs.RuntimeObject.
-      let threeObject: THREE.Object3D | null = closestIntersect.object;
-      while (true) {
-        if (!threeObject) return null;
+      let threeObject: THREE.Object3D | null = initialThreeObject;
+      while (threeObject) {
         const runtimeObject: gdjs.RuntimeObject | null =
           // @ts-ignore
           threeObject.gdjsRuntimeObject;
@@ -1551,14 +1624,27 @@ namespace gdjs {
         }
         threeObject = threeObject.parent || null;
       }
+      return null;
     }
 
     updateAndRender() {
       const objectUnderCursor: gdjs.RuntimeObject | null =
         this.getObjectUnderCursor();
 
+      const inputManager = this._runtimeGame.getInputManager();
+      if (
+        !this._wasMouseLeftButtonPressed &&
+        !this._wasMouseRightButtonPressed &&
+        (inputManager.isMouseButtonPressed(0) ||
+          inputManager.isMouseButtonPressed(1))
+      ) {
+        this._pressedOriginalCursorX = inputManager.getCursorX();
+        this._pressedOriginalCursorY = inputManager.getCursorY();
+      }
+
       this._handleCameraMovement();
       this._handleSelectionMovement();
+      this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updateSelectionControls();
@@ -1568,7 +1654,7 @@ namespace gdjs {
       if (!this._selectionControlsMovementTotalDelta) {
         this._hasSelectionActuallyMoved = false;
       }
-      const inputManager = this._runtimeGame.getInputManager();
+      this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
     }
   }

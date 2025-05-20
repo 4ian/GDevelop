@@ -9,6 +9,7 @@ export { DRACOLoader } from "./examples/jsm/loaders/DRACOLoader";
 export * as SkeletonUtils from "./examples/jsm/utils/SkeletonUtils";
 
 export { TransformControls } from "./examples/jsm/controls/TransformControls";
+export { SelectionBox } from "./examples/jsm/interactive/SelectionBox";
 
 export { EffectComposer } from "./examples/jsm/postprocessing/EffectComposer";
 export { RenderPass } from "./examples/jsm/postprocessing/RenderPass";

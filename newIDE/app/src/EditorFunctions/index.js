@@ -10,6 +10,10 @@ import { applyEventsChanges } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { Trans } from '@lingui/macro';
 import Link from '../UI/Link';
+import {
+  hexNumberToRGBArray,
+  rgbOrHexToHexNumber,
+} from '../Utils/ColorTransformer';
 
 const gd: libGDevelop = global.gd;
 
@@ -1200,6 +1204,10 @@ const createScene: EditorFunction = {
       args,
       'include_ui_layer'
     );
+    const background_color = SafeExtractor.extractStringProperty(
+      args,
+      'background_color'
+    );
 
     if (project.hasLayoutNamed(scene_name)) {
       const scene = project.getLayout(scene_name);
@@ -1219,6 +1227,12 @@ const createScene: EditorFunction = {
     const scene = project.insertNewLayout(scene_name, scenesCount);
     if (include_ui_layer) {
       scene.insertNewLayer('UI', 0);
+    }
+    if (background_color) {
+      const colorAsRgb = hexNumberToRGBArray(
+        rgbOrHexToHexNumber(background_color)
+      );
+      scene.setBackgroundColor(colorAsRgb[0], colorAsRgb[1], colorAsRgb[2]);
     }
 
     return makeGenericSuccess(

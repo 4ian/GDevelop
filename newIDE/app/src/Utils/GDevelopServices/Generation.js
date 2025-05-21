@@ -128,6 +128,23 @@ export type AiGeneratedEvent = {
   stats: AiGeneratedEventStats | null,
 };
 
+export type AssetSearch = {
+  id: string,
+  userId: string,
+  createdAt: string,
+  query: {
+    searchTerms: string[],
+    objectType: string,
+    description: string | null,
+    twoDimensionalViewKind: string | null,
+  },
+  status: 'completed' | 'failed',
+  results: Array<{
+    score: number,
+    asset: any,
+  }> | null,
+};
+
 export const getGeneratedProject = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -477,6 +494,43 @@ export const getAiGeneratedEvent = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.get(
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event/${aiGeneratedEventId}`,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const createAssetSearch = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    searchTerms,
+    description,
+    objectType,
+    twoDimensionalViewKind,
+  }: {|
+    userId: string,
+    searchTerms: string,
+    description: string,
+    objectType: string,
+    twoDimensionalViewKind: string,
+  |}
+): Promise<AssetSearch> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopGenerationApi.baseUrl}/asset-search`,
+    {
+      searchTerms,
+      description,
+      objectType,
+      twoDimensionalViewKind,
+    },
     {
       params: {
         userId,

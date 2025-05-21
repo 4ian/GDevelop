@@ -16,7 +16,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
     AuthenticatedUserContext
   );
 
-  const launchEventsGeneration = React.useCallback(
+  const generateEvents = React.useCallback(
     async ({
       sceneName,
       eventsDescription,
@@ -94,5 +94,5 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
     [getAuthorizationHeader, project, profile]
   );
 
-  return { launchEventsGeneration };
+  return { generateEvents };
 };

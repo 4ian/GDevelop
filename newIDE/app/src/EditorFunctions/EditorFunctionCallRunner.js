@@ -5,6 +5,8 @@ import {
   type EditorFunction,
   type EditorFunctionCall,
   type EventsGenerationOptions,
+  type AssetSearchAndInstallOptions,
+  type AssetSearchAndInstallResult,
 } from '.';
 
 export type EditorFunctionCallResult =
@@ -39,20 +41,24 @@ export type ProcessEditorFunctionCallsOptions = {|
   project: gdProject,
   functionCalls: Array<EditorFunctionCall>,
   ignore: boolean,
-  launchEventsGeneration: (
+  generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
-  onEnsureExtensionInstalled: (options: {
+  ensureExtensionInstalled: (options: {|
     extensionName: string,
-  }) => Promise<void>,
+  |}) => Promise<void>,
+  searchAndInstallAsset: (
+    options: AssetSearchAndInstallOptions
+  ) => Promise<AssetSearchAndInstallResult>,
 |};
 
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
-  launchEventsGeneration,
+  generateEvents,
   ignore,
-  onEnsureExtensionInstalled,
+  ensureExtensionInstalled,
+  searchAndInstallAsset,
 }: ProcessEditorFunctionCallsOptions): Promise<
   Array<EditorFunctionCallResult>
 > => {
@@ -129,8 +135,9 @@ export const processEditorFunctionCalls = async ({
         {
           project,
           args,
-          launchEventsGeneration,
-          onEnsureExtensionInstalled,
+          generateEvents,
+          ensureExtensionInstalled,
+          searchAndInstallAsset,
         }
       );
       const { success, ...output } = result;

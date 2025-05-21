@@ -66,6 +66,21 @@ export type EventsGenerationOptions = {|
   placementHint: string,
 |};
 
+export type AssetSearchAndInstallResult = {|
+  status: 'asset-installed' | 'nothing-found' | 'error',
+  message: string,
+  createdObjects: Array<gdObject>,
+|};
+
+export type AssetSearchAndInstallOptions = {|
+  scene: gdLayout,
+  objectName: string,
+  objectType: string,
+  searchTerms: string,
+  description: string,
+  twoDimensionalViewKind: string,
+|};
+
 export type EditorCallbacks = {|
   onOpenLayout: (sceneName: string) => void,
   onOpenEvents: (sceneName: string) => void,
@@ -83,12 +98,15 @@ export type EditorFunction = {|
   launchFunction: (options: {|
     project: gdProject,
     args: any,
-    launchEventsGeneration: (
+    generateEvents: (
       options: EventsGenerationOptions
     ) => Promise<EventsGenerationResult>,
-    onEnsureExtensionInstalled: (options: {
+    ensureExtensionInstalled: (options: {|
       extensionName: string,
-    }) => Promise<void>,
+    |}) => Promise<void>,
+    searchAndInstallAsset: (
+      options: AssetSearchAndInstallOptions
+    ) => Promise<AssetSearchAndInstallResult>,
   |}) => Promise<EditorFunctionGenericOutput>,
 |};
 
@@ -161,10 +179,27 @@ const createObject: EditorFunction = {
       </Trans>
     );
   },
-  launchFunction: async ({ project, args, onEnsureExtensionInstalled }) => {
+  launchFunction: async ({
+    project,
+    args,
+    ensureExtensionInstalled,
+    searchAndInstallAsset,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
     const object_name = extractRequiredString(args, 'object_name');
+    const description = SafeExtractor.extractStringProperty(
+      args,
+      'description'
+    );
+    const search_terms = SafeExtractor.extractStringProperty(
+      args,
+      'search_terms'
+    );
+    const two_dimensional_view_kind = SafeExtractor.extractStringProperty(
+      args,
+      'two_dimensional_view_kind'
+    );
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -186,10 +221,44 @@ const createObject: EditorFunction = {
       );
     }
 
+    // First try to search and install an object from the asset store.
+    try {
+      const { status, message, createdObjects } = await searchAndInstallAsset({
+        scene: layout,
+        objectName: object_name,
+        objectType: object_type,
+        searchTerms: search_terms,
+        description,
+        twoDimensionalViewKind: two_dimensional_view_kind,
+      });
+
+      if (status === 'error') {
+        return makeGenericFailure(
+          `Unable to search and install object (${message}).`
+        );
+      } else if (status === 'asset-installed') {
+        return makeGenericSuccess(
+          `Created (from the asset store) ${createdObjects
+            .map(object => `object "${object_name}" of type "${object_type}"`)
+            .join(', ')} in scene "${scene_name}".`
+        );
+      } else {
+        // No asset found - we'll create an object from scratch.
+      }
+    } catch (error) {
+      return makeGenericFailure(
+        `An unexpected error happened while search and installing objects (${
+          error.message
+        }).`
+      );
+    }
+
+    // Create an object from scratch:
+    // Ensure the extension for this object type is installed.
     if (object_type.includes('::')) {
       const extensionName = object_type.split('::')[0];
       try {
-        await onEnsureExtensionInstalled({ extensionName });
+        await ensureExtensionInstalled({ extensionName });
       } catch (error) {
         console.error(
           `Could not get extension "${extensionName}" installed:`,
@@ -201,6 +270,7 @@ const createObject: EditorFunction = {
       }
     }
 
+    // Ensure the object type is valid.
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       project.getCurrentPlatform(),
       object_type
@@ -211,17 +281,14 @@ const createObject: EditorFunction = {
       );
     }
 
-    // Create the object based on the type
     objectsContainer.insertNewObject(
       project,
       object_type,
       object_name,
       objectsContainer.getObjectsCount()
     );
-
-    // TODO: send back the properties of the object?
     return makeGenericSuccess(
-      `Created object "${object_name}" of type "${object_type}" in scene "${scene_name}".`
+      `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`
     );
   },
 };
@@ -416,7 +483,7 @@ const addBehavior: EditorFunction = {
 
     return makeText(behaviorMetadata.getFullName());
   },
-  launchFunction: async ({ project, args, onEnsureExtensionInstalled }) => {
+  launchFunction: async ({ project, args, ensureExtensionInstalled }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_type = extractRequiredString(args, 'behavior_type');
@@ -444,7 +511,7 @@ const addBehavior: EditorFunction = {
     if (behavior_type.includes('::')) {
       const extensionName = behavior_type.split('::')[0];
       try {
-        await onEnsureExtensionInstalled({ extensionName });
+        await ensureExtensionInstalled({ extensionName });
       } catch (error) {
         console.error(
           `Could not get extension "${extensionName}" installed:`,
@@ -1015,8 +1082,8 @@ const addSceneEvents: EditorFunction = {
   launchFunction: async ({
     project,
     args,
-    launchEventsGeneration,
-    onEnsureExtensionInstalled,
+    generateEvents,
+    ensureExtensionInstalled,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
@@ -1045,7 +1112,7 @@ const addSceneEvents: EditorFunction = {
     });
 
     try {
-      const eventsGenerationResult = await launchEventsGeneration({
+      const eventsGenerationResult = await generateEvents({
         sceneName,
         eventsDescription,
         extensionNamesList,
@@ -1089,7 +1156,7 @@ const addSceneEvents: EditorFunction = {
 
       for (const change of changes) {
         for (const extensionName of change.extensionNames || []) {
-          await onEnsureExtensionInstalled({ extensionName });
+          await ensureExtensionInstalled({ extensionName });
         }
       }
 

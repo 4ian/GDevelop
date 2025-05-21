@@ -44,6 +44,8 @@ import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
+import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -105,13 +107,15 @@ const useEditorFunctionCallResultsPerRequest = () => {
 const useProcessFunctionCalls = ({
   i18n,
   project,
+  resourceManagementProps,
   selectedAiRequest,
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
 }: {|
   i18n: I18nType,
-  project: ?gdProject,
+  project: gdProject | null,
+  resourceManagementProps: ResourceManagementProps,
   selectedAiRequest: ?AiRequest,
   onSendEditorFunctionCallResults: () => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
@@ -124,7 +128,11 @@ const useProcessFunctionCalls = ({
     project,
     i18n,
   });
-  const { launchEventsGeneration } = useGenerateEvents({ project });
+  const { searchAndInstallAsset } = useSearchAndInstallAsset({
+    project,
+    resourceManagementProps,
+  });
+  const { generateEvents } = useGenerateEvents({ project });
 
   const triggerSendEditorFunctionCallResults = useTriggerAtNextRender(
     onSendEditorFunctionCallResults
@@ -179,15 +187,14 @@ const useProcessFunctionCalls = ({
           call_id: functionCall.call_id,
         })),
         ignore: !!options && !!options.ignore,
-        launchEventsGeneration: async options => {
-          return await launchEventsGeneration({
+        generateEvents: async options => {
+          return await generateEvents({
             ...options,
             relatedAiRequestId: selectedAiRequest.id,
           });
         },
-        onEnsureExtensionInstalled: async ({ extensionName }) => {
-          await ensureExtensionInstalled(extensionName);
-        },
+        ensureExtensionInstalled,
+        searchAndInstallAsset,
       });
 
       addEditorFunctionCallResults(
@@ -204,7 +211,8 @@ const useProcessFunctionCalls = ({
       selectedAiRequest,
       addEditorFunctionCallResults,
       ensureExtensionInstalled,
-      launchEventsGeneration,
+      searchAndInstallAsset,
+      generateEvents,
       triggerSendEditorFunctionCallResults,
     ]
   );
@@ -425,7 +433,8 @@ const styles = {
 
 type Props = {|
   isActive: boolean,
-  project: ?gdProject,
+  project: gdProject | null,
+  resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
   storageProvider: ?StorageProvider,
   setToolbar: (?React.Node) => void,
@@ -461,6 +470,7 @@ export const AskAiEditor = React.memo<Props>(
         isActive,
         setToolbar,
         project,
+        resourceManagementProps,
         fileMetadata,
         storageProvider,
         i18n,
@@ -837,6 +847,7 @@ export const AskAiEditor = React.memo<Props>(
         onProcessFunctionCalls,
       } = useProcessFunctionCalls({
         project,
+        resourceManagementProps,
         selectedAiRequest,
         onSendEditorFunctionCallResults,
         getEditorFunctionCallResults,
@@ -919,7 +930,8 @@ export const renderAskAiEditorContainer = (
       <AskAiEditor
         ref={props.ref}
         i18n={i18n}
-        project={props.project}
+        project={props.project || null}
+        resourceManagementProps={props.resourceManagementProps}
         fileMetadata={props.fileMetadata}
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}

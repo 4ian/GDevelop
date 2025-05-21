@@ -153,6 +153,7 @@ export type InstallAssetArgs = {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   targetObjectFolderOrObject?: ?gdObjectFolderOrObject,
+  requestedObjectName?: string,
 |};
 
 const findVariant = (
@@ -177,6 +178,7 @@ export const addAssetToProject = async ({
   project,
   objectsContainer,
   targetObjectFolderOrObject,
+  requestedObjectName,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
   const objectNewNames = {};
   const resourceNewNames = {};
@@ -270,7 +272,9 @@ export const addAssetToProject = async ({
     }
 
     // Insert the object
-    const originalName = sanitizeObjectName(objectAsset.object.name);
+    const originalName = sanitizeObjectName(
+      requestedObjectName || objectAsset.object.name
+    );
     const newName = newNameGenerator(originalName, name =>
       objectsContainer.hasObjectNamed(name)
     );

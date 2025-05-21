@@ -49,10 +49,6 @@ export class DebuggerEditorContainer extends React.Component<
     // No updates to be done.
   }
 
-  onEditorShown() {}
-
-  onEditorHidden() {}
-
   onEventsBasedObjectChildrenEdited() {
     // No thing to be done.
   }

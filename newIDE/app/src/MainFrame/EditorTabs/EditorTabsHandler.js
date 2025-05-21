@@ -192,23 +192,10 @@ export const changeCurrentTab = (
   state: EditorTabsState,
   newTabId: number
 ): EditorTabsState => {
-  const oldTab = state.editors[state.currentTab];
-  // oldTab can be undefined when another project is open.
-  if (oldTab) {
-    const oldEditor = oldTab.editorRef;
-    if (oldEditor) {
-      oldEditor.onEditorHidden();
-    }
-  }
-  const newState = {
+  return {
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
   };
-  const newEditor = newState.editors[newState.currentTab].editorRef;
-  if (newEditor) {
-    newEditor.onEditorShown();
-  }
-  return newState;
 };
 
 export const isStartPageTabPresent = (state: EditorTabsState): boolean => {

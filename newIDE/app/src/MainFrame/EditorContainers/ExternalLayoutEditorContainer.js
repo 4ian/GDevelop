@@ -66,7 +66,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName } = this.props;
+      const { projectItemName, editorId } = this.props;
       const layout = this.getLayout();
       this.props.setPreviewedLayout({
         layoutName: layout ? layout.getName() : null,
@@ -77,6 +77,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
       if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
         switchToSceneEdition({
+          editorId,
           sceneName: layout.getName(),
           externalLayoutName: projectItemName,
           eventsBasedObjectType: null,
@@ -96,7 +97,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName } = this.props;
+      const { projectItemName, editorId } = this.props;
       const layout = this.getLayout();
       this.props.setPreviewedLayout({
         layoutName: layout ? layout.getName() : null,
@@ -107,6 +108,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
       if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
         switchToSceneEdition({
+          editorId,
           sceneName: layout.getName(),
           externalLayoutName: projectItemName,
           eventsBasedObjectType: null,
@@ -116,18 +118,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
           this.editor.onEditorReloaded();
         }
       }
-    }
-  }
-
-  onEditorShown() {
-    if (this.editor) {
-      this.editor.onEditorShown();
-    }
-  }
-
-  onEditorHidden() {
-    if (this.editor) {
-      this.editor.onEditorHidden();
     }
   }
 
@@ -279,6 +269,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       <div style={styles.container}>
         {layout && (
           <SceneEditor
+            editorId={this.props.editorId}
             setToolbar={this.props.setToolbar}
             resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}

@@ -289,6 +289,7 @@ namespace gdjs {
   };
 
   export class InGameEditor {
+    private _editorId: string = '';
     private _runtimeGame: RuntimeGame;
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
@@ -342,6 +343,14 @@ namespace gdjs {
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
+    }
+
+    getEditorId(): string {
+      return this._editorId;
+    }
+
+    setEditorId(editorId: string): void {
+      this._editorId = editorId;
     }
 
     setEditedInstanceDataList(editedInstanceDataList: InstanceData[]) {

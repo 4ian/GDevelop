@@ -3977,6 +3977,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
+    [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);

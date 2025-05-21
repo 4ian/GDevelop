@@ -11,6 +11,7 @@ type AttachToPreviewOptions = {|
 |};
 
 type SwitchToSceneEditionOptions = {|
+  editorId: string,
   sceneName: string | null,
   externalLayoutName: string | null,
   eventsBasedObjectType: string | null,
@@ -28,6 +29,7 @@ export const attachToPreview = ({
 };
 
 export const switchToSceneEdition = ({
+  editorId,
   sceneName,
   externalLayoutName,
   eventsBasedObjectType,
@@ -36,6 +38,7 @@ export const switchToSceneEdition = ({
   if (!onSwitchToSceneEdition)
     throw new Error('No EmbeddedGameFrame registered.');
   onSwitchToSceneEdition({
+    editorId,
     sceneName,
     externalLayoutName,
     eventsBasedObjectType,
@@ -46,6 +49,7 @@ export const switchToSceneEdition = ({
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   onLaunchPreviewForInGameEdition: ({|
+    editorId: string,
     sceneName: string | null,
     externalLayoutName: string | null,
     eventsBasedObjectType: string | null,
@@ -78,6 +82,7 @@ export const EmbeddedGameFrame = ({
         if (!previewDebuggerServer) return;
 
         const {
+          editorId,
           sceneName,
           externalLayoutName,
           eventsBasedObjectType,
@@ -96,6 +101,7 @@ export const EmbeddedGameFrame = ({
                   ''}".`
           );
           onLaunchPreviewForInGameEdition({
+            editorId,
             sceneName,
             externalLayoutName,
             eventsBasedObjectType,
@@ -115,6 +121,7 @@ export const EmbeddedGameFrame = ({
           previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
             previewDebuggerServer.sendMessage(debuggerId, {
               command: 'switchForInGameEdition',
+              editorId,
               sceneName,
               externalLayoutName,
               eventsBasedObjectType,

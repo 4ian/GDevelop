@@ -212,6 +212,14 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the in-game editor identifier.
+   */
+  PreviewExportOptions &SetEditorId(const gd::String &editorId_) {
+    editorId = editorId_;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -338,6 +346,7 @@ struct PreviewExportOptions {
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;
+  gd::String editorId;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;

@@ -307,11 +307,17 @@ namespace gdjs {
         }
 
         this._runtimegame._switchToSceneOrVariant(
+          data.editorId || null,
           sceneName,
           externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName
         );
+
+        const inGameEditor = this._runtimegame._inGameEditor;
+        if (inGameEditor) {
+          inGameEditor.setEditorId(data.editorId);
+        }
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);
@@ -387,6 +393,7 @@ namespace gdjs {
           const initialRuntimeGameStatus =
             this._runtimegame.getAdditionalOptions().initialRuntimeGameStatus;
           const runtimeGameStatus: RuntimeGameStatus = {
+            editorId: initialRuntimeGameStatus?.editorId || null,
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: initialRuntimeGameStatus?.sceneName || null,
@@ -711,18 +718,28 @@ namespace gdjs {
       selectedInstances: Array<InstancePersistentUuidData>;
       removedInstances: Array<InstancePersistentUuidData>;
     }): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
       this._sendMessage(
         circularSafeStringify({
           command: 'updateInstances',
+          editorId: inGameEditor.getEditorId(),
           payload: changes,
         })
       );
     }
 
     sendOpenContextMenu(cursorX: float, cursorY: float): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
       this._sendMessage(
         circularSafeStringify({
           command: 'openContextMenu',
+          editorId: inGameEditor.getEditorId(),
           payload: { cursorX, cursorY },
         })
       );

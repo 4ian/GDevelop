@@ -54,6 +54,7 @@ namespace gdjs {
     skipCreatingInstancesFromScene: boolean;
     eventsBasedObjectType: string | null;
     eventsBasedObjectVariantName: string | null;
+    editorId: string | null;
   };
 
   /**
@@ -78,6 +79,7 @@ namespace gdjs {
         eventsBasedObjectType: parsedRuntimeGameStatus.eventsBasedObjectType,
         eventsBasedObjectVariantName:
           parsedRuntimeGameStatus.eventsBasedObjectVariantName,
+        editorId: parsedRuntimeGameStatus.editorId,
       };
     } catch (e) {
       return null;
@@ -1015,7 +1017,10 @@ namespace gdjs {
         const eventsBasedObjectVariantName =
           this._options.initialRuntimeGameStatus
             ?.eventsBasedObjectVariantName || null;
+        const editorId =
+          this._options.initialRuntimeGameStatus?.editorId || null;
         this._switchToSceneOrVariant(
+          editorId,
           sceneName,
           externalLayoutName,
           eventsBasedObjectType,
@@ -1129,6 +1134,7 @@ namespace gdjs {
     }
 
     _switchToSceneOrVariant(
+      editorId: string | null,
       sceneName: string | null,
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
@@ -1199,8 +1205,11 @@ namespace gdjs {
           }
         }
       }
-      if (this._inGameEditor && editedInstanceDataList) {
-        this._inGameEditor.setEditedInstanceDataList(editedInstanceDataList);
+      if (this._inGameEditor) {
+        this._inGameEditor.setEditedInstanceDataList(
+          editedInstanceDataList || []
+        );
+        this._inGameEditor.setEditorId(editorId || '');
       }
 
       // Update initialRuntimeGameStatus so that a hard reload
@@ -1214,6 +1223,7 @@ namespace gdjs {
         skipCreatingInstancesFromScene: !!externalLayoutName,
         eventsBasedObjectType,
         eventsBasedObjectVariantName,
+        editorId,
       };
     }
 

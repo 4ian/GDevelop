@@ -226,6 +226,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.layoutName);
   if (options.isInGameEdition) {
     initialRuntimeGameStatus.AddChild("isInGameEdition").SetBoolValue(true);
+    initialRuntimeGameStatus.AddChild("editorId").SetValue(options.editorId);
   }
   if (!options.externalLayoutName.empty()) {
     initialRuntimeGameStatus.AddChild("injectedExternalLayoutName")

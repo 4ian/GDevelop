@@ -172,8 +172,6 @@ export type HomePageEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
-  onEditorShown: () => void,
-  onEditorHidden: () => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -498,8 +496,6 @@ export const HomePage = React.memo<Props>(
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
         onSceneObjectsDeleted,
-        onEditorShown: noop,
-        onEditorHidden: noop,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

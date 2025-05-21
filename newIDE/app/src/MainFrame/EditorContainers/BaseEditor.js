@@ -31,6 +31,7 @@ export type EditorContainerExtraProps = {|
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
+  editorId: string,
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,

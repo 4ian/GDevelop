@@ -225,6 +225,7 @@ export default class LocalPreviewLauncher extends React.Component<
     previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
     previewExportOptions.setLayoutName(layout.getName());
     previewExportOptions.setIsInGameEdition(previewOptions.isForInGameEdition);
+    previewExportOptions.setEditorId(previewOptions.editorId || '');
     if (externalLayout) {
       previewExportOptions.setExternalLayoutName(externalLayout.getName());
     }

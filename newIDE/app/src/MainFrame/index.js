@@ -1799,6 +1799,7 @@ const MainFrame = (props: Props) => {
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
+          editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
           inAppTutorialMessageInPreview: inAppTutorialMessageInPreview.message,
           inAppTutorialMessagePositionInPreview:
             inAppTutorialMessageInPreview.position,
@@ -1906,11 +1907,13 @@ const MainFrame = (props: Props) => {
 
   const onLaunchPreviewForInGameEdition = React.useCallback(
     ({
+      editorId,
       sceneName,
       externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
     }: {|
+      editorId: string,
       sceneName: string | null,
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
@@ -1921,6 +1924,7 @@ const MainFrame = (props: Props) => {
         hotReload: false,
         forceDiagnosticReport: false,
         isForInGameEdition: {
+          editorId,
           forcedSceneName: sceneName,
           forcedExternalLayoutName: externalLayoutName,
           eventsBasedObjectType,
@@ -4053,6 +4057,7 @@ const MainFrame = (props: Props) => {
                   scope={errorBoundaryProps.scope}
                 >
                   {editorTab.renderEditorContainer({
+                    editorId: editorTab.key,
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,

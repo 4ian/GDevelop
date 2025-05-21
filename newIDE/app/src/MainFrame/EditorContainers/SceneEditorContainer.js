@@ -33,7 +33,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName } = this.props;
+      const { projectItemName, editorId } = this.props;
       this.props.setPreviewedLayout({
         layoutName: projectItemName || null,
         externalLayoutName: null,
@@ -43,6 +43,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
         switchToSceneEdition({
+          editorId,
           sceneName: projectItemName,
           externalLayoutName: null,
           eventsBasedObjectType: null,
@@ -54,7 +55,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName } = this.props;
+      const { projectItemName, editorId } = this.props;
       this.props.setPreviewedLayout({
         layoutName: projectItemName || null,
         externalLayoutName: null,
@@ -64,6 +65,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
         switchToSceneEdition({
+          editorId,
           sceneName: projectItemName,
           externalLayoutName: null,
           eventsBasedObjectType: null,
@@ -73,18 +75,6 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
           this.editor.onEditorReloaded();
         }
       }
-    }
-  }
-
-  onEditorShown() {
-    if (this.editor) {
-      this.editor.onEditorShown();
-    }
-  }
-
-  onEditorHidden() {
-    if (this.editor) {
-      this.editor.onEditorHidden();
     }
   }
 
@@ -180,6 +170,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
     return (
       <SceneEditor
+        editorId={this.props.editorId}
         setToolbar={this.props.setToolbar}
         resourceManagementProps={this.props.resourceManagementProps}
         unsavedChanges={this.props.unsavedChanges}

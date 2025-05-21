@@ -66,10 +66,6 @@ export class ExternalEventsEditorContainer extends React.Component<
     );
   }
 
-  onEditorShown() {}
-
-  onEditorHidden() {}
-
   onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
     if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
   };

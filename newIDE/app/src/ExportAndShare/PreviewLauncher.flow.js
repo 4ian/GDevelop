@@ -16,6 +16,7 @@ export type LaunchPreviewOptions = {
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
   isForInGameEdition?: {|
+    editorId: string,
     forcedSceneName: string | null,
     forcedExternalLayoutName: string | null,
     eventsBasedObjectType: string | null,
@@ -49,6 +50,7 @@ export type PreviewOptions = {|
   },
   numberOfWindows: number,
   isForInGameEdition: boolean,
+  editorId: string,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
   captureOptions: CaptureOptions,

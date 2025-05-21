@@ -60,8 +60,6 @@ export type AskAiEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
-  onEditorShown: () => void,
-  onEditorHidden: () => void,
 |};
 
 const noop = () => {};
@@ -113,8 +111,6 @@ export const AskAi = React.memo<Props>(
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
-        onEditorShown: noop,
-        onEditorHidden: noop,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(

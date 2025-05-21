@@ -120,6 +120,7 @@ const styles = {
 };
 
 type Props = {|
+  editorId: string,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
@@ -285,19 +286,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
-  }
-
-  componentWillUnmount() {
-    unregisterOnResourceExternallyChangedCallback(
-      this.resourceExternallyChangedCallbackId
-    );
-    if (this.unregisterDebuggerCallback) {
-      this.unregisterDebuggerCallback();
-      this.unregisterDebuggerCallback = null;
-    }
-  }
-
-  onEditorShown() {
     if (this.props.previewDebuggerServer && !this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback = this.props.previewDebuggerServer.registerCallbacks(
         {
@@ -307,6 +295,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           onConnectionErrored: () => {},
           onServerStateChanged: () => {},
           onHandleParsedMessage: ({ id, parsedMessage }) => {
+            if (parsedMessage.editorId !== this.props.editorId) {
+              return;
+            }
             if (parsedMessage.command === 'updateInstances') {
               this.onReceiveInstanceChanges(parsedMessage.payload);
             } else if (parsedMessage.command === 'openContextMenu') {
@@ -321,7 +312,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  onEditorHidden() {
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
     if (this.unregisterDebuggerCallback) {
       this.unregisterDebuggerCallback();
       this.unregisterDebuggerCallback = null;

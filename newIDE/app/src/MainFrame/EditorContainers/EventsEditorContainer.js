@@ -43,10 +43,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
-  onEditorShown() {}
-
-  onEditorHidden() {}
-
   getProject(): ?gdProject {
     return this.props.project;
   }

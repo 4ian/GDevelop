@@ -311,7 +311,7 @@ namespace gdjs {
           externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName
-        )
+        );
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)
           runtimeGame._inGameEditor.reloadInstances(data.payload.instances);

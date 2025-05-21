@@ -1004,16 +1004,17 @@ namespace gdjs {
           return;
         }
         this._forceGameResolutionUpdate();
-        
+
         // Load the first scene
         const sceneName = this._getFirstSceneName();
         const externalLayoutName =
-          this._options.initialRuntimeGameStatus
-            ?.injectedExternalLayoutName || null;
+          this._options.initialRuntimeGameStatus?.injectedExternalLayoutName ||
+          null;
         const eventsBasedObjectType =
           this._options.initialRuntimeGameStatus?.eventsBasedObjectType || null;
         const eventsBasedObjectVariantName =
-          this._options.initialRuntimeGameStatus?.eventsBasedObjectVariantName || null;
+          this._options.initialRuntimeGameStatus
+            ?.eventsBasedObjectVariantName || null;
         this._switchToSceneOrVariant(
           sceneName,
           externalLayoutName,
@@ -1153,7 +1154,7 @@ namespace gdjs {
       if (eventsBasedObjectType) {
         const sceneAndCustomObject = this._createSceneWithCustomObject(
           eventsBasedObjectType,
-          eventsBasedObjectVariantName || ""
+          eventsBasedObjectVariantName || ''
         );
         if (sceneAndCustomObject) {
           const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
@@ -1165,7 +1166,7 @@ namespace gdjs {
             const eventsBasedObjectVariantData =
               this.getEventsBasedObjectVariantData(
                 eventsBasedObjectType,
-                eventsBasedObjectVariantName || ""
+                eventsBasedObjectVariantName || ''
               );
             if (eventsBasedObjectVariantData) {
               editedInstanceDataList = eventsBasedObjectVariantData.instances;
@@ -1175,7 +1176,8 @@ namespace gdjs {
       } else if (sceneName) {
         this.getSceneStack().replace({
           sceneName,
-          externalLayoutName: externalLayoutName === null ? undefined : externalLayoutName,
+          externalLayoutName:
+            externalLayoutName === null ? undefined : externalLayoutName,
           skipCreatingInstancesFromScene: !!externalLayoutName,
           clear: true,
         });

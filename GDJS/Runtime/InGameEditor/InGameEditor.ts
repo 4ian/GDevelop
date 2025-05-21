@@ -963,7 +963,7 @@ namespace gdjs {
 
       const selected3DObjects = this._selection
         .getSelectedObjects()
-        .filter((obj) => is3D(obj));
+        .filter((obj) => is3D(obj)) as Array<RuntimeObjectWith3D>;
 
       // Add/update boxes for selected objects
       selected3DObjects.forEach((object) =>

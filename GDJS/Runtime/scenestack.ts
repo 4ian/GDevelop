@@ -1,5 +1,6 @@
+let time = 0.0;
+
 namespace gdjs {
-  const logger = new gdjs.Logger('Scene stack');
   const debugLogger = new gdjs.Logger('Multiplayer - Debug');
 
   /**
@@ -35,6 +36,8 @@ namespace gdjs {
     }
 
     step(elapsedTime: float): boolean {
+      time += this._stack[0].getTimeManager().getElapsedTime() / 100;
+      lavaMaterial.uniforms.time.value = time;
       this._throwIfDisposed();
       if (this._isNextLayoutLoading || this._stack.length === 0) {
         return false;
@@ -68,10 +71,8 @@ namespace gdjs {
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
-          logger.error('Unrecognized change in scene stack: ' + request);
         }
       }
-
       return true;
     }
 

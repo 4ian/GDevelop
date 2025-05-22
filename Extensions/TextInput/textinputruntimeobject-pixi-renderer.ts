@@ -211,8 +211,8 @@ namespace gdjs {
       const isOutsideCanvas =
         canvasRight < 0 ||
         canvasBottom < 0 ||
-        canvasLeft > runtimeGame.getGameResolutionWidth() ||
-        canvasTop > runtimeGame.getGameResolutionHeight();
+        canvasLeft > runtimeGame.getRenderingResolutionWidth() ||
+        canvasTop > runtimeGame.getRenderingResolutionHeight();
       if (isOutsideCanvas) {
         this._form.style.display = 'none';
         return;

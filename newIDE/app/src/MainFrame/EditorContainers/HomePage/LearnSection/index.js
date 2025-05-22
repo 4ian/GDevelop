@@ -237,6 +237,10 @@ const LearnSection = ({
       category={selectedCategory}
       tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
+      onSelectCourse={(courseId: string) => {
+        onSelectCourse(courseId);
+        onSelectCategory('course');
+      }}
     />
   );
 };

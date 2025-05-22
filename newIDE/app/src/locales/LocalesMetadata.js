@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اَلْعَرَبِيَّةُ",
-    "translationRatio": 0.9924408413672218
+    "translationRatio": 0.9932077125328659
   },
   {
     "languageCode": "az_AZ",
@@ -71,7 +71,7 @@ module.exports = [
     "languageCode": "en",
     "languageName": "English",
     "languageNativeName": "English",
-    "translationRatio": 0.07323943661971832
+    "translationRatio": 0.07321881160236554
   },
   {
     "languageCode": "eo_UY",
@@ -155,7 +155,7 @@ module.exports = [
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9874014022787029
+    "translationRatio": 0.9922217353198949
   },
   {
     "languageCode": "ka_GE",
@@ -221,13 +221,13 @@ module.exports = [
     "languageCode": "pl_PL",
     "languageName": "Polish",
     "languageNativeName": "Polski",
-    "translationRatio": 0.9844434706397897
+    "translationRatio": 0.9900306748466258
   },
   {
     "languageCode": "pseudo_LOCALE",
     "languageName": "for development only",
     "languageNativeName": "Pseudolocalization",
-    "translationRatio": 0.9960563380281691
+    "translationRatio": 0.9960574486060265
   },
   {
     "languageCode": "pt_BR",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9768843120070114
+    "translationRatio": 0.9836765994741454
   },
   {
     "languageCode": "si_LK",
@@ -317,7 +317,7 @@ module.exports = [
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.989592462751972
+    "translationRatio": 0.9903593339176161
   },
   {
     "languageCode": "ur_PK",
@@ -347,7 +347,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9916739702015775
+    "translationRatio": 0.9924408413672218
   },
   {
     "languageCode": "zh_TW",

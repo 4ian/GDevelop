@@ -83,6 +83,8 @@ namespace gdjs {
         );
 
       const boxMesh = new THREE.Mesh(geometry, materials);
+      boxMesh.receiveShadow = true;
+      boxMesh.castShadow = true;
 
       super(runtimeObject, instanceContainer, boxMesh);
       this._boxMesh = boxMesh;
@@ -118,6 +120,8 @@ namespace gdjs {
     updateFace(faceIndex: integer) {
       const materialIndex = faceIndexToMaterialIndex[faceIndex];
       if (materialIndex === undefined) return;
+      this._boxMesh.receiveShadow = true;
+      this._boxMesh.castShadow = true;
 
       this._boxMesh.material[materialIndex] = getFaceMaterial(
         this._cube3DRuntimeObject,

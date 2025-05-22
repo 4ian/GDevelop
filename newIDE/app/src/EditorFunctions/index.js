@@ -14,6 +14,7 @@ import {
   hexNumberToRGBArray,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
+import { type SimplifiedBehavior } from '../Utils/SimplifiedProjectJson';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,7 +40,7 @@ export type EditorFunctionCallResult =
       call_id: string,
     |};
 
-type EditorFunctionGenericOutput = {|
+export type EditorFunctionGenericOutput = {|
   success: boolean,
   message?: string,
   eventsForSceneNamed?: string,
@@ -49,6 +50,7 @@ type EditorFunctionGenericOutput = {|
   properties?: any,
   sharedProperties?: any,
   instances?: any,
+  behaviors?: Array<SimplifiedBehavior>,
 |};
 
 export type EventsGenerationResult =
@@ -150,12 +152,14 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
   message,
 });
 
+const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
+  return property.isHidden() || property.isDeprecated();
+};
+
 const serializeNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
 ): null | {} => {
-  if (property.isHidden() || property.isDeprecated()) return null;
-
   return {
     name,
     ...serializeToJSObject(property),
@@ -339,15 +343,28 @@ const inspectObjectProperties: EditorFunction = {
     const properties = propertyNames
       .map(name => {
         const propertyDescriptor = objectProperties.get(name);
+        if (shouldHideProperty(propertyDescriptor)) return null;
 
         return serializeNamedProperty(name, propertyDescriptor);
       })
       .filter(Boolean);
 
+    const behaviors = object
+      .getAllBehaviorNames()
+      .toJSArray()
+      .map(behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
+        return {
+          behaviorName: behaviorName,
+          behaviorType: behavior.getTypeName(),
+        };
+      });
+
     return {
       success: true,
       objectName: object_name,
       properties,
+      behaviors,
     };
   },
 };
@@ -683,6 +700,7 @@ const inspectBehaviorProperties: EditorFunction = {
     const properties = propertyNames
       .map(name => {
         const propertyDescriptor = behaviorProperties.get(name);
+        if (shouldHideProperty(propertyDescriptor)) return null;
 
         return serializeNamedProperty(name, propertyDescriptor);
       })
@@ -702,6 +720,7 @@ const inspectBehaviorProperties: EditorFunction = {
       sharedProperties = behaviorSharedDataPropertyNames
         .map(name => {
           const propertyDescriptor = behaviorSharedDataProperties.get(name);
+          if (shouldHideProperty(propertyDescriptor)) return null;
 
           return serializeNamedProperty(name, propertyDescriptor);
         })

@@ -4,35 +4,35 @@ import { isCollectionVariable } from './VariablesUtils';
 
 const gd: libGDevelop = global.gd;
 
-type SimplifiedBehaviorJson = {|
+export type SimplifiedBehavior = {|
   behaviorName: string,
   behaviorType: string,
 |};
 
-type SimplifiedVariableJson = {|
+type SimplifiedVariable = {|
   variableName: string,
   type: string,
   value?: string,
-  variableChildren?: Array<SimplifiedVariableJson>,
+  variableChildren?: Array<SimplifiedVariable>,
 |};
 
-type SimplifiedObjectJson = {|
+type SimplifiedObject = {|
   objectName: string,
   objectType: string,
-  behaviors?: Array<SimplifiedBehaviorJson>,
-  objectVariables?: Array<SimplifiedVariableJson>,
+  behaviors?: Array<SimplifiedBehavior>,
+  objectVariables?: Array<SimplifiedVariable>,
 |};
 
-type SimplifiedSceneJson = {|
+type SimplifiedScene = {|
   sceneName: string,
-  objects: Array<SimplifiedObjectJson>,
-  sceneVariables: Array<SimplifiedVariableJson>,
+  objects: Array<SimplifiedObject>,
+  sceneVariables: Array<SimplifiedVariable>,
 |};
 
-type SimplifiedProjectJson = {|
-  globalObjects: Array<SimplifiedObjectJson>,
-  scenes: Array<SimplifiedSceneJson>,
-  globalVariables: Array<SimplifiedVariableJson>,
+type SimplifiedProject = {|
+  globalObjects: Array<SimplifiedObject>,
+  scenes: Array<SimplifiedScene>,
+  globalVariables: Array<SimplifiedVariable>,
 |};
 
 const getSimplifiedBehaviorJson = (behavior: gdBehavior) => {
@@ -76,11 +76,11 @@ const getVariableValueAsString = (variable: gdVariable) => {
     : 'unknown';
 };
 
-const getSimplifiedVariableJson = (
+const getSimplifiedVariable = (
   name: string,
   variable: gdVariable,
   depth = 0
-): SimplifiedVariableJson => {
+): SimplifiedVariable => {
   const isCollection = isCollectionVariable(variable);
 
   if (isCollection) {
@@ -94,11 +94,7 @@ const getSimplifiedVariableJson = (
           .toJSArray()
           .map(childName => {
             const childVariable = variable.getChild(childName);
-            return getSimplifiedVariableJson(
-              childName,
-              childVariable,
-              depth + 1
-            );
+            return getSimplifiedVariable(childName, childVariable, depth + 1);
           }),
       };
     }
@@ -117,15 +113,15 @@ const getSimplifiedVariableJson = (
 
 const getSimplifiedVariablesContainerJson = (
   container: gdVariablesContainer
-): Array<SimplifiedVariableJson> => {
+): Array<SimplifiedVariable> => {
   return mapFor(0, Math.min(container.count(), 20), (index: number) => {
     const name = container.getNameAt(index);
     const variable = container.getAt(index);
-    return getSimplifiedVariableJson(name, variable);
+    return getSimplifiedVariable(name, variable);
   }).filter(Boolean);
 };
 
-const getSimplifiedObjectJson = (object: gdObject): SimplifiedObjectJson => {
+const getSimplifiedObject = (object: gdObject): SimplifiedObject => {
   const objectVariables = getSimplifiedVariablesContainerJson(
     object.getVariables()
   );
@@ -139,7 +135,7 @@ const getSimplifiedObjectJson = (object: gdObject): SimplifiedObjectJson => {
     })
     .filter(Boolean);
 
-  const simplifiedObject: SimplifiedObjectJson = {
+  const simplifiedObject: SimplifiedObject = {
     objectName: object.getName(),
     objectType: object.getType(),
   };
@@ -156,14 +152,14 @@ const getSimplifiedObjectJson = (object: gdObject): SimplifiedObjectJson => {
 
 const getSimplifiedObjectsJson = (
   objects: gdObjectsContainer
-): Array<SimplifiedObjectJson> => {
+): Array<SimplifiedObject> => {
   return mapFor(0, objects.getObjectsCount(), i => {
     const object = objects.getObjectAt(i);
-    return getSimplifiedObjectJson(object);
+    return getSimplifiedObject(object);
   });
 };
 
-const getSimplifiedSceneJson = (scene: gdLayout) => {
+const getSimplifiedScene = (scene: gdLayout) => {
   return {
     sceneName: scene.getName(),
     objects: getSimplifiedObjectsJson(scene.getObjects()),
@@ -171,21 +167,21 @@ const getSimplifiedSceneJson = (scene: gdLayout) => {
   };
 };
 
-export type SimplifiedProjectJsonOptions = {|
+export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const getSimplifiedProjectJson = (
+export const getSimplifiedProject = (
   project: gdProject,
-  options: SimplifiedProjectJsonOptions
-): SimplifiedProjectJson => {
+  options: SimplifiedProjectOptions
+): SimplifiedProject => {
   const globalObjects = getSimplifiedObjectsJson(project.getObjects());
   const scenes = mapFor(0, project.getLayoutsCount(), i => {
     const scene = project.getLayoutAt(i);
     if (options.scopeToScene && scene.getName() !== options.scopeToScene)
       return null;
 
-    return getSimplifiedSceneJson(scene);
+    return getSimplifiedScene(scene);
   }).filter(Boolean);
 
   return {

@@ -1,5 +1,5 @@
 // @flow
-import { getSimplifiedProjectJson } from './SimplifiedProjectJson';
+import { getSimplifiedProject } from './SimplifiedProjectJson';
 import { makeTestProject } from '../fixtures/TestProject';
 
 const gd: libGDevelop = global.gd;
@@ -7,7 +7,7 @@ const gd: libGDevelop = global.gd;
 describe('SimplifiedProjectJson', () => {
   it('should create a simplified project JSON with global objects and scenes', () => {
     const { project } = makeTestProject(gd);
-    const simplifiedJson = getSimplifiedProjectJson(project, {});
+    const simplifiedJson = getSimplifiedProject(project, {});
 
     expect(simplifiedJson).toMatchInlineSnapshot(`
       Object {

@@ -4,6 +4,7 @@ import {
   editorFunctions,
   type EditorFunction,
   type EditorFunctionCall,
+  type EditorFunctionGenericOutput,
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
@@ -24,18 +25,6 @@ export type EditorFunctionCallResult =
       status: 'ignored',
       call_id: string,
     |};
-
-type EditorFunctionGenericOutput = {|
-  success: boolean,
-  message?: string,
-  eventsForSceneNamed?: string,
-  eventsAsText?: string,
-  objectName?: string,
-  behaviorName?: string,
-  properties?: any,
-  sharedProperties?: any,
-  instances?: any,
-|};
 
 export type ProcessEditorFunctionCallsOptions = {|
   project: gdProject,

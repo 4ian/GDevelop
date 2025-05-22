@@ -18,7 +18,7 @@ import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
-import { getSimplifiedProjectJson } from '../Utils/SimplifiedProjectJson';
+import { getSimplifiedProject } from '../Utils/SimplifiedProjectJson';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
@@ -651,7 +651,7 @@ export const AskAiEditor = React.memo<Props>(
             // Request is now ready to be started.
             try {
               const simplifiedProjectJson = project
-                ? JSON.stringify(getSimplifiedProjectJson(project, {}))
+                ? JSON.stringify(getSimplifiedProject(project, {}))
                 : null;
 
               setSendingAiRequest(null, true);

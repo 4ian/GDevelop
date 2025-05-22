@@ -9,7 +9,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 
 import { type EventsGenerationResult } from '../EditorFunctions';
-import { getSimplifiedProjectJson } from '../Utils/SimplifiedProjectJson';
+import { getSimplifiedProject } from '../Utils/SimplifiedProjectJson';
 
 export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -41,7 +41,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
         createAiGeneratedEvent(getAuthorizationHeader, {
           userId: profile.id,
           partialGameProjectJson: JSON.stringify(
-            getSimplifiedProjectJson(project, {
+            getSimplifiedProject(project, {
               scopeToScene: sceneName,
             }),
             null,

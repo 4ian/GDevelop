@@ -153,7 +153,11 @@ const makeGenericSuccess = (message: string): EditorFunctionGenericOutput => ({
 });
 
 const shouldHideProperty = (property: gdPropertyDescriptor): boolean => {
-  return property.isHidden() || property.isDeprecated();
+  return (
+    property.isHidden() ||
+    property.isDeprecated() ||
+    property.getType() === 'Behavior' // No need to mess around with the "required behaviors", they are automatically filled.
+  );
 };
 
 const serializeNamedProperty = (
@@ -167,6 +171,25 @@ const serializeNamedProperty = (
     quickCustomizationVisibility: undefined,
     advanced: undefined,
   };
+};
+
+const makeShortTextForNamedProperty = (
+  name: string,
+  property: gdPropertyDescriptor
+): string => {
+  const type = property.getType();
+  const measurementUnit = property.getMeasurementUnit();
+  const choices =
+    type === 'Choice' ? property.getExtraInfo().toJSArray() : null;
+  const information = [
+    type,
+    choices
+      ? `one of: [${choices.map(choice => `"${choice}"`).join(', ')}]`
+      : null,
+    measurementUnit.isUndefined() ? null : measurementUnit.getName(),
+  ].filter(Boolean);
+
+  return `${name} (${information.join(', ')})`;
 };
 
 /**
@@ -216,6 +239,28 @@ const createObject: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const objectsContainer = layout.getObjects();
 
+    const getPropertiesText = (object: gdObject): string => {
+      const objectConfiguration = object.getConfiguration();
+      const properties = objectConfiguration.getProperties();
+      const propertyShortTexts = properties
+        .keys()
+        .toJSArray()
+        .map(
+          (name: string): string | null => {
+            const propertyDescriptor = properties.get(name);
+            if (shouldHideProperty(propertyDescriptor)) return null;
+
+            return makeShortTextForNamedProperty(name, propertyDescriptor);
+          }
+        )
+        .filter(Boolean);
+
+      const propertiesText = `It has the following properties: ${propertyShortTexts.join(
+        ', '
+      )}.`;
+      return propertiesText;
+    };
+
     // Check if object with this name already exists
     if (objectsContainer.hasObjectNamed(object_name)) {
       if (objectsContainer.getObject(object_name).getType() !== object_type) {
@@ -245,6 +290,16 @@ const createObject: EditorFunction = {
           `Unable to search and install object (${message}).`
         );
       } else if (status === 'asset-installed') {
+        if (createdObjects.length === 1) {
+          const object = createdObjects[0];
+          return makeGenericSuccess(
+            [
+              `Created (from the asset store) object "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+              getPropertiesText(object),
+            ].join(' ')
+          );
+        }
+
         return makeGenericSuccess(
           `Created (from the asset store) ${createdObjects
             .map(object => `object "${object_name}" of type "${object_type}"`)
@@ -289,14 +344,17 @@ const createObject: EditorFunction = {
       );
     }
 
-    objectsContainer.insertNewObject(
+    const object = objectsContainer.insertNewObject(
       project,
       object_type,
       object_name,
       objectsContainer.getObjectsCount()
     );
     return makeGenericSuccess(
-      `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`
+      [
+        `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+        getPropertiesText(object),
+      ].join(' ')
     );
   },
 };
@@ -593,10 +651,35 @@ const addBehavior: EditorFunction = {
     }
 
     // Add the behavior
-    object.addNewBehavior(project, behavior_type, behaviorName);
+    const behavior = object.addNewBehavior(
+      project,
+      behavior_type,
+      behaviorName
+    );
+
+    const behaviorProperties = behavior.getProperties();
+    const propertyShortTexts = behaviorProperties
+      .keys()
+      .toJSArray()
+      .map(
+        (name: string): string | null => {
+          const propertyDescriptor = behaviorProperties.get(name);
+          if (shouldHideProperty(propertyDescriptor)) return null;
+
+          return makeShortTextForNamedProperty(name, propertyDescriptor);
+        }
+      )
+      .filter(Boolean);
+
+    const propertiesText = `It has the following properties: ${propertyShortTexts.join(
+      ', '
+    )}.`;
 
     return makeGenericSuccess(
-      `Added behavior called "${behaviorName}" with type "${behavior_type}" to object "${object_name}".`
+      [
+        `Added behavior called "${behaviorName}" with type "${behavior_type}" to object "${object_name}".`,
+        propertiesText,
+      ].join(' ')
     );
   },
 };

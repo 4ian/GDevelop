@@ -317,6 +317,7 @@ namespace gdjs {
         const inGameEditor = this._runtimegame._inGameEditor;
         if (inGameEditor) {
           inGameEditor.setEditorId(data.editorId);
+          // TODO Call zoomToInitialPosition?
         }
       } else if (data.command === 'updateInstances') {
         if (runtimeGame._inGameEditor)

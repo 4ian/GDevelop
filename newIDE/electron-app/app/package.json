@@ -8,7 +8,7 @@
   "homepage": "https://gdevelop.io",
   "main": "main.js",
   "dependencies": {
-    "@electron/remote": "^2.0.8",
+    "@electron/remote": "^2.1.2",
     "archiver": "^2.1.1",
     "async": "^2.6.0",
     "axios": "^0.19.1",

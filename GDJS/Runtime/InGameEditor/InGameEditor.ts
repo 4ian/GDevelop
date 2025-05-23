@@ -1857,7 +1857,7 @@ namespace gdjs {
 
           const rotationSpeed = 0.2;
           this.rotationAngle += xDelta * rotationSpeed;
-          this.elevationAngle -= yDelta * rotationSpeed;
+          this.elevationAngle += yDelta * rotationSpeed;
         }
       }
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);

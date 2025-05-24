@@ -9,7 +9,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 
 import { type EventsGenerationResult } from '../EditorFunctions';
-import { getSimplifiedProject } from '../Utils/SimplifiedProjectJson';
+import { getSimplifiedProject } from '../Utils/SimplifiedProject';
 
 export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -47,6 +47,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
             null,
             2
           ),
+          sceneName,
           eventsDescription,
           extensionNamesList,
           objectsList,

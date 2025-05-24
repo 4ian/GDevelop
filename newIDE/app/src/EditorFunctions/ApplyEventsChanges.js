@@ -1,6 +1,9 @@
 // @flow
 import { unserializeFromJSObject } from '../Utils/Serializer';
-import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import {
+  type AiGeneratedEventChange,
+  type AiGeneratedEventUndeclaredVariable,
+} from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
@@ -367,6 +370,35 @@ export const applyEventsChanges = (
       if (op.eventsToInsert) {
         op.eventsToInsert.delete();
       }
+    }
+  });
+};
+
+export const addUndeclaredVariables = ({
+  project,
+  scene,
+  undeclaredVariables,
+}: {|
+  project: gdProject,
+  scene: gdLayout,
+  undeclaredVariables: Array<AiGeneratedEventUndeclaredVariable>,
+|}) => {
+  undeclaredVariables.forEach(variable => {
+    const { name, type, requiredScope } = variable;
+    if (requiredScope === 'global') {
+      if (!project.getVariables().has(name)) {
+        const newVariable = project.getVariables().insertNew(name, 0);
+        // TODO: apply type
+      }
+    } else if (requiredScope === 'scene' || requiredScope === 'none') {
+      if (!scene.getVariables().has(name)) {
+        const newVariable = scene.getVariables().insertNew(name, 0);
+        // TODO: apply type
+      }
+    } else {
+      console.warn(
+        `Unknown requiredScope for undeclared variable: ${name}. Skipping.`
+      );
     }
   });
 };

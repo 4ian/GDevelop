@@ -95,6 +95,12 @@ export type AiGeneratedEventStats = {
   finalModelPublicId: string,
 };
 
+export type AiGeneratedEventUndeclaredVariable = {
+  name: string,
+  type?: 'number' | 'string' | 'boolean' | 'structure' | 'array',
+  requiredScope: 'global' | 'scene' | 'none',
+};
+
 export type AiGeneratedEventChange = {
   operationName: string,
   operationTargetEvent: string | null,
@@ -103,6 +109,7 @@ export type AiGeneratedEventChange = {
   areEventsValid: boolean | null,
   extensionNames: string[] | null,
   diagnosticLines: string[],
+  undeclaredVariables: AiGeneratedEventUndeclaredVariable[],
 };
 
 export type AiGeneratedEvent = {
@@ -420,6 +427,7 @@ export const createAiGeneratedEvent = async (
   {
     userId,
     partialGameProjectJson,
+    sceneName,
     eventsDescription,
     extensionNamesList,
     objectsList,
@@ -429,6 +437,7 @@ export const createAiGeneratedEvent = async (
   }: {|
     userId: string,
     partialGameProjectJson: string,
+    sceneName: string,
     eventsDescription: string,
     extensionNamesList: string,
     objectsList: string,
@@ -442,6 +451,7 @@ export const createAiGeneratedEvent = async (
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
     {
       partialGameProjectJson,
+      sceneName,
       eventsDescription,
       extensionNamesList,
       objectsList,

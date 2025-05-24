@@ -23,24 +23,26 @@ type SimplifiedObject = {|
   objectVariables?: Array<SimplifiedVariable>,
 |};
 
+type SimplifiedObjectGroup = {|
+  objectGroupName: string,
+  objectGroupType: string,
+  objectNames: Array<string>,
+  behaviors?: Array<SimplifiedBehavior>,
+|};
+
 type SimplifiedScene = {|
   sceneName: string,
   objects: Array<SimplifiedObject>,
+  objectGroups: Array<SimplifiedObjectGroup>,
   sceneVariables: Array<SimplifiedVariable>,
 |};
 
 type SimplifiedProject = {|
   globalObjects: Array<SimplifiedObject>,
+  globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
   globalVariables: Array<SimplifiedVariable>,
 |};
-
-const getSimplifiedBehaviorJson = (behavior: gdBehavior) => {
-  return {
-    behaviorName: behavior.getName(),
-    behaviorType: behavior.getTypeName(),
-  };
-};
 
 const getVariableType = (variable: gdVariable) => {
   const type = variable.getType();
@@ -130,8 +132,11 @@ const getSimplifiedObject = (object: gdObject): SimplifiedObject => {
     .toJSArray()
     .map(behaviorName => {
       const behavior = object.getBehavior(behaviorName);
-      if (behavior.isDefaultBehavior()) return null;
-      return getSimplifiedBehaviorJson(behavior);
+
+      return {
+        behaviorName: behavior.getName(),
+        behaviorType: behavior.getTypeName(),
+      };
     })
     .filter(Boolean);
 
@@ -159,10 +164,50 @@ const getSimplifiedObjectsJson = (
   });
 };
 
-const getSimplifiedScene = (scene: gdLayout) => {
+const getSimplifiedObjectGroups = (
+  objectGroups: gdObjectGroupsContainer,
+  objectsContainersList: gdObjectsContainersList
+): Array<SimplifiedObjectGroup> => {
+  return mapFor(0, objectGroups.count(), i => {
+    const objectGroup = objectGroups.getAt(i);
+
+    const behaviorNames = objectsContainersList
+      .getBehaviorsOfObject(objectGroup.getName(), true)
+      .toJSArray();
+    return {
+      objectGroupName: objectGroup.getName(),
+      objectGroupType: objectsContainersList.getTypeOfObject(
+        objectGroup.getName()
+      ),
+      objectNames: objectGroup.getAllObjectsNames().toJSArray(),
+      behaviors:
+        behaviorNames.length > 0
+          ? behaviorNames.map(behaviorName => ({
+              behaviorName,
+              behaviorType: objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+                objectGroup.getName(),
+                behaviorName,
+                true
+              ),
+            }))
+          : undefined,
+    };
+  });
+};
+
+const getSimplifiedScene = (project: gdProject, scene: gdLayout) => {
+  const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+    project,
+    scene
+  );
+
   return {
     sceneName: scene.getName(),
     objects: getSimplifiedObjectsJson(scene.getObjects()),
+    objectGroups: getSimplifiedObjectGroups(
+      scene.getObjects().getObjectGroups(),
+      projectScopedContainers.getObjectsContainersList()
+    ),
     sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
   };
 };
@@ -181,11 +226,19 @@ export const getSimplifiedProject = (
     if (options.scopeToScene && scene.getName() !== options.scopeToScene)
       return null;
 
-    return getSimplifiedScene(scene);
+    return getSimplifiedScene(project, scene);
   }).filter(Boolean);
+
+  const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
+    project
+  );
 
   return {
     globalObjects,
+    globalObjectGroups: getSimplifiedObjectGroups(
+      project.getObjects().getObjectGroups(),
+      projectScopedContainers.getObjectsContainersList()
+    ),
     scenes,
     globalVariables: getSimplifiedVariablesContainerJson(
       project.getVariables()

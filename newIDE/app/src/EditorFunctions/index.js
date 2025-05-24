@@ -6,7 +6,10 @@ import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
-import { applyEventsChanges } from './ApplyEventsChanges';
+import {
+  addUndeclaredVariables,
+  applyEventsChanges,
+} from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { Trans } from '@lingui/macro';
 import Link from '../UI/Link';
@@ -14,7 +17,7 @@ import {
   hexNumberToRGBArray,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
-import { type SimplifiedBehavior } from '../Utils/SimplifiedProjectJson';
+import { type SimplifiedBehavior } from '../Utils/SimplifiedProject';
 
 const gd: libGDevelop = global.gd;
 
@@ -1211,6 +1214,31 @@ const addSceneEvents: EditorFunction = {
     const scene = project.getLayout(sceneName);
     const currentSceneEvents = scene.getEvents();
 
+    // Validate objectsList:
+    if (objectsList) {
+      const objectsListArray = objectsList
+        .split(',')
+        .map(object => object.trim());
+      const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+        project,
+        scene
+      );
+
+      const missingObjectOrGroupNames = objectsListArray.filter(
+        object =>
+          !projectScopedContainers
+            .getObjectsContainersList()
+            .hasObjectOrGroupNamed(object)
+      );
+      if (missingObjectOrGroupNames.length > 0) {
+        return makeGenericFailure(
+          `Object (or group) called "${missingObjectOrGroupNames.join(
+            ', '
+          )}" does not exist in the scene (or project). Please create the objects first if needed, or fix the objects_list or the description of the events to generate.`
+        );
+      }
+    }
+
     const existingEventsAsText = renderEventsAsText({
       eventsList: currentSceneEvents,
       parentPath: '',
@@ -1218,14 +1246,16 @@ const addSceneEvents: EditorFunction = {
     });
 
     try {
-      const eventsGenerationResult = await generateEvents({
-        sceneName,
-        eventsDescription,
-        extensionNamesList,
-        objectsList,
-        existingEventsAsText,
-        placementHint,
-      });
+      const eventsGenerationResult: EventsGenerationResult = await generateEvents(
+        {
+          sceneName,
+          eventsDescription,
+          extensionNamesList,
+          objectsList,
+          existingEventsAsText,
+          placementHint,
+        }
+      );
 
       if (!eventsGenerationResult.generationCompleted) {
         return makeGenericFailure(
@@ -1264,6 +1294,14 @@ const addSceneEvents: EditorFunction = {
         for (const extensionName of change.extensionNames || []) {
           await ensureExtensionInstalled({ extensionName });
         }
+      }
+
+      for (const change of changes) {
+        addUndeclaredVariables({
+          project,
+          scene,
+          undeclaredVariables: change.undeclaredVariables,
+        });
       }
 
       applyEventsChanges(

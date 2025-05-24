@@ -1,10 +1,10 @@
 // @flow
-import { getSimplifiedProject } from './SimplifiedProjectJson';
+import { getSimplifiedProject } from './SimplifiedProject';
 import { makeTestProject } from '../fixtures/TestProject';
 
 const gd: libGDevelop = global.gd;
 
-describe('SimplifiedProjectJson', () => {
+describe('SimplifiedProject', () => {
   it('should create a simplified project JSON with global objects and scenes', () => {
     const { project } = makeTestProject(gd);
     const simplifiedJson = getSimplifiedProject(project, {});

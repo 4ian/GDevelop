@@ -51,6 +51,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: null,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -91,6 +92,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: null,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -125,6 +127,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: true,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -157,6 +160,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: true,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -190,6 +194,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: true,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -222,6 +227,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: true,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -258,6 +264,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: null,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
       {
         operationName: 'insert_before_event',
@@ -267,6 +274,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: true,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(
@@ -303,6 +311,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: null,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
 
@@ -336,6 +345,7 @@ describe('applyEventsChanges', () => {
         areEventsValid: null,
         diagnosticLines: [],
         extensionNames: [],
+        undeclaredVariables: [],
       },
     ];
     applyEventsChanges(

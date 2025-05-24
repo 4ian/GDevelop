@@ -18,7 +18,7 @@ import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
-import { getSimplifiedProject } from '../Utils/SimplifiedProjectJson';
+import { getSimplifiedProject } from '../Utils/SimplifiedProject';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,

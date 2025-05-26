@@ -1,7 +1,18 @@
 // @flow
 
 import * as React from 'react';
-import RouterContext from './RouterContext';
+import RouterContext, { type Route } from './RouterContext';
+
+const homePageRoutes: Route[] = [
+  'play',
+  'learn',
+  'build',
+  'create',
+  'games-dashboard',
+  'asset-store',
+  'store',
+  'education',
+];
 
 /**
  * This hook is used to be able to use route arguments from anywhere to open the homepage.
@@ -22,18 +33,7 @@ const useHomepageWitchForRouting = ({
       const initialDialog = routeArguments['initial-dialog'];
       if (!initialDialog) return;
 
-      if (
-        [
-          'games-dashboard',
-          'asset-store',
-          'store',
-          'build',
-          'education',
-          'play',
-          'community',
-          'get-started',
-        ].includes(initialDialog)
-      ) {
+      if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();
       }

@@ -10,7 +10,6 @@ import HammerIcon from '../../../UI/CustomSvgIcons/Hammer';
 import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import ControllerIcon from '../../../UI/CustomSvgIcons/Controller';
 import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
-import SunIcon from '../../../UI/CustomSvgIcons/Sun';
 import StoreIcon from '../../../UI/CustomSvgIcons/Store';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
@@ -43,13 +42,7 @@ export const styles = {
   },
 };
 
-export type HomeTab =
-  | 'get-started'
-  | 'create'
-  | 'learn'
-  | 'play'
-  | 'shop'
-  | 'team-view';
+export type HomeTab = 'create' | 'learn' | 'play' | 'shop' | 'team-view';
 
 export type GetIconFunction = ({
   color: string,
@@ -64,14 +57,6 @@ export type HomePageMenuTab = {|
 |};
 
 const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
-  'get-started': {
-    label: <Trans>Start</Trans>,
-    tab: 'get-started',
-    id: 'home-get-started-tab',
-    getIcon: ({ color, fontSize }) => (
-      <SunIcon fontSize={fontSize} color={color} />
-    ),
-  },
   create: {
     label: <Trans>Create</Trans>,
     tab: 'create',
@@ -131,15 +116,14 @@ export const getTabsToDisplay = ({
       limits.capabilities.classrooms &&
       limits.capabilities.classrooms.hidePremiumProducts
     );
+  const displayTeachTab =
+    !shouldHideClassroomTab(limits) && !isNativeMobileApp();
   const tabs: HomeTab[] = [
-    'get-started',
-    'create',
-    !shouldHideClassroomTab(limits) && !isNativeMobileApp()
-      ? 'team-view'
-      : null,
-    displayShopTab ? 'shop' : null,
     'learn',
+    'create',
     displayPlayTab ? 'play' : null,
+    displayShopTab ? 'shop' : null,
+    displayTeachTab ? 'team-view' : null,
   ].filter(Boolean);
   return tabs.map(tab => homePageMenuTabs[tab]);
 };

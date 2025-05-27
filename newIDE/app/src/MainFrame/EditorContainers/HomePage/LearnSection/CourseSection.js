@@ -37,7 +37,11 @@ import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
-  sideContainer: { maxWidth: 250, position: 'relative' },
+  sideContainer: {
+    width: 250,
+    flexShrink: 0,
+    position: 'relative',
+  },
   sideContent: {
     position: 'sticky',
     top: 20,

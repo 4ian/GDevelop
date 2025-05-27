@@ -65,8 +65,8 @@ export const TUTORIAL_CATEGORY_TEXTS = {
     ),
   },
   course: {
-    title: 'UNUSED',
-    description: 'UNUSED',
+    title: <Trans>Loading</Trans>,
+    description: <Trans>Loading course...</Trans>,
   },
   recommendations: {
     title: <Trans>Recommendations</Trans>,

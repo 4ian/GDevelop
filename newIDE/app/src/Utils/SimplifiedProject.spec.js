@@ -11,12 +11,45 @@ describe('SimplifiedProject', () => {
 
     expect(simplifiedJson).toMatchInlineSnapshot(`
       Object {
+        "globalObjectGroups": Array [],
         "globalObjects": Array [
           Object {
+            "behaviors": Array [
+              Object {
+                "behaviorName": "Effect",
+                "behaviorType": "EffectCapability::EffectBehavior",
+              },
+              Object {
+                "behaviorName": "Opacity",
+                "behaviorType": "OpacityCapability::OpacityBehavior",
+              },
+              Object {
+                "behaviorName": "Resizable",
+                "behaviorType": "ResizableCapability::ResizableBehavior",
+              },
+            ],
             "objectName": "GlobalTiledSpriteObject",
             "objectType": "TiledSpriteObject::TiledSprite",
           },
           Object {
+            "behaviors": Array [
+              Object {
+                "behaviorName": "Effect",
+                "behaviorType": "EffectCapability::EffectBehavior",
+              },
+              Object {
+                "behaviorName": "Opacity",
+                "behaviorType": "OpacityCapability::OpacityBehavior",
+              },
+              Object {
+                "behaviorName": "Scale",
+                "behaviorType": "ScalableCapability::ScalableBehavior",
+              },
+              Object {
+                "behaviorName": "Text",
+                "behaviorType": "TextContainerCapability::TextContainerBehavior",
+              },
+            ],
             "objectName": "GlobalTextObject",
             "objectType": "TextObject::Text",
           },
@@ -24,38 +57,325 @@ describe('SimplifiedProject', () => {
         "globalVariables": Array [],
         "scenes": Array [
           Object {
+            "objectGroups": Array [
+              Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
+                "objectGroupName": "GroupOfSprites",
+                "objectGroupType": "Sprite",
+                "objectNames": Array [
+                  "MySpriteObject",
+                ],
+              },
+              Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
+                "objectGroupName": "GroupOfObjects",
+                "objectGroupType": "",
+                "objectNames": Array [
+                  "MySpriteObject",
+                  "MyTextObject",
+                ],
+              },
+              Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Draggable",
+                    "behaviorType": "DraggableBehavior::Draggable",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "PlatformerObject",
+                    "behaviorType": "PlatformBehavior::PlatformerObjectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
+                "objectGroupName": "GroupOfSpriteObjectsWithBehaviors",
+                "objectGroupType": "Sprite",
+                "objectNames": Array [
+                  "MySpriteObjectWithBehaviors",
+                ],
+              },
+              Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
+                "objectGroupName": "MyGroupWithObjectsHavingLongName",
+                "objectGroupType": "Sprite",
+                "objectNames": Array [
+                  "MySpriteObject",
+                  "MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name",
+                  "MySpriteObjectWithoutBehaviors",
+                ],
+              },
+            ],
             "objects": Array [
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MySpriteObjectWithEffects",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MySpriteObjectWithoutEffect",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MySpriteObjectWithoutBehaviors",
                 "objectType": "Sprite",
               },
               Object {
                 "behaviors": Array [
                   Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
                     "behaviorName": "Draggable",
                     "behaviorType": "DraggableBehavior::Draggable",
                   },
                   Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
                     "behaviorName": "PlatformerObject",
                     "behaviorType": "PlatformBehavior::PlatformerObjectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
                   },
                 ],
                 "objectName": "MySpriteObjectWithBehaviors",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MyEmptySpriteObject",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MySpriteObject",
                 "objectType": "Sprite",
                 "objectVariables": Array [
@@ -93,6 +413,20 @@ describe('SimplifiedProject', () => {
                 ],
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                ],
                 "objectName": "MyPanelSpriteObject",
                 "objectType": "PanelSpriteObject::PanelSprite",
               },
@@ -105,18 +439,74 @@ describe('SimplifiedProject', () => {
                 "objectType": "FakeScene3D::Cube3DObject",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                ],
                 "objectName": "MyTiledSpriteObject",
                 "objectType": "TiledSpriteObject::TiledSprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                ],
                 "objectName": "MyParticleEmitter",
                 "objectType": "ParticleSystem::ParticleEmitter",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Text",
+                    "behaviorType": "TextContainerCapability::TextContainerBehavior",
+                  },
+                ],
                 "objectName": "MyTextObject",
                 "objectType": "TextObject::Text",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MyShapePainterObject",
                 "objectType": "PrimitiveDrawing::Drawer",
               },
@@ -125,6 +515,32 @@ describe('SimplifiedProject', () => {
                 "objectType": "Button::PanelSpriteButton",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name",
                 "objectType": "Sprite",
               },
@@ -133,26 +549,182 @@ describe('SimplifiedProject', () => {
                 "objectType": "FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls1",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls2",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls3",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls4",
                 "objectType": "Sprite",
               },
               Object {
+                "behaviors": Array [
+                  Object {
+                    "behaviorName": "Animation",
+                    "behaviorType": "AnimatableCapability::AnimatableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Effect",
+                    "behaviorType": "EffectCapability::EffectBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Flippable",
+                    "behaviorType": "FlippableCapability::FlippableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Opacity",
+                    "behaviorType": "OpacityCapability::OpacityBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Resizable",
+                    "behaviorType": "ResizableCapability::ResizableBehavior",
+                  },
+                  Object {
+                    "behaviorName": "Scale",
+                    "behaviorType": "ScalableCapability::ScalableBehavior",
+                  },
+                ],
                 "objectName": "VirtualControls5",
                 "objectType": "Sprite",
               },
@@ -201,11 +773,13 @@ describe('SimplifiedProject', () => {
             ],
           },
           Object {
+            "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "EmptyLayout",
             "sceneVariables": Array [],
           },
           Object {
+            "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "Layout with a very looooooooong naaaaame to test in the project manager",
             "sceneVariables": Array [],

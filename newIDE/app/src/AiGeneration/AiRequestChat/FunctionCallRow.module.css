@@ -17,6 +17,22 @@
 .functionCallContainer {
   animation: function-call-appear 0.5s;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@keyframes details-paper-appear {
+  0% {
+    transform: scaleY(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.detailsPaperContainer {
+  transform-origin: top left;
+  animation: details-paper-appear 0.1s;
 }

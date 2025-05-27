@@ -5,7 +5,7 @@ import { mapFor } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
-import { renderEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
+import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
   addUndeclaredVariables,
   applyEventsChanges,
@@ -18,6 +18,8 @@ import {
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
 import { type SimplifiedBehavior } from '../Utils/SimplifiedProject';
+import { ColumnStackLayout } from '../UI/Layout';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -54,6 +56,7 @@ export type EditorFunctionGenericOutput = {|
   sharedProperties?: any,
   instances?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  generatedEventsErrorDiagnostics?: string,
 |};
 
 export type EventsGenerationResult =
@@ -99,11 +102,16 @@ export type EditorCallbacks = {|
  * A function that does something in the editor on the given project.
  */
 export type EditorFunction = {|
-  renderAsText: (options: {|
+  renderForEditor: (options: {|
     project: gdProject | null,
     args: any,
     editorCallbacks: EditorCallbacks,
-  |}) => React.Node,
+    shouldShowDetails: boolean,
+  |}) => {|
+    text: React.Node,
+    details?: ?React.Node,
+    hasDetailsToShow?: boolean,
+  |},
   launchFunction: (options: {|
     project: gdProject,
     args: any,
@@ -199,19 +207,24 @@ const makeShortTextForNamedProperty = (
  * Creates a new object in the specified scene
  */
 const createObject: EditorFunction = {
-  renderAsText: ({ args, editorCallbacks }) => {
+  renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
 
-    return (
-      <Trans>
-        Create object <b>{object_name}</b> in scene{' '}
-        <Link href="#" onClick={() => editorCallbacks.onOpenLayout(scene_name)}>
-          {scene_name}
-        </Link>
-        .
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Create object <b>{object_name}</b> in scene{' '}
+          <Link
+            href="#"
+            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({
     project,
@@ -366,18 +379,23 @@ const createObject: EditorFunction = {
  * Retrieves the properties of a specific object in a scene
  */
 const inspectObjectProperties: EditorFunction = {
-  renderAsText: ({ args, editorCallbacks }) => {
+  renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
 
-    return (
-      <Trans>
-        Inspecting properties of object <b>{object_name}</b> in scene{' '}
-        <Link href="#" onClick={() => editorCallbacks.onOpenLayout(scene_name)}>
-          {scene_name}
-        </Link>
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Inspecting properties of object <b>{object_name}</b> in scene{' '}
+          <Link
+            href="#"
+            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+          >
+            {scene_name}
+          </Link>
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -434,26 +452,28 @@ const inspectObjectProperties: EditorFunction = {
  * Changes a property of a specific object in a scene
  */
 const changeObjectProperty: EditorFunction = {
-  renderAsText: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const property_name = extractRequiredString(args, 'property_name');
     const new_value = extractRequiredString(args, 'new_value');
 
     const makeText = (propertyLabel: string) => {
-      return (
-        <Trans>
-          Change property "<b>{propertyLabel}</b>" of object{' '}
-          <b>{object_name}</b> (in scene{' '}
-          <Link
-            href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
-          >
-            {scene_name}
-          </Link>
-          ) to <b>{new_value}</b>.
-        </Trans>
-      );
+      return {
+        text: (
+          <Trans>
+            Change property "<b>{propertyLabel}</b>" of object{' '}
+            <b>{object_name}</b> (in scene{' '}
+            <Link
+              href="#"
+              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            >
+              {scene_name}
+            </Link>
+            ) to <b>{new_value}</b>.
+          </Trans>
+        ),
+      };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
@@ -522,7 +542,7 @@ const changeObjectProperty: EditorFunction = {
  * Adds a behavior to an object in a scene
  */
 const addBehavior: EditorFunction = {
-  renderAsText: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_type = extractRequiredString(args, 'behavior_type');
@@ -532,18 +552,20 @@ const addBehavior: EditorFunction = {
     );
 
     const makeText = (behaviorTypeLabel: string) => {
-      return (
-        <Trans>
-          Add behavior {behaviorName} (<b>{behaviorTypeLabel}</b>) on object{' '}
-          <b>{object_name}</b> in scene{' '}
-          <Link
-            href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
-          >
-            {scene_name}
-          </Link>
-        </Trans>
-      );
+      return {
+        text: (
+          <Trans>
+            Add behavior {behaviorName} (<b>{behaviorTypeLabel}</b>) on object{' '}
+            <b>{object_name}</b> in scene{' '}
+            <Link
+              href="#"
+              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            >
+              {scene_name}
+            </Link>
+          </Trans>
+        ),
+      };
     };
 
     if (!project) {
@@ -691,17 +713,19 @@ const addBehavior: EditorFunction = {
  * Removes a behavior from an object in a scene
  */
 const removeBehavior: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
-    return (
-      <Trans>
-        Remove behavior {behavior_name} from object {object_name} in scene{' '}
-        {scene_name}.
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Remove behavior {behavior_name} from object {object_name} in scene{' '}
+          {scene_name}.
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -742,17 +766,19 @@ const removeBehavior: EditorFunction = {
  * Retrieves the properties of a specific behavior attached to an object
  */
 const inspectBehaviorProperties: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
 
-    return (
-      <Trans>
-        Inspecting properties of behavior {behavior_name} on object{' '}
-        {object_name} in scene {scene_name}.
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Inspecting properties of behavior {behavior_name} on object{' '}
+          {object_name} in scene {scene_name}.
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -826,7 +852,7 @@ const inspectBehaviorProperties: EditorFunction = {
  * Changes a property of a specific behavior attached to an object
  */
 const changeBehaviorProperty: EditorFunction = {
-  renderAsText: ({ project, args, editorCallbacks }) => {
+  renderForEditor: ({ project, args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
@@ -834,19 +860,21 @@ const changeBehaviorProperty: EditorFunction = {
     const new_value = extractRequiredString(args, 'new_value');
 
     const makeText = (propertyLabel: string) => {
-      return (
-        <Trans>
-          Change property "<b>{propertyLabel}</b>" of behavior {behavior_name}{' '}
-          on object <b>{object_name}</b> (in scene{' '}
-          <Link
-            href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
-          >
-            {scene_name}
-          </Link>
-          ) to <b>{new_value}</b>.
-        </Trans>
-      );
+      return {
+        text: (
+          <Trans>
+            Change property "<b>{propertyLabel}</b>" of behavior {behavior_name}{' '}
+            on object <b>{object_name}</b> (in scene{' '}
+            <Link
+              href="#"
+              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            >
+              {scene_name}
+            </Link>
+            ) to <b>{new_value}</b>.
+          </Trans>
+        ),
+      };
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
@@ -972,17 +1000,22 @@ const changeBehaviorProperty: EditorFunction = {
  * Lists all object instances in a scene
  */
 const describeInstances: EditorFunction = {
-  renderAsText: ({ args, editorCallbacks }) => {
+  renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
-    return (
-      <Trans>
-        Inspecting instances of scene{' '}
-        <Link href="#" onClick={() => editorCallbacks.onOpenLayout(scene_name)}>
-          {scene_name}.
-        </Link>
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Inspecting instances of scene{' '}
+          <Link
+            href="#"
+            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+          >
+            {scene_name}.
+          </Link>
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1021,19 +1054,21 @@ const describeInstances: EditorFunction = {
  * Places a new 2D instance in a scene
  */
 const put2dInstance: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
     const x = extractRequiredNumber(args, 'x');
     const y = extractRequiredNumber(args, 'y');
 
-    return (
-      <Trans>
-        Add instance of object {object_name} at position {x};{y} (layer:{' '}
-        {layer_name || 'base'}) in scene {scene_name}.
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Add instance of object {object_name} at position {x};{y} (layer:{' '}
+          {layer_name || 'base'}) in scene {scene_name}.
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1081,19 +1116,21 @@ const put2dInstance: EditorFunction = {
  * Places a new 3D instance in a scene
  */
 const put3dInstance: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
     const x = extractRequiredNumber(args, 'x');
     const y = extractRequiredNumber(args, 'y');
     const z = extractRequiredNumber(args, 'z');
-    return (
-      <Trans>
-        Add instance of object {object_name} at position {x};{y};{z} (layer:{' '}
-        {layer_name || 'base'}) in scene {scene_name}.
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Add instance of object {object_name} at position {x};{y};{z} (layer:{' '}
+          {layer_name || 'base'}) in scene {scene_name}.
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1143,17 +1180,22 @@ const put3dInstance: EditorFunction = {
  * Retrieves the event sheet structure for a scene
  */
 const readSceneEvents: EditorFunction = {
-  renderAsText: ({ args, editorCallbacks }) => {
+  renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
-    return (
-      <Trans>
-        Inspecting event sheet of scene{' '}
-        <Link href="#" onClick={() => editorCallbacks.onOpenLayout(scene_name)}>
-          {scene_name}.
-        </Link>
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Inspecting event sheet of scene{' '}
+          <Link
+            href="#"
+            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+          >
+            {scene_name}.
+          </Link>
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1165,10 +1207,8 @@ const readSceneEvents: EditorFunction = {
     const scene = project.getLayout(scene_name);
     const events = scene.getEvents();
 
-    const eventsAsText = renderEventsAsText({
+    const eventsAsText = renderNonTranslatedEventsAsText({
       eventsList: events,
-      parentPath: '',
-      padding: '',
     });
 
     return {
@@ -1183,10 +1223,69 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const eventsDescription = extractRequiredString(args, 'events_description');
+    const objectsListArgument = SafeExtractor.extractStringProperty(
+      args,
+      'objects_list'
+    );
+    const objectsList = objectsListArgument === null ? '' : objectsListArgument;
+    const placementHint =
+      SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
 
-    return <Trans>Add new events to scene {scene_name}.</Trans>;
+    const details = shouldShowDetails ? (
+      <ColumnStackLayout noMargin>
+        {eventsDescription && (
+          <Text noMargin allowSelection color="secondary">
+            <b>
+              <Trans>Description</Trans>
+            </b>
+            : {eventsDescription}
+          </Text>
+        )}
+        {placementHint && (
+          <Text noMargin allowSelection color="secondary">
+            <b>
+              <Trans>Generation hint</Trans>
+            </b>
+            : {placementHint}
+          </Text>
+        )}
+        {objectsList && (
+          <Text noMargin allowSelection color="secondary">
+            <b>
+              <Trans>Related objects</Trans>
+            </b>
+            : {objectsList}
+          </Text>
+        )}
+      </ColumnStackLayout>
+    ) : null;
+
+    if (eventsDescription) {
+      return {
+        text: <Trans>Add or rework events of scene {scene_name}</Trans>,
+        details,
+        hasDetailsToShow: true,
+      };
+    } else if (placementHint) {
+      return {
+        text: (
+          <Trans>
+            Adapt events of scene {scene_name}: "{placementHint}".
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    } else {
+      return {
+        text: <Trans>Modify events of scene {scene_name}.</Trans>,
+        details,
+        hasDetailsToShow: true,
+      };
+    }
   },
   launchFunction: async ({
     project,
@@ -1239,10 +1338,8 @@ const addSceneEvents: EditorFunction = {
       }
     }
 
-    const existingEventsAsText = renderEventsAsText({
+    const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
-      parentPath: '',
-      padding: '',
     });
 
     try {
@@ -1277,7 +1374,7 @@ const addSceneEvents: EditorFunction = {
       const changes = aiGeneratedEvent.changes;
       if (!changes || changes.length === 0) {
         return makeGenericFailure(
-          `No generated events could be found. Consider trying again or a different approach`
+          `Error when generating events (no generated events found). Consider trying again or a different approach.`
         );
       }
 
@@ -1285,9 +1382,13 @@ const addSceneEvents: EditorFunction = {
         changes.some(change => change.isEventsJsonValid === false) ||
         changes.some(change => change.areEventsValid === false)
       ) {
-        return makeGenericFailure(
-          `Generated events are not valid - this means what you asked for is not possible or does not work like this. Consider a different approach.`
-        );
+        return {
+          success: false,
+          message: `Generated events are not valid - this means what you asked for is not possible or does not work like this. Read the diagnostic below to try to understand what went wrong and either try again differently or consider a different approach.`,
+          generatedEventsErrorDiagnostics: changes
+            .map(change => change.diagnosticLines.join('\n'))
+            .join('\n\n'),
+        };
       }
 
       for (const change of changes) {
@@ -1326,17 +1427,22 @@ const addSceneEvents: EditorFunction = {
  * Creates a new, empty scene
  */
 const createScene: EditorFunction = {
-  renderAsText: ({ args, editorCallbacks }) => {
+  renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
-    return (
-      <Trans>
-        Create a new scene called{' '}
-        <Link href="#" onClick={() => editorCallbacks.onOpenLayout(scene_name)}>
-          {scene_name}.
-        </Link>
-      </Trans>
-    );
+    return {
+      text: (
+        <Trans>
+          Create a new scene called{' '}
+          <Link
+            href="#"
+            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+          >
+            {scene_name}.
+          </Link>
+        </Trans>
+      ),
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1387,10 +1493,12 @@ const createScene: EditorFunction = {
  * Deletes an existing scene
  */
 const deleteScene: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
-    return <Trans>Delete scene {scene_name}.</Trans>;
+    return {
+      text: <Trans>Delete scene {scene_name}.</Trans>,
+    };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -1408,14 +1516,16 @@ const deleteScene: EditorFunction = {
 };
 
 const addOrEditVariable: EditorFunction = {
-  renderAsText: ({ args }) => {
+  renderForEditor: ({ args }) => {
     const variable_name_or_path = extractRequiredString(
       args,
       'variable_name_or_path'
     );
 
     // TODO: add scope.
-    return <Trans>Add or edit variable {variable_name_or_path}.</Trans>;
+    return {
+      text: <Trans>Add or edit variable {variable_name_or_path}.</Trans>,
+    };
   },
   launchFunction: async ({ project, args }) => {
     const variable_name_or_path = extractRequiredString(

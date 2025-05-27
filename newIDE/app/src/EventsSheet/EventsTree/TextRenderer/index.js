@@ -227,7 +227,7 @@ export const renderEventsAsText = ({
   eventsList: gdEventsList,
   parentPath: string,
   padding: string,
-|}) => {
+|}): string => {
   return mapFor(0, eventsList.getEventsCount(), i => {
     const event = eventsList.getEventAt(i);
 
@@ -242,4 +242,34 @@ export const renderEventsAsText = ({
 ${eventAndSubEventsText}
 ${padding}</event-${eventPath}>`;
   }).join('\n');
+};
+
+export const renderNonTranslatedEventsAsText = ({
+  eventsList,
+}: {
+  eventsList: gdEventsList,
+}) => {
+  // Temporarily override the getTranslation function to return the original
+  // string, so that events are always rendered in English.
+  // $FlowFixMe
+  const previousGetTranslation = gd.getTranslation;
+  // $FlowFixMe
+  gd.getTranslation = (str: string) => str;
+
+  let text = '';
+  try {
+    text = renderEventsAsText({
+      eventsList,
+      parentPath: '',
+      padding: '',
+    });
+  } catch (error) {
+    console.error('Error while rendering events as text:', error);
+    text = 'Error while rendering events as text.';
+  } finally {
+    // $FlowFixMe
+    gd.getTranslation = previousGetTranslation;
+  }
+
+  return text;
 };

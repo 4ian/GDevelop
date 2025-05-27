@@ -385,19 +385,33 @@ export const addUndeclaredVariables = ({
 |}) => {
   undeclaredVariables.forEach(variable => {
     const { name, type, requiredScope } = variable;
+    let newVariable = null;
     if (requiredScope === 'global') {
       if (!project.getVariables().has(name)) {
-        const newVariable = project.getVariables().insertNew(name, 0);
-        // TODO: apply type
+        newVariable = project.getVariables().insertNew(name, 0);
       }
     } else if (requiredScope === 'scene' || requiredScope === 'none') {
       if (!scene.getVariables().has(name)) {
-        const newVariable = scene.getVariables().insertNew(name, 0);
-        // TODO: apply type
+        newVariable = scene.getVariables().insertNew(name, 0);
       }
     } else {
       console.warn(
         `Unknown requiredScope for undeclared variable: ${name}. Skipping.`
+      );
+    }
+
+    if (newVariable && type) {
+      const lowerCaseType = type.toLowerCase();
+      newVariable.castTo(
+        lowerCaseType === 'string'
+          ? 'String'
+          : lowerCaseType === 'boolean'
+          ? 'Boolean'
+          : lowerCaseType === 'array'
+          ? 'Array'
+          : lowerCaseType === 'structure'
+          ? 'Structure'
+          : 'Number'
       );
     }
   });

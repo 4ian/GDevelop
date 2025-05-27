@@ -21,6 +21,12 @@ import {
   type EditorFunction,
   type EditorCallbacks,
 } from '../../EditorFunctions';
+import Link from '../../UI/Link';
+import { LineStackLayout } from '../../UI/Layout';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
+import Paper from '../../UI/Paper';
+import { Line, Column } from '../../UI/Grid';
 
 type Props = {|
   project: gdProject | null,
@@ -44,6 +50,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
   onProcessFunctionCalls,
   editorCallbacks,
 }: Props) {
+  const [showDetails, setShowDetails] = React.useState(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   let existingParsedOutput;
@@ -80,6 +87,8 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
   const editorFunction: EditorFunction | null =
     editorFunctions[functionCall.name] || null;
   let text;
+  let details;
+  let hasDetailsToShow = false;
   if (!editorFunction) {
     text = (
       <Trans>
@@ -88,11 +97,16 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     );
   } else {
     try {
-      text = editorFunction.renderAsText({
+      const result = editorFunction.renderForEditor({
         project,
         args: JSON.parse(functionCall.arguments),
         editorCallbacks,
+        shouldShowDetails: showDetails,
       });
+
+      text = result.text;
+      details = result.details;
+      hasDetailsToShow = result.hasDetailsToShow;
     } catch (error) {
       text = (
         <Trans>
@@ -105,52 +119,95 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
 
   return (
     <div className={classes.functionCallContainer}>
-      <Tooltip
-        title={JSON.stringify(
-          existingFunctionCallOutput || editorFunctionCallResult
-        )}
-      >
-        <div>
-          {hasErrored ? (
-            <Error htmlColor={gdevelopTheme.message.error} />
-          ) : isIgnored ? (
-            <Check htmlColor={gdevelopTheme.text.color.disabled} />
-          ) : isFinished ? (
-            <Check htmlColor={gdevelopTheme.message.valid} />
-          ) : (
-            <CircularProgress
-              size={24}
-              value={100}
-              variant={isWorking ? 'indeterminate' : 'determinate'}
-            />
+      <LineStackLayout noMargin alignItems="center">
+        <Tooltip
+          title={JSON.stringify(
+            existingFunctionCallOutput || editorFunctionCallResult
           )}
-        </div>
-      </Tooltip>
-      <Text>{text || 'Working...'}</Text>
-      {!isFinished && (
-        <RaisedButtonWithSplitMenu
-          primary
-          disabled={isWorking}
-          onClick={() => onProcessFunctionCalls([functionCall])}
-          label={<Trans>Apply</Trans>}
-          buildMenuTemplate={i18n => [
-            {
-              label: i18n._(t`Ignore this`),
-              click: () => {
-                onProcessFunctionCalls([functionCall], {
-                  ignore: true,
-                });
+        >
+          <div>
+            {hasErrored ? (
+              <Error htmlColor={gdevelopTheme.message.error} />
+            ) : isIgnored ? (
+              <Check htmlColor={gdevelopTheme.text.color.disabled} />
+            ) : isFinished ? (
+              <Check htmlColor={gdevelopTheme.message.valid} />
+            ) : (
+              <CircularProgress
+                size={24}
+                value={100}
+                variant={isWorking ? 'indeterminate' : 'determinate'}
+              />
+            )}
+          </div>
+        </Tooltip>
+        <LineStackLayout noMargin alignItems="baseline">
+          <Text>{text || 'Working...'}</Text>
+          {hasDetailsToShow && (
+            <Text size="body-small" color="secondary">
+              <Link
+                color="inherit"
+                href={'#'}
+                onClick={() => setShowDetails(!showDetails)}
+              >
+                <Trans>Details</Trans>
+                {details ? (
+                  <ChevronArrowBottom
+                    fontSize="small"
+                    style={{
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                ) : (
+                  <ChevronArrowRight
+                    fontSize="small"
+                    style={{
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                )}
+              </Link>
+            </Text>
+          )}
+        </LineStackLayout>
+        {!isFinished && (
+          <RaisedButtonWithSplitMenu
+            primary
+            disabled={isWorking}
+            onClick={() => onProcessFunctionCalls([functionCall])}
+            label={<Trans>Apply</Trans>}
+            buildMenuTemplate={i18n => [
+              {
+                label: i18n._(t`Ignore this`),
+                click: () => {
+                  onProcessFunctionCalls([functionCall], {
+                    ignore: true,
+                  });
+                },
               },
-            },
-          ]}
-        />
-      )}
-      {functionCallResultIsErrored && (
-        <RaisedButton
-          color="primary"
-          onClick={() => onProcessFunctionCalls([functionCall])}
-          label={<Trans>Retry</Trans>}
-        />
+            ]}
+          />
+        )}
+        {functionCallResultIsErrored && (
+          <RaisedButton
+            color="primary"
+            onClick={() => onProcessFunctionCalls([functionCall])}
+            label={<Trans>Retry</Trans>}
+          />
+        )}
+      </LineStackLayout>
+      {details && (
+        <div className={classes.detailsPaperContainer}>
+          <Paper background="medium" elevation={0} square variant="outlined">
+            <Line expand>
+              <Column expand>
+                <Text noMargin color="secondary">
+                  {details}
+                </Text>
+              </Column>
+            </Line>
+          </Paper>
+        </div>
       )}
     </div>
   );

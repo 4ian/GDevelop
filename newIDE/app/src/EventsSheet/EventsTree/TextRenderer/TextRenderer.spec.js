@@ -1,7 +1,7 @@
 // @flow
 import { makeTestProject } from '../../../fixtures/TestProject';
 import { unserializeFromJSObject } from '../../../Utils/Serializer';
-import { renderEventsAsText } from '.';
+import { renderNonTranslatedEventsAsText } from '.';
 
 const gd: libGDevelop = global.gd;
 
@@ -186,8 +186,11 @@ describe('EventsTree/TextRenderer', () => {
         project
       );
 
-      expect(renderEventsAsText({ eventsList, parentPath: '', padding: '' }))
-        .toMatchInlineSnapshot(`
+      expect(
+        renderNonTranslatedEventsAsText({
+          eventsList,
+        })
+      ).toMatchInlineSnapshot(`
         "<event-0>
          Conditions:
          - GroupOfSpriteObjectsWithBehaviors is falling

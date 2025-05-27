@@ -21,6 +21,7 @@ class InitialInstance;
 class SerializerElement;
 class EffectsContainer;
 class AbstractFileSystem;
+class EventsBasedObjectVariant;
 } // namespace gd
 
 namespace gd {
@@ -58,6 +59,8 @@ private:
       gd::Project &project, const gd::Object &object,
       SerializerElement &variantsElement,
       std::unordered_set<gd::String> &alreadyUsedVariantIdentifiers);
+
+  static const gd::EventsBasedObjectVariant* GetVariant(gd::Project &project, const gd::Object &object);
 };
 
 } // namespace gd

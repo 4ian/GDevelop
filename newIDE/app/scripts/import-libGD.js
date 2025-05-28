@@ -63,6 +63,19 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       var hash = (hashShellString.stdout || 'unknown-hash').trim();
       var branch = (branchShellString.stdout || 'unknown-branch').trim();
 
+      if (branch === 'HEAD') {
+        // We're in detached HEAD. Try to read the branch from the CI environment variables.
+        if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
+          branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
+        } else if (process.env.APPVEYOR_REPO_BRANCH) {
+          branch = process.env.APPVEYOR_REPO_BRANCH;
+        } else {
+          shell.echo(
+            `⚠️ Can't find the branch of the associated commit - if you're in detached HEAD, you need to be on a branch instead.`
+          );
+        }
+      }
+
       resolve(
         downloadLibGdJs(
           `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
@@ -163,6 +176,6 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
           })
         )
       )
-    )
+    );
   });
 }

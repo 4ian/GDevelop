@@ -92,6 +92,7 @@ const getEventContainerStyle = (windowSize: WindowSizeType) =>
 type EventsContainerProps = {|
   eventsHeightsCache: EventHeightsCache,
   event: gdBaseEvent,
+  onUpdate: () => void,
   leftIndentWidth: number,
   disabled: boolean,
   project: gdProject,
@@ -153,6 +154,7 @@ const EventContainer = (props: EventsContainerProps) => {
     eventsHeightsCache,
     onEventContextMenu,
     projectScopedContainersAccessor,
+    onUpdate,
   } = props;
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -167,6 +169,14 @@ const EventContainer = (props: EventsContainerProps) => {
     }
     eventsHeightsCache.setEventHeight(event, height);
   });
+
+  const _onUpdate = React.useCallback(
+    () => {
+      forceUpdate();
+      onUpdate();
+    },
+    [forceUpdate, onUpdate]
+  );
 
   const _onEventContextMenu = React.useCallback(
     (domEvent: MouseEvent) => {
@@ -214,7 +224,7 @@ const EventContainer = (props: EventsContainerProps) => {
               selected={isEventSelected(props.selection, event)}
               selection={props.selection}
               leftIndentWidth={props.leftIndentWidth}
-              onUpdate={forceUpdate}
+              onUpdate={_onUpdate}
               onAddNewInstruction={props.onAddNewInstruction}
               onPasteInstructions={props.onPasteInstructions}
               onMoveToInstruction={props.onMoveToInstruction}
@@ -413,27 +423,6 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     const [isScrolledTop, setIsScrolledTop] = React.useState(true);
     const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
 
-    // TODO: ensure this is not needed anymore.
-    // componentDidUpdate(prevProps: EventsTreeProps) {
-    // const {
-    //   values: { hiddenTutorialHints },
-    // } = props.preferences;
-    // const {
-    //   values: { hiddenTutorialHints: previousHiddenTutorialHints },
-    // } = prevProps.preferences;
-    // if (
-    //   hiddenTutorialHints['intro-event-system'] !==
-    //   previousHiddenTutorialHints['intro-event-system']
-    // ) {
-    //   this.setState({
-    //     ...this.state,
-    //     treeData: this.state.treeData.filter(
-    //       data => data.key !== 'eventstree-tutorial-node'
-    //     ),
-    //   });
-    // }
-    // }
-
     // This is the data that will be displayed by the tree - reconstructed at each render
     // (because events could have changed, some could have been deleted, so we can't keep
     // any reference to them).
@@ -586,7 +575,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       [forceEventsUpdate]
     );
 
-    const _getRowHeight = ({ node }: {| node: ?SortableTreeNode |}) => {
+    const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
       if (!node) {
         return 0;
       }
@@ -594,7 +583,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
         return node.fixedHeight || 0;
       }
 
-      return eventsHeightsCache.getEventHeight(node.event);
+      const height = eventsHeightsCache.getEventHeight(node.event);
+      return height;
     };
 
     const {
@@ -707,6 +697,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                     depth *
                     (getIndentWidth(props.windowSize) * props.indentScale)
                   }
+                  onUpdate={forceUpdate}
                   onAddNewInstruction={instructionsListContext =>
                     props.onAddNewInstruction(
                       eventContext,

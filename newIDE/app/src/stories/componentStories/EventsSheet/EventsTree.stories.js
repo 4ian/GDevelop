@@ -42,6 +42,9 @@ export const DefaultMediumScreenScopeInLayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
@@ -53,6 +56,10 @@ export const DefaultMediumScreenScopeInLayout = () => (
           onInstructionDoubleClick={action('instruction double click')}
           onInstructionContextMenu={action('instruction context menu')}
           onAddInstructionContextMenu={action('instruction list context menu')}
+          onVariableDeclarationDoubleClick={action(
+            'onVariableDeclarationDoubleClick'
+          )}
+          onVariableDeclarationClick={action('onVariableDeclarationClick')}
           onParameterClick={action('parameter click')}
           onEventClick={action('event click')}
           onEventContextMenu={action('event context menu')}
@@ -66,6 +73,8 @@ export const DefaultMediumScreenScopeInLayout = () => (
           screenType={'normal'}
           windowSize={'medium'}
           eventsSheetHeight={500}
+          eventsSheetWidth={500}
+          indentScale={1}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -86,6 +95,9 @@ export const DefaultSmallScreenScopeInLayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
@@ -97,6 +109,10 @@ export const DefaultSmallScreenScopeInLayout = () => (
           onInstructionDoubleClick={action('instruction double click')}
           onInstructionContextMenu={action('instruction context menu')}
           onAddInstructionContextMenu={action('instruction list context menu')}
+          onVariableDeclarationDoubleClick={action(
+            'onVariableDeclarationDoubleClick'
+          )}
+          onVariableDeclarationClick={action('onVariableDeclarationClick')}
           onParameterClick={action('parameter click')}
           onEventClick={action('event click')}
           onEventContextMenu={action('event context menu')}
@@ -110,6 +126,8 @@ export const DefaultSmallScreenScopeInLayout = () => (
           screenType={'normal'}
           windowSize={'small'}
           eventsSheetHeight={500}
+          eventsSheetWidth={500}
+          indentScale={1}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -127,6 +145,9 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           events={testProject.testLayout.getEvents()}
           project={testProject.project}
           scope={{ project: testProject.project }}
+          projectScopedContainersAccessor={
+            testProject.testProjectScopedContainersAccessor
+          }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
@@ -138,6 +159,10 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           onInstructionDoubleClick={action('instruction double click')}
           onInstructionContextMenu={action('instruction context menu')}
           onAddInstructionContextMenu={action('instruction list context menu')}
+          onVariableDeclarationDoubleClick={action(
+            'onVariableDeclarationDoubleClick'
+          )}
+          onVariableDeclarationClick={action('onVariableDeclarationClick')}
           onParameterClick={action('parameter click')}
           onEventClick={action('event click')}
           onEventContextMenu={action('event context menu')}
@@ -151,6 +176,8 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           screenType={'normal'}
           windowSize={'medium'}
           eventsSheetHeight={500}
+          eventsSheetWidth={500}
+          indentScale={1}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -171,6 +198,9 @@ export const EmptySmallScreenScopeInALayout = () => (
             project: testProject.project,
             layout: testProject.testLayout,
           }}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
           selection={getInitialSelection()}
@@ -182,6 +212,10 @@ export const EmptySmallScreenScopeInALayout = () => (
           onInstructionDoubleClick={action('instruction double click')}
           onInstructionContextMenu={action('instruction context menu')}
           onAddInstructionContextMenu={action('instruction list context menu')}
+          onVariableDeclarationDoubleClick={action(
+            'onVariableDeclarationDoubleClick'
+          )}
+          onVariableDeclarationClick={action('onVariableDeclarationClick')}
           onParameterClick={action('parameter click')}
           onEventClick={action('event click')}
           onEventContextMenu={action('event context menu')}
@@ -195,6 +229,8 @@ export const EmptySmallScreenScopeInALayout = () => (
           screenType={'normal'}
           windowSize={'small'}
           eventsSheetHeight={500}
+          eventsSheetWidth={500}
+          indentScale={1}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}

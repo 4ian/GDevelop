@@ -129,7 +129,20 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
   // Try to download the latest libGD.js, fallback to previous or master ones
   // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs('HEAD').then(onLibGdJsDownloaded, () =>
+  downloadCommitLibGdJs('HEAD').then(onLibGdJsDownloaded, () => {
+    // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
+    // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
+    // with the IDE JavaScript).
+    if (process.env.APPVEYOR || process.env.REQUIRES_EXACT_LIBGD_JS_VERSION) {
+      shell.echo(
+        `❌ Can't download the exact required version of libGD.js - check it was built by CircleCI before running this CI.`
+      );
+      shell.echo(
+        `ℹ️ See the pipeline on https://app.circleci.com/pipelines/github/4ian/GDevelop.`
+      );
+      shell.exit(1);
+    }
+
     downloadCommitLibGdJs('HEAD~1').then(onLibGdJsDownloaded, () =>
       downloadCommitLibGdJs('HEAD~2').then(onLibGdJsDownloaded, () =>
         downloadCommitLibGdJs('HEAD~3').then(onLibGdJsDownloaded, () =>
@@ -151,5 +164,5 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
         )
       )
     )
-  );
+  });
 }

@@ -7,11 +7,7 @@ pull_requests:
   do_not_increment_build_number: true
 image: Visual Studio 2019
 clone_depth: 5
-# Only build
-branches:
-  only:
-    - master
-    - /experimental-build.*/
+# Build must be triggered by the API.
 skip_tags: true # Don't rebuild on tags.
 init:
   - ps: Install-Product node 16
@@ -22,12 +18,12 @@ cache:
   - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
   - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
 install:
-  # Download and install SSL.com eSigner CKA. 
+  # Download and install SSL.com eSigner CKA.
   # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
   #
-  # This is necessary because of "signing to be FIPS-140 compliant". See 
+  # This is necessary because of "signing to be FIPS-140 compliant". See
   # https://github.com/electron-userland/electron-builder/issues/6158
-  # 
+  #
   # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
   # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
   - ps: >-
@@ -42,13 +38,13 @@ install:
       Remove-Item eSigner_CKA_Setup.zip
 
       Move-Item -Destination "eSigner_CKA_Installer.exe" -Path "eSigner_CKA_*\*.exe"
-      
+
       # Install it. See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
 
       New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
 
       ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
-      
+
       # Disable logger.
 
       # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
@@ -56,23 +52,6 @@ install:
       # $LogConfig[0] = '<log4net threshold="OFF">'
 
       # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
-
-  # Build GDevelop.js (and run tests to ensure it works).
-  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-  - cmd: >-
-      cd GDevelop.js
-
-      npm -v && npm install
-
-      git clone https://github.com/juj/emsdk.git
-
-      cd emsdk
-
-      emsdk install 3.1.21
-
-      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
-
-      cd ..\..
 
   # Build GDevelop IDE.
   # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
@@ -142,10 +121,6 @@ build_script:
 # Run a few tests on Windows.
 test_script:
   - cmd: >-
-      cd GDevelop.js
-
-      npm test
-
       cd ..
 
       cd newIDE\app

@@ -121,8 +121,6 @@ build_script:
 # Run a few tests on Windows.
 test_script:
   - cmd: >-
-      cd ..
-
       cd newIDE\app
 
       npm test

@@ -14,7 +14,7 @@ orbs:
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@5.2.0 # For a recent npm version (see below)
 jobs:
-  # Build the **entire** app for macOS.
+  # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
     macos:
       xcode: 14.2.0
@@ -94,7 +94,7 @@ jobs:
           name: Deploy to S3 (latest)
           command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
-  # Build the **entire** app for Linux.
+  # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
@@ -107,44 +107,25 @@ jobs:
       - checkout
       - aws-cli/setup
 
-      # System dependencies (for Electron Builder and Emscripten)
+      # System dependencies (for Electron Builder)
       - run:
-          name: Install dependencies for Emscripten
-          command: sudo apt-get update && sudo apt install cmake
-
-      - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
-
-      - run:
-          name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
+          name: Update system dependencies
+          command: sudo apt-get update
 
       - run:
           name: Install system dependencies for Electron builder
           command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
 
-      # GDevelop.js dependencies
       - restore_cache:
           keys:
             - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
             # fallback to using the latest cache if no exact match is found
             - gd-linux-nodejs-dependencies---
 
-      - run:
-          name: Install GDevelop.js dependencies and build it
-          command: cd GDevelop.js && npm install && cd ..
-
-      # Build GDevelop.js (and run tests to ensure it works)
-      - run:
-          name: Build GDevelop.js
-          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
-
-      # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
+      # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE/app && npm install && cd ../electron-app && npm install
 
       - save_cache:
           paths:
@@ -295,10 +276,26 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
 
+  # Trigger AppVeyor build, which finishes building the Windows app
+  # (using GDevelop.js built in a previous step).
+  trigger-appveyor-windows-build:
+    docker:
+      - image: cimg/node:16.13
+    steps:
+      - run:
+          name: Trigger AppVeyor Windows build
+          command: |
+            curl -H "Content-Type: application/json" \
+                 -H "Authorization: Bearer ${APPVEYOR_API_KEY}" \
+                 --data "{
+                   \"accountName\": \"4ian\",
+                   \"projectSlug\": \"gdevelop\",
+                   \"branch\": \"${CIRCLE_BRANCH}\"
+                 }" \
+                 -X POST https://ci.appveyor.com/api/builds
+
+
 workflows:
-  gdevelop_js-wasm:
-    jobs:
-      - build-gdevelop_js-wasm-only
   gdevelop_js-wasm-extra-checks:
     jobs:
       - build-gdevelop_js-debug-sanitizers-and-extra-checks:
@@ -310,13 +307,28 @@ workflows:
                 - /experimental-build.*/
   builds:
     jobs:
+      - build-gdevelop_js-wasm-only
       - build-macos:
+          # The macOS version builds by itself GDevelop.js
+          # (so we verify we can build it on macOS).
+          # requires:
+          #   - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:
                 - master
                 - /experimental-build.*/
       - build-linux:
+          requires:
+            - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+      - trigger-appveyor-windows-build:
+          requires:
+            - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:

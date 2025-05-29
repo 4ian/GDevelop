@@ -1,7 +1,5 @@
 // @flow
 
-type OnHeightChangedCallback = (cb?: () => void) => void;
-
 /**
  * Store the height of events.
  * Needed for EventsTree as we need to tell the react-virtualized List
@@ -10,11 +8,6 @@ type OnHeightChangedCallback = (cb?: () => void) => void;
 export default class EventHeightsCache {
   eventHeights = {};
   updateTimeoutId: ?TimeoutID = null;
-  onHeightsChanged: OnHeightChangedCallback;
-
-  constructor(onHeightsChanged: OnHeightChangedCallback) {
-    this.onHeightsChanged = onHeightsChanged;
-  }
 
   setEventHeight(event: gdBaseEvent, height: number) {
     this.eventHeights[event.ptr] = height;

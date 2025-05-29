@@ -406,6 +406,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     const forceUpdate = useForceUpdate();
 
     const _list = React.useRef<?any>(null);
+    const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
     const DragSourceAndDropTarget = React.useMemo(
       () =>
@@ -454,11 +455,6 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       [forceUpdate]
     );
     const forceEventsUpdate = onHeightsChanged;
-
-    const eventsHeightsCache = React.useMemo(
-      () => new EventHeightsCache(onHeightsChanged),
-      [onHeightsChanged]
-    );
 
     React.useEffect(() => {
       onHeightsChanged();
@@ -813,7 +809,6 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       );
     };
 
-    // TODO: consider moving this to a standalone function.
     const buildEventsTreeData = (
       treeData: Array<SortableTreeNode>,
       parentProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -1053,6 +1048,9 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
 
     const zoomLevel = props.fontSize || 14;
 
+    // Update treeDataRoot with the events tree. Done at each render as events
+    // could change at any time, so we can't keep stale data
+    // (we would risk pointing to deleted events in memory).
     buildEventsTreeData(
       treeDataRoot.current,
       props.projectScopedContainersAccessor,

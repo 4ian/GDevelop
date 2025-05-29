@@ -31,6 +31,7 @@ type EducationCurriculumProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   onSelectTutorial: Tutorial => void,
+  onSelectCourse: (courseId: string) => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
   isLocked?: boolean,
   onClickSubscribe?: () => void,
@@ -42,6 +43,7 @@ export const EducationCurriculum = ({
   limits,
   tutorials,
   onSelectTutorial,
+  onSelectCourse,
   onOpenTemplateFromTutorial,
   isLocked,
   onClickSubscribe,
@@ -84,6 +86,7 @@ export const EducationCurriculum = ({
             isLocked={isLocked}
             onClickSubscribe={onClickSubscribe}
             onSelectTutorial={onSelectTutorial}
+            onSelectCourse={onSelectCourse}
             index={sectionIndex}
             onOpenTemplateFromTutorial={
               tutorial.templateUrl
@@ -103,6 +106,7 @@ export const EducationCurriculum = ({
       i18n,
       limits,
       onSelectTutorial,
+      onSelectCourse,
       onOpenTemplateFromTutorial,
       renderInterstitialCallout,
       isLocked,
@@ -135,6 +139,7 @@ type Props = {|
   tutorials: Array<Tutorial>,
   category: TutorialCategory,
   onOpenTemplateFromTutorial: string => Promise<void>,
+  onSelectCourse: (courseId: string) => void,
 |};
 
 const TutorialsCategoryPage = ({
@@ -142,6 +147,7 @@ const TutorialsCategoryPage = ({
   tutorials,
   onBack,
   onOpenTemplateFromTutorial,
+  onSelectCourse,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
@@ -167,6 +173,7 @@ const TutorialsCategoryPage = ({
               <EducationCurriculum
                 tutorials={filteredTutorials}
                 onSelectTutorial={setSelectedTutorial}
+                onSelectCourse={onSelectCourse}
                 i18n={i18n}
                 limits={limits}
                 onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}

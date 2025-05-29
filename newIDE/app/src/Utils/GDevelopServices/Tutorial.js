@@ -26,7 +26,7 @@ export type Tutorial = {|
   /** Deprecated - see `descriptionByLocale`. */
   description?: string,
   descriptionByLocale: MessageByLocale,
-  type: 'video' | 'text' | 'pdf-tutorial',
+  type: 'video' | 'text' | 'pdf-tutorial' | 'course',
   category: TutorialCategory,
   duration?: number,
   /** Deprecated - see `linkByLocale`. */
@@ -44,6 +44,8 @@ export type Tutorial = {|
   availableAt?: string,
   gameLink?: string,
   templateUrl?: string,
+
+  courseId?: string,
 |};
 
 export const canAccessTutorial = (

@@ -190,17 +190,30 @@ const makeShortTextForNamedProperty = (
 ): string => {
   const type = property.getType();
   const measurementUnit = property.getMeasurementUnit();
+  const measurementUnitText = measurementUnit.isUndefined()
+    ? null
+    : measurementUnit.getName();
+  const value = property.getValue();
+
+  if (type.toLowerCase() === 'number') {
+    return `${name}: ${value} ${
+      measurementUnitText ? `(${measurementUnitText})` : ''
+    }`;
+  }
+
   const choices =
-    type === 'Choice' ? property.getExtraInfo().toJSArray() : null;
+    type.toLowerCase() === 'choice'
+      ? property.getExtraInfo().toJSArray()
+      : null;
   const information = [
     type,
     choices
       ? `one of: [${choices.map(choice => `"${choice}"`).join(', ')}]`
       : null,
-    measurementUnit.isUndefined() ? null : measurementUnit.getName(),
+    measurementUnitText,
   ].filter(Boolean);
 
-  return `${name} (${information.join(', ')})`;
+  return `${name}: ${value} (${information.join(', ')})`;
 };
 
 /**
@@ -310,7 +323,7 @@ const createObject: EditorFunction = {
           const object = createdObjects[0];
           return makeGenericSuccess(
             [
-              `Created (from the asset store) object "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+              `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
               getPropertiesText(object),
             ].join(' ')
           );
@@ -318,7 +331,10 @@ const createObject: EditorFunction = {
 
         return makeGenericSuccess(
           `Created (from the asset store) ${createdObjects
-            .map(object => `object "${object_name}" of type "${object_type}"`)
+            .map(
+              object =>
+                `object "${object.getName()}" of type "${object.getType()}"`
+            )
             .join(', ')} in scene "${scene_name}".`
         );
       } else {
@@ -676,11 +692,18 @@ const addBehavior: EditorFunction = {
     }
 
     // Add the behavior
-    const behavior = object.addNewBehavior(
+    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
       project,
+      object,
       behavior_type,
       behaviorName
     );
+    if (!object.hasBehaviorNamed(behaviorName)) {
+      return makeGenericFailure(
+        `Unexpected error: behavior "${behaviorName}" was not added to object "${object_name}" despite a valid type and name.`
+      );
+    }
+    const behavior = object.getBehavior(behaviorName);
 
     const behaviorProperties = behavior.getProperties();
     const propertyShortTexts = behaviorProperties

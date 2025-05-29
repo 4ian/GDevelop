@@ -140,6 +140,9 @@ describe('libGD.js', function () {
       expect(gd.Project.getSafeName('官话 name')).toBe('官话_name');
       expect(gd.Project.getSafeName('')).toBe('Unnamed');
       expect(gd.Project.getSafeName('9')).toBe('_9');
+      expect(gd.Project.getSafeName('ExplosionParticles3D')).toBe(
+        'ExplosionParticles3D'
+      );
     });
 
     it('should have a list of extensions', function () {

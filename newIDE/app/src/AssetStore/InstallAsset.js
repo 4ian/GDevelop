@@ -26,34 +26,6 @@ import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
 
-const toPascalCase = (str: string) => {
-  if (!str) return '';
-  return str
-    .replace(/^[^A-Za-z0-9]*|[^A-Za-z0-9]*$/g, '$')
-    .replace(/[^A-Za-z0-9]+/g, '$')
-    .replace(/([a-z])([A-Z])/g, function(m, a, b) {
-      return a + '$' + b;
-    })
-    .toLowerCase()
-    .replace(/(\$)(\w?)/g, function(m, a, b) {
-      return b.toUpperCase();
-    });
-};
-
-export const sanitizeObjectName = (objectName: string) => {
-  const trimmedObjectName = objectName.trim();
-  if (!trimmedObjectName) return 'UnnamedObject';
-
-  const pascalCaseName = toPascalCase(trimmedObjectName);
-
-  let prefixedObjectName = pascalCaseName;
-  if (prefixedObjectName[0] >= '0' && prefixedObjectName[0] <= '9') {
-    prefixedObjectName = '_' + prefixedObjectName;
-  }
-
-  return prefixedObjectName;
-};
-
 /**
  * Adds the specified resource to the resources manager, avoiding to duplicate
  * if it was already added.
@@ -271,8 +243,8 @@ export const addAssetToProject = async ({
       }
     }
 
-    // Insert the object
-    const originalName = sanitizeObjectName(
+    // Insert the object.
+    const originalName = gd.Project.getSafeName(
       requestedObjectName || objectAsset.object.name
     );
     const newName = newNameGenerator(originalName, name =>

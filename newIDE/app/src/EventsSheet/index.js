@@ -1484,11 +1484,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       // If it is a ADD or EDIT, then the element will be present, so we can select them.
       // If it is a DELETE, then they will not be present, so we can't select them.
       let newSelection: SelectionState = getInitialSelection();
-      let eventContexts: Array<EventContext> = [];
       if (type === 'DELETE') {
         newSelection = clearSelection();
       } else {
-        eventContexts = eventsTree.getEventContextAtRowIndexes(
+        const eventContexts = eventsTree.getEventContextAtRowIndexes(
           positions.positionAfterAction
         );
         newSelection = selectEventsAfterHistoryChange(eventContexts);

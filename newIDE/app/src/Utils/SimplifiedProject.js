@@ -28,6 +28,7 @@ type SimplifiedObjectGroup = {|
   objectGroupType: string,
   objectNames: Array<string>,
   behaviors?: Array<SimplifiedBehavior>,
+  variables?: Array<SimplifiedVariable>,
 |};
 
 type SimplifiedScene = {|
@@ -174,6 +175,12 @@ const getSimplifiedObjectGroups = (
     const behaviorNames = objectsContainersList
       .getBehaviorsOfObject(objectGroup.getName(), true)
       .toJSArray();
+
+    const variablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+      objectsContainersList,
+      objectGroup
+    );
+
     return {
       objectGroupName: objectGroup.getName(),
       objectGroupType: objectsContainersList.getTypeOfObject(
@@ -190,6 +197,10 @@ const getSimplifiedObjectGroups = (
                 true
               ),
             }))
+          : undefined,
+      variables:
+        variablesContainer.count() > 0
+          ? getSimplifiedVariablesContainerJson(variablesContainer)
           : undefined,
     };
   });

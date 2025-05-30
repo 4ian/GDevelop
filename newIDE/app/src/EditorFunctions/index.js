@@ -1379,7 +1379,7 @@ const addSceneEvents: EditorFunction = {
 
       if (!eventsGenerationResult.generationCompleted) {
         return makeGenericFailure(
-          `Error when launching or completing events generation (${
+          `Infrastructure error when launching or completing events generation (${
             eventsGenerationResult.errorMessage
           }). Consider trying again or a different approach.`
         );
@@ -1388,7 +1388,7 @@ const addSceneEvents: EditorFunction = {
       const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
       if (aiGeneratedEvent.error) {
         return makeGenericFailure(
-          `Error when generating events (${
+          `Infrastructure error when generating events (${
             aiGeneratedEvent.error.message
           }). Consider trying again or a different approach.`
         );
@@ -1396,8 +1396,11 @@ const addSceneEvents: EditorFunction = {
 
       const changes = aiGeneratedEvent.changes;
       if (!changes || changes.length === 0) {
+        const resultMessage =
+          aiGeneratedEvent.resultMessage ||
+          'No generated events found and no other information was given.';
         return makeGenericFailure(
-          `Error when generating events (no generated events found). Consider trying again or a different approach.`
+          `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
         );
       }
 
@@ -1405,9 +1408,12 @@ const addSceneEvents: EditorFunction = {
         changes.some(change => change.isEventsJsonValid === false) ||
         changes.some(change => change.areEventsValid === false)
       ) {
+        const resultMessage =
+          aiGeneratedEvent.resultMessage ||
+          'This probably means what you asked for is not possible or does not work like this.';
         return {
           success: false,
-          message: `Generated events are not valid - this means what you asked for is not possible or does not work like this. Read the diagnostic below to try to understand what went wrong and either try again differently or consider a different approach.`,
+          message: `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
           generatedEventsErrorDiagnostics: changes
             .map(change => change.diagnosticLines.join('\n'))
             .join('\n\n'),
@@ -1434,11 +1440,14 @@ const addSceneEvents: EditorFunction = {
         changes,
         aiGeneratedEvent.id
       );
-      return makeGenericSuccess('Properly modified or added new event(s).');
+      const resultMessage =
+        aiGeneratedEvent.resultMessage ||
+        'Properly modified or added new event(s).';
+      return makeGenericSuccess(resultMessage);
     } catch (error) {
       console.error('Error in addSceneEvents with AI generation:', error);
       return makeGenericFailure(
-        `An unexpected error happened while adding generated events: ${
+        `An unexpected error happened in the GDevelop editor while adding generated events: ${
           error.message
         }. Consider a different approach.`
       );

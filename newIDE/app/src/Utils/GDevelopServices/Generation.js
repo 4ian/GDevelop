@@ -125,6 +125,7 @@ export type AiGeneratedEvent = {
   objectsList: string,
   existingEventsAsText: string,
 
+  resultMessage: string | null,
   changes: Array<AiGeneratedEventChange> | null,
 
   error: {

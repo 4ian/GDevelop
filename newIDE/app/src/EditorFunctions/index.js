@@ -7,6 +7,7 @@ import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  addObjectUndeclaredVariables,
   addUndeclaredVariables,
   applyEventsChanges,
 } from './ApplyEventsChanges';
@@ -1432,6 +1433,18 @@ const addSceneEvents: EditorFunction = {
           scene,
           undeclaredVariables: change.undeclaredVariables,
         });
+
+        const objectNames = Object.keys(change.undeclaredObjectVariables);
+        for (const objectName of objectNames) {
+          const undeclaredVariables =
+            change.undeclaredObjectVariables[objectName];
+          addObjectUndeclaredVariables({
+            project,
+            scene,
+            objectName,
+            undeclaredVariables,
+          });
+        }
       }
 
       applyEventsChanges(

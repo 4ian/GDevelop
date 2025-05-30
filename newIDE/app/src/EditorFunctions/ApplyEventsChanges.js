@@ -416,3 +416,123 @@ export const addUndeclaredVariables = ({
     }
   });
 };
+
+export const addObjectUndeclaredVariables = ({
+  project,
+  scene,
+  objectName,
+  undeclaredVariables,
+}: {|
+  project: gdProject,
+  scene: gdLayout,
+  objectName: string,
+  undeclaredVariables: Array<AiGeneratedEventUndeclaredVariable>,
+|}) => {
+  const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
+    project,
+    scene
+  );
+
+  const setupVariable = (variable: gdVariable, type: string | null) => {
+    if (!type) {
+      return;
+    }
+    const lowerCaseType = type.toLowerCase();
+    variable.castTo(
+      lowerCaseType === 'string'
+        ? 'String'
+        : lowerCaseType === 'boolean'
+        ? 'Boolean'
+        : lowerCaseType === 'array'
+        ? 'Array'
+        : lowerCaseType === 'structure'
+        ? 'Structure'
+        : 'Number'
+    );
+  };
+
+  const addVariableForObjectsOfGroup = (
+    group: gdObjectGroup,
+    undeclaredVariable: AiGeneratedEventUndeclaredVariable
+  ) => {
+    const groupVariablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+      projectScopedContainers.getObjectsContainersList(),
+      group
+    );
+    const originalSerializedVariables = new gd.SerializerElement();
+    groupVariablesContainer.serializeTo(originalSerializedVariables);
+
+    const variable = groupVariablesContainer.insertNew(
+      undeclaredVariable.name,
+      0
+    );
+    setupVariable(variable, undeclaredVariable.type);
+
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      originalSerializedVariables,
+      groupVariablesContainer
+    );
+    originalSerializedVariables.delete();
+
+    gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
+      project,
+      project.getObjects(),
+      scene.getObjects(),
+      scene.getInitialInstances(),
+      groupVariablesContainer,
+      group,
+      changeset,
+      originalSerializedVariables
+    );
+  };
+
+  undeclaredVariables.forEach(undeclaredVariable => {
+    if (
+      projectScopedContainers
+        .getObjectsContainersList()
+        .hasObjectOrGroupWithVariableNamed(objectName, undeclaredVariable.name)
+    ) {
+      // Variable already exists, no need to add it.
+      return;
+    }
+
+    if (scene.getObjects().hasObjectNamed(objectName)) {
+      const object = scene.getObjects().getObject(objectName);
+      const variable = object
+        .getVariables()
+        .insertNew(undeclaredVariable.name, 0);
+      setupVariable(variable, undeclaredVariable.type);
+    } else if (
+      scene
+        .getObjects()
+        .getObjectGroups()
+        .has(objectName)
+    ) {
+      const group = scene
+        .getObjects()
+        .getObjectGroups()
+        .get(objectName);
+
+      addVariableForObjectsOfGroup(group, undeclaredVariable);
+    } else if (project.getObjects().hasObjectNamed(objectName)) {
+      const object = project.getObjects().getObject(objectName);
+      const variable = object
+        .getVariables()
+        .insertNew(undeclaredVariable.name, 0);
+      setupVariable(variable, undeclaredVariable.type);
+    }
+    if (
+      project
+        .getObjects()
+        .getObjectGroups()
+        .has(objectName)
+    ) {
+      const group = project
+        .getObjects()
+        .getObjectGroups()
+        .get(objectName);
+
+      addVariableForObjectsOfGroup(group, undeclaredVariable);
+    }
+  });
+};

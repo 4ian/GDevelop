@@ -97,7 +97,7 @@ export type AiGeneratedEventStats = {
 
 export type AiGeneratedEventUndeclaredVariable = {
   name: string,
-  type?: 'number' | 'string' | 'boolean' | 'structure' | 'array',
+  type: 'number' | 'string' | 'boolean' | 'structure' | 'array' | null,
   requiredScope: 'global' | 'scene' | 'none',
 };
 
@@ -110,6 +110,9 @@ export type AiGeneratedEventChange = {
   extensionNames: string[] | null,
   diagnosticLines: string[],
   undeclaredVariables: AiGeneratedEventUndeclaredVariable[],
+  undeclaredObjectVariables: {
+    [objectName: string]: AiGeneratedEventUndeclaredVariable[],
+  },
 };
 
 export type AiGeneratedEvent = {

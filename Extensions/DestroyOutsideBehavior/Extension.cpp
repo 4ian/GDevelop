@@ -12,35 +12,42 @@ This project is released under the MIT License.
 
 void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("DestroyOutsideBehavior",
-                               _("Destroy Outside Screen Behavior"),
-                               _("This behavior can be used to destroy "
-                                 "objects when they go outside of "
-                                 "the bounds of the camera. Useful for bullets "
-                                 "or other short-lived objects."),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "DestroyOutsideBehavior",
+          _("Destroy Outside Screen Behavior"),
+          _("This behavior can be used to destroy objects when they go "
+            "outside of the bounds of the 2D camera. Useful for 2D bullets or "
+            "other short-lived objects. Don't use it for 3D objects in a "
+            "FPS/TPS game or any game with a camera not being a top view "
+            "(for 3D objects, prefer comparing "
+            "the position, for example Z position to see if an object goes "
+            "outside of the bound of the map). Be careful when using this "
+            "behavior because if the object appears outside of the screen, it "
+            "will be immediately removed."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetCategory("Game mechanic")
       .SetTags("screen")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
 
   gd::BehaviorMetadata& aut =
-      extension.AddBehavior("DestroyOutside",
-                            _("Destroy when outside of the screen"),
-                            _("DestroyOutside"),
-                            _("Destroy objects automatically when they go "
-                              "outside of the screen's borders."),
-                            "",
-                            "CppPlatform/Extensions/destroyoutsideicon.png",
-                            "DestroyOutsideBehavior",
-                            std::make_shared<DestroyOutsideBehavior>(),
-                            std::shared_ptr<gd::BehaviorsSharedData>())
-                            .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
+      extension
+          .AddBehavior("DestroyOutside",
+                       _("Destroy when outside of the screen"),
+                       _("DestroyOutside"),
+                       _("Destroy objects automatically when they go "
+                         "outside of the 2D camera borders."),
+                       "",
+                       "CppPlatform/Extensions/destroyoutsideicon.png",
+                       "DestroyOutsideBehavior",
+                       std::make_shared<DestroyOutsideBehavior>(),
+                       std::shared_ptr<gd::BehaviorsSharedData>())
+          .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);
 
   aut.AddCondition("ExtraBorder",
-                   _("Additional border"),
-                   _("Compare the additional border that the object must cross "
-                     "before being deleted."),
+                   _("Additional border (extra distance before deletion)"),
+                   _("Compare the extra distance (in pixels) the object must "
+                     "travel beyond the screen before it gets deleted."),
                    _("the additional border"),
                    _("Destroy outside configuration"),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
@@ -53,9 +60,9 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetExtraBorder");
 
   aut.AddAction("ExtraBorder",
-                _("Additional border"),
-                _("Change the additional border that the object must cross "
-                  "before being deleted."),
+                _("Additional border (extra distance before deletion)"),
+                _("Change the extra distance (in pixels) the object must "
+                  "travel beyond the screen before it gets deleted."),
                 _("the additional border"),
                 _("Destroy outside configuration"),
                 "CppPlatform/Extensions/destroyoutsideicon24.png",

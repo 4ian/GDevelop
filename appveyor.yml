@@ -85,7 +85,35 @@ build_script:
 
       # Find certificate so we can tell electron-builder which one to use.
 
-      $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+      $maxRetries = 10
+
+      $retryDelay = 5
+
+      $certAvailable = $false
+
+      for ($i = 0; $i -lt $maxRetries; $i++) {
+
+        $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*GDevelop Ltd*" }
+
+        if ($CodeSigningCert -and $CodeSigningCert.HasPrivateKey) {
+
+          Write-Host "✅ Certificate is loaded and has private key."
+
+          $certAvailable = $true
+
+          break
+
+        }
+
+        Write-Host "⏳ Waiting for certificate to load with private key... ($($i + 1)/$maxRetries)"
+
+        Start-Sleep -Seconds $retryDelay
+
+      }
+
+      if (-not $certAvailable) {
+        throw "❌ Certificate failed to load with private key after $maxRetries attempts."
+      }
 
       echo Certificate: $CodeSigningCert
 

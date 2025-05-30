@@ -37,9 +37,9 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
         extension
             .AddObject<ParticleEmitterObject>(
                 "ParticleEmitter",
-                _("Particles emitter"),
+                _("2D particles emitter"),
                 _("Displays a large number of small 2D particles to create "
-                  "visual effects."),
+                  "visual effects in a 2D game or user interface."),
                 "CppPlatform/Extensions/particleSystemicon.png")
             .SetCategoryFullName(_("Visual effect"))
             .AddDefaultBehavior("EffectCapability::EffectBehavior");

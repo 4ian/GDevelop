@@ -52,6 +52,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -93,6 +94,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -128,6 +130,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -161,6 +164,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -195,6 +199,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -228,6 +233,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -265,6 +271,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
       {
         operationName: 'insert_before_event',
@@ -275,6 +282,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(
@@ -312,6 +320,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
 
@@ -346,6 +355,7 @@ describe('applyEventsChanges', () => {
         diagnosticLines: [],
         extensionNames: [],
         undeclaredVariables: [],
+        undeclaredObjectVariables: {},
       },
     ];
     applyEventsChanges(

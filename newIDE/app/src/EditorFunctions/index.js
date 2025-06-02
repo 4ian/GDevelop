@@ -21,6 +21,7 @@ import {
 import { type SimplifiedBehavior } from '../Utils/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
+import { applyVariableChange } from './ApplyVariableChange';
 
 const gd: libGDevelop = global.gd;
 
@@ -1561,13 +1562,62 @@ const deleteScene: EditorFunction = {
 };
 
 const addOrEditVariable: EditorFunction = {
-  renderForEditor: ({ args }) => {
+  renderForEditor: ({ args, shouldShowDetails }) => {
     const variable_name_or_path = extractRequiredString(
       args,
       'variable_name_or_path'
     );
+    const variable_scope = extractRequiredString(args, 'variable_scope');
+    const value = extractRequiredString(args, 'value');
+    const object_name = SafeExtractor.extractStringProperty(
+      args,
+      'object_name'
+    );
+    const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
 
-    // TODO: add scope.
+    const details = shouldShowDetails ? (
+      <ColumnStackLayout noMargin>
+        <Text noMargin allowSelection color="secondary">
+          <b>
+            <Trans>Value</Trans>
+          </b>
+          : {value}
+        </Text>
+      </ColumnStackLayout>
+    ) : null;
+
+    if (variable_scope === 'scene') {
+      return {
+        text: (
+          <Trans>
+            Add or edit scene variable {variable_name_or_path} in scene{' '}
+            {scene_name}.
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    } else if (variable_scope === 'object') {
+      return {
+        text: (
+          <Trans>
+            Add or edit object variable {variable_name_or_path} for object{' '}
+            {object_name}.
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    } else if (variable_scope === 'global') {
+      return {
+        text: (
+          <Trans>Add or edit global variable {variable_name_or_path}.</Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
+    }
+
     return {
       text: <Trans>Add or edit variable {variable_name_or_path}.</Trans>,
     };
@@ -1609,14 +1659,14 @@ const addOrEditVariable: EditorFunction = {
         objectsContainer = project.getLayout(scene_name).getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
           return makeGenericFailure(
-            `Object not found: "${object_name}" in scene "${scene_name}".`
+            `Object not found: "${object_name}" in scene "${scene_name}". Have you created it? For a global object, don't specify the scene name.`
           );
         }
       } else {
         objectsContainer = project.getObjects();
         if (!objectsContainer.hasObjectNamed(object_name)) {
           return makeGenericFailure(
-            `Object not found: "${object_name}" in project.`
+            `Object not found: "${object_name}" in project. Have you created it or forgot to specify the scene name?`
           );
         }
       }
@@ -1632,70 +1682,12 @@ const addOrEditVariable: EditorFunction = {
       );
     }
 
-    const variableNames = variable_name_or_path.split('.');
-    if (variable_name_or_path.length === 0) {
-      return makeGenericFailure(
-        `Invalid "variable_name_or_path" argument: "${variable_name_or_path}". It should be the name of the variable, or a dot separated path to the variable (for structures).`
-      );
-    }
-
-    let addedNewVariable = false;
-    const firstVariableName = variableNames[0];
-    let variable = null;
-    if (!variablesContainer.has(firstVariableName)) {
-      variable = variablesContainer.insertNew(firstVariableName, 0);
-      addedNewVariable = true;
-    } else {
-      variable = variablesContainer.get(firstVariableName);
-    }
-
-    for (let i = 1; i < variableNames.length; i++) {
-      const childVariableName = variableNames[i];
-
-      variable.castTo('Structure');
-      if (!variable.hasChild(childVariableName)) {
-        addedNewVariable = true;
-      }
-
-      variable = variable.getChild(childVariableName);
-    }
-
-    const readOrInferVariableType = (
-      specifiedType: string | null,
-      value: string
-    ): string => {
-      if (specifiedType) {
-        const lowercaseSpecifiedType = specifiedType.toLowerCase();
-        if (lowercaseSpecifiedType === 'string') {
-          return 'String';
-        } else if (lowercaseSpecifiedType === 'number') {
-          return 'Number';
-        } else if (lowercaseSpecifiedType === 'boolean') {
-          return 'Boolean';
-        }
-      }
-
-      if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
-        return 'Boolean';
-      }
-
-      const numberValue = parseFloat(value);
-      if (!Number.isNaN(numberValue)) {
-        return 'Number';
-      }
-
-      return 'String';
-    };
-
-    const variableType = readOrInferVariableType(variable_type, value);
-
-    if (variableType === 'String') {
-      variable.setString(value);
-    } else if (variableType === 'Number') {
-      variable.setValue(parseFloat(value));
-    } else if (variableType === 'Boolean') {
-      variable.setBool(value.toLowerCase() === 'true');
-    }
+    const { addedNewVariable, variableType } = applyVariableChange({
+      variablePath: variable_name_or_path,
+      forcedVariableType: variable_type,
+      variablesContainer,
+      value,
+    });
 
     return makeGenericSuccess(
       addedNewVariable

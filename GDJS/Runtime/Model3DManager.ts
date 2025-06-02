@@ -45,11 +45,12 @@ namespace gdjs {
          * easily spotted if rendered on screen.
          */
         const group = new THREE.Group();
-        const mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(1, 1, 1),
-          new THREE.MeshStandardMaterial({ color: '##ff00ff' })
+        group.add(
+          new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.MeshBasicMaterial({ color: '#ff00ff' })
+          )
         );
-        group.add(mesh);
         this._invalidModel = {
           scene: group,
           animations: [],

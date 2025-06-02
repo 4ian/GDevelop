@@ -31,10 +31,6 @@ namespace gdjs {
       this._threeRenderer = this._runtimeGameRenderer
         ? this._runtimeGameRenderer.getThreeRenderer()
         : null;
-      if (this._threeRenderer) {
-        this._threeRenderer.shadowMap.enabled = true;
-        this._threeRenderer.shadowMap.type = THREE.PCFShadowMap;
-      }
     }
 
     onGameResolutionResized() {

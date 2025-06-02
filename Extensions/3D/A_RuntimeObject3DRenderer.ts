@@ -11,8 +11,6 @@ namespace gdjs {
       this._object = runtimeObject;
       this._threeObject3D = threeObject3D;
       this._threeObject3D.rotation.order = 'ZYX';
-      this._threeObject3D.castShadow = true;
-      this._threeObject3D.receiveShadow = true;
 
       instanceContainer
         .getLayer('')

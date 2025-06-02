@@ -346,8 +346,6 @@ namespace gdjs {
               this._threePlaneGeometry,
               this._threePlaneMaterial
             );
-            this._threePlaneMesh.castShadow = true;
-            this._threePlaneMesh.receiveShadow = true;
 
             // Force to render the mesh last (after the rest of 3D objects, including
             // transparent ones). In most cases, the 2D rendering is composed of a lot

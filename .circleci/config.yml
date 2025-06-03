@@ -13,6 +13,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@5.2.0 # For a recent npm version (see below)
+  win: circleci/windows@5.1.0
 jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
@@ -294,6 +295,136 @@ jobs:
                  }" \
                  -X POST https://ci.appveyor.com/api/builds
 
+  build-windows:
+    executor:
+      name: win/default
+      size: large
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - run:
+          # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
+          #
+          # This is necessary because of "signing to be FIPS-140 compliant". See
+          # https://github.com/electron-userland/electron-builder/issues/6158
+          #
+          # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
+          # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
+          name: Download and Unzip eSignerCKA Setup
+          command: |
+
+            Invoke-WebRequest -OutFile eSigner_CKA_1.0.3.zip "https://www.ssl.com/download/ssl-com-esigner-cka-1-0-3"
+
+            Expand-Archive -Force eSigner_CKA_1.0.3.zip
+
+            Remove-Item eSigner_CKA_1.0.3.zip
+
+            Move-Item -Destination "eSigner_CKA_1.0.3.exe" -Path "eSigner_CKA_1.0.3SSL.COM eSigner CKA_1.0.3.exe"
+      - run:
+          name: Setup eSignerCKA in Silent Mode
+          command: |
+
+            mkdir -p "/home/circleci/project/eSignerCKA"
+
+            ./eSigner_CKA_1.0.3.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="/home/circleci/project/eSignerCKA" | Out-Null
+      - run:
+          name: Config Account Information on eSignerCKA
+          command: |
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe config -mode product -user "$env:ESIGNER_USER_NAME" -pass "$env:ESIGNER_USER_PASSWORD" -totp "$env:ESIGNER_USER_TOTP" -key "/home/circleci/project/eSignerCKA/master.key" -r
+      - run:
+          name: Load Certificate into Windows Store
+          command: |
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe unload
+
+            /home/circleci/project/eSignerCKA/eSignerCKATool.exe load
+      - run:
+          name: Select Certificate From Windows Store and Sign Sample File with SignTool
+          command: |
+
+            $CodeSigningCert = Get-ChildItem Cert:CurrentUserMy -CodeSigningCert | Select-Object -First 1
+
+            echo Certificate: $CodeSigningCert
+
+      - restore_cache:
+        name: Restore node_modules cache
+        keys:
+          - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+          - v1-win-node-
+
+      - run:
+          name: Install dependencies
+          # TODO: add exact GDevelop.js commit requirement.
+          # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
+          # setuptools will make distutils available again (but we should migrate our packages probably).
+          command: |
+            pip install setuptools
+
+            cd newIDE\app
+
+            npm -v
+
+            npm install
+
+            cd ..\electron-app
+
+            npm install
+
+            cd ..\..
+
+      - save_cache:
+        name: Save node_modules cache
+        key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+        paths:
+          - newIDE/app/node_modules
+          - newIDE/electron-app/node_modules
+
+      - run:
+          name: Build with codesigning
+          # Package the app for Windows (and sign it).
+          # Don't sign the appx (it will be signed by the Microsoft Store).
+          command: |
+
+            $CodeSigningCert = Get-ChildItem Cert:CurrentUserMy -CodeSigningCert | Select-Object -First 1
+
+            echo Certificate: $CodeSigningCert
+
+            # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
+            # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
+            # TODO: try with "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe"
+
+            $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+
+            # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+            # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
+
+            node scripts/build.js --win nsis --publish=never
+
+            # Build the appx (not signed).
+
+            $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+            node scripts/build.js --skip-app-build --win appx --publish=never
+
+            cd ..\..
+
+      - run:
+          name: Clean binaries
+          shell: cmd.exe
+          command: |
+            rmdir /s /q newIDE\electron-app\dist\win-unpacked
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: newIDE/electron-app/dist
 
 workflows:
   gdevelop_js-wasm-extra-checks:
@@ -321,6 +452,15 @@ workflows:
       - build-linux:
           requires:
             - build-gdevelop_js-wasm-only
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+      - build-windows:
+          # TODO: activate this to build with the exact GDevelop.js version
+          # requires:
+          #   - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:

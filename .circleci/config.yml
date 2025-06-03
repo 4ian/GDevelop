@@ -387,9 +387,7 @@ jobs:
             - GDJS/node_modules
 
       - run:
-          name: Build with codesigning
-          # Package the app for Windows (and sign it).
-          # Don't sign the appx (it will be signed by the Microsoft Store).
+          name: Build NSIS executable (with code signing)
           command: |
             cd newIDE\electron-app
 
@@ -413,11 +411,22 @@ jobs:
 
             node scripts/build.js --win nsis --publish=never
 
-            # Build the appx (not signed).
+            cd ..\..
+      - run:
+          name: Build AppX (without code signing)
+          # Don't sign the appx (it will be signed by the Microsoft Store).
+          command: |
+            cd newIDE\electron-app
+
+            # Build the appx (not signed). Ensure all variables used for code signing are empty.
 
             $Env:GD_SIGNTOOL_THUMBPRINT = ''
 
-            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''            
+            
+            $Env:CSC_LINK = ''
+            
+            $Env:CSC_KEY_PASSWORD = ''
 
             node scripts/build.js --skip-app-build --win appx --publish=never
 

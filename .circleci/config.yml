@@ -298,7 +298,7 @@ jobs:
   build-windows:
     executor:
       name: win/default
-      size: large
+      size: 2xlarge
     working_directory: /home/circleci/project
     steps:
       - checkout
@@ -448,7 +448,8 @@ workflows:
             branches:
               only:
                 - master
-                - /experimental-build.*/
+                # TODO
+                # - /experimental-build.*/
       - build-linux:
           requires:
             - build-gdevelop_js-wasm-only
@@ -456,7 +457,8 @@ workflows:
             branches:
               only:
                 - master
-                - /experimental-build.*/
+                # TODO
+                # - /experimental-build.*/
       - build-windows:
           # TODO: activate this to build with the exact GDevelop.js version
           # requires:

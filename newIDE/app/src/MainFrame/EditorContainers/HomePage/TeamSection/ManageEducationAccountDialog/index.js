@@ -273,7 +273,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
   });
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
@@ -374,6 +374,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     [selectedUserIds, members]
   );
 
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
   const isLoading = !subscriptionPlansWithPricingSystems;
 
   const availableSeats = getAvailableSeats();

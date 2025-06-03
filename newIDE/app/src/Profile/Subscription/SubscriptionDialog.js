@@ -203,16 +203,18 @@ export const getPlanSpecificRequirements = (
 
 type Props = {|
   onClose: Function,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
-  userLegacySubscriptionPlanWithPricingSystem: ?SubscriptionPlanWithPricingSystems,
+  getAvailableSubscriptionPlansWithPrices: () =>
+    | SubscriptionPlanWithPricingSystems[]
+    | null,
+  getUserLegacySubscriptionPlanWithPricingSystem: () => SubscriptionPlanWithPricingSystems | null,
   filter: ?SubscriptionType,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function SubscriptionDialog({
   onClose,
-  subscriptionPlansWithPricingSystems,
-  userLegacySubscriptionPlanWithPricingSystem,
+  getAvailableSubscriptionPlansWithPrices,
+  getUserLegacySubscriptionPlanWithPricingSystem,
   filter,
   onOpenPendingDialog,
 }: Props) {
@@ -225,6 +227,8 @@ export default function SubscriptionDialog({
   ] = React.useState<number>(20);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
+  const userLegacySubscriptionPlanWithPricingSystem = getUserLegacySubscriptionPlanWithPricingSystem();
   const [period, setPeriod] = React.useState<'year' | 'month'>(
     getSubscriptionPricingSystemPeriod(
       authenticatedUser.subscription,

@@ -20,10 +20,10 @@ import {
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
-import useSubscriptionPlans, {
-  getAvailableSubscriptionPlansWithPrices,
-} from '../../../../Utils/UseSubscriptionPlans';
 import LoaderModal from '../../../../UI/LoaderModal';
+import useSubscriptionPlans, {
+  filterAvailableSubscriptionPlansWithPrices,
+} from '../../../../Utils/UseSubscriptionPlans';
 
 export default {
   title: 'Subscription/SubscriptionDetails',
@@ -184,15 +184,16 @@ export const Default = ({
   }
 
   const { subscription: userSubscription } = authenticatedUser;
-  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
     authenticatedUser,
   });
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
   return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <SubscriptionDetails
-        subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+        subscriptionPlansWithPricingSystems={filterAvailableSubscriptionPlansWithPrices(
           subscriptionPlansWithPricingSystems
         )}
         subscription={userSubscription}

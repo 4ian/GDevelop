@@ -65,6 +65,13 @@ export const GDevelopAssetApi = {
     : 'https://api.gdevelop.io/asset',
 };
 
+export const GDevelopAssetCdn = {
+  baseUrl: {
+    staging: 'https://resources.gdevelop-app.com/staging/assets-database',
+    live: 'https://resources.gdevelop-app.com/assets-database',
+  },
+};
+
 export const GDevelopAnalyticsApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/analytics'

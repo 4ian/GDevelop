@@ -384,6 +384,7 @@ jobs:
           paths:
             - newIDE/app/node_modules
             - newIDE/electron-app/node_modules
+            - GDJS/node_modules
 
       - run:
           name: Build with codesigning

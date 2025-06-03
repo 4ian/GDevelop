@@ -47,9 +47,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies---
+            - gd-macos-nodejs-dependencies-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -70,7 +70,8 @@ jobs:
             - newIDE/electron-app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - GDJS/node_modules
+          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -119,9 +120,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies---
+            - gd-linux-nodejs-dependencies-
 
       # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
@@ -133,7 +134,8 @@ jobs:
             - newIDE/electron-app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - GDJS/node_modules
+          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
@@ -349,13 +351,13 @@ jobs:
       - restore_cache:
           name: Restore node_modules cache
           keys:
-            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
             - v1-win-node-
 
       - run:
           name: Install dependencies
-          no_output_timeout: 45m
-          # TODO: add exact GDevelop.js commit requirement.
+          no_output_timeout: 25m
+          # Remove package-lock.json because they seems to cause the npm install to be stuck. We should try again after re-generating them.
           # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
           # setuptools will make distutils available again (but we should migrate our packages probably).
           command: |
@@ -366,6 +368,8 @@ jobs:
             npm -v
 
             Remove-Item package-lock.json
+            
+            $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
 
             npm install
 
@@ -379,7 +383,7 @@ jobs:
 
       - save_cache:
           name: Save node_modules cache
-          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
           paths:
             - newIDE/app/node_modules
             - newIDE/electron-app/node_modules
@@ -439,7 +443,6 @@ jobs:
 
       - run:
           name: Install AWS CLI
-          shell: powershell.exe
           command: |
             # Install the CLI for the current user
             
@@ -456,13 +459,11 @@ jobs:
       # Upload artifacts (S3)
       - run:
           name: Deploy to S3 (specific commit)
-          shell: powershell.exe
           command: |
             aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/commit/$Env:CIRCLE_SHA1/"
 
       - run:
           name: Deploy to S3 (latest)
-          shell: powershell.exe
           command: |
             aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/latest/"
 
@@ -474,7 +475,7 @@ workflows:
   gdevelop_js-wasm-extra-checks:
     jobs:
       - build-gdevelop_js-debug-sanitizers-and-extra-checks:
-          # Extra checks are resource intensive so don't all run them.
+          # Extra checks are resource intensive so don't always run them.
           filters:
             branches:
               only:
@@ -502,9 +503,8 @@ workflows:
                 - master
                 - /experimental-build.*/
       - build-windows:
-          # TODO: activate this to build with the exact GDevelop.js version
-          # requires:
-          #   - build-gdevelop_js-wasm-only
+          requires:
+            - build-gdevelop_js-wasm-only
           filters:
             branches:
               only:

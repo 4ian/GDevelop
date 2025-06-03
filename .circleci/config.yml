@@ -277,8 +277,7 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/variant/debug-sanitizers/commit/$(git rev-parse HEAD)/
 
-  # Trigger AppVeyor build, which finishes building the Windows app
-  # (using GDevelop.js built in a previous step).
+  # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
     docker:
       - image: cimg/node:16.13
@@ -298,7 +297,7 @@ jobs:
   build-windows:
     executor:
       name: win/default
-      size: xlarge
+      size: large
     working_directory: /home/circleci/project
     steps:
       - checkout
@@ -397,7 +396,7 @@ jobs:
 
             # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
             # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
-            # TODO: try with "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe"
+            # or "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe".
 
             $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
 
@@ -480,16 +479,10 @@ workflows:
             branches:
               only:
                 - master
-                # TODO
-                # - /experimental-build.*/
+                - /experimental-build.*/
   builds:
     jobs:
       - build-gdevelop_js-wasm-only:
-          # TODO: remove filters
-          filters:
-            branches:
-              only:
-                - master
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).
@@ -499,8 +492,7 @@ workflows:
             branches:
               only:
                 - master
-                # TODO
-                # - /experimental-build.*/
+                - /experimental-build.*/
       - build-linux:
           requires:
             - build-gdevelop_js-wasm-only
@@ -508,8 +500,7 @@ workflows:
             branches:
               only:
                 - master
-                # TODO
-                # - /experimental-build.*/
+                - /experimental-build.*/
       - build-windows:
           # TODO: activate this to build with the exact GDevelop.js version
           # requires:

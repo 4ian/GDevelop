@@ -390,6 +390,7 @@ jobs:
           # Package the app for Windows (and sign it).
           # Don't sign the appx (it will be signed by the Microsoft Store).
           command: |
+            cd newIDE\electron-app
 
             $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
 

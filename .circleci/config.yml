@@ -438,6 +438,35 @@ jobs:
           command: |
             rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
+      - run:
+          name: Install AWS CLI
+          shell: powershell.exe
+          command: |
+            # Install the CLI for the current user
+            
+            pip install --quiet --upgrade --user awscli
+            
+            # Add the user-Scripts dir to PATH for this step and the next.
+            
+            $binDir = (python -m site --user-base) + "\Scripts"
+            $Env:Path += ";$binDir"
+
+            # Sanity check:
+            aws --version  
+
+      # Upload artifacts (S3)
+      - run:
+          name: Deploy to S3 (specific commit)
+          shell: powershell.exe
+          command: |
+            aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/commit/$Env:CIRCLE_SHA1/"
+
+      - run:
+          name: Deploy to S3 (latest)
+          shell: powershell.exe
+          command: |
+            aws s3 sync newIDE\electron-app\dist "s3://gdevelop-releases/$Env:CIRCLE_BRANCH/latest/"
+
       # Upload artifacts (CircleCI)
       - store_artifacts:
           path: newIDE/electron-app/dist

@@ -214,9 +214,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TextObjectNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TextObjectNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         str: this._str,
         o: this.opacity,
         cs: this._characterSize,
@@ -243,9 +245,10 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: TextObjectNetworkSyncData
+      networkSyncData: TextObjectNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
     ): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+      super.updateFromNetworkSyncData(networkSyncData, options);
       if (networkSyncData.str !== undefined) {
         this.setText(networkSyncData.str);
       }

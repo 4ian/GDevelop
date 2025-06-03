@@ -42,6 +42,16 @@ declare type ObjectData = {
 declare type GetNetworkSyncDataOptions = {
   playerNumber?: number;
   isHost?: boolean;
+  forceSyncEverything?: boolean;
+};
+
+declare type UpdateFromNetworkSyncDataOptions = {
+  clearMemory?: boolean;
+  syncSounds?: boolean;
+  syncTimers?: boolean;
+  syncTweens?: boolean;
+  keepControl?: boolean;
+  ignoreVariableOwnership?: boolean;
 };
 
 /** Object containing basic properties for all objects synchronizing over the network. */
@@ -52,6 +62,10 @@ declare type BasicObjectNetworkSyncData = {
   y: number;
   /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
+  /** The width of the instance */
+  w: number;
+  /** The height of the instance */
+  h: number;
   /** Z order of the instance */
   zo: number;
   /** The angle of the instance. */
@@ -66,6 +80,8 @@ declare type BasicObjectNetworkSyncData = {
   pfx: number;
   /** Permanent force on Y */
   pfy: number;
+  /* name :*/
+  n?: string;
 };
 
 /**
@@ -98,6 +114,7 @@ declare type ForceNetworkSyncData = {
 };
 
 declare type TimerNetworkSyncData = {
+  name?: string;
   time: float;
   paused: boolean;
 };
@@ -177,6 +194,8 @@ declare interface LayoutNetworkSyncData {
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  timeManager?: TimeManagerSyncData;
+  tweenManager?: gdjs.evtTools.tween.TweenManagerNetworkSyncData;
 }
 
 declare interface SceneStackSceneNetworkSyncData {
@@ -186,12 +205,36 @@ declare interface SceneStackSceneNetworkSyncData {
 
 declare type SceneStackNetworkSyncData = SceneStackSceneNetworkSyncData[];
 
+declare type SoundManagerSyncData = {
+  globalVolume: float;
+  cachedSpatialPosition: Record<integer, [number, number, number]>;
+  freeSounds: SoundSyncData[];
+  freeMusics: SoundSyncData[];
+  musics: SoundSyncData[];
+  sounds: SoundSyncData[];
+};
+
+declare type SoundSyncData = {
+  loop: boolean;
+  volume: float;
+  rate: float;
+  resourceName: string;
+  position: float;
+  channel?: float;
+};
+
+declare type LoadRequestOptions = {
+  loadStorageName: string;
+  loadVariable: gdjs.Variable | null;
+};
+
 declare interface GameNetworkSyncData {
   var?: VariableNetworkSyncData[];
   ss?: SceneStackNetworkSyncData;
   extVar?: {
     [extensionName: string]: VariableNetworkSyncData[];
   };
+  sm?: SoundManagerSyncData;
 }
 
 declare interface EventsFunctionsExtensionData {

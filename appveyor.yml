@@ -1,6 +1,8 @@
-# AppVeyor configuration to build GDevelop app running
+# Deprecated AppVeyor configuration to build GDevelop app running
 # on the Electron runtime (newIDE/electron-app) for Windows.
-# For macOS and Linux, see the config.yml file.
+#
+# This was replaced by build on CircleCI - but kept for redundancy/tests.
+# For Windows, macOS and Linux builds, see the config.yml file.
 
 version: 1.0.{build}
 pull_requests:
@@ -17,6 +19,7 @@ cache:
   - newIDE\app\node_modules -> newIDE\app\package-lock.json
   - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
   - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
+  - GDJS\node_modules -> GDJS\package-lock.json
 install:
   # Download and install SSL.com eSigner CKA.
   # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
@@ -90,9 +93,8 @@ build_script:
       echo Certificate: $CodeSigningCert
 
       # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
-      # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
 
-      $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+      $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x86\signtool.exe"
 
       # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
 
@@ -132,8 +134,9 @@ artifacts:
     name: GDevelopWindows
 
 # Upload artifacts (AWS) - configuration is stored on AppVeyor itself.
-deploy:
-  - provider: Environment
-    name: Amazon S3 releases
-  - provider: Environment
-    name: Amazon S3 latest releases
+# Disabled because done by CircleCI "build-windows" job.
+# deploy:
+#   - provider: Environment
+#     name: Amazon S3 releases
+#   - provider: Environment
+#     name: Amazon S3 latest releases

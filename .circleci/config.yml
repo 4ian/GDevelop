@@ -319,7 +319,7 @@ jobs:
 
             Remove-Item eSigner_CKA_1.0.3.zip
 
-            Move-Item -Destination "eSigner_CKA_1.0.3.exe" -Path "eSigner_CKA_1.0.3SSL.COM eSigner CKA_1.0.3.exe"
+            Move-Item -Destination "eSigner_CKA_1.0.3.exe" -Path "eSigner_CKA_*\*.exe"
       - run:
           name: Setup eSignerCKA in Silent Mode
           command: |

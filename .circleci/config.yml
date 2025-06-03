@@ -298,7 +298,7 @@ jobs:
   build-windows:
     executor:
       name: win/default
-      size: 2xlarge
+      size: xlarge
     working_directory: /home/circleci/project
     steps:
       - checkout
@@ -439,6 +439,11 @@ workflows:
   builds:
     jobs:
       - build-gdevelop_js-wasm-only
+          # TODO: remove filters
+          filters:
+            branches:
+              only:
+                - master
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).

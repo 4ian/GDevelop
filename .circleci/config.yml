@@ -355,6 +355,7 @@ jobs:
 
       - run:
           name: Install dependencies
+          no_output_timeout: 45m
           # TODO: add exact GDevelop.js commit requirement.
           # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
           # setuptools will make distutils available again (but we should migrate our packages probably).
@@ -365,9 +366,13 @@ jobs:
 
             npm -v
 
+            Remove-Item package-lock.json
+
             npm install
 
             cd ..\electron-app
+
+            Remove-Item package-lock.json
 
             npm install
 

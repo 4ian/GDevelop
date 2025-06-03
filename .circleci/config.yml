@@ -343,7 +343,7 @@ jobs:
           name: Select Certificate From Windows Store and Sign Sample File with SignTool
           command: |
 
-            $CodeSigningCert = Get-ChildItem Cert:CurrentUserMy -CodeSigningCert | Select-Object -First 1
+            $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
 
             echo Certificate: $CodeSigningCert
 
@@ -386,7 +386,7 @@ jobs:
           # Don't sign the appx (it will be signed by the Microsoft Store).
           command: |
 
-            $CodeSigningCert = Get-ChildItem Cert:CurrentUserMy -CodeSigningCert | Select-Object -First 1
+            $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
 
             echo Certificate: $CodeSigningCert
 

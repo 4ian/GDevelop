@@ -482,7 +482,7 @@ workflows:
                 - /experimental-build.*/
   builds:
     jobs:
-      - build-gdevelop_js-wasm-only:
+      - build-gdevelop_js-wasm-only
       - build-macos:
           # The macOS version builds by itself GDevelop.js
           # (so we verify we can build it on macOS).

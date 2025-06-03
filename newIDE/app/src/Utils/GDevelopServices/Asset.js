@@ -2,6 +2,7 @@
 import axios from 'axios';
 import {
   GDevelopAssetApi,
+  GDevelopAssetCdn,
   GDevelopPrivateAssetsStorage,
   GDevelopPrivateGameTemplatesStorage,
   GDevelopPublicAssetResourcesStorageBaseUrl,
@@ -345,7 +346,20 @@ export const listAllPublicAssets = async ({
     },
   });
 
-  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
+  const {
+    assetShortHeadersUrl,
+    filtersUrl,
+    assetPacksUrl,
+    assetCdn,
+  } = response.data;
+
+  // Overwrite the CDN from where public assets are served.
+  if (assetCdn.baseUrl) {
+    GDevelopAssetCdn.baseUrl['live'] =
+      assetCdn.baseUrl['live'] || GDevelopAssetCdn.baseUrl['live'];
+    GDevelopAssetCdn.baseUrl['staging'] =
+      assetCdn.baseUrl['staging'] || GDevelopAssetCdn.baseUrl['staging'];
+  }
 
   const responsesData = await Promise.all([
     client
@@ -387,16 +401,9 @@ export const getPublicAsset = async (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  const response = await client.get(`/asset/${assetShortHeader.id}`, {
-    params: {
-      environment,
-    },
-  });
-  if (!response.data.assetUrl) {
-    throw new Error('Unexpected response from the asset endpoint.');
-  }
-
-  const assetResponse = await client.get(response.data.assetUrl);
+  const assetResponse = await client.get(
+    `${GDevelopAssetCdn.baseUrl[environment]}/assets/${assetShortHeader.id}.json`
+  );
   return assetResponse.data;
 };
 

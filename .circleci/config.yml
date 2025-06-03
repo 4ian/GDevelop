@@ -348,10 +348,10 @@ jobs:
             echo Certificate: $CodeSigningCert
 
       - restore_cache:
-        name: Restore node_modules cache
-        keys:
-          - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
-          - v1-win-node-
+          name: Restore node_modules cache
+          keys:
+            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+            - v1-win-node-
 
       - run:
           name: Install dependencies
@@ -374,11 +374,11 @@ jobs:
             cd ..\..
 
       - save_cache:
-        name: Save node_modules cache
-        key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
-        paths:
-          - newIDE/app/node_modules
-          - newIDE/electron-app/node_modules
+          name: Save node_modules cache
+          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}
+          paths:
+            - newIDE/app/node_modules
+            - newIDE/electron-app/node_modules
 
       - run:
           name: Build with codesigning

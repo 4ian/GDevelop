@@ -9,6 +9,7 @@ import {
   type SubscriptionPlanPricingSystem,
 } from './GDevelopServices/Usage';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { useAsyncLazyMemo } from './UseLazyMemo';
 
 const mergeSubscriptionPlansWithPrices = (
   subscriptionPlans: SubscriptionPlan[],
@@ -35,7 +36,7 @@ const mergeSubscriptionPlansWithPrices = (
     .filter(Boolean);
 };
 
-export const getAvailableSubscriptionPlansWithPrices = (
+export const filterAvailableSubscriptionPlansWithPrices = (
   subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[]
 ): SubscriptionPlanWithPricingSystems[] => {
   const nonLegacyPlans = subscriptionPlansWithPricingSystems.filter(
@@ -61,10 +62,6 @@ type Props = {|
  * Hook to access subscription plans across the app.
  */
 const useSubscriptionPlans = ({ includeLegacy, authenticatedUser }: Props) => {
-  const [
-    subscriptionPlansWithPricingSystems,
-    setSubscriptionPlansWithPrices,
-  ] = React.useState<?(SubscriptionPlanWithPricingSystems[])>(null);
   const userId =
     authenticatedUser && authenticatedUser.profile
       ? authenticatedUser.profile.id
@@ -74,7 +71,12 @@ const useSubscriptionPlans = ({ includeLegacy, authenticatedUser }: Props) => {
     : null;
 
   const fetchSubscriptionPlansAndPrices = React.useCallback(
-    async () => {
+    async (): Promise<SubscriptionPlanWithPricingSystems[]> => {
+      console.info(
+        `Fetching subscription plans and pricing systems (includeLegacy=${
+          includeLegacy ? 'true' : 'false'
+        }, userId=${userId || 'null'})...`
+      );
       const results = await Promise.all([
         listSubscriptionPlans({
           includeLegacy,
@@ -87,21 +89,23 @@ const useSubscriptionPlans = ({ includeLegacy, authenticatedUser }: Props) => {
           userId,
         }),
       ]);
-      setSubscriptionPlansWithPrices(
-        mergeSubscriptionPlansWithPrices(results[0], results[1])
+      console.info(
+        `Subscription plans and pricing systems (includeLegacy=${
+          includeLegacy ? 'true' : 'false'
+        }, userId=${userId || 'null'}) fetched.`
       );
+      return mergeSubscriptionPlansWithPrices(results[0], results[1]);
     },
     [includeLegacy, getAuthorizationHeader, userId]
   );
 
-  React.useEffect(
-    () => {
-      fetchSubscriptionPlansAndPrices();
-    },
-    [fetchSubscriptionPlansAndPrices]
+  const getSubscriptionPlansWithPricingSystems = useAsyncLazyMemo(
+    fetchSubscriptionPlansAndPrices
   );
 
-  return { subscriptionPlansWithPricingSystems };
+  return {
+    getSubscriptionPlansWithPricingSystems,
+  };
 };
 
 export default useSubscriptionPlans;

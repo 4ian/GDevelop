@@ -24,14 +24,16 @@ import AlertMessage from '../../../UI/AlertMessage';
 
 type Props = {|
   onClose: Function,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  getAvailableSubscriptionPlansWithPrices: () =>
+    | SubscriptionPlanWithPricingSystems[]
+    | null,
   recommendedPlanId: string,
   onOpenPendingDialog: (open: boolean) => void,
 |};
 
 export default function PromotionSubscriptionDialog({
   onClose,
-  subscriptionPlansWithPricingSystems,
+  getAvailableSubscriptionPlansWithPrices,
   recommendedPlanId,
   onOpenPendingDialog,
 }: Props) {
@@ -78,6 +80,8 @@ export default function PromotionSubscriptionDialog({
       })
     );
   };
+
+  const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
 
   const purchasablePlansWithPricingSystems = React.useMemo(
     () =>

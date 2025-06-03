@@ -14,11 +14,12 @@ import {
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import useSubscriptionPlans, {
-  getAvailableSubscriptionPlansWithPrices,
+  filterAvailableSubscriptionPlansWithPrices,
 } from '../../Utils/UseSubscriptionPlans';
 import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
+import { useLazyMemo } from '../../Utils/UseLazyMemo';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
 
@@ -62,7 +63,7 @@ export const SubscriptionSuggestionProvider = ({
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
-  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
     authenticatedUser,
   });
@@ -101,46 +102,57 @@ export const SubscriptionSuggestionProvider = ({
     openSubscriptionDialog,
   ]);
 
-  const availableSubscriptionPlansWithPrices = React.useMemo(
-    () =>
-      subscriptionPlansWithPricingSystems
-        ? getAvailableSubscriptionPlansWithPrices(
-            subscriptionPlansWithPricingSystems
-          )
-        : null,
-    [subscriptionPlansWithPricingSystems]
+  const getAvailableSubscriptionPlansWithPrices = useLazyMemo(
+    React.useCallback(
+      () => {
+        const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+
+        return subscriptionPlansWithPricingSystems
+          ? filterAvailableSubscriptionPlansWithPrices(
+              subscriptionPlansWithPricingSystems
+            )
+          : null;
+      },
+      [getSubscriptionPlansWithPricingSystems]
+    )
   );
 
-  const userLegacySubscriptionPlanWithPricingSystem = React.useMemo(
-    () => {
-      if (
-        !authenticatedUser.subscription ||
-        !authenticatedUser.subscription.planId ||
-        !authenticatedUser.subscription.pricingSystemId ||
-        !subscriptionPlansWithPricingSystems
-      ) {
-        return null;
-      }
-      const {
-        planId: userPlanId,
-        pricingSystemId: userPricingSystemId,
-      } = authenticatedUser.subscription;
-      const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
-        planWithPricingSystems => planWithPricingSystems.id === userPlanId
-      );
-      if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
-        return null;
-      }
-      const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
-        pricingSystem => pricingSystem.id === userPricingSystemId
-      );
-      if (!userPricingSystem) return null;
-      return {
-        ...userPlanWithPricingSystems,
-        pricingSystems: [userPricingSystem],
-      };
-    },
-    [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+  const getUserLegacySubscriptionPlanWithPricingSystem = useLazyMemo(
+    React.useCallback(
+      () => {
+        const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+        if (
+          !authenticatedUser.subscription ||
+          !authenticatedUser.subscription.planId ||
+          !authenticatedUser.subscription.pricingSystemId ||
+          !subscriptionPlansWithPricingSystems
+        ) {
+          return null;
+        }
+        const {
+          planId: userPlanId,
+          pricingSystemId: userPricingSystemId,
+        } = authenticatedUser.subscription;
+        const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
+          planWithPricingSystems => planWithPricingSystems.id === userPlanId
+        );
+        if (
+          !userPlanWithPricingSystems ||
+          !userPlanWithPricingSystems.isLegacy
+        ) {
+          return null;
+        }
+        const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
+          pricingSystem => pricingSystem.id === userPricingSystemId
+        );
+        if (!userPricingSystem) return null;
+        return {
+          ...userPlanWithPricingSystems,
+          pricingSystems: [userPricingSystem],
+        };
+      },
+      [getSubscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+    )
   );
 
   // When the analyticsMetadata is set, a dialog is shown so we can send an event.
@@ -172,8 +184,8 @@ export const SubscriptionSuggestionProvider = ({
         ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
           analyticsMetadata.recommendedPlanId ? (
           <PromotionSubscriptionDialog
-            subscriptionPlansWithPricingSystems={
-              availableSubscriptionPlansWithPrices
+            getAvailableSubscriptionPlansWithPrices={
+              getAvailableSubscriptionPlansWithPrices
             }
             onClose={closeSubscriptionDialog}
             recommendedPlanId={analyticsMetadata.recommendedPlanId}
@@ -183,11 +195,11 @@ export const SubscriptionSuggestionProvider = ({
           />
         ) : (
           <SubscriptionDialog
-            subscriptionPlansWithPricingSystems={
-              availableSubscriptionPlansWithPrices
+            getAvailableSubscriptionPlansWithPrices={
+              getAvailableSubscriptionPlansWithPrices
             }
-            userLegacySubscriptionPlanWithPricingSystem={
-              userLegacySubscriptionPlanWithPricingSystem
+            getUserLegacySubscriptionPlanWithPricingSystem={
+              getUserLegacySubscriptionPlanWithPricingSystem
             }
             onClose={closeSubscriptionDialog}
             filter={filter}

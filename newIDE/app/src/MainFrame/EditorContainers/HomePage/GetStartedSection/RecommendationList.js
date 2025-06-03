@@ -8,7 +8,6 @@ import { makeStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
-import { type Subscription } from '../../../../Utils/GDevelopServices/Usage';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import { SectionRow } from '../SectionContainer';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
@@ -21,16 +20,11 @@ import {
 import Text from '../../../../UI/Text';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
 import Window from '../../../../Utils/Window';
 import { ColumnStackLayout } from '../../../../UI/Layout';
-import {
-  type GuidedLessonsRecommendation,
-  type PlanRecommendation,
-} from '../../../../Utils/GDevelopServices/User';
+import { type GuidedLessonsRecommendation } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
-import PlanRecommendationRow from './PlanRecommendationRow';
 import { SurveyCard } from './SurveyCard';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
@@ -109,26 +103,6 @@ const getTutorialsLimitsFromWidth = (
   }
 };
 
-const isPlanRecommendationRelevant = (
-  subscription: Subscription,
-  planRecommendation: PlanRecommendation
-): boolean => {
-  // Don't recommend plans to holders of education plan.
-  if (subscription.planId === 'gdevelop_education') return false;
-
-  const relevantPlans =
-    subscription.planId === 'gdevelop_silver' ||
-    subscription.planId === 'gdevelop_indie'
-      ? ['gold', 'startup', 'business', 'education']
-      : subscription.planId === 'gdevelop_gold' ||
-        subscription.planId === 'gdevelop_pro'
-      ? ['startup', 'business', 'education']
-      : subscription.planId === 'gdevelop_startup'
-      ? ['business']
-      : [];
-  return relevantPlans.includes(planRecommendation.id);
-};
-
 type TextTutorialsRowProps = {|
   tutorials: Array<Tutorial>,
   i18n: I18nType,
@@ -186,7 +160,6 @@ const TextTutorialsRow = ({ tutorials, i18n }: TextTutorialsRowProps) => {
 type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onStartSurvey: null | (() => void),
   hasFilledSurveyAlready: boolean,
   onOpenProfile: () => void,
@@ -202,14 +175,13 @@ type Props = {|
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
-  subscriptionPlansWithPricingSystems,
   onStartSurvey,
   hasFilledSurveyAlready,
   onOpenProfile,
   onCreateProjectFromExample,
   askToCloseProject,
 }: Props) => {
-  const { recommendations, subscription, limits } = authenticatedUser;
+  const { recommendations, limits } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const {
     getTutorialProgress,
@@ -250,11 +222,6 @@ const RecommendationList = ({
   const guidedLessonsIds = guidedLessonsRecommendation
     ? guidedLessonsRecommendation.lessonsIds
     : null;
-
-  // $FlowIgnore
-  const planRecommendation: ?PlanRecommendation = recommendations.find(
-    recommendation => recommendation.type === 'plan'
-  );
 
   const getInAppTutorialPartProgress = ({
     tutorialId,
@@ -372,32 +339,6 @@ const RecommendationList = ({
               />
             </SectionRow>
           );
-        }
-        if (planRecommendation) {
-          const shouldDisplayPlanRecommendation =
-            limits &&
-            !(
-              limits.capabilities.classrooms &&
-              limits.capabilities.classrooms.hideUpgradeNotice
-            ) &&
-            (!subscription ||
-              isPlanRecommendationRelevant(subscription, planRecommendation));
-          if (
-            shouldDisplayPlanRecommendation &&
-            subscriptionPlansWithPricingSystems
-          ) {
-            items.push(
-              <SectionRow key="plan">
-                <PlanRecommendationRow
-                  recommendationPlanId={planRecommendation.id}
-                  subscriptionPlansWithPricingSystems={
-                    subscriptionPlansWithPricingSystems
-                  }
-                  i18n={i18n}
-                />
-              </SectionRow>
-            );
-          }
         }
 
         return (

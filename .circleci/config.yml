@@ -297,7 +297,7 @@ jobs:
   build-windows:
     executor:
       name: win/default
-      size: large
+      size: medium
     working_directory: /home/circleci/project
     steps:
       - checkout

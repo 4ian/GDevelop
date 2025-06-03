@@ -435,10 +435,11 @@ workflows:
             branches:
               only:
                 - master
-                - /experimental-build.*/
+                # TODO
+                # - /experimental-build.*/
   builds:
     jobs:
-      - build-gdevelop_js-wasm-only
+      - build-gdevelop_js-wasm-only:
           # TODO: remove filters
           filters:
             branches:

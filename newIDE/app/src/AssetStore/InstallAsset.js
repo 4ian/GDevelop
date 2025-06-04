@@ -4,7 +4,6 @@ import {
   isPixelArt,
   isPublicAssetResourceUrl,
   extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
-  isCompatibleWithGDevelopVersion,
 } from '../Utils/GDevelopServices/Asset';
 import { getIDEVersion } from '../Version';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -15,6 +14,8 @@ import uniq from 'lodash/uniq';
 import {
   getExtensionsRegistry,
   getExtension,
+  isCompatibleWithGDevelopVersion,
+  getBreakingChanges,
   type SerializedExtension,
   type ExtensionShortHeader,
 } from '../Utils/GDevelopServices/Extension';
@@ -391,6 +392,7 @@ export type RequiredExtensionInstallation = {|
   requiredExtensionShortHeaders: Array<ExtensionShortHeader>,
   missingExtensionShortHeaders: Array<ExtensionShortHeader>,
   outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
+  breakingChangesExtensionShortHeaders: Array<ExtensionShortHeader>,
   incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader>,
 |};
 
@@ -509,6 +511,7 @@ export const checkRequiredExtensionsUpdate = async ({
       requiredExtensionShortHeaders: [],
       missingExtensionShortHeaders: [],
       outOfDateExtensionShortHeaders: [],
+      breakingChangesExtensionShortHeaders: [],
       incompatibleWithIdeExtensionShortHeaders: [],
     };
   }
@@ -534,24 +537,15 @@ export const checkRequiredExtensionsUpdate = async ({
     }
   );
 
-  const compatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader> = [];
-  const incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader> = [];
-  for (const requiredExtensionShortHeader of requiredExtensionShortHeaders) {
-    if (
-      isCompatibleWithGDevelopVersion(
+  const incompatibleWithIdeExtensionShortHeaders = requiredExtensionShortHeaders.filter(
+    requiredExtensionShortHeader =>
+      !isCompatibleWithGDevelopVersion(
         getIDEVersion(),
         requiredExtensionShortHeader.gdevelopVersion
       )
-    ) {
-      compatibleWithIdeExtensionShortHeaders.push(requiredExtensionShortHeader);
-    } else {
-      incompatibleWithIdeExtensionShortHeaders.push(
-        requiredExtensionShortHeader
-      );
-    }
-  }
+  );
 
-  const outOfDateExtensionShortHeaders = compatibleWithIdeExtensionShortHeaders.filter(
+  const outOfDateExtensionShortHeaders = requiredExtensionShortHeaders.filter(
     requiredExtensionShortHeader =>
       project.hasEventsFunctionsExtensionNamed(
         requiredExtensionShortHeader.name
@@ -561,15 +555,29 @@ export const checkRequiredExtensionsUpdate = async ({
         .getVersion() !== requiredExtensionShortHeader.version
   );
 
+  const breakingChangesExtensionShortHeaders = outOfDateExtensionShortHeaders.filter(
+    requiredExtensionShortHeader =>
+      project.hasEventsFunctionsExtensionNamed(
+        requiredExtensionShortHeader.name
+      ) &&
+      getBreakingChanges(
+        project
+          .getEventsFunctionsExtension(requiredExtensionShortHeader.name)
+          .getVersion(),
+        requiredExtensionShortHeader
+      )
+  );
+
   const missingExtensionShortHeaders = filterMissingExtensions(
     gd,
-    compatibleWithIdeExtensionShortHeaders
+    requiredExtensionShortHeaders
   );
 
   return {
     requiredExtensionShortHeaders,
     missingExtensionShortHeaders,
     outOfDateExtensionShortHeaders,
+    breakingChangesExtensionShortHeaders,
     incompatibleWithIdeExtensionShortHeaders,
   };
 };

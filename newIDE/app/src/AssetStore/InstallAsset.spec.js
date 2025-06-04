@@ -423,6 +423,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [flashExtensionShortHeader],
         missingExtensionShortHeaders: [flashExtensionShortHeader],
         outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
@@ -457,6 +458,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
@@ -491,6 +493,7 @@ describe('InstallAsset', () => {
         requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
         missingExtensionShortHeaders: [],
         outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
       });
     });
@@ -654,6 +657,7 @@ describe('InstallAsset', () => {
               },
             ],
             outOfDateExtensionShortHeaders: [],
+          breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
@@ -686,6 +690,7 @@ describe('InstallAsset', () => {
             requiredExtensionShortHeaders: [flashExtensionShortHeader],
             missingExtensionShortHeaders: [flashExtensionShortHeader],
             outOfDateExtensionShortHeaders: [],
+          breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
@@ -723,6 +728,7 @@ describe('InstallAsset', () => {
           ],
           missingExtensionShortHeaders: [],
           outOfDateExtensionShortHeaders: [],
+          breakingChangesExtensionShortHeaders: [],
           incompatibleWithIdeExtensionShortHeaders: [],
         },
         shouldUpdateExtension: true,

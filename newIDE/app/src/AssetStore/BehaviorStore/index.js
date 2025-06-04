@@ -2,7 +2,10 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
+import { type BehaviorShortHeader,
+  isCompatibleWithGDevelopVersion,
+  getBreakingChanges,
+ } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
@@ -22,10 +25,14 @@ import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
+import { getIDEVersion } from '../../Version';
 
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
-  return async (): Promise<boolean> => {
+  return async (
+    project: gdProject,
+    behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+  ): Promise<boolean> => {
     return await showConfirmation({
       title: t`Extension update`,
       message: t`This behavior needs an extension update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
@@ -147,7 +154,29 @@ export const BehaviorStore = ({
           behaviorShortHeader.extensionName
         );
       if (isExtensionAlreadyInstalled) {
-        const shouldUpdateExtension = await showExtensionUpdateConfirmation();
+        if (
+          !isCompatibleWithGDevelopVersion(
+            getIDEVersion(),
+            behaviorShortHeader.gdevelopVersion
+          )
+        ) {
+          // Don't suggest to update the extension if the editor can't understand it.
+          return;
+        }
+        const breakingChanges = getBreakingChanges(
+          project
+            .getEventsFunctionsExtension(behaviorShortHeader.extensionName)
+            .getVersion(),
+          behaviorShortHeader
+        );
+        if (breakingChanges) {
+          // Don't suggest to update the extension if it would break the project.
+          return;
+        }
+        const shouldUpdateExtension = await showExtensionUpdateConfirmation(
+          project,
+          behaviorShortHeader
+        );
         if (!shouldUpdateExtension) {
           return;
         }

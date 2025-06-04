@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
+import { gt } from 'semver/functions/gt';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
 
@@ -23,6 +24,7 @@ export type ExtensionRegistryItemHeader = {|
   tags: Array<string>,
   category: string,
   previewIconUrl: string,
+  changelog?: {[key: string]: {breaking?: string}}
 |};
 
 export type EventsFunctionInsideExtensionShortHeader = {
@@ -287,4 +289,32 @@ export const getUserExtensionShortHeaders = async (
   );
 
   return response.data;
+};
+
+
+/**
+ * Check if the IDE version, passed as argument, satisfy the version required by the asset.
+ */
+export const isCompatibleWithGDevelopVersion = (
+  ideVersion: string,
+  requiredGDevelopVersion: ?string
+) =>
+  requiredGDevelopVersion
+    ? semverSatisfies(ideVersion, requiredGDevelopVersion, {
+        includePrerelease: true,
+      })
+    : true;
+
+export const getBreakingChanges = (
+  installedVersion: string,
+  extension: ExtensionShortHeader | BehaviorShortHeader
+): Array<{ version: string, changes: Array<string> }> => {
+  const breakingChanges = [];
+  for (const version in extension.changelog) {
+    const changes = extension.changelog[version];
+    if (gt(version, installedVersion)) {
+      breakingChanges.push.apply({ version, changes: changes.breaking });
+    }
+  }
+  return breakingChanges;
 };

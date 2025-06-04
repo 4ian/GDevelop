@@ -28,7 +28,8 @@ import {
   getPublicAsset,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader,
+  getBreakingChanges } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -47,21 +48,73 @@ import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 const isDev = Window.isDev();
 
+
+export const formatBreakingChanges = (
+  breakingChanges: Map<ExtensionShortHeader, string>
+): string => {
+  let formattedChanges = '';
+  for (const [extension, breakingChangesString] of breakingChanges) {
+    formattedChanges += ' - ' + extension.fullName + '\n';
+    formattedChanges += breakingChangesString.replace(/'\n'/g, '\n  ');
+  }
+  return formattedChanges;
+};
+
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
-  return async (
-    outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>
-  ): Promise<boolean> => {
-    return await showConfirmation({
-      title: t`Extension update`,
-      message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
-        outOfDateExtensionShortHeaders
-          .map(extension => extension.fullName)
-          .join('\n\n - ') +
-        '\n\n'}Do you want to update it now ?`,
-      confirmButtonLabel: t`Update the extension`,
-      dismissButtonLabel: t`Skip the update`,
-    });
+  return async ({
+    project,
+    outOfDateExtensionShortHeaders,
+  }: {|
+    project: gdProject,
+    outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
+  |}): Promise<string> => {
+    const breakingChanges = new Map<ExtensionShortHeader, string>();
+    for (const extension of outOfDateExtensionShortHeaders) {
+      const installedVersion = project
+        .getEventsFunctionsExtension(extension.name)
+        .getVersion();
+      const extensionBreakingChanges = getBreakingChanges(
+        installedVersion,
+        extension
+      ).join('\n');
+      if (extensionBreakingChanges) {
+        breakingChanges.set(extension, extensionBreakingChanges);
+      }
+    }
+    const notBreakingExtensions = outOfDateExtensionShortHeaders.filter(
+      extension => breakingChanges.has(extension)
+    );
+    if (breakingChanges) {
+      return (await showConfirmation({
+        title: t`Extension update`,
+        message: t`This asset required extensions update with breaking changes ${'\n\n' +
+          formatBreakingChanges(breakingChanges) +
+          '\n' +
+          notBreakingExtensions
+            .map(extension => extension.fullName)
+            .join('\n - ') +
+          '\n\n'}Do you want to update them now ?`,
+        confirmButtonLabel: t`Update the extension`,
+        dismissButtonLabel: t`Abort`,
+      }))
+        ? 'update'
+        // Avoid to install assets which wouldn't work with the installed version.
+        : 'abort';
+    } else {
+      return (await showConfirmation({
+        title: t`Extension update`,
+        message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
+          notBreakingExtensions
+            .map(extension => extension.fullName)
+            .join('\n - ') +
+          '\n\n'}Do you want to update them now ?`,
+        confirmButtonLabel: t`Update the extension`,
+        dismissButtonLabel: t`Skip the update`,
+      }))
+        ? 'update'
+        : 'skip';
+    }
   };
 };
 
@@ -166,21 +219,27 @@ export const useInstallAsset = ({
         requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders
           .length > 0
       ) {
+        // Even if the asset may work with already installed extensions,
+        // we don't risk it since the asset may use the features of the extension.
         showAlert({
           title: t`Could not install the asset`,
           message: t`Please upgrade the editor to the latest version.`,
         });
         return null;
       }
-      const shouldUpdateExtension =
-        requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-          0 &&
-        (await showExtensionUpdateConfirmation(
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders
-        ));
+      const extensionUpdateAction =
+        requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
+          0 ? 'skip' :
+        (await showExtensionUpdateConfirmation({
+          project,
+          outOfDateExtensionShortHeaders: requiredExtensionInstallation.outOfDateExtensionShortHeaders
+      }));
+      if (extensionUpdateAction === 'abort') {
+        return null;
+      }
       await installRequiredExtensions({
         requiredExtensionInstallation,
-        shouldUpdateExtension,
+        shouldUpdateExtension: extensionUpdateAction === 'update',
         eventsFunctionsExtensionsState,
         project,
       });
@@ -347,24 +406,33 @@ function NewObjectDialog({
           }
         );
         if (
-          requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders
-            .length > 0
+          requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.some(extension => 
+            requiredExtensionInstallation.missingExtensionShortHeaders.includes(extension))
         ) {
           showAlert({
-            title: t`Could not install the asset`,
+            title: t`Could not install required extensions`,
             message: t`Please upgrade the editor to the latest version.`,
           });
           return;
         }
-        const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-            0 &&
-          (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensionShortHeaders
-          ));
+        // Users must be able to create an object from scratch without being
+        // forced to update extensions that may break their projects.
+        const safeToUpdateExtensions = requiredExtensionInstallation.outOfDateExtensionShortHeaders.filter(extension =>
+          !requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.includes(extension) &&
+          !requiredExtensionInstallation.breakingChangesExtensionShortHeaders.includes(extension));
+        const extensionUpdateAction =
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
+            0 ? 'skip' :
+          (await showExtensionUpdateConfirmation({
+            project,
+            outOfDateExtensionShortHeaders: safeToUpdateExtensions,
+          })) === 'update';
+        if (extensionUpdateAction === 'abort') {
+          return;
+        }
         await installRequiredExtensions({
           requiredExtensionInstallation,
-          shouldUpdateExtension,
+          shouldUpdateExtension: extensionUpdateAction === 'update',
           eventsFunctionsExtensionsState,
           project,
         });

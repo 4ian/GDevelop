@@ -265,6 +265,8 @@ namespace gdjs {
 
       // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
+      threeObject.castShadow = true;
+      threeObject.receiveShadow = true;
       threeObject.rotation.order = 'ZYX';
       const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
       threeObject.add(root);

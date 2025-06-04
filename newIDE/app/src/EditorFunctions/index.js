@@ -186,6 +186,36 @@ const serializeNamedProperty = (
   };
 };
 
+const findPropertyByName = ({
+  properties,
+  name,
+}: {|
+  properties: gdMapStringPropertyDescriptor | null,
+  name: string,
+|}): {|
+  foundProperty: gdPropertyDescriptor | null,
+  foundPropertyName: string | null,
+|} => {
+  if (!properties)
+    return {
+      foundProperty: null,
+      foundPropertyName: null,
+    };
+
+  const propertyNames = properties.keys().toJSArray();
+  const foundPropertyName =
+    propertyNames.find(
+      propertyName => propertyName.toLowerCase() === name.toLowerCase()
+    ) || null;
+  const foundProperty = foundPropertyName
+    ? properties.get(foundPropertyName)
+    : null;
+  return {
+    foundProperty,
+    foundPropertyName,
+  };
+};
+
 const makeShortTextForNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
@@ -509,11 +539,12 @@ const changeObjectProperty: EditorFunction = {
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
-    if (!objectProperties.has(property_name)) {
-      return makeText(property_name);
-    }
+    const { foundProperty } = findPropertyByName({
+      properties: objectProperties,
+      name: property_name,
+    });
 
-    return makeText(objectProperties.get(property_name).getLabel());
+    return makeText(foundProperty ? foundProperty.getLabel() : property_name);
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -538,20 +569,25 @@ const changeObjectProperty: EditorFunction = {
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
-    if (!objectProperties.has(property_name)) {
+    const { foundPropertyName } = findPropertyByName({
+      properties: objectProperties,
+      name: property_name,
+    });
+
+    if (!foundPropertyName) {
       return makeGenericFailure(
         `Property not found: ${property_name} on object ${object_name}.`
       );
     }
 
-    if (!objectConfiguration.updateProperty(property_name, new_value)) {
+    if (!objectConfiguration.updateProperty(foundPropertyName, new_value)) {
       return makeGenericFailure(
-        `Could not change property "${property_name}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
+        `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
       );
     }
 
     return makeGenericSuccess(
-      `Changed property "${property_name}" of object "${object_name}" to "${new_value}".`
+      `Changed property "${foundPropertyName}" of object "${object_name}" to "${new_value}".`
     );
   },
 };
@@ -926,22 +962,27 @@ const changeBehaviorProperty: EditorFunction = {
       .getAllBehaviorSharedDataNames()
       .toJSArray();
 
-    let behaviorSharedData = null;
     let behaviorSharedDataProperties = null;
     if (allBehaviorSharedDataNames.includes(behavior_name)) {
-      behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
+      const behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    if (behaviorProperties.has(property_name)) {
-      return makeText(behaviorProperties.get(property_name).getLabel());
-    } else if (
-      behaviorSharedData &&
-      behaviorSharedDataProperties &&
-      behaviorSharedDataProperties.has(property_name)
-    ) {
+    const behaviorPropertySearch = findPropertyByName({
+      properties: behaviorProperties,
+      name: property_name,
+    });
+
+    const behaviorSharedDataPropertySearch = findPropertyByName({
+      properties: behaviorSharedDataProperties,
+      name: property_name,
+    });
+
+    if (behaviorPropertySearch.foundProperty) {
+      return makeText(behaviorPropertySearch.foundProperty.getLabel());
+    } else if (behaviorSharedDataPropertySearch.foundProperty) {
       return makeText(
-        behaviorSharedDataProperties.get(property_name).getLabel()
+        behaviorSharedDataPropertySearch.foundProperty.getLabel()
       );
     } else {
       return makeText(property_name);
@@ -989,29 +1030,40 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    if (behaviorProperties.has(property_name)) {
-      if (!behavior.updateProperty(property_name, new_value)) {
+    const behaviorPropertySearch = findPropertyByName({
+      properties: behaviorProperties,
+      name: property_name,
+    });
+
+    const behaviorSharedDataPropertySearch = findPropertyByName({
+      properties: behaviorSharedDataProperties,
+      name: property_name,
+    });
+
+    if (behaviorPropertySearch.foundPropertyName) {
+      const { foundPropertyName } = behaviorPropertySearch;
+      if (!behavior.updateProperty(foundPropertyName, new_value)) {
         return makeGenericFailure(
-          `Could not change property "${property_name}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
         );
       }
 
       return makeGenericSuccess(
-        `Changed property "${property_name}" of behavior "${behavior_name}" to "${new_value}".`
+        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${new_value}".`
       );
     } else if (
       behaviorSharedData &&
-      behaviorSharedDataProperties &&
-      behaviorSharedDataProperties.has(property_name)
+      behaviorSharedDataPropertySearch.foundPropertyName
     ) {
-      if (!behaviorSharedData.updateProperty(property_name, new_value)) {
+      const { foundPropertyName } = behaviorSharedDataPropertySearch;
+      if (!behaviorSharedData.updateProperty(foundPropertyName, new_value)) {
         return makeGenericFailure(
-          `Could not change shared property "${property_name}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
+          `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
         );
       }
 
       return makeGenericSuccess(
-        `Changed property "${property_name}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${new_value}".`
+        `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${new_value}".`
       );
     } else {
       return makeGenericFailure(

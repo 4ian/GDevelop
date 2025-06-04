@@ -153,9 +153,19 @@ const generateExtensionHeaderText = ({ extension, depth }) => {
         depth,
       }).text +
       `
-${extension.getDescription()} ${generateReadMoreLink(extension.getHelpPath())}
+${extension.getDescription()} ${generateReadMoreLink(
+        extension.getHelpPath()
+      )} \n\n ${generateBuiltInExtensionNote({
+        extension: extension.getFullName(),
+      })}
 `,
   };
+};
+
+/** @returns {String} */
+const generateBuiltInExtensionNote = ({ extension }) => {
+  return `!!! note
+            The ${extension} extension is always installed in all GDevelop projects: there is no need to add it from the Project Manager.\n\n`;
 };
 
 /** @returns {RawText} */

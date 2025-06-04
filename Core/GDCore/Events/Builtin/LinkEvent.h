@@ -109,6 +109,10 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
 
   virtual bool IsExecutable() const override { return true; };
 
+  virtual std::vector<gd::String> GetAllSearchableStrings() const override;
+  virtual bool ReplaceAllSearchableStrings(
+      std::vector<gd::String> newSearchableString) override;
+
   virtual void SerializeTo(SerializerElement& element) const override;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element) override;

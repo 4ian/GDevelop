@@ -167,7 +167,7 @@ const generateBuiltInExtensionNote = ({ extension }) => {
 const generateExtensionFooterText = ({ extension }) => {
   return {
     text:
-      `---\n\n` +
+      `\n\n---\n\n` +
       generateBuiltInExtensionNote({ extension }) +
       `*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
       ' ' +

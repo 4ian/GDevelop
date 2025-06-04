@@ -28,7 +28,6 @@ import {
   type ExtensionShortHeader,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
-//import { useFetchAssets } from './NewObjectDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -425,6 +424,8 @@ describe('InstallAsset', () => {
         outOfDateExtensionShortHeaders: [],
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
       });
     });
 
@@ -460,6 +461,8 @@ describe('InstallAsset', () => {
         outOfDateExtensionShortHeaders: [],
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
       });
     });
 
@@ -495,6 +498,8 @@ describe('InstallAsset', () => {
         outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
         breakingChangesExtensionShortHeaders: [],
         incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        isGDevelopUpdateNeeded: false,
       });
     });
 
@@ -657,8 +662,10 @@ describe('InstallAsset', () => {
               },
             ],
             outOfDateExtensionShortHeaders: [],
-          breakingChangesExtensionShortHeaders: [],
+            breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
+            safeToUpdateExtensions: [],
+            isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -690,8 +697,10 @@ describe('InstallAsset', () => {
             requiredExtensionShortHeaders: [flashExtensionShortHeader],
             missingExtensionShortHeaders: [flashExtensionShortHeader],
             outOfDateExtensionShortHeaders: [],
-          breakingChangesExtensionShortHeaders: [],
+            breakingChangesExtensionShortHeaders: [],
             incompatibleWithIdeExtensionShortHeaders: [],
+            safeToUpdateExtensions: [],
+            isGDevelopUpdateNeeded: false,
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -730,6 +739,8 @@ describe('InstallAsset', () => {
           outOfDateExtensionShortHeaders: [],
           breakingChangesExtensionShortHeaders: [],
           incompatibleWithIdeExtensionShortHeaders: [],
+          safeToUpdateExtensions: [],
+          isGDevelopUpdateNeeded: false,
         },
         shouldUpdateExtension: true,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,

@@ -14,8 +14,6 @@ import uniq from 'lodash/uniq';
 import {
   getExtensionsRegistry,
   getExtension,
-  isCompatibleWithGDevelopVersion,
-  getBreakingChanges,
   type SerializedExtension,
   type ExtensionShortHeader,
 } from '../Utils/GDevelopServices/Extension';
@@ -24,6 +22,7 @@ import { mapVector } from '../Utils/MapFor';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
+import { getBreakingChanges, isCompatibleWithGDevelopVersion } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 
 const gd: libGDevelop = global.gd;
 
@@ -394,6 +393,8 @@ export type RequiredExtensionInstallation = {|
   outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
   breakingChangesExtensionShortHeaders: Array<ExtensionShortHeader>,
   incompatibleWithIdeExtensionShortHeaders: Array<ExtensionShortHeader>,
+  safeToUpdateExtensions: Array<ExtensionShortHeader>,
+  isGDevelopUpdateNeeded: boolean,
 |};
 
 export type InstallRequiredExtensionsArgs = {|
@@ -513,6 +514,8 @@ export const checkRequiredExtensionsUpdate = async ({
       outOfDateExtensionShortHeaders: [],
       breakingChangesExtensionShortHeaders: [],
       incompatibleWithIdeExtensionShortHeaders: [],
+      safeToUpdateExtensions: [],
+      isGDevelopUpdateNeeded: false,
     };
   }
 
@@ -538,7 +541,7 @@ export const checkRequiredExtensionsUpdate = async ({
   );
 
   const incompatibleWithIdeExtensionShortHeaders = requiredExtensionShortHeaders.filter(
-    requiredExtensionShortHeader =>
+    requiredExtensionShortHeader => 
       !isCompatibleWithGDevelopVersion(
         getIDEVersion(),
         requiredExtensionShortHeader.gdevelopVersion
@@ -565,7 +568,7 @@ export const checkRequiredExtensionsUpdate = async ({
           .getEventsFunctionsExtension(requiredExtensionShortHeader.name)
           .getVersion(),
         requiredExtensionShortHeader
-      )
+      ).length > 0
   );
 
   const missingExtensionShortHeaders = filterMissingExtensions(
@@ -573,12 +576,22 @@ export const checkRequiredExtensionsUpdate = async ({
     requiredExtensionShortHeaders
   );
 
+  const safeToUpdateExtensions = outOfDateExtensionShortHeaders.filter(extension =>
+    !incompatibleWithIdeExtensionShortHeaders.includes(extension) &&
+    !breakingChangesExtensionShortHeaders.includes(extension));
+
+  // Overridden by `checkRequiredExtensionsUpdateForAssets`
+  const isGDevelopUpdateNeeded = incompatibleWithIdeExtensionShortHeaders.some(extension => 
+    missingExtensionShortHeaders.includes(extension));
+
   return {
     requiredExtensionShortHeaders,
     missingExtensionShortHeaders,
     outOfDateExtensionShortHeaders,
     breakingChangesExtensionShortHeaders,
     incompatibleWithIdeExtensionShortHeaders,
+    safeToUpdateExtensions,
+    isGDevelopUpdateNeeded,
   };
 };
 
@@ -606,7 +619,13 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
     });
   });
 
-  return checkRequiredExtensionsUpdate({ requiredExtensions, project });
+  const requiredExtensionsUpdate = await checkRequiredExtensionsUpdate({ requiredExtensions, project });
+  // Even if the asset may work with already installed extensions,
+  // we don't risk it since the asset may use the new features of the extension.
+  requiredExtensionsUpdate.isGDevelopUpdateNeeded =
+    requiredExtensionsUpdate.isGDevelopUpdateNeeded ||
+    requiredExtensionsUpdate.incompatibleWithIdeExtensionShortHeaders.length > 0;
+  return requiredExtensionsUpdate;
 };
 
 export const complyVariantsToEventsBasedObjectOf = (

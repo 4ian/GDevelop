@@ -11,7 +11,6 @@ import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
-import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
@@ -90,7 +89,7 @@ export default function NewBehaviorDialog({
     [project]
   );
 
-  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const allInstalledBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
       const behaviorMetadataList =
@@ -115,12 +114,22 @@ export default function NewBehaviorDialog({
             behavior.behaviorMetadata
           ),
           tags: behavior.tags,
+
+          tier: 'installed',
+          // Not relevent for `installed` extensions
+          version: '',
+          url: '',
+          name: '',
+          headerUrl: '',
+          extensionNamespace: '',
+          extensionName: '',
+          authorIds: [], 
         }));
     },
     [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
   );
 
-  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const installedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () =>
       allInstalledBehaviorMetadataList.filter(
         behavior => !deprecatedBehaviorsInformation[behavior.type]
@@ -128,7 +137,7 @@ export default function NewBehaviorDialog({
     [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
   );
 
-  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const deprecatedBehaviorMetadataList: Array<BehaviorShortHeader> = React.useMemo(
     () => {
       const deprecatedBehaviors = allInstalledBehaviorMetadataList.filter(
         behavior => deprecatedBehaviorsInformation[behavior.type]

@@ -2,9 +2,8 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import { type BehaviorShortHeader,
-  isCompatibleWithGDevelopVersion,
-  getBreakingChanges,
+import { getBreakingChanges, isCompatibleWithGDevelopVersion } from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
+import { type BehaviorShortHeader
  } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
@@ -19,7 +18,6 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
-import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
@@ -31,7 +29,7 @@ export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async (
     project: gdProject,
-    behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+    behaviorShortHeader: BehaviorShortHeader
   ): Promise<boolean> => {
     return await showConfirmation({
       title: t`Extension update`,
@@ -47,14 +45,14 @@ type Props = {|
   project: gdProject,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
-  installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
-  deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
+  installedBehaviorMetadataList: Array<BehaviorShortHeader>,
+  deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
 |};
 
 const getBehaviorType = (
-  behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+  behaviorShortHeader: BehaviorShortHeader
 ) => behaviorShortHeader.type;
 
 export const BehaviorStore = ({
@@ -127,7 +125,7 @@ export const BehaviorStore = ({
 
   const getExtensionsMatches = React.useCallback(
     (
-      extensionShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+      extensionShortHeader: BehaviorShortHeader
     ): SearchMatch[] => {
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(
@@ -146,13 +144,14 @@ export const BehaviorStore = ({
 
   const installAndChoose = React.useCallback(
     async (
-      behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+      behaviorShortHeader: BehaviorShortHeader
     ) => {
       const isExtensionAlreadyInstalled =
+        behaviorShortHeader.tier === 'installed' || (
         behaviorShortHeader.extensionName &&
         project.hasEventsFunctionsExtensionNamed(
           behaviorShortHeader.extensionName
-        );
+        ));
       if (isExtensionAlreadyInstalled) {
         if (
           !isCompatibleWithGDevelopVersion(
@@ -181,6 +180,9 @@ export const BehaviorStore = ({
           return;
         }
       }
+      // Behaviors from the store that are not compatible with the editor are
+      // greyed out in the list and can't be chosen by users.
+      // No need to check `isCompatibleWithGDevelopVersion`.
 
       if (behaviorShortHeader.url) {
         sendExtensionAddedToProject(behaviorShortHeader.name);

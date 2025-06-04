@@ -8,8 +8,8 @@ import {
   type ExtensionHeader,
   type BehaviorShortHeader,
   getExtensionHeader,
-  isCompatibleWithExtension,
 } from '../../Utils/GDevelopServices/Extension';
+import { isCompatibleWithGDevelopVersion } from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
 import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
@@ -109,9 +109,9 @@ const ExtensionInstallDialog = ({
 
   React.useEffect(() => loadExtensionheader(), [loadExtensionheader]);
 
-  const isCompatible = isCompatibleWithExtension(
+  const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
-    extensionShortHeader
+    extensionShortHeader.gdevelopVersion
   );
 
   const canInstallExtension = !isInstalling && isCompatible;

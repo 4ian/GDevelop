@@ -5,7 +5,6 @@ import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
-import { type SearchableBehaviorMetadata } from '../../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
@@ -15,7 +14,6 @@ type SearchableItem =
   | ExtensionShortHeader
   | ExampleShortHeader
   | BehaviorShortHeader
-  | SearchableBehaviorMetadata
   | PrivateGameTemplateListingData;
 
 export type SearchMatch = {|

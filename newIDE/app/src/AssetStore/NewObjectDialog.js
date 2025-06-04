@@ -28,8 +28,8 @@ import {
   getPublicAsset,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { type ExtensionShortHeader,
-  getBreakingChanges } from '../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { getBreakingChanges } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -215,12 +215,7 @@ export const useInstallAsset = ({
           project,
         }
       );
-      if (
-        requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders
-          .length > 0
-      ) {
-        // Even if the asset may work with already installed extensions,
-        // we don't risk it since the asset may use the features of the extension.
+      if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
         showAlert({
           title: t`Could not install the asset`,
           message: t`Please upgrade the editor to the latest version.`,
@@ -405,10 +400,7 @@ function NewObjectDialog({
             project,
           }
         );
-        if (
-          requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.some(extension => 
-            requiredExtensionInstallation.missingExtensionShortHeaders.includes(extension))
-        ) {
+        if (requiredExtensionInstallation.isGDevelopUpdateNeeded) {
           showAlert({
             title: t`Could not install required extensions`,
             message: t`Please upgrade the editor to the latest version.`,
@@ -417,9 +409,7 @@ function NewObjectDialog({
         }
         // Users must be able to create an object from scratch without being
         // forced to update extensions that may break their projects.
-        const safeToUpdateExtensions = requiredExtensionInstallation.outOfDateExtensionShortHeaders.filter(extension =>
-          !requiredExtensionInstallation.incompatibleWithIdeExtensionShortHeaders.includes(extension) &&
-          !requiredExtensionInstallation.breakingChangesExtensionShortHeaders.includes(extension));
+        const safeToUpdateExtensions = requiredExtensionInstallation.safeToUpdateExtensions;
         const extensionUpdateAction =
           requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
             0 ? 'skip' :

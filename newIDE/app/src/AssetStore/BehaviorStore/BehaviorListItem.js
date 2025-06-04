@@ -67,7 +67,10 @@ export const BehaviorListItem = ({
         objectBehaviorsTypes.includes(requiredBehaviorType)
       );
     });
-  const isEngineCompatible = isCompatibleWithGDevelopVersion(getIDEVersion(), behaviorShortHeader.gdevelopVersion);
+  const isEngineCompatible = isCompatibleWithGDevelopVersion(
+    getIDEVersion(),
+    behaviorShortHeader.gdevelopVersion
+  );
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);

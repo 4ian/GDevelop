@@ -48,7 +48,6 @@ import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 const isDev = Window.isDev();
 
-
 export const formatBreakingChanges = (
   breakingChanges: Map<ExtensionShortHeader, string>
 ): string => {
@@ -99,8 +98,8 @@ export const useExtensionUpdateAlertDialog = () => {
         dismissButtonLabel: t`Abort`,
       }))
         ? 'update'
-        // Avoid to install assets which wouldn't work with the installed version.
-        : 'abort';
+        : // Avoid to install assets which wouldn't work with the installed version.
+          'abort';
     } else {
       return (await showConfirmation({
         title: t`Extension update`,
@@ -224,11 +223,13 @@ export const useInstallAsset = ({
       }
       const extensionUpdateAction =
         requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
-          0 ? 'skip' :
-        (await showExtensionUpdateConfirmation({
-          project,
-          outOfDateExtensionShortHeaders: requiredExtensionInstallation.outOfDateExtensionShortHeaders
-      }));
+        0
+          ? 'skip'
+          : await showExtensionUpdateConfirmation({
+              project,
+              outOfDateExtensionShortHeaders:
+                requiredExtensionInstallation.outOfDateExtensionShortHeaders,
+            });
       if (extensionUpdateAction === 'abort') {
         return null;
       }
@@ -409,14 +410,16 @@ function NewObjectDialog({
         }
         // Users must be able to create an object from scratch without being
         // forced to update extensions that may break their projects.
-        const safeToUpdateExtensions = requiredExtensionInstallation.safeToUpdateExtensions;
+        const safeToUpdateExtensions =
+          requiredExtensionInstallation.safeToUpdateExtensions;
         const extensionUpdateAction =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
-            0 ? 'skip' :
-          (await showExtensionUpdateConfirmation({
-            project,
-            outOfDateExtensionShortHeaders: safeToUpdateExtensions,
-          })) === 'update';
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders
+            .length === 0
+            ? 'skip'
+            : (await showExtensionUpdateConfirmation({
+                project,
+                outOfDateExtensionShortHeaders: safeToUpdateExtensions,
+              })) === 'update';
         if (extensionUpdateAction === 'abort') {
           return;
         }

@@ -2,9 +2,11 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import { getBreakingChanges, isCompatibleWithGDevelopVersion } from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
-import { type BehaviorShortHeader
- } from '../../Utils/GDevelopServices/Extension';
+import {
+  getBreakingChanges,
+  isCompatibleWithGDevelopVersion,
+} from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
+import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
@@ -51,9 +53,8 @@ type Props = {|
   onChoose: (behaviorType: string) => void,
 |};
 
-const getBehaviorType = (
-  behaviorShortHeader: BehaviorShortHeader
-) => behaviorShortHeader.type;
+const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
+  behaviorShortHeader.type;
 
 export const BehaviorStore = ({
   isInstalling,
@@ -124,9 +125,7 @@ export const BehaviorStore = ({
   );
 
   const getExtensionsMatches = React.useCallback(
-    (
-      extensionShortHeader: BehaviorShortHeader
-    ): SearchMatch[] => {
+    (extensionShortHeader: BehaviorShortHeader): SearchMatch[] => {
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(
         result => result.item.type === extensionShortHeader.type
@@ -143,15 +142,13 @@ export const BehaviorStore = ({
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const installAndChoose = React.useCallback(
-    async (
-      behaviorShortHeader: BehaviorShortHeader
-    ) => {
+    async (behaviorShortHeader: BehaviorShortHeader) => {
       const isExtensionAlreadyInstalled =
-        behaviorShortHeader.tier === 'installed' || (
-        behaviorShortHeader.extensionName &&
-        project.hasEventsFunctionsExtensionNamed(
-          behaviorShortHeader.extensionName
-        ));
+        behaviorShortHeader.tier === 'installed' ||
+        (behaviorShortHeader.extensionName &&
+          project.hasEventsFunctionsExtensionNamed(
+            behaviorShortHeader.extensionName
+          ));
       if (isExtensionAlreadyInstalled) {
         if (
           !isCompatibleWithGDevelopVersion(

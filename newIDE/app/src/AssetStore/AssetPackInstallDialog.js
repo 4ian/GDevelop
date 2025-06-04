@@ -160,15 +160,17 @@ const AssetPackInstallDialog = ({
           }
         );
         const extensionUpdateAction =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length ===
-            0 ? 'skip' :
-          (await showExtensionUpdateConfirmation({
-            project,
-            outOfDateExtensionShortHeaders: requiredExtensionInstallation.outOfDateExtensionShortHeaders
-       }));
-      if (extensionUpdateAction === 'abort') {
-        return;
-      }
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders
+            .length === 0
+            ? 'skip'
+            : await showExtensionUpdateConfirmation({
+                project,
+                outOfDateExtensionShortHeaders:
+                  requiredExtensionInstallation.outOfDateExtensionShortHeaders,
+              });
+        if (extensionUpdateAction === 'abort') {
+          return;
+        }
         await installRequiredExtensions({
           requiredExtensionInstallation,
           shouldUpdateExtension: extensionUpdateAction === 'update',

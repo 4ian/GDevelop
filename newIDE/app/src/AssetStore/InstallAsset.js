@@ -22,7 +22,10 @@ import { mapVector } from '../Utils/MapFor';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 import { getInsertionParentAndPositionFromSelection } from '../Utils/ObjectFolders';
 import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
-import { getBreakingChanges, isCompatibleWithGDevelopVersion } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
+import {
+  getBreakingChanges,
+  isCompatibleWithGDevelopVersion,
+} from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 
 const gd: libGDevelop = global.gd;
 
@@ -541,7 +544,7 @@ export const checkRequiredExtensionsUpdate = async ({
   );
 
   const incompatibleWithIdeExtensionShortHeaders = requiredExtensionShortHeaders.filter(
-    requiredExtensionShortHeader => 
+    requiredExtensionShortHeader =>
       !isCompatibleWithGDevelopVersion(
         getIDEVersion(),
         requiredExtensionShortHeader.gdevelopVersion
@@ -576,13 +579,16 @@ export const checkRequiredExtensionsUpdate = async ({
     requiredExtensionShortHeaders
   );
 
-  const safeToUpdateExtensions = outOfDateExtensionShortHeaders.filter(extension =>
-    !incompatibleWithIdeExtensionShortHeaders.includes(extension) &&
-    !breakingChangesExtensionShortHeaders.includes(extension));
+  const safeToUpdateExtensions = outOfDateExtensionShortHeaders.filter(
+    extension =>
+      !incompatibleWithIdeExtensionShortHeaders.includes(extension) &&
+      !breakingChangesExtensionShortHeaders.includes(extension)
+  );
 
   // Overridden by `checkRequiredExtensionsUpdateForAssets`
-  const isGDevelopUpdateNeeded = incompatibleWithIdeExtensionShortHeaders.some(extension => 
-    missingExtensionShortHeaders.includes(extension));
+  const isGDevelopUpdateNeeded = incompatibleWithIdeExtensionShortHeaders.some(
+    extension => missingExtensionShortHeaders.includes(extension)
+  );
 
   return {
     requiredExtensionShortHeaders,
@@ -619,12 +625,16 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
     });
   });
 
-  const requiredExtensionsUpdate = await checkRequiredExtensionsUpdate({ requiredExtensions, project });
+  const requiredExtensionsUpdate = await checkRequiredExtensionsUpdate({
+    requiredExtensions,
+    project,
+  });
   // Even if the asset may work with already installed extensions,
   // we don't risk it since the asset may use the new features of the extension.
   requiredExtensionsUpdate.isGDevelopUpdateNeeded =
     requiredExtensionsUpdate.isGDevelopUpdateNeeded ||
-    requiredExtensionsUpdate.incompatibleWithIdeExtensionShortHeaders.length > 0;
+    requiredExtensionsUpdate.incompatibleWithIdeExtensionShortHeaders.length >
+      0;
   return requiredExtensionsUpdate;
 };
 

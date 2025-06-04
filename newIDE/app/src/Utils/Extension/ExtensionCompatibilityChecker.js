@@ -12,7 +12,7 @@ import {
 export const isCompatibleWithGDevelopVersion = (
   ideVersion: string,
   requiredGDevelopVersion: ?string
-): boolean => 
+): boolean =>
   requiredGDevelopVersion
     ? semverSatisfies(ideVersion, requiredGDevelopVersion, {
         includePrerelease: true,

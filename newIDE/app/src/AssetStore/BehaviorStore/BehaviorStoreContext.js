@@ -24,9 +24,7 @@ const excludedCommunityTiers = new Set(['community']);
 
 type BehaviorStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<
-    SearchResult<BehaviorShortHeader>
-  >,
+  searchResults: ?Array<SearchResult<BehaviorShortHeader>>,
   fetchBehaviors: () => void,
   error: ?Error,
   searchText: string,

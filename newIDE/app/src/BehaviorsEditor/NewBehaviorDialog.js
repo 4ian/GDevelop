@@ -123,7 +123,7 @@ export default function NewBehaviorDialog({
           headerUrl: '',
           extensionNamespace: '',
           extensionName: '',
-          authorIds: [], 
+          authorIds: [],
         }));
     },
     [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]

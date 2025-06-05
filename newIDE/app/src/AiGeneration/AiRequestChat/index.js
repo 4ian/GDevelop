@@ -102,24 +102,24 @@ const getQuotaOrCreditsExplanation = ({
     const quotaOrCreditsExplanation = !quota.limitReached ? (
       increaseQuotaOffering === 'subscribe' ? (
         <Trans>
-          You still have {quota.max - quota.current} free AI agent builds.
+          You still have {quota.max - quota.current} free AI agent requests.
         </Trans>
       ) : (
         <Trans>
-          You still have {quota.max - quota.current} free AI agent builds with
+          You still have {quota.max - quota.current} free AI agent requests with
           your membership (refreshed every month).
         </Trans>
       )
     ) : aiRequestPriceInCredits ? (
       availableCredits ? (
         <Trans>
-          Launch a build with the AI agent for{' '}
+          Launch a request to the AI agent for{' '}
           <b>{aiRequestPriceInCredits} credits</b> – you have {availableCredits}{' '}
           credits.
         </Trans>
       ) : (
         <Trans>
-          Launch a build with the AI agent for{' '}
+          Launch a request to the AI agent for{' '}
           <b>{aiRequestPriceInCredits} credits.</b>
         </Trans>
       )

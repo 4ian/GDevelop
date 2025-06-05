@@ -120,6 +120,7 @@ export type EditorFunction = {|
     generateEvents: (
       options: EventsGenerationOptions
     ) => Promise<EventsGenerationResult>,
+    onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
     ensureExtensionInstalled: (options: {|
       extensionName: string,
     |}) => Promise<void>,
@@ -741,7 +742,7 @@ const addBehavior: EditorFunction = {
         `Unexpected error: behavior "${behaviorName}" was not added to object "${object_name}" despite a valid type and name.`
       );
     }
-    layout.updateBehaviorsSharedData(project)
+    layout.updateBehaviorsSharedData(project);
 
     const behavior = object.getBehavior(behaviorName);
 
@@ -1370,6 +1371,7 @@ const addSceneEvents: EditorFunction = {
     project,
     args,
     generateEvents,
+    onSceneEventsModifiedOutsideEditor,
     ensureExtensionInstalled,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
@@ -1508,6 +1510,8 @@ const addSceneEvents: EditorFunction = {
         changes,
         aiGeneratedEvent.id
       );
+      onSceneEventsModifiedOutsideEditor(scene);
+
       const resultMessage =
         aiGeneratedEvent.resultMessage ||
         'Properly modified or added new event(s).';

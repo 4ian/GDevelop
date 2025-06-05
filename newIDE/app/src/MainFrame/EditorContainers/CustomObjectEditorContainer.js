@@ -106,6 +106,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   saveUiSettings = () => {
     // const layout = this.getCustomObject();
     // const editor = this.editor;

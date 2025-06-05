@@ -33,6 +33,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
   |}) => Promise<void>,
@@ -45,6 +46,7 @@ export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
   generateEvents,
+  onSceneEventsModifiedOutsideEditor,
   ignore,
   ensureExtensionInstalled,
   searchAndInstallAsset,
@@ -125,6 +127,7 @@ export const processEditorFunctionCalls = async ({
           project,
           args,
           generateEvents,
+          onSceneEventsModifiedOutsideEditor,
           ensureExtensionInstalled,
           searchAndInstallAsset,
         }

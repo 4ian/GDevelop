@@ -2364,6 +2364,18 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const onSceneEventsModifiedOutsideEditor = React.useCallback(
+    (scene: gdLayout) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneEventsModifiedOutsideEditor(scene);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const _onProjectItemModified = () => {
     triggerUnsavedChanges();
     forceUpdate();
@@ -4064,6 +4076,7 @@ const MainFrame = (props: Props) => {
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                     onSceneObjectsDeleted: onSceneObjectsDeleted,
+                    onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                     onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                     gamesPlatformFrameTools,

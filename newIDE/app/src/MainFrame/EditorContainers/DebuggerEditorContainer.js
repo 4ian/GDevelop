@@ -61,6 +61,10 @@ export class DebuggerEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps() {
     this._checkUserHasSubscription();

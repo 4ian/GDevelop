@@ -152,6 +152,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   getExternalLayout(): ?gdExternalLayout {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;

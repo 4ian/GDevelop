@@ -112,6 +112,7 @@ const useProcessFunctionCalls = ({
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
+  onSceneEventsModifiedOutsideEditor,
 }: {|
   i18n: I18nType,
   project: gdProject | null,
@@ -123,6 +124,7 @@ const useProcessFunctionCalls = ({
     string,
     Array<EditorFunctionCallResult>
   ) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 |}) => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -193,6 +195,7 @@ const useProcessFunctionCalls = ({
             relatedAiRequestId: selectedAiRequest.id,
           });
         },
+        onSceneEventsModifiedOutsideEditor,
         ensureExtensionInstalled,
         searchAndInstallAsset,
       });
@@ -213,6 +216,7 @@ const useProcessFunctionCalls = ({
       ensureExtensionInstalled,
       searchAndInstallAsset,
       generateEvents,
+      onSceneEventsModifiedOutsideEditor,
       triggerSendEditorFunctionCallResults,
     ]
   );
@@ -442,6 +446,7 @@ type Props = {|
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onOpenLayout: (sceneName: string) => void,
   onOpenEvents: (sceneName: string) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -454,6 +459,7 @@ export type AskAiEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -477,6 +483,7 @@ export const AskAiEditor = React.memo<Props>(
         onCreateEmptyProject,
         onOpenLayout,
         onOpenEvents,
+        onSceneEventsModifiedOutsideEditor,
       }: Props,
       ref
     ) => {
@@ -556,6 +563,7 @@ export const AskAiEditor = React.memo<Props>(
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
+        onSceneEventsModifiedOutsideEditor: noop,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
@@ -852,6 +860,7 @@ export const AskAiEditor = React.memo<Props>(
         onSendEditorFunctionCallResults,
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
+        onSceneEventsModifiedOutsideEditor,
         i18n,
       });
 
@@ -939,6 +948,9 @@ export const renderAskAiEditorContainer = (
         onCreateEmptyProject={props.onCreateEmptyProject}
         onOpenLayout={props.onOpenLayout}
         onOpenEvents={props.onOpenEvents}
+        onSceneEventsModifiedOutsideEditor={
+          props.onSceneEventsModifiedOutsideEditor
+        }
       />
     )}
   </I18n>

@@ -443,13 +443,13 @@ namespace gdjs {
         }
       } catch (error) {
         if (
-            error.message &&
-            typeof error.message === 'string' &&
-            error.message.startsWith('Maximum call stack size exceeded')
+          error.message &&
+          typeof error.message === 'string' &&
+          error.message.startsWith('Maximum call stack size exceeded')
         ) {
           console.warn(
-              'An error occurred when resuming paused sounds while the game was in background:',
-              error
+            'An error occurred when resuming paused sounds while the game was in background:',
+            error
           );
         } else {
           throw error;

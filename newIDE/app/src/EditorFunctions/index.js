@@ -741,6 +741,8 @@ const addBehavior: EditorFunction = {
         `Unexpected error: behavior "${behaviorName}" was not added to object "${object_name}" despite a valid type and name.`
       );
     }
+    layout.updateBehaviorsSharedData(project)
+
     const behavior = object.getBehavior(behaviorName);
 
     const behaviorProperties = behavior.getProperties();

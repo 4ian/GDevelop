@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
+import EventsSheetWidthCache from './EventsTree/EventsSheetWidthCache';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from './InstructionEditor/InstructionEditorMenu';
@@ -323,11 +324,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+    this._updateWidth();
+    window.addEventListener('resize', this._updateWidth);
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    window.removeEventListener('resize', this._updateWidth);
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -345,6 +349,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // allowing the keyboard shortcuts to work.
     if (!prevProps.isActive && this.props.isActive) {
       this._ensureFocused();
+    }
+
+    if (prevProps.isActive !== this.props.isActive) {
+      this._updateWidth();
     }
   }
 
@@ -1758,7 +1766,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
               this.closeInstructionEditor(true);
               ensureSingleOnceInstructions(instrsList);
-              if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+              if (this._eventsTree) {
+                this._eventsTree.forceEventsUpdate();
+                // Atualiza o cache de largura quando uma nova condição é adicionada
+                const tabId = this.state.editedInstruction.eventContext
+                  ?.idPrefix;
+                if (tabId && this._containerDiv.current) {
+                  const width = this._containerDiv.current.clientWidth;
+                  EventsSheetWidthCache.setWidth(tabId, width);
+                  this.forceUpdate();
+                }
+              }
             }}
             resourceManagementProps={this.props.resourceManagementProps}
             openInstructionOrExpression={(extension, type) => {
@@ -1820,6 +1838,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       containerDivElement.focus();
     }
   };
+  // Update width cache when component mounts or resizes
+  _updateWidth = () => {
+    if (this._containerDiv.current) {
+      const width = this._containerDiv.current.clientWidth;
+      const tabId = this.props.scope.externalEvents
+        ? this.props.scope.externalEvents.getName()
+        : this.props.scope.layout
+        ? this.props.scope.layout.getName()
+        : 'default';
+
+      // Update cache with current width
+      EventsSheetWidthCache.setWidth(tabId, width);
+
+      // Force component update to use new width
+      this.forceUpdate();
+    }
+  };
 
   render() {
     const {
@@ -1872,6 +1907,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       .editedParameter.eventContext
       ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
       : projectScopedContainersAccessor;
+
+    const tabId = this.props.scope.externalEvents
+      ? this.props.scope.externalEvents.getName()
+      : this.props.scope.layout
+      ? this.props.scope.layout.getName()
+      : 'default';
 
     return (
       <>
@@ -1973,11 +2014,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     screenType={screenType}
                     windowSize={windowSize}
-                    eventsSheetWidth={
-                      this._containerDiv.current
-                        ? this._containerDiv.current.clientWidth
-                        : 0
-                    }
+                    // Get cached width for current tab
+                    eventsSheetWidth={EventsSheetWidthCache.getWidth(tabId)}
                     eventsSheetHeight={
                       this._containerDiv.current
                         ? this._containerDiv.current.clientHeight

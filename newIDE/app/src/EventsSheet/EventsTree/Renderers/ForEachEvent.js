@@ -165,6 +165,7 @@ export default class ForEachEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          tabId={this.props.idPrefix}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}

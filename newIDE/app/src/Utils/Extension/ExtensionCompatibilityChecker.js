@@ -6,7 +6,7 @@ import {
   type BehaviorShortHeader,
 } from '../GDevelopServices/Extension';
 
-export type ExtensionChange = { version: string, changes: Array<string> };
+export type ExtensionChange = { version: string, changes: string };
 
 /**
  * Check if the IDE version satisfies the version required by the asset.
@@ -25,26 +25,61 @@ export const getBreakingChanges = (
   installedVersion: string,
   extension: ExtensionShortHeader | BehaviorShortHeader
 ): Array<ExtensionChange> => {
+  if (!extension.changelog) {
+    return [];
+  }
   const breakingChanges = [];
-  for (const version in extension.changelog) {
-    const changes = extension.changelog[version];
-    if (semverGreaterThan(version, installedVersion)) {
-      breakingChanges.push({ version, changes: changes.breaking });
+  for (const { version, breaking } of extension.changelog) {
+    console.log("version", version, breaking);
+    if (breaking && semverGreaterThan(version, installedVersion)) {
+      breakingChanges.push({ version, changes: breaking });
     }
   }
   return breakingChanges;
 };
 
-export const formatBreakingChanges = (
+export const formatExtensionsBreakingChanges = (
   extensionsBreakingChanges: Map<ExtensionShortHeader, Array<ExtensionChange>>
 ): string => {
   let formattedChanges = '';
   for (const [extension, breakingChanges] of extensionsBreakingChanges) {
     formattedChanges += '- ' + extension.fullName + '\n';
-    for (const breakingChange of breakingChanges) {
-      formattedChanges +=
-        '  ' + breakingChange.changes.replace(/\n/g, '\n  ') + '\n';
+    formattedChanges += formatBreakingChanges(breakingChanges, '  ');
+  }
+  return formattedChanges;
+};
+
+export const formatBreakingChanges = (
+  extensionChange: Array<ExtensionChange>,
+  indentation: string = ''
+): string => {
+  let formattedChanges = '';
+  for (const breakingChange of extensionChange) {
+    formattedChanges += formatChange(breakingChange.changes, indentation);
+  }
+  return formattedChanges;
+};
+
+const formatChange = (change: string, indentation) =>
+  indentation + change.replace(/\n/g, '\n' + indentation) + '\n';
+
+export const formatOldBreakingChanges = (
+  installedVersion: string,
+  extension: ExtensionShortHeader | BehaviorShortHeader
+): string => {
+  if (!extension.changelog) {
+    return '';
+  }
+  const extensionsBreakingChanges: Array<ExtensionChange> = [];
+  for (const { version, breaking } of extension.changelog) {
+    if (breaking && !semverGreaterThan(version, installedVersion)) {
+      extensionsBreakingChanges.push({ version, changes: breaking });
     }
+  }
+  let formattedChanges = '';
+  for (const { version, changes } of extensionsBreakingChanges) {
+    formattedChanges += '- ' + version + '\n';
+    formattedChanges += formatChange(changes, '  ');
   }
   return formattedChanges;
 };

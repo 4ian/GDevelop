@@ -31,7 +31,7 @@ import {
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import {
   getBreakingChanges,
-  formatBreakingChanges,
+  formatExtensionsBreakingChanges,
   type ExtensionChange,
 } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -84,7 +84,7 @@ export const useExtensionUpdateAlertDialog = () => {
       return (await showConfirmation({
         title: t`Extension update`,
         message: t`This asset required extensions update with breaking changes ${'\n\n' +
-          formatBreakingChanges(breakingChanges) +
+          formatExtensionsBreakingChanges(breakingChanges) +
           '\n' +
           notBreakingExtensions
             .map(extension => extension.fullName)

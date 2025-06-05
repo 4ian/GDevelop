@@ -1670,21 +1670,25 @@ export const buttonV2ExtensionShortHeader: ExtensionShortHeader = {
 export const breakingButtonV3ExtensionShortHeader: ExtensionShortHeader = {
   ...buttonV1ExtensionShortHeader,
   version: '3.0.0',
-  changelog: {
-    '3.0.0': {
-      breaking: '- Breaking reason',
+  changelog: [
+    {
+      version: '3.0.0',
+      breaking:
+        '- The extension has breaking changes. It needs the following adaptations:\n  - first do this\n  - then this',
     },
-  },
+  ],
 };
 
 export const breakingButtonV31ExtensionShortHeader: ExtensionShortHeader = {
   ...buttonV1ExtensionShortHeader,
   version: '3.1.0',
-  changelog: {
-    '3.0.0': {
-      breaking: '- Breaking reason',
+  changelog: [
+    {
+      version: '3.0.0',
+      breaking:
+        '- The extension has breaking changes. It needs the following adaptations:\n  - first do this\n  - then this',
     },
-  },
+  ],
 };
 
 export const incompatibleButtonV4ExtensionShortHeader: ExtensionShortHeader = {

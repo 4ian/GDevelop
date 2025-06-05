@@ -25,7 +25,7 @@ export type ExtensionRegistryItemHeader = {|
   tags: Array<string>,
   category: string,
   previewIconUrl: string,
-  changelog?: { [key: string]: { breaking?: string } },
+  changelog?: [{ version: string, breaking?: string }],
 |};
 
 export type EventsFunctionInsideExtensionShortHeader = {

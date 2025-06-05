@@ -29,7 +29,11 @@ import {
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { getBreakingChanges } from '../Utils/Extension/ExtensionCompatibilityChecker.js';
+import {
+  getBreakingChanges,
+  formatBreakingChanges,
+  type ExtensionChange,
+} from '../Utils/Extension/ExtensionCompatibilityChecker.js';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -48,17 +52,6 @@ import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 
 const isDev = Window.isDev();
 
-export const formatBreakingChanges = (
-  breakingChanges: Map<ExtensionShortHeader, string>
-): string => {
-  let formattedChanges = '';
-  for (const [extension, breakingChangesString] of breakingChanges) {
-    formattedChanges += ' - ' + extension.fullName + '\n';
-    formattedChanges += breakingChangesString.replace(/'\n'/g, '\n  ');
-  }
-  return formattedChanges;
-};
-
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async ({
@@ -68,7 +61,10 @@ export const useExtensionUpdateAlertDialog = () => {
     project: gdProject,
     outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
   |}): Promise<string> => {
-    const breakingChanges = new Map<ExtensionShortHeader, string>();
+    const breakingChanges = new Map<
+      ExtensionShortHeader,
+      Array<ExtensionChange>
+    >();
     for (const extension of outOfDateExtensionShortHeaders) {
       const installedVersion = project
         .getEventsFunctionsExtension(extension.name)
@@ -76,7 +72,7 @@ export const useExtensionUpdateAlertDialog = () => {
       const extensionBreakingChanges = getBreakingChanges(
         installedVersion,
         extension
-      ).join('\n');
+      );
       if (extensionBreakingChanges) {
         breakingChanges.set(extension, extensionBreakingChanges);
       }

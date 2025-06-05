@@ -1638,6 +1638,12 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   helpPath: '',
 };
 
+export const incompatibleFlashExtensionShortHeader: ExtensionShortHeader = {
+  ...flashExtensionShortHeader,
+  version: '2.0.0',
+  gdevelopVersion: '>=9.999.999',
+};
+
 export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
   authorIds: [],
@@ -1659,6 +1665,32 @@ export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
 export const buttonV2ExtensionShortHeader: ExtensionShortHeader = {
   ...buttonV1ExtensionShortHeader,
   version: '2.0.0',
+};
+
+export const breakingButtonV3ExtensionShortHeader: ExtensionShortHeader = {
+  ...buttonV1ExtensionShortHeader,
+  version: '3.0.0',
+  changelog: {
+    '3.0.0': {
+      breaking: '- Breaking reason',
+    },
+  },
+};
+
+export const breakingButtonV31ExtensionShortHeader: ExtensionShortHeader = {
+  ...buttonV1ExtensionShortHeader,
+  version: '3.1.0',
+  changelog: {
+    '3.0.0': {
+      breaking: '- Breaking reason',
+    },
+  },
+};
+
+export const incompatibleButtonV4ExtensionShortHeader: ExtensionShortHeader = {
+  ...buttonV1ExtensionShortHeader,
+  version: '4.0.0',
+  gdevelopVersion: '>=9.999.999',
 };
 
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {

@@ -6,6 +6,7 @@ import {
   installRequiredExtensions,
   sanitizeObjectName,
   installPublicAsset,
+  checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
@@ -16,10 +17,13 @@ import {
   fakeAssetWithUnknownExtension1,
   fakeAssetWithFlashExtensionDependency1,
   flashExtensionShortHeader,
+  incompatibleFlashExtensionShortHeader,
   fireBulletExtensionShortHeader,
   fakeAssetWithCustomObject,
   buttonV1ExtensionShortHeader,
   buttonV2ExtensionShortHeader,
+  breakingButtonV3ExtensionShortHeader,
+  incompatibleButtonV4ExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
@@ -393,6 +397,258 @@ describe('InstallAsset', () => {
   //   });
   // });
 
+  describe('checkRequiredExtensionsUpdate', () => {
+    it('can find an extension to install', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [fireBulletExtensionShortHeader, flashExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: flashExtensionShortHeader.name,
+              extensionVersion: flashExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [flashExtensionShortHeader],
+        missingExtensionShortHeaders: [flashExtensionShortHeader],
+        outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an up to date extension from the project', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [buttonV1ExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: buttonV1ExtensionShortHeader.name,
+              extensionVersion: buttonV1ExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to update', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [buttonV2ExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: buttonV2ExtensionShortHeader.name,
+              extensionVersion: buttonV2ExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to update with breaking changes', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [breakingButtonV3ExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: breakingButtonV3ExtensionShortHeader.name,
+              extensionVersion: breakingButtonV3ExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
+        breakingChangesExtensionShortHeaders: [
+          breakingButtonV3ExtensionShortHeader,
+        ],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to update incompatible with the editor', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [incompatibleButtonV4ExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: incompatibleButtonV4ExtensionShortHeader.name,
+              extensionVersion:
+                incompatibleButtonV4ExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to install incompatible with the editor', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
+
+      // The extension is in the registry.
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [incompatibleFlashExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: incompatibleFlashExtensionShortHeader.name,
+              extensionVersion: incompatibleFlashExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
+        missingExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
+        outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [
+          incompatibleFlashExtensionShortHeader,
+        ],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: true,
+      });
+    });
+
+    it('errors if an extension is not found in the registry', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: 'UnknownExtension',
+              extensionVersion: '1.0.0',
+            },
+          ],
+          project,
+        })
+      ).rejects.toMatchObject({
+        message: 'Unable to find extension UnknownExtension in the registry.',
+      });
+    });
+
+    it("errors if the registry can't be loaded ", async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => {
+        throw new Error('Fake error');
+      });
+
+      await expect(
+        checkRequiredExtensionsUpdate({
+          requiredExtensions: [
+            {
+              extensionName: flashExtensionShortHeader.name,
+              extensionVersion: flashExtensionShortHeader.version,
+            },
+          ],
+          project,
+        })
+      ).rejects.toMatchObject({
+        message: 'Fake error',
+      });
+    });
+  });
+
   describe('checkRequiredExtensionsUpdateForAssets', () => {
     it('can find an extension to install', async () => {
       makeTestExtensions(gd);
@@ -500,6 +756,128 @@ describe('InstallAsset', () => {
         incompatibleWithIdeExtensionShortHeaders: [],
         safeToUpdateExtensions: [buttonV2ExtensionShortHeader],
         isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to update with breaking changes', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+          // The project contains the 1.0.0 of this extension.
+          breakingButtonV3ExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdateForAssets({
+          assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [breakingButtonV3ExtensionShortHeader],
+        breakingChangesExtensionShortHeaders: [
+          breakingButtonV3ExtensionShortHeader,
+        ],
+        incompatibleWithIdeExtensionShortHeaders: [],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: false,
+      });
+    });
+
+    it('can find an extension to update incompatible with the editor', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+          // The project contains the 1.0.0 of this extension.
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdateForAssets({
+          assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [
+          incompatibleButtonV4ExtensionShortHeader,
+        ],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: true,
+      });
+    });
+
+    it('can find an extension to install incompatible with the editor', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithFlashExtensionDependency1
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        headers: [
+          incompatibleFlashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionsUpdateForAssets({
+          assets: [
+            fakeAssetWithFlashExtensionDependency1,
+            fakeAssetWithFlashExtensionDependency1,
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
+        missingExtensionShortHeaders: [incompatibleFlashExtensionShortHeader],
+        outOfDateExtensionShortHeaders: [],
+        breakingChangesExtensionShortHeaders: [],
+        incompatibleWithIdeExtensionShortHeaders: [
+          incompatibleFlashExtensionShortHeader,
+        ],
+        safeToUpdateExtensions: [],
+        isGDevelopUpdateNeeded: true,
       });
     });
 

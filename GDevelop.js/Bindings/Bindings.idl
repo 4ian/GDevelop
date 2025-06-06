@@ -1002,6 +1002,10 @@ interface Layout {
 
     void SetStopSoundsOnStartup(boolean enable);
     boolean StopSoundsOnStartup();
+
+    void SetShouldUnloadAssetsWhenUnloaded(boolean enable);
+    boolean ShouldUnloadAssetsWhenUnloaded();
+
 };
 
 interface ExternalEvents {

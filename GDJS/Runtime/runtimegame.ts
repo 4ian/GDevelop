@@ -364,6 +364,14 @@ namespace gdjs {
     }
 
     /**
+     * Get the gdjs.ResourceLoader of the RuntimeGame.
+     * @return The resource loader.
+     */
+    getResourceLoader(): gdjs.ResourceLoader {
+      return this._resourcesLoader;
+    }
+
+    /**
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */
@@ -824,6 +832,34 @@ namespace gdjs {
       } catch (e) {
         if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
 
+        throw e;
+      }
+    }
+
+    /**
+     * Load all assets needed to display the scene, displaying progress in
+     * renderer.
+     * This method is used for scenes which was unloaded assets
+     */
+    async loadSceneAssetsBySceneName(
+      sceneName: string,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      try {
+        await Promise.all([
+          this._loadAssetsWithLoadingScreen(
+            /* isFirstScene = */ false,
+            async (onProgress) => {
+              await this._resourcesLoader.loadSceneResourcesBySceneName(
+                sceneName,
+                onProgress
+              );
+            },
+            progressCallback
+          ),
+        ]);
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
         throw e;
       }
     }

@@ -349,6 +349,18 @@ class GD_CORE_API Layout {
    * launched
    */
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
+
+  /**
+   * Set if the scene must unload all assets after exit scene 
+   */
+  void SetShouldUnloadAssetsWhenUnloaded(bool enable = false) {
+    shouldUnloadAssetsWhenUnloaded = enable;
+  }
+
+  /**
+   * Return true if the scene must unload all assets after the exit scene
+   */
+  bool ShouldUnloadAssetsWhenUnloaded() const { return shouldUnloadAssetsWhenUnloaded; }
   ///@}
 
   /** \name Saving and loading
@@ -381,6 +393,7 @@ class GD_CORE_API Layout {
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup = true;  ///< True to make the scene stop all sounds at
                                     ///< startup.
+  bool shouldUnloadAssetsWhenUnloaded = false; ///< True to unload scene assets after exit scene
   bool standardSortMethod = true;   ///< True to sort objects using standard sort.
   bool disableInputWhenNotFocused = true;  /// If set to true, the input must be
                                            /// disabled when the window do not have the

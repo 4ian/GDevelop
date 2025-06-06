@@ -69,6 +69,11 @@ public:
   virtual ~EventsFunctionsExtensionChangelog(){};
 
   /**
+   * \brief Return the number of variants.
+   */
+  std::size_t GetChangesCount() const { return versionChanges.size(); }
+
+  /**
    * \brief Serialize the EventsFunctionsExtensionChangelog to the specified
    * element
    */

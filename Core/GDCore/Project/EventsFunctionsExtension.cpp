@@ -83,7 +83,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
   element.SetAttribute("iconUrl", iconUrl);
   element.SetAttribute("helpPath", helpPath);
   element.SetAttribute("gdevelopVersion", gdevelopVersion);
-  changelog.SerializeTo(element.AddChild("changelog"));
+  if (changelog.GetChangesCount() > 0) {
+    changelog.SerializeTo(element.AddChild("changelog"));
+  }
   auto& dependenciesElement = element.AddChild("dependencies");
   dependenciesElement.ConsiderAsArray();
   for (auto& dependency : dependencies)

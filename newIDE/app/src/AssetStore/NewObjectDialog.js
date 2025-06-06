@@ -53,7 +53,7 @@ import { AssetStoreNavigatorContext } from './AssetStoreNavigator';
 const isDev = Window.isDev();
 
 export const useExtensionUpdateAlertDialog = () => {
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   return async ({
     project,
     outOfDateExtensionShortHeaders,
@@ -73,23 +73,21 @@ export const useExtensionUpdateAlertDialog = () => {
         installedVersion,
         extension
       );
-      if (extensionBreakingChanges) {
+      if (extensionBreakingChanges.length > 0) {
         breakingChanges.set(extension, extensionBreakingChanges);
       }
     }
     const notBreakingExtensions = outOfDateExtensionShortHeaders.filter(
-      extension => breakingChanges.has(extension)
+      extension => !breakingChanges.has(extension)
     );
-    if (breakingChanges) {
-      return (await showConfirmation({
-        title: t`Extension update`,
-        message: t`This asset required extensions update with breaking changes ${'\n\n' +
+    if (breakingChanges.size > 0) {
+      // Extensions without breaking changes are not listed since it would make
+      // the message more confusing.
+      return (await showDeleteConfirmation({
+        title: t`Breaking changes`,
+        message: t`This asset required extension updates with breaking changes ${'\n\n' +
           formatExtensionsBreakingChanges(breakingChanges) +
-          '\n' +
-          notBreakingExtensions
-            .map(extension => extension.fullName)
-            .join('\n - ') +
-          '\n\n'}Do you want to update them now ?`,
+          '\n'}Do you want to update them now ?`,
         confirmButtonLabel: t`Update the extension`,
         dismissButtonLabel: t`Abort`,
       }))

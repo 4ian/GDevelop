@@ -23,7 +23,13 @@ describe('ExtensionCompatibilityChecker', () => {
     it('can report breaking changes', () => {
       expect(
         getBreakingChanges('1.0.0', breakingButtonV3ExtensionShortHeader)
-      ).toEqual([{ version: '3.0.0', changes: '- The extension has breaking changes. It needs the following adaptations:\n  - first do this\n  - then this' }]);
+      ).toEqual([
+        {
+          version: '3.0.0',
+          changes:
+            '- The extension has breaking changes. It needs the following adaptations:\n  - first do this\n  - then this',
+        },
+      ]);
     });
 
     it('can exclude older breaking changes', () => {

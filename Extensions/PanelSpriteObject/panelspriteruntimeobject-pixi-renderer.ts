@@ -116,20 +116,24 @@ namespace gdjs {
 
     _updateLocalPositions() {
       const obj = this._object;
-      this._centerSprite.position.x = obj._lBorder;
-      this._centerSprite.position.y = obj._tBorder;
+      const leftBorder = this._borderSprites[3].width;
+      const topBorder = this._borderSprites[3].height;
+      const rightBorder = this._borderSprites[7].width;
+      const bottomBorder = this._borderSprites[7].height;
+
+      this._centerSprite.position.x = leftBorder;
+      this._centerSprite.position.y = topBorder;
 
       //Right
-      this._borderSprites[0].position.x = obj._width - obj._rBorder;
-      this._borderSprites[0].position.y = obj._tBorder;
+      this._borderSprites[0].position.x = obj._width - rightBorder;
+      this._borderSprites[0].position.y = topBorder;
 
       //Top-right
-      this._borderSprites[1].position.x =
-        obj._width - this._borderSprites[1].width;
+      this._borderSprites[1].position.x = obj._width - rightBorder;
       this._borderSprites[1].position.y = 0;
 
       //Top
-      this._borderSprites[2].position.x = obj._lBorder;
+      this._borderSprites[2].position.x = leftBorder;
       this._borderSprites[2].position.y = 0;
 
       //Top-Left
@@ -138,26 +142,24 @@ namespace gdjs {
 
       //Left
       this._borderSprites[4].position.x = 0;
-      this._borderSprites[4].position.y = obj._tBorder;
+      this._borderSprites[4].position.y = topBorder;
 
       //Bottom-Left
       this._borderSprites[5].position.x = 0;
-      this._borderSprites[5].position.y =
-        obj._height - this._borderSprites[5].height;
+      this._borderSprites[5].position.y = obj._height - bottomBorder;
 
       //Bottom
-      this._borderSprites[6].position.x = obj._lBorder;
-      this._borderSprites[6].position.y = obj._height - obj._bBorder;
+      this._borderSprites[6].position.x = leftBorder;
+      this._borderSprites[6].position.y = obj._height - bottomBorder;
 
       //Bottom-Right
-      this._borderSprites[7].position.x =
-        obj._width - this._borderSprites[7].width;
-      this._borderSprites[7].position.y =
-        obj._height - this._borderSprites[7].height;
+      this._borderSprites[7].position.x = obj._width - rightBorder;
+      this._borderSprites[7].position.y = obj._height - bottomBorder;
     }
 
     _updateSpritesAndTexturesSize() {
       const obj = this._object;
+
       this._centerSprite.width = Math.max(
         obj._width - obj._rBorder - obj._lBorder,
         0
@@ -167,33 +169,65 @@ namespace gdjs {
         0
       );
 
+      let leftMargin = obj._lBorder;
+      let rightMargin = obj._rBorder;
+      if (this._centerSprite.width === 0 && obj._lBorder + obj._rBorder > 0) {
+        leftMargin =
+          (obj._width * obj._lBorder) / (obj._lBorder + obj._rBorder);
+        rightMargin = obj._width - leftMargin;
+      }
+      let topMargin = obj._tBorder;
+      let bottomMargin = obj._bBorder;
+      if (this._centerSprite.height === 0 && obj._tBorder + obj._bBorder > 0) {
+        topMargin =
+          (obj._height * obj._tBorder) / (obj._tBorder + obj._bBorder);
+        bottomMargin = obj._height - topMargin;
+      }
+
       //Right
-      this._borderSprites[0].width = obj._rBorder;
+      this._borderSprites[0].width = rightMargin;
       this._borderSprites[0].height = Math.max(
-        obj._height - obj._tBorder - obj._bBorder,
+        obj._height - topMargin - bottomMargin,
         0
       );
 
       //Top
-      this._borderSprites[2].height = obj._tBorder;
+      this._borderSprites[2].height = topMargin;
       this._borderSprites[2].width = Math.max(
-        obj._width - obj._rBorder - obj._lBorder,
+        obj._width - rightMargin - leftMargin,
         0
       );
 
       //Left
-      this._borderSprites[4].width = obj._lBorder;
+      this._borderSprites[4].width = leftMargin;
       this._borderSprites[4].height = Math.max(
-        obj._height - obj._tBorder - obj._bBorder,
+        obj._height - topMargin - bottomMargin,
         0
       );
 
       //Bottom
-      this._borderSprites[6].height = obj._bBorder;
+      this._borderSprites[6].height = bottomMargin;
       this._borderSprites[6].width = Math.max(
-        obj._width - obj._rBorder - obj._lBorder,
+        obj._width - rightMargin - leftMargin,
         0
       );
+
+      //Top-right
+      this._borderSprites[1].width = rightMargin;
+      this._borderSprites[1].height = topMargin;
+
+      //Top-Left
+      this._borderSprites[3].width = leftMargin;
+      this._borderSprites[3].height = topMargin;
+
+      //Bottom-Left
+      this._borderSprites[5].width = leftMargin;
+      this._borderSprites[5].height = bottomMargin;
+
+      //Bottom-Right
+      this._borderSprites[7].width = rightMargin;
+      this._borderSprites[7].height = bottomMargin;
+
       this._wasRendered = true;
       this._spritesContainer.cacheAsBitmap = false;
     }

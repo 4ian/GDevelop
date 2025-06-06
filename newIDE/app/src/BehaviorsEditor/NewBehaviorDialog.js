@@ -114,15 +114,22 @@ export default function NewBehaviorDialog({
             behavior.behaviorMetadata
           ),
           tags: behavior.tags,
+          name: gd.PlatformExtension.getBehaviorNameFromFullBehaviorType(
+            behavior.type
+          ),
+          extensionName: gd.PlatformExtension.getExtensionFromFullBehaviorType(
+            behavior.type
+          ),
 
+          isInstalled: true,
+          // The tier will be overridden with repository data.
+          // Only the built-in and user extensions will keep this value.
           tier: 'installed',
           // Not relevent for `installed` extensions
           version: '',
           url: '',
-          name: '',
           headerUrl: '',
           extensionNamespace: '',
-          extensionName: '',
           authorIds: [],
         }));
     },

@@ -35,9 +35,16 @@ export const useExtensionUpdateAlertDialog = () => {
   ): Promise<boolean> => {
     return await showConfirmation({
       title: t`Extension update`,
-      message: t`This behavior needs an extension update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
+      message:
+        behaviorShortHeader.tier === 'reviewed'
+          ? // Reviewed extensions are closely watched
+            // and any breaking change will be added to the extension metadata.
+            t`This behavior can be updated with new features and fixes.${'\n\n'}Do you want to update it now ?`
+          : // Community extensions are checked as much as possible
+            // but we can't ensure every breaking changes will be added to the extension metadata.
+            t`This behavior can be updated. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
       confirmButtonLabel: t`Update the extension`,
-      dismissButtonLabel: t`Cancel`,
+      dismissButtonLabel: t`Skip the update`,
     });
   };
 };
@@ -143,12 +150,19 @@ export const BehaviorStore = ({
 
   const installAndChoose = React.useCallback(
     async (behaviorShortHeader: BehaviorShortHeader) => {
+      console.log(behaviorShortHeader);
+      if (behaviorShortHeader.tier === 'installed') {
+        // The extension is not in the repository.
+        // It's either built-in or user made.
+        // It can't be updated.
+        onChoose(behaviorShortHeader.type);
+        return;
+      }
       const isExtensionAlreadyInstalled =
-        behaviorShortHeader.tier === 'installed' ||
-        (behaviorShortHeader.extensionName &&
-          project.hasEventsFunctionsExtensionNamed(
-            behaviorShortHeader.extensionName
-          ));
+        behaviorShortHeader.extensionName &&
+        project.hasEventsFunctionsExtensionNamed(
+          behaviorShortHeader.extensionName
+        );
       if (isExtensionAlreadyInstalled) {
         if (
           !isCompatibleWithGDevelopVersion(
@@ -157,6 +171,7 @@ export const BehaviorStore = ({
           )
         ) {
           // Don't suggest to update the extension if the editor can't understand it.
+          onChoose(behaviorShortHeader.type);
           return;
         }
         const breakingChanges = getBreakingChanges(
@@ -165,8 +180,9 @@ export const BehaviorStore = ({
             .getVersion(),
           behaviorShortHeader
         );
-        if (breakingChanges) {
+        if (breakingChanges && breakingChanges.length > 0) {
           // Don't suggest to update the extension if it would break the project.
+          onChoose(behaviorShortHeader.type);
           return;
         }
         const shouldUpdateExtension = await showExtensionUpdateConfirmation(
@@ -174,6 +190,7 @@ export const BehaviorStore = ({
           behaviorShortHeader
         );
         if (!shouldUpdateExtension) {
+          onChoose(behaviorShortHeader.type);
           return;
         }
       }

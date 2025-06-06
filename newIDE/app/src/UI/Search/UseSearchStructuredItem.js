@@ -351,7 +351,8 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       return true;
     })
     .filter(({ item }) => {
-      const passTier = !item.tier || !excludedTiers.has(item.tier);
+      const passTier =
+        item.isInstalled || !item.tier || !excludedTiers.has(item.tier);
       // When checking the chosen filters, we ignore the case.
       // Particularly useful when multiple items are being searched but are not
       // in the same repository, so the tags/categories are not always the same case.

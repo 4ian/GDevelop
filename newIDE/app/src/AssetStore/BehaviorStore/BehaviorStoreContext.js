@@ -206,9 +206,39 @@ export const BehaviorStoreStateProvider = ({
           translatedBehaviorShortHeadersByType[type];
       }
       for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
+        const repositoryBehaviorMetadata =
+          translatedBehaviorShortHeadersByType[installedBehaviorMetadata.type];
+        const behaviorMetadata = repositoryBehaviorMetadata
+          ? {
+              isInstalled: true,
+              tier: repositoryBehaviorMetadata.tier,
+              version: repositoryBehaviorMetadata.version,
+              url: repositoryBehaviorMetadata.url,
+              headerUrl: repositoryBehaviorMetadata.headerUrl,
+              extensionNamespace: repositoryBehaviorMetadata.extensionNamespace,
+              authorIds: repositoryBehaviorMetadata.authorIds,
+              authors: repositoryBehaviorMetadata.authors,
+              changelog: repositoryBehaviorMetadata.changelog,
+              // Keep installed behavior metadata
+              // Especially `objectType` and `allRequiredBehaviorTypes`
+              // since breaking changes won't be suggested and they must not
+              // forbid users to continue to use their version as before.
+              type: installedBehaviorMetadata.type,
+              fullName: installedBehaviorMetadata.fullName,
+              description: installedBehaviorMetadata.description,
+              previewIconUrl: installedBehaviorMetadata.previewIconUrl,
+              objectType: installedBehaviorMetadata.objectType,
+              category: installedBehaviorMetadata.category,
+              allRequiredBehaviorTypes:
+                installedBehaviorMetadata.allRequiredBehaviorTypes,
+              tags: installedBehaviorMetadata.tags,
+              name: installedBehaviorMetadata.name,
+              extensionName: installedBehaviorMetadata.extensionName,
+            }
+          : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
-        ] = installedBehaviorMetadata;
+        ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;
     },

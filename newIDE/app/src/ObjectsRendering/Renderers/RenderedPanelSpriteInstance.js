@@ -156,25 +156,24 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   _updateLocalPositions() {
-    const panelSprite = gd.asPanelSpriteConfiguration(
-      this._associatedObjectConfiguration
-    );
+    const leftBorder = this._borderSprites[3].width;
+    const topBorder = this._borderSprites[3].height;
+    const rightBorder = this._width - this._borderSprites[7].width;
+    const bottomBorder = this._height - this._borderSprites[7].height;
 
-    this._centerSprite.position.x = panelSprite.getLeftMargin();
-    this._centerSprite.position.y = panelSprite.getTopMargin();
+    this._centerSprite.position.x = leftBorder;
+    this._centerSprite.position.y = topBorder;
 
     //Right
-    this._borderSprites[0].position.x =
-      this._width - panelSprite.getRightMargin();
-    this._borderSprites[0].position.y = panelSprite.getTopMargin();
+    this._borderSprites[0].position.x = rightBorder;
+    this._borderSprites[0].position.y = topBorder;
 
     //Top-right
-    this._borderSprites[1].position.x =
-      this._width - this._borderSprites[1].width;
+    this._borderSprites[1].position.x = rightBorder;
     this._borderSprites[1].position.y = 0;
 
     //Top
-    this._borderSprites[2].position.x = panelSprite.getLeftMargin();
+    this._borderSprites[2].position.x = leftBorder;
     this._borderSprites[2].position.y = 0;
 
     //Top-Left
@@ -183,23 +182,19 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
 
     //Left
     this._borderSprites[4].position.x = 0;
-    this._borderSprites[4].position.y = panelSprite.getTopMargin();
+    this._borderSprites[4].position.y = topBorder;
 
     //Bottom-Left
     this._borderSprites[5].position.x = 0;
-    this._borderSprites[5].position.y =
-      this._height - this._borderSprites[5].height;
+    this._borderSprites[5].position.y = bottomBorder;
 
     //Bottom
-    this._borderSprites[6].position.x = panelSprite.getLeftMargin();
-    this._borderSprites[6].position.y =
-      this._height - panelSprite.getBottomMargin();
+    this._borderSprites[6].position.x = leftBorder;
+    this._borderSprites[6].position.y = bottomBorder;
 
     //Bottom-Right
-    this._borderSprites[7].position.x =
-      this._width - this._borderSprites[7].width;
-    this._borderSprites[7].position.y =
-      this._height - this._borderSprites[7].height;
+    this._borderSprites[7].position.x = rightBorder;
+    this._borderSprites[7].position.y = bottomBorder;
   }
 
   _updateSpritesAndTexturesSize() {
@@ -215,33 +210,62 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       0
     );
 
+    let leftMargin = panelSprite.getLeftMargin();
+    let rightMargin = panelSprite.getRightMargin();
+    if (this._centerSprite.width === 0 && leftMargin + rightMargin > 0) {
+      leftMargin = (this._width * leftMargin) / (leftMargin + rightMargin);
+      rightMargin = this._width - leftMargin;
+    }
+    let topMargin = panelSprite.getTopMargin();
+    let bottomMargin = panelSprite.getBottomMargin();
+    if (this._centerSprite.height === 0 && topMargin + bottomMargin > 0) {
+      topMargin = (this._height * topMargin) / (topMargin + bottomMargin);
+      bottomMargin = this._height - topMargin;
+    }
+
     //Right
-    this._borderSprites[0].width = panelSprite.getRightMargin();
+    this._borderSprites[0].width = rightMargin;
     this._borderSprites[0].height = Math.max(
-      this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
+      this._height - topMargin - bottomMargin,
       0
     );
 
     //Top
-    this._borderSprites[2].height = panelSprite.getTopMargin();
+    this._borderSprites[2].height = topMargin;
     this._borderSprites[2].width = Math.max(
-      this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
+      this._width - rightMargin - leftMargin,
       0
     );
 
     //Left
-    this._borderSprites[4].width = panelSprite.getLeftMargin();
+    this._borderSprites[4].width = leftMargin;
     this._borderSprites[4].height = Math.max(
-      this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
+      this._height - topMargin - bottomMargin,
       0
     );
 
     //Bottom
-    this._borderSprites[6].height = panelSprite.getBottomMargin();
+    this._borderSprites[6].height = bottomMargin;
     this._borderSprites[6].width = Math.max(
-      this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
+      this._width - rightMargin - leftMargin,
       0
     );
+
+    //Top-right
+    this._borderSprites[1].width = rightMargin;
+    this._borderSprites[1].height = topMargin;
+
+    //Top-Left
+    this._borderSprites[3].width = leftMargin;
+    this._borderSprites[3].height = topMargin;
+
+    //Bottom-Left
+    this._borderSprites[5].width = leftMargin;
+    this._borderSprites[5].height = bottomMargin;
+
+    //Bottom-Right
+    this._borderSprites[7].width = rightMargin;
+    this._borderSprites[7].height = bottomMargin;
 
     this._pixiObject.cacheAsBitmap = false;
   }

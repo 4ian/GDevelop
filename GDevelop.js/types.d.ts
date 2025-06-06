@@ -1740,6 +1740,8 @@ export class PlatformExtension extends EmscriptenObject {
   getAllSourceFiles(): VectorSourceFileMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
+  static getExtensionFromFullBehaviorType(type: string): string;
+  static getBehaviorNameFromFullBehaviorType(type: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;
   static getExtensionFromFullObjectType(type: string): string;
   static getObjectNameFromFullObjectType(type: string): string;

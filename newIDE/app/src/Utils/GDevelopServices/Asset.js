@@ -8,7 +8,6 @@ import {
   GDevelopPublicAssetResourcesStorageBaseUrl,
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
-import semverSatisfies from 'semver/functions/satisfies';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import {
@@ -321,19 +320,6 @@ export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
 export const doesAssetPackContainAudio = (
   assetPack: PrivateAssetPack
 ): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
-
-/**
- * Check if the IDE version, passed as argument, satisfy the version required by the asset.
- */
-export const isCompatibleWithGDevelopVersion = (
-  ideVersion: string,
-  assetRequiredGDevelopVersion: ?string
-) =>
-  assetRequiredGDevelopVersion
-    ? semverSatisfies(ideVersion, assetRequiredGDevelopVersion, {
-        includePrerelease: true,
-      })
-    : true;
 
 export const listAllPublicAssets = async ({
   environment,

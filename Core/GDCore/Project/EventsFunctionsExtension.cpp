@@ -83,6 +83,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
   element.SetAttribute("iconUrl", iconUrl);
   element.SetAttribute("helpPath", helpPath);
   element.SetAttribute("gdevelopVersion", gdevelopVersion);
+  if (changelog.GetChangesCount() > 0) {
+    changelog.SerializeTo(element.AddChild("changelog"));
+  }
   auto& dependenciesElement = element.AddChild("dependencies");
   dependenciesElement.ConsiderAsArray();
   for (auto& dependency : dependencies)
@@ -139,6 +142,9 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   iconUrl = element.GetStringAttribute("iconUrl");
   helpPath = element.GetStringAttribute("helpPath");
   gdevelopVersion = element.GetStringAttribute("gdevelopVersion");
+  if (element.HasChild("changelog")) {
+    changelog.UnserializeFrom(element.GetChild("changelog"));
+  }
 
   if (element.HasChild("origin")) {
     gd::String originName =

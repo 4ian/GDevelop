@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
+import { isCompatibleWithGDevelopVersion } from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
@@ -10,12 +11,10 @@ import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import Chip from '../../UI/Chip';
 import { LineStackLayout } from '../../UI/Layout';
-import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
 import IconButton from '../../UI/IconButton';
-import semverSatisfies from 'semver/functions/satisfies';
 import { getIDEVersion } from '../../Version';
 
 const gd: libGDevelop = global.gd;
@@ -34,7 +33,7 @@ type Props = {|
   id?: string,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
-  behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata,
+  behaviorShortHeader: BehaviorShortHeader,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
   onShowDetails: () => void,
@@ -68,11 +67,10 @@ export const BehaviorListItem = ({
         objectBehaviorsTypes.includes(requiredBehaviorType)
       );
     });
-  const isEngineCompatible =
-    !behaviorShortHeader.gdevelopVersion ||
-    semverSatisfies(getIDEVersion(), behaviorShortHeader.gdevelopVersion, {
-      includePrerelease: true,
-    });
+  const isEngineCompatible = isCompatibleWithGDevelopVersion(
+    getIDEVersion(),
+    behaviorShortHeader.gdevelopVersion
+  );
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);

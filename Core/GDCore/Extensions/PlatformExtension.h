@@ -651,6 +651,10 @@ class GD_CORE_API PlatformExtension {
   static gd::String GetBehaviorFullType(const gd::String& extensionName,
                                         const gd::String& behaviorName);
 
+  static gd::String GetExtensionFromFullBehaviorType(const gd::String& type);
+
+  static gd::String GetBehaviorNameFromFullBehaviorType(const gd::String& type);
+
   static gd::String GetObjectEventsFunctionFullType(
       const gd::String& extensionName,
       const gd::String& objectName,

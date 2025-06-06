@@ -22,26 +22,9 @@ const emptySearchText = '';
 const noExcludedTiers = new Set();
 const excludedCommunityTiers = new Set(['community']);
 
-export type SearchableBehaviorMetadata = {|
-  type: string,
-  fullName: string,
-  description: string,
-  objectType: string,
-  /**
-   * All required behaviors including transitive ones.
-   */
-  allRequiredBehaviorTypes: Array<string>,
-  previewIconUrl: string,
-  category: string,
-  tags: string[],
-  isDeprecated?: boolean,
-|};
-
 type BehaviorStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<
-    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
-  >,
+  searchResults: ?Array<SearchResult<BehaviorShortHeader>>,
   fetchBehaviors: () => void,
   error: ?Error,
   searchText: string,
@@ -50,7 +33,7 @@ type BehaviorStoreState = {|
   chosenCategory: string,
   setChosenCategory: string => void,
   setInstalledBehaviorMetadataList: (
-    installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>
+    installedBehaviorMetadataList: Array<BehaviorShortHeader>
   ) => void,
   translatedBehaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
   filtersState: FiltersState,
@@ -92,7 +75,7 @@ export const BehaviorStoreStateProvider = ({
   const [
     installedBehaviorMetadataList,
     setInstalledBehaviorMetadataList,
-  ] = React.useState<Array<SearchableBehaviorMetadata>>([]);
+  ] = React.useState<Array<BehaviorShortHeader>>([]);
   const [
     translatedBehaviorShortHeadersByType,
     setTranslatedBehaviorShortHeadersByType,
@@ -216,16 +199,46 @@ export const BehaviorStoreStateProvider = ({
   const allTranslatedBehaviors = React.useMemo(
     () => {
       const allTranslatedBehaviors: {
-        [name: string]: BehaviorShortHeader | SearchableBehaviorMetadata,
+        [name: string]: BehaviorShortHeader,
       } = {};
       for (const type in translatedBehaviorShortHeadersByType) {
         allTranslatedBehaviors[type] =
           translatedBehaviorShortHeadersByType[type];
       }
       for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
+        const repositoryBehaviorMetadata =
+          translatedBehaviorShortHeadersByType[installedBehaviorMetadata.type];
+        const behaviorMetadata = repositoryBehaviorMetadata
+          ? {
+              isInstalled: true,
+              tier: repositoryBehaviorMetadata.tier,
+              version: repositoryBehaviorMetadata.version,
+              url: repositoryBehaviorMetadata.url,
+              headerUrl: repositoryBehaviorMetadata.headerUrl,
+              extensionNamespace: repositoryBehaviorMetadata.extensionNamespace,
+              authorIds: repositoryBehaviorMetadata.authorIds,
+              authors: repositoryBehaviorMetadata.authors,
+              changelog: repositoryBehaviorMetadata.changelog,
+              // Keep installed behavior metadata
+              // Especially `objectType` and `allRequiredBehaviorTypes`
+              // since breaking changes won't be suggested and they must not
+              // forbid users to continue to use their version as before.
+              type: installedBehaviorMetadata.type,
+              fullName: installedBehaviorMetadata.fullName,
+              description: installedBehaviorMetadata.description,
+              previewIconUrl: installedBehaviorMetadata.previewIconUrl,
+              objectType: installedBehaviorMetadata.objectType,
+              category: installedBehaviorMetadata.category,
+              allRequiredBehaviorTypes:
+                installedBehaviorMetadata.allRequiredBehaviorTypes,
+              tags: installedBehaviorMetadata.tags,
+              name: installedBehaviorMetadata.name,
+              extensionName: installedBehaviorMetadata.extensionName,
+            }
+          : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
-        ] = installedBehaviorMetadata;
+        ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;
     },
@@ -282,7 +295,7 @@ export const BehaviorStoreStateProvider = ({
   );
 
   const searchResults: ?Array<
-    SearchResult<BehaviorShortHeader | SearchableBehaviorMetadata>
+    SearchResult<BehaviorShortHeader>
   > = useSearchStructuredItem(allTranslatedBehaviors, {
     searchText,
     chosenItemCategory: chosenCategory,

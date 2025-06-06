@@ -150,7 +150,6 @@ export const BehaviorStore = ({
 
   const installAndChoose = React.useCallback(
     async (behaviorShortHeader: BehaviorShortHeader) => {
-      console.log(behaviorShortHeader);
       if (behaviorShortHeader.tier === 'installed') {
         // The extension is not in the repository.
         // It's either built-in or user made.

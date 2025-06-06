@@ -341,7 +341,7 @@ const ExtensionInstallDialog = ({
           </>
         )}
         {oldBreakingChangesText && (
-          <Accordion>
+          <Accordion noMargin>
             <AccordionHeader noMargin>
               <Text size="sub-title">
                 <Trans>No longer relevent breaking changes</Trans>

@@ -586,12 +586,12 @@ export const AskAiEditor = React.memo<Props>(
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
         (limits && limits.quotas && limits.quotas['ai-request']) || null;
-      const aiRequestPriceInCredits =
-        (limits &&
-          limits.credits &&
-          limits.credits.prices['ai-request'] &&
-          limits.credits.prices['ai-request'].priceInCredits) ||
+      const aiRequestPrice =
+        (limits && limits.credits && limits.credits.prices['ai-request']) ||
         null;
+      const aiRequestPriceInCredits = aiRequestPrice
+        ? aiRequestPrice.priceInCredits
+        : null;
 
       // Refresh limits when navigating ot this tab, as we want to be sure
       // we display the proper quota and credits information for the user.
@@ -890,7 +890,7 @@ export const AskAiEditor = React.memo<Props>(
                     getEditorFunctionCallResults(selectedAiRequest.id)) ||
                   null
                 }
-                aiRequestPriceInCredits={aiRequestPriceInCredits}
+                price={aiRequestPrice}
                 availableCredits={availableCredits}
                 onSendFeedback={onSendFeedback}
                 hasOpenedProject={!!project}

@@ -108,11 +108,11 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
   properties["IgnoreDefaultControls"]
-      .SetLabel(_("Default controls"))
+      .SetLabel(_("Disable default keyboard controls"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
-                    ? "false"
-                    : "true")
+                    ? "true"
+                    : "false")
       .SetType("Boolean");
   properties["SlopeMaxAngle"]
       .SetLabel(_("Slope max. angle"))
@@ -180,7 +180,7 @@ bool PlatformerObjectBehavior::UpdateProperty(
     const gd::String& name,
     const gd::String& value) {
   if (name == "IgnoreDefaultControls")
-    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
+    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "1"));
   else if (name == "CanGrabPlatforms")
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
   else if (name == "CanGrabWithoutMoving")

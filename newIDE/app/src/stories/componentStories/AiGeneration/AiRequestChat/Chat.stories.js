@@ -25,7 +25,14 @@ const commonProps = {
   onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
   isSending: false,
-  aiRequestPriceInCredits: 5,
+  price: {
+    priceInCredits: 5,
+    variablePrice: {
+      agent: {
+        maximumPriceInCredits: 20,
+      },
+    },
+  },
   lastSendError: null,
   availableCredits: 400,
   onSendFeedback: async () => {},
@@ -55,6 +62,11 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
           i18n={i18n}
           aiRequest={null}
           {...commonProps}
+          quota={{
+            limitReached: false,
+            current: 1,
+            max: 2,
+          }}
           increaseQuotaOffering="upgrade"
         />
       )}
@@ -383,13 +395,13 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
+          {...commonProps}
+          increaseQuotaOffering="upgrade"
           quota={{
             limitReached: false,
             current: 1,
             max: 30,
           }}
-          increaseQuotaOffering="upgrade"
-          {...commonProps}
         />
       )}
     </I18n>
@@ -436,8 +448,8 @@ export const LaunchingFollowupAiRequest = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
-          isSending={true}
           {...commonProps}
+          isSending={true}
         />
       )}
     </I18n>

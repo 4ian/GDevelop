@@ -1,11 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n as I18nType } from '@lingui/core';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import {
@@ -13,9 +9,9 @@ import {
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
-import { CompactTextAreaField } from '../../UI/CompactTextAreaField';
+import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import LeftLoader from '../../UI/LeftLoader';
+import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '../../UI/Paper';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
@@ -23,7 +19,10 @@ import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import GetSubscriptionCard from '../../Profile/Subscription/GetSubscriptionCard';
-import { type Quota } from '../../Utils/GDevelopServices/Usage';
+import {
+  type Quota,
+  type UsagePrice,
+} from '../../Utils/GDevelopServices/Usage';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import Link from '../../UI/Link';
 import { getHelpLink } from '../../Utils/HelpLink';
@@ -75,7 +74,7 @@ type Props = {
   // Quota available for using the feature.
   quota: Quota | null,
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
-  aiRequestPriceInCredits: number | null,
+  price: UsagePrice | null,
   availableCredits: number,
 };
 
@@ -83,76 +82,111 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-const getQuotaOrCreditsExplanation = ({
-  newAiRequestMode,
+const getQuotaOrCreditsText = ({
   quota,
   increaseQuotaOffering,
-  aiRequestPriceInCredits,
+  price,
   availableCredits,
+  isMobile,
 }: {|
-  newAiRequestMode: 'chat' | 'agent',
   quota: Quota | null,
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
-  aiRequestPriceInCredits: number | null,
+  price: UsagePrice | null,
   availableCredits: number,
+  isMobile: boolean,
 |}) => {
   if (!quota) return null;
 
-  if (newAiRequestMode === 'agent') {
-    const quotaOrCreditsExplanation = !quota.limitReached ? (
-      increaseQuotaOffering === 'subscribe' ? (
-        <Trans>
-          You still have {quota.max - quota.current} free AI agent requests.
-        </Trans>
-      ) : (
-        <Trans>
-          You still have {quota.max - quota.current} free AI agent requests with
-          your membership (refreshed every month).
-        </Trans>
-      )
-    ) : aiRequestPriceInCredits ? (
-      availableCredits ? (
-        <Trans>
-          Launch a request to the AI agent for{' '}
-          <b>{aiRequestPriceInCredits} credits</b> – you have {availableCredits}{' '}
-          credits.
-        </Trans>
-      ) : (
-        <Trans>
-          Launch a request to the AI agent for{' '}
-          <b>{aiRequestPriceInCredits} credits.</b>
-        </Trans>
-      )
-    ) : null;
+  const quotaOrCreditsText = !quota.limitReached ? (
+    <Tooltip
+      title={
+        <>
+          {increaseQuotaOffering === 'subscribe' ? (
+            <Trans>
+              Get GDevelop premium to get more free requests every month.
+            </Trans>
+          ) : (
+            <Trans>
+              These are parts of your GDevelop premium membership ({quota.max}{' '}
+              free requests per month).
+            </Trans>
+          )}{' '}
+          <Trans>Free requests do not consume credits on your account.</Trans>
+        </>
+      }
+    >
+      <div>
+        {isMobile ? (
+          <Trans>{quota.max - quota.current} free requests left</Trans>
+        ) : (
+          <Trans>
+            {quota.max - quota.current} of {quota.max} free requests left this
+            month
+          </Trans>
+        )}
+      </div>
+    </Tooltip>
+  ) : (
+    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
+  );
 
-    return quotaOrCreditsExplanation;
-  }
+  return quotaOrCreditsText;
+};
 
-  const quotaOrCreditsExplanation = !quota.limitReached ? (
-    increaseQuotaOffering === 'subscribe' ? (
-      <Trans>
-        You still have {quota.max - quota.current} free answers from the AI.
-      </Trans>
-    ) : (
-      <Trans>
-        You still have {quota.max - quota.current} free answers with your
-        membership (refreshed every month).
-      </Trans>
-    )
-  ) : aiRequestPriceInCredits ? (
-    availableCredits ? (
-      <Trans>
-        Use an AI request for <b>{aiRequestPriceInCredits} credits</b> – you
-        have {availableCredits} credits.
-      </Trans>
-    ) : (
-      <Trans>
-        Use an AI request for <b>{aiRequestPriceInCredits} credits.</b>
-      </Trans>
-    )
-  ) : null;
+const getPriceText = ({
+  aiRequestMode,
+  price,
+}: {|
+  aiRequestMode: 'chat' | 'agent',
+  price: UsagePrice | null,
+|}) => {
+  if (!price) return null;
 
-  return quotaOrCreditsExplanation;
+  const priceInCredits = price.priceInCredits;
+  const maximumPriceInCredits =
+    (price.variablePrice &&
+      price.variablePrice[aiRequestMode] &&
+      price.variablePrice[aiRequestMode].maximumPriceInCredits) ||
+    null;
+
+  const priceText = maximumPriceInCredits ? (
+    <Trans>
+      {priceInCredits} to {maximumPriceInCredits}
+    </Trans>
+  ) : (
+    <Trans>{priceInCredits}</Trans>
+  );
+
+  return (
+    <Tooltip
+      title={
+        aiRequestMode === 'agent' ? (
+          <Trans>
+            Each request to the AI agent costs {priceText} credits. It depends
+            on the amount of work the agent will do and the number of times it
+            generates events.
+          </Trans>
+        ) : (
+          <Trans>Each answer from the AI costs {priceText} credits.</Trans>
+        )
+      }
+    >
+      <div>
+        <LineStackLayout alignItems="center" noMargin>
+          {aiRequestMode === 'agent' ? (
+            <Hammer fontSize="small" />
+          ) : (
+            <Help fontSize="small" />
+          )}
+          {aiRequestMode === 'agent' ? (
+            <Trans>{priceText} credits/request</Trans>
+          ) : (
+            <Trans>{priceText} credits/answer</Trans>
+          )}
+        </LineStackLayout>
+      </div>
+    </Tooltip>
+  );
 };
 
 export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
@@ -167,7 +201,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       quota,
       increaseQuotaOffering,
       lastSendError,
-      aiRequestPriceInCredits,
+      price,
       availableCredits,
       hasOpenedProject,
       editorFunctionCallResults,
@@ -244,13 +278,16 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     const { isMobile } = useResponsiveWindowSize();
 
-    const quotaOrCreditsExplanation = getQuotaOrCreditsExplanation({
-      newAiRequestMode,
-      quota,
-      increaseQuotaOffering,
-      aiRequestPriceInCredits,
-      availableCredits,
-    });
+    const priceText = (
+      <Text size="body-small" color="secondary" noMargin>
+        {getPriceText({
+          aiRequestMode: aiRequest
+            ? aiRequest.mode || 'chat'
+            : newAiRequestMode,
+          price,
+        }) || '\u00A0'}
+      </Text>
+    );
 
     const subscriptionBanner =
       quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
@@ -289,15 +326,23 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         </GetSubscriptionCard>
       ) : null;
 
-    const errorOrQuotaOrCreditsExplanation = (
-      <Text size="body2" color={lastSendError ? 'error' : 'secondary'}>
-        {lastSendError ? (
-          <Trans>
-            An error happened when sending your request, please try again.
-          </Trans>
-        ) : (
-          quotaOrCreditsExplanation || '\u00a0'
-        )}
+    const errorText = lastSendError ? (
+      <Text size="body-small" color="error" noMargin>
+        <Trans>
+          An error happened when sending your request, please try again.
+        </Trans>
+      </Text>
+    ) : null;
+
+    const quotaOrCreditsText = (
+      <Text size="body-small" color="secondary" noMargin>
+        {getQuotaOrCreditsText({
+          quota,
+          increaseQuotaOffering,
+          price,
+          availableCredits,
+          isMobile,
+        })}
       </Text>
     );
 
@@ -349,10 +394,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               <ColumnStackLayout justifyContent="center" noMargin>
                 <Column noMargin alignItems="stretch" justifyContent="stretch">
                   <Spacer />
-                  <CompactTextAreaField
+                  <CompactTextAreaFieldWithControls
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isSending}
+                    errored={!!lastSendError}
                     onChange={userRequestText =>
                       setUserRequestTextPerRequestId(
                         userRequestTextPerAiRequestId => ({
@@ -369,70 +415,100 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     }}
                     placeholder={newChatPlaceholder}
                     rows={5}
+                    controls={
+                      <Column>
+                        <LineStackLayout
+                          alignItems="center"
+                          justifyContent="flex-end"
+                        >
+                          <RaisedButton
+                            color="primary"
+                            label={
+                              newAiRequestMode === 'agent' ? (
+                                hasOpenedProject ? (
+                                  <Trans>Build this on my game</Trans>
+                                ) : (
+                                  <Trans>Start building the game</Trans>
+                                )
+                              ) : (
+                                <Trans>Send question</Trans>
+                              )
+                            }
+                            style={{ flexShrink: 0 }}
+                            disabled={
+                              isSending ||
+                              !userRequestTextPerAiRequestId[aiRequestId]
+                            }
+                            onClick={() => {
+                              onStartNewAiRequest({
+                                mode: newAiRequestMode,
+                                userRequest: userRequestTextPerAiRequestId[''],
+                              });
+                            }}
+                          />
+                        </LineStackLayout>
+                      </Column>
+                    }
                   />
                 </Column>
                 <Line noMargin>
-                  <ResponsiveLineStackLayout
+                  <LineStackLayout
                     noMargin
-                    alignItems="flex-start"
+                    alignItems="center"
                     justifyContent="space-between"
                     expand
                   >
-                    {!isMobile && errorOrQuotaOrCreditsExplanation}
-                    <Line noMargin justifyContent="flex-end">
-                      <LeftLoader reserveSpace isLoading={isSending}>
-                        <RaisedButton
-                          color="primary"
-                          label={
-                            newAiRequestMode === 'agent' ? (
-                              hasOpenedProject ? (
-                                <Trans>Build this on my game</Trans>
-                              ) : (
-                                <Trans>Start building the game</Trans>
-                              )
-                            ) : (
-                              <Trans>Send question</Trans>
-                            )
-                          }
-                          style={{ flexShrink: 0 }}
-                          disabled={
-                            isSending ||
-                            !userRequestTextPerAiRequestId[aiRequestId]
-                          }
-                          onClick={() => {
-                            onStartNewAiRequest({
-                              mode: newAiRequestMode,
-                              userRequest: userRequestTextPerAiRequestId[''],
-                            });
-                          }}
-                        />
-                      </LeftLoader>
-                    </Line>
-                    {isMobile && errorOrQuotaOrCreditsExplanation}
-                  </ResponsiveLineStackLayout>
+                    {errorText || priceText}
+                    {errorText ? null : quotaOrCreditsText}
+                  </LineStackLayout>
                 </Line>
               </ColumnStackLayout>
             </form>
             {subscriptionBanner}
           </ColumnStackLayout>
           <Column justifyContent="center">
-            <Text size="body-small" color="secondary" align="center" noMargin>
-              <Trans>
-                The AI is experimental and still being improved.{' '}
-                <Link
-                  href={getHelpLink('/interface/ask-ai')}
-                  color="secondary"
-                  onClick={() =>
-                    Window.openExternalURL(getHelpLink('/interface/ask-ai'))
-                  }
-                >
-                  It has access to your game objects but not events.
-                </Link>
-              </Trans>
-            </Text>
-            <Text size="body-small" color="secondary" align="center" noMargin>
-              <Trans>Answers may have mistakes: always verify them.</Trans>
-            </Text>
+            {newAiRequestMode === 'agent' ? (
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>
+                  The AI agent will build simple games or features for you.{' '}
+                  <Link
+                    href={getHelpLink('/interface/ask-ai')}
+                    color="secondary"
+                    onClick={() =>
+                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                    }
+                  >
+                    It can inspect your game objects and events.
+                  </Link>
+                </Trans>
+              </Text>
+            ) : (
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>
+                  The AI chat is experimental and still being improved.{' '}
+                  <Link
+                    href={getHelpLink('/interface/ask-ai')}
+                    color="secondary"
+                    onClick={() =>
+                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                    }
+                  >
+                    It has access to your game objects but not events.
+                  </Link>
+                </Trans>
+              </Text>
+            )}
+            {newAiRequestMode === 'agent' ? (
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>
+                  Results may vary: experiment and use it for learning.
+                </Trans>
+              </Text>
+            ) : (
+              <Text size="body-small" color="secondary" align="center" noMargin>
+                <Trans>Answers may have mistakes: always verify them.</Trans>
+              </Text>
+            )}
           </Column>
         </div>
       );
@@ -559,10 +635,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Column>
               </Paper>
             ) : null}
-            <CompactTextAreaField
+            <CompactTextAreaFieldWithControls
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}
               disabled={isSending}
+              errored={!!lastSendError}
               onChange={userRequestText =>
                 setUserRequestTextPerRequestId(
                   userRequestTextPerAiRequestId => ({
@@ -582,12 +659,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
                 });
               }}
-            />
-            <Column noMargin alignItems="flex-end">
-              <ResponsiveLineStackLayout noMargin>
-                {!isMobile && errorOrQuotaOrCreditsExplanation}
-                <Line noMargin justifyContent="flex-end">
-                  <LeftLoader reserveSpace isLoading={isSending}>
+              controls={
+                <Column>
+                  <LineStackLayout
+                    alignItems="center"
+                    justifyContent="flex-end"
+                  >
                     <RaisedButton
                       color="primary"
                       disabled={aiRequest.status === 'working' || isSending}
@@ -599,10 +676,20 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         });
                       }}
                     />
-                  </LeftLoader>
-                </Line>
-                {isMobile && errorOrQuotaOrCreditsExplanation}
-              </ResponsiveLineStackLayout>
+                  </LineStackLayout>
+                </Column>
+              }
+            />
+            <Column noMargin alignItems="stretch">
+              <LineStackLayout
+                expand
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                {errorText || priceText}
+                {errorText ? null : quotaOrCreditsText}
+              </LineStackLayout>
             </Column>
           </ColumnStackLayout>
         </form>

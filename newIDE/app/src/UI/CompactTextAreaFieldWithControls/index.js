@@ -3,28 +3,12 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import classNames from 'classnames';
-import classes from './CompactTextAreaField.module.css';
+import classes from './CompactTextAreaFieldWithControls.module.css';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-import Tooltip from '@material-ui/core/Tooltip';
-import Text from '../../UI/Text';
-import { MarkdownText } from '../../UI/MarkdownText';
-import { tooltipEnterDelay } from '../../UI/Tooltip';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { shouldSubmit } from '../KeyboardShortcuts/InteractionKeys';
 
-const styles = {
-  label: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    lineHeight: '17px',
-    maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
-    opacity: 0.7,
-  },
-};
-
-export type CompactTextAreaFieldProps = {|
-  label?: string,
-  markdownDescription?: ?string,
+export type CompactTextAreaFieldWithControlsProps = {|
   value: string,
   onChange: (newValue: string) => void,
   onSubmit?: () => void,
@@ -34,11 +18,10 @@ export type CompactTextAreaFieldProps = {|
   placeholder?: MessageDescriptor,
   rows?: number,
   maxLength?: number,
+  controls: React.Node,
 |};
 
-export const CompactTextAreaField = ({
-  label,
-  markdownDescription,
+export const CompactTextAreaFieldWithControls = ({
   value,
   onChange,
   id,
@@ -48,16 +31,9 @@ export const CompactTextAreaField = ({
   rows,
   maxLength,
   onSubmit,
-}: CompactTextAreaFieldProps) => {
+  controls,
+}: CompactTextAreaFieldWithControlsProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
-
-  const title = !markdownDescription
-    ? label
-    : [
-        label,
-        ' - ',
-        <MarkdownText key="markdown-desc" source={markdownDescription} />,
-      ];
 
   return (
     <I18n>
@@ -69,29 +45,6 @@ export const CompactTextAreaField = ({
             [classes.errored]: errored,
           })}
         >
-          {label && (
-            <Tooltip
-              title={title}
-              enterDelay={tooltipEnterDelay}
-              placement="bottom"
-              PopperProps={{
-                modifiers: {
-                  offset: {
-                    enabled: true,
-                    /**
-                     * It does not seem possible to get the tooltip closer to the anchor
-                     * when positioned on top. So it is positioned on bottom with a negative offset.
-                     */
-                    offset: '0,-20',
-                  },
-                },
-              }}
-            >
-              <Text noMargin style={styles.label}>
-                {label}
-              </Text>
-            </Tooltip>
-          )}
           <div
             className={classNames({
               [classes.compactTextAreaField]: true,
@@ -113,6 +66,7 @@ export const CompactTextAreaField = ({
               rows={rows || 3}
               maxLength={maxLength}
             />
+            {controls}
           </div>
         </label>
       )}

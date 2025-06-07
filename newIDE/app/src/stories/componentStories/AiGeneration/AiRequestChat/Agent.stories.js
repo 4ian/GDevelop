@@ -30,7 +30,14 @@ const commonProps = {
   onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
   isSending: false,
-  aiRequestPriceInCredits: 5,
+  price: {
+    priceInCredits: 5,
+    variablePrice: {
+      agent: {
+        maximumPriceInCredits: 20,
+      },
+    },
+  },
   lastSendError: null,
   availableCredits: 400,
   onSendFeedback: async () => {},

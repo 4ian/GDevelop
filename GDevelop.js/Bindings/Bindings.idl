@@ -2805,6 +2805,7 @@ interface WholeProjectRefactorer {
     unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
     void STATIC_RenameLeaderboards([Ref] Project project, [Const, Ref] MapStringString leaderboardIdMap);
     [Value] SetString STATIC_FindAllLeaderboardIds([Ref] Project project);
+    void STATIC_UpdateBehaviorsSharedData([Ref] Project project);
 };
 
 interface ObjectTools {

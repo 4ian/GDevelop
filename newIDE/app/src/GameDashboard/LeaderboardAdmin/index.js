@@ -858,7 +858,7 @@ export const LeaderboardAdmin = ({
           helperMarkdownText={
             currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
               ? i18n._(
-                  t`Users can chose to see only players' best entries or not.`
+                  t`Users can choose to see only players' best entries or not.`
                 )
               : currentLeaderboard.playerUnicityDisplayChoice ===
                 'PREFER_UNIQUE'

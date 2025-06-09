@@ -311,7 +311,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                   "such as \"Path line\" (in the Advanced category) can be "
                   "used to draw. Be sure to use \"End fill path\" action when "
                   "you're done drawing the shape."),
-                _("Begins drawing filling of an advanced path "
+                _("Begin drawing filling of an advanced path "
                   "with _PARAM0_ (start: _PARAM1_;_PARAM2_)"),
                 _("Advanced"),
                 "res/actions/beginFillPath24.png",

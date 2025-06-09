@@ -1996,6 +1996,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
   static renameLeaderboards(project: Project, leaderboardIdMap: MapStringString): void;
   static findAllLeaderboardIds(project: Project): SetString;
+  static updateBehaviorsSharedData(project: Project): void;
 }
 
 export class ObjectTools extends EmscriptenObject {

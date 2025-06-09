@@ -57,6 +57,8 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 
+const gd: libGDevelop = global.gd;
+
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
 const globalObjectsEmptyPlaceholderId = 'global-empty-placeholder';
@@ -846,6 +848,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ? index
             : globalObjectsContainer.getObjectsCount()
         );
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
         onObjectModified(true);
 
         const newObjectFolderOrObjectWithContext = {
@@ -865,6 +868,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }, 100); // A few ms is enough for a new render to be done.
       },
       [
+        project,
         globalObjectsContainer,
         objectsContainer,
         beforeSetAsGlobalObject,

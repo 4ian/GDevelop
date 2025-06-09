@@ -20,7 +20,7 @@ export default {
 const apiDataServerSideError = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/extensions-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/extension?environment=live`,
       method: 'GET',
       status: 500,
       response: { data: 'status' },
@@ -31,7 +31,15 @@ const apiDataServerSideError = {
 const apiDataFakeExtensions = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/extensions-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/extension?environment=live`,
+      method: 'GET',
+      status: 200,
+      response: {
+        databaseUrl: 'https://fake-cdn.com/extensions-database-v2.json',
+      },
+    },
+    {
+      url: `https://fake-cdn.com/extensions-database-v2.json`,
       method: 'GET',
       status: 200,
       response: fakeExtensionsRegistry,

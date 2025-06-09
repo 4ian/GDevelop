@@ -524,7 +524,7 @@ const Model3DEditor = ({
               <AlertMessage kind="error">
                 <Trans>
                   Make sure to set up a light in the effects of the layer or
-                  chose "No lighting effect" - otherwise the object will appear
+                  choose "No lighting effect" - otherwise the object will appear
                   black.
                 </Trans>
               </AlertMessage>

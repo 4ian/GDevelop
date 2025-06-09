@@ -136,10 +136,6 @@ type EventsContainerProps = {|
   idPrefix: string,
 |};
 
-const hiddenBecauseHeightNotComputedYetStyle = {
-  visibility: 'hidden',
-};
-
 /**
  * The component containing an event.
  * It will report the rendered event height so that the EventsTree can
@@ -161,7 +157,8 @@ const EventContainer = (props: EventsContainerProps) => {
 
   // At EACH rendering, update the cache with the current height of the event.
   React.useLayoutEffect(() => {
-    const height = containerRef.current ? containerRef.current.offsetHeight : 0;
+    const container = containerRef.current;
+    const height = container ? container.offsetHeight : 0;
     if (height === 0) {
       // An empty height means that the event is hidden, when navigating outside of the events sheet tab for example.
       // Don't store the height in this case.
@@ -204,11 +201,6 @@ const EventContainer = (props: EventsContainerProps) => {
       onClick={props.onEventClick}
       onContextMenu={_onEventContextMenu}
       {...longTouchForContextMenuProps}
-      style={
-        eventsHeightsCache.getEventHeight(event)
-          ? undefined
-          : hiddenBecauseHeightNotComputedYetStyle
-      }
     >
       {!!EventComponent && (
         <div style={styles.eventComponentContainer}>

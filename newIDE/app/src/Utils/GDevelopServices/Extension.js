@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type UserPublicProfile } from './User';
+import { retryIfFailed } from '../RetryIfFailed';
 
 const gd: libGDevelop = global.gd;
 
@@ -180,10 +181,19 @@ export const isCompatibleWithExtension = (
     : true;
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/extensions-registry`
+  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/extension`, {
+    params: {
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
+  const { databaseUrl } = response.data;
+
+  const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
+    { times: 2 },
+    async () => (await axios.get(databaseUrl)).data
   );
-  const extensionsRegistry: ExtensionsRegistry = response.data;
 
   if (!extensionsRegistry) {
     throw new Error('Unexpected response from the extensions endpoint.');
@@ -203,10 +213,19 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/behaviors-registry`
+  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/behavior`, {
+    params: {
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
+  const { databaseUrl } = response.data;
+
+  const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
+    { times: 2 },
+    async () => (await axios.get(databaseUrl)).data
   );
-  const behaviorsRegistry: BehaviorsRegistry = response.data;
 
   if (!behaviorsRegistry) {
     throw new Error('Unexpected response from the behaviors endpoint.');
@@ -260,6 +279,9 @@ export const getUserExtensionShortHeaders = async (
     {
       params: {
         authorId,
+        // Could be changed according to the editor environment, but keep
+        // reading from the "live" data for now.
+        environment: 'live',
       },
     }
   );

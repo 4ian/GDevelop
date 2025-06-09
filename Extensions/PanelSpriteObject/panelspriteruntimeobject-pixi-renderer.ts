@@ -116,49 +116,6 @@ namespace gdjs {
 
     _updateLocalPositions() {
       const obj = this._object;
-      const leftBorder = this._borderSprites[3].width;
-      const topBorder = this._borderSprites[3].height;
-      const rightBorder = this._borderSprites[7].width;
-      const bottomBorder = this._borderSprites[7].height;
-
-      this._centerSprite.position.x = leftBorder;
-      this._centerSprite.position.y = topBorder;
-
-      //Right
-      this._borderSprites[0].position.x = obj._width - rightBorder;
-      this._borderSprites[0].position.y = topBorder;
-
-      //Top-right
-      this._borderSprites[1].position.x = obj._width - rightBorder;
-      this._borderSprites[1].position.y = 0;
-
-      //Top
-      this._borderSprites[2].position.x = leftBorder;
-      this._borderSprites[2].position.y = 0;
-
-      //Top-Left
-      this._borderSprites[3].position.x = 0;
-      this._borderSprites[3].position.y = 0;
-
-      //Left
-      this._borderSprites[4].position.x = 0;
-      this._borderSprites[4].position.y = topBorder;
-
-      //Bottom-Left
-      this._borderSprites[5].position.x = 0;
-      this._borderSprites[5].position.y = obj._height - bottomBorder;
-
-      //Bottom
-      this._borderSprites[6].position.x = leftBorder;
-      this._borderSprites[6].position.y = obj._height - bottomBorder;
-
-      //Bottom-Right
-      this._borderSprites[7].position.x = obj._width - rightBorder;
-      this._borderSprites[7].position.y = obj._height - bottomBorder;
-    }
-
-    _updateSpritesAndTexturesSize() {
-      const obj = this._object;
 
       this._centerSprite.width = Math.max(
         obj._width - obj._rBorder - obj._lBorder,
@@ -230,6 +187,46 @@ namespace gdjs {
 
       this._wasRendered = true;
       this._spritesContainer.cacheAsBitmap = false;
+
+      const leftBorder = leftMargin;
+      const topBorder = topMargin;
+      const rightBorder = obj._width - rightMargin;
+      const bottomBorder = obj._height - bottomMargin;
+
+      this._centerSprite.position.x = leftBorder;
+      this._centerSprite.position.y = topBorder;
+
+      //Right
+      this._borderSprites[0].position.x = rightBorder;
+      this._borderSprites[0].position.y = topBorder;
+
+      //Top-right
+      this._borderSprites[1].position.x = rightBorder;
+      this._borderSprites[1].position.y = 0;
+
+      //Top
+      this._borderSprites[2].position.x = leftBorder;
+      this._borderSprites[2].position.y = 0;
+
+      //Top-Left
+      this._borderSprites[3].position.x = 0;
+      this._borderSprites[3].position.y = 0;
+
+      //Left
+      this._borderSprites[4].position.x = 0;
+      this._borderSprites[4].position.y = topBorder;
+
+      //Bottom-Left
+      this._borderSprites[5].position.x = 0;
+      this._borderSprites[5].position.y = bottomBorder;
+
+      //Bottom
+      this._borderSprites[6].position.x = leftBorder;
+      this._borderSprites[6].position.y = bottomBorder;
+
+      //Bottom-Right
+      this._borderSprites[7].position.x = rightBorder;
+      this._borderSprites[7].position.y = bottomBorder;
     }
 
     setTexture(
@@ -374,7 +371,6 @@ namespace gdjs {
           )
         )
       );
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
       this._wrapperContainer.pivot.x = this._object._width / 2;
@@ -383,14 +379,12 @@ namespace gdjs {
 
     updateWidth(): void {
       this._wrapperContainer.pivot.x = this._object._width / 2;
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
     }
 
     updateHeight(): void {
       this._wrapperContainer.pivot.y = this._object._height / 2;
-      this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
     }

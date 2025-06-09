@@ -157,8 +157,8 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
   properties["UseLegacyTrajectory"]
-      .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
-                  "recommended to leave this unchecked)"))
+      .SetLabel(_("Use frame rate dependent trajectories "
+                  "(deprecated — best left unchecked)"))
       .SetGroup(_("Deprecated options"))
       .SetDeprecated()
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
@@ -166,8 +166,8 @@ PlatformerObjectBehavior::GetProperties(
                     : "false")
       .SetType("Boolean");
   properties["UseRepeatedJump"]
-      .SetLabel(_("Allow the character to jump again when the key is held (deprecated, it's "
-                  "recommended to leave this unchecked)"))
+      .SetLabel(_("Allows repeated jumps while holding the jump key "
+                  "(deprecated — best left unchecked)"))
       .SetGroup(_("Deprecated options"))
       .SetDeprecated()
       .SetValue(behaviorContent.GetBoolAttribute("useRepeatedJump", true)

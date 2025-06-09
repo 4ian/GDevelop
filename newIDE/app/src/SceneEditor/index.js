@@ -1808,10 +1808,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._onInstancesSelected(instancesToSelect);
   };
 
-  updateBehaviorsSharedData = () => {
+  updateBehaviorsSharedData = (objectWithContext: ObjectWithContext) => {
     const { layout, project } = this.props;
     if (layout) {
-      layout.updateBehaviorsSharedData(project);
+      if (objectWithContext.global) {
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+      }
+      else {
+        layout.updateBehaviorsSharedData(project);
+      }
     } else {
       // TODO EBO: refactoring for custom objects.
     }
@@ -1917,7 +1922,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         );
       }
     }
-    this.updateBehaviorsSharedData();
+    this.updateBehaviorsSharedData(objectWithContext);
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
   };
@@ -2162,7 +2167,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                           this.props.hotReloadPreviewButtonProps
                         }
                         onUpdateBehaviorsSharedData={() =>
-                          this.updateBehaviorsSharedData()
+                          this.updateBehaviorsSharedData(editedObjectWithContext)
                         }
                         openBehaviorEvents={this.props.openBehaviorEvents}
                         onExtensionInstalled={this.props.onExtensionInstalled}

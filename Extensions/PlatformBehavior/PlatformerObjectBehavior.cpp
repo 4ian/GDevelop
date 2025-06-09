@@ -36,6 +36,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
   behaviorContent.SetAttribute("useLegacyTrajectory", false);
+  behaviorContent.SetAttribute("useRepeatedJump", false);
   behaviorContent.SetAttribute("canGoDownFromJumpthru", true);
 }
 
@@ -156,11 +157,20 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
   properties["UseLegacyTrajectory"]
-      .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
-                  "recommended to leave this unchecked)"))
+      .SetLabel(_("Use frame rate dependent trajectories "
+                  "(deprecated — best left unchecked)"))
       .SetGroup(_("Deprecated options"))
       .SetDeprecated()
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties["UseRepeatedJump"]
+      .SetLabel(_("Allows repeated jumps while holding the jump key "
+                  "(deprecated — best left unchecked)"))
+      .SetGroup(_("Deprecated options"))
+      .SetDeprecated()
+      .SetValue(behaviorContent.GetBoolAttribute("useRepeatedJump", true)
                     ? "true"
                     : "false")
       .SetType("Boolean");
@@ -187,6 +197,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
   else if (name == "UseLegacyTrajectory")
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
+  else if (name == "UseRepeatedJump")
+    behaviorContent.SetAttribute("useRepeatedJump", (value == "1"));
   else if (name == "CanGoDownFromJumpthru")
     behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));
   else if (name == "YGrabOffset")

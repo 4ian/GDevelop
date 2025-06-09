@@ -156,48 +156,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   _updateLocalPositions() {
-    const leftBorder = this._borderSprites[3].width;
-    const topBorder = this._borderSprites[3].height;
-    const rightBorder = this._width - this._borderSprites[7].width;
-    const bottomBorder = this._height - this._borderSprites[7].height;
-
-    this._centerSprite.position.x = leftBorder;
-    this._centerSprite.position.y = topBorder;
-
-    //Right
-    this._borderSprites[0].position.x = rightBorder;
-    this._borderSprites[0].position.y = topBorder;
-
-    //Top-right
-    this._borderSprites[1].position.x = rightBorder;
-    this._borderSprites[1].position.y = 0;
-
-    //Top
-    this._borderSprites[2].position.x = leftBorder;
-    this._borderSprites[2].position.y = 0;
-
-    //Top-Left
-    this._borderSprites[3].position.x = 0;
-    this._borderSprites[3].position.y = 0;
-
-    //Left
-    this._borderSprites[4].position.x = 0;
-    this._borderSprites[4].position.y = topBorder;
-
-    //Bottom-Left
-    this._borderSprites[5].position.x = 0;
-    this._borderSprites[5].position.y = bottomBorder;
-
-    //Bottom
-    this._borderSprites[6].position.x = leftBorder;
-    this._borderSprites[6].position.y = bottomBorder;
-
-    //Bottom-Right
-    this._borderSprites[7].position.x = rightBorder;
-    this._borderSprites[7].position.y = bottomBorder;
-  }
-
-  _updateSpritesAndTexturesSize() {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
@@ -268,6 +226,46 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this._borderSprites[7].height = bottomMargin;
 
     this._pixiObject.cacheAsBitmap = false;
+
+    const leftBorder = leftMargin;
+    const topBorder = topMargin;
+    const rightBorder = this._width - rightMargin;
+    const bottomBorder = this._height - bottomMargin;
+
+    this._centerSprite.position.x = leftBorder;
+    this._centerSprite.position.y = topBorder;
+
+    //Right
+    this._borderSprites[0].position.x = rightBorder;
+    this._borderSprites[0].position.y = topBorder;
+
+    //Top-right
+    this._borderSprites[1].position.x = rightBorder;
+    this._borderSprites[1].position.y = 0;
+
+    //Top
+    this._borderSprites[2].position.x = leftBorder;
+    this._borderSprites[2].position.y = 0;
+
+    //Top-Left
+    this._borderSprites[3].position.x = 0;
+    this._borderSprites[3].position.y = 0;
+
+    //Left
+    this._borderSprites[4].position.x = 0;
+    this._borderSprites[4].position.y = topBorder;
+
+    //Bottom-Left
+    this._borderSprites[5].position.x = 0;
+    this._borderSprites[5].position.y = bottomBorder;
+
+    //Bottom
+    this._borderSprites[6].position.x = leftBorder;
+    this._borderSprites[6].position.y = bottomBorder;
+
+    //Bottom-Right
+    this._borderSprites[7].position.x = rightBorder;
+    this._borderSprites[7].position.y = bottomBorder;
   }
 
   updateTextures() {
@@ -457,7 +455,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       )
     );
 
-    this._updateSpritesAndTexturesSize();
     this._updateLocalPositions();
     this.updatePosition();
   }
@@ -465,7 +462,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   updateWidthHeight() {
     this._pixiObject.pivot.x = this._width / 2;
     this._pixiObject.pivot.y = this._height / 2;
-    this._updateSpritesAndTexturesSize();
     this._updateLocalPositions();
     this.updatePosition();
   }

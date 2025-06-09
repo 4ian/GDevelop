@@ -18,7 +18,7 @@ import {
   hexNumberToRGBArray,
   rgbOrHexToHexNumber,
 } from '../Utils/ColorTransformer';
-import { type SimplifiedBehavior } from '../Utils/SimplifiedProject';
+import { type SimplifiedBehavior } from './SimplifiedProject/SimplifiedProject';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { applyVariableChange } from './ApplyVariableChange';

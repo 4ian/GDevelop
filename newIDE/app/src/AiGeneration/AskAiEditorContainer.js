@@ -18,7 +18,7 @@ import { delay } from '../Utils/Delay';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
-import { getSimplifiedProject } from '../Utils/SimplifiedProject';
+import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
@@ -46,6 +46,8 @@ import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+
+const gd: libGDevelop = global.gd;
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -658,8 +660,18 @@ export const AskAiEditor = React.memo<Props>(
 
             // Request is now ready to be started.
             try {
+              const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
               const simplifiedProjectJson = project
-                ? JSON.stringify(getSimplifiedProject(project, {}))
+                ? JSON.stringify(
+                    simplifiedProjectBuilder.getSimplifiedProject(project, {})
+                  )
+                : null;
+              const projectSpecificExtensionsSummaryJson = project
+                ? JSON.stringify(
+                    simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+                      project
+                    )
+                  )
                 : null;
 
               setSendingAiRequest(null, true);
@@ -667,7 +679,8 @@ export const AskAiEditor = React.memo<Props>(
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
                 userId: profile.id,
-                simplifiedProjectJson,
+                gameProjectJson: simplifiedProjectJson,
+                projectSpecificExtensionsSummaryJson,
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
                 fileMetadata,
@@ -773,11 +786,27 @@ export const AskAiEditor = React.memo<Props>(
           try {
             setSendingAiRequest(selectedAiRequestId, true);
 
+            const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+            const simplifiedProjectJson = project
+              ? JSON.stringify(
+                  simplifiedProjectBuilder.getSimplifiedProject(project, {})
+                )
+              : null;
+            const projectSpecificExtensionsSummaryJson = project
+              ? JSON.stringify(
+                  simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+                    project
+                  )
+                )
+              : null;
+
             const aiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
+                gameProjectJson: simplifiedProjectJson,
+                projectSpecificExtensionsSummaryJson,
                 payWithCredits,
                 userMessage,
               })
@@ -819,6 +848,7 @@ export const AskAiEditor = React.memo<Props>(
           getAuthorizationHeader,
           setLastSendError,
           onRefreshLimits,
+          project,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(

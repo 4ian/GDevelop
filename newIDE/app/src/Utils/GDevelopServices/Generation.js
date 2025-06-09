@@ -294,7 +294,8 @@ export const createAiRequest = async (
   {
     userId,
     userRequest,
-    simplifiedProjectJson,
+    gameProjectJson,
+    projectSpecificExtensionsSummaryJson,
     payWithCredits,
     mode,
     gameId,
@@ -303,7 +304,8 @@ export const createAiRequest = async (
   }: {|
     userId: string,
     userRequest: string,
-    simplifiedProjectJson: string | null,
+    gameProjectJson: string | null,
+    projectSpecificExtensionsSummaryJson: string | null,
     payWithCredits: boolean,
     mode: 'chat' | 'agent',
     gameId: string | null,
@@ -321,7 +323,8 @@ export const createAiRequest = async (
     `${GDevelopGenerationApi.baseUrl}/ai-request`,
     {
       userRequest,
-      gameProjectJson: simplifiedProjectJson,
+      gameProjectJson,
+      projectSpecificExtensionsSummaryJson,
       payWithCredits,
       mode,
       gameId,
@@ -348,12 +351,16 @@ export const addMessageToAiRequest = async (
     functionCallOutputs,
     userMessage,
     payWithCredits,
+    gameProjectJson,
+    projectSpecificExtensionsSummaryJson,
   }: {|
     userId: string,
     aiRequestId: string,
     userMessage: string,
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
     payWithCredits: boolean,
+    gameProjectJson: string | null,
+    projectSpecificExtensionsSummaryJson: string | null,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -365,6 +372,8 @@ export const addMessageToAiRequest = async (
       functionCallOutputs,
       userMessage,
       payWithCredits,
+      gameProjectJson,
+      projectSpecificExtensionsSummaryJson,
     },
     {
       params: {
@@ -431,6 +440,7 @@ export const createAiGeneratedEvent = async (
   {
     userId,
     partialGameProjectJson,
+    projectSpecificExtensionsSummaryJson,
     sceneName,
     eventsDescription,
     extensionNamesList,
@@ -441,6 +451,7 @@ export const createAiGeneratedEvent = async (
   }: {|
     userId: string,
     partialGameProjectJson: string,
+    projectSpecificExtensionsSummaryJson: string,
     sceneName: string,
     eventsDescription: string,
     extensionNamesList: string,
@@ -455,6 +466,7 @@ export const createAiGeneratedEvent = async (
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
     {
       partialGameProjectJson,
+      projectSpecificExtensionsSummaryJson,
       sceneName,
       eventsDescription,
       extensionNamesList,

@@ -9,7 +9,9 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 
 import { type EventsGenerationResult } from '../EditorFunctions';
-import { getSimplifiedProject } from '../Utils/SimplifiedProject';
+import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+
+const gd: libGDevelop = global.gd;
 
 export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
@@ -37,16 +39,24 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       if (!project) throw new Error('No project is opened.');
       if (!profile) throw new Error('User should be authenticated.');
 
+      const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+      const projectSpecificExtensionsSummaryJson = JSON.stringify(
+        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
+          project
+        )
+      );
+
       const createResult = await retryIfFailed({ times: 2 }, () =>
         createAiGeneratedEvent(getAuthorizationHeader, {
           userId: profile.id,
           partialGameProjectJson: JSON.stringify(
-            getSimplifiedProject(project, {
+            simplifiedProjectBuilder.getSimplifiedProject(project, {
               scopeToScene: sceneName,
             }),
             null,
             2
           ),
+          projectSpecificExtensionsSummaryJson,
           sceneName,
           eventsDescription,
           extensionNamesList,

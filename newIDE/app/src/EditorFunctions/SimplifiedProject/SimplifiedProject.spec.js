@@ -1,13 +1,16 @@
 // @flow
-import { getSimplifiedProject } from './SimplifiedProject';
-import { makeTestProject } from '../fixtures/TestProject';
-
-const gd: libGDevelop = global.gd;
+import { makeSimplifiedProjectBuilder } from './SimplifiedProject';
+import { makeTestProject } from '../../fixtures/TestProject';
+import { makeTestExtensions } from '../../fixtures/TestExtensions';
+const initializeGDevelopJs = require('libGD.js-for-tests-only');
 
 describe('SimplifiedProject', () => {
-  it('should create a simplified project JSON with global objects and scenes', () => {
+  it('should create a simplified project JSON with global objects and scenes', async () => {
+    const gd = await initializeGDevelopJs();
     const { project } = makeTestProject(gd);
-    const simplifiedJson = getSimplifiedProject(project, {});
+    const simplifiedJson = makeSimplifiedProjectBuilder(
+      gd
+    ).getSimplifiedProject(project, {});
 
     expect(simplifiedJson).toMatchInlineSnapshot(`
       Object {
@@ -90,6 +93,39 @@ describe('SimplifiedProject', () => {
                 "objectNames": Array [
                   "MySpriteObject",
                 ],
+                "variables": Array [
+                  Object {
+                    "type": "String",
+                    "value": "A multiline
+      str value",
+                    "variableName": "ObjectVariable",
+                  },
+                  Object {
+                    "type": "Structure",
+                    "variableChildren": Array [
+                      Object {
+                        "type": "Number",
+                        "value": "564",
+                        "variableName": "ObjectChild1",
+                      },
+                      Object {
+                        "type": "String",
+                        "value": "Guttentag",
+                        "variableName": "ObjectChild2",
+                      },
+                      Object {
+                        "type": "Boolean",
+                        "value": "True",
+                        "variableName": "ObjectChild3",
+                      },
+                      Object {
+                        "type": "Array",
+                        "variableName": "ObjectChild4",
+                      },
+                    ],
+                    "variableName": "OtherObjectVariable",
+                  },
+                ],
               },
               Object {
                 "behaviors": Array [
@@ -112,6 +148,7 @@ describe('SimplifiedProject', () => {
                   "MySpriteObject",
                   "MyTextObject",
                 ],
+                "variables": undefined,
               },
               Object {
                 "behaviors": Array [
@@ -153,6 +190,7 @@ describe('SimplifiedProject', () => {
                 "objectNames": Array [
                   "MySpriteObjectWithBehaviors",
                 ],
+                "variables": undefined,
               },
               Object {
                 "behaviors": Array [
@@ -188,6 +226,7 @@ describe('SimplifiedProject', () => {
                   "MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name",
                   "MySpriteObjectWithoutBehaviors",
                 ],
+                "variables": undefined,
               },
             ],
             "objects": Array [
@@ -787,5 +826,67 @@ describe('SimplifiedProject', () => {
         ],
       }
     `);
+  });
+
+  it('should include summaries of project specific extensions', async () => {
+    const gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
+
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    // Mimic the test extension "FakeBehavior" was created from a project extension:
+    project.insertNewEventsFunctionsExtension('FakeBehavior', 0);
+
+    const projectSpecificExtensionsSummary = makeSimplifiedProjectBuilder(
+      gd
+    ).getProjectSpecificExtensionsSummary(project);
+
+    expect(projectSpecificExtensionsSummary).toMatchInlineSnapshot(`
+      Object {
+        "extensionSummaries": Array [
+          Object {
+            "behaviors": Object {
+              "FakeBehavior::FakeBehavior": Object {
+                "actions": Array [],
+                "conditions": Array [],
+                "description": "A fake behavior with two properties.",
+                "expressions": Array [
+                  Object {
+                    "description": "Some expression returning a number",
+                    "parameters": Array [
+                      Object {
+                        "description": "First parameter (number)",
+                        "type": "number",
+                      },
+                    ],
+                    "type": "SomethingReturningNumberWith1NumberParam",
+                  },
+                  Object {
+                    "description": "Some expression returning a string",
+                    "parameters": Array [
+                      Object {
+                        "description": "First parameter (number)",
+                        "type": "number",
+                      },
+                    ],
+                    "type": "SomethingReturningStringWith1NumberParam",
+                  },
+                ],
+                "fullName": "Fake behavior with two properties",
+                "name": "FakeBehavior::FakeBehavior",
+              },
+            },
+            "description": "A fake extension with a fake behavior containing 2 properties.",
+            "extensionFullName": "Fake extension with a fake behavior",
+            "extensionName": "FakeBehavior",
+            "freeActions": Array [],
+            "freeConditions": Array [],
+            "freeExpressions": Array [],
+            "objects": Object {},
+          },
+        ],
+      }
+    `);
+
+    project.delete();
   });
 });

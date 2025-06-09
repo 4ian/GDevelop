@@ -23,7 +23,6 @@ namespace gdjs {
   interface JumpingStateNetworkSyncData {
     cjs: number;
     tscjs: number;
-    jkhsjs: boolean;
     jfd: boolean;
   }
 
@@ -57,6 +56,7 @@ namespace gdjs {
     juk: boolean;
     rpk: boolean;
     rlk: boolean;
+    jkhsjs: boolean;
     sn: string;
     ssd: StateNetworkSyncData;
   }
@@ -119,6 +119,7 @@ namespace gdjs {
     private _xGrabTolerance: any;
 
     _useLegacyTrajectory: boolean;
+    _useRepeatedJump: boolean;
 
     _canGoDownFromJumpthru: boolean = false;
 
@@ -139,6 +140,7 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
+    _jumpKeyHeldSinceJumpStart: boolean = false;
     _releasePlatformKey: boolean = false;
     _releaseLadderKey: boolean = false;
 
@@ -204,6 +206,10 @@ namespace gdjs {
         behaviorData.useLegacyTrajectory === undefined
           ? true
           : behaviorData.useLegacyTrajectory;
+      this._useRepeatedJump =
+        behaviorData.useRepeatedJump === undefined
+          ? true
+          : behaviorData.useRepeatedJump;
       this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -249,6 +255,7 @@ namespace gdjs {
           juk: this._wasJumpKeyPressed,
           rpk: this._wasReleasePlatformKeyPressed,
           rlk: this._wasReleaseLadderKeyPressed,
+          jkhsjs: this._jumpKeyHeldSinceJumpStart,
           sn: this._state.toString(),
           ssd: this._state.getNetworkSyncData(),
         },
@@ -305,6 +312,9 @@ namespace gdjs {
       }
       if (behaviorSpecificProps.rlk !== this._releaseLadderKey) {
         this._releaseLadderKey = behaviorSpecificProps.rlk;
+      }
+      if (behaviorSpecificProps.jkhsjs !== this._jumpKeyHeldSinceJumpStart) {
+        this._jumpKeyHeldSinceJumpStart = behaviorSpecificProps.jkhsjs;
       }
 
       if (behaviorSpecificProps.sn !== this._state.toString()) {
@@ -427,6 +437,11 @@ namespace gdjs {
           (inputManager.isKeyPressed(LSHIFTKEY) ||
             inputManager.isKeyPressed(RSHIFTKEY) ||
             inputManager.isKeyPressed(SPACEKEY)));
+      // Check if the jump key is continuously held since
+      // the beginning of the jump.
+      if (!this._jumpKey) {
+        this._jumpKeyHeldSinceJumpStart = false;
+      }
 
       this._ladderKey ||
         (this._ladderKey =
@@ -750,7 +765,11 @@ namespace gdjs {
     }
 
     _checkTransitionJumping() {
-      if (this._canJump && this._jumpKey) {
+      if (
+        this._canJump &&
+        this._jumpKey &&
+        (!this._jumpKeyHeldSinceJumpStart || this._useRepeatedJump)
+      ) {
         this._setJumping();
       }
     }
@@ -2270,7 +2289,6 @@ namespace gdjs {
     private _behavior: PlatformerObjectRuntimeBehavior;
     private _currentJumpSpeed: number = 0;
     private _timeSinceCurrentJumpStart: number = 0;
-    private _jumpKeyHeldSinceJumpStart: boolean = false;
     private _jumpingFirstDelta: boolean = false;
 
     constructor(behavior: PlatformerObjectRuntimeBehavior) {
@@ -2288,7 +2306,7 @@ namespace gdjs {
     enter(from: State) {
       const behavior = this._behavior;
       this._timeSinceCurrentJumpStart = 0;
-      this._jumpKeyHeldSinceJumpStart = true;
+      behavior._jumpKeyHeldSinceJumpStart = true;
 
       if (from !== behavior._jumping && from !== behavior._falling) {
         this._jumpingFirstDelta = true;
@@ -2329,17 +2347,12 @@ namespace gdjs {
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
 
-      // Check if the jump key is continuously held since
-      // the beginning of the jump.
-      if (!behavior._jumpKey) {
-        this._jumpKeyHeldSinceJumpStart = false;
-      }
       this._timeSinceCurrentJumpStart += timeDelta;
 
       const previousJumpSpeed = this._currentJumpSpeed;
       // Decrease jump speed after the (optional) jump sustain time is over.
       const sustainJumpSpeed =
-        this._jumpKeyHeldSinceJumpStart &&
+        behavior._jumpKeyHeldSinceJumpStart &&
         this._timeSinceCurrentJumpStart < behavior._jumpSustainTime;
       if (!sustainJumpSpeed) {
         this._currentJumpSpeed -= behavior._gravity * timeDelta;
@@ -2374,7 +2387,6 @@ namespace gdjs {
       return {
         cjs: this._currentJumpSpeed,
         tscjs: this._timeSinceCurrentJumpStart,
-        jkhsjs: this._jumpKeyHeldSinceJumpStart,
         jfd: this._jumpingFirstDelta,
       };
     }
@@ -2382,7 +2394,6 @@ namespace gdjs {
     updateFromNetworkSyncData(data: JumpingStateNetworkSyncData) {
       this._currentJumpSpeed = data.cjs;
       this._timeSinceCurrentJumpStart = data.tscjs;
-      this._jumpKeyHeldSinceJumpStart = data.jkhsjs;
       this._jumpingFirstDelta = data.jfd;
     }
 

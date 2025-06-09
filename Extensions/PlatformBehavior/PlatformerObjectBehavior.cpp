@@ -36,6 +36,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
   behaviorContent.SetAttribute("useLegacyTrajectory", false);
+  behaviorContent.SetAttribute("useRepeatedJump", false);
   behaviorContent.SetAttribute("canGoDownFromJumpthru", true);
 }
 
@@ -164,6 +165,15 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
+  properties["UseRepeatedJump"]
+      .SetLabel(_("Allow the character to jump again when the key is held (deprecated, it's "
+                  "recommended to leave this unchecked)"))
+      .SetGroup(_("Deprecated options"))
+      .SetDeprecated()
+      .SetValue(behaviorContent.GetBoolAttribute("useRepeatedJump", true)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
   properties["CanGoDownFromJumpthru"]
       .SetLabel(_("Can go down from jumpthru platforms"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
@@ -187,6 +197,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
   else if (name == "UseLegacyTrajectory")
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
+  else if (name == "UseRepeatedJump")
+    behaviorContent.SetAttribute("useRepeatedJump", (value == "1"));
   else if (name == "CanGoDownFromJumpthru")
     behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));
   else if (name == "YGrabOffset")

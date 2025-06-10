@@ -471,48 +471,31 @@ namespace gdjs {
       let cos = 1;
       let sin = 0;
 
+      let isMoving = false;
+      let targetedSpeed = 0;
       // Update the speed of the object:
       if (direction !== -1) {
+        isMoving = true;
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
-        // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
-        if (cos === -1 || cos === 1) {
-          sin = 0;
-        }
-        if (sin === -1 || sin === 1) {
-          cos = 0;
-        }
-        this._xVelocity += this._acceleration * timeDelta * cos;
-        this._yVelocity += this._acceleration * timeDelta * sin;
+        targetedSpeed = this._maxSpeed;
       } else if (this._stickForce !== 0) {
+        isMoving = true;
         if (!this._allowDiagonals) {
           this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
         }
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
-        const norm = this._acceleration * timeDelta * this._stickForce;
-        // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
-        if (cos === -1 || cos === 1) {
-          sin = 0;
-        }
-        if (sin === -1 || sin === 1) {
-          cos = 0;
-        }
-        this._xVelocity += norm * cos;
-        this._yVelocity += norm * sin;
+        targetedSpeed = this._maxSpeed * this._stickForce;
 
         this._wasStickUsed = true;
-        this._stickForce = 0;
       } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
+        isMoving = true;
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
         directionInDeg = (directionInRad * 180.0) / Math.PI;
-        const xVelocityWasPositive = this._xVelocity >= 0;
-        const yVelocityWasPositive = this._yVelocity >= 0;
+      }
+      if (isMoving) {
         // This makes the trigo resilient to rounding errors on directionInRad.
         cos = Math.cos(directionInRad);
         sin = Math.sin(directionInRad);
@@ -522,20 +505,32 @@ namespace gdjs {
         if (sin === -1 || sin === 1) {
           cos = 0;
         }
-        this._xVelocity -= this._deceleration * timeDelta * cos;
-        this._yVelocity -= this._deceleration * timeDelta * sin;
-        if (this._xVelocity > 0 !== xVelocityWasPositive) {
-          this._xVelocity = 0;
+        const targetedSpeedX = targetedSpeed * cos;
+        const targetedSpeedY = targetedSpeed * sin;
+
+        this._xVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+          this._xVelocity,
+          targetedSpeedX,
+          this._maxSpeed,
+          this._acceleration,
+          this._deceleration,
+          timeDelta
+        );
+        this._yVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+          this._yVelocity,
+          targetedSpeedY,
+          this._maxSpeed,
+          this._acceleration,
+          this._deceleration,
+          timeDelta
+        );
+
+        const squaredSpeed =
+          this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
+        if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
+          this._xVelocity = this._maxSpeed * cos;
+          this._yVelocity = this._maxSpeed * sin;
         }
-        if (this._yVelocity > 0 !== yVelocityWasPositive) {
-          this._yVelocity = 0;
-        }
-      }
-      const squaredSpeed =
-        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
-      if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-        this._xVelocity = this._maxSpeed * cos;
-        this._yVelocity = this._maxSpeed * sin;
       }
 
       // No acceleration for angular speed for now.
@@ -589,7 +584,67 @@ namespace gdjs {
         this._rightKey = false;
         this._upKey = false;
         this._downKey = false;
+        this._stickForce = 0;
       }
+    }
+
+    private static getAcceleratedSpeed(
+      currentSpeed: float,
+      targetedSpeed: float,
+      speedMax: float,
+      acceleration: float,
+      deceleration: float,
+      timeDelta: float
+    ): float {
+      let newSpeed = currentSpeed;
+      const turningBackAcceleration = Math.max(acceleration, deceleration);
+      if (targetedSpeed < 0) {
+        if (currentSpeed <= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + turningBackAcceleration * timeDelta
+          );
+        } else if (currentSpeed <= 0) {
+          // Accelerate
+          newSpeed -= Math.max(-speedMax, acceleration * timeDelta);
+        } else {
+          // Turn back at least as fast as it would stop.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - turningBackAcceleration * timeDelta
+          );
+        }
+      } else if (targetedSpeed > 0) {
+        if (currentSpeed >= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - turningBackAcceleration * timeDelta
+          );
+        } else if (currentSpeed >= 0) {
+          // Accelerate
+          newSpeed = Math.min(
+            speedMax,
+            currentSpeed + acceleration * timeDelta
+          );
+        } else {
+          // Turn back at least as fast as it would stop.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + turningBackAcceleration * timeDelta
+          );
+        }
+      } else {
+        // Decelerate and stop.
+        if (currentSpeed < 0) {
+          newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
+        }
+        if (currentSpeed > 0) {
+          newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
+        }
+      }
+      return newSpeed;
     }
 
     simulateControl(input: string) {

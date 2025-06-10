@@ -527,46 +527,27 @@ namespace gdjs {
         const targetedSpeedX = targetedSpeed * cos;
         const targetedSpeedY = targetedSpeed * sin;
 
+        const getAcceleratedSpeed = this._useLegacyTurnBack
+          ? TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed
+          : TopDownMovementRuntimeBehavior.getAcceleratedSpeed;
+
         if (this._movementMode === MovementMode.SmoothTurn) {
-          if (this._useLegacyTurnBack) {
-            this._xVelocity =
-              TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
-                this._xVelocity,
-                targetedSpeedX,
-                this._maxSpeed,
-                this._acceleration,
-                this._deceleration,
-                timeDelta
-              );
-            this._yVelocity =
-              TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
-                this._yVelocity,
-                targetedSpeedY,
-                this._maxSpeed,
-                this._acceleration,
-                this._deceleration,
-                timeDelta
-              );
-          } else {
-            this._xVelocity =
-              TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-                this._xVelocity,
-                targetedSpeedX,
-                this._maxSpeed,
-                this._acceleration,
-                this._deceleration,
-                timeDelta
-              );
-            this._yVelocity =
-              TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-                this._yVelocity,
-                targetedSpeedY,
-                this._maxSpeed,
-                this._acceleration,
-                this._deceleration,
-                timeDelta
-              );
-          }
+          this._xVelocity = getAcceleratedSpeed(
+            this._xVelocity,
+            targetedSpeedX,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
+          this._yVelocity = getAcceleratedSpeed(
+            this._yVelocity,
+            targetedSpeedY,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
 
           const squaredSpeed =
             this._xVelocity * this._xVelocity +
@@ -580,18 +561,19 @@ namespace gdjs {
           if (this._movementMode === MovementMode.SharpTurnWithSmoothTurnBack) {
             const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
             if (dotProduct < 0) {
+              // The object is turning back.
+              // Keep negative part of velocity projected on the new direction.
               currentSpeed = dotProduct;
             }
           }
-          const speed =
-            TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
-              currentSpeed,
-              targetedSpeed,
-              this._maxSpeed,
-              this._acceleration,
-              this._deceleration,
-              timeDelta
-            );
+          const speed = getAcceleratedSpeed(
+            currentSpeed,
+            targetedSpeed,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
           this._xVelocity = speed * cos;
           this._yVelocity = speed * sin;
         }

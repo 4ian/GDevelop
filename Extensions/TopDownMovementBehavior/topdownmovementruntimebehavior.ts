@@ -18,6 +18,20 @@ namespace gdjs {
     sf: float;
   }
 
+  enum MovementMode {
+    SharpTurnWithSmoothTurnBack = 0,
+    SharpTurn,
+    SmoothTurn,
+  }
+
+  const getMovementMode = (movementModeString: string) => {
+    return movementModeString === 'Sharp turn'
+      ? MovementMode.SharpTurn
+      : movementModeString === 'Smooth turn'
+        ? MovementMode.SmoothTurn
+        : MovementMode.SharpTurnWithSmoothTurnBack;
+  };
+
   export interface TopDownMovementNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
@@ -38,6 +52,7 @@ namespace gdjs {
     private _ignoreDefaultControls: boolean;
     private _movementAngleOffset: float;
     private _useLegacyTurnBack: boolean;
+    private _movementMode: MovementMode;
 
     /** The latest angle of movement, in degrees. */
     private _angle: float = 0;
@@ -107,6 +122,7 @@ namespace gdjs {
         behaviorData.useLegacyTurnBack === undefined
           ? true
           : behaviorData.useLegacyTurnBack;
+      this._movementMode = getMovementMode(behaviorData.movementMode);
     }
 
     getNetworkSyncData(): TopDownMovementNetworkSyncData {
@@ -308,9 +324,7 @@ namespace gdjs {
     }
 
     getSpeed(): float {
-      return Math.sqrt(
-        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
-      );
+      return Math.hypot(this._xVelocity, this._yVelocity);
     }
 
     getXVelocity(): float {
@@ -513,48 +527,73 @@ namespace gdjs {
         const targetedSpeedX = targetedSpeed * cos;
         const targetedSpeedY = targetedSpeed * sin;
 
-        if (this._useLegacyTurnBack) {
-          this._xVelocity = TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
-            this._xVelocity,
-            targetedSpeedX,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-          this._yVelocity = TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
-            this._yVelocity,
-            targetedSpeedY,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-        }
-        else {
-          this._xVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-            this._xVelocity,
-            targetedSpeedX,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-          this._yVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-            this._yVelocity,
-            targetedSpeedY,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-        }
+        if (this._movementMode === MovementMode.SmoothTurn) {
+          if (this._useLegacyTurnBack) {
+            this._xVelocity =
+              TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
+                this._xVelocity,
+                targetedSpeedX,
+                this._maxSpeed,
+                this._acceleration,
+                this._deceleration,
+                timeDelta
+              );
+            this._yVelocity =
+              TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
+                this._yVelocity,
+                targetedSpeedY,
+                this._maxSpeed,
+                this._acceleration,
+                this._deceleration,
+                timeDelta
+              );
+          } else {
+            this._xVelocity =
+              TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+                this._xVelocity,
+                targetedSpeedX,
+                this._maxSpeed,
+                this._acceleration,
+                this._deceleration,
+                timeDelta
+              );
+            this._yVelocity =
+              TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+                this._yVelocity,
+                targetedSpeedY,
+                this._maxSpeed,
+                this._acceleration,
+                this._deceleration,
+                timeDelta
+              );
+          }
 
-        const squaredSpeed =
-          this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
-        if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-          this._xVelocity = this._maxSpeed * cos;
-          this._yVelocity = this._maxSpeed * sin;
+          const squaredSpeed =
+            this._xVelocity * this._xVelocity +
+            this._yVelocity * this._yVelocity;
+          if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
+            this._xVelocity = this._maxSpeed * cos;
+            this._yVelocity = this._maxSpeed * sin;
+          }
+        } else {
+          let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
+          if (this._movementMode === MovementMode.SharpTurnWithSmoothTurnBack) {
+            const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
+            if (dotProduct < 0) {
+              currentSpeed = dotProduct;
+            }
+          }
+          const speed =
+            TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
+              currentSpeed,
+              targetedSpeed,
+              this._maxSpeed,
+              this._acceleration,
+              this._deceleration,
+              timeDelta
+            );
+          this._xVelocity = speed * cos;
+          this._yVelocity = speed * sin;
         }
       }
 

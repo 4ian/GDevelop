@@ -1573,20 +1573,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </I18n>
         </div>
-        <Line>
-          <Column expand>
-            <ResponsiveRaisedButton
-              label={<Trans>Add a new object</Trans>}
-              primary
-              onClick={() =>
-                onAddNewObject(selectedObjectFolderOrObjectsWithContext[0])
-              }
-              id="add-new-object-button"
-              icon={<Add />}
-              disabled={isListLocked}
-            />
-          </Column>
-        </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(null)}

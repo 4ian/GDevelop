@@ -548,15 +548,6 @@ namespace gdjs {
             this._deceleration,
             timeDelta
           );
-
-          const squaredSpeed =
-            this._xVelocity * this._xVelocity +
-            this._yVelocity * this._yVelocity;
-          if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-            const ratio = this._maxSpeed / Math.sqrt(squaredSpeed);
-            this._xVelocity *= ratio;
-            this._yVelocity *= ratio;
-          }
         } else {
           let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
           if (this._movementMode === MovementMode.SharpTurnWithSmoothTurnBack) {
@@ -578,6 +569,15 @@ namespace gdjs {
           this._xVelocity = speed * cos;
           this._yVelocity = speed * sin;
         }
+      }
+
+      const squaredSpeed =
+        this._xVelocity * this._xVelocity +
+        this._yVelocity * this._yVelocity;
+      if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
+        const ratio = this._maxSpeed / Math.sqrt(squaredSpeed);
+        this._xVelocity *= ratio;
+        this._yVelocity *= ratio;
       }
 
       // No acceleration for angular speed for now.

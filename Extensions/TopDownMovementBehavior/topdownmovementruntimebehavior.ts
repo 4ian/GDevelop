@@ -553,8 +553,9 @@ namespace gdjs {
             this._xVelocity * this._xVelocity +
             this._yVelocity * this._yVelocity;
           if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-            this._xVelocity = this._maxSpeed * cos;
-            this._yVelocity = this._maxSpeed * sin;
+            const ratio = this._maxSpeed / Math.sqrt(squaredSpeed);
+            this._xVelocity *= ratio;
+            this._yVelocity *= ratio;
           }
         } else {
           let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);

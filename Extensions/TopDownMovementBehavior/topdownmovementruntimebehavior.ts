@@ -37,6 +37,7 @@ namespace gdjs {
     private _angleOffset: float;
     private _ignoreDefaultControls: boolean;
     private _movementAngleOffset: float;
+    private _useLegacyTurnBack: boolean;
 
     /** The latest angle of movement, in degrees. */
     private _angle: float = 0;
@@ -102,6 +103,10 @@ namespace gdjs {
         behaviorData.customIsometryAngle
       );
       this._movementAngleOffset = behaviorData.movementAngleOffset || 0;
+      this._useLegacyTurnBack =
+        behaviorData.useLegacyTurnBack === undefined
+          ? true
+          : behaviorData.useLegacyTurnBack;
     }
 
     getNetworkSyncData(): TopDownMovementNetworkSyncData {
@@ -508,22 +513,42 @@ namespace gdjs {
         const targetedSpeedX = targetedSpeed * cos;
         const targetedSpeedY = targetedSpeed * sin;
 
-        this._xVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-          this._xVelocity,
-          targetedSpeedX,
-          this._maxSpeed,
-          this._acceleration,
-          this._deceleration,
-          timeDelta
-        );
-        this._yVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
-          this._yVelocity,
-          targetedSpeedY,
-          this._maxSpeed,
-          this._acceleration,
-          this._deceleration,
-          timeDelta
-        );
+        if (this._useLegacyTurnBack) {
+          this._xVelocity = TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
+            this._xVelocity,
+            targetedSpeedX,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
+          this._yVelocity = TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed(
+            this._yVelocity,
+            targetedSpeedY,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
+        }
+        else {
+          this._xVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+            this._xVelocity,
+            targetedSpeedX,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
+          this._yVelocity = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
+            this._yVelocity,
+            targetedSpeedY,
+            this._maxSpeed,
+            this._acceleration,
+            this._deceleration,
+            timeDelta
+          );
+        }
 
         const squaredSpeed =
           this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
@@ -633,6 +658,62 @@ namespace gdjs {
           newSpeed = Math.min(
             targetedSpeed,
             currentSpeed + turningBackAcceleration * timeDelta
+          );
+        }
+      } else {
+        // Decelerate and stop.
+        if (currentSpeed < 0) {
+          newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
+        }
+        if (currentSpeed > 0) {
+          newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
+        }
+      }
+      return newSpeed;
+    }
+
+    private static getLegacyAcceleratedSpeed(
+      currentSpeed: float,
+      targetedSpeed: float,
+      speedMax: float,
+      acceleration: float,
+      deceleration: float,
+      timeDelta: float
+    ): float {
+      let newSpeed = currentSpeed;
+      if (targetedSpeed < 0) {
+        if (currentSpeed <= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + deceleration * timeDelta
+          );
+        } else if (currentSpeed <= 0) {
+          // Accelerate
+          newSpeed -= Math.max(-speedMax, acceleration * timeDelta);
+        } else {
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - deceleration * timeDelta
+          );
+        }
+      } else if (targetedSpeed > 0) {
+        if (currentSpeed >= targetedSpeed) {
+          // Reduce the speed to match the stick force.
+          newSpeed = Math.max(
+            targetedSpeed,
+            currentSpeed - deceleration * timeDelta
+          );
+        } else if (currentSpeed >= 0) {
+          // Accelerate
+          newSpeed = Math.min(
+            speedMax,
+            currentSpeed + acceleration * timeDelta
+          );
+        } else {
+          newSpeed = Math.min(
+            targetedSpeed,
+            currentSpeed + deceleration * timeDelta
           );
         }
       } else {

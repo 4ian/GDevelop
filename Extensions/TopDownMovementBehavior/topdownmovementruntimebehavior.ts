@@ -554,7 +554,7 @@ namespace gdjs {
             const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
             if (dotProduct < 0) {
               // The object is turning back.
-              // Keep negative part of velocity projected on the new direction.
+              // Keep the negative velocity projected on the new direction.
               currentSpeed = dotProduct;
             }
           }

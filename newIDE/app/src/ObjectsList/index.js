@@ -1161,7 +1161,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
-                id: 'add-new-object-top-button',
+                id: 'add-new-object-button',
                 enabled: !isListLocked,
               },
               () => [

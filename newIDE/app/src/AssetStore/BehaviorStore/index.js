@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import semverGreaterThan from 'semver/functions/gt';
 import SearchBar from '../../UI/SearchBar';
 import {
   getBreakingChanges,
@@ -163,6 +164,15 @@ export const BehaviorStore = ({
           behaviorShortHeader.extensionName
         );
       if (isExtensionAlreadyInstalled) {
+        const installedVersion = project
+          .getEventsFunctionsExtension(behaviorShortHeader.extensionName)
+          .getVersion();
+        // repository version <= installed version
+        if (!semverGreaterThan(behaviorShortHeader.version, installedVersion)) {
+          // The extension is already up to date.
+          onChoose(behaviorShortHeader.type);
+          return;
+        }
         if (
           !isCompatibleWithGDevelopVersion(
             getIDEVersion(),
@@ -174,9 +184,7 @@ export const BehaviorStore = ({
           return;
         }
         const breakingChanges = getBreakingChanges(
-          project
-            .getEventsFunctionsExtension(behaviorShortHeader.extensionName)
-            .getVersion(),
+          installedVersion,
           behaviorShortHeader
         );
         if (breakingChanges && breakingChanges.length > 0) {

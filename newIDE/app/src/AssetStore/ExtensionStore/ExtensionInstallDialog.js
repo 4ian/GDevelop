@@ -344,7 +344,7 @@ const ExtensionInstallDialog = ({
           <Accordion noMargin>
             <AccordionHeader noMargin>
               <Text size="sub-title">
-                <Trans>No longer relevent breaking changes</Trans>
+                <Trans>Previous breaking changes (no longer relevant)</Trans>
               </Text>
             </AccordionHeader>
             <AccordionBody disableGutters>

@@ -9,7 +9,7 @@ import {
 export type ExtensionChange = { version: string, changes: string };
 
 /**
- * Check if the IDE version satisfies the version required by the asset.
+ * Check if the IDE version satisfies the required version.
  */
 export const isCompatibleWithGDevelopVersion = (
   ideVersion: string,

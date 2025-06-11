@@ -85,7 +85,7 @@ export const useExtensionUpdateAlertDialog = () => {
       // the message more confusing.
       return (await showDeleteConfirmation({
         title: t`Breaking changes`,
-        message: t`This asset required extension updates with breaking changes ${'\n\n' +
+        message: t`This asset requires updates to extensions that have breaking changes${'\n\n' +
           formatExtensionsBreakingChanges(breakingChanges) +
           '\n'}Do you want to update them now ?`,
         confirmButtonLabel: t`Update the extension`,

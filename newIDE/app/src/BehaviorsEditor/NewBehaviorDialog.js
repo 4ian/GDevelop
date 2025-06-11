@@ -125,7 +125,7 @@ export default function NewBehaviorDialog({
           // The tier will be overridden with repository data.
           // Only the built-in and user extensions will keep this value.
           tier: 'installed',
-          // Not relevent for `installed` extensions
+          // Not relevant for `installed` extensions
           version: '',
           url: '',
           headerUrl: '',

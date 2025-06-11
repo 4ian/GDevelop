@@ -26,7 +26,7 @@ export type ExtensionRegistryItemHeader = {|
   category: string,
   previewIconUrl: string,
   changelog?: Array<{ version: string, breaking?: string }>,
-  // Add by the editor.
+  // Added by the editor.
   isInstalled?: boolean,
 |};
 

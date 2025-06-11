@@ -24,8 +24,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { Column, Line } from '../UI/Grid';
-import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import { Column } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {

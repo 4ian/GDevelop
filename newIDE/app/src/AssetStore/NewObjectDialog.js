@@ -66,6 +66,9 @@ export const useExtensionUpdateAlertDialog = () => {
       Array<ExtensionChange>
     >();
     for (const extension of outOfDateExtensionShortHeaders) {
+      if (!project.hasEventsFunctionsExtensionNamed(extension.name)) {
+        continue;
+      }
       const installedVersion = project
         .getEventsFunctionsExtension(extension.name)
         .getVersion();

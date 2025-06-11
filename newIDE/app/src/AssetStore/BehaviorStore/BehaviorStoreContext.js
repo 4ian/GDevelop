@@ -22,6 +22,12 @@ const emptySearchText = '';
 const noExcludedTiers = new Set();
 const excludedCommunityTiers = new Set(['community']);
 
+type TranslatedBehaviorShortHeader = {|
+  ...BehaviorShortHeader,
+  englishFullName: string,
+  englishDescription: string,
+|};
+
 type BehaviorStoreState = {|
   filters: ?Filters,
   searchResults: ?Array<SearchResult<BehaviorShortHeader>>,
@@ -35,7 +41,9 @@ type BehaviorStoreState = {|
   setInstalledBehaviorMetadataList: (
     installedBehaviorMetadataList: Array<BehaviorShortHeader>
   ) => void,
-  translatedBehaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
+  translatedBehaviorShortHeadersByType: {
+    [name: string]: TranslatedBehaviorShortHeader,
+  },
   filtersState: FiltersState,
 |};
 
@@ -80,7 +88,7 @@ export const BehaviorStoreStateProvider = ({
     translatedBehaviorShortHeadersByType,
     setTranslatedBehaviorShortHeadersByType,
   ] = React.useState<{
-    [string]: BehaviorShortHeader,
+    [string]: TranslatedBehaviorShortHeader,
   }>({});
 
   const preferences = React.useContext(PreferencesContext);
@@ -122,10 +130,12 @@ export const BehaviorStoreStateProvider = ({
 
           const translatedBehaviorShortHeadersByType = {};
           behaviorShortHeaders.forEach(behaviorShortHeader => {
-            const translatedBehaviorShortHeader: BehaviorShortHeader = {
+            const translatedBehaviorShortHeader: TranslatedBehaviorShortHeader = {
               ...behaviorShortHeader,
               fullName: i18n._(behaviorShortHeader.fullName),
               description: i18n._(behaviorShortHeader.description),
+              englishFullName: behaviorShortHeader.fullName,
+              englishDescription: behaviorShortHeader.description,
             };
             translatedBehaviorShortHeadersByType[
               behaviorShortHeader.type
@@ -202,38 +212,68 @@ export const BehaviorStoreStateProvider = ({
         [name: string]: BehaviorShortHeader,
       } = {};
       for (const type in translatedBehaviorShortHeadersByType) {
-        allTranslatedBehaviors[type] =
-          translatedBehaviorShortHeadersByType[type];
+        const behaviorShortHeader: any = {
+          ...translatedBehaviorShortHeadersByType[type],
+        };
+        delete behaviorShortHeader.englishFullName;
+        delete behaviorShortHeader.englishDescription;
+        allTranslatedBehaviors[type] = behaviorShortHeader;
       }
       for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
         const repositoryBehaviorMetadata =
           translatedBehaviorShortHeadersByType[installedBehaviorMetadata.type];
         const behaviorMetadata = repositoryBehaviorMetadata
           ? {
+              // Attributes from the extension repository
+
+              // These attributes are important for the installation and update workflow.
               isInstalled: true,
               tier: repositoryBehaviorMetadata.tier,
               version: repositoryBehaviorMetadata.version,
+              changelog: repositoryBehaviorMetadata.changelog,
               url: repositoryBehaviorMetadata.url,
+              // It gives info about the extension that can be displayed to users.
               headerUrl: repositoryBehaviorMetadata.headerUrl,
-              extensionNamespace: repositoryBehaviorMetadata.extensionNamespace,
               authorIds: repositoryBehaviorMetadata.authorIds,
               authors: repositoryBehaviorMetadata.authors,
-              changelog: repositoryBehaviorMetadata.changelog,
-              // Keep installed behavior metadata
-              // Especially `objectType` and `allRequiredBehaviorTypes`
-              // since breaking changes won't be suggested and they must not
-              // forbid users to continue to use their version as before.
-              type: installedBehaviorMetadata.type,
-              fullName: installedBehaviorMetadata.fullName,
-              description: installedBehaviorMetadata.description,
-              previewIconUrl: installedBehaviorMetadata.previewIconUrl,
+              // It's empty and not used.
+              extensionNamespace: repositoryBehaviorMetadata.extensionNamespace,
+
+              // Attributes from the installed extension
+
+              // New extension versions might require a different object.
+              // It must not forbid users to attach the behavior since their
+              // version allows it.
               objectType: installedBehaviorMetadata.objectType,
-              category: installedBehaviorMetadata.category,
               allRequiredBehaviorTypes:
                 installedBehaviorMetadata.allRequiredBehaviorTypes,
+              // These ones are less important but its better to use the icon of
+              // the installed extension since it's used everywhere in the editor.
+              previewIconUrl: installedBehaviorMetadata.previewIconUrl,
+              category: installedBehaviorMetadata.category,
               tags: installedBehaviorMetadata.tags,
+              // Both metadata are supposed to have the same type, but the
+              // installed ones are safer to use.
+              // It reduces the risk of accessing an extension that doesn't
+              // actually exist in the project.
+              type: installedBehaviorMetadata.type,
               name: installedBehaviorMetadata.name,
               extensionName: installedBehaviorMetadata.extensionName,
+
+              // Attributes switching between both
+
+              // Translations may not be relevant for the installed version.
+              // We use the translation only if the not translated texts match.
+              fullName:
+                installedBehaviorMetadata.fullName ===
+                repositoryBehaviorMetadata.englishFullName
+                  ? repositoryBehaviorMetadata.fullName
+                  : installedBehaviorMetadata.fullName,
+              description:
+                installedBehaviorMetadata.description ===
+                repositoryBehaviorMetadata.englishDescription
+                  ? repositoryBehaviorMetadata.description
+                  : installedBehaviorMetadata.description,
             }
           : installedBehaviorMetadata;
         allTranslatedBehaviors[

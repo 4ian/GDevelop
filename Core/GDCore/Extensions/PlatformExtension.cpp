@@ -779,6 +779,26 @@ gd::String PlatformExtension::GetBehaviorFullType(
   return extensionName + separator + behaviorName;
 }
 
+gd::String PlatformExtension::GetExtensionFromFullBehaviorType(
+    const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return "";
+  }
+  return type.substr(0, separatorIndex);
+}
+
+gd::String PlatformExtension::GetBehaviorNameFromFullBehaviorType(
+    const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return "";
+  }
+  return type.substr(separatorIndex + 2);
+}
+
 gd::String PlatformExtension::GetObjectEventsFunctionFullType(
     const gd::String& extensionName,
     const gd::String& objectName,

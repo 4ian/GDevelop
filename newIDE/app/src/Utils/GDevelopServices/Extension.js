@@ -1,13 +1,15 @@
 // @flow
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
-import semverSatisfies from 'semver/functions/satisfies';
 import { type UserPublicProfile } from './User';
 import { retryIfFailed } from '../RetryIfFailed';
 
+// This file is mocked by tests.
+// Don't put any function that is not calling services.
+
 const gd: libGDevelop = global.gd;
 
-type ExtensionTier = 'community' | 'reviewed';
+type ExtensionTier = 'community' | 'reviewed' | 'installed';
 
 export type ExtensionRegistryItemHeader = {|
   tier: ExtensionTier,
@@ -23,6 +25,9 @@ export type ExtensionRegistryItemHeader = {|
   tags: Array<string>,
   category: string,
   previewIconUrl: string,
+  changelog?: Array<{ version: string, breaking?: string }>,
+  // Added by the editor.
+  isInstalled?: boolean,
 |};
 
 export type EventsFunctionInsideExtensionShortHeader = {
@@ -86,6 +91,10 @@ export type BehaviorShortHeader = {|
    * @see adaptBehaviorHeader
    */
   type: string,
+  /**
+   * Can only be true for `installed` extensions.
+   */
+  isDeprecated?: boolean,
 |};
 
 export type ObjectShortHeader = {|
@@ -168,17 +177,6 @@ const transformTagsAsStringToTagsAsArray = <
     tags: dataWithTags.tags.split(',').map(tag => tag.trim().toLowerCase()),
   };
 };
-
-/** Check if the IDE version, passed as argument, satisfy the version required by the extension. */
-export const isCompatibleWithExtension = (
-  ideVersion: string,
-  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
-) =>
-  extensionShortHeader.gdevelopVersion
-    ? semverSatisfies(ideVersion, extensionShortHeader.gdevelopVersion, {
-        includePrerelease: true,
-      })
-    : true;
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
   const response = await axios.get(`${GDevelopAssetApi.baseUrl}/extension`, {

@@ -530,7 +530,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
               icon: <Add />,
               label: i18n._(t`Add a new group`),
               click: onCreateGroup,
-              id: 'add-new-group-top-button',
+              id: 'add-new-group-button',
               enabled: !isListLocked,
             }
           : null,
@@ -696,18 +696,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             }}
           </I18n>
         </div>
-        <Line>
-          <Column expand>
-            <ResponsiveRaisedButton
-              label={<Trans>Add a new group</Trans>}
-              primary
-              onClick={onCreateGroup}
-              id="add-new-group-button"
-              icon={<Add />}
-              disabled={isListLocked}
-            />
-          </Column>
-        </Line>
       </Background>
     );
   }

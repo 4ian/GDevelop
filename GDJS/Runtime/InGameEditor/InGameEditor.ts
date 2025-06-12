@@ -303,8 +303,7 @@ namespace gdjs {
     private _raycaster: THREE.Raycaster =
       typeof THREE === 'undefined' ? null : new THREE.Raycaster();
 
-    private _orbitCameraControl: OrbitCameraControl;
-    private _freeCameraControl: FreeCameraControl;
+    private _editorCameras = new Map<string, EditorCamera>();
 
     // The controls shown to manipulate the selection.
     private _selectionControls: {
@@ -346,9 +345,6 @@ namespace gdjs {
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
-      this._orbitCameraControl = new OrbitCameraControl(game);
-      this._freeCameraControl = new FreeCameraControl(game);
-      this._freeCameraControl.setEnabled(false);
     }
 
     getEditorId(): string {
@@ -540,13 +536,14 @@ namespace gdjs {
           (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
         zoom;
 
-      this.switchToOrbitCamera();
-      this._orbitCameraControl.target.x = sceneAreaCenterX;
-      this._orbitCameraControl.target.y = sceneAreaCenterY;
-      this._orbitCameraControl.target.z = sceneArea.minZ;
-      this._orbitCameraControl.distance = distance;
-      this._orbitCameraControl.rotationAngle = 0;
-      this._orbitCameraControl.elevationAngle = 90;
+      this._getEditorCamera().switchToOrbitCamera();
+      const orbitCameraControl = this._getObitCameraControl();
+      orbitCameraControl.target.x = sceneAreaCenterX;
+      orbitCameraControl.target.y = sceneAreaCenterY;
+      orbitCameraControl.target.z = sceneArea.minZ;
+      orbitCameraControl.distance = distance;
+      orbitCameraControl.rotationAngle = 0;
+      orbitCameraControl.elevationAngle = 90;
     }
 
     zoomBy(zoomInFactor: float) {
@@ -554,13 +551,15 @@ namespace gdjs {
       if (!currentScene) return;
 
       const distanceDelta = zoomInFactor > 1 ? 200 : -200;
-      if (this._orbitCameraControl.isEnabled()) {
-        this._orbitCameraControl.distance = Math.min(
+      const orbitCameraControl = this._getObitCameraControl();
+      if (orbitCameraControl.isEnabled()) {
+        orbitCameraControl.distance = Math.min(
           10,
-          this._orbitCameraControl.distance + distanceDelta
+          orbitCameraControl.distance + distanceDelta
         );
       } else {
-        this._freeCameraControl.moveForward(distanceDelta);
+        const freeCameraControl = this._getFreeCameraControl();
+        freeCameraControl.moveForward(distanceDelta);
       }
     }
 
@@ -642,16 +641,17 @@ namespace gdjs {
           (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
         zoom;
 
-      this.switchToOrbitCamera();
+      this._getEditorCamera().switchToOrbitCamera();
 
       // We keep the same camera distance.
-      this._orbitCameraControl.target.x = object.getCenterXInScene();
-      this._orbitCameraControl.target.y = object.getCenterYInScene();
-      this._orbitCameraControl.target.z = is3D(object)
+      const orbitCameraControl = this._getObitCameraControl();
+      orbitCameraControl.target.x = object.getCenterXInScene();
+      orbitCameraControl.target.y = object.getCenterYInScene();
+      orbitCameraControl.target.z = is3D(object)
         ? object.getUnrotatedAABBMinZ()
         : 0;
-      this._orbitCameraControl.rotationAngle = 0;
-      this._orbitCameraControl.elevationAngle = 90;
+      orbitCameraControl.rotationAngle = 0;
+      orbitCameraControl.elevationAngle = 90;
     }
 
     private _handleCameraMovement() {
@@ -659,20 +659,23 @@ namespace gdjs {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
+      const orbitCameraControl = this._getObitCameraControl();
+      const freeCameraControl = this._getFreeCameraControl();
+
       const selectedObject = this._selection.getLastSelectedObject();
       if (inputManager.isKeyPressed(F_KEY) && selectedObject) {
-        this.switchToOrbitCamera();
+        this._getEditorCamera().switchToOrbitCamera();
 
         // TODO Use the center of the AABB of the whole selection instead
-        this._orbitCameraControl.target.x = selectedObject.getCenterXInScene();
-        this._orbitCameraControl.target.y = selectedObject.getCenterYInScene();
-        this._orbitCameraControl.target.z = is3D(selectedObject)
+        orbitCameraControl.target.x = selectedObject.getCenterXInScene();
+        orbitCameraControl.target.y = selectedObject.getCenterYInScene();
+        orbitCameraControl.target.z = is3D(selectedObject)
           ? selectedObject.getCenterZInScene()
           : 0;
       }
 
       if (
-        !this._freeCameraControl.isEnabled() &&
+        !freeCameraControl.isEnabled() &&
         (inputManager.isKeyPressed(W_KEY) ||
           inputManager.isKeyPressed(S_KEY) ||
           inputManager.isKeyPressed(A_KEY) ||
@@ -680,49 +683,28 @@ namespace gdjs {
           inputManager.isKeyPressed(Q_KEY) ||
           inputManager.isKeyPressed(E_KEY))
       ) {
-        this._orbitCameraControl.setEnabled(false);
-        this._freeCameraControl.setEnabled(true);
+        orbitCameraControl.setEnabled(false);
+        freeCameraControl.setEnabled(true);
 
-        this._freeCameraControl.position.x =
-          this._orbitCameraControl.getCameraX();
-        this._freeCameraControl.position.y =
-          this._orbitCameraControl.getCameraY();
-        this._freeCameraControl.position.z =
-          this._orbitCameraControl.getCameraZ();
-        this._freeCameraControl.rotationAngle =
-          this._orbitCameraControl.rotationAngle;
-        this._freeCameraControl.elevationAngle =
-          this._orbitCameraControl.elevationAngle;
+        freeCameraControl.position.x = orbitCameraControl.getCameraX();
+        freeCameraControl.position.y = orbitCameraControl.getCameraY();
+        freeCameraControl.position.z = orbitCameraControl.getCameraZ();
+        freeCameraControl.rotationAngle = orbitCameraControl.rotationAngle;
+        freeCameraControl.elevationAngle = orbitCameraControl.elevationAngle;
       }
 
-      this._orbitCameraControl.step();
-      this._freeCameraControl.step();
+      this._getEditorCamera().step();
 
       const layerNames = [];
       currentScene.getAllLayerNames(layerNames);
       layerNames.forEach((layerName) => {
         const layer = currentScene.getLayer(layerName);
 
-        if (this._orbitCameraControl.isEnabled()) {
-          this._orbitCameraControl.updateCamera(currentScene, layer);
-        } else {
-          this._freeCameraControl.updateCamera(currentScene, layer);
-        }
+        this._getEditorCamera().updateCamera(currentScene, layer);
       });
 
       // TODO: touch controls - pinch to zoom
       // TODO: touch controls - two fingers to move the camera
-    }
-
-    switchToOrbitCamera(): void {
-      if (this._freeCameraControl.isEnabled()) {
-        this._orbitCameraControl.rotationAngle =
-          this._freeCameraControl.rotationAngle;
-        this._orbitCameraControl.elevationAngle =
-          this._freeCameraControl.elevationAngle;
-      }
-      this._orbitCameraControl.setEnabled(true);
-      this._freeCameraControl.setEnabled(false);
     }
 
     moveSelectionUnderCursor() {
@@ -1669,6 +1651,58 @@ namespace gdjs {
       }
       this._wasMouseLeftButtonPressed = inputManager.isMouseButtonPressed(0);
       this._wasMouseRightButtonPressed = inputManager.isMouseButtonPressed(1);
+    }
+
+    private _getEditorCamera(): EditorCamera {
+      let editorCamera = this._editorCameras.get(this._editorId);
+      if (!editorCamera) {
+        editorCamera = new EditorCamera(this._runtimeGame);
+        this._editorCameras.set(this._editorId, editorCamera);
+      }
+      return editorCamera;
+    }
+
+    private _getObitCameraControl() {
+      return this._getEditorCamera().orbitCameraControl;
+    }
+
+    private _getFreeCameraControl() {
+      return this._getEditorCamera().freeCameraControl;
+    }
+  }
+
+  class EditorCamera implements CameraControl {
+    orbitCameraControl: OrbitCameraControl;
+    freeCameraControl: FreeCameraControl;
+
+    constructor(runtimeGame: gdjs.RuntimeGame) {
+      this.orbitCameraControl = new OrbitCameraControl(runtimeGame);
+      this.freeCameraControl = new FreeCameraControl(runtimeGame);
+      this.freeCameraControl.setEnabled(false);
+    }
+
+    switchToOrbitCamera(): void {
+      if (this.freeCameraControl.isEnabled()) {
+        this.orbitCameraControl.rotationAngle =
+          this.freeCameraControl.rotationAngle;
+        this.orbitCameraControl.elevationAngle =
+          this.freeCameraControl.elevationAngle;
+      }
+      this.orbitCameraControl.setEnabled(true);
+      this.freeCameraControl.setEnabled(false);
+    }
+
+    step(): void {
+      this.orbitCameraControl.step();
+      this.freeCameraControl.step();
+    }
+
+    updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
+      if (this.orbitCameraControl.isEnabled()) {
+        this.orbitCameraControl.updateCamera(currentScene, layer);
+      } else {
+        this.freeCameraControl.updateCamera(currentScene, layer);
+      }
     }
   }
 

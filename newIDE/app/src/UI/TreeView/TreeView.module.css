@@ -24,6 +24,7 @@
   align-items: center;
   height: 100%;
   position: relative;
+  min-width: 0;
 
   --horizontal-padding: 21px;
 }
@@ -38,8 +39,9 @@
 }
 .rowContentSide.rowContentSideRight {
   /* Used for a better dragging preview. */
-  position: absolute;
-  right: 0;
+  /* position: absolute;
+  right: 0; */
+  flex-shrink: 0;
   z-index: 1;
 }
 

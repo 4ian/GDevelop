@@ -295,6 +295,7 @@ namespace gdjs {
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
     private _editedInstanceDataList: InstanceData[] = [];
+    private _selectedLayerName: string = '';
     //@ts-ignore
     private _tempVector2d: THREE.Vector2 =
       typeof THREE === 'undefined' ? null : new THREE.Vector2();
@@ -373,6 +374,10 @@ namespace gdjs {
         this._editedInstanceContainer ||
         this._runtimeGame.getSceneStack().getCurrentScene()
       );
+    }
+
+    setSelectedLayerName(layerName: string): void {
+      this._selectedLayerName = layerName;
     }
 
     getTempVector2d(x: float, y: float): THREE.Vector2 {
@@ -618,11 +623,16 @@ namespace gdjs {
         return;
       }
 
+      const layer = this._getFirstLayer3D();
+      if (!layer) {
+        return;
+      }
+
       // TODO Use this delta to rotate around the visible part of the screen.
       // or maybe we don't care and this block can be removed.
       const renderedWidth = this._runtimeGame.getGameResolutionWidth();
       const renderedHeight = this._runtimeGame.getGameResolutionHeight();
-      const zoom = currentScene.getLayer('').getCameraZoom();
+      const zoom = layer.getCameraZoom();
       const centerDeltaX =
         (renderedWidth *
           (0.5 * (-visibleScreenArea.minX + (1 - visibleScreenArea.maxX)))) /
@@ -794,56 +804,61 @@ namespace gdjs {
       if (!threeRenderer) return;
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
-      // TODO Loop on all 3D layers
-      const layerName = '';
-      const runtimeLayerRender = currentScene.getLayer(layerName).getRenderer();
-      const threeCamera = runtimeLayerRender.getThreeCamera();
-      const threeScene = runtimeLayerRender.getThreeScene();
-      if (!threeCamera || !threeScene) return;
 
-      const cursorX = inputManager.getCursorX();
-      const cursorY = inputManager.getCursorY();
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const runtimeLayerRender = currentScene
+          .getLayer(layerName)
+          .getRenderer();
+        const threeCamera = runtimeLayerRender.getThreeCamera();
+        const threeScene = runtimeLayerRender.getThreeScene();
+        if (!threeCamera || !threeScene) return;
 
-      if (inputManager.isMouseButtonPressed(0)) {
-        if (this._wasMouseLeftButtonPressed && this._selectionBox) {
-          this._selectionBox.endPoint.set(
-            this._getNormalizedScreenX(cursorX),
-            this._getNormalizedScreenY(cursorY),
-            0.5
-          );
-        } else {
-          this._selectionBox = new THREE_ADDONS.SelectionBox(
-            threeCamera,
-            threeScene
-          );
-          this._selectionBox.startPoint.set(
-            this._getNormalizedScreenX(cursorX),
-            this._getNormalizedScreenY(cursorY),
-            0.5
-          );
-        }
-      }
-      if (
-        inputManager.isMouseButtonReleased(0) &&
-        this._selectionBox &&
-        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
-      ) {
-        const objects = new Set<gdjs.RuntimeObject>();
-        for (const selectThreeObject of this._selectionBox.select()) {
-          // TODO Select the object if all its meshes are inside the rectangle
-          // instead of if any is.
-          const object = this._getObject(selectThreeObject);
-          if (object) {
-            objects.add(object);
+        const cursorX = inputManager.getCursorX();
+        const cursorY = inputManager.getCursorY();
+
+        if (inputManager.isMouseButtonPressed(0)) {
+          if (this._wasMouseLeftButtonPressed && this._selectionBox) {
+            this._selectionBox.endPoint.set(
+              this._getNormalizedScreenX(cursorX),
+              this._getNormalizedScreenY(cursorY),
+              0.5
+            );
+          } else {
+            this._selectionBox = new THREE_ADDONS.SelectionBox(
+              threeCamera,
+              threeScene
+            );
+            this._selectionBox.startPoint.set(
+              this._getNormalizedScreenX(cursorX),
+              this._getNormalizedScreenY(cursorY),
+              0.5
+            );
           }
         }
-        if (!isShiftPressed(inputManager)) {
-          this._selection.clear();
+        if (
+          inputManager.isMouseButtonReleased(0) &&
+          this._selectionBox &&
+          !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
+        ) {
+          const objects = new Set<gdjs.RuntimeObject>();
+          for (const selectThreeObject of this._selectionBox.select()) {
+            // TODO Select the object if all its meshes are inside the rectangle
+            // instead of if any is.
+            const object = this._getObject(selectThreeObject);
+            if (object) {
+              objects.add(object);
+            }
+          }
+          if (!isShiftPressed(inputManager)) {
+            this._selection.clear();
+          }
+          for (const object of objects) {
+            this._selection.add(object);
+          }
+          this._selectionBox = null;
         }
-        for (const object of objects) {
-          this._selection.add(object);
-        }
-        this._selectionBox = null;
       }
     }
 
@@ -1265,18 +1280,17 @@ namespace gdjs {
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
 
-      // TODO Actually get the active layer of the editor.
-      const activeLayer = currentScene.getLayer('');
+      const selectedLayer = currentScene.getLayer(this._selectedLayerName);
 
       if (dropped) {
         if (this._draggedNewObject) {
-          const isLayer3D = activeLayer.getRenderer().getThreeGroup();
+          const isLayer3D = selectedLayer.getRenderer().getThreeGroup();
           if (isLayer3D) {
-            const cameraX = activeLayer.getCameraX();
-            const cameraY = activeLayer.getCameraY();
+            const cameraX = selectedLayer.getCameraX();
+            const cameraY = selectedLayer.getCameraY();
             const cameraZ = gdjs.scene3d.camera.getCameraZ(
               currentScene,
-              activeLayer.getName(),
+              selectedLayer.getName(),
               0
             );
 
@@ -1312,7 +1326,8 @@ namespace gdjs {
               cursorZ - cameraZ
             );
             if (
-              cursorDistance > activeLayer.getInitialCamera3DFarPlaneDistance()
+              cursorDistance >
+              selectedLayer.getInitialCamera3DFarPlaneDistance()
             ) {
               // Avoid to create an object outside of the rendered area.
               this.cancelDragNewInstance();
@@ -1337,7 +1352,7 @@ namespace gdjs {
         const newObject = editedInstanceContainer.createObject(name);
         if (!newObject) return;
         newObject.persistentUuid = gdjs.makeUuid();
-        newObject.setLayer(activeLayer.getName());
+        newObject.setLayer(selectedLayer.getName());
         this._draggedNewObject = newObject;
       }
 
@@ -1364,31 +1379,50 @@ namespace gdjs {
       }
     }
 
+    _getFirstLayer3D(): gdjs.RuntimeLayer | null {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return null;
+
+      const layerNames = [];
+      currentScene.getAllLayerNames(layerNames);
+      for (const layerName of layerNames) {
+        const layer = currentScene.getLayer(layerName);
+        const isLayer3D = layer.getRenderer().getThreeGroup();
+        if (isLayer3D) {
+          return layer;
+        }
+      }
+      return null;
+    }
+
     /**
      * @returns The cursor projected on the plane Z = 0 or `null` if the cursor is in the sky.
      */
     _getProjectedCursor(): FloatPoint | null {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return null;
-      // TODO Actually get the active layer of the editor.
-      const activeLayer = currentScene.getLayer('');
 
-      const cameraX = activeLayer.getCameraX();
-      const cameraY = activeLayer.getCameraY();
+      const layer = this._getFirstLayer3D();
+      if (!layer) {
+        return null;
+      }
+
+      const cameraX = layer.getCameraX();
+      const cameraY = layer.getCameraY();
       const cameraZ = gdjs.scene3d.camera.getCameraZ(
         currentScene,
-        activeLayer.getName(),
+        layer.getName(),
         0
       );
 
       const cursorX = gdjs.evtTools.input.getCursorX(
         currentScene,
-        activeLayer.getName(),
+        layer.getName(),
         0
       );
       const cursorY = gdjs.evtTools.input.getCursorY(
         currentScene,
-        activeLayer.getName(),
+        layer.getName(),
         0
       );
 
@@ -1396,7 +1430,7 @@ namespace gdjs {
       const deltaY = cursorY - cameraY;
       const deltaZ = 0 - cameraZ;
 
-      const threeCamera = activeLayer.getRenderer().getThreeCamera();
+      const threeCamera = layer.getRenderer().getThreeCamera();
       if (!threeCamera) {
         return [cursorX, cursorY];
       }

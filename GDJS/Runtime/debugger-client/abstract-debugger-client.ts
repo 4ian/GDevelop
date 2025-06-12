@@ -362,6 +362,12 @@ namespace gdjs {
             data.payload.visibleScreenArea
           );
         }
+      } else if (data.command === 'setSelectedLayer') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.setSelectedLayerName(
+            data.payload.layerName
+          );
+        }
       } else if (data.command === 'zoomToFitSelection') {
         if (runtimeGame._inGameEditor) {
           runtimeGame._inGameEditor.zoomToFitSelection(

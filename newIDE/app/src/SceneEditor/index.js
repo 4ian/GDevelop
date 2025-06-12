@@ -1261,6 +1261,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _onSelectLayer = (layerName: string) => {
+    this.setState({ selectedLayer: layerName });
+
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setSelectedLayer',
+          payload: {
+            layerName,
+          },
+        });
+      });
+    }
+  }
+
   _onDeleteObjects = (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],
@@ -2409,9 +2425,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onLayerRenamed={this._onLayerRenamed}
                 onLayersModified={this._onLayersModified}
                 onRemoveLayer={this._onRemoveLayer}
-                onSelectLayer={(layer: string) =>
-                  this.setState({ selectedLayer: layer })
-                }
+                onSelectLayer={this._onSelectLayer}
                 tileMapTileSelection={this.state.tileMapTileSelection}
                 onSelectTileMapTile={this.onSelectTileMapTile}
                 onExportAssets={this.openObjectExporterDialog}

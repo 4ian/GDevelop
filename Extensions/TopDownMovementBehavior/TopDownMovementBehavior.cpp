@@ -34,6 +34,7 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("viewpoint", "TopDown");
   behaviorContent.SetAttribute("customIsometryAngle", 30);
   behaviorContent.SetAttribute("movementAngleOffset", 0);
+  behaviorContent.SetAttribute("useLegacyTurnBack", false);
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
@@ -93,6 +94,15 @@ TopDownMovementBehavior::GetProperties(
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "false"
                     : "true")
+      .SetType("Boolean");
+  properties["UseLegacyTurnBack"]
+      .SetLabel(_("Only use acceleration to turn back "
+                  "(deprecated — best left unchecked)"))
+      .SetGroup(_("Deprecated options"))
+      .SetDeprecated()
+      .SetValue(behaviorContent.GetBoolAttribute("useLegacyTurnBack", true)
+                    ? "true"
+                    : "false")
       .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
@@ -155,6 +165,9 @@ bool TopDownMovementBehavior::UpdateProperty(
   if (name == "RotateObject") {
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
+  }
+  if (name == "UseLegacyTurnBack") {
+    behaviorContent.SetAttribute("useLegacyTurnBack", (value == "1"));
   }
   if (name == "Viewpoint") {
     // Fix the offset angle when switching between top-down and isometry

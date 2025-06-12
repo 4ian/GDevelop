@@ -24,8 +24,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { Column, Line } from '../UI/Grid';
-import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import { Column } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
@@ -1093,6 +1092,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [projectScopedContainersAccessor]
     );
 
+    const isEntirelyEmpty =
+      objectsContainer.getObjectsCount() === 0 &&
+      (!globalObjectsContainer ||
+        globalObjectsContainer.getObjectsCount() === 0);
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -1156,12 +1160,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               sceneObjectsRootFolderId,
               i18n._(labels.localScopeObjectsTitle),
               {
+                primary: true,
+                showPrimaryLabel: isEntirelyEmpty,
                 icon: <Add />,
-                label: t`Add an object`,
+                label: t`Add object`,
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
-                id: 'add-new-object-top-button',
+                id: 'add-new-object-button',
                 enabled: !isListLocked,
               },
               () => [
@@ -1217,6 +1223,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onAddNewObject,
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
+        isEntirelyEmpty,
       ]
     );
 
@@ -1573,20 +1580,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </I18n>
         </div>
-        <Line>
-          <Column expand>
-            <ResponsiveRaisedButton
-              label={<Trans>Add a new object</Trans>}
-              primary
-              onClick={() =>
-                onAddNewObject(selectedObjectFolderOrObjectsWithContext[0])
-              }
-              id="add-new-object-button"
-              icon={<Add />}
-              disabled={isListLocked}
-            />
-          </Column>
-        </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(null)}

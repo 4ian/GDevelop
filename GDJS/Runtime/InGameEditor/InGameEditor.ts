@@ -805,60 +805,58 @@ namespace gdjs {
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const layerNames = [];
-      currentScene.getAllLayerNames(layerNames);
-      for (const layerName of layerNames) {
-        const runtimeLayerRender = currentScene
-          .getLayer(layerName)
-          .getRenderer();
-        const threeCamera = runtimeLayerRender.getThreeCamera();
-        const threeScene = runtimeLayerRender.getThreeScene();
-        if (!threeCamera || !threeScene) return;
+      const layer = currentScene.getLayer(this._selectedLayerName);
+      const runtimeLayerRender = layer.getRenderer();
+      const threeCamera = runtimeLayerRender.getThreeCamera();
+      const threeScene = runtimeLayerRender.getThreeScene();
+      if (!threeCamera || !threeScene) return;
 
-        const cursorX = inputManager.getCursorX();
-        const cursorY = inputManager.getCursorY();
+      const cursorX = inputManager.getCursorX();
+      const cursorY = inputManager.getCursorY();
 
-        if (inputManager.isMouseButtonPressed(0)) {
-          if (this._wasMouseLeftButtonPressed && this._selectionBox) {
-            this._selectionBox.endPoint.set(
-              this._getNormalizedScreenX(cursorX),
-              this._getNormalizedScreenY(cursorY),
-              0.5
-            );
-          } else {
-            this._selectionBox = new THREE_ADDONS.SelectionBox(
-              threeCamera,
-              threeScene
-            );
-            this._selectionBox.startPoint.set(
-              this._getNormalizedScreenX(cursorX),
-              this._getNormalizedScreenY(cursorY),
-              0.5
-            );
+      if (inputManager.isMouseButtonPressed(0)) {
+        if (this._wasMouseLeftButtonPressed && this._selectionBox) {
+          this._selectionBox.endPoint.set(
+            this._getNormalizedScreenX(cursorX),
+            this._getNormalizedScreenY(cursorY),
+            0.5
+          );
+        } else {
+          this._selectionBox = new THREE_ADDONS.SelectionBox(
+            threeCamera,
+            threeScene
+          );
+          this._selectionBox.startPoint.set(
+            this._getNormalizedScreenX(cursorX),
+            this._getNormalizedScreenY(cursorY),
+            0.5
+          );
+        }
+      }
+      if (
+        inputManager.isMouseButtonReleased(0) &&
+        this._selectionBox &&
+        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
+      ) {
+        const objects = new Set<gdjs.RuntimeObject>();
+        for (const selectThreeObject of this._selectionBox.select()) {
+          // TODO Select the object if all its meshes are inside the rectangle
+          // instead of if any is.
+          const object = this._getObject(selectThreeObject);
+          if (object) {
+            objects.add(object);
           }
         }
-        if (
-          inputManager.isMouseButtonReleased(0) &&
-          this._selectionBox &&
-          !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
-        ) {
-          const objects = new Set<gdjs.RuntimeObject>();
-          for (const selectThreeObject of this._selectionBox.select()) {
-            // TODO Select the object if all its meshes are inside the rectangle
-            // instead of if any is.
-            const object = this._getObject(selectThreeObject);
-            if (object) {
-              objects.add(object);
-            }
-          }
-          if (!isShiftPressed(inputManager)) {
-            this._selection.clear();
-          }
+        if (!isShiftPressed(inputManager)) {
+          this._selection.clear();
+        }
+        if (layer.isVisible() && !layer._initialLayerData.isLocked) {
           for (const object of objects) {
+            // TODO Check if the object is locked
             this._selection.add(object);
           }
-          this._selectionBox = null;
         }
+        this._selectionBox = null;
       }
     }
 
@@ -887,7 +885,13 @@ namespace gdjs {
             this._selection.clear();
           }
           if (objectUnderCursor) {
-            this._selection.toggle(objectUnderCursor);
+            // TODO Check if the object is locked
+            const layer = editedInstanceContainer.getLayer(
+              objectUnderCursor.getLayer()
+            );
+            if (!layer._initialLayerData.isLocked) {
+              this._selection.toggle(objectUnderCursor);
+            }
           }
           this._sendSelectionUpdate();
         }

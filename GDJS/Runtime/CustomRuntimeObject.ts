@@ -253,6 +253,10 @@ namespace gdjs {
      */
     onDestroy(parent: gdjs.RuntimeInstanceContainer) {}
 
+    override onGameZoomFactorChanged() {
+      this._instanceContainer.onGameZoomFactorChanged();
+    }
+
     override updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();

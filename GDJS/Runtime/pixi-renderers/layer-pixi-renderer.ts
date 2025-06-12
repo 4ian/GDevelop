@@ -262,8 +262,8 @@ namespace gdjs {
             if (game.getAntialiasingMode() !== 'none') {
               this._threeEffectComposer.addPass(
                 new THREE_ADDONS.SMAAPass(
-                  game.getGameResolutionWidth(),
-                  game.getGameResolutionHeight()
+                  game.getRenderingResolutionWidth(),
+                  game.getRenderingResolutionHeight()
                 )
               );
             }
@@ -304,9 +304,12 @@ namespace gdjs {
 
             this._threePlaneTexture = texture;
             this._threePlaneTexture.generateMipmaps = false;
+            const scaleMode = this._layer
+              .getRuntimeScene()
+              .getGame()
+              .getScaleMode();
             const filter =
-              this._layer.getRuntimeScene().getGame().getScaleMode() ===
-              'nearest'
+              scaleMode === 'nearest' || scaleMode === 'magnified'
                 ? THREE.NearestFilter
                 : THREE.LinearFilter;
             this._threePlaneTexture.minFilter = filter;
@@ -501,8 +504,8 @@ namespace gdjs {
       if (this._threeEffectComposer) {
         const game = this._layer.getRuntimeScene().getGame();
         this._threeEffectComposer.setSize(
-          game.getGameResolutionWidth(),
-          game.getGameResolutionHeight()
+          game.getRenderingResolutionWidth(),
+          game.getRenderingResolutionHeight()
         );
       }
     }

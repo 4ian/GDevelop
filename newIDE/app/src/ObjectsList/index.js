@@ -24,8 +24,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { Column, Line } from '../UI/Grid';
-import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import { Column } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
@@ -56,6 +55,8 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
+
+const gd: libGDevelop = global.gd;
 
 const sceneObjectsRootFolderId = 'scene-objects';
 const globalObjectsRootFolderId = 'global-objects';
@@ -846,6 +847,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             ? index
             : globalObjectsContainer.getObjectsCount()
         );
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
         onObjectModified(true);
 
         const newObjectFolderOrObjectWithContext = {
@@ -865,6 +867,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         }, 100); // A few ms is enough for a new render to be done.
       },
       [
+        project,
         globalObjectsContainer,
         objectsContainer,
         beforeSetAsGlobalObject,
@@ -1157,7 +1160,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
-                id: 'add-new-object-top-button',
+                id: 'add-new-object-button',
                 enabled: !isListLocked,
               },
               () => [
@@ -1569,20 +1572,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </I18n>
         </div>
-        <Line>
-          <Column expand>
-            <ResponsiveRaisedButton
-              label={<Trans>Add a new object</Trans>}
-              primary
-              onClick={() =>
-                onAddNewObject(selectedObjectFolderOrObjectsWithContext[0])
-              }
-              id="add-new-object-button"
-              icon={<Add />}
-              disabled={isListLocked}
-            />
-          </Column>
-        </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(null)}

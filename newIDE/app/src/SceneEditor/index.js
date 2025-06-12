@@ -2220,7 +2220,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   updateBehaviorsSharedData = () => {
     const { layout, project } = this.props;
     if (layout) {
-      layout.updateBehaviorsSharedData(project);
+      gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
     } else {
       // TODO EBO: refactoring for custom objects.
     }

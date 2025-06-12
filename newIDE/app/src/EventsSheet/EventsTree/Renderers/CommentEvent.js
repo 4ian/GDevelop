@@ -70,6 +70,9 @@ export default class CommentEvent extends React.Component<
         if (this._textField) {
           this._textField.focus({ caretPosition: 'end' });
         }
+        // Wait for the change to be applied on the DOM before calling onUpdate,
+        // so that the height of the event is updated.
+        this.props.onUpdate();
       }
     );
   };
@@ -78,8 +81,11 @@ export default class CommentEvent extends React.Component<
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(text);
 
-    this.props.onUpdate();
-    this.forceUpdate();
+    this.forceUpdate(() => {
+      // Wait for the change to be applied on the DOM before calling onUpdate,
+      // so that the height of the event is updated.
+      this.props.onUpdate();
+    });
   };
 
   endEditing = () => {

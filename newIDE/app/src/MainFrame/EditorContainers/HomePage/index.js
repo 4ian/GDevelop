@@ -28,7 +28,6 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
 import {
   sendUserSurveyHidden,
@@ -294,9 +293,6 @@ export const HomePage = React.memo<Props>(
             : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
-      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-        includeLegacy: false,
-      });
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
@@ -594,9 +590,6 @@ export const HomePage = React.memo<Props>(
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}
-                      subscriptionPlansWithPricingSystems={
-                        subscriptionPlansWithPricingSystems
-                      }
                       onOpenProfile={onOpenProfile}
                       onCreateProjectFromExample={onCreateProjectFromExample}
                       askToCloseProject={askToCloseProject}

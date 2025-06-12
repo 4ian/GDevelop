@@ -1781,6 +1781,14 @@ void WholeProjectRefactorer::DoRenameBehavior(
   projectBrowser.ExposeFunctions(project, behaviorParameterRenamer);
 }
 
+void WholeProjectRefactorer::UpdateBehaviorsSharedData(gd::Project &project) {
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+
+    layout.UpdateBehaviorsSharedData(project);
+  }
+}
+
 void WholeProjectRefactorer::DoRenameObject(
     gd::Project &project, const gd::String &oldObjectType,
     const gd::String &newObjectType, const gd::ProjectBrowser &projectBrowser) {

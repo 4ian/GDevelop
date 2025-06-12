@@ -90,6 +90,7 @@ type Props = {|
   limits: ?Limits,
   tutorial: Tutorial,
   onSelectTutorial: (tutorial: Tutorial) => void,
+  onSelectCourse: (courseId: string) => void,
   index: number,
   onOpenTemplateFromTutorial: ?(string) => void,
   isLocked?: boolean,
@@ -101,6 +102,7 @@ const EducationCurriculumLesson = ({
   tutorial,
   limits,
   onSelectTutorial,
+  onSelectCourse,
   index,
   onOpenTemplateFromTutorial,
   isLocked,
@@ -120,7 +122,7 @@ const EducationCurriculumLesson = ({
         })}`
       )
     : null;
-  const { gameLink } = tutorial;
+  const { gameLink, courseId } = tutorial;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
@@ -229,13 +231,23 @@ const EducationCurriculumLesson = ({
                         onClick={onOpenTemplateFromTutorial}
                       />
                     )}
-                    <RaisedButton
-                      primary
-                      fullWidth={isMobile && !isLandscape}
-                      disabled={isLessonLocked}
-                      label={<Trans>Open lesson</Trans>}
-                      onClick={() => onSelectTutorial(tutorial)}
-                    />
+                    {courseId ? (
+                      <RaisedButton
+                        primary
+                        fullWidth={isMobile && !isLandscape}
+                        disabled={isLessonLocked}
+                        label={<Trans>Open course</Trans>}
+                        onClick={() => onSelectCourse(courseId)}
+                      />
+                    ) : (
+                      <RaisedButton
+                        primary
+                        fullWidth={isMobile && !isLandscape}
+                        disabled={isLessonLocked}
+                        label={<Trans>Open lesson</Trans>}
+                        onClick={() => onSelectTutorial(tutorial)}
+                      />
+                    )}
                   </LineStackLayout>
                 </LineStackLayout>
               )}

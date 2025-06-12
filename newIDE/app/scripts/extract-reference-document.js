@@ -158,13 +158,18 @@ ${extension.getDescription()} ${generateReadMoreLink(extension.getHelpPath())}
   };
 };
 
+/** @returns {String} */
+const generateBuiltInExtensionNote = ({ extension }) => {
+  return `The ${extension.getFullName()} extension is always installed in all GDevelop projects: there is no need to add it from the Project Manager.\n\n`;
+};
+
 /** @returns {RawText} */
 const generateExtensionFooterText = ({ extension }) => {
   return {
     text:
-      `
----
-*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
+      `\n\n---\n\n` +
+      generateBuiltInExtensionNote({ extension }) +
+      `*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
       ' ' +
       'Learn more about [all GDevelop features here](/gdevelop5/all-features).',
   };

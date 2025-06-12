@@ -2,12 +2,12 @@
 import axios from 'axios';
 import {
   GDevelopAssetApi,
+  GDevelopAssetCdn,
   GDevelopPrivateAssetsStorage,
   GDevelopPrivateGameTemplatesStorage,
   GDevelopPublicAssetResourcesStorageBaseUrl,
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
-import semverSatisfies from 'semver/functions/satisfies';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import {
@@ -321,19 +321,6 @@ export const doesAssetPackContainAudio = (
   assetPack: PrivateAssetPack
 ): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
 
-/**
- * Check if the IDE version, passed as argument, satisfy the version required by the asset.
- */
-export const isCompatibleWithGDevelopVersion = (
-  ideVersion: string,
-  assetRequiredGDevelopVersion: ?string
-) =>
-  assetRequiredGDevelopVersion
-    ? semverSatisfies(ideVersion, assetRequiredGDevelopVersion, {
-        includePrerelease: true,
-      })
-    : true;
-
 export const listAllPublicAssets = async ({
   environment,
 }: {|
@@ -345,7 +332,20 @@ export const listAllPublicAssets = async ({
     },
   });
 
-  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
+  const {
+    assetShortHeadersUrl,
+    filtersUrl,
+    assetPacksUrl,
+    assetCdn,
+  } = response.data;
+
+  // Overwrite the CDN from where public assets are served.
+  if (assetCdn.baseUrl) {
+    GDevelopAssetCdn.baseUrl['live'] =
+      assetCdn.baseUrl['live'] || GDevelopAssetCdn.baseUrl['live'];
+    GDevelopAssetCdn.baseUrl['staging'] =
+      assetCdn.baseUrl['staging'] || GDevelopAssetCdn.baseUrl['staging'];
+  }
 
   const responsesData = await Promise.all([
     client
@@ -387,16 +387,11 @@ export const getPublicAsset = async (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  const response = await client.get(`/asset/${assetShortHeader.id}`, {
-    params: {
-      environment,
-    },
-  });
-  if (!response.data.assetUrl) {
-    throw new Error('Unexpected response from the asset endpoint.');
-  }
-
-  const assetResponse = await client.get(response.data.assetUrl);
+  const assetResponse = await client.get(
+    `${GDevelopAssetCdn.baseUrl[environment]}/assets/${
+      assetShortHeader.id
+    }.json`
+  );
   return assetResponse.data;
 };
 

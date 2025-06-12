@@ -23,12 +23,23 @@ namespace gdjs {
           top: string = 'Y-';
           elevation: float = 45;
           rotation: float = 0;
+          shadowSize: float = 1024;
 
           constructor() {
             this.light = new THREE.DirectionalLight();
+            this.light.castShadow = true;
+            this.light.shadow.mapSize.width = this.shadowSize;
+            this.light.shadow.mapSize.height = this.shadowSize;
+            this.light.shadow.camera.near = 3;
+            this.light.shadow.camera.far = 10000;
+            this.light.shadow.camera.right = 1000;
+            this.light.shadow.camera.left = -1000;
+            this.light.shadow.camera.top = 1000;
+            this.light.shadow.camera.bottom = -1000;
             this.light.position.set(1, 0, 0);
             this.rotationObject = new THREE.Group();
             this.rotationObject.add(this.light);
+            this.light.shadow.camera.updateProjectionMatrix();
             this.updateRotation();
           }
 

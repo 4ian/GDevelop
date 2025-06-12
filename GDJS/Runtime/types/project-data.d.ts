@@ -310,7 +310,7 @@ declare interface LayerData {
   camera3DNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
-  isLocked: boolean;
+  isLocked?: boolean;
 }
 
 declare interface CameraData {

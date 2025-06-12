@@ -60,7 +60,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           editorId,
           sceneName: null,
           externalLayoutName: null,
-          eventsBasedObjectType: projectItemName || null,
+          eventsBasedObjectType: this.getEventsBasedObjectType() || null,
           eventsBasedObjectVariantName: this.getVariantName(),
         });
       }
@@ -91,7 +91,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           editorId,
           sceneName: null,
           externalLayoutName: null,
-          eventsBasedObjectType: projectItemName || null,
+          eventsBasedObjectType: this.getEventsBasedObjectType() || null,
           eventsBasedObjectVariantName: this.getVariantName(),
         });
         if (this.editor) {
@@ -176,6 +176,17 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       return null;
     }
     return extension.getEventsBasedObjects().get(eventsBasedObjectName);
+  }
+
+  getEventsBasedObjectType(): string {
+    const { projectItemName } = this.props;
+    return (
+      (projectItemName &&
+        projectItemName.split('::')[0] +
+          '::' +
+          projectItemName.split('::')[1]) ||
+      ''
+    );
   }
 
   getVariantName(): string {

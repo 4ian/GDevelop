@@ -34,8 +34,6 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("viewpoint", "TopDown");
   behaviorContent.SetAttribute("customIsometryAngle", 30);
   behaviorContent.SetAttribute("movementAngleOffset", 0);
-  behaviorContent.SetAttribute("useLegacyTurnBack", false);
-  behaviorContent.SetAttribute("movementMode", "Sharp turn with smooth turn back");
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
@@ -96,15 +94,6 @@ TopDownMovementBehavior::GetProperties(
                     ? "false"
                     : "true")
       .SetType("Boolean");
-  properties["UseLegacyTurnBack"]
-      .SetLabel(_("Only use acceleration to turn back "
-                  "(deprecated — best left unchecked)"))
-      .SetGroup(_("Deprecated options"))
-      .SetDeprecated()
-      .SetValue(behaviorContent.GetBoolAttribute("useLegacyTurnBack", true)
-                    ? "true"
-                    : "false")
-      .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
   gd::String viewpointStr = _("Top-Down");
@@ -148,21 +137,6 @@ TopDownMovementBehavior::GetProperties(
           "Usually 0, unless you choose an *Isometry* viewpoint in which case "
           "-45 is recommended."));
 
-  gd::String movementMode = behaviorContent.GetStringAttribute("movementMode");
-  gd::String movementModeStr = _("Sharp turn with smooth turn back");
-  if (movementMode == "Sharp turn")
-    movementModeStr = _("Sharp turn");
-  else if (movementMode == "Smooth turn")
-    movementModeStr = _("Smooth turn");
-
-  properties["MovementMode"]
-      .SetLabel(_("Mode"))
-      .SetValue(movementModeStr)
-      .SetType("Choice")
-      .AddExtraInfo(_("Sharp turn with smooth turn back"))
-      .AddExtraInfo(_("Sharp turn"))
-      .AddExtraInfo(_("Smooth turn"));
-
   return properties;
 }
 
@@ -181,9 +155,6 @@ bool TopDownMovementBehavior::UpdateProperty(
   if (name == "RotateObject") {
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
-  }
-  if (name == "UseLegacyTurnBack") {
-    behaviorContent.SetAttribute("useLegacyTurnBack", (value == "1"));
   }
   if (name == "Viewpoint") {
     // Fix the offset angle when switching between top-down and isometry
@@ -213,14 +184,6 @@ bool TopDownMovementBehavior::UpdateProperty(
   }
   if (name == "MovementAngleOffset") {
     behaviorContent.SetAttribute("movementAngleOffset", value.To<float>());
-  }
-  if (name == "MovementMode") {
-    if (value == _("Sharp turn"))
-      behaviorContent.SetAttribute("movementMode", "Sharp turn");
-    else if (value == _("Smooth turn"))
-      behaviorContent.SetAttribute("movementMode", "Smooth turn");
-    else
-      behaviorContent.SetAttribute("movementMode", "Sharp turn with smooth turn back");
   }
 
   if (value.To<float>() < 0) return false;

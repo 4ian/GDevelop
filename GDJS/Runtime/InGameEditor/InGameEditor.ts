@@ -857,6 +857,7 @@ namespace gdjs {
           }
         }
         this._selectionBox = null;
+        this._sendSelectionUpdate();
       }
     }
 

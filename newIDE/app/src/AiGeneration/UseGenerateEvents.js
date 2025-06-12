@@ -41,9 +41,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const projectSpecificExtensionsSummaryJson = JSON.stringify(
-        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(
-          project
-        )
+        simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
       );
 
       const createResult = await retryIfFailed({ times: 2 }, () =>

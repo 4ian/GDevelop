@@ -35,9 +35,22 @@ import TwoStatesButton from '../../UI/TwoStatesButton';
 import Help from '../../UI/CustomSvgIcons/Help';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
+import Send from '../../UI/CustomSvgIcons/Send';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
+
+const styles = {
+  chatScrollView: {
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingBottom: 8,
+    paddingTop: 14,
+    maskImage: 'linear-gradient(to bottom, transparent, black 14px)',
+    maskSize: '100% 100%',
+    maskRepeat: 'no-repeat',
+  },
+};
 
 type Props = {
   project: gdProject | null,
@@ -423,6 +436,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                         >
                           <RaisedButton
                             color="primary"
+                            icon={<Send />}
                             label={
                               newAiRequestMode === 'agent' ? (
                                 hasOpenedProject ? (
@@ -529,13 +543,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     });
 
     return (
-      <ColumnStackLayout
+      <Column
         expand
         alignItems="stretch"
         justifyContent="stretch"
         useFullHeight
       >
-        <ScrollView ref={scrollViewRef}>
+        <ScrollView ref={scrollViewRef} style={styles.chatScrollView}>
           <ChatMessages
             aiRequest={aiRequest}
             onSendFeedback={onSendFeedback}
@@ -544,24 +558,24 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             project={project}
             onProcessFunctionCalls={onProcessFunctionCalls}
           />
+          {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
+            <AlertMessage
+              kind={
+                userMessagesCount >= TOO_MANY_USER_MESSAGES_ERROR_COUNT
+                  ? 'error'
+                  : 'warning'
+              }
+            >
+              <Trans>
+                The chat is becoming long - consider creating a new chat to ask
+                other questions. The AI will better analyze your game and
+                request in a new chat.
+              </Trans>
+            </AlertMessage>
+          ) : (
+            subscriptionBanner
+          )}
         </ScrollView>
-        {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
-          <AlertMessage
-            kind={
-              userMessagesCount >= TOO_MANY_USER_MESSAGES_ERROR_COUNT
-                ? 'error'
-                : 'warning'
-            }
-          >
-            <Trans>
-              The chat is becoming long - consider creating a new chat to ask
-              other questions. The AI will better analyze your game and request
-              in a new chat.
-            </Trans>
-          </AlertMessage>
-        ) : (
-          subscriptionBanner
-        )}
         <form
           onSubmit={() => {
             onSendMessage({
@@ -667,8 +681,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   >
                     <RaisedButton
                       color="primary"
-                      disabled={aiRequest.status === 'working' || isSending}
-                      label={<Trans>Send</Trans>}
+                      disabled={
+                        aiRequest.status === 'working' ||
+                        isSending ||
+                        !userRequestTextPerAiRequestId[aiRequestId]
+                      }
+                      icon={<Send />}
                       onClick={() => {
                         onSendMessage({
                           userMessage:
@@ -693,7 +711,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Column>
           </ColumnStackLayout>
         </form>
-      </ColumnStackLayout>
+      </Column>
     );
   }
 );

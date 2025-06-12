@@ -10,6 +10,71 @@ namespace gdjs {
     export namespace tween {
       const logger = new gdjs.Logger('Tween');
 
+      // TODO: Use this factory to get the tween setter and store only type and options
+      // in tween instance.
+      const tweenSetterFactory =
+        (runtimeScene: RuntimeScene) => (type: string, options: any) => {
+          if (type === 'variable') {
+            // TODO: Find variable.
+            // return (value: float) => variable.setNumber(value)
+          }
+          if (type === 'cameraZoom') {
+            const layer = runtimeScene.getLayer(options.layerName);
+            return (value: float) => layer.setCameraZoom(value);
+          }
+          if (type === 'cameraRotation') {
+            const layer = runtimeScene.getLayer(options.layerName);
+            return (value: float) => layer.setCameraRotation(value);
+          }
+          if (type === 'cameraPosition') {
+            const layer = runtimeScene.getLayer(options.layerName);
+            return ([x, y]) => {
+              layer.setCameraX(x);
+              layer.setCameraY(y);
+            };
+          }
+          if (type === 'colorEffectProperty') {
+            const layer = runtimeScene.getLayer(options.layerName);
+            const effect = layer.getRendererEffects()[options.effectName];
+            if (!effect) {
+              logger.error(
+                `The layer "${options.layerName}" doesn't have any effect called "${options.effectName}"`
+              );
+            }
+
+            return ([hue, saturation, lightness]) => {
+              const rgbFromHslColor = gdjs.evtTools.tween.hslToRgb(
+                hue,
+                saturation,
+                lightness
+              );
+              effect.updateColorParameter(
+                options.propertyName,
+                gdjs.rgbToHexNumber(
+                  rgbFromHslColor[0],
+                  rgbFromHslColor[1],
+                  rgbFromHslColor[2]
+                )
+              );
+            };
+          }
+          if (type === 'numberEffectProperty') {
+            const layer = runtimeScene.getLayer(options.layerName);
+            const effect = layer.getRendererEffects()[options.effectName];
+            if (!effect) {
+              logger.error(
+                `The layer "${options.layerName}" doesn't have any effect called "${options.effectName}"`
+              );
+            }
+            return (value: float) => {
+              effect.updateDoubleParameter(options.propertyName, value);
+            };
+          }
+
+          // 'layoutValue' and 'layerValue' types don't set anything.
+          return () => {};
+        };
+
       export const getTweensMap = (runtimeScene: RuntimeScene) =>
         runtimeScene._tweens ||
         (runtimeScene._tweens = new gdjs.evtTools.tween.TweenManager());

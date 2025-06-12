@@ -278,7 +278,9 @@ namespace gdjs {
 
       const instanceNetworkId = this._getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const objectNetworkSyncData = this.owner.getNetworkSyncData();
+      const objectNetworkSyncData = this.owner.getNetworkSyncData({
+        forceSyncEverything: false,
+      });
 
       // this._logToConsoleWithThrottle(
       //   `Synchronizing object ${this.owner.getName()} (instance ${
@@ -293,6 +295,8 @@ namespace gdjs {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
           z: objectNetworkSyncData.z,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
@@ -300,6 +304,7 @@ namespace gdjs {
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
+          n: objectNetworkSyncData.n,
         });
       const shouldSyncObjectBasicInfo =
         !this._hasObjectBasicInfoBeenSyncedRecently() ||
@@ -369,6 +374,8 @@ namespace gdjs {
         this._lastSentBasicObjectSyncData = {
           x: objectNetworkSyncData.x,
           y: objectNetworkSyncData.y,
+          w: objectNetworkSyncData.w,
+          h: objectNetworkSyncData.h,
           zo: objectNetworkSyncData.zo,
           a: objectNetworkSyncData.a,
           hid: objectNetworkSyncData.hid,
@@ -376,6 +383,7 @@ namespace gdjs {
           if: objectNetworkSyncData.if,
           pfx: objectNetworkSyncData.pfx,
           pfy: objectNetworkSyncData.pfy,
+          n: objectNetworkSyncData.n,
         };
         this._numberOfForcedBasicObjectUpdates = Math.max(
           this._numberOfForcedBasicObjectUpdates - 1,
@@ -443,7 +451,9 @@ namespace gdjs {
           objectOwner: this.playerNumber,
           objectName,
           instanceNetworkId,
-          objectNetworkSyncData: this.owner.getNetworkSyncData(),
+          objectNetworkSyncData: this.owner.getNetworkSyncData({
+            forceSyncEverything: false,
+          }),
           sceneNetworkId,
         });
       this._sendDataToPeersWithIncreasedClock(
@@ -593,7 +603,9 @@ namespace gdjs {
         debugLogger.info(
           'Sending update message to move the object immediately.'
         );
-        const objectNetworkSyncData = this.owner.getNetworkSyncData();
+        const objectNetworkSyncData = this.owner.getNetworkSyncData({
+          forceSyncEverything: false,
+        });
         const {
           messageName: updateMessageName,
           messageData: updateMessageData,

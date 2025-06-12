@@ -18,20 +18,6 @@ namespace gdjs {
     sf: float;
   }
 
-  enum MovementMode {
-    SharpTurnWithSmoothTurnBack = 0,
-    SharpTurn,
-    SmoothTurn,
-  }
-
-  const getMovementMode = (movementModeString: string) => {
-    return movementModeString === 'Sharp turn'
-      ? MovementMode.SharpTurn
-      : movementModeString === 'Smooth turn'
-        ? MovementMode.SmoothTurn
-        : MovementMode.SharpTurnWithSmoothTurnBack;
-  };
-
   export interface TopDownMovementNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: TopDownMovementNetworkSyncDataType;
@@ -52,7 +38,6 @@ namespace gdjs {
     private _ignoreDefaultControls: boolean;
     private _movementAngleOffset: float;
     private _useLegacyTurnBack: boolean;
-    private _movementMode: MovementMode;
 
     /** The latest angle of movement, in degrees. */
     private _angle: float = 0;
@@ -122,7 +107,6 @@ namespace gdjs {
         behaviorData.useLegacyTurnBack === undefined
           ? true
           : behaviorData.useLegacyTurnBack;
-      this._movementMode = getMovementMode(behaviorData.movementMode);
     }
 
     getNetworkSyncData(): TopDownMovementNetworkSyncData {
@@ -487,8 +471,6 @@ namespace gdjs {
       // variables without assigning them a value.
       let directionInRad = 0;
       let directionInDeg = 0;
-      let cos = 1;
-      let sin = 0;
 
       let isMoving = false;
       let targetedSpeed = 0;
@@ -516,59 +498,36 @@ namespace gdjs {
       }
       if (isMoving) {
         // This makes the trigo resilient to rounding errors on directionInRad.
-        cos = Math.cos(directionInRad);
-        sin = Math.sin(directionInRad);
+        let cos = Math.cos(directionInRad);
+        let sin = Math.sin(directionInRad);
         if (cos === -1 || cos === 1) {
           sin = 0;
         }
         if (sin === -1 || sin === 1) {
           cos = 0;
         }
-        const targetedSpeedX = targetedSpeed * cos;
-        const targetedSpeedY = targetedSpeed * sin;
 
         const getAcceleratedSpeed = this._useLegacyTurnBack
           ? TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed
           : TopDownMovementRuntimeBehavior.getAcceleratedSpeed;
 
-        if (this._movementMode === MovementMode.SmoothTurn) {
-          this._xVelocity = getAcceleratedSpeed(
-            this._xVelocity,
-            targetedSpeedX,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-          this._yVelocity = getAcceleratedSpeed(
-            this._yVelocity,
-            targetedSpeedY,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-        } else {
-          let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
-          if (this._movementMode === MovementMode.SharpTurnWithSmoothTurnBack) {
-            const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
-            if (dotProduct < 0) {
-              // The object is turning back.
-              // Keep the negative velocity projected on the new direction.
-              currentSpeed = dotProduct;
-            }
-          }
-          const speed = getAcceleratedSpeed(
-            currentSpeed,
-            targetedSpeed,
-            this._maxSpeed,
-            this._acceleration,
-            this._deceleration,
-            timeDelta
-          );
-          this._xVelocity = speed * cos;
-          this._yVelocity = speed * sin;
+        let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
+        const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
+        if (dotProduct < 0) {
+          // The object is turning back.
+          // Keep the negative velocity projected on the new direction.
+          currentSpeed = dotProduct;
         }
+        const speed = getAcceleratedSpeed(
+          currentSpeed,
+          targetedSpeed,
+          this._maxSpeed,
+          this._acceleration,
+          this._deceleration,
+          timeDelta
+        );
+        this._xVelocity = speed * cos;
+        this._yVelocity = speed * sin;
       }
 
       const squaredSpeed =

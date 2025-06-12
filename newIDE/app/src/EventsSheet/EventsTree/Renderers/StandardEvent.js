@@ -49,6 +49,7 @@ export default class StandardEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          tabId={this.props.idPrefix}
           className={classNames({
             [executableEventContainer]: true,
           })}

@@ -6,6 +6,7 @@ import {
   conditionsContainer,
   smallWidthContainer,
 } from './ClassNames';
+import EventsSheetWidthCache from './EventsSheetWidthCache';
 
 type Props = {|
   renderConditionsList: ({ style: Object, className: string }) => React.Node,
@@ -14,6 +15,7 @@ type Props = {|
   className?: string,
   leftIndentWidth: number,
   eventsSheetWidth: number,
+  tabId: string,
 |};
 
 const styles = {
@@ -52,6 +54,46 @@ const getConditionWidthRatio = (eventsSheetWidth: number) => {
  */
 const ConditionsActionsColumns = (props: Props) => {
   const isMobile = props.windowSize === 'small';
+  const tabId = props.tabId;
+
+  // Update width cache when component mounts or eventsSheetWidth changes
+  React.useEffect(
+    () => {
+      if (!isMobile) {
+        const conditionsWidth =
+          getConditionWidthRatio(props.eventsSheetWidth) *
+            props.eventsSheetWidth -
+          props.leftIndentWidth;
+        const actionsWidth = props.eventsSheetWidth - conditionsWidth;
+
+        // Store both conditions and actions widths in cache
+        EventsSheetWidthCache.setConditionsWidth(tabId, conditionsWidth);
+        EventsSheetWidthCache.setActionsWidth(tabId, actionsWidth);
+        EventsSheetWidthCache.setWidth(tabId, props.eventsSheetWidth);
+      }
+    },
+    [props.eventsSheetWidth, props.leftIndentWidth, isMobile, tabId]
+  );
+
+  // Force cache update on component mount
+  React.useEffect(
+    () => {
+      if (!isMobile) {
+        const conditionsWidth =
+          getConditionWidthRatio(props.eventsSheetWidth) *
+            props.eventsSheetWidth -
+          props.leftIndentWidth;
+        const actionsWidth = props.eventsSheetWidth - conditionsWidth;
+
+        // Initialize cache with initial widths
+        EventsSheetWidthCache.setConditionsWidth(tabId, conditionsWidth);
+        EventsSheetWidthCache.setActionsWidth(tabId, actionsWidth);
+        EventsSheetWidthCache.setWidth(tabId, props.eventsSheetWidth);
+      }
+    },
+    [props.eventsSheetWidth, props.leftIndentWidth, isMobile, tabId]
+  );
+
   if (isMobile) {
     return (
       <div style={styles.oneColumnContainer} className={props.className}>
@@ -67,13 +109,17 @@ const ConditionsActionsColumns = (props: Props) => {
     );
   }
 
+  // Get width from cache or calculate if not cached
+  const conditionsWidth =
+    EventsSheetWidthCache.getConditionsWidth(tabId) ||
+    getConditionWidthRatio(props.eventsSheetWidth) * props.eventsSheetWidth -
+      props.leftIndentWidth;
+
   return (
     <div style={styles.twoColumnsContainer} className={props.className}>
       {props.renderConditionsList({
         style: {
-          width: `${getConditionWidthRatio(props.eventsSheetWidth) *
-            props.eventsSheetWidth -
-            props.leftIndentWidth}px`,
+          width: `${conditionsWidth}px`,
         },
         className: conditionsContainer,
       })}

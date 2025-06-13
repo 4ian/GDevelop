@@ -1275,7 +1275,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       });
     }
-  }
+  };
 
   _onDeleteObjects = (
     i18n: I18nType,
@@ -2728,7 +2728,28 @@ export default class SceneEditor extends React.Component<Props, State> {
                     eventsBasedObject={eventsBasedObject}
                     eventsBasedObjectVariant={eventsBasedObjectVariant}
                     onClose={() => this.openSceneProperties(false)}
-                    onApply={() => this.openSceneProperties(false)}
+                    onApply={() => {
+                      this.openSceneProperties(false);
+
+                      const { previewDebuggerServer } = this.props;
+                      if (previewDebuggerServer) {
+                        previewDebuggerServer
+                          .getExistingDebuggerIds()
+                          .forEach(debuggerId => {
+                            previewDebuggerServer.sendMessage(debuggerId, {
+                              command: 'updateInnerArea',
+                              payload: {
+                                areaMinX: eventsBasedObjectVariant.getAreaMinX(),
+                                areaMinY: eventsBasedObjectVariant.getAreaMinY(),
+                                areaMinZ: eventsBasedObjectVariant.getAreaMinZ(),
+                                areaMaxX: eventsBasedObjectVariant.getAreaMaxX(),
+                                areaMaxY: eventsBasedObjectVariant.getAreaMaxY(),
+                                areaMaxZ: eventsBasedObjectVariant.getAreaMaxZ(),
+                              },
+                            });
+                          });
+                      }
+                    }}
                     getContentAABB={
                       this.editorDisplay
                         ? this.editorDisplay.instancesHandlers.getContentAABB

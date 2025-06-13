@@ -1176,6 +1176,11 @@ namespace gdjs {
               );
             if (eventsBasedObjectVariantData) {
               editedInstanceDataList = eventsBasedObjectVariantData.instances;
+              if (this._inGameEditor) {
+                this._inGameEditor.setInnerArea(
+                  eventsBasedObjectVariantData._initialInnerArea
+                );
+              }
             }
           }
         }

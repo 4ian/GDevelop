@@ -390,6 +390,17 @@ namespace gdjs {
             data.payload.visibleScreenArea
           );
         }
+      } else if (data.command === 'updateInnerArea') {
+        if (runtimeGame._inGameEditor) {
+          runtimeGame._inGameEditor.updateInnerArea(
+            data.payload.areaMinX,
+            data.payload.areaMinY,
+            data.payload.areaMinZ,
+            data.payload.areaMaxX,
+            data.payload.areaMaxY,
+            data.payload.areaMaxZ
+          );
+        }
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.

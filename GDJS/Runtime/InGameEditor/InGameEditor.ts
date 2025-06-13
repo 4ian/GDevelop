@@ -51,6 +51,11 @@ namespace gdjs {
     return typeof THREE !== 'undefined' && gdjs.Base3DHandler.is3D(object);
   };
 
+  type AABB3D = {
+    min: [float, float, float];
+    max: [float, float, float];
+  };
+
   // TODO: factor this?
   const isMacLike =
     typeof navigator !== 'undefined' &&
@@ -296,6 +301,8 @@ namespace gdjs {
       null;
     private _editedInstanceDataList: InstanceData[] = [];
     private _selectedLayerName: string = '';
+    private _innerArea: AABB3D | null = null;
+    private _threeInnerArea: THREE.Object3D | null = null;
     //@ts-ignore
     private _tempVector2d: THREE.Vector2 =
       typeof THREE === 'undefined' ? null : new THREE.Vector2();
@@ -363,6 +370,8 @@ namespace gdjs {
       editedInstanceContainer: gdjs.RuntimeInstanceContainer | null
     ) {
       this._editedInstanceContainer = editedInstanceContainer;
+      // The 3D scene is rebuilt and the inner area marker is lost in the process.
+      this._threeInnerArea = null;
     }
 
     _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
@@ -370,6 +379,31 @@ namespace gdjs {
         this._editedInstanceContainer ||
         this._runtimeGame.getSceneStack().getCurrentScene()
       );
+    }
+
+    setInnerArea(innerArea: AABB3D | null) {
+      this._innerArea = innerArea;
+    }
+
+    updateInnerArea(
+      areaMinX: float,
+      areaMinY: float,
+      areaMinZ: float,
+      areaMaxX: float,
+      areaMaxY: float,
+      areaMaxZ: float
+    ) {
+      if (!this._innerArea) {
+        return;
+      }
+      // This only works because `this._innerArea` is the same instance as the
+      // one used by custom object instances.
+      this._innerArea.min[0] = areaMinX;
+      this._innerArea.min[1] = areaMinY;
+      this._innerArea.min[2] = areaMinZ;
+      this._innerArea.max[0] = areaMaxX;
+      this._innerArea.max[1] = areaMaxY;
+      this._innerArea.max[2] = areaMaxZ;
     }
 
     setSelectedLayerName(layerName: string): void {
@@ -1223,6 +1257,57 @@ namespace gdjs {
       }
     }
 
+    private _updateInnerAreaOutline(): void {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const layer = this._getFirstLayer3D();
+      if (!layer) {
+        return;
+      }
+      const threeGroup = layer.getRenderer().getThreeGroup();
+      if (!threeGroup) {
+        return;
+      }
+      if (!this._innerArea) {
+        if (this._threeInnerArea) {
+          threeGroup.remove(this._threeInnerArea);
+          this._threeInnerArea = null;
+        }
+        return;
+      }
+      if (!this._threeInnerArea) {
+        const boxMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0,
+            alphaTest: 1,
+          })
+        );
+        boxMesh.position.x = 0.5;
+        boxMesh.position.y = 0.5;
+        boxMesh.position.z = 0.5;
+        const box = new THREE.BoxHelper(boxMesh, '#444444');
+        box.rotation.order = 'ZYX';
+        //box.material.depthTest = false;
+        box.material.fog = false;
+        const container = new THREE.Group();
+        container.rotation.order = 'ZYX';
+        container.add(box);
+        threeGroup.add(container);
+        this._threeInnerArea = container;
+      }
+      const threeInnerArea = this._threeInnerArea;
+      const innerArea = this._innerArea;
+      threeInnerArea.scale.x = innerArea.max[0] - innerArea.min[0];
+      threeInnerArea.scale.y = innerArea.max[1] - innerArea.min[1];
+      threeInnerArea.scale.z = innerArea.max[2] - innerArea.min[2];
+      threeInnerArea.position.x = innerArea.min[0];
+      threeInnerArea.position.y = innerArea.min[1];
+      threeInnerArea.position.z = innerArea.min[2];
+    }
+
     private _handleContextMenu() {
       const inputManager = this._runtimeGame.getInputManager();
       if (
@@ -1643,6 +1728,7 @@ namespace gdjs {
       this._handleSelection({ objectUnderCursor });
       this._updateSelectionOutline({ objectUnderCursor });
       this._updateSelectionControls();
+      this._updateInnerAreaOutline();
       this._handleContextMenu();
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;

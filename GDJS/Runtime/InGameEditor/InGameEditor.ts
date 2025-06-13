@@ -112,6 +112,9 @@ namespace gdjs {
     }
   };
 
+  const shouldDragSelectedObject = (inputManager: gdjs.InputManager) =>
+    isAltPressed(inputManager);
+
   const getInstanceDataFromRuntimeObject = (
     runtimeObject: gdjs.RuntimeObject
   ): InstanceData | null => {
@@ -349,6 +352,7 @@ namespace gdjs {
 
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
+    private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
@@ -787,6 +791,58 @@ namespace gdjs {
       this._sendSelectionUpdate();
     }
 
+    private _handleSelectedObjectDragging(): void {
+      const inputManager = this._runtimeGame.getInputManager();
+      if (!shouldDragSelectedObject(inputManager)) {
+        return;
+      }
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return;
+
+      if (
+        inputManager.isMouseButtonPressed(0) &&
+        !this._draggedSelectedObject
+      ) {
+        const object = this.getObjectUnderCursor();
+        if (object && this._selection.getSelectedObjects().includes(object)) {
+          this._draggedSelectedObject = object;
+        }
+      }
+
+      if (!this._draggedSelectedObject) {
+        return;
+      }
+
+      if (is3D(this._draggedSelectedObject)) {
+        const closestIntersect = this._getClosestIntersectionUnderCursor();
+        if (closestIntersect) {
+          this._draggedSelectedObject.setX(closestIntersect.point.x);
+          this._draggedSelectedObject.setY(-closestIntersect.point.y);
+          this._draggedSelectedObject.setZ(closestIntersect.point.z);
+        } else {
+          const projectedCursor = this._getProjectedCursor();
+          if (projectedCursor) {
+            this._draggedSelectedObject.setX(projectedCursor[0]);
+            this._draggedSelectedObject.setY(projectedCursor[1]);
+            this._draggedSelectedObject.setZ(0);
+          }
+        }
+      } else {
+        const projectedCursor = this._getProjectedCursor();
+        if (projectedCursor) {
+          this._draggedSelectedObject.setX(projectedCursor[0]);
+          this._draggedSelectedObject.setY(projectedCursor[1]);
+        }
+      }
+
+      if (inputManager.isMouseButtonReleased(0)) {
+        this._draggedSelectedObject = null;
+        this._sendSelectionUpdate();
+      }
+    }
+
     private _handleSelectionMovement() {
       // Finished moving the selection.
       if (
@@ -831,7 +887,10 @@ namespace gdjs {
       const cursorX = inputManager.getCursorX();
       const cursorY = inputManager.getCursorY();
 
-      if (inputManager.isMouseButtonPressed(0)) {
+      if (
+        inputManager.isMouseButtonPressed(0) &&
+        !shouldDragSelectedObject(inputManager)
+      ) {
         if (this._wasMouseLeftButtonPressed && this._selectionBox) {
           this._selectionBox.endPoint.set(
             this._getNormalizedScreenX(cursorX),
@@ -853,7 +912,8 @@ namespace gdjs {
       if (
         inputManager.isMouseButtonReleased(0) &&
         this._selectionBox &&
-        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint)
+        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
+        !this._hasSelectionActuallyMoved
       ) {
         const objects = new Set<gdjs.RuntimeObject>();
         for (const selectThreeObject of this._selectionBox.select()) {
@@ -895,6 +955,7 @@ namespace gdjs {
       ) {
         if (
           !isShiftPressed(inputManager) &&
+          !shouldDragSelectedObject(inputManager) &&
           this._selection.getLastSelectedObject() === objectUnderCursor
         ) {
           this._swapTransformControlsMode();
@@ -1035,6 +1096,7 @@ namespace gdjs {
 
     private _updateSelectionControls() {
       const runtimeGame = this._runtimeGame;
+      const inputManager = this._runtimeGame.getInputManager();
       const currentScene = runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
@@ -1044,7 +1106,8 @@ namespace gdjs {
         this._selectionControls &&
         (!lastSelectedObject ||
           (lastSelectedObject &&
-            this._selectionControls.object !== lastSelectedObject))
+            this._selectionControls.object !== lastSelectedObject) ||
+          shouldDragSelectedObject(inputManager))
       ) {
         this._selectionControls.threeTransformControls.detach();
         this._selectionControls.threeTransformControls.removeFromParent();
@@ -1052,7 +1115,11 @@ namespace gdjs {
         this._selectionControls = null;
       }
 
-      if (lastSelectedObject && !this._selectionControls) {
+      if (
+        lastSelectedObject &&
+        !this._selectionControls &&
+        !shouldDragSelectedObject(inputManager)
+      ) {
         const threeObject = lastSelectedObject.get3DRendererObject();
         if (!threeObject) return;
 
@@ -1598,9 +1665,10 @@ namespace gdjs {
         }
       }
       let draggedNewObjectPreviousMask = 0;
-      if (this._draggedNewObject && is3D(this._draggedNewObject)) {
-        const draggedRendererObject =
-          this._draggedNewObject.get3DRendererObject();
+      const draggedObject =
+        this._draggedNewObject || this._draggedSelectedObject;
+      if (draggedObject && is3D(draggedObject)) {
+        const draggedRendererObject = draggedObject.get3DRendererObject();
         if (draggedRendererObject) {
           draggedNewObjectPreviousMask = draggedRendererObject.layers.mask;
           draggedRendererObject.layers.set(1);
@@ -1647,9 +1715,8 @@ namespace gdjs {
         }
       }
       // Also reset the layer of the object being added.
-      if (this._draggedNewObject && is3D(this._draggedNewObject)) {
-        const draggedRendererObject =
-          this._draggedNewObject.get3DRendererObject();
+      if (draggedObject && is3D(draggedObject)) {
+        const draggedRendererObject = draggedObject.get3DRendererObject();
         if (draggedRendererObject) {
           draggedRendererObject.layers.mask = draggedNewObjectPreviousMask;
           draggedRendererObject.traverse(
@@ -1734,6 +1801,7 @@ namespace gdjs {
       }
 
       this._handleCameraMovement();
+      this._handleSelectedObjectDragging();
       this._handleSelectionMovement();
       this._updateSelectionBox();
       this._handleSelection({ objectUnderCursor });

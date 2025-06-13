@@ -17,6 +17,8 @@ export type InstructionSummary = {|
   type: string,
   description: string,
   parameters: Array<ParameterSummary>,
+  hidden?: boolean,
+  relevantForSceneEvents?: boolean,
 |};
 
 /**
@@ -26,6 +28,8 @@ export type ExpressionSummary = {|
   type: string,
   description: string,
   parameters: Array<ParameterSummary>,
+  hidden?: boolean,
+  relevantForSceneEvents?: boolean,
 |};
 
 export type ObjectSummary = {|
@@ -120,7 +124,7 @@ export const buildExtensionSummary = ({
 
         if (instructionMetadata.isPrivate()) return null;
 
-        return {
+        const instructionSummary: InstructionSummary = {
           type: instructionType,
           description: instructionMetadata.getDescription(),
           parameters: mapFor(
@@ -132,6 +136,14 @@ export const buildExtensionSummary = ({
             }
           ),
         };
+        if (instructionMetadata.isHidden()) {
+          instructionSummary.hidden = true;
+        }
+        if (!instructionMetadata.isRelevantForLayoutEvents()) {
+          instructionSummary.relevantForSceneEvents = false;
+        }
+
+        return instructionSummary;
       })
       .filter(Boolean);
   };
@@ -148,7 +160,7 @@ export const buildExtensionSummary = ({
 
         if (expressionMetadata.isPrivate()) return null;
 
-        return {
+        const expressionSummary: ExpressionSummary = {
           type: expressionType,
           description: expressionMetadata.getDescription(),
           parameters: mapFor(
@@ -160,6 +172,14 @@ export const buildExtensionSummary = ({
             }
           ),
         };
+        if (!expressionMetadata.isShown()) {
+          expressionSummary.hidden = true;
+        }
+        if (!expressionMetadata.isRelevantForLayoutEvents()) {
+          expressionSummary.relevantForSceneEvents = false;
+        }
+
+        return expressionSummary;
       })
       .filter(Boolean);
   };

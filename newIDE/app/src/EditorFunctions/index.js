@@ -59,6 +59,7 @@ export type EditorFunctionGenericOutput = {|
   instances?: any,
   behaviors?: Array<SimplifiedBehavior>,
   generatedEventsErrorDiagnostics?: string,
+  aiGeneratedEventId?: string,
 |};
 
 export type EventsGenerationResult =
@@ -1472,6 +1473,7 @@ const addSceneEvents: EditorFunction = {
         return {
           success: false,
           message: `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
+          aiGeneratedEventId: aiGeneratedEvent.id,
           generatedEventsErrorDiagnostics: changes
             .map(change => change.diagnosticLines.join('\n'))
             .join('\n\n'),
@@ -1515,7 +1517,11 @@ const addSceneEvents: EditorFunction = {
       const resultMessage =
         aiGeneratedEvent.resultMessage ||
         'Properly modified or added new event(s).';
-      return makeGenericSuccess(resultMessage);
+      return {
+        success: true,
+        message: resultMessage,
+        aiGeneratedEventId: aiGeneratedEvent.id,
+      };
     } catch (error) {
       console.error('Error in addSceneEvents with AI generation:', error);
       return makeGenericFailure(

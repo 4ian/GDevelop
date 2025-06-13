@@ -1591,6 +1591,11 @@ namespace gdjs {
       // are not considered by raycasting.
       this._raycaster.layers.set(0);
       this._selectionBoxes.forEach(({ box }) => box.layers.set(1));
+      if (this._threeInnerArea) {
+        for (const child of this._threeInnerArea.children) {
+          child.layers.set(1);
+        }
+      }
       let draggedNewObjectPreviousMask = 0;
       if (this._draggedNewObject && is3D(this._draggedNewObject)) {
         const draggedRendererObject =
@@ -1635,6 +1640,11 @@ namespace gdjs {
 
       // Reset selection boxes layers so they are properly displayed.
       this._selectionBoxes.forEach(({ box }) => box.layers.set(0));
+      if (this._threeInnerArea) {
+        for (const child of this._threeInnerArea.children) {
+          child.layers.set(0);
+        }
+      }
       // Also reset the layer of the object being added.
       if (this._draggedNewObject && is3D(this._draggedNewObject)) {
         const draggedRendererObject =

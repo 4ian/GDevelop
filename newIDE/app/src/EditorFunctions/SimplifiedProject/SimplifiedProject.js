@@ -38,6 +38,7 @@ type SimplifiedScene = {|
   objects: Array<SimplifiedObject>,
   objectGroups: Array<SimplifiedObjectGroup>,
   sceneVariables: Array<SimplifiedVariable>,
+  instancesOnSceneDescription: string,
 |};
 
 type SimplifiedProject = {|
@@ -217,7 +218,63 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     });
   };
 
-  const getSimplifiedScene = (project: gdProject, scene: gdLayout) => {
+  const getInstancesDescription = (scene: gdLayout): string => {
+    let isEmpty = true;
+    const instancesCountPerLayer: { [string]: { [string]: number } } = {};
+
+    const instancesListerFunctor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    instancesListerFunctor.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
+      const name = instance.getObjectName();
+      if (!name) return;
+
+      const layer = instance.getLayer();
+
+      const layerInstancesCount = (instancesCountPerLayer[layer] =
+        instancesCountPerLayer[layer] || {});
+      layerInstancesCount[name] = (layerInstancesCount[name] || 0) + 1;
+      isEmpty = false;
+    };
+    // $FlowFixMe - JSFunctor is incompatible with Functor
+    scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
+    instancesListerFunctor.delete();
+
+    if (isEmpty) {
+      return 'There are no instances of objects placed on the scene - the scene is empty.';
+    }
+
+    const layersContainer = scene.getLayers();
+
+    return [
+      `On the scene, there are:`,
+      ...mapFor(0, layersContainer.getLayersCount(), i => {
+        const layer = layersContainer.getLayerAt(i);
+        const layerName = layer.getName();
+        const layerInstancesCount = instancesCountPerLayer[layerName];
+
+        return [
+          layerName ? `- on layer "${layer.getName()}":` : `- on base layer:`,
+          !layerInstancesCount || Object.keys(layerInstancesCount).length === 0
+            ? `  - Nothing (no instances)`
+            : Object.keys(layerInstancesCount)
+                .map(name => `  - ${layerInstancesCount[name]} ${name}`)
+                .join('\n'),
+        ].join('\n');
+      }),
+      '',
+      `Inspect instances on the scene to get more details if needed.`,
+    ].join('\n');
+  };
+
+  const getSimplifiedScene = (
+    project: gdProject,
+    scene: gdLayout
+  ): SimplifiedScene => {
     const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
       project,
       scene
@@ -231,6 +288,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         projectScopedContainers.getObjectsContainersList()
       ),
       sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
+      instancesOnSceneDescription: getInstancesDescription(scene),
     };
   };
 

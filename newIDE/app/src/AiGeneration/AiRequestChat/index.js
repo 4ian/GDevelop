@@ -380,7 +380,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 value={newAiRequestMode}
                 leftButton={{
                   icon: <Hammer fontSize="small" />,
-                  label: <Trans>Build for me</Trans>,
+                  label: <Trans>Build for me (beta)</Trans>,
                   value: 'agent',
                 }}
                 rightButton={{

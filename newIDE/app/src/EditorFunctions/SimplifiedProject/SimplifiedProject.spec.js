@@ -60,6 +60,17 @@ describe('SimplifiedProject', () => {
         "globalVariables": Array [],
         "scenes": Array [
           Object {
+            "instancesOnSceneDescription": "On the scene, there are:
+      - on layer \\"GUI\\":
+        - Nothing (no instances)
+      - on layer \\"OtherLayer\\":
+        - Nothing (no instances)
+      - on base layer:
+        - 1 CubeObject
+        - 1 TextInputObject
+        - 1 MySpriteObject
+
+      Inspect instances on the scene to get more details if needed.",
             "objectGroups": Array [
               Object {
                 "behaviors": Array [
@@ -812,12 +823,14 @@ describe('SimplifiedProject', () => {
             ],
           },
           Object {
+            "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "EmptyLayout",
             "sceneVariables": Array [],
           },
           Object {
+            "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "Layout with a very looooooooong naaaaame to test in the project manager",

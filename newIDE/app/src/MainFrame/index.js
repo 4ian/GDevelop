@@ -1156,7 +1156,6 @@ const MainFrame = (props: Props) => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-    createProjectFromAIGeneration,
   } = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
@@ -1225,6 +1224,19 @@ const MainFrame = (props: Props) => {
     onGameRegistered: gamesList.fetchGames,
   });
 
+  const openAskAi = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
   const {
     onSelectExampleShortHeader,
     onSelectPrivateGameTemplateListingData,
@@ -1238,7 +1250,7 @@ const MainFrame = (props: Props) => {
     createEmptyProject,
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
-    createProjectFromAIGeneration,
+    openAskAi,
     storageProviders: props.storageProviders,
   });
 
@@ -2022,19 +2034,6 @@ const MainFrame = (props: Props) => {
         editorTabs: openEditorTab(
           state.editorTabs,
           getEditorOpeningOptions({ kind: 'start page', name: '' })
-        ),
-      }));
-    },
-    [setState, getEditorOpeningOptions]
-  );
-
-  const openAskAi = React.useCallback(
-    () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
-          state.editorTabs,
-          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
         ),
       }));
     },

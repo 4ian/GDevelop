@@ -4,7 +4,6 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import {
   createNewEmptyProject,
-  createNewProjectFromAIGeneratedProject,
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
@@ -458,17 +457,6 @@ const useCreateProject = ({
     [beforeCreatingProject, createProject]
   );
 
-  const createProjectFromAIGeneration = React.useCallback(
-    async (projectFileUrl: string, newProjectSetup: NewProjectSetup) => {
-      beforeCreatingProject();
-      const newProjectSource = createNewProjectFromAIGeneratedProject(
-        projectFileUrl
-      );
-      await createProject(newProjectSource, newProjectSetup);
-    },
-    [beforeCreatingProject, createProject]
-  );
-
   return {
     createEmptyProject,
     createProjectFromExample,
@@ -476,7 +464,6 @@ const useCreateProject = ({
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-    createProjectFromAIGeneration,
   };
 };
 

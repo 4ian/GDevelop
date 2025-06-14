@@ -8,7 +8,7 @@ import TextField from '../UI/TextField';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -25,7 +25,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
-import { type GeneratedProject } from '../Utils/GDevelopServices/Generation';
 import ResolutionOptions, {
   type ResolutionOption,
   resolutionOptions,
@@ -37,7 +36,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { CLOUD_PROJECT_NAME_MAX_LENGTH } from '../Utils/GDevelopServices/Project';
-import AIPromptField from './AIPromptField';
 import EmptyAndStartingPointProjects, {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
@@ -57,10 +55,22 @@ import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper
 import { useOnlineStatus } from '../Utils/OnlineStatus';
 import PrivateGameTemplateOwnedInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateOwnedInformationPage';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import EmptyMessage from '../UI/EmptyMessage';
+import RaisedButton from '../UI/RaisedButton';
+import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import Chip from '../UI/Chip';
+import { LineStackLayout } from '../UI/Layout';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
+
+const styles = {
+  chip: { height: 24 },
+  tryAIAgentButton: {
+    flexShrink: 0,
+  },
+};
 
 export const getItemsColumns = (
   windowSize: WindowSizeType,
@@ -101,10 +111,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
-  onCreateFromAIGeneration: (
-    generatedProject: GeneratedProject,
-    newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
+  onOpenAskAi: () => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -122,7 +129,7 @@ const NewProjectSetupDialog = ({
   onCreateEmptyProject,
   onCreateFromExample,
   onCreateProjectFromPrivateGameTemplate,
-  onCreateFromAIGeneration,
+  onOpenAskAi,
   selectedExampleShortHeader,
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
@@ -165,9 +172,6 @@ const NewProjectSetupDialog = ({
   const [projectName, setProjectName] = React.useState<string>(
     generateProjectName()
   );
-  const [isGeneratingProject, setIsGeneratingProject] = React.useState<boolean>(
-    false
-  );
   const [
     resolutionOption,
     setResolutionOption,
@@ -185,7 +189,7 @@ const NewProjectSetupDialog = ({
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
-    () => {
+    (): StorageProvider => {
       const localFileStorageProvider = storageProviders.find(
         ({ internalName }) => internalName === 'LocalFile'
       );
@@ -255,7 +259,7 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
-  const isLoading = isGeneratingProject || isProjectOpening;
+  const isLoading = isProjectOpening;
 
   const linkedExampleShortHeaders: {
     exampleShortHeader: ExampleShortHeader,
@@ -566,7 +570,7 @@ const NewProjectSetupDialog = ({
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
                     onClick={onBack}
-                    disabled={isProjectOpening || isGeneratingProject}
+                    disabled={isProjectOpening}
                   />
                 </Line>
                 <Spacer />
@@ -583,9 +587,35 @@ const NewProjectSetupDialog = ({
                   onSelectEmptyProject={() => {
                     setEmptyProjectSelected(true);
                   }}
-                  disabled={isProjectOpening || isGeneratingProject}
+                  disabled={isProjectOpening}
                 />
-                {isOnline && (
+                <LineStackLayout noMargin>
+                  <Text size="block-title" noMargin>
+                    <Trans>Prototype with AI</Trans>
+                  </Text>
+                  <Chip label={<Trans>New</Trans>} style={styles.chip} />
+                </LineStackLayout>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  alignItems="center"
+                  noColumnMargin
+                >
+                  <Text size="body2" noMargin>
+                    <Trans>
+                      Start prototyping a new game or build on top of an
+                      existing one with the GDevelop AI agent.
+                    </Trans>
+                  </Text>
+                  <RaisedButton
+                    size="large"
+                    color="success"
+                    label={<Trans>Try the AI agent</Trans>}
+                    icon={<ArrowRight />}
+                    style={styles.tryAIAgentButton}
+                    onClick={onOpenAskAi}
+                  />
+                </ResponsiveLineStackLayout>
+                {isOnline ? (
                   <>
                     <Text size="block-title" noMargin>
                       <Trans>Remix an existing game</Trans>
@@ -601,27 +631,18 @@ const NewProjectSetupDialog = ({
                       }}
                       i18n={i18n}
                       columnsCount={getItemsColumns(windowSize, isLandscape)}
-                      rowToInsert={{
-                        row: 2,
-                        element: (
-                          <AIPromptField
-                            onCreateFromAIGeneration={onCreateFromAIGeneration}
-                            isProjectOpening={!!isProjectOpening}
-                            isGeneratingProject={isGeneratingProject}
-                            storageProvider={storageProvider}
-                            saveAsLocation={saveAsLocation}
-                            onGenerationStarted={() =>
-                              setIsGeneratingProject(true)
-                            }
-                            onGenerationEnded={() =>
-                              setIsGeneratingProject(false)
-                            }
-                          />
-                        ),
-                      }}
                       hideStartingPoints
                     />
                   </>
+                ) : (
+                  <EmptyMessage>
+                    <Text>
+                      <Trans>
+                        Get back online to browse the huge library of free and
+                        premium examples.
+                      </Trans>
+                    </Text>
+                  </EmptyMessage>
                 )}
               </ColumnStackLayout>
             )}

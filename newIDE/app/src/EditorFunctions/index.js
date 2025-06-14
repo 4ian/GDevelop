@@ -1446,11 +1446,13 @@ const addSceneEvents: EditorFunction = {
 
       const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
       if (aiGeneratedEvent.error) {
-        return makeGenericFailure(
-          `Infrastructure error when generating events (${
+        return {
+          success: false,
+          message: `Infrastructure error when generating events (${
             aiGeneratedEvent.error.message
-          }). Consider trying again or a different approach.`
-        );
+          }). Consider trying again or a different approach.`,
+          aiGeneratedEventId: aiGeneratedEvent.id,
+        };
       }
 
       const changes = aiGeneratedEvent.changes;

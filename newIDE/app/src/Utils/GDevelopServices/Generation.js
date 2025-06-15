@@ -84,6 +84,9 @@ export type AiRequest = {
   } | null,
 
   output: Array<AiRequestMessage>,
+
+  lastUserMessagePriceInCredits?: number | null,
+  totalPriceInCredits?: number | null,
 };
 
 export type AiGeneratedEventStats = {
@@ -395,12 +398,14 @@ export const sendAiRequestFeedback = async (
     messageIndex,
     feedback,
     reason,
+    freeFormDetails,
   }: {|
     userId: string,
     aiRequestId: string,
     messageIndex: number,
     feedback: 'like' | 'dislike',
     reason?: string,
+    freeFormDetails?: string,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -412,6 +417,7 @@ export const sendAiRequestFeedback = async (
       messageIndex,
       feedback,
       reason,
+      freeFormDetails,
     },
     {
       params: {

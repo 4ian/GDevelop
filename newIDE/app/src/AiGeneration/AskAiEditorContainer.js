@@ -894,7 +894,13 @@ export const AskAiEditor = React.memo<Props>(
       );
 
       const onSendFeedback = React.useCallback(
-        async (aiRequestId, messageIndex, feedback, reason) => {
+        async (
+          aiRequestId,
+          messageIndex,
+          feedback,
+          reason,
+          freeFormDetails
+        ) => {
           if (!profile) return;
           try {
             await retryIfFailed({ times: 2 }, () =>
@@ -904,6 +910,7 @@ export const AskAiEditor = React.memo<Props>(
                 messageIndex,
                 feedback,
                 reason,
+                freeFormDetails,
               })
             );
           } catch (error) {

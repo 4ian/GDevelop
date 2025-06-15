@@ -36,12 +36,15 @@ import Help from '../../UI/CustomSvgIcons/Help';
 import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
+import { FeedbackBanner } from './FeedbackBanner';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
 
 const styles = {
   chatScrollView: {
+    display: 'flex',
+    flexDirection: 'column',
     paddingLeft: 8,
     paddingRight: 8,
     paddingBottom: 8,
@@ -69,7 +72,8 @@ type Props = {
     aiRequestId: string,
     messageIndex: number,
     feedback: 'like' | 'dislike',
-    reason?: string
+    reason?: string,
+    freeFormDetails?: string
   ) => Promise<void>,
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
@@ -149,9 +153,11 @@ const getQuotaOrCreditsText = ({
 const getPriceText = ({
   aiRequestMode,
   price,
+  lastUserMessagePriceInCredits,
 }: {|
   aiRequestMode: 'chat' | 'agent',
   price: UsagePrice | null,
+  lastUserMessagePriceInCredits: number | null,
 |}) => {
   if (!price) return null;
 
@@ -174,11 +180,18 @@ const getPriceText = ({
     <Tooltip
       title={
         aiRequestMode === 'agent' ? (
-          <Trans>
-            Each request to the AI agent costs {priceText} credits. It depends
-            on the amount of work the agent will do and the number of times it
-            generates events.
-          </Trans>
+          <>
+            <Trans>
+              Each request to the AI agent costs {priceText} credits. It depends
+              on the amount of work the agent will do and the number of times it
+              generates events.
+            </Trans>{' '}
+            {lastUserMessagePriceInCredits ? (
+              <Trans>
+                The last request used {lastUserMessagePriceInCredits} credits.
+              </Trans>
+            ) : null}
+          </>
         ) : (
           <Trans>Each answer from the AI costs {priceText} credits.</Trans>
         )
@@ -243,9 +256,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           newAiRequestMode === 'agent'
             ? hasOpenedProject
               ? [
-                  t`Add an enemy that spawns periodically`,
-                  t`Display the score on the screen`,
-                  t`Show an explosion when the player is hit`,
+                  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
+                  t`Add a score and display it on the screen`,
+                  t`Create an explosion when the player is hit`,
                 ]
               : [
                   t`Build a platformer game with a score and coins to collect`,
@@ -298,6 +311,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             ? aiRequest.mode || 'chat'
             : newAiRequestMode,
           price,
+          lastUserMessagePriceInCredits: aiRequest
+            ? aiRequest.lastUserMessagePriceInCredits
+            : null,
         }) || '\u00A0'}
       </Text>
     );
@@ -478,7 +494,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Line>
               </ColumnStackLayout>
             </form>
-            {subscriptionBanner}
+            {subscriptionBanner ? (
+              <>
+                <Spacer />
+                {subscriptionBanner}
+              </>
+            ) : null}
           </ColumnStackLayout>
           <Column justifyContent="center">
             {newAiRequestMode === 'agent' ? (
@@ -542,6 +563,31 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       editorFunctionCallResults,
     });
 
+    const lastMessageIndex = aiRequest.output.length - 1;
+    const lastMessage = aiRequest.output[lastMessageIndex];
+    const shouldDisplayFeedbackBanner =
+      aiRequest.status === 'ready' &&
+      aiRequest.mode === 'agent' &&
+      lastMessage.type === 'message' &&
+      lastMessage.role === 'assistant';
+    const lastMessageFeedbackBanner = shouldDisplayFeedbackBanner && (
+      <FeedbackBanner
+        onSendFeedback={(
+          feedback: 'like' | 'dislike',
+          reason?: string,
+          freeFormDetails?: string
+        ) => {
+          onSendFeedback(
+            aiRequestId,
+            lastMessageIndex,
+            feedback,
+            reason,
+            freeFormDetails
+          );
+        }}
+      />
+    );
+
     return (
       <Column
         expand
@@ -558,23 +604,27 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             project={project}
             onProcessFunctionCalls={onProcessFunctionCalls}
           />
-          {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
-            <AlertMessage
-              kind={
-                userMessagesCount >= TOO_MANY_USER_MESSAGES_ERROR_COUNT
-                  ? 'error'
-                  : 'warning'
-              }
-            >
-              <Trans>
-                The chat is becoming long - consider creating a new chat to ask
-                other questions. The AI will better analyze your game and
-                request in a new chat.
-              </Trans>
-            </AlertMessage>
-          ) : (
-            subscriptionBanner
-          )}
+          <Spacer />
+          <ColumnStackLayout noMargin>
+            {lastMessageFeedbackBanner}
+            {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
+              <AlertMessage
+                kind={
+                  userMessagesCount >= TOO_MANY_USER_MESSAGES_ERROR_COUNT
+                    ? 'error'
+                    : 'warning'
+                }
+              >
+                <Trans>
+                  The chat is becoming long - consider creating a new chat to
+                  ask other questions. The AI will better analyze your game and
+                  request in a new chat.
+                </Trans>
+              </AlertMessage>
+            ) : (
+              subscriptionBanner
+            )}
+          </ColumnStackLayout>
         </ScrollView>
         <form
           onSubmit={() => {

@@ -83,6 +83,8 @@ const createFakeAiRequest = ({
   gameProjectJson: 'FAKE DATA',
   output,
   error,
+  lastUserMessagePriceInCredits: 5,
+  totalPriceInCredits: 5,
 });
 
 export default {

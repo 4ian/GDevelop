@@ -31,7 +31,8 @@ type Props = {|
     aiRequestId: string,
     messageIndex: number,
     feedback: 'like' | 'dislike',
-    reason?: string
+    reason?: string,
+    freeFormDetails?: string
   ) => Promise<void>,
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null,
   onProcessFunctionCalls: (
@@ -238,14 +239,16 @@ export const ChatMessages = React.memo<Props>(function ChatMessages({
       ) : null}
       {dislikeFeedbackDialogOpenedFor && (
         <DislikeFeedbackDialog
+          mode={aiRequest.mode || 'chat'}
           open
           onClose={() => setDislikeFeedbackDialogOpenedFor(null)}
-          onSendFeedback={(reason: string) => {
+          onSendFeedback={(reason: string, freeFormDetails: string) => {
             onSendFeedback(
               dislikeFeedbackDialogOpenedFor.aiRequestId,
               dislikeFeedbackDialogOpenedFor.messageIndex,
               'dislike',
-              reason
+              reason,
+              freeFormDetails
             );
           }}
         />

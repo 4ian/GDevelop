@@ -91,7 +91,10 @@ import {
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
-import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import {
+  type WindowSizeType,
+  useResponsiveWindowSize,
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
@@ -156,6 +159,7 @@ type Props = {|
 
 type ComponentProps = {|
   ...Props,
+  windowSize: WindowSizeType,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -236,6 +240,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
   _containerDiv = React.createRef<HTMLDivElement>();
+  _containerDivLastKnownSize = null;
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
       !this.state.inlineEditing &&
@@ -1682,10 +1687,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.deleteSelection({ deleteInstructions: false });
   };
 
-  _ensureEventUnfolded = (cb: () => ?gdBaseEvent) => {
+  _ensureUnfoldedAndScrollTo = (cb: () => ?gdBaseEvent) => {
     const event = cb();
-    if (event && this._eventsTree) {
-      this._eventsTree.unfoldForEvent(event);
+    const eventsTree = this._eventsTree;
+    if (event && eventsTree) {
+      eventsTree.unfoldForEvent(event);
+      setTimeout(() => {
+        eventsTree.scrollToRow(eventsTree.getEventRow(event));
+      }, 0);
     }
   };
 
@@ -1866,6 +1875,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onCreateEventsFunction,
       tutorials,
       hotReloadPreviewButtonProps,
+      windowSize,
     } = this.props;
     if (!project) return null;
 
@@ -1902,222 +1912,225 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
       : projectScopedContainersAccessor;
 
+    // Memorize the last size of the container div, that is used to render the events tree.
+    // When the events editor tab is hidden, the container div width/height are 0.
+    // In this case, we keep the previous known size to avoid trashing the layout and events tree
+    // memorized heights for events (which would create flickering when switching back
+    // to the events editor tab).
+    if (this._containerDiv.current) {
+      const width = this._containerDiv.current.clientWidth;
+      const height = this._containerDiv.current.clientHeight;
+
+      if (width > 0 && height > 0) {
+        this._containerDivLastKnownSize = {
+          width,
+          height,
+        };
+      }
+    }
+
     return (
       <>
-        <ResponsiveWindowMeasurer>
-          {({ windowSize }) => (
-            <EventsSearcher
-              key={events.ptr}
-              ref={eventSearcher => (this._eventSearcher = eventSearcher)}
-              events={events}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              selection={this.state.selection}
-              project={project}
+        <EventsSearcher
+          key={events.ptr}
+          ref={eventSearcher => (this._eventSearcher = eventSearcher)}
+          events={events}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          selection={this.state.selection}
+          project={project}
+        >
+          {({
+            eventsSearchResultEvents,
+            searchFocusOffset,
+            searchInEvents,
+            replaceInEvents,
+            goToPreviousSearchResult,
+            goToNextSearchResult,
+          }) => (
+            <div
+              id="events-editor"
+              data-active={isActive ? 'true' : undefined}
+              className="gd-events-sheet"
+              style={styles.container}
+              onKeyDown={this._keyboardShortcuts.onKeyDown}
+              onKeyUp={this._keyboardShortcuts.onKeyUp}
+              onDragOver={this._keyboardShortcuts.onDragOver}
+              ref={this._containerDiv}
+              tabIndex={0}
             >
-              {({
-                eventsSearchResultEvents,
-                searchFocusOffset,
-                searchInEvents,
-                replaceInEvents,
-                goToPreviousSearchResult,
-                goToNextSearchResult,
-              }) => (
-                <div
-                  id="events-editor"
-                  data-active={isActive ? 'true' : undefined}
-                  className="gd-events-sheet"
-                  style={styles.container}
-                  onKeyDown={this._keyboardShortcuts.onKeyDown}
-                  onKeyUp={this._keyboardShortcuts.onKeyUp}
-                  onDragOver={this._keyboardShortcuts.onDragOver}
-                  ref={this._containerDiv}
-                  tabIndex={0}
-                >
-                  {isFunctionOnlyCallingItself && (
-                    <Line>
-                      <Column expand>
-                        <AlertMessage kind="warning">
-                          <Trans>
-                            This function calls itself (it is "recursive").
-                            Ensure this is expected and there is a proper
-                            condition to stop it if necessary.
-                          </Trans>
-                        </AlertMessage>
-                      </Column>
-                    </Line>
-                  )}
-                  <EventsTree
-                    ref={eventsTree => (this._eventsTree = eventsTree)}
-                    key={events.ptr}
-                    indentScale={preferences.values.eventsSheetIndentScale}
-                    onScroll={this._ensureFocused}
-                    events={events}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    projectScopedContainersAccessor={
-                      projectScopedContainersAccessor
-                    }
-                    selection={this.state.selection}
-                    onInstructionClick={this.selectInstruction}
-                    onInstructionDoubleClick={this.openInstructionEditor}
-                    onInstructionContextMenu={this.openInstructionContextMenu}
-                    onAddInstructionContextMenu={
-                      this.openAddInstructionContextMenu
-                    }
-                    onAddNewInstruction={this.openInstructionEditor}
-                    onPasteInstructions={
-                      this.pasteInstructionsInInstructionsList
-                    }
-                    onMoveToInstruction={this.moveSelectionToInstruction}
-                    onMoveToInstructionsList={
-                      this.moveSelectionToInstructionsList
-                    }
-                    onParameterClick={this.openParameterEditor}
-                    onVariableDeclarationClick={() => {
-                      // Nothing to do.
-                    }}
-                    onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                    onEventClick={this.selectEvent}
-                    onEventContextMenu={this.openEventContextMenu}
-                    onAddNewEvent={(
-                      eventType: string,
-                      eventsList: gdEventsList
-                    ) => {
-                      this.addNewEvent(eventType, {
-                        eventsList,
-                        indexInList: eventsList.getEventsCount(),
-                      });
-                    }}
-                    onOpenExternalEvents={onOpenExternalEvents}
-                    onOpenLayout={onOpenLayout}
-                    searchResults={eventsSearchResultEvents}
-                    searchFocusOffset={searchFocusOffset}
-                    onEventMoved={this._onEventMoved}
-                    onEndEditingEvent={this._onEndEditingStringEvent}
-                    showObjectThumbnails={
-                      preferences.values.eventsSheetShowObjectThumbnails
-                    }
-                    screenType={screenType}
-                    windowSize={windowSize}
-                    eventsSheetWidth={
-                      this._containerDiv.current
-                        ? this._containerDiv.current.clientWidth
-                        : 0
-                    }
-                    eventsSheetHeight={
-                      this._containerDiv.current
-                        ? this._containerDiv.current.clientHeight
-                        : 0
-                    }
-                    fontSize={preferences.values.eventsSheetZoomLevel}
-                    preferences={preferences}
-                    tutorials={tutorials}
-                  />
-                  {this.state.showSearchPanel && (
-                    <ErrorBoundary
-                      componentTitle={<Trans>Search panel</Trans>}
-                      scope="scene-events-search"
-                      onClose={() => this._closeSearchPanel()}
-                    >
-                      <SearchPanel
-                        ref={searchPanel => (this._searchPanel = searchPanel)}
-                        onSearchInEvents={inputs =>
-                          this._searchInEvents(searchInEvents, inputs)
-                        }
-                        onReplaceInEvents={inputs => {
-                          this._replaceInEvents(replaceInEvents, inputs);
-                        }}
-                        resultsCount={
-                          eventsSearchResultEvents
-                            ? eventsSearchResultEvents.length
-                            : null
-                        }
-                        hasEventSelected={hasEventSelected(
-                          this.state.selection
-                        )}
-                        onGoToPreviousSearchResult={() =>
-                          this._ensureEventUnfolded(goToPreviousSearchResult)
-                        }
-                        onCloseSearchPanel={() => {
-                          this._closeSearchPanel();
-                        }}
-                        onGoToNextSearchResult={() =>
-                          this._ensureEventUnfolded(goToNextSearchResult)
-                        }
-                        searchFocusOffset={searchFocusOffset}
-                      />
-                    </ErrorBoundary>
-                  )}
-                  <InlineParameterEditor
-                    open={this.state.inlineEditing}
-                    anchorEl={this.state.inlineEditingAnchorEl}
-                    onRequestClose={() => {
-                      this.closeParameterEditor(
-                        /*shouldCancel=*/ preferences.values
-                          .eventsSheetCancelInlineParameter === 'cancel'
-                      );
-                    }}
-                    onApply={() => {
-                      this.closeParameterEditor(/*shouldCancel=*/ false);
-                    }}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    projectScopedContainersAccessor={
-                      editedParameterProjectScopedContainersAccessor
-                    }
-                    isCondition={this.state.editedParameter.isCondition}
-                    instruction={this.state.editedParameter.instruction}
-                    parameterIndex={this.state.editedParameter.parameterIndex}
-                    onChange={value => {
-                      const {
-                        instruction,
-                        parameterIndex,
-                      } = this.state.editedParameter;
-                      if (!instruction || !this.state.inlineEditing) {
-                        // Unlikely to ever happen, but maybe a component could
-                        // fire the "onChange" while the inline editor was just
-                        // dismissed.
-                        return;
-                      }
-                      instruction.setParameter(parameterIndex, value);
-
-                      gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
-                        project.getCurrentPlatform(),
-                        editedParameterProjectScopedContainersAccessor.get(),
-                        instruction
-                      );
-
-                      // Ask the component to re-render, so that the new parameter
-                      // set for the instruction in the state
-                      // is taken into account for the InlineParameterEditor.
-                      this.forceUpdate();
-                      if (this._searchPanel)
-                        this._searchPanel.markSearchResultsDirty();
-                    }}
-                    resourceManagementProps={resourceManagementProps}
-                  />
-                  <ContextMenu
-                    ref={eventContextMenu =>
-                      (this.eventContextMenu = eventContextMenu)
-                    }
-                    buildMenuTemplate={this._buildEventContextMenu}
-                  />
-                  <ContextMenu
-                    ref={instructionContextMenu =>
-                      (this.instructionContextMenu = instructionContextMenu)
-                    }
-                    buildMenuTemplate={this._buildInstructionContextMenu}
-                  />
-                </div>
+              {isFunctionOnlyCallingItself && (
+                <Line>
+                  <Column expand>
+                    <AlertMessage kind="warning">
+                      <Trans>
+                        This function calls itself (it is "recursive"). Ensure
+                        this is expected and there is a proper condition to stop
+                        it if necessary.
+                      </Trans>
+                    </AlertMessage>
+                  </Column>
+                </Line>
               )}
-            </EventsSearcher>
+              {this._containerDivLastKnownSize && (
+                <EventsTree
+                  ref={eventsTree => (this._eventsTree = eventsTree)}
+                  key={events.ptr}
+                  indentScale={preferences.values.eventsSheetIndentScale}
+                  onScroll={this._ensureFocused}
+                  events={events}
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  selection={this.state.selection}
+                  onInstructionClick={this.selectInstruction}
+                  onInstructionDoubleClick={this.openInstructionEditor}
+                  onInstructionContextMenu={this.openInstructionContextMenu}
+                  onAddInstructionContextMenu={
+                    this.openAddInstructionContextMenu
+                  }
+                  onAddNewInstruction={this.openInstructionEditor}
+                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
+                  onMoveToInstruction={this.moveSelectionToInstruction}
+                  onMoveToInstructionsList={
+                    this.moveSelectionToInstructionsList
+                  }
+                  onParameterClick={this.openParameterEditor}
+                  onVariableDeclarationClick={() => {
+                    // Nothing to do.
+                  }}
+                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
+                  onEventClick={this.selectEvent}
+                  onEventContextMenu={this.openEventContextMenu}
+                  onAddNewEvent={(
+                    eventType: string,
+                    eventsList: gdEventsList
+                  ) => {
+                    this.addNewEvent(eventType, {
+                      eventsList,
+                      indexInList: eventsList.getEventsCount(),
+                    });
+                  }}
+                  onOpenExternalEvents={onOpenExternalEvents}
+                  onOpenLayout={onOpenLayout}
+                  searchResults={eventsSearchResultEvents}
+                  searchFocusOffset={searchFocusOffset}
+                  onEventMoved={this._onEventMoved}
+                  onEndEditingEvent={this._onEndEditingStringEvent}
+                  showObjectThumbnails={
+                    preferences.values.eventsSheetShowObjectThumbnails
+                  }
+                  screenType={screenType}
+                  windowSize={windowSize}
+                  eventsSheetWidth={this._containerDivLastKnownSize.width}
+                  eventsSheetHeight={this._containerDivLastKnownSize.height}
+                  fontSize={preferences.values.eventsSheetZoomLevel}
+                  preferences={preferences}
+                  tutorials={tutorials}
+                />
+              )}
+              {this.state.showSearchPanel && (
+                <ErrorBoundary
+                  componentTitle={<Trans>Search panel</Trans>}
+                  scope="scene-events-search"
+                  onClose={() => this._closeSearchPanel()}
+                >
+                  <SearchPanel
+                    ref={searchPanel => (this._searchPanel = searchPanel)}
+                    onSearchInEvents={inputs =>
+                      this._searchInEvents(searchInEvents, inputs)
+                    }
+                    onReplaceInEvents={inputs => {
+                      this._replaceInEvents(replaceInEvents, inputs);
+                    }}
+                    resultsCount={
+                      eventsSearchResultEvents
+                        ? eventsSearchResultEvents.length
+                        : null
+                    }
+                    hasEventSelected={hasEventSelected(this.state.selection)}
+                    onGoToPreviousSearchResult={() =>
+                      this._ensureUnfoldedAndScrollTo(goToPreviousSearchResult)
+                    }
+                    onCloseSearchPanel={() => {
+                      this._closeSearchPanel();
+                    }}
+                    onGoToNextSearchResult={() =>
+                      this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
+                    }
+                    searchFocusOffset={searchFocusOffset}
+                  />
+                </ErrorBoundary>
+              )}
+              <InlineParameterEditor
+                open={this.state.inlineEditing}
+                anchorEl={this.state.inlineEditingAnchorEl}
+                onRequestClose={() => {
+                  this.closeParameterEditor(
+                    /*shouldCancel=*/ preferences.values
+                      .eventsSheetCancelInlineParameter === 'cancel'
+                  );
+                }}
+                onApply={() => {
+                  this.closeParameterEditor(/*shouldCancel=*/ false);
+                }}
+                project={project}
+                scope={scope}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                projectScopedContainersAccessor={
+                  editedParameterProjectScopedContainersAccessor
+                }
+                isCondition={this.state.editedParameter.isCondition}
+                instruction={this.state.editedParameter.instruction}
+                parameterIndex={this.state.editedParameter.parameterIndex}
+                onChange={value => {
+                  const {
+                    instruction,
+                    parameterIndex,
+                  } = this.state.editedParameter;
+                  if (!instruction || !this.state.inlineEditing) {
+                    // Unlikely to ever happen, but maybe a component could
+                    // fire the "onChange" while the inline editor was just
+                    // dismissed.
+                    return;
+                  }
+                  instruction.setParameter(parameterIndex, value);
+
+                  gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+                    project.getCurrentPlatform(),
+                    editedParameterProjectScopedContainersAccessor.get(),
+                    instruction
+                  );
+
+                  // Ask the component to re-render, so that the new parameter
+                  // set for the instruction in the state
+                  // is taken into account for the InlineParameterEditor.
+                  this.forceUpdate();
+                  if (this._searchPanel)
+                    this._searchPanel.markSearchResultsDirty();
+                }}
+                resourceManagementProps={resourceManagementProps}
+              />
+              <ContextMenu
+                ref={eventContextMenu =>
+                  (this.eventContextMenu = eventContextMenu)
+                }
+                buildMenuTemplate={this._buildEventContextMenu}
+              />
+              <ContextMenu
+                ref={instructionContextMenu =>
+                  (this.instructionContextMenu = instructionContextMenu)
+                }
+                buildMenuTemplate={this._buildInstructionContextMenu}
+              />
+            </div>
           )}
-        </ResponsiveWindowMeasurer>
+        </EventsSearcher>
         {this._renderInstructionEditorDialog()}
         {this.state.analyzedEventsContextResult && (
           <EventsContextAnalyzerDialog
@@ -2245,6 +2258,7 @@ const EventsSheet = (props, ref) => {
   const preferences = React.useContext(PreferencesContext);
   const { tutorials } = React.useContext(TutorialContext);
   const leaderboardsManager = React.useContext(LeaderboardContext);
+  const { windowSize } = useResponsiveWindowSize();
   const shortcutMap = useShortcutMap();
   return (
     <EventsSheetComponentWithoutHandle
@@ -2254,6 +2268,7 @@ const EventsSheet = (props, ref) => {
       tutorials={tutorials}
       leaderboardsManager={leaderboardsManager}
       shortcutMap={shortcutMap}
+      windowSize={windowSize}
       {...props}
     />
   );

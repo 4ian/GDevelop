@@ -46,6 +46,10 @@ import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
 import { useSearchAndInstallAsset } from './UseSearchAndInstallAsset';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import {
+  sendAiRequestMessageSent,
+  sendAiRequestStarted,
+} from '../Utils/Analytics/EventSender';
 
 const gd: libGDevelop = global.gd;
 
@@ -617,6 +621,7 @@ export const AskAiEditor = React.memo<Props>(
 
             if (!profile) {
               onOpenCreateAccountDialog();
+              startNewAiRequest(null);
               return;
             }
 
@@ -673,6 +678,9 @@ export const AskAiEditor = React.memo<Props>(
                     )
                   )
                 : null;
+              const storageProviderName = storageProvider
+                ? storageProvider.internalName
+                : null;
 
               setSendingAiRequest(null, true);
 
@@ -684,9 +692,7 @@ export const AskAiEditor = React.memo<Props>(
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
                 fileMetadata,
-                storageProviderName: storageProvider
-                  ? storageProvider.internalName
-                  : null,
+                storageProviderName,
                 mode,
               });
 
@@ -702,6 +708,19 @@ export const AskAiEditor = React.memo<Props>(
 
               if (aiRequestChatRef.current)
                 aiRequestChatRef.current.resetUserInput(selectedAiRequestId);
+
+              sendAiRequestStarted({
+                simplifiedProjectJsonLength: simplifiedProjectJson
+                  ? simplifiedProjectJson.length
+                  : 0,
+                projectSpecificExtensionsSummaryJsonLength: projectSpecificExtensionsSummaryJson
+                  ? projectSpecificExtensionsSummaryJson.length
+                  : 0,
+                payWithCredits,
+                storageProviderName,
+                mode,
+                aiRequestId: aiRequest.id,
+              });
             } catch (error) {
               console.error('Error starting a new AI request:', error);
               setLastSendError(null, error);
@@ -800,7 +819,7 @@ export const AskAiEditor = React.memo<Props>(
                 )
               : null;
 
-            const aiRequest = await retryIfFailed({ times: 2 }, () =>
+            const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
@@ -814,6 +833,21 @@ export const AskAiEditor = React.memo<Props>(
             updateAiRequest(aiRequest.id, aiRequest);
             setSendingAiRequest(aiRequest.id, false);
             clearEditorFunctionCallResults(aiRequest.id);
+
+            if (userMessage) {
+              sendAiRequestMessageSent({
+                simplifiedProjectJsonLength: simplifiedProjectJson
+                  ? simplifiedProjectJson.length
+                  : 0,
+                projectSpecificExtensionsSummaryJsonLength: projectSpecificExtensionsSummaryJson
+                  ? projectSpecificExtensionsSummaryJson.length
+                  : 0,
+                payWithCredits,
+                mode: aiRequest.mode || 'chat',
+                aiRequestId: aiRequest.id,
+                outputLength: aiRequest.output.length,
+              });
+            }
           } catch (error) {
             // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);

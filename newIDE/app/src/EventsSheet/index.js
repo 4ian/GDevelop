@@ -1658,10 +1658,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.deleteSelection({ deleteInstructions: false });
   };
 
-  _ensureEventUnfolded = (cb: () => ?gdBaseEvent) => {
+  _ensureUnfoldedAndScrollTo = (cb: () => ?gdBaseEvent) => {
     const event = cb();
-    if (event && this._eventsTree) {
-      this._eventsTree.unfoldForEvent(event);
+    const eventsTree = this._eventsTree;
+    if (event && eventsTree) {
+      eventsTree.unfoldForEvent(event);
+      setTimeout(() => {
+        eventsTree.scrollToRow(eventsTree.getEventRow(event));
+      }, 0);
     }
   };
 
@@ -2021,13 +2025,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     hasEventSelected={hasEventSelected(this.state.selection)}
                     onGoToPreviousSearchResult={() =>
-                      this._ensureEventUnfolded(goToPreviousSearchResult)
+                      this._ensureUnfoldedAndScrollTo(goToPreviousSearchResult)
                     }
                     onCloseSearchPanel={() => {
                       this._closeSearchPanel();
                     }}
                     onGoToNextSearchResult={() =>
-                      this._ensureEventUnfolded(goToNextSearchResult)
+                      this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
                     }
                     searchFocusOffset={searchFocusOffset}
                   />

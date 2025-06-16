@@ -582,8 +582,6 @@ const NewProjectSetupDialog = ({
                   onSelectExampleShortHeader={exampleShortHeader => {
                     onSelectExampleShortHeader(exampleShortHeader);
                   }}
-                  storageProvider={storageProvider}
-                  saveAsLocation={saveAsLocation}
                   onSelectEmptyProject={() => {
                     setEmptyProjectSelected(true);
                   }}

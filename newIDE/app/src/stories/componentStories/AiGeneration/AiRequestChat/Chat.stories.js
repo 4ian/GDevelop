@@ -29,7 +29,10 @@ const commonProps = {
     priceInCredits: 5,
     variablePrice: {
       agent: {
-        maximumPriceInCredits: 20,
+        default: {
+          minimumPriceInCredits: 4,
+          maximumPriceInCredits: 20,
+        },
       },
     },
   },

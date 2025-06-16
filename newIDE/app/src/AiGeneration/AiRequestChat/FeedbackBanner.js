@@ -36,7 +36,7 @@ export const FeedbackBanner = ({ onSendFeedback }: Props) => {
         <Column expand>
           <div className={classes.textAndButtonsContainer}>
             <Text size="block-title" color="inherit">
-              <Trans>How did it go?</Trans>
+              <Trans>Did it work?</Trans>
             </Text>
             <Line alignItems="center" noMargin neverShrink>
               <IconButton

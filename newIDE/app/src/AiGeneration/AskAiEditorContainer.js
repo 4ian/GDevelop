@@ -36,11 +36,7 @@ import {
 } from './AiRequestChat/AiRequestUtils';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
-import {
-  generateProjectName,
-  type NewProjectSetup,
-} from '../ProjectCreation/NewProjectSetupDialog';
-import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
 import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -50,6 +46,8 @@ import {
   sendAiRequestMessageSent,
   sendAiRequestStarted,
 } from '../Utils/Analytics/EventSender';
+import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 
 const gd: libGDevelop = global.gd;
 
@@ -450,6 +448,12 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
+  onCreateProjectFromExample: (
+    exampleShortHeader: ExampleShortHeader,
+    newProjectSetup: NewProjectSetup,
+    i18n: I18nType,
+    isQuickCustomization?: boolean
+  ) => Promise<void>,
   onOpenLayout: (sceneName: string) => void,
   onOpenEvents: (sceneName: string) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
@@ -487,6 +491,7 @@ export const AskAiEditor = React.memo<Props>(
         storageProvider,
         i18n,
         onCreateEmptyProject,
+        onCreateProjectFromExample,
         onOpenLayout,
         onOpenEvents,
         onSceneEventsModifiedOutsideEditor,
@@ -544,6 +549,11 @@ export const AskAiEditor = React.memo<Props>(
         addEditorFunctionCallResults,
         clearEditorFunctionCallResults,
       } = useEditorFunctionCallResultsPerRequest();
+
+      const {
+        createAiProject,
+        renderCreateAiProjectDialog,
+      } = useCreateAiProjectDialog();
 
       const updateToolbar = React.useCallback(
         () => {
@@ -633,13 +643,14 @@ export const AskAiEditor = React.memo<Props>(
             // the AI agent.
             if (mode === 'agent' && !project) {
               try {
-                console.info('No project opened, creating a new empty one.');
-                await onCreateEmptyProject({
-                  projectName: generateProjectName('AI starter'),
-                  storageProvider: UrlStorageProvider,
-                  saveAsLocation: null,
-                  dontOpenAnySceneOrProjectManager: true,
-                });
+                console.info(
+                  'No project opened, opening the dialog to create a new project.'
+                );
+                const result = await createAiProject();
+                if (result === 'canceled') {
+                  return;
+                }
+                console.info('New project created - starting AI request.');
                 startNewAiRequest({
                   mode,
                   userRequest,
@@ -754,7 +765,7 @@ export const AskAiEditor = React.memo<Props>(
           setSendingAiRequest,
           upToDateSelectedAiRequestId,
           updateAiRequest,
-          onCreateEmptyProject,
+          createAiProject,
           newAiRequestOptions,
         ]
       );
@@ -982,6 +993,10 @@ export const AskAiEditor = React.memo<Props>(
               />
             </div>
           </Paper>
+          {renderCreateAiProjectDialog({
+            onCreateEmptyProject,
+            onCreateProjectFromExample,
+          })}
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
@@ -1017,6 +1032,7 @@ export const renderAskAiEditorContainer = (
         setToolbar={props.setToolbar}
         isActive={props.isActive}
         onCreateEmptyProject={props.onCreateEmptyProject}
+        onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}
         onOpenEvents={props.onOpenEvents}
         onSceneEventsModifiedOutsideEditor={

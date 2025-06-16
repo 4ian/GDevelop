@@ -101,7 +101,10 @@ export type UsagePrice = {|
   priceInCredits: number,
   variablePrice?: {
     [subUsageType: string]: {
-      maximumPriceInCredits: number,
+      [variantType: string]: {
+        minimumPriceInCredits: number,
+        maximumPriceInCredits: number,
+      },
     },
   },
 |};

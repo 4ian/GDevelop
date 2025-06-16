@@ -165,15 +165,22 @@ const getPriceText = ({
   const maximumPriceInCredits =
     (price.variablePrice &&
       price.variablePrice[aiRequestMode] &&
-      price.variablePrice[aiRequestMode].maximumPriceInCredits) ||
+      price.variablePrice[aiRequestMode]['default'] &&
+      price.variablePrice[aiRequestMode]['default'].maximumPriceInCredits) ||
+    null;
+  const minimumPriceInCredits =
+    (price.variablePrice &&
+      price.variablePrice[aiRequestMode] &&
+      price.variablePrice[aiRequestMode]['default'] &&
+      price.variablePrice[aiRequestMode]['default'].minimumPriceInCredits) ||
     null;
 
   const priceText = maximumPriceInCredits ? (
     <Trans>
-      {priceInCredits} to {maximumPriceInCredits}
+      {minimumPriceInCredits || priceInCredits} to {maximumPriceInCredits}
     </Trans>
   ) : (
-    <Trans>{priceInCredits}</Trans>
+    <Trans>{minimumPriceInCredits || priceInCredits}</Trans>
   );
 
   return (
@@ -311,9 +318,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             ? aiRequest.mode || 'chat'
             : newAiRequestMode,
           price,
-          lastUserMessagePriceInCredits: aiRequest
-            ? aiRequest.lastUserMessagePriceInCredits
-            : null,
+          lastUserMessagePriceInCredits:
+            (aiRequest && aiRequest.lastUserMessagePriceInCredits) || null,
         }) || '\u00A0'}
       </Text>
     );
@@ -566,6 +572,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const lastMessageIndex = aiRequest.output.length - 1;
     const lastMessage = aiRequest.output[lastMessageIndex];
     const shouldDisplayFeedbackBanner =
+      !hasWorkingFunctionCalls &&
+      !isSending &&
       aiRequest.status === 'ready' &&
       aiRequest.mode === 'agent' &&
       lastMessage.type === 'message' &&

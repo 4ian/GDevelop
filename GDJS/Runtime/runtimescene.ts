@@ -23,6 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
+    _unloadAssetsOnSceneExit: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -141,6 +142,7 @@ namespace gdjs {
         this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
+      this._unloadAssetsOnSceneExit = sceneData.shouldUnloadAssetsWhenUnloaded;
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -321,6 +323,10 @@ namespace gdjs {
       this.networkId = null;
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;
+
+      if (this._unloadAssetsOnSceneExit) {
+        this._runtimeGame.getResourceLoader().disposeScene(this._name);
+      }
     }
 
     /**
@@ -576,6 +582,13 @@ namespace gdjs {
      */
     getName(): string {
       return this._name;
+    }
+
+    /**
+     * Get _unloadAssetsOnSceneExit state if need to unload resources of scene
+     */
+    getUnloadAssetsOnSceneExit(): boolean {
+      return this._unloadAssetsOnSceneExit;
     }
 
     /**

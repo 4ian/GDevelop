@@ -218,6 +218,22 @@ const findPropertyByName = ({
   };
 };
 
+const sanitizePropertyNewValue = (
+  property: gdPropertyDescriptor | null,
+  newValue: string
+): string => {
+  // Note: updateProperty expect the booleans in an usual "0" or "1" format.
+  if (property && property.getType().toLowerCase() === 'boolean') {
+    const lowerCaseNewValue = newValue.toLowerCase();
+    return lowerCaseNewValue === 'true' ||
+      lowerCaseNewValue === 'yes' ||
+      lowerCaseNewValue === '1'
+      ? '1'
+      : '0';
+  }
+  return newValue;
+};
+
 const makeShortTextForNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
@@ -571,7 +587,7 @@ const changeObjectProperty: EditorFunction = {
     const objectConfiguration = object.getConfiguration();
     const objectProperties = objectConfiguration.getProperties();
 
-    const { foundPropertyName } = findPropertyByName({
+    const { foundPropertyName, foundProperty } = findPropertyByName({
       properties: objectProperties,
       name: property_name,
     });
@@ -582,7 +598,12 @@ const changeObjectProperty: EditorFunction = {
       );
     }
 
-    if (!objectConfiguration.updateProperty(foundPropertyName, new_value)) {
+    if (
+      !objectConfiguration.updateProperty(
+        foundPropertyName,
+        sanitizePropertyNewValue(foundProperty, new_value)
+      )
+    ) {
       return makeGenericFailure(
         `Could not change property "${foundPropertyName}" of object "${object_name}". The value might be invalid, of the wrong type or not allowed.`
       );
@@ -1045,8 +1066,13 @@ const changeBehaviorProperty: EditorFunction = {
     });
 
     if (behaviorPropertySearch.foundPropertyName) {
-      const { foundPropertyName } = behaviorPropertySearch;
-      if (!behavior.updateProperty(foundPropertyName, new_value)) {
+      const { foundPropertyName, foundProperty } = behaviorPropertySearch;
+      if (
+        !behavior.updateProperty(
+          foundPropertyName,
+          sanitizePropertyNewValue(foundProperty, new_value)
+        )
+      ) {
         return makeGenericFailure(
           `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
         );
@@ -1059,8 +1085,16 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedData &&
       behaviorSharedDataPropertySearch.foundPropertyName
     ) {
-      const { foundPropertyName } = behaviorSharedDataPropertySearch;
-      if (!behaviorSharedData.updateProperty(foundPropertyName, new_value)) {
+      const {
+        foundPropertyName,
+        foundProperty,
+      } = behaviorSharedDataPropertySearch;
+      if (
+        !behaviorSharedData.updateProperty(
+          foundPropertyName,
+          sanitizePropertyNewValue(foundProperty, new_value)
+        )
+      ) {
         return makeGenericFailure(
           `Could not change shared property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
         );

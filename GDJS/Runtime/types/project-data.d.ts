@@ -169,6 +169,7 @@ declare interface LayoutData extends InstanceContainerData {
   title: string;
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
+  shouldUnloadAssetsWhenUnloaded: boolean;
 }
 
 declare interface LayoutNetworkSyncData {

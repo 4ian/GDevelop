@@ -54,6 +54,7 @@ Layout::Layout()
       backgroundColorG(209),
       backgroundColorB(209),
       stopSoundsOnStartup(true),
+      shouldUnloadAssetsWhenUnloaded(false),
       standardSortMethod(true),
       disableInputWhenNotFocused(true),
       variables(gd::VariablesContainer::SourceType::Scene),
@@ -244,6 +245,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("title", GetWindowDefaultTitle());
   element.SetAttribute("standardSortMethod", standardSortMethod);
   element.SetAttribute("stopSoundsOnStartup", stopSoundsOnStartup);
+  element.SetAttribute("shouldUnloadAssetsWhenUnloaded", shouldUnloadAssetsWhenUnloaded);
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
 
@@ -304,6 +306,7 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetStringAttribute("title", "(No title)", "titre"));
   standardSortMethod = element.GetBoolAttribute("standardSortMethod");
   stopSoundsOnStartup = element.GetBoolAttribute("stopSoundsOnStartup");
+  shouldUnloadAssetsWhenUnloaded = element.GetBoolAttribute("shouldUnloadAssetsWhenUnloaded");
   disableInputWhenNotFocused =
       element.GetBoolAttribute("disableInputWhenNotFocused");
 
@@ -391,6 +394,7 @@ void Layout::Init(const Layout& other) {
   standardSortMethod = other.standardSortMethod;
   title = other.title;
   stopSoundsOnStartup = other.stopSoundsOnStartup;
+  shouldUnloadAssetsWhenUnloaded = other.shouldUnloadAssetsWhenUnloaded;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
   initialInstances = other.initialInstances;
   layers = other.layers;

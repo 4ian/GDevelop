@@ -113,9 +113,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): SpineNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): SpineNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         opa: this._opacity,
         wid: this.getWidth(),
         hei: this.getHeight(),
@@ -131,8 +133,11 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: SpineNetworkSyncData): void {
-      super.updateFromNetworkSyncData(syncData);
+    updateFromNetworkSyncData(
+      syncData: SpineNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(syncData, options);
 
       if (syncData.opa !== undefined && syncData.opa !== this._opacity) {
         this.setOpacity(syncData.opa);

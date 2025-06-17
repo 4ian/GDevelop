@@ -238,7 +238,7 @@ namespace gdjs {
       export const replaceScene = function (
         runtimeScene: gdjs.RuntimeScene,
         newSceneName: string,
-        clearOthers: boolean,
+        clearOthers: boolean
       ) {
         if (!runtimeScene.getGame().getSceneAndExtensionsData(newSceneName)) {
           return;
@@ -249,7 +249,7 @@ namespace gdjs {
             clearOthers
               ? gdjs.SceneChangeRequest.CLEAR_SCENES
               : gdjs.SceneChangeRequest.REPLACE_SCENE,
-            newSceneName,
+            newSceneName
           );
       };
 

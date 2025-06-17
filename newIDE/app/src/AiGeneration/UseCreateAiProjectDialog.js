@@ -50,9 +50,6 @@ const CreateAiProjectDialog = ({
         />,
       ]}
       onRequestClose={onClose}
-      onApply={() => {
-        // TODO
-      }}
       flexColumnBody
     >
       <ColumnStackLayout noMargin>

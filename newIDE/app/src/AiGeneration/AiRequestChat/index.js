@@ -37,6 +37,7 @@ import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import { FeedbackBanner } from './FeedbackBanner';
+import LeftLoader from '../../UI/LeftLoader';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -456,32 +457,35 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                           alignItems="center"
                           justifyContent="flex-end"
                         >
-                          <RaisedButton
-                            color="primary"
-                            icon={<Send />}
-                            label={
-                              newAiRequestMode === 'agent' ? (
-                                hasOpenedProject ? (
-                                  <Trans>Build this on my game</Trans>
+                          <LeftLoader isLoading={isSending}>
+                            <RaisedButton
+                              color="primary"
+                              icon={<Send />}
+                              label={
+                                newAiRequestMode === 'agent' ? (
+                                  hasOpenedProject ? (
+                                    <Trans>Build this on my game</Trans>
+                                  ) : (
+                                    <Trans>Start building the game</Trans>
+                                  )
                                 ) : (
-                                  <Trans>Start building the game</Trans>
+                                  <Trans>Send question</Trans>
                                 )
-                              ) : (
-                                <Trans>Send question</Trans>
-                              )
-                            }
-                            style={{ flexShrink: 0 }}
-                            disabled={
-                              isSending ||
-                              !userRequestTextPerAiRequestId[aiRequestId]
-                            }
-                            onClick={() => {
-                              onStartNewAiRequest({
-                                mode: newAiRequestMode,
-                                userRequest: userRequestTextPerAiRequestId[''],
-                              });
-                            }}
-                          />
+                              }
+                              style={{ flexShrink: 0 }}
+                              disabled={
+                                isSending ||
+                                !userRequestTextPerAiRequestId[aiRequestId]
+                              }
+                              onClick={() => {
+                                onStartNewAiRequest({
+                                  mode: newAiRequestMode,
+                                  userRequest:
+                                    userRequestTextPerAiRequestId[''],
+                                });
+                              }}
+                            />
+                          </LeftLoader>
                         </LineStackLayout>
                       </Column>
                     }

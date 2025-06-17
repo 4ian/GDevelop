@@ -159,9 +159,9 @@ export const LaunchingNewAiRequest = () => (
       {({ i18n }) => (
         <AiRequestChat
           i18n={i18n}
+          {...commonProps}
           aiRequest={null}
           isSending={true}
-          {...commonProps}
         />
       )}
     </I18n>
@@ -560,12 +560,12 @@ export const QuotaLimitReachedAndNoCredits = () => (
             output: fakeOutputWithAiResponses,
             error: null,
           }}
+          {...commonProps}
           quota={{
             limitReached: true,
             current: 2,
             max: 2,
           }}
-          {...commonProps}
           increaseQuotaOffering="none"
           availableCredits={0}
         />

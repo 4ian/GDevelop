@@ -4,7 +4,6 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import {
   createNewEmptyProject,
-  createNewProjectFromAIGeneratedProject,
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
@@ -44,7 +43,11 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
-    options: { openAllScenes: boolean, openQuickCustomizationDialog: boolean },
+    options: {
+      openAllScenes: boolean,
+      openQuickCustomizationDialog: boolean,
+      dontOpenAnySceneOrProjectManager: boolean,
+    },
   |}) => Promise<void>,
   onError: () => void,
   onSuccessOrError: () => void,
@@ -266,6 +269,7 @@ const useCreateProject = ({
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
+            dontOpenAnySceneOrProjectManager: !!newProjectSetup.dontOpenAnySceneOrProjectManager,
           },
         });
       } catch (rawError) {
@@ -415,13 +419,31 @@ const useCreateProject = ({
   );
 
   const createProjectFromCourseChapter = React.useCallback(
-    async (courseChapter: CourseChapter, newProjectSetup: NewProjectSetup) => {
+    async ({
+      courseChapter,
+      templateId,
+      newProjectSetup,
+    }: {|
+      courseChapter: CourseChapter,
+      templateId?: string,
+      newProjectSetup: NewProjectSetup,
+    |}) => {
       if (courseChapter.isLocked) return;
       beforeCreatingProject();
-      const { templateUrl } = courseChapter;
+      let templateUrl;
+      if (courseChapter.templateUrl) {
+        templateUrl = courseChapter.templateUrl;
+      } else if (courseChapter.templates) {
+        const matchingTemplate = courseChapter.templates.find(
+          template => template.id === templateId
+        );
+        if (matchingTemplate) templateUrl = matchingTemplate.url;
+      }
       if (!templateUrl) {
         throw new Error(
-          `No template URL for the course chapter "${courseChapter.id}"`
+          `No template URL for the course chapter "${
+            courseChapter.id
+          }" and template id "${templateId || 'undefined'}"`
         );
       }
       const newProjectSource = await createNewProjectFromCourseChapterTemplate(
@@ -435,17 +457,6 @@ const useCreateProject = ({
     [beforeCreatingProject, createProject]
   );
 
-  const createProjectFromAIGeneration = React.useCallback(
-    async (projectFileUrl: string, newProjectSetup: NewProjectSetup) => {
-      beforeCreatingProject();
-      const newProjectSource = createNewProjectFromAIGeneratedProject(
-        projectFileUrl
-      );
-      await createProject(newProjectSource, newProjectSetup);
-    },
-    [beforeCreatingProject, createProject]
-  );
-
   return {
     createEmptyProject,
     createProjectFromExample,
@@ -453,7 +464,6 @@ const useCreateProject = ({
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-    createProjectFromAIGeneration,
   };
 };
 

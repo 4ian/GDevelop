@@ -5,10 +5,21 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import { focusButton } from './Button';
+import { Spacer } from './Grid';
 
 type Props = {|
-  leftButton: {| label: React.Node, value: string, id?: string |},
-  rightButton: {| label: React.Node, value: string, id?: string |},
+  leftButton: {|
+    icon?: React.Node,
+    label: React.Node,
+    value: string,
+    id?: string,
+  |},
+  rightButton: {|
+    icon?: React.Node,
+    label: React.Node,
+    value: string,
+    id?: string,
+  |},
   onChange: string => void,
   value: string,
 |};
@@ -31,7 +42,7 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
     const leftButtonDataset = isLeft ? { effective: 'true' } : undefined;
     const rightButtonDataset = !isLeft ? { effective: 'true' } : undefined;
     return (
-      <ButtonGroup>
+      <ButtonGroup size="small" disableElevation>
         <Button
           id={leftButton.id}
           {...dataObjectToProps(leftButtonDataset)}
@@ -40,6 +51,8 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
           onClick={() => onChange(leftButton.value)}
           ref={leftButtonRef}
         >
+          {leftButton.icon}
+          {leftButton.icon && leftButton.label && <Spacer />}
           {leftButton.label}
         </Button>
         <Button
@@ -49,6 +62,8 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
           color={!isLeft ? 'secondary' : 'default'}
           onClick={() => onChange(rightButton.value)}
         >
+          {rightButton.icon}
+          {rightButton.icon && rightButton.label && <Spacer />}
           {rightButton.label}
         </Button>
       </ButtonGroup>

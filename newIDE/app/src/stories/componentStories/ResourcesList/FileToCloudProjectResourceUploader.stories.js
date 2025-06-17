@@ -5,9 +5,7 @@ import { FileToCloudProjectResourceUploader } from '../../../ResourcesList/FileT
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import paperDecorator from '../../PaperDecorator';
-import GDevelopJsInitializerDecorator, {
-  testProject,
-} from '../../GDevelopJsInitializerDecorator';
+import GDevelopJsInitializerDecorator from '../../GDevelopJsInitializerDecorator';
 import {
   fakeSilverAuthenticatedUser,
   fakeNotAuthenticatedUser,
@@ -25,7 +23,6 @@ export default {
 export const Default = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
-      project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
       onChooseResources={action('onChooseResources')}
       options={{
@@ -43,7 +40,6 @@ export const Default = () => (
 export const AutomaticallyOpenInput = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
-      project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
       onChooseResources={action('onChooseResources')}
       options={{
@@ -61,7 +57,6 @@ export const AutomaticallyOpenInput = () => (
 export const SingleFile = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
-      project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
       onChooseResources={action('onChooseResources')}
       options={{
@@ -79,7 +74,6 @@ export const SingleFile = () => (
 export const IncompatibleStorageProvider = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
-      project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
       onChooseResources={action('onChooseResources')}
       options={{
@@ -97,7 +91,6 @@ export const IncompatibleStorageProvider = () => (
 export const NotAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
-      project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
       onChooseResources={action('onChooseResources')}
       options={{

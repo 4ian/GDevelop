@@ -10,17 +10,18 @@ export type JsExtensionModule = {
   runExtensionSanityTests(gd: any, extension: gdPlatformExtension): Array<string>,
 };
 
-export type ExtensionLoadingResult = {
+export type ExtensionLoadingResult = {|
   error: boolean,
   message: string,
   dangerous?: boolean,
   rawError?: any,
-};
+|};
 
 export interface JsExtensionsLoader {
-  loadAllExtensions(_: TranslationFunction): Promise<
-    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
-  >,
+  loadAllExtensions(_: TranslationFunction): Promise<{|
+    results: Array<{| extensionModulePath: string, result: ExtensionLoadingResult |}>,
+    expectedNumberOfJSExtensionModulesLoaded: number,
+  |}>,
 }
 */
 

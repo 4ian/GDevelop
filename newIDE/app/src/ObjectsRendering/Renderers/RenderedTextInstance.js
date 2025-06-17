@@ -38,14 +38,16 @@ export default class RenderedTextInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    propertyOverridings: Map<string, string>
   ) {
     super(
       project,
       instance,
       associatedObjectConfiguration,
       pixiContainer,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      propertyOverridings
     );
 
     const style = new PIXI.TextStyle({
@@ -84,7 +86,9 @@ export default class RenderedTextInstance extends RenderedInstance {
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       this._associatedObjectConfiguration
     );
-    this._pixiObject.text = textObjectConfiguration.getText();
+    this._pixiObject.text = this._propertyOverridings.has('Text')
+      ? this._propertyOverridings.get('Text')
+      : textObjectConfiguration.getText();
 
     //Update style, only if needed to avoid destroying text rendering performances
     if (
@@ -188,7 +192,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._styleFontDirty = false;
     }
 
-    if (this._instance.hasCustomSize()) {
+    if (this._instance.hasCustomSize() && this._pixiObject.width !== 0) {
       const alignmentX =
         this._textAlignment === 'right'
           ? 1

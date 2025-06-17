@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
+import { retryIfFailed } from '../RetryIfFailed';
 
 export type ExampleShortHeader = {|
   id: string,
@@ -34,14 +35,29 @@ export type AllExamples = {|
 |};
 
 export const listAllExamples = async (): Promise<AllExamples> => {
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/example-short-header-and-filter`
-  );
+  const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
+    params: {
+      // Could be changed according to the editor environment, but keep
+      // reading from the "live" data for now.
+      environment: 'live',
+    },
+  });
+  const { exampleShortHeadersUrl, filtersUrl } = response.data;
 
-  const examples = response.data;
-  if (!examples) throw new Error('Unexpected response from examples endpoint.');
+  const [exampleShortHeaders, filters] = await Promise.all([
+    retryIfFailed(
+      { times: 2 },
+      async () => (await axios.get(exampleShortHeadersUrl)).data
+    ),
+    retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
+  ]);
 
-  return response.data;
+  const allExamples: AllExamples = {
+    exampleShortHeaders,
+    filters,
+  };
+
+  return allExamples;
 };
 
 export const getExample = async (

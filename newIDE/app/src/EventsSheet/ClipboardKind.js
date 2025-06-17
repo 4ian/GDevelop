@@ -1,5 +1,6 @@
 // @flow
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   type SelectionState,
   getSelectedEvents,

@@ -155,12 +155,14 @@ const applyThreeTextureSettings = (
   }
 };
 
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
 const removeMetalness = (material: THREE.Material): void => {
   if (material.metalness) {
     material.metalness = 0;
   }
 };
 
+// If modifying this function, make sure to update Resource3DPreview.worker.js copy.
 const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
   const mesh = (node: THREE.Mesh);
   if (!mesh.material) {

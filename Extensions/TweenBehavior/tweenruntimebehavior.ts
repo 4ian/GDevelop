@@ -89,7 +89,7 @@ namespace gdjs {
     }
 
     private _deleteFromScene() {
-      this.owner.deleteFromScene(this.owner.getInstanceContainer());
+      this.owner.deleteFromScene();
     }
 
     /**

@@ -12,6 +12,7 @@ namespace gdjs {
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
     animatable?: SpriteAnimationData[];
+    variant: string;
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
@@ -92,34 +93,57 @@ namespace gdjs {
     }
 
     private _initializeFromObjectData(
-      objectData: ObjectData & CustomObjectConfiguration
+      customObjectData: ObjectData & CustomObjectConfiguration
     ) {
       const eventsBasedObjectData = this._runtimeScene
         .getGame()
-        .getEventsBasedObjectData(objectData.type);
+        .getEventsBasedObjectData(customObjectData.type);
       if (!eventsBasedObjectData) {
         logger.error(
-          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${objectData.type}".`
+          `A CustomRuntimeObject was initialized (or re-initialized) from object data referring to an non existing events based object data with type "${customObjectData.type}".`
         );
         return;
       }
+
+      if (!eventsBasedObjectData.defaultVariant) {
+        eventsBasedObjectData.defaultVariant = {
+          ...eventsBasedObjectData,
+          name: '',
+        };
+      }
+      let usedVariantData: EventsBasedObjectVariantData =
+        eventsBasedObjectData.defaultVariant;
+      if (customObjectData.variant) {
+        for (
+          let variantIndex = 0;
+          variantIndex < eventsBasedObjectData.variants.length;
+          variantIndex++
+        ) {
+          const variantData = eventsBasedObjectData.variants[variantIndex];
+          if (variantData.name === customObjectData.variant) {
+            usedVariantData = variantData;
+            break;
+          }
+        }
+      }
+
       this._isInnerAreaFollowingParentSize =
         eventsBasedObjectData.isInnerAreaFollowingParentSize;
-      if (eventsBasedObjectData.instances.length > 0) {
+      if (usedVariantData.instances.length > 0) {
         if (!this._innerArea) {
           this._innerArea = {
             min: [0, 0, 0],
             max: [0, 0, 0],
           };
         }
-        this._innerArea.min[0] = eventsBasedObjectData.areaMinX;
-        this._innerArea.min[1] = eventsBasedObjectData.areaMinY;
-        this._innerArea.min[2] = eventsBasedObjectData.areaMinZ;
-        this._innerArea.max[0] = eventsBasedObjectData.areaMaxX;
-        this._innerArea.max[1] = eventsBasedObjectData.areaMaxY;
-        this._innerArea.max[2] = eventsBasedObjectData.areaMaxZ;
+        this._innerArea.min[0] = usedVariantData.areaMinX;
+        this._innerArea.min[1] = usedVariantData.areaMinY;
+        this._innerArea.min[2] = usedVariantData.areaMinZ;
+        this._innerArea.max[0] = usedVariantData.areaMaxX;
+        this._innerArea.max[1] = usedVariantData.areaMaxY;
+        this._innerArea.max[2] = usedVariantData.areaMaxZ;
       }
-      this._instanceContainer.loadFrom(objectData, eventsBasedObjectData);
+      this._instanceContainer.loadFrom(customObjectData, usedVariantData);
     }
 
     protected abstract _createRender():
@@ -182,13 +206,13 @@ namespace gdjs {
       }
     }
 
-    override onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    override onDeletedFromScene(): void {
       // Let subclasses do something before the object is destroyed.
-      this.onDestroy(parent);
+      this.onDestroy(this._runtimeScene);
       // Let behaviors do something before the object is destroyed.
-      super.onDeletedFromScene(parent);
+      super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(parent);
+      this._instanceContainer.onDestroyFromScene(this._runtimeScene);
     }
 
     override update(parent: gdjs.RuntimeInstanceContainer): void {

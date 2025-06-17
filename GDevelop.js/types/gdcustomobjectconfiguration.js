@@ -6,6 +6,8 @@ declare class gdCustomObjectConfiguration extends gdObjectConfiguration {
   static Proportional: 3;
   static Center: 4;
   clone(): gdUniquePtrObjectConfiguration;
+  getVariantName(): string;
+  setVariantName(name: string): void;
   isForcedToOverrideEventsBasedObjectChildrenConfiguration(): boolean;
   isMarkedAsOverridingEventsBasedObjectChildrenConfiguration(): boolean;
   setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(isOverridingEventsBasedObjectChildrenConfiguration: boolean): void;

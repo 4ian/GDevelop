@@ -300,6 +300,15 @@ const SpritesList = ({
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
 
+  const storageProvider = resourceManagementProps.getStorageProvider();
+  const resourceSources = resourceManagementProps.resourceSources
+    .filter(source => source.kind === 'image')
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
+
   const updateSelectionIndexesAfterMoveUp = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
       for (let i = oldIndex; i <= newIndex; ++i) {
@@ -385,21 +394,38 @@ const SpritesList = ({
   );
 
   const onAddSprite = React.useCallback(
-    async (resourceSource: ResourceSource) => {
+    async (initialResourceSource: ResourceSource) => {
       const directionSpritesCountBeforeAdding = direction.getSpritesCount();
-
-      const resources = await resourceManagementProps.onChooseResource({
-        initialSourceName: resourceSource.name,
+      const {
+        selectedResources,
+        selectedSourceName,
+      } = await resourceManagementProps.onChooseResource({
+        initialSourceName: initialResourceSource.name,
         multiSelection: true,
         resourceKind: 'image',
       });
-      resources.forEach(resource => {
-        applyResourceDefaults(project, resource);
-        project.getResourcesManager().addResource(resource);
-      });
 
-      if (directionSpritesCountBeforeAdding === 0 && resources.length > 1) {
-        const resourcesByAnimation = groupResourcesByAnimations(resources);
+      if (!selectedResources.length) return;
+      const selectedResourceSource = resourceSources.find(
+        source => source.name === selectedSourceName
+      );
+      if (!selectedResourceSource) return;
+
+      if (selectedResourceSource.shouldCreateResource) {
+        selectedResources.forEach(resource => {
+          applyResourceDefaults(project, resource);
+          project.getResourcesManager().addResource(resource);
+        });
+      }
+
+      if (
+        directionSpritesCountBeforeAdding === 0 &&
+        selectedResources.length > 1 &&
+        selectedResourceSource.shouldGuessAnimationsFromName
+      ) {
+        const resourcesByAnimation = groupResourcesByAnimations(
+          selectedResources
+        );
         if (resourcesByAnimation.size > 1) {
           addAnimations(resourcesByAnimation);
         } else {
@@ -411,20 +437,22 @@ const SpritesList = ({
           }
         }
       } else {
-        for (const resource of resources) {
+        for (const resource of selectedResources) {
           addAnimationFrame(animations, direction, resource, onSpriteAdded);
         }
       }
 
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
+      if (selectedResourceSource.shouldCreateResource) {
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+        selectedResources.forEach(resource => resource.delete());
+      }
 
       forceUpdate();
 
       await resourceManagementProps.onFetchNewlyAddedResources();
 
-      if (resources.length && onSpriteUpdated) onSpriteUpdated();
+      if (selectedResources.length && onSpriteUpdated) onSpriteUpdated();
       if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
         // If there was no sprites before, we can assume the first sprite was added.
         onFirstSpriteUpdated();
@@ -440,6 +468,7 @@ const SpritesList = ({
       addAnimations,
       animations,
       onSpriteAdded,
+      resourceSources,
     ]
   );
 
@@ -553,15 +582,6 @@ const SpritesList = ({
     [selectUniqueSprite]
   );
 
-  const storageProvider = resourceManagementProps.getStorageProvider();
-  const resourceSources = resourceManagementProps.resourceSources
-    .filter(source => source.kind === 'image')
-    .filter(
-      ({ onlyForStorageProvider }) =>
-        !onlyForStorageProvider ||
-        onlyForStorageProvider === storageProvider.internalName
-    );
-
   return (
     <ColumnStackLayout noMargin>
       <DirectionTools
@@ -582,12 +602,11 @@ const SpritesList = ({
           resourcesLoader={resourcesLoader}
           direction={direction}
           project={project}
-          onSortEnd={onSortEnd}
-          onAddSprite={onAddSprite}
           resourceManagementProps={resourceManagementProps}
           selectedSprites={selectedSprites.current}
           onSelectSprite={addSpriteToSelection}
           onOpenSpriteContextMenu={openSpriteContextMenu}
+          onSortEnd={onSortEnd}
           helperClass="sortable-helper"
           lockAxis="x"
           axis="x"

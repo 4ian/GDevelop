@@ -99,6 +99,14 @@ export type Capabilities = {|
 
 export type UsagePrice = {|
   priceInCredits: number,
+  variablePrice?: {
+    [subUsageType: string]: {
+      [variantType: string]: {
+        minimumPriceInCredits: number,
+        maximumPriceInCredits: number,
+      },
+    },
+  },
 |};
 
 export type UsagePrices = {|
@@ -430,7 +438,6 @@ export const changeUserSubscription = async (
     '/subscription-v2',
     {
       ...newSubscriptionDetails,
-      prohibitSeamlessUpdate: true,
       cancelImmediately: options.cancelImmediately,
       cancelReasons: options.cancelReasons,
     },

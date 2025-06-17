@@ -25,7 +25,7 @@ export default {
 const apiDataServerSideError = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/behaviors-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/behavior?environment=live`,
       method: 'GET',
       status: 500,
       response: { data: 'status' },
@@ -36,7 +36,15 @@ const apiDataServerSideError = {
 const apiDataFakeBehaviors = {
   mockData: [
     {
-      url: `${GDevelopAssetApi.baseUrl}/behaviors-registry`,
+      url: `${GDevelopAssetApi.baseUrl}/behavior?environment=live`,
+      method: 'GET',
+      status: 200,
+      response: {
+        databaseUrl: 'https://fake-cdn.com/behaviors-database-v2.json',
+      },
+    },
+    {
+      url: `https://fake-cdn.com/behaviors-database-v2.json`,
       method: 'GET',
       status: 200,
       response: fakeBehaviorsRegistry,

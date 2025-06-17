@@ -74,3 +74,12 @@ export const filterEnumeratedBehaviorMetadata = (
     );
   });
 };
+
+export const isBehaviorDefaultCapability = (
+  behaviorMetadata: gdBehaviorMetadata
+) => {
+  return (
+    behaviorMetadata.getName().includes('Capability') ||
+    behaviorMetadata.getName() === 'Scene3D::Base3DBehavior'
+  );
+};

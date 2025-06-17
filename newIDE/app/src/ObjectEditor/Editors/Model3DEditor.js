@@ -30,11 +30,8 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import * as THREE from 'three';
-import {
-  PropertyCheckbox,
-  PropertyField,
-  PropertyResourceSelector,
-} from './PropertyFields';
+import { PropertyCheckbox, PropertyField } from './PropertyFields';
+import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 
 const gd: libGDevelop = global.gd;
 
@@ -485,14 +482,18 @@ const Model3DEditor = ({
       <ScrollView ref={scrollView}>
         <ColumnStackLayout noMargin>
           {renderObjectNameField && renderObjectNameField()}
-          <PropertyResourceSelector
-            objectConfiguration={objectConfiguration}
-            propertyName="modelResourceName"
+          <ResourceSelectorWithThumbnail
             project={project}
+            resourceKind="model3D"
+            floatingLabelText={properties.get('modelResourceName').getLabel()}
             resourceManagementProps={resourceManagementProps}
-            onChange={resourceName => {
-              loadGltf(resourceName);
+            resourceName={properties.get('modelResourceName').getValue()}
+            onChange={newValue => {
+              onChangeProperty('modelResourceName', newValue);
+              loadGltf(newValue);
+              forceUpdate();
             }}
+            id={`model3d-object-modelResourceName`}
           />
           <SelectField
             value={properties.get('materialType').getValue()}
@@ -523,7 +524,7 @@ const Model3DEditor = ({
               <AlertMessage kind="error">
                 <Trans>
                   Make sure to set up a light in the effects of the layer or
-                  chose "No lighting effect" - otherwise the object will appear
+                  choose "No lighting effect" - otherwise the object will appear
                   black.
                 </Trans>
               </AlertMessage>

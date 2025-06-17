@@ -1781,6 +1781,14 @@ void WholeProjectRefactorer::DoRenameBehavior(
   projectBrowser.ExposeFunctions(project, behaviorParameterRenamer);
 }
 
+void WholeProjectRefactorer::UpdateBehaviorsSharedData(gd::Project &project) {
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout &layout = project.GetLayout(i);
+
+    layout.UpdateBehaviorsSharedData(project);
+  }
+}
+
 void WholeProjectRefactorer::DoRenameObject(
     gd::Project &project, const gd::String &oldObjectType,
     const gd::String &newObjectType, const gd::ProjectBrowser &projectBrowser) {
@@ -2127,6 +2135,26 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
     auto &groups = eventsBasedObject.GetObjects().GetObjectGroups();
     for (std::size_t g = 0; g < groups.size(); ++g) {
       groups[g].RenameObject(oldName, newName);
+    }
+  }
+
+  for (auto &variant : eventsBasedObject.GetVariants().GetInternalVector()) {
+    auto &variantObjects = variant->GetObjects();
+    auto &variantObjectGroups = variantObjects.GetObjectGroups();
+    if (isObjectGroup) {
+      if (variantObjectGroups.Has(oldName)) {
+        variantObjectGroups.Get(oldName).SetName(newName);
+      }
+      // Object groups can't have instances or be in other groups
+    }
+    else {
+      if (variantObjects.HasObjectNamed(oldName)) {
+        variantObjects.GetObject(oldName).SetName(newName);
+      }
+      variant->GetInitialInstances().RenameInstancesOfObject(oldName, newName);
+      for (std::size_t g = 0; g < variantObjectGroups.size(); ++g) {
+        variantObjectGroups[g].RenameObject(oldName, newName);
+      }
     }
   }
 }

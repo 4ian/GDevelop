@@ -28,7 +28,6 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
 import {
   sendUserSurveyHidden,
@@ -149,7 +148,8 @@ type Props = {|
   ) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
-    courseChapter: CourseChapter
+    CourseChapter,
+    templateId?: string
   ) => Promise<void>,
 
   // Project save
@@ -168,6 +168,8 @@ export type HomePageEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -248,8 +250,11 @@ export const HomePage = React.memo<Props>(
         onResetEducationForm,
       } = useEducationForm({ authenticatedUser });
       const {
+        courses,
         selectedCourse,
-        courseChapters,
+        courseChaptersByCourseId,
+        onSelectCourse,
+        fetchCourses,
         areChaptersReady,
         onCompleteTask,
         isTaskCompleted,
@@ -287,9 +292,6 @@ export const HomePage = React.memo<Props>(
             : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
-      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-        includeLegacy: false,
-      });
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
@@ -332,18 +334,16 @@ export const HomePage = React.memo<Props>(
               // Do not process requested tab before courses are ready.
               return;
             }
-
-            if (courseId && selectedCourse && selectedCourse.id === courseId) {
-              setLearnCategory('course');
-              removeRouteArguments(['course-id']);
-            }
+            onSelectCourse(courseId);
+            setLearnCategory('course');
+            removeRouteArguments(['course-id']);
           }
 
           removeRouteArguments(['initial-dialog']);
         },
         [
           routeArguments,
-          selectedCourse,
+          onSelectCourse,
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
@@ -381,6 +381,16 @@ export const HomePage = React.memo<Props>(
           }
         },
         [fetchGames, activeTab, games]
+      );
+
+      // Only fetch courses if the user decides to open the Learn section.
+      React.useEffect(
+        () => {
+          if (activeTab === 'learn' && !courses) {
+            fetchCourses();
+          }
+        },
+        [fetchCourses, activeTab, courses]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -470,12 +480,25 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
+        // No thing to be done.
+      }, []);
+
+      const onSceneEventsModifiedOutsideEditor = React.useCallback(
+        (scene: gdLayout) => {
+          // No thing to be done.
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
+        onSceneObjectsDeleted,
+        onSceneEventsModifiedOutsideEditor,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {
@@ -529,6 +552,10 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
+      const premiumCourse = courses
+        ? courses.find(course => course.id === 'premium-course')
+        : null;
+
       return (
         <I18n>
           {({ i18n }) => (
@@ -570,9 +597,6 @@ export const HomePage = React.memo<Props>(
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}
-                      subscriptionPlansWithPricingSystems={
-                        subscriptionPlansWithPricingSystems
-                      }
                       onOpenProfile={onOpenProfile}
                       onCreateProjectFromExample={onCreateProjectFromExample}
                       askToCloseProject={askToCloseProject}
@@ -588,8 +612,20 @@ export const HomePage = React.memo<Props>(
                       }
                       selectedCategory={learnCategory}
                       onSelectCategory={setLearnCategory}
+                      onSelectCourse={onSelectCourse}
+                      courses={courses}
+                      previewedCourse={premiumCourse}
+                      previewedCourseChapters={
+                        premiumCourse
+                          ? courseChaptersByCourseId[premiumCourse.id]
+                          : null
+                      }
                       course={selectedCourse}
-                      courseChapters={courseChapters}
+                      courseChapters={
+                        selectedCourse
+                          ? courseChaptersByCourseId[selectedCourse.id]
+                          : null
+                      }
                       onCompleteCourseTask={onCompleteTask}
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}

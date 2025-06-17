@@ -114,6 +114,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     asset,
     project,
     objectsContainer,
+    requestedObjectName,
     targetObjectFolderOrObject,
   }: InstallAssetArgs): Promise<?InstallAssetOutput> => {
     if (!profile) {
@@ -134,6 +135,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       asset: assetWithAuthorizedResourceUrls,
       project,
       objectsContainer,
+      requestedObjectName,
       targetObjectFolderOrObject,
     });
   };

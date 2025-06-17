@@ -63,10 +63,10 @@ const getDefaultAnchor = () => ({
  * Build the layouts description from the custom object properties.
  */
 export const getObjectAnchor = (
-  eventBasedObject: gdEventsBasedObject,
+  eventBasedObjectVariant: gdEventsBasedObjectVariant,
   objectName: string
 ): ObjectAnchor => {
-  const objects = eventBasedObject.getObjects();
+  const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
     return getDefaultAnchor();
   }
@@ -309,7 +309,7 @@ export interface ChildRenderedInstance {
 export interface LayoutedParent<
   CovariantChildRenderedInstance: ChildRenderedInstance
 > {
-  eventBasedObject: gdEventsBasedObject | null;
+  getVariant(): gdEventsBasedObjectVariant | null;
   getWidth(): number;
   getHeight(): number;
   getRendererOfInstance: (
@@ -322,8 +322,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   parent: LayoutedParent<T>,
   initialInstance: gdInitialInstance
 ): T | null => {
-  const eventBasedObject = parent.eventBasedObject;
-  if (!eventBasedObject) {
+  const eventBasedObjectVariant = parent.getVariant();
+  if (!eventBasedObjectVariant) {
     return null;
   }
 
@@ -333,7 +333,7 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   );
 
   const objectAnchor = getObjectAnchor(
-    eventBasedObject,
+    eventBasedObjectVariant,
     layoutedInstance.getObjectName()
   );
   const leftEdgeAnchor = objectAnchor
@@ -349,10 +349,10 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
     ? objectAnchor.bottomEdgeAnchor
     : gd.CustomObjectConfiguration.NoAnchor;
 
-  const parentInitialMinX = eventBasedObject.getAreaMinX();
-  const parentInitialMinY = eventBasedObject.getAreaMinY();
-  const parentInitialMaxX = eventBasedObject.getAreaMaxX();
-  const parentInitialMaxY = eventBasedObject.getAreaMaxY();
+  const parentInitialMinX = eventBasedObjectVariant.getAreaMinX();
+  const parentInitialMinY = eventBasedObjectVariant.getAreaMinY();
+  const parentInitialMaxX = eventBasedObjectVariant.getAreaMaxX();
+  const parentInitialMaxY = eventBasedObjectVariant.getAreaMaxY();
   const parentInitialWidth = parentInitialMaxX - parentInitialMinX;
   const parentInitialHeight = parentInitialMaxY - parentInitialMinY;
 

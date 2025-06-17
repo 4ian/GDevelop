@@ -26,7 +26,10 @@ type Props = {|
   options: ChooseResourceOptions,
   resourceSources: Array<ResourceSource>,
   onClose: () => void,
-  onChooseResources: (resources: Array<gdResource>) => void,
+  onChooseResources: ({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void,
 |};
 
 export const NewResourceDialog = ({
@@ -48,6 +51,9 @@ export const NewResourceDialog = ({
     selectedResourceIndex,
     setSelectedResourceIndex,
   ] = React.useState<?number>(null);
+  const [selectedResources, setSelectedResources] = React.useState<
+    Array<gdResource>
+  >([]);
   const preferences = React.useContext(PreferencesContext);
   const possibleResourceSources = resourceSources
     .filter(({ kind }) => kind === options.resourceKind)
@@ -110,10 +116,16 @@ export const NewResourceDialog = ({
             resourcesImporationBehavior:
               preferences.values.resourcesImporationBehavior,
           });
-          onChooseResources(resources);
+          onChooseResources({
+            selectedResources: resources,
+            selectedSourceName: initialSource.name,
+          });
         } catch (error) {
           console.error('Unexpected error from a resource source:', error);
-          onChooseResources([]);
+          onChooseResources({
+            selectedResources: [],
+            selectedSourceName: initialSource.name,
+          });
         }
       })();
     },
@@ -146,8 +158,10 @@ export const NewResourceDialog = ({
             searchResults && typeof selectedResourceIndex === 'number'
               ? searchResults[selectedResourceIndex]
               : null;
+
           return source.renderPrimaryAction({
             resource: selectedResource,
+            selectedResources,
             onChooseResources,
           });
         }),
@@ -193,6 +207,8 @@ export const NewResourceDialog = ({
           fileMetadata,
           selectedResourceIndex,
           onSelectResource: setSelectedResourceIndex,
+          selectedResources,
+          onResourcesSelected: setSelectedResources,
           getStorageProvider,
           getLastUsedPath: preferences.getLastUsedPath,
           setLastUsedPath: preferences.setLastUsedPath,

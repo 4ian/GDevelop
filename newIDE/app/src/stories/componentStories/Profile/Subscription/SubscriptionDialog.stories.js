@@ -18,7 +18,7 @@ import {
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
 import useSubscriptionPlans, {
-  getAvailableSubscriptionPlansWithPrices,
+  filterAvailableSubscriptionPlansWithPrices,
 } from '../../../../Utils/UseSubscriptionPlans';
 import LoaderModal from '../../../../UI/LoaderModal';
 
@@ -161,29 +161,33 @@ export const Default = ({
     }
   }
 
-  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
     authenticatedUser,
   });
+  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
   const { subscription: userSubscription } = authenticatedUser;
   const userLegacySubscriptionPlanWithPricingSystem =
-    userSubscription && subscriptionPlansWithPricingSystems
-      ? subscriptionPlansWithPricingSystems.find(
-          planWithPricingSystem =>
-            planWithPricingSystem.id === userSubscription.planId &&
-            planWithPricingSystem.isLegacy
-        )
-      : null;
+    (userSubscription &&
+      subscriptionPlansWithPricingSystems &&
+      subscriptionPlansWithPricingSystems.find(
+        planWithPricingSystem =>
+          planWithPricingSystem.id === userSubscription.planId &&
+          planWithPricingSystem.isLegacy
+      )) ||
+    null;
 
   return subscriptionPlansWithPricingSystems ? (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionDialog
-          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
-            subscriptionPlansWithPricingSystems
-          )}
-          userLegacySubscriptionPlanWithPricingSystem={
+          getAvailableSubscriptionPlansWithPrices={() =>
+            filterAvailableSubscriptionPlansWithPrices(
+              subscriptionPlansWithPricingSystems
+            )
+          }
+          getUserLegacySubscriptionPlanWithPricingSystem={() =>
             userLegacySubscriptionPlanWithPricingSystem
           }
           onClose={() => action('on close')()}

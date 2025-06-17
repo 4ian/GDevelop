@@ -16,6 +16,12 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { NumericProperty, UnitAdornment } from '../Physics2Editor';
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+} from '../../../UI/Accordion';
+import { areAdvancedPropertiesModified } from '../BehaviorPropertiesEditor';
 
 type Props = BehaviorEditorProps;
 
@@ -57,6 +63,11 @@ const Physics3DEditor = (props: Props) => {
   const { behavior, onBehaviorUpdated } = props;
   const forceUpdate = useForceUpdate();
 
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => areAdvancedPropertiesModified(behavior),
+    [behavior]
+  );
+
   const updateBehaviorProperty = React.useCallback(
     (property, value) => {
       behavior.updateProperty(property, value);
@@ -74,6 +85,10 @@ const Physics3DEditor = (props: Props) => {
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
   const isStatic = properties.get('bodyType').getValue() === 'Static';
+
+  const canShapeBeOriented =
+    properties.get('shape').getValue() !== 'Sphere' &&
+    properties.get('shape').getValue() !== 'Box';
 
   return (
     <Column
@@ -160,14 +175,15 @@ const Physics3DEditor = (props: Props) => {
           id="physics3d-parameter-shape-orientation"
           fullWidth
           floatingLabelText={properties.get('shapeOrientation').getLabel()}
-          value={properties.get('shapeOrientation').getValue()}
+          value={
+            canShapeBeOriented
+              ? properties.get('shapeOrientation').getValue()
+              : 'Z'
+          }
           onChange={(e, i, newValue: string) =>
             updateBehaviorProperty('shapeOrientation', newValue)
           }
-          disabled={
-            properties.get('shape').getValue() === 'Sphere' ||
-            properties.get('shape').getValue() === 'Box'
-          }
+          disabled={!canShapeBeOriented}
         >
           <SelectOption key={'shape-orientation-z'} value={'Z'} label={t`Z`} />
           <SelectOption key={'shape-orientation-y'} value={'Y'} label={t`Y`} />
@@ -235,6 +251,18 @@ const Physics3DEditor = (props: Props) => {
           onUpdate={newValue =>
             updateBehaviorProperty(
               'density',
+              parseFloat(newValue) > 0 ? newValue : '0'
+            )
+          }
+        />
+        <NumericProperty
+          id="physics3d-parameter-mass-override"
+          properties={properties}
+          propertyName={'massOverride'}
+          step={0.1}
+          onUpdate={newValue =>
+            updateBehaviorProperty(
+              'massOverride',
               parseFloat(newValue) > 0 ? newValue : '0'
             )
           }
@@ -351,6 +379,72 @@ const Physics3DEditor = (props: Props) => {
           disabled={isStatic}
         />
       </Line>
+      <Accordion
+        defaultExpanded={areAdvancedPropertiesExpandedByDefault}
+        noMargin
+      >
+        <AccordionHeader noMargin>
+          <Text size="sub-title">
+            <Trans>Advanced properties</Trans>
+          </Text>
+        </AccordionHeader>
+        <AccordionBody disableGutters>
+          <Column expand noMargin>
+            <ResponsiveLineStackLayout>
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetX'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetX', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetY'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetY', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'shapeOffsetZ'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('shapeOffsetZ', newValue)
+                }
+              />
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout>
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetX'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetX', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetY'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetY', newValue)
+                }
+              />
+              <NumericProperty
+                properties={properties}
+                propertyName={'massCenterOffsetZ'}
+                step={1}
+                onUpdate={newValue =>
+                  updateBehaviorProperty('massCenterOffsetZ', newValue)
+                }
+              />
+            </ResponsiveLineStackLayout>
+          </Column>
+        </AccordionBody>
+      </Accordion>
     </Column>
   );
 };

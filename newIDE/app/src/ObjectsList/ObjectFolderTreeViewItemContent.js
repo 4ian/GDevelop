@@ -3,7 +3,8 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import { TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
@@ -72,6 +73,7 @@ export type ObjectFolderTreeViewItemProps = {|
   ) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
+  isListLocked: boolean,
 |};
 
 export const getObjectFolderTreeViewItemId = (
@@ -197,6 +199,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       onAddNewObject,
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
       forceUpdate,
+      isListLocked,
     } = this.props;
 
     const container = this._isGlobal
@@ -222,54 +225,61 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
           isGlobalObject: this._isGlobal,
           isFolder: true,
         }),
-        enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND),
+        enabled: Clipboard.has(OBJECT_CLIPBOARD_KIND) && !isListLocked,
         click: () => this.paste(),
       },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
+        enabled: !isListLocked,
       },
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
+        enabled: !isListLocked,
       },
-      {
-        label: i18n._('Move to folder'),
-        submenu: [
-          ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
-            label: path,
-            enabled: folder !== this.objectFolder.getParent(),
-            click: () => {
-              if (folder === this.objectFolder.getParent()) return;
-              this.objectFolder
-                .getParent()
-                .moveObjectFolderOrObjectToAnotherFolder(
-                  this.objectFolder,
-                  folder,
-                  0
-                );
-              onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
-                objectFolderOrObject: folder,
-                global: this._isGlobal,
-              });
-            },
-          })),
-
-          { type: 'separator' },
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () =>
-              addFolder([
-                {
-                  objectFolderOrObject: this.objectFolder.getParent(),
-                  global: this._isGlobal,
+      isListLocked
+        ? {
+            label: i18n._('Move to folder'),
+            enabled: false,
+          }
+        : {
+            label: i18n._('Move to folder'),
+            submenu: [
+              ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
+                label: path,
+                enabled: folder !== this.objectFolder.getParent(),
+                click: () => {
+                  if (folder === this.objectFolder.getParent()) return;
+                  this.objectFolder
+                    .getParent()
+                    .moveObjectFolderOrObjectToAnotherFolder(
+                      this.objectFolder,
+                      folder,
+                      0
+                    );
+                  onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
+                    objectFolderOrObject: folder,
+                    global: this._isGlobal,
+                  });
                 },
-              ]),
+              })),
+
+              { type: 'separator' },
+              {
+                label: i18n._(t`Create new folder...`),
+                click: () =>
+                  addFolder([
+                    {
+                      objectFolderOrObject: this.objectFolder.getParent(),
+                      global: this._isGlobal,
+                    },
+                  ]),
+              },
+            ],
           },
-        ],
-      },
       ...renderQuickCustomizationMenuItems({
         i18n,
         visibility: this.objectFolder.getQuickCustomizationVisibility(),
@@ -286,6 +296,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
             objectFolderOrObject: this.objectFolder,
             global: this._isGlobal,
           }),
+        enabled: !isListLocked,
       },
       {
         label: i18n._(t`Add a new folder`),
@@ -293,6 +304,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
           addFolder([
             { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
           ]),
+        enabled: !isListLocked,
       },
       { type: 'separator' },
       {

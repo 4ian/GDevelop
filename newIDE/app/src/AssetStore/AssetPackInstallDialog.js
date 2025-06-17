@@ -18,6 +18,7 @@ import {
   installRequiredExtensions,
   installPublicAsset,
   type RequiredExtensionInstallation,
+  complyVariantsToEventsBasedObjectOf,
 } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -158,15 +159,21 @@ const AssetPackInstallDialog = ({
             project,
           }
         );
-        const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-            0 &&
-          (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensionShortHeaders
-          ));
+        const extensionUpdateAction =
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders
+            .length === 0
+            ? 'skip'
+            : await showExtensionUpdateConfirmation({
+                project,
+                outOfDateExtensionShortHeaders:
+                  requiredExtensionInstallation.outOfDateExtensionShortHeaders,
+              });
+        if (extensionUpdateAction === 'abort') {
+          return;
+        }
         await installRequiredExtensions({
           requiredExtensionInstallation,
-          shouldUpdateExtension,
+          shouldUpdateExtension: extensionUpdateAction === 'update',
           eventsFunctionsExtensionsState,
           project,
         });
@@ -226,6 +233,7 @@ const AssetPackInstallDialog = ({
         const createdObjects = results
           .map(result => result.createdObjects)
           .flat();
+        complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded(createdObjects);
       } catch (error) {
         setAreAssetsBeingInstalled(false);

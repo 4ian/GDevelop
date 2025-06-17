@@ -331,7 +331,8 @@ export const sendErrorMessage = (
     | 'error-boundary_mainframe'
     | 'error-boundary_list-search-result'
     | 'error-boundary_box-search-result'
-    | 'error-boundary_app',
+    | 'error-boundary_app'
+    | 'error-boundary_extension-loader',
   rawError: any,
   errorId: string
 ) => {
@@ -680,4 +681,26 @@ export const sendPlaySectionOpened = () => {
   }
 
   recordEvent('play-section-opened');
+};
+
+export const sendAiRequestStarted = (metadata: {|
+  simplifiedProjectJsonLength: number,
+  projectSpecificExtensionsSummaryJsonLength: number,
+  payWithCredits: boolean,
+  storageProviderName: string | null,
+  mode: string,
+  aiRequestId: string,
+|}) => {
+  recordEvent('ai-request-started', metadata);
+};
+
+export const sendAiRequestMessageSent = (metadata: {|
+  simplifiedProjectJsonLength: number,
+  projectSpecificExtensionsSummaryJsonLength: number,
+  payWithCredits: boolean,
+  mode: string,
+  aiRequestId: string,
+  outputLength: number,
+|}) => {
+  recordEvent('ai-request-message-sent', metadata);
 };

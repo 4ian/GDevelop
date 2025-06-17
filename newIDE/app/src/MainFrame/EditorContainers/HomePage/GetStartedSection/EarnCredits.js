@@ -167,12 +167,27 @@ const BadgeItem = ({
   hasThisBadge,
   buttonLabel,
   linkUrl,
+  onOpenProfile,
 }: {|
   achievement: ?Achievement,
   hasThisBadge: boolean,
   buttonLabel: React.Node,
   linkUrl: string,
+  onOpenProfile: () => void,
 |}) => {
+  const [hasBeenClicked, setHasBeenClicked] = React.useState(false);
+  const onClick = React.useCallback(
+    () => {
+      if (hasBeenClicked) {
+        onOpenProfile();
+      } else {
+        Window.openExternalURL(linkUrl);
+        setHasBeenClicked(true);
+      }
+    },
+    [hasBeenClicked, linkUrl, onOpenProfile]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -217,11 +232,9 @@ const BadgeItem = ({
             </Text>
           </Column>
           <TextButton
-            label={buttonLabel}
+            label={!hasBeenClicked ? buttonLabel : <Trans>Claim credits</Trans>}
             secondary
-            onClick={() => {
-              Window.openExternalURL(linkUrl);
-            }}
+            onClick={onClick}
             disabled={hasThisBadge}
           />
         </LineStackLayout>
@@ -364,6 +377,7 @@ export const EarnCredits = ({
                       hasThisBadge={!!item.hasThisBadge}
                       buttonLabel={item.label}
                       linkUrl={item.linkUrl}
+                      onOpenProfile={onOpenProfile}
                     />
                   );
                 }

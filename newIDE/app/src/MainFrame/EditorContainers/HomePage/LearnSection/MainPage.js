@@ -43,6 +43,8 @@ import Help from '../../../../UI/CustomSvgIcons/Help';
 import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
+import CourseCard from './CourseCard';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -142,10 +144,13 @@ type Props = {|
   onSelectCategory: (TutorialCategory | null) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
-  course: ?Course,
-  courseChapters: ?(CourseChapter[]),
-  getCourseCompletion: () => CourseCompletion | null,
+  previewedCourse: ?Course,
+  courses: ?(Course[]),
+  previewedCourseChapters: ?(CourseChapter[]),
+  onSelectCourse: (courseId: string | null) => void,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
+    courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
 |};
@@ -155,8 +160,10 @@ const MainPage = ({
   onSelectCategory,
   tutorials,
   selectInAppTutorial,
-  course,
-  courseChapters,
+  previewedCourse,
+  courses,
+  previewedCourseChapters,
+  onSelectCourse,
   getCourseCompletion,
   getCourseChapterCompletion,
 }: Props) => {
@@ -164,6 +171,10 @@ const MainPage = ({
   const { onLoadInAppTutorialFromLocalFile } = React.useContext(
     InAppTutorialContext
   );
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
+
   const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
     false
   );
@@ -207,17 +218,68 @@ const MainPage = ({
   ].filter(Boolean);
 
   return (
-    <SectionContainer>
+    <SectionContainer
+      title={<Trans>Your learning journey starts here</Trans>}
+      customPaperStyle={{
+        backgroundAttachment: 'local',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top',
+        backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
+        backgroundImage: `url('res/premium/premium_dialog_background.png'),${
+          paletteType === 'dark'
+            ? 'linear-gradient(180deg, #322659 0px, #3F2458 20px, #1D1D26 200px, #1D1D26 100%)'
+            : 'linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, #F5F5F7 200px, #F5F5F7 100%)'
+        }`,
+      }}
+    >
       <SectionRow>
-        {!!course && !!courseChapters && (
-          <CoursePreviewBanner
-            course={course}
-            courseChapters={courseChapters}
-            getCourseCompletion={getCourseCompletion}
-            getCourseChapterCompletion={getCourseChapterCompletion}
-            onDisplayCourse={() => onSelectCategory('course')}
-          />
-        )}
+        <CoursePreviewBanner
+          course={previewedCourse}
+          courseChapters={previewedCourseChapters}
+          getCourseCompletion={getCourseCompletion}
+          getCourseChapterCompletion={getCourseChapterCompletion}
+          onDisplayCourse={() => {
+            if (!previewedCourse) return;
+            onSelectCourse(previewedCourse.id);
+            onSelectCategory('course');
+          }}
+        />
+      </SectionRow>
+
+      <SectionRow>
+        <Text size="title">
+          <Trans>GameDev official specialization courses</Trans>
+        </Text>
+        <Line>
+          <GridList
+            cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={ITEMS_SPACING * 2}
+          >
+            {courses
+              ? courses.map(course => {
+                  const completion = getCourseCompletion(course.id);
+                  return (
+                    <GridListTile key={course.id}>
+                      <CourseCard
+                        course={course}
+                        completion={completion}
+                        onClick={() => {
+                          onSelectCourse(course.id);
+                          onSelectCategory('course');
+                        }}
+                      />
+                    </GridListTile>
+                  );
+                })
+              : new Array(2).fill(0).map((_, index) => (
+                  <GridListTile key={`skeleton-course-${index}`}>
+                    <CourseCard course={null} completion={null} />
+                  </GridListTile>
+                ))}
+          </GridList>
+        </Line>
       </SectionRow>
       <SectionRow>
         <Line justifyContent="space-between" noMargin alignItems="center">

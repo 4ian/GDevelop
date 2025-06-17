@@ -23,7 +23,6 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RecommendationList from './RecommendationList';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import Checkbox from '../../../../UI/Checkbox';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
 import { type NewProjectSetup } from '../../../../ProjectCreation/NewProjectSetupDialog';
@@ -60,7 +59,6 @@ type Props = {|
   onUserSurveyStarted: () => void,
   onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onOpenProfile: () => void,
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
@@ -75,7 +73,6 @@ const GetStartedSection = ({
   selectInAppTutorial,
   onUserSurveyStarted,
   onUserSurveyHidden,
-  subscriptionPlansWithPricingSystems,
   onOpenProfile,
   onCreateProjectFromExample,
   askToCloseProject,
@@ -247,9 +244,6 @@ const GetStartedSection = ({
           <RecommendationList
             authenticatedUser={authenticatedUser}
             selectInAppTutorial={selectInAppTutorial}
-            subscriptionPlansWithPricingSystems={
-              subscriptionPlansWithPricingSystems
-            }
             onOpenProfile={onOpenProfile}
             onStartSurvey={
               profile

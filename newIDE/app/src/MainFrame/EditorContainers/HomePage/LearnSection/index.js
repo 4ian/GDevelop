@@ -65,8 +65,8 @@ export const TUTORIAL_CATEGORY_TEXTS = {
     ),
   },
   course: {
-    title: 'UNUSED',
-    description: 'UNUSED',
+    title: <Trans>Loading</Trans>,
+    description: <Trans>Loading course...</Trans>,
   },
   recommendations: {
     title: <Trans>Recommendations</Trans>,
@@ -131,7 +131,11 @@ type Props = {|
   onSelectCategory: (TutorialCategory | null) => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
+  previewedCourse: ?Course,
+  previewedCourseChapters: ?(CourseChapter[]),
+  onSelectCourse: (courseId: string | null) => void,
   course: ?Course,
+  courses: ?(Course[]),
   courseChapters: ?(CourseChapter[]),
   onCompleteCourseTask: (
     chapterId: string,
@@ -140,9 +144,10 @@ type Props = {|
   ) => void,
   isCourseTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getCourseChapterCompletion: (
+    courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  getCourseCompletion: () => CourseCompletion | null,
+  getCourseCompletion: (courseId: string) => CourseCompletion | null,
   onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
 |};
 
@@ -153,8 +158,12 @@ const LearnSection = ({
   onSelectCategory,
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
+  previewedCourse,
+  previewedCourseChapters,
+  onSelectCourse,
   course,
   courseChapters,
+  courses,
   onCompleteCourseTask,
   isCourseTaskCompleted,
   getCourseChapterCompletion,
@@ -179,12 +188,17 @@ const LearnSection = ({
       <CourseSection
         course={course}
         courseChapters={courseChapters}
-        onBack={() => onSelectCategory(null)}
+        onBack={() => {
+          onSelectCategory(null);
+          onSelectCourse(null);
+        }}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
         onCompleteTask={onCompleteCourseTask}
         isTaskCompleted={isCourseTaskCompleted}
-        getChapterCompletion={getCourseChapterCompletion}
-        getCourseCompletion={getCourseCompletion}
+        getChapterCompletion={(chapterId: string) =>
+          getCourseChapterCompletion(course.id, chapterId)
+        }
+        getCourseCompletion={() => getCourseCompletion(course.id)}
         onBuyCourseChapterWithCredits={onBuyCourseChapterWithCredits}
       />
     );
@@ -210,8 +224,10 @@ const LearnSection = ({
       onSelectCategory={onSelectCategory}
       tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
-      course={course}
-      courseChapters={courseChapters}
+      courses={courses}
+      onSelectCourse={onSelectCourse}
+      previewedCourse={previewedCourse}
+      previewedCourseChapters={previewedCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
     />
@@ -221,6 +237,10 @@ const LearnSection = ({
       category={selectedCategory}
       tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
+      onSelectCourse={(courseId: string) => {
+        onSelectCourse(courseId);
+        onSelectCategory('course');
+      }}
     />
   );
 };

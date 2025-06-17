@@ -1130,7 +1130,7 @@ describe('Multiplayer', () => {
             'MySpriteObject'
           )[0];
 
-        p1SpriteObject1.deleteFromScene(p1RuntimeScene);
+        p1SpriteObject1.deleteFromScene();
         p1RuntimeScene.renderAndStep(1000 / 60);
       }
 
@@ -1297,7 +1297,7 @@ describe('Multiplayer', () => {
             'MySpriteObject'
           )[0];
 
-        p2SpriteObject1.deleteFromScene(p2RuntimeScene);
+        p2SpriteObject1.deleteFromScene();
         p2RuntimeScene.renderAndStep(1000 / 60);
       }
 

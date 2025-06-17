@@ -61,28 +61,59 @@ const ResourcePropertiesEditor = React.forwardRef<
     const forceUpdate = useForceUpdate();
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
+    const resourceSources = React.useMemo(
+      () => {
+        const storageProvider = resourceManagementProps.getStorageProvider();
+        return resources.length
+          ? resourceManagementProps.resourceSources
+              .filter(source => source.kind === resources[0].getKind())
+              .filter(
+                ({ onlyForStorageProvider }) =>
+                  !onlyForStorageProvider ||
+                  onlyForStorageProvider === storageProvider.internalName
+              )
+              .filter(source => !source.hideInResourceEditor)
+          : [];
+      },
+      [resourceManagementProps, resources]
+    );
+
     const chooseResourcePath = React.useCallback(
-      async (resourceSource: ResourceSource) => {
+      async (initialResourceSource: ResourceSource) => {
         const resource = resources[0];
 
-        const newResources = await resourceManagementProps.onChooseResource({
-          initialSourceName: resourceSource.name,
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
           multiSelection: false,
           resourceKind: resource.getKind(),
         });
-        if (!newResources.length) return; // No path was chosen by the user.
-        resource.setFile(newResources[0].getFile());
+        if (!selectedResources.length) return; // No path was chosen by the user.
+        const selectedResourceSource = resourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        resource.setFile(selectedResources[0].getFile());
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak.
-        newResources.forEach(resource => resource.delete());
+        selectedResources.forEach(resource => resource.delete());
 
         onResourcePathUpdated();
         forceUpdate();
 
         await resourceManagementProps.onFetchNewlyAddedResources();
       },
-      [resourceManagementProps, resources, onResourcePathUpdated, forceUpdate]
+      [
+        resourceManagementProps,
+        resources,
+        onResourcePathUpdated,
+        forceUpdate,
+        resourceSources,
+      ]
     );
 
     const schema: Schema = React.useMemo(
@@ -102,35 +133,20 @@ const ResourcePropertiesEditor = React.forwardRef<
           setValue: (resource: gdResource, newValue: string) =>
             resource.setFile(newValue),
           onEditButtonClick: () => {
-            const storageProvider = resourceManagementProps.getStorageProvider();
-            const resourceSources = resourceManagementProps.resourceSources
-              .filter(source => source.kind === resources[0].getKind())
-              .filter(
-                ({ onlyForStorageProvider }) =>
-                  !onlyForStorageProvider ||
-                  onlyForStorageProvider === storageProvider.internalName
-              );
-
             const firstResourceSource = resourceSources[0];
             if (firstResourceSource) chooseResourcePath(firstResourceSource);
           },
-          onEditButtonBuildMenuTemplate: (i18n: I18nType) => {
-            const storageProvider = resourceManagementProps.getStorageProvider();
-            return resourceManagementProps.resourceSources
-              .filter(source => source.kind === resources[0].getKind())
-              .filter(
-                ({ onlyForStorageProvider }) =>
-                  !onlyForStorageProvider ||
-                  onlyForStorageProvider === storageProvider.internalName
-              )
-              .map(source => ({
-                label: i18n._(source.displayName),
-                click: () => chooseResourcePath(source),
-              }));
-          },
+          onEditButtonBuildMenuTemplate:
+            resourceSources.length > 1
+              ? (i18n: I18nType) =>
+                  resourceSources.map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => chooseResourcePath(source),
+                  }))
+              : undefined,
         },
       ],
-      [resourceManagementProps, resources, chooseResourcePath]
+      [resourceSources, chooseResourcePath]
     );
 
     const renderResourcesProperties = React.useCallback(

@@ -24,6 +24,7 @@ type Props = {|
   canCopy: boolean,
   canPaste: boolean,
   canDelete: boolean,
+  canAdd: boolean,
   hideHistoryChangeButtons: boolean,
   onUndo?: () => void,
   onRedo?: () => void,
@@ -140,6 +141,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
             tooltip={t`Add variable`}
             onClick={props.onAdd}
             size="small"
+            disabled={!props.canAdd}
           >
             <Add style={props.iconStyle} />
           </IconButton>
@@ -150,6 +152,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
             onClick={props.onAdd}
             label={<Trans>Add variable</Trans>}
             leftIcon={<Add />}
+            disabled={!props.canAdd}
           />
         )}
       </Column>

@@ -28,7 +28,8 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

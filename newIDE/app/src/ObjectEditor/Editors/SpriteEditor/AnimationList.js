@@ -40,7 +40,10 @@ import {
 } from '../../../ResourcesList/ResourceExternalEditor';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type UnsavedChanges } from '../../../MainFrame/UnsavedChangesContext';
-import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
+import {
+  type ResourceManagementProps,
+  type ResourceSource,
+} from '../../../ResourcesList/ResourceSource';
 import { type ScrollViewInterface } from '../../../UI/ScrollView';
 import ThreeDotsMenu from '../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
@@ -439,41 +442,57 @@ const AnimationList = React.forwardRef<
     );
 
     const importImages = React.useCallback(
-      async () => {
-        const resources = await resourceManagementProps.onChooseResource({
-          initialSourceName: resourceSources[0].name,
+      async (initialResourceSource: ResourceSource) => {
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
           multiSelection: true,
           resourceKind: 'image',
         });
-        if (resources.length === 0) {
-          return;
+
+        if (!selectedResources.length) return;
+        const selectedResourceSource = resourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        if (selectedResourceSource.shouldCreateResource) {
+          selectedResources.forEach(resource => {
+            applyResourceDefaults(project, resource);
+            project.getResourcesManager().addResource(resource);
+          });
+
+          const resourcesByAnimation = selectedResourceSource.shouldGuessAnimationsFromName
+            ? groupResourcesByAnimations(selectedResources)
+            : new Map<string, Array<gdResource>>();
+          addAnimations(resourcesByAnimation);
+
+          // Important, we are responsible for deleting the resources that were given to us.
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          selectedResources.forEach(resource => resource.delete());
+
+          await resourceManagementProps.onFetchNewlyAddedResources();
+        } else {
+          const resourcesByAnimation = new Map<string, Array<gdResource>>();
+          resourcesByAnimation.set('default', selectedResources);
+          addAnimations(resourcesByAnimation);
         }
-        resources.forEach(resource => {
-          applyResourceDefaults(project, resource);
-          project.getResourcesManager().addResource(resource);
-        });
-
-        addAnimations(groupResourcesByAnimations(resources));
-
-        // Important, we are responsible for deleting the resources that were given to us.
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resources.forEach(resource => resource.delete());
 
         forceUpdate();
-
-        await resourceManagementProps.onFetchNewlyAddedResources();
 
         adaptCollisionMaskIfNeeded();
         if (onObjectUpdated) onObjectUpdated();
       },
       [
         resourceManagementProps,
-        resourceSources,
         addAnimations,
         forceUpdate,
         adaptCollisionMaskIfNeeded,
         onObjectUpdated,
         project,
+        resourceSources,
       ]
     );
 
@@ -662,8 +681,17 @@ const AnimationList = React.forwardRef<
                   helpPagePath="/objects/sprite"
                   tutorialId="intermediate-changing-animations"
                   onAction={() => {
-                    importImages();
+                    importImages(resourceSources[0]);
                   }}
+                  actionBuildSplitMenuTemplate={
+                    resourceSources.length < 2
+                      ? undefined
+                      : i18n =>
+                          resourceSources.map(resourceSource => ({
+                            label: i18n._(resourceSource.displayName),
+                            click: () => importImages(resourceSource),
+                          }))
+                  }
                   onSecondaryAction={() => {
                     createAnimationWith(i18n, imageResourceExternalEditors[0]);
                   }}

@@ -55,7 +55,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   sceneVariables = other.GetSceneVariables();
 }
 
-void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
+void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isExternal) const {
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
@@ -83,6 +83,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("iconUrl", iconUrl);
   element.SetAttribute("helpPath", helpPath);
   element.SetAttribute("gdevelopVersion", gdevelopVersion);
+  if (changelog.GetChangesCount() > 0) {
+    changelog.SerializeTo(element.AddChild("changelog"));
+  }
   auto& dependenciesElement = element.AddChild("dependencies");
   dependenciesElement.ConsiderAsArray();
   for (auto& dependency : dependencies)
@@ -102,8 +105,18 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
       element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
       "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
-  eventsBasedObjects.SerializeElementsTo(
-      "eventsBasedObject", element.AddChild("eventsBasedObjects"));
+  if (isExternal) {
+    auto &eventsBasedObjectElement = element.AddChild("eventsBasedObjects");
+    eventsBasedObjectElement.ConsiderAsArrayOf("eventsBasedObject");
+    for (const auto &eventsBasedObject :
+         eventsBasedObjects.GetInternalVector()) {
+      eventsBasedObject->SerializeToExternal(
+          eventsBasedObjectElement.AddChild("eventsBasedObject"));
+    }
+  } else {
+    eventsBasedObjects.SerializeElementsTo(
+        "eventsBasedObject", element.AddChild("eventsBasedObjects"));
+  }
 }
 
 void EventsFunctionsExtension::UnserializeFrom(
@@ -129,6 +142,9 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   iconUrl = element.GetStringAttribute("iconUrl");
   helpPath = element.GetStringAttribute("helpPath");
   gdevelopVersion = element.GetStringAttribute("gdevelopVersion");
+  if (element.HasChild("changelog")) {
+    changelog.UnserializeFrom(element.GetChild("changelog"));
+  }
 
   if (element.HasChild("origin")) {
     gd::String originName =

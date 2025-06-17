@@ -46,6 +46,14 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  onSceneObjectsDeleted(scene: gdLayout) {
+    // No thing to be done.
+  }
+
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
@@ -169,7 +177,8 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onOpenCustomObjectEditor={eventsBasedObject => {
             this.props.onOpenCustomObjectEditor(
               eventsFunctionsExtension,
-              eventsBasedObject
+              eventsBasedObject,
+              ''
             );
           }}
           hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}

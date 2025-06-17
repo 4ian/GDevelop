@@ -44,6 +44,21 @@ const getDefaultGroup = ({ id }: {| id: string |}) => ({
 });
 
 describe('groupMembersByGroupId', () => {
+  test('Works if there are no members', () => {
+    expect(
+      groupMembersByGroupId({
+        groups: [],
+        members: [],
+        memberships: [],
+      })
+    ).toEqual({
+      active: {
+        NONE: { group: { id: 'none', name: 'none' }, members: [] },
+      },
+      inactive: [],
+    });
+  });
+
   test("All members are returned in the NONE group if they don't have a group yet", () => {
     const user1 = getDefaultUser({ id: 'user-id-1' });
     const user2 = getDefaultUser({ id: 'user-id-2' });
@@ -116,6 +131,7 @@ describe('groupMembersByGroupId', () => {
       })
     ).toEqual({
       active: {
+        NONE: { group: { id: 'none', name: 'none' }, members: [] },
         [group1.id]: { group: group1, members: [] },
         [group2.id]: { group: group2, members: [] },
       },
@@ -145,6 +161,7 @@ describe('groupMembersByGroupId', () => {
       })
     ).toEqual({
       active: {
+        NONE: { group: { id: 'none', name: 'none' }, members: [] },
         [group1.id]: { group: group1, members: [user1, user2, user3, user5] },
         [group2.id]: { group: group2, members: [] },
       },

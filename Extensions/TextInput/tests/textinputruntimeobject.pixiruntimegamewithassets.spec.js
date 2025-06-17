@@ -146,7 +146,7 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
     expect(gameDomElementContainer.querySelector('input')).not.to.be(null);
     expect(gameDomElementContainer.querySelector('textarea')).to.be(null);
 
-    object.deleteFromScene(runtimeScene);
+    object.deleteFromScene();
     runtimeScene.renderAndStep(1000 / 60);
     expect(gameDomElementContainer.querySelector('input')).to.be(null);
     expect(gameDomElementContainer.querySelector('textarea')).to.be(null);

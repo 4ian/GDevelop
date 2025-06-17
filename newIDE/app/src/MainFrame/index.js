@@ -39,6 +39,7 @@ import {
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
   closeCustomObjectTab,
+  closeEventsBasedObjectVariantTab,
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
@@ -57,7 +58,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
-import { renderAskAiContainer } from './EditorContainers/AskAi';
+import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
@@ -137,7 +138,6 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
@@ -203,6 +203,7 @@ import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
+import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -220,7 +221,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'ask-ai': renderAskAiContainer,
+  'ask-ai': renderAskAiEditorContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -371,9 +372,10 @@ const MainFrame = (props: Props) => {
     chooseResourceOptions,
     setChooseResourceOptions,
   ] = React.useState<?ChooseResourceOptions>(null);
-  const [onResourceChosen, setOnResourceChosen] = React.useState<?(
-    Array<gdResource>
-  ) => void>(null);
+  const [onResourceChosen, setOnResourceChosen] = React.useState<?({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -551,6 +553,12 @@ const MainFrame = (props: Props) => {
     gamesList,
   });
 
+  const {
+    setExtensionLoadingResults,
+    hasExtensionLoadErrors,
+    renderExtensionLoadErrorDialog,
+  } = useExtensionLoadErrorDialog();
+
   /**
    * This reference is useful to get the current opened project,
    * even in the callback of a hook/promise - without risking to read "stale" data.
@@ -589,7 +597,8 @@ const MainFrame = (props: Props) => {
           : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
           : kind === 'custom object'
-          ? name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
+          ? name.split('::')[2] ||
+            name.split('::')[1] + ` ${i18n._(t`(Object)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -807,36 +816,26 @@ const MainFrame = (props: Props) => {
 
     return extensionsLoader
       .loadAllExtensions(getNotNullTranslationFunction(i18n))
-      .then(loadingResults => {
-        const successLoadingResults = loadingResults.filter(
-          loadingResult => !loadingResult.result.error
-        );
-        const failLoadingResults = loadingResults.filter(
-          loadingResult =>
-            loadingResult.result.error && !loadingResult.result.dangerous
-        );
-        const dangerousLoadingResults = loadingResults.filter(
-          loadingResult =>
-            loadingResult.result.error && loadingResult.result.dangerous
-        );
-        console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
-        if (failLoadingResults.length) {
-          console.error(
-            `⚠️ Unable to load ${
-              failLoadingResults.length
-            } JS extensions. Please check these errors:`,
-            failLoadingResults
+      .then(
+        ({
+          expectedNumberOfJSExtensionModulesLoaded,
+          results: loadingResults,
+        }) => {
+          const successLoadingResults = loadingResults.filter(
+            loadingResult => !loadingResult.result.error
           );
-        }
-        if (dangerousLoadingResults.length) {
-          console.error(
-            `💣 Dangerous exceptions while loading ${
-              dangerousLoadingResults.length
-            } JS extensions. 🔥 Please check these errors as they will CRASH GDevelop:`,
-            dangerousLoadingResults
+          console.info(
+            `Loaded ${
+              successLoadingResults.length
+            }/${expectedNumberOfJSExtensionModulesLoaded} JS extensions.`
           );
+
+          setExtensionLoadingResults({
+            expectedNumberOfJSExtensionModulesLoaded,
+            results: loadingResults,
+          });
         }
-      });
+      );
   };
 
   useDiscordRichPresence(currentProject);
@@ -1157,7 +1156,6 @@ const MainFrame = (props: Props) => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-    createProjectFromAIGeneration,
   } = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
@@ -1192,15 +1190,17 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      options.openAllScenes || options.openQuickCustomizationDialog
-        ? openAllScenes({
-            currentProject: project,
-            editorTabs,
-          })
-        : openSceneOrProjectManager({
-            currentProject: project,
-            editorTabs: editorTabs,
-          });
+      if (!options.dontOpenAnySceneOrProjectManager) {
+        options.openAllScenes || options.openQuickCustomizationDialog
+          ? openAllScenes({
+              currentProject: project,
+              editorTabs,
+            })
+          : openSceneOrProjectManager({
+              currentProject: project,
+              editorTabs: editorTabs,
+            });
+      }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
@@ -1224,6 +1224,19 @@ const MainFrame = (props: Props) => {
     onGameRegistered: gamesList.fetchGames,
   });
 
+  const openAskAi = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
   const {
     onSelectExampleShortHeader,
     onSelectPrivateGameTemplateListingData,
@@ -1237,7 +1250,7 @@ const MainFrame = (props: Props) => {
     createEmptyProject,
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
-    createProjectFromAIGeneration,
+    openAskAi,
     storageProviders: props.storageProviders,
   });
 
@@ -1271,12 +1284,12 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
+  const onInstallExtension = (extensionName: string) => {
     const { currentProject } = state;
     if (!currentProject) return;
 
     // Close the extension tab before updating/reinstalling the extension.
-    const eventsFunctionsExtensionName = extensionShortHeader.name;
+    const eventsFunctionsExtensionName = extensionName;
 
     if (
       currentProject.hasEventsFunctionsExtensionNamed(
@@ -1400,6 +1413,20 @@ const MainFrame = (props: Props) => {
   };
 
   const onExtensionInstalled = (extensionName: string) => {
+    const { currentProject } = state;
+    if (!currentProject) {
+      return;
+    }
+    const eventsBasedObjects = currentProject
+      .getEventsFunctionsExtension(extensionName)
+      .getEventsBasedObjects();
+    for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+      const eventsBasedObject = eventsBasedObjects.getAt(index);
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        currentProject,
+        eventsBasedObject
+      );
+    }
     // TODO Open the closed tabs back
     // It would be safer to close the tabs before the extension is installed
     // but it would make opening them back more complicated.
@@ -1581,6 +1608,29 @@ const MainFrame = (props: Props) => {
         state.editorTabs,
         eventsFunctionsExtension.getName(),
         name
+      ),
+    }));
+  };
+
+  const deleteEventsBasedObjectVariant = (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ): void => {
+    const variants = eventBasedObject.getVariants();
+    const variantName = variant.getName();
+    if (!variants.hasVariantNamed(variantName)) {
+      return;
+    }
+    variants.removeVariant(variantName);
+
+    setState(state => ({
+      ...state,
+      editorTabs: closeEventsBasedObjectVariantTab(
+        state.editorTabs,
+        eventsFunctionsExtension.getName(),
+        eventBasedObject.getName(),
+        variantName
       ),
     }));
   };
@@ -1990,19 +2040,6 @@ const MainFrame = (props: Props) => {
     [setState, getEditorOpeningOptions]
   );
 
-  const openAskAi = React.useCallback(
-    () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
-          state.editorTabs,
-          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
-        ),
-      }));
-    },
-    [setState, getEditorOpeningOptions]
-  );
-
   const closeDialogsToOpenHomePage = React.useCallback(() => {
     setShareDialogOpen(false);
   }, []);
@@ -2108,7 +2145,8 @@ const MainFrame = (props: Props) => {
   const openCustomObjectEditor = React.useCallback(
     (
       eventsFunctionsExtension: gdEventsFunctionsExtension,
-      eventsBasedObject: gdEventsBasedObject
+      eventsBasedObject: gdEventsBasedObject,
+      variantName: string
     ) => {
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
@@ -2116,7 +2154,8 @@ const MainFrame = (props: Props) => {
       const foundTab = getCustomObjectEditor(
         editorTabs,
         eventsFunctionsExtension,
-        eventsBasedObject
+        eventsBasedObject,
+        variantName
       );
       if (foundTab) {
         setState(state => ({
@@ -2133,7 +2172,10 @@ const MainFrame = (props: Props) => {
               name:
                 eventsFunctionsExtension.getName() +
                 '::' +
-                eventsBasedObject.getName(),
+                eventsBasedObject.getName() +
+                (eventsBasedObject.getVariants().hasVariantNamed(variantName)
+                  ? '::' + variantName
+                  : ''),
               project: currentProject,
             }),
           }),
@@ -2217,13 +2259,41 @@ const MainFrame = (props: Props) => {
     extensionName: string,
     eventsBasedObjectName: string
   ) => {
-    if (!currentProject) return;
+    if (
+      !currentProject ||
+      !currentProject.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      return;
+    }
     openEventsFunctionsExtension(
       extensionName,
       null,
       null,
       eventsBasedObjectName
     );
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+      extensionName
+    );
+    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
+    if (!eventsBasedObjects.has(eventsBasedObjectName)) {
+      return;
+    }
+    const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
+    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject, '');
+
+    // Trigger reloading of extensions as an extension was modified (or even added)
+    // to create the custom object.
+    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+      currentProject
+    );
+  };
+
+  const onOpenEventBasedObjectVariantEditor = (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => {
+    if (!currentProject) return;
     if (!currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
       return;
     }
@@ -2235,7 +2305,11 @@ const MainFrame = (props: Props) => {
       return;
     }
     const eventsBasedObject = eventsBasedObjects.get(eventsBasedObjectName);
-    openCustomObjectEditor(eventsFunctionsExtension, eventsBasedObject);
+    openCustomObjectEditor(
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      variantName
+    );
 
     // Trigger reloading of extensions as an extension was modified (or even added)
     // to create the custom object.
@@ -2245,7 +2319,16 @@ const MainFrame = (props: Props) => {
   };
 
   const onEventsBasedObjectChildrenEdited = React.useCallback(
-    () => {
+    (eventsBasedObject: gdEventsBasedObject) => {
+      const project = state.currentProject;
+      if (!project) {
+        return;
+      }
+      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+        project,
+        eventsBasedObject
+      );
+
       for (const editor of state.editorTabs.editors) {
         const { editorRef } = editor;
         if (editorRef) {
@@ -2253,7 +2336,7 @@ const MainFrame = (props: Props) => {
         }
       }
     },
-    [state.editorTabs]
+    [state.editorTabs, state.currentProject]
   );
 
   const onSceneObjectEdited = React.useCallback(
@@ -2262,6 +2345,30 @@ const MainFrame = (props: Props) => {
         const { editorRef } = editor;
         if (editorRef) {
           editorRef.onSceneObjectEdited(scene, objectWithContext);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onSceneObjectsDeleted = React.useCallback(
+    (scene: gdLayout) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneObjectsDeleted(scene);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onSceneEventsModifiedOutsideEditor = React.useCallback(
+    (scene: gdLayout) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneEventsModifiedOutsideEditor(scene);
         }
       }
     },
@@ -2631,6 +2738,9 @@ const MainFrame = (props: Props) => {
       |}
     ) => {
       if (!currentProject) return;
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
 
       saveUiSettings(state.editorTabs);
 
@@ -2849,6 +2959,7 @@ const MainFrame = (props: Props) => {
       showAlert,
       showConfirmation,
       gamesList,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -2860,6 +2971,9 @@ const MainFrame = (props: Props) => {
       if (!canSaveProjectAs) {
         return;
       }
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
 
       if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
@@ -2886,12 +3000,17 @@ const MainFrame = (props: Props) => {
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
       canSaveProjectAs,
+      hasExtensionLoadErrors,
     ]
   );
 
   const saveProject = React.useCallback(
     async () => {
       if (!currentProject) return;
+      // Prevent saving if there are errors in the extension modules, as
+      // this can lead to corrupted projects.
+      if (hasExtensionLoadErrors) return;
+
       if (!currentFileMetadata) {
         return saveProjectAs();
       }
@@ -3051,6 +3170,7 @@ const MainFrame = (props: Props) => {
       showConfirmation,
       checkedOutVersionStatus,
       gamesList,
+      hasExtensionLoadErrors,
     ]
   );
 
@@ -3237,9 +3357,11 @@ const MainFrame = (props: Props) => {
     (options: ChooseResourceOptions) => {
       return new Promise(resolve => {
         setChooseResourceOptions(options);
-        const onResourceChosenSetter: () => (
-          Promise<Array<gdResource>> | Array<gdResource>
-        ) => void = () => resolve;
+        const onResourceChosenSetter: () => ({|
+          selectedResources: Array<gdResource>,
+          selectedSourceName: string,
+        |}) => void = () => resolve;
+
         setOnResourceChosen(onResourceChosenSetter);
       });
     },
@@ -3290,16 +3412,20 @@ const MainFrame = (props: Props) => {
   );
 
   const openTemplateFromCourseChapter = React.useCallback(
-    async (courseChapter: CourseChapter) => {
+    async (courseChapter: CourseChapter, templateId?: string) => {
       const projectIsClosed = await askToCloseProject();
       if (!projectIsClosed) {
         return;
       }
       try {
-        await createProjectFromCourseChapter(courseChapter, {
-          storageProvider: emptyStorageProvider,
-          saveAsLocation: null,
-          // Remaining will be set by the template.
+        await createProjectFromCourseChapter({
+          courseChapter,
+          templateId,
+          newProjectSetup: {
+            storageProvider: emptyStorageProvider,
+            saveAsLocation: null,
+            // Remaining will be set by the template.
+          },
         });
       } catch (error) {
         showErrorBox({
@@ -3849,16 +3975,16 @@ const MainFrame = (props: Props) => {
                         openSceneEditor: false,
                       });
                     },
+                    onOpenLayout: (sceneName: string) => {
+                      openLayout(sceneName, {
+                        openEventsEditor: false,
+                        openSceneEditor: true,
+                      });
+                    },
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
-                    onOpenLayout: name => {
-                      openLayout(name, {
-                        openEventsEditor: true,
-                        openSceneEditor: false,
-                      });
-                    },
                     resourceManagementProps,
                     onSave: saveProject,
                     canSave,
@@ -3897,6 +4023,7 @@ const MainFrame = (props: Props) => {
                         preventBackHome: true,
                       });
                     },
+                    onCreateEmptyProject: createEmptyProject,
                     onCreateProjectFromExample: createProjectFromExample,
                     onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
@@ -3943,8 +4070,12 @@ const MainFrame = (props: Props) => {
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
                     onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
+                    onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
+                    onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
+                    onSceneObjectsDeleted: onSceneObjectsDeleted,
+                    onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                     onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                     gamesPlatformFrameTools,
@@ -4008,15 +4139,18 @@ const MainFrame = (props: Props) => {
           getStorageProvider={getStorageProvider}
           i18n={i18n}
           resourceSources={resourceSources}
-          onChooseResources={resources => {
+          onChooseResources={resourcesOptions => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen(resources);
+            onResourceChosen(resourcesOptions);
           }}
           onClose={() => {
             setOnResourceChosen(null);
             setChooseResourceOptions(null);
-            onResourceChosen([]);
+            onResourceChosen({
+              selectedResources: [],
+              selectedSourceName: '',
+            });
           }}
           options={chooseResourceOptions}
         />
@@ -4108,6 +4242,7 @@ const MainFrame = (props: Props) => {
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
       {renderSaveReminder()}
+      {renderExtensionLoadErrorDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

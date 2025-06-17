@@ -10,17 +10,22 @@ type Props = {|
   href: string,
   onClick: () => void | Promise<void>,
   disabled?: boolean,
-  color?: 'primary' | 'secondary',
+  color?: 'primary' | 'secondary' | 'inherit',
 |};
 
 const useLinkStyles = (
   theme: GDevelopTheme,
-  color: 'primary' | 'secondary',
+  color: 'primary' | 'secondary' | 'inherit',
   disabled: boolean
 ) =>
   makeStyles({
     root: {
-      color: color === 'primary' ? theme.link.color.default : undefined,
+      color:
+        color === 'inherit'
+          ? 'inherit'
+          : color === 'primary'
+          ? theme.link.color.default
+          : undefined,
       textDecoration: 'underline',
       '&:hover': {
         color:

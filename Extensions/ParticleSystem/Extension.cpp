@@ -20,9 +20,10 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
       .SetExtensionInformation(
           "ParticleSystem",
           _("Particle system"),
-          "A particle emitter allows to create various effects by showing a "
+          "A 2D particle emitter allows to create various effects by showing a "
           "lot of tiny images called particles. It's ideal for fires, smoke, "
-          "explosions, magical effects, etc...",
+          "explosions, magical effects, etc... in 2D games. For 3D games, use "
+          "the 3D particle emitter instead.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Visual effect")
@@ -36,9 +37,9 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
         extension
             .AddObject<ParticleEmitterObject>(
                 "ParticleEmitter",
-                _("Particles emitter"),
-                _("Displays a large number of small particles to create visual "
-                  "effects."),
+                _("2D particles emitter"),
+                _("Displays a large number of small 2D particles to create "
+                  "visual effects in a 2D game or user interface."),
                 "CppPlatform/Extensions/particleSystemicon.png")
             .SetCategoryFullName(_("Visual effect"))
             .AddDefaultBehavior("EffectCapability::EffectBehavior");

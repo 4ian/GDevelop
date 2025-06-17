@@ -47,3 +47,32 @@ export const WithSecondaryAction = () => (
     />
   </FixedHeightFlexContainer>
 );
+
+export const WithActionSplitMenu = () => (
+  <FixedHeightFlexContainer
+    height={500}
+    justifyContent="center"
+    alignItems="center"
+  >
+    <EmptyPlaceholder
+      title="Add your first event"
+      description="You can use events to create cause and effect."
+      actionLabel="Add something"
+      helpPagePath="/objects/tiled_sprite"
+      onAction={action('onAdd')}
+      actionBuildSplitMenuTemplate={() => [
+        {
+          label: 'Add something',
+          click: action('onAdd'),
+        },
+        {
+          label: 'Add something else',
+          click: action('onAdd'),
+        },
+      ]}
+      secondaryActionIcon={<PasteIcon />}
+      secondaryActionLabel="Paste"
+      onSecondaryAction={action('onAdd')}
+    />
+  </FixedHeightFlexContainer>
+);

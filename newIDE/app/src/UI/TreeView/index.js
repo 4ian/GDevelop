@@ -30,6 +30,9 @@ export type MenuButton = {|
   icon: React.Node,
   label: MessageDescriptor,
   click: ?() => void | Promise<void>,
+  enabled?: boolean,
+  primary?: boolean,
+  showPrimaryLabel?: boolean,
 |};
 
 type FlattenedNode<Item> = {|

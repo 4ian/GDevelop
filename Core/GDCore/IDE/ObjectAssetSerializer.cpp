@@ -17,6 +17,8 @@
 #include "GDCore/IDE/Project/ResourcesRenamer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/CustomBehavior.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -60,9 +62,6 @@ void ObjectAssetSerializer::SerializeTo(
   element.SetAttribute("version", "");
   element.SetIntAttribute("animationsCount", 1);
   element.SetIntAttribute("maxFramesCount", 1);
-  // TODO Find the right object dimensions.
-  element.SetIntAttribute("width", 0);
-  element.SetIntAttribute("height", 0);
   SerializerElement &authorsElement = element.AddChild("authors");
   authorsElement.ConsiderAsArrayOf("author");
   SerializerElement &tagsElement = element.AddChild("tags");
@@ -74,6 +73,28 @@ void ObjectAssetSerializer::SerializeTo(
       objectAssetsElement.AddChild("objectAsset");
 
   cleanObject->SerializeTo(objectAssetElement.AddChild("object"));
+
+  double width = 0;
+  double height = 0;
+  if (project.HasEventsBasedObject(object.GetType())) {
+    SerializerElement &variantsElement =
+        objectAssetElement.AddChild("variants");
+    variantsElement.ConsiderAsArrayOf("variant");
+
+    const auto *variant = ObjectAssetSerializer::GetVariant(project, object);
+    if (variant) {
+      width = variant->GetAreaMaxX() - variant->GetAreaMinX();
+      height = variant->GetAreaMaxY() - variant->GetAreaMinY();
+    }
+
+    std::unordered_set<gd::String> alreadyUsedVariantIdentifiers;
+    gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
+        project, object, variantsElement, alreadyUsedVariantIdentifiers);
+  }
+
+  // TODO Find the right object dimensions when their is no variant.
+  element.SetIntAttribute("width", width);
+  element.SetIntAttribute("height", height);
 
   SerializerElement &resourcesElement =
       objectAssetElement.AddChild("resources");
@@ -107,5 +128,60 @@ void ObjectAssetSerializer::SerializeTo(
   SerializerElement &customizationElement =
       objectAssetElement.AddChild("customization");
   customizationElement.ConsiderAsArrayOf("empty");
+}
+
+void ObjectAssetSerializer::SerializeUsedVariantsTo(
+    gd::Project &project, const gd::Object &object,
+    SerializerElement &variantsElement,
+    std::unordered_set<gd::String> &alreadyUsedVariantIdentifiers) {
+  const auto *variant = ObjectAssetSerializer::GetVariant(project, object);
+  if (!variant) {
+    return;
+  }
+  const auto &variantIdentifier =
+      object.GetType() + gd::PlatformExtension::GetNamespaceSeparator() +
+      variant->GetName();
+  auto insertResult = alreadyUsedVariantIdentifiers.insert(variantIdentifier);
+  if (!insertResult.second) {
+    return;
+  }
+  SerializerElement &pairElement = variantsElement.AddChild("variant");
+  pairElement.SetAttribute("objectType", object.GetType());
+  SerializerElement &variantElement = pairElement.AddChild("variant");
+  variant->SerializeTo(variantElement);
+
+  for (auto &object : variant->GetObjects().GetObjects()) {
+    gd::ObjectAssetSerializer::SerializeUsedVariantsTo(
+        project, *object, variantsElement, alreadyUsedVariantIdentifiers);
+  }
+}
+
+const gd::EventsBasedObjectVariant *
+ObjectAssetSerializer::GetVariant(gd::Project &project,
+                                  const gd::Object &object) {
+  if (!project.HasEventsBasedObject(object.GetType())) {
+    return nullptr;
+  }
+  const auto &eventsBasedObject =
+      project.GetEventsBasedObject(object.GetType());
+  const auto &variants = eventsBasedObject.GetVariants();
+  const auto *customObjectConfiguration =
+      dynamic_cast<const gd::CustomObjectConfiguration *>(
+          &object.GetConfiguration());
+  const auto &variantName = customObjectConfiguration->GetVariantName();
+  if (!variants.HasVariantNamed(variantName) &&
+      (customObjectConfiguration
+           ->IsMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ||
+       customObjectConfiguration
+           ->IsForcedToOverrideEventsBasedObjectChildrenConfiguration())) {
+    return nullptr;
+  }
+  const auto &variantIdentifier =
+      object.GetType() + gd::PlatformExtension::GetNamespaceSeparator() +
+      variantName;
+  const auto &variant = variants.HasVariantNamed(variantName)
+                            ? variants.GetVariant(variantName)
+                            : eventsBasedObject.GetDefaultVariant();
+  return &variant;
 }
 } // namespace gd

@@ -182,7 +182,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                                 "SceneLoadingProgress",
                                 _("Scene loading progress"),
                                 _("The progress of resources loading in background for a scene (between 0 and 1)."),
-                                _("_PARAM0_ loading progress"),
+                                _("_PARAM1_ loading progress"),
                                 _(""),
                                 "res/actions/hourglass_black.svg")
       .SetHelpPath("/all-features/resources-loading")

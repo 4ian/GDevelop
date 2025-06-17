@@ -79,6 +79,7 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
+  onStartNewChat: () => void,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -232,6 +233,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onStartNewAiRequest,
       onSendMessage,
       onSendFeedback,
+      onStartNewChat,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -257,6 +259,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const requiredGameId = (aiRequest && aiRequest.gameId) || null;
 
     const newChatPlaceholder = React.useMemo(
       () => {
@@ -266,7 +269,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               ? [
                   t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
                   t`Add a score and display it on the screen`,
-                  t`Create an explosion when the player is hit`,
+                  t`Create a 3D explosion when the player is hit`,
                 ]
               : [
                   t`Build a platformer game with a score and coins to collect`,
@@ -600,6 +603,21 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       />
     );
 
+    const isForAnotherProject =
+      !!requiredGameId &&
+      (!project || requiredGameId !== project.getProjectUuid());
+    const isForAnotherProjectText = isForAnotherProject ? (
+      <Text size="body-small" color="secondary" align="center" noMargin>
+        <Trans>
+          This request is for another project.{' '}
+          <Link href="#" onClick={onStartNewChat}>
+            Start a new chat
+          </Link>{' '}
+          to build on a new project.
+        </Trans>
+      </Text>
+    ) : null;
+
     return (
       <Column
         expand
@@ -714,7 +732,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             <CompactTextAreaFieldWithControls
               maxLength={6000}
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}
-              disabled={isSending}
+              disabled={isSending || isForAnotherProject}
               errored={!!lastSendError}
               onChange={userRequestText =>
                 setUserRequestTextPerRequestId(
@@ -726,7 +744,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               }
               placeholder={
                 aiRequest.mode === 'agent'
-                  ? t`Specify something more to the AI to build`
+                  ? isForAnotherProject
+                    ? t`You must re-open the project to continue this chat.`
+                    : t`Specify something more to the AI to build`
                   : t`Ask a follow up question`
               }
               rows={2}
@@ -746,6 +766,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       disabled={
                         aiRequest.status === 'working' ||
                         isSending ||
+                        isForAnotherProject ||
                         !userRequestTextPerAiRequestId[aiRequestId]
                       }
                       icon={<Send />}
@@ -767,8 +788,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 alignItems="center"
                 justifyContent="space-between"
               >
-                {errorText || priceText}
-                {errorText ? null : quotaOrCreditsText}
+                {isForAnotherProjectText || errorText || priceText}
+                {errorText || isForAnotherProjectText
+                  ? null
+                  : quotaOrCreditsText}
               </LineStackLayout>
             </Column>
           </ColumnStackLayout>

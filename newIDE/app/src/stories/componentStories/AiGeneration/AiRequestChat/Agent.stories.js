@@ -50,6 +50,7 @@ const commonProps = {
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
+  onStartNewChat: () => {},
 };
 
 const fakeOutputWithUserRequestOnly = [
@@ -433,6 +434,21 @@ export const LongReadyAiRequest = () => (
         <AiRequestChat
           i18n={i18n}
           aiRequest={agentAiRequest}
+          {...commonProps}
+          isAutoProcessingFunctionCalls={true}
+        />
+      )}
+    </I18n>
+  </FixedHeightFlexContainer>
+);
+
+export const LongReadyAiRequestForAnotherProject = () => (
+  <FixedHeightFlexContainer height={500}>
+    <I18n>
+      {({ i18n }) => (
+        <AiRequestChat
+          i18n={i18n}
+          aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
           {...commonProps}
           isAutoProcessingFunctionCalls={true}
         />

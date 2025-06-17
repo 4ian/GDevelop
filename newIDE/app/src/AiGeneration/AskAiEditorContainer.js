@@ -990,6 +990,7 @@ export const AskAiEditor = React.memo<Props>(
                 }}
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
+                onStartNewChat={onStartNewChat}
               />
             </div>
           </Paper>

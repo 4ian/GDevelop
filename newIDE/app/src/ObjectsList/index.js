@@ -1092,6 +1092,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [projectScopedContainersAccessor]
     );
 
+    const isEntirelyEmpty =
+      objectsContainer.getObjectsCount() === 0 &&
+      (!globalObjectsContainer ||
+        globalObjectsContainer.getObjectsCount() === 0);
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -1155,8 +1160,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               sceneObjectsRootFolderId,
               i18n._(labels.localScopeObjectsTitle),
               {
+                primary: true,
+                showPrimaryLabel: isEntirelyEmpty,
                 icon: <Add />,
-                label: t`Add an object`,
+                label: t`Add object`,
                 click: () => {
                   onAddNewObject(selectedObjectFolderOrObjectsWithContext[0]);
                 },
@@ -1216,6 +1223,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onAddNewObject,
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
+        isEntirelyEmpty,
       ]
     );
 

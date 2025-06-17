@@ -401,10 +401,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       </ColumnStackLayout>
                     </>
                   )}
-                  {!getVariantName(
+                  {(!getVariantName(
                     eventBasedObject,
                     customObjectConfiguration
-                  ) &&
+                  ) ||
+                    customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
                     (eventBasedObject &&
                       (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
                       !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (

@@ -13,7 +13,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
-import { type AskAiEditorInterface } from '../EditorContainers/AskAi';
+import { type AskAiEditorInterface } from '../../AiGeneration/AskAiEditorContainer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
 

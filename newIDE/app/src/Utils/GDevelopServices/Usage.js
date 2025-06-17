@@ -99,6 +99,14 @@ export type Capabilities = {|
 
 export type UsagePrice = {|
   priceInCredits: number,
+  variablePrice?: {
+    [subUsageType: string]: {
+      [variantType: string]: {
+        minimumPriceInCredits: number,
+        maximumPriceInCredits: number,
+      },
+    },
+  },
 |};
 
 export type UsagePrices = {|

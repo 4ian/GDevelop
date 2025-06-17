@@ -172,12 +172,10 @@ export const useFetchAssets = () => {
 
 export const useInstallAsset = ({
   project,
-  objectsContainer,
   targetObjectFolderOrObjectWithContext,
   resourceManagementProps,
 }: {|
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
+  project: gdProject | null,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   resourceManagementProps: ResourceManagementProps,
 |}) => {
@@ -196,9 +194,18 @@ export const useInstallAsset = ({
     resourceManagementProps.canInstallPrivateAsset
   );
 
-  return async (
-    assetShortHeader: AssetShortHeader
-  ): Promise<InstallAssetOutput | null> => {
+  return async ({
+    assetShortHeader,
+    objectsContainer,
+    requestedObjectName,
+  }: {|
+    assetShortHeader: AssetShortHeader,
+    objectsContainer: gdObjectsContainer,
+    requestedObjectName?: string,
+  |}): Promise<InstallAssetOutput | null> => {
+    if (!project) {
+      return null;
+    }
     try {
       if (await showProjectNeedToBeSaved(assetShortHeader)) {
         return null;
@@ -242,6 +249,7 @@ export const useInstallAsset = ({
             asset,
             project,
             objectsContainer,
+            requestedObjectName,
             targetObjectFolderOrObject:
               targetObjectFolderOrObjectWithContext &&
               !targetObjectFolderOrObjectWithContext.global
@@ -252,6 +260,7 @@ export const useInstallAsset = ({
             asset,
             project,
             objectsContainer,
+            requestedObjectName,
             targetObjectFolderOrObject:
               targetObjectFolderOrObjectWithContext &&
               !targetObjectFolderOrObjectWithContext.global
@@ -367,7 +376,6 @@ function NewObjectDialog({
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const installAsset = useInstallAsset({
     project,
-    objectsContainer,
     resourceManagementProps,
     targetObjectFolderOrObjectWithContext,
   });
@@ -377,13 +385,16 @@ function NewObjectDialog({
       if (!assetShortHeader) return false;
 
       setIsAssetBeingInstalled(true);
-      const installAssetOutput = await installAsset(assetShortHeader);
+      const installAssetOutput = await installAsset({
+        assetShortHeader,
+        objectsContainer,
+      });
       setIsAssetBeingInstalled(false);
       if (installAssetOutput)
         onObjectsAddedFromAssets(installAssetOutput.createdObjects);
       return !!installAssetOutput;
     },
-    [installAsset, onObjectsAddedFromAssets]
+    [installAsset, onObjectsAddedFromAssets, objectsContainer]
   );
 
   const onInstallEmptyCustomObject = React.useCallback(

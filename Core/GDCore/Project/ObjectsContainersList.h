@@ -81,6 +81,11 @@ class GD_CORE_API ObjectsContainersList {
   /**
    * \brief Return the container of the variables for the specified object or
    * group of objects.
+   *
+   * \warning In most cases, prefer to use other methods to access variables or use
+   * ObjectVariableHelper::MergeVariableContainers if you know you're dealing with a group.
+   * This is because the variables container of an object group does not exist and the one from
+   * first object of the group will be returned.
    */
   const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName) const;

@@ -2344,6 +2344,9 @@ interface BaseEvent {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    [Const, Ref] DOMString GetAiGeneratedEventId();
+    void SetAiGeneratedEventId([Const] DOMString aiGeneratedEventId);
 };
 
 interface StandardEvent {

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Add from '../UI/CustomSvgIcons/Add';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
@@ -103,16 +102,12 @@ type Props = {|
   onSelectEmptyProject: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   disabled?: boolean,
-  storageProvider: StorageProvider,
-  saveAsLocation: ?SaveAsLocation,
 |};
 
 const EmptyAndStartingPointProjects = ({
   onSelectExampleShortHeader,
   onSelectEmptyProject,
   disabled,
-  storageProvider,
-  saveAsLocation,
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getStyles(gdevelopTheme);

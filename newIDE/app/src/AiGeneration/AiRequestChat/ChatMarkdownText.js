@@ -4,8 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { I18n } from '@lingui/react';
 import classNames from 'classnames';
-import Window from '../../../Utils/Window';
-import { getHelpLink } from '../../../Utils/HelpLink';
+import Window from '../../Utils/Window';
+import { getHelpLink } from '../../Utils/HelpLink';
 import classes from './ChatMarkdownText.module.css';
 import {
   type ConceptMetadata,
@@ -127,7 +127,7 @@ type Props = {|
 /**
  * Display a markdown text for a AI chat bubble.
  */
-export const ChatMarkdownText = (props: Props) => {
+export const ChatMarkdownText = React.memo<Props>((props: Props) => {
   const { getConceptMetadataFromHref } = useGetConceptMetadata();
   const renderChatLink = React.useMemo(
     () => makeRenderChatLink({ getConceptMetadataFromHref }),
@@ -169,4 +169,4 @@ export const ChatMarkdownText = (props: Props) => {
   });
 
   return <span className={className}>{markdownElement}</span>;
-};
+});

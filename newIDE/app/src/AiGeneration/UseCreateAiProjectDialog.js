@@ -12,6 +12,7 @@ import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { generateProjectName } from '../ProjectCreation/NewProjectSetupDialog';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
+import { Spacer } from '../UI/Grid';
 
 type RenderCreateAiProjectDialogProps = {
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
@@ -53,6 +54,7 @@ const CreateAiProjectDialog = ({
       flexColumnBody
     >
       <ColumnStackLayout noMargin>
+        <Spacer />
         <EmptyAndStartingPointProjects
           onSelectExampleShortHeader={exampleShortHeader => {
             onSelectExampleShortHeader(exampleShortHeader);
@@ -61,6 +63,8 @@ const CreateAiProjectDialog = ({
             onSelectEmptyProject();
           }}
         />
+        {/* Use a spacer to avoid extra scrollbars when template tiles are hovered. */}
+        <Spacer />
       </ColumnStackLayout>
     </Dialog>
   );

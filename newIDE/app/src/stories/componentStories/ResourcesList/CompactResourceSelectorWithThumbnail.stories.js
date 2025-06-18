@@ -70,6 +70,7 @@ export const Default = () => {
             ],
             getStorageProviderResourceOperations: () => null,
             canInstallPrivateAsset: () => false,
+            onResourceUsageChanged: () => {},
           }}
           resourceName="icon128.png"
           onChange={action('on change')}

@@ -63,7 +63,10 @@ export type SceneEditorsDisplayProps = {|
   onLayersModified: () => void,
   onObjectCreated: gdObject => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
-  onObjectEdited: ObjectWithContext => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,

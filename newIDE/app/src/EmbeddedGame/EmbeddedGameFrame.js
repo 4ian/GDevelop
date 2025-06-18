@@ -16,6 +16,7 @@ type SwitchToSceneEditionOptions = {|
   externalLayoutName: string | null,
   eventsBasedObjectType: string | null,
   eventsBasedObjectVariantName: string | null,
+  forceFullDataReload?: boolean,
 |};
 
 let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
@@ -34,6 +35,7 @@ export const switchToSceneEdition = ({
   externalLayoutName,
   eventsBasedObjectType,
   eventsBasedObjectVariantName,
+  forceFullDataReload,
 }: SwitchToSceneEditionOptions) => {
   if (!onSwitchToSceneEdition)
     throw new Error('No EmbeddedGameFrame registered.');
@@ -43,6 +45,7 @@ export const switchToSceneEdition = ({
     externalLayoutName,
     eventsBasedObjectType,
     eventsBasedObjectVariantName,
+    forceFullDataReload,
   });
 };
 
@@ -54,6 +57,8 @@ type Props = {|
     externalLayoutName: string | null,
     eventsBasedObjectType: string | null,
     eventsBasedObjectVariantName: string | null,
+    hotReload: boolean,
+    projectDataOnlyExport: boolean,
   |}) => void,
 |};
 
@@ -87,9 +92,10 @@ export const EmbeddedGameFrame = ({
           externalLayoutName,
           eventsBasedObjectType,
           eventsBasedObjectVariantName,
+          forceFullDataReload,
         } = options;
 
-        if (!previewIndexHtmlLocation) {
+        if (!previewIndexHtmlLocation || forceFullDataReload) {
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
@@ -106,6 +112,8 @@ export const EmbeddedGameFrame = ({
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
+            hotReload: forceFullDataReload || false,
+            projectDataOnlyExport: forceFullDataReload || false,
           });
         } else {
           console.info(

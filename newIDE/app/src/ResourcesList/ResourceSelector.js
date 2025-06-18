@@ -130,15 +130,27 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [initialResourceName]
     );
 
+    const _onChange = React.useCallback(
+      (value: string) => {
+        if (onChange) {
+          onChange(value);
+        }
+        if (resourceManagementProps.onResourceUsageChanged) {
+          resourceManagementProps.onResourceUsageChanged();
+        }
+      },
+      [onChange, resourceManagementProps]
+    );
+
     const onResetResourceName = React.useCallback(
       () => {
         setResourceName('');
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo('');
         setNotFoundError(false);
-        if (onChange) onChange('');
+        _onChange('');
       },
-      [onChange]
+      [_onChange]
     );
 
     const onChangeResourceName = React.useCallback(
@@ -147,18 +159,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           onResetResourceName();
           return;
         }
+        if (newResourceName === resourceName) {
+          return;
+        }
         const isMissing =
           allResourcesNamesRef.current.indexOf(newResourceName) === -1;
 
         if (!isMissing) {
-          if (onChange) onChange(newResourceName);
+          _onChange(newResourceName);
         }
         setResourceName(newResourceName);
         if (autoCompleteRef.current)
           autoCompleteRef.current.forceInputValueTo(newResourceName);
         setNotFoundError(isMissing);
       },
-      [onChange, onResetResourceName]
+      [resourceName, _onChange, onResetResourceName]
     );
 
     const onInputValueChange = React.useCallback(
@@ -344,7 +359,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
             resources[0].name,
           ]);
 
-          onChange(resources[0].name);
+          _onChange(resources[0].name);
           triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
@@ -368,7 +383,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [
         defaultNewResourceName,
         forceUpdate,
-        onChange,
+        _onChange,
         project,
         resourceManagementProps,
         resourceName,

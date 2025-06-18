@@ -67,6 +67,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     // No thing to be done.
   }
 
+  forceInGameEditorFullDataReload() {
+    // No thing to be done.
+  }
+
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
     if (

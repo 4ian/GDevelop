@@ -45,6 +45,10 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
+  forceInGameEditorFullDataReload() {
+    // No thing to be done.
+  }
+
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (
       this.editor &&

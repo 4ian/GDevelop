@@ -60,6 +60,7 @@ export type AskAiEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  forceInGameEditorFullDataReload: () => void,
 |};
 
 const noop = () => {};
@@ -111,6 +112,7 @@ export const AskAi = React.memo<Props>(
         onEventsBasedObjectChildrenEdited: noop,
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
+        forceInGameEditorFullDataReload: noop,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(

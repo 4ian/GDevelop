@@ -472,7 +472,10 @@ type Props = {|
   ) => void,
   onExportAssets: () => void,
   onObjectCreated: gdObject => void,
-  onObjectEdited: ObjectWithContext => void,
+  onObjectEdited: (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -1598,7 +1601,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onClose={({ swappingDone }) => {
               setObjectAssetSwappingDialogOpen(null);
               if (swappingDone)
-                onObjectEdited(objectAssetSwappingDialogOpen.objectWithContext);
+                onObjectEdited(
+                  objectAssetSwappingDialogOpen.objectWithContext,
+                  true
+                );
             }}
             project={project}
             layout={layout}

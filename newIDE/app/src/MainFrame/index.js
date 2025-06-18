@@ -1912,16 +1912,21 @@ const MainFrame = (props: Props) => {
       externalLayoutName,
       eventsBasedObjectType,
       eventsBasedObjectVariantName,
+      hotReload,
+      projectDataOnlyExport,
     }: {|
       editorId: string,
       sceneName: string | null,
       externalLayoutName: string | null,
       eventsBasedObjectType: string | null,
       eventsBasedObjectVariantName: string | null,
+      hotReload: boolean,
+      projectDataOnlyExport: boolean,
     |}) => {
       launchPreview({
         networkPreview: false,
-        hotReload: false,
+        hotReload,
+        projectDataOnlyExport,
         forceDiagnosticReport: false,
         isForInGameEdition: {
           editorId,
@@ -2443,6 +2448,16 @@ const MainFrame = (props: Props) => {
         if (editorRef) {
           editorRef.onSceneObjectsDeleted(scene);
         }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onResourceUsageChanged = React.useCallback(
+    () => {
+      const { editorRef } = getCurrentTab(state.editorTabs);
+      if (editorRef) {
+        editorRef.forceInGameEditorFullDataReload();
       }
     },
     [state.editorTabs]
@@ -3803,6 +3818,7 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onResourceUsageChanged,
     }),
     [
       resourceSources,
@@ -3812,6 +3828,7 @@ const MainFrame = (props: Props) => {
       onFetchNewlyAddedResources,
       getStorageProviderResourceOperations,
       canInstallPrivateAsset,
+      onResourceUsageChanged,
     ]
   );
 

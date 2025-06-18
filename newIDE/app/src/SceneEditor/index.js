@@ -1032,6 +1032,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
+    this._hotReloadObjects(objects);
+  };
+
+  _hotReloadObjects = (objects: Array<gdObject>) => {
     const { previewDebuggerServer } = this.props;
 
     if (previewDebuggerServer) {
@@ -1046,8 +1050,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  _onObjectEdited = (objectWithContext: ObjectWithContext) => {
-    const { project, layout } = this.props;
+  _onObjectEdited = (
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged: boolean
+  ) => {
+    const { project, layout, resourceManagementProps } = this.props;
     // It triggers forceUpdateRenderedInstancesOfObject on this editor too.
     this.props.onObjectEdited(objectWithContext);
     if (layout) {
@@ -1069,7 +1076,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
-    this._onObjectsModified([objectWithContext.object]);
+    if (hasResourceChanged) {
+      // ObjectEditorDialog intercepts onResourceUsageChanged callbacks.
+      // Send it now that the dialog changes are accepted.
+      resourceManagementProps.onResourceUsageChanged();
+    } else {
+      this._hotReloadObjects([objectWithContext.object]);
+    }
   };
 
   onSelectTileMapTile = (tileMapTileSelection: ?TileMapTileSelection) => {
@@ -2555,9 +2568,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onRename={newName => {
                           this._onRenameEditedObject(newName);
                         }}
-                        onApply={() => {
+                        onApply={(hasResourceChanged: boolean) => {
                           if (editedObjectWithContext) {
-                            this._onObjectEdited(editedObjectWithContext);
+                            this._onObjectEdited(
+                              editedObjectWithContext,
+                              hasResourceChanged
+                            );
                           }
                           this.editObject(null);
                         }}

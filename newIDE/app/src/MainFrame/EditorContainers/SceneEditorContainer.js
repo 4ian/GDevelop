@@ -55,25 +55,37 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName, editorId } = this.props;
-      this.props.setPreviewedLayout({
-        layoutName: projectItemName || null,
+      this._switchToSceneEdition({ forceFullDataReload: false });
+    }
+  }
+
+  forceInGameEditorFullDataReload() {
+    this._switchToSceneEdition({ forceFullDataReload: true });
+  }
+
+  _switchToSceneEdition({
+    forceFullDataReload,
+  }: {|
+    forceFullDataReload: boolean,
+  |}): void {
+    const { projectItemName, editorId } = this.props;
+    this.props.setPreviewedLayout({
+      layoutName: projectItemName || null,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
+    if (gameEditorMode === 'embedded-game' && projectItemName) {
+      switchToSceneEdition({
+        editorId,
+        sceneName: projectItemName,
         externalLayoutName: null,
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
+        forceFullDataReload,
       });
-
-      if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({
-          editorId,
-          sceneName: projectItemName,
-          externalLayoutName: null,
-          eventsBasedObjectType: null,
-          eventsBasedObjectVariantName: null,
-        });
-        if (this.editor) {
-          this.editor.onEditorReloaded();
-        }
+      if (this.editor) {
+        this.editor.onEditorReloaded();
       }
     }
   }

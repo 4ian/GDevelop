@@ -78,25 +78,38 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      const { projectItemName, editorId } = this.props;
-      this.props.setPreviewedLayout({
-        layoutName: null,
-        externalLayoutName: null,
-        eventsBasedObjectType: projectItemName || null,
-        eventsBasedObjectVariantName: this.getVariantName(),
-      });
+      this._switchToSceneEdition({ forceFullDataReload: false });
+    }
+  }
 
-      if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({
-          editorId,
-          sceneName: null,
-          externalLayoutName: null,
-          eventsBasedObjectType: this.getEventsBasedObjectType() || null,
-          eventsBasedObjectVariantName: this.getVariantName(),
-        });
-        if (this.editor) {
-          this.editor.onEditorReloaded();
-        }
+  forceInGameEditorFullDataReload() {
+    this._switchToSceneEdition({ forceFullDataReload: true });
+  }
+
+  _switchToSceneEdition({
+    forceFullDataReload,
+  }: {|
+    forceFullDataReload: boolean,
+  |}): void {
+    const { projectItemName, editorId } = this.props;
+    this.props.setPreviewedLayout({
+      layoutName: null,
+      externalLayoutName: null,
+      eventsBasedObjectType: projectItemName || null,
+      eventsBasedObjectVariantName: this.getVariantName(),
+    });
+
+    if (gameEditorMode === 'embedded-game' && projectItemName) {
+      switchToSceneEdition({
+        editorId,
+        sceneName: null,
+        externalLayoutName: null,
+        eventsBasedObjectType: this.getEventsBasedObjectType() || null,
+        eventsBasedObjectVariantName: this.getVariantName(),
+        forceFullDataReload,
+      });
+      if (this.editor) {
+        this.editor.onEditorReloaded();
       }
     }
   }

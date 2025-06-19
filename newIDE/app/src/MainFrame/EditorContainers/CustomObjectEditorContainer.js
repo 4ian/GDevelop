@@ -56,12 +56,9 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       });
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({
-          editorId,
-          sceneName: null,
-          externalLayoutName: null,
-          eventsBasedObjectType: this.getEventsBasedObjectType() || null,
-          eventsBasedObjectVariantName: this.getVariantName(),
+        this._switchToSceneEdition({
+          hotReload: false,
+          projectDataOnlyExport: false,
         });
       }
     }
@@ -78,18 +75,27 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      this._switchToSceneEdition({ forceFullDataReload: false });
+      this._switchToSceneEdition({
+        hotReload: false,
+        projectDataOnlyExport: false,
+      });
     }
   }
 
-  forceInGameEditorFullDataReload() {
-    this._switchToSceneEdition({ forceFullDataReload: true });
+  forceInGameEditorHotReload({
+    projectDataOnlyExport,
+  }: {|
+    projectDataOnlyExport: boolean,
+  |}) {
+    this._switchToSceneEdition({ hotReload: true, projectDataOnlyExport });
   }
 
   _switchToSceneEdition({
-    forceFullDataReload,
+    hotReload,
+    projectDataOnlyExport,
   }: {|
-    forceFullDataReload: boolean,
+    hotReload: boolean,
+    projectDataOnlyExport: boolean,
   |}): void {
     const { projectItemName, editorId } = this.props;
     this.props.setPreviewedLayout({
@@ -106,7 +112,8 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
         externalLayoutName: null,
         eventsBasedObjectType: this.getEventsBasedObjectType() || null,
         eventsBasedObjectVariantName: this.getVariantName(),
-        forceFullDataReload,
+        hotReload,
+        projectDataOnlyExport,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();

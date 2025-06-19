@@ -94,7 +94,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  forceInGameEditorFullDataReload() {
+  forceInGameEditorHotReload({
+    projectDataOnlyExport,
+  }: {|
+    projectDataOnlyExport: boolean,
+  |}) {
     // No thing to be done.
   }
 

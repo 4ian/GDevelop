@@ -33,7 +33,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName, editorId } = this.props;
+      const { projectItemName } = this.props;
       this.props.setPreviewedLayout({
         layoutName: projectItemName || null,
         externalLayoutName: null,
@@ -42,12 +42,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       });
 
       if (gameEditorMode === 'embedded-game' && projectItemName) {
-        switchToSceneEdition({
-          editorId,
-          sceneName: projectItemName,
-          externalLayoutName: null,
-          eventsBasedObjectType: null,
-          eventsBasedObjectVariantName: null,
+        this._switchToSceneEdition({
+          hotReload: false,
+          projectDataOnlyExport: false,
         });
       }
     }
@@ -55,18 +52,27 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
     if (!prevProps.isActive && this.props.isActive) {
-      this._switchToSceneEdition({ forceFullDataReload: false });
+      this._switchToSceneEdition({
+        hotReload: false,
+        projectDataOnlyExport: false,
+      });
     }
   }
 
-  forceInGameEditorFullDataReload() {
-    this._switchToSceneEdition({ forceFullDataReload: true });
+  forceInGameEditorHotReload({
+    projectDataOnlyExport,
+  }: {|
+    projectDataOnlyExport: boolean,
+  |}) {
+    this._switchToSceneEdition({ hotReload: true, projectDataOnlyExport });
   }
 
   _switchToSceneEdition({
-    forceFullDataReload,
+    hotReload,
+    projectDataOnlyExport,
   }: {|
-    forceFullDataReload: boolean,
+    hotReload: boolean,
+    projectDataOnlyExport: boolean,
   |}): void {
     const { projectItemName, editorId } = this.props;
     this.props.setPreviewedLayout({
@@ -82,7 +88,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         externalLayoutName: null,
         eventsBasedObjectType: null,
         eventsBasedObjectVariantName: null,
-        forceFullDataReload,
+        hotReload,
+        projectDataOnlyExport,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();

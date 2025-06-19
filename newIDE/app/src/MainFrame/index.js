@@ -1417,6 +1417,7 @@ const MainFrame = (props: Props) => {
     if (!currentProject) {
       return;
     }
+    let hasEventsBasedObject = false;
     for (const extensionName of extensionNames) {
       const eventsBasedObjects = currentProject
         .getEventsFunctionsExtension(extensionName)
@@ -1442,6 +1443,18 @@ const MainFrame = (props: Props) => {
           extensionName
         ),
       }));
+
+      hasEventsBasedObject =
+        hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
+    }
+    if (hasEventsBasedObject) {
+      // TODO This won't do anything if the current tab is not a scene tab.
+      const { editorRef } = getCurrentTab(state.editorTabs);
+      if (editorRef) {
+        editorRef.forceInGameEditorHotReload({
+          projectDataOnlyExport: false,
+        });
+      }
     }
   };
 
@@ -2464,7 +2477,7 @@ const MainFrame = (props: Props) => {
     () => {
       const { editorRef } = getCurrentTab(state.editorTabs);
       if (editorRef) {
-        editorRef.forceInGameEditorFullDataReload();
+        editorRef.forceInGameEditorHotReload({ projectDataOnlyExport: true });
       }
     },
     [state.editorTabs]

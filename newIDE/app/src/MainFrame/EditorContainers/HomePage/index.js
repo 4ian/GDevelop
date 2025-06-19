@@ -174,7 +174,7 @@ export type HomePageEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
-  forceInGameEditorFullDataReload: () => void,
+  forceInGameEditorHotReload: ({| projectDataOnlyExport: boolean |}) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -497,7 +497,7 @@ export const HomePage = React.memo<Props>(
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
         onSceneObjectsDeleted,
-        forceInGameEditorFullDataReload: noop,
+        forceInGameEditorHotReload: noop,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {

@@ -50,7 +50,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  forceInGameEditorFullDataReload() {
+  forceInGameEditorHotReload({
+    projectDataOnlyExport,
+  }: {|
+    projectDataOnlyExport: boolean,
+  |}) {
     // No thing to be done.
   }
 

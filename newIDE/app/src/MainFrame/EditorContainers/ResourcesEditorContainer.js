@@ -45,7 +45,11 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
-  forceInGameEditorFullDataReload() {
+  forceInGameEditorHotReload({
+    projectDataOnlyExport,
+  }: {|
+    projectDataOnlyExport: boolean,
+  |}) {
     // No thing to be done.
   }
 

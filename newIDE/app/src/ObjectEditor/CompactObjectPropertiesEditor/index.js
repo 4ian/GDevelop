@@ -216,7 +216,7 @@ type Props = {|
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   isVariableListLocked: boolean,
   isBehaviorListLocked: boolean,
 |};

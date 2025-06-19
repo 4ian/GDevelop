@@ -52,6 +52,7 @@ export const Default = () => (
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={false}
+        onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>
   </DragAndDropContextProvider>
@@ -90,6 +91,7 @@ export const WithSerializedObjectView = () => (
           onObjectFolderOrObjectWithContextSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           isListLocked={false}
+          onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
     </SerializedObjectDisplay>
@@ -128,6 +130,7 @@ export const Locked = () => (
         onObjectFolderOrObjectWithContextSelected={() => {}}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         isListLocked={true}
+        onExtensionInstalled={action('onExtensionInstalled')}
       />
     </div>
   </DragAndDropContextProvider>

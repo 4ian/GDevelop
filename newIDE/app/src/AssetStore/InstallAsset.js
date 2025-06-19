@@ -405,6 +405,7 @@ export type InstallRequiredExtensionsArgs = {|
   shouldUpdateExtension: boolean,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export const installRequiredExtensions = async ({
@@ -412,6 +413,7 @@ export const installRequiredExtensions = async ({
   shouldUpdateExtension,
   eventsFunctionsExtensionsState,
   project,
+  onExtensionInstalled,
 }: InstallRequiredExtensionsArgs): Promise<void> => {
   const {
     requiredExtensionShortHeaders,
@@ -440,6 +442,9 @@ export const installRequiredExtensions = async ({
     eventsFunctionsExtensionsState,
     project,
     serializedExtensions
+  );
+  onExtensionInstalled(
+    neededExtensions.map(extensionShortHeader => extensionShortHeader.name)
   );
 
   const stillMissingExtensions = filterMissingExtensions(

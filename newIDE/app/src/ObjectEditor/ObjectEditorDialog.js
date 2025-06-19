@@ -60,7 +60,7 @@ type Props = {|
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
     eventsBasedObjectName: string

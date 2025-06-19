@@ -165,7 +165,7 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,

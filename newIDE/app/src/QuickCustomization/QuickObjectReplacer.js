@@ -14,6 +14,7 @@ import TipCard from './TipCard';
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const styles = {
@@ -29,6 +30,7 @@ const styles = {
 export const QuickObjectReplacer = ({
   project,
   resourceManagementProps,
+  onExtensionInstalled,
 }: Props) => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
@@ -96,6 +98,7 @@ export const QuickObjectReplacer = ({
             setSelectedObjectToSwap(null);
           }}
           minimalUI
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
     </ColumnStackLayout>

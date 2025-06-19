@@ -25,7 +25,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: (extensionName: string) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onCreateNew?: () => void,
 |};
 
@@ -84,7 +84,7 @@ const ExtensionsSearchDialog = ({
 
       if (installedOrImportedExtensionName) {
         setExtensionWasInstalled(true);
-        onExtensionInstalled(installedOrImportedExtensionName);
+        onExtensionInstalled([installedOrImportedExtensionName]);
         return true;
       }
 

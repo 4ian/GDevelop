@@ -101,6 +101,7 @@ export const LayoutPublicAssetInstallSuccess = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -122,6 +123,7 @@ export const LayoutPublicAssetInstallFailure = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -143,6 +145,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -161,6 +164,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -197,6 +201,7 @@ export const LayoutPrivateAssetInstallSuccess = () => {
               ...fakeResourceManagementProps,
               canInstallPrivateAsset: () => true,
             }}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </AssetStoreStateProvider>
       </AssetStoreNavigatorStateProvider>
@@ -233,6 +238,7 @@ export const LayoutPrivateAssetInstallFailure = () => {
               ...fakeResourceManagementProps,
               canInstallPrivateAsset: () => true,
             }}
+            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </AssetStoreStateProvider>
       </AssetStoreNavigatorStateProvider>
@@ -251,6 +257,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={testProject.testLayout.getObjects()}
       resourceManagementProps={fakeResourceManagementProps}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -272,6 +279,7 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -290,6 +298,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
         ...fakeResourceManagementProps,
         canInstallPrivateAsset: () => true,
       }}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );
@@ -308,6 +317,7 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={null}
       resourceManagementProps={fakeResourceManagementProps}
+      onExtensionInstalled={action('onExtensionInstalled')}
     />
   </Wrapper>
 );

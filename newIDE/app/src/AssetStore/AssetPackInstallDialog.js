@@ -49,6 +49,7 @@ type Props = {|
   addedAssetIds: Set<string>,
   onClose: () => void,
   onAssetsAdded: (createdObjects: gdObject[]) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
   resourceManagementProps: ResourceManagementProps,
@@ -61,6 +62,7 @@ const AssetPackInstallDialog = ({
   addedAssetIds,
   onClose,
   onAssetsAdded,
+  onExtensionInstalled,
   project,
   objectsContainer,
   resourceManagementProps,
@@ -176,6 +178,7 @@ const AssetPackInstallDialog = ({
           shouldUpdateExtension: extensionUpdateAction === 'update',
           eventsFunctionsExtensionsState,
           project,
+          onExtensionInstalled,
         });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
@@ -253,6 +256,7 @@ const AssetPackInstallDialog = ({
       eventsFunctionsExtensionsState,
       resourceManagementProps,
       onAssetsAdded,
+      onExtensionInstalled,
       installPrivateAsset,
       targetObjectsContainer,
       targetObjectFolderOrObjectWithContext,

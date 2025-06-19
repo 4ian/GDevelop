@@ -99,6 +99,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     selectedLayer,
     onSelectInstances,
     onInstancesModified,
+    onExtensionInstalled,
   } = props;
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -462,6 +463,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
               isListLocked={isCustomVariant}
+              onExtensionInstalled={onExtensionInstalled}
             />
           )}
         </I18n>

@@ -21,6 +21,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile: () => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const StoreSection = ({
@@ -28,6 +29,7 @@ const StoreSection = ({
   resourceManagementProps,
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
+  onExtensionInstalled,
 }: Props) => {
   const [
     isAssetPackDialogInstallOpen,
@@ -129,6 +131,7 @@ const StoreSection = ({
             project={project}
             objectsContainer={null}
             resourceManagementProps={resourceManagementProps}
+            onExtensionInstalled={onExtensionInstalled}
           />
         )}
     </SectionContainer>

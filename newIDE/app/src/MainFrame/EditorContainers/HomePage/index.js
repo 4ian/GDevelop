@@ -154,6 +154,9 @@ type Props = {|
     templateId?: string
   ) => Promise<void>,
 
+  // Asset store
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+
   // Project save
   onSave: () => Promise<void>,
   canSave: boolean,
@@ -207,6 +210,7 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromCourseChapter,
         gamesList,
         gamesPlatformFrameTools,
+        onExtensionInstalled,
       }: Props,
       ref
     ) => {
@@ -643,6 +647,7 @@ export const HomePage = React.memo<Props>(
                         onOpenPrivateGameTemplateListingData
                       }
                       onOpenProfile={onOpenProfile}
+                      onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
                   {activeTab === 'team-view' &&
@@ -728,5 +733,6 @@ export const renderHomePageContainer = (
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
+    onExtensionInstalled={props.onExtensionInstalled}
   />
 );

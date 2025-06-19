@@ -326,6 +326,7 @@ export const WithObjectsList = () => (
                   onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   isListLocked={false}
+                  onExtensionInstalled={action('onExtensionInstalled')}
                 />
               </TabContentContainer>
             }

@@ -422,7 +422,7 @@ type Props = {|
   onShareProject: () => void,
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,

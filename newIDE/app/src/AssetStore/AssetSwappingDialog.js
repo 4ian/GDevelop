@@ -29,6 +29,7 @@ type Props = {|
   onClose: ({ swappingDone: boolean }) => void,
   // Use minimal UI to hide filters & the details page (useful for Quick Customization)
   minimalUI?: boolean,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 function AssetSwappingDialog({
@@ -40,6 +41,7 @@ function AssetSwappingDialog({
   resourceManagementProps,
   onClose,
   minimalUI,
+  onExtensionInstalled,
 }: Props) {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetShortHeader } = shopNavigationState.getCurrentPage();
@@ -51,6 +53,7 @@ function AssetSwappingDialog({
   const installAsset = useInstallAsset({
     project,
     resourceManagementProps,
+    onExtensionInstalled,
   });
   const { showAlert } = useAlertDialog();
 

@@ -1284,28 +1284,6 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const onInstallExtension = (extensionName: string) => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    // Close the extension tab before updating/reinstalling the extension.
-    const eventsFunctionsExtensionName = extensionName;
-
-    if (
-      currentProject.hasEventsFunctionsExtensionNamed(
-        eventsFunctionsExtensionName
-      )
-    ) {
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
-          eventsFunctionsExtensionName
-        ),
-      }));
-    }
-  };
-
   const deleteLayout = (layout: gdLayout) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -1412,31 +1390,60 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const onExtensionInstalled = (extensionName: string) => {
+  const onInstallExtension = (extensionName: string) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    // Close the extension tab before updating/reinstalling the extension.
+    // This is especially important when the extension tab in selected.
+    const eventsFunctionsExtensionName = extensionName;
+
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtensionName
+        ),
+      }));
+    }
+  };
+
+  const onExtensionInstalled = (extensionNames: Array<string>) => {
     const { currentProject } = state;
     if (!currentProject) {
       return;
     }
-    const eventsBasedObjects = currentProject
-      .getEventsFunctionsExtension(extensionName)
-      .getEventsBasedObjects();
-    for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
-      const eventsBasedObject = eventsBasedObjects.getAt(index);
-      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
-        currentProject,
-        eventsBasedObject
-      );
+    for (const extensionName of extensionNames) {
+      const eventsBasedObjects = currentProject
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedObjects();
+      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+        const eventsBasedObject = eventsBasedObjects.getAt(index);
+        gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+          currentProject,
+          eventsBasedObject
+        );
+      }
+
+      // Close extension tab because `onInstallExtension` is not necessarily
+      // called when the extension tab is not selected.
+
+      // TODO Open the closed tabs back
+      // It would be safer to close the tabs before the extension is installed
+      // but it would make opening them back more complicated.
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          extensionName
+        ),
+      }));
     }
-    // TODO Open the closed tabs back
-    // It would be safer to close the tabs before the extension is installed
-    // but it would make opening them back more complicated.
-    setState(state => ({
-      ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        extensionName
-      ),
-    }));
   };
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -4395,6 +4402,7 @@ const MainFrame = (props: Props) => {
             currentProject.getProjectUuid()
           )}
           onScreenshotsClaimed={onGameScreenshotsClaimed}
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
       <CustomDragLayer />

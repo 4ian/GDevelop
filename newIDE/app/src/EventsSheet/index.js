@@ -154,7 +154,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   isActive: boolean,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 type ComponentProps = {|

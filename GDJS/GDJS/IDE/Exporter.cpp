@@ -18,6 +18,9 @@
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/Project/SceneResourcesFinder.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -140,6 +143,34 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       scenesUsedResources[layout.GetName()] =
           gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
     }
+    std::unordered_map<gd::String, std::set<gd::String>>
+        eventsBasedObjectVariantsUsedResources;
+    for (std::size_t extensionIndex = 0;
+        extensionIndex < exportedProject.GetEventsFunctionsExtensionsCount();
+        extensionIndex++) {
+      auto &eventsFunctionsExtension =
+          exportedProject.GetEventsFunctionsExtension(extensionIndex);
+      for (auto &&eventsBasedObject :
+          eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+
+        auto eventsBasedObjectType = gd::PlatformExtension::GetObjectFullType(
+            eventsFunctionsExtension.GetName(), eventsBasedObject->GetName());
+        eventsBasedObjectVariantsUsedResources[eventsBasedObjectType] =
+            gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+                exportedProject, eventsBasedObject->GetDefaultVariant());
+
+        for (auto &&eventsBasedObjectVariant :
+            eventsBasedObject->GetVariants().GetInternalVector()) {
+              
+          auto variantType = gd::PlatformExtension::GetVariantFullType(
+              eventsFunctionsExtension.GetName(), eventsBasedObject->GetName(),
+              eventsBasedObjectVariant->GetName());
+          eventsBasedObjectVariantsUsedResources[variantType] =
+              gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+                  exportedProject, *eventsBasedObjectVariant);
+        }
+      }
+    }
 
     // Strip the project (*after* generating events as the events may use
     // stripped things like objects groups...)...
@@ -152,7 +183,8 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                              codeOutputDir + "/data.js",
                              noRuntimeGameOptions,
                              projectUsedResources,
-                             scenesUsedResources);
+                             scenesUsedResources,
+                             eventsBasedObjectVariantsUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);

@@ -238,6 +238,7 @@ declare interface EventsBasedObjectVariantData extends InstanceContainerData {
   instances: InstanceData[];
   objects: ObjectData[];
   layers: LayerData[];
+  usedResources: ResourceReference[];
 }
 
 declare interface BehaviorSharedData {

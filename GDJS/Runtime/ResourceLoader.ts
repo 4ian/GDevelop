@@ -275,6 +275,27 @@ namespace gdjs {
       this._sceneNamesToMakeReady.clear();
     }
 
+    async loadResources(
+      resourceNames: Array<string>,
+      onProgress: (loadingCount: integer, totalCount: integer) => void
+    ): Promise<void> {
+      let loadedCount = 0;
+      await processAndRetryIfNeededWithPromisePool(
+        resourceNames,
+        maxForegroundConcurrency,
+        maxAttempt,
+        async (resourceName) => {
+          const resource = this._resources.get(resourceName);
+          if (resource) {
+            await this._loadResource(resource);
+            await this._processResource(resource);
+          }
+          loadedCount++;
+          onProgress(loadedCount, this._resources.size);
+        }
+      );
+    }
+
     /**
      * Load the resources that are needed to launch the first scene.
      */

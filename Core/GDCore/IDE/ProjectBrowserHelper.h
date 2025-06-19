@@ -13,6 +13,7 @@ class EventsFunctionsExtension;
 class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
+class EventsBasedObjectVariant;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
 class ArbitraryEventsFunctionsWorker;
@@ -206,6 +207,17 @@ public:
    */
   static void ExposeLayoutObjects(gd::Layout &layout,
                                   gd::ArbitraryObjectsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all ObjectContainers of the
+   * events-based object variant.
+   *
+   * This should be the preferred way to traverse all the objects of an
+   * events-based object variant.
+   */
+  static void ExposeEventsBasedObjectVariantObjects(
+      gd::EventsBasedObjectVariant &eventsBasedObjectVariant,
+      gd::ArbitraryObjectsWorker &worker);
 
   /**
    * \brief Call the specified worker on all FunctionsContainers of the project

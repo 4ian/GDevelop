@@ -32,6 +32,7 @@
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsBasedObjectVariant.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -209,6 +210,34 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     scenesUsedResources[layout.GetName()] =
         gd::SceneResourcesFinder::FindSceneResources(exportedProject, layout);
   }
+  std::unordered_map<gd::String, std::set<gd::String>>
+      eventsBasedObjectVariantsUsedResources;
+  for (std::size_t extensionIndex = 0;
+       extensionIndex < exportedProject.GetEventsFunctionsExtensionsCount();
+       extensionIndex++) {
+    auto &eventsFunctionsExtension =
+        exportedProject.GetEventsFunctionsExtension(extensionIndex);
+    for (auto &&eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+
+      auto eventsBasedObjectType = gd::PlatformExtension::GetObjectFullType(
+          eventsFunctionsExtension.GetName(), eventsBasedObject->GetName());
+      eventsBasedObjectVariantsUsedResources[eventsBasedObjectType] =
+          gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+              exportedProject, eventsBasedObject->GetDefaultVariant());
+
+      for (auto &&eventsBasedObjectVariant :
+           eventsBasedObject->GetVariants().GetInternalVector()) {
+
+        auto variantType = gd::PlatformExtension::GetVariantFullType(
+            eventsFunctionsExtension.GetName(), eventsBasedObject->GetName(),
+            eventsBasedObjectVariant->GetName());
+        eventsBasedObjectVariantsUsedResources[variantType] =
+            gd::SceneResourcesFinder::FindEventsBasedObjectVariantResources(
+                exportedProject, *eventsBasedObjectVariant);
+      }
+    }
+  }
 
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))
@@ -331,7 +360,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                     codeOutputDir + "/data.js",
                     runtimeGameOptions,
                     projectUsedResources,
-                    scenesUsedResources);
+                    scenesUsedResources,
+                    eventsBasedObjectVariantsUsedResources);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   previousTime = LogTimeSpent("Project data export", previousTime);
@@ -360,14 +390,15 @@ gd::String ExporterHelper::ExportProjectData(
     gd::String filename,
     const gd::SerializerElement &runtimeGameOptions,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
+    std::unordered_map<gd::String, std::set<gd::String>> &eventsBasedObjectVariantsUsedResources) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   // Save the project to JSON
   gd::SerializerElement rootElement;
   project.SerializeTo(rootElement);
-  SerializeUsedResources(
-      rootElement, projectUsedResources, scenesUsedResources);
+  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
+                         eventsBasedObjectVariantsUsedResources);
   gd::String output =
       "gdjs.projectData = " + gd::Serializer::ToJSON(rootElement) + ";\n" +
       "gdjs.runtimeGameOptions = " +
@@ -381,7 +412,9 @@ gd::String ExporterHelper::ExportProjectData(
 void ExporterHelper::SerializeUsedResources(
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
+    std::unordered_map<gd::String, std::set<gd::String>>
+        &eventsBasedObjectVariantsUsedResources) {
   auto serializeUsedResources =
       [](gd::SerializerElement &element,
          std::set<gd::String> &usedResources) -> void {
@@ -404,6 +437,41 @@ void ExporterHelper::SerializeUsedResources(
 
     auto &layoutUsedResources = scenesUsedResources[layoutName];
     serializeUsedResources(layoutElement, layoutUsedResources);
+  }
+
+  auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");
+  for (std::size_t extensionIndex = 0;
+       extensionIndex < extensionsElement.GetChildrenCount();
+       extensionIndex++) {
+    auto &extensionElement = extensionsElement.GetChild(extensionIndex);
+    const auto extensionName = extensionElement.GetStringAttribute("name");
+
+    auto &objectsElement = extensionElement.GetChild("eventsBasedObjects");
+
+    for (std::size_t objectIndex = 0;
+         objectIndex < objectsElement.GetChildrenCount(); objectIndex++) {
+      auto &objectElement = objectsElement.GetChild(objectIndex);
+      const auto objectName = objectElement.GetStringAttribute("name");
+
+      auto eventsBasedObjectType =
+          gd::PlatformExtension::GetObjectFullType(extensionName, objectName);
+      auto &objectUsedResources =
+          eventsBasedObjectVariantsUsedResources[eventsBasedObjectType];
+      serializeUsedResources(objectElement, objectUsedResources);
+
+      auto &variantsElement = objectElement.GetChild("variants");
+      for (std::size_t variantIndex = 0;
+           variantIndex < variantsElement.GetChildrenCount(); variantIndex++) {
+        auto &variantElement = variantsElement.GetChild(variantIndex);
+        const auto variantName = variantElement.GetStringAttribute("name");
+
+        auto variantType = gd::PlatformExtension::GetVariantFullType(
+            extensionName, objectName, variantName);
+        auto &variantUsedResources =
+            eventsBasedObjectVariantsUsedResources[variantType];
+        serializeUsedResources(variantElement, variantUsedResources);
+      }
+    }
   }
 }
 

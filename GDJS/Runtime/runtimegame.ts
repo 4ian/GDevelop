@@ -1158,31 +1158,42 @@ namespace gdjs {
 
       let editedInstanceDataList: Array<InstanceData> | null = null;
       if (eventsBasedObjectType) {
-        const sceneAndCustomObject = this._createSceneWithCustomObject(
-          eventsBasedObjectType,
-          eventsBasedObjectVariantName || ''
-        );
-        if (sceneAndCustomObject) {
-          const { scene, customObjectInstanceContainer } = sceneAndCustomObject;
-          this.getSceneStack().setEditedRuntimeScene(scene);
+        const eventsBasedObjectVariantData =
+          this.getEventsBasedObjectVariantData(
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName || ''
+          );
+        if (eventsBasedObjectVariantData) {
+          editedInstanceDataList = eventsBasedObjectVariantData.instances;
           if (this._inGameEditor) {
-            this._inGameEditor.setEditedInstanceContainer(
-              customObjectInstanceContainer
+            this._inGameEditor.setInnerArea(
+              eventsBasedObjectVariantData._initialInnerArea
             );
-            const eventsBasedObjectVariantData =
-              this.getEventsBasedObjectVariantData(
+          }
+          // TODO Can this leave the editor in an inconsistent state for a few frames?
+          this._resourcesLoader
+            .loadResources(
+              eventsBasedObjectVariantData.usedResources.map(
+                (resource) => resource.name
+              ),
+              () => {}
+            )
+            .then(() => {
+              const sceneAndCustomObject = this._createSceneWithCustomObject(
                 eventsBasedObjectType,
                 eventsBasedObjectVariantName || ''
               );
-            if (eventsBasedObjectVariantData) {
-              editedInstanceDataList = eventsBasedObjectVariantData.instances;
-              if (this._inGameEditor) {
-                this._inGameEditor.setInnerArea(
-                  eventsBasedObjectVariantData._initialInnerArea
-                );
+              if (sceneAndCustomObject) {
+                const { scene, customObjectInstanceContainer } =
+                  sceneAndCustomObject;
+                this.getSceneStack().setEditedRuntimeScene(scene);
+                if (this._inGameEditor) {
+                  this._inGameEditor.setEditedInstanceContainer(
+                    customObjectInstanceContainer
+                  );
+                }
               }
-            }
-          }
+            });
         }
       } else if (sceneName) {
         this.getSceneStack().replace({

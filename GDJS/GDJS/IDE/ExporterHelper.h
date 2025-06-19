@@ -430,13 +430,12 @@ class ExporterHelper {
    * description of the error otherwise.
    */
   static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs,
-      gd::Project &project,
-      gd::String filename,
+      gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
       const gd::SerializerElement &runtimeGameOptions,
       std::set<gd::String> &projectUsedResources,
+      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources,
       std::unordered_map<gd::String, std::set<gd::String>>
-          &layersUsedResources);
+          &eventsBasedObjectVariantsUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -653,11 +652,13 @@ class ExporterHelper {
                              ///< be then copied to the final output directory.
 
  private:
-  static void SerializeUsedResources(
-      gd::SerializerElement &rootElement,
-      std::set<gd::String> &projectUsedResources,
-      std::unordered_map<gd::String, std::set<gd::String>>
-          &layersUsedResources);
+   static void
+   SerializeUsedResources(gd::SerializerElement &rootElement,
+                          std::set<gd::String> &projectUsedResources,
+                          std::unordered_map<gd::String, std::set<gd::String>>
+                              &layersUsedResources,
+                          std::unordered_map<gd::String, std::set<gd::String>>
+                              &eventsBasedObjectVariantsUsedResources);
 };
 
 }  // namespace gdjs

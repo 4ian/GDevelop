@@ -117,6 +117,7 @@ const useProcessFunctionCalls = ({
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
   onSceneEventsModifiedOutsideEditor,
+  onExtensionInstalled,
 }: {|
   i18n: I18nType,
   project: gdProject | null,
@@ -129,6 +130,7 @@ const useProcessFunctionCalls = ({
     Array<EditorFunctionCallResult>
   ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -137,6 +139,7 @@ const useProcessFunctionCalls = ({
   const { searchAndInstallAsset } = useSearchAndInstallAsset({
     project,
     resourceManagementProps,
+    onExtensionInstalled,
   });
   const { generateEvents } = useGenerateEvents({ project });
 
@@ -457,6 +460,7 @@ type Props = {|
   onOpenLayout: (sceneName: string) => void,
   onOpenEvents: (sceneName: string) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -495,6 +499,7 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onOpenEvents,
         onSceneEventsModifiedOutsideEditor,
+        onExtensionInstalled,
       }: Props,
       ref
     ) => {
@@ -944,6 +949,7 @@ export const AskAiEditor = React.memo<Props>(
         addEditorFunctionCallResults,
         onSceneEventsModifiedOutsideEditor,
         i18n,
+        onExtensionInstalled,
       });
 
       return (
@@ -1039,6 +1045,7 @@ export const renderAskAiEditorContainer = (
         onSceneEventsModifiedOutsideEditor={
           props.onSceneEventsModifiedOutsideEditor
         }
+        onExtensionInstalled={props.onExtensionInstalled}
       />
     )}
   </I18n>

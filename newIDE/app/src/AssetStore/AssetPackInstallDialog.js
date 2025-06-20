@@ -219,7 +219,6 @@ const AssetPackInstallDialog = ({
             if (!installOutput) {
               throw new Error('Unable to install the asset.');
             }
-
             return installOutput;
           });
 
@@ -238,6 +237,7 @@ const AssetPackInstallDialog = ({
           .flat();
         complyVariantsToEventsBasedObjectOf(project, createdObjects);
         onAssetsAdded(createdObjects);
+        resourceManagementProps.onResourceUsageChanged();
       } catch (error) {
         setAreAssetsBeingInstalled(false);
         console.error('Error while installing the assets', error);

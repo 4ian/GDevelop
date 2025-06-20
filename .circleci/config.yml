@@ -88,13 +88,27 @@ jobs:
       - store_artifacts:
           path: newIDE/electron-app/dist
 
+
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
-          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+          command: |
+            export PATH=~/.local/bin:$PATH
+            for i in 1 2 3; do
+              aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ && break
+              echo "Retry $i failed... retrying in 10 seconds"
+              sleep 10
+            done
+
       - run:
           name: Deploy to S3 (latest)
-          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
+          command: |
+            export PATH=~/.local/bin:$PATH
+            for i in 1 2 3; do
+              aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/ && break
+              echo "Retry $i failed... retrying in 10 seconds"
+              sleep 10
+            done
 
   # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:
@@ -368,7 +382,7 @@ jobs:
             npm -v
 
             Remove-Item package-lock.json
-            
+
             $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
 
             npm install
@@ -425,10 +439,10 @@ jobs:
 
             $Env:GD_SIGNTOOL_THUMBPRINT = ''
 
-            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''            
-            
+            $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
             $Env:CSC_LINK = ''
-            
+
             $Env:CSC_KEY_PASSWORD = ''
 
             node scripts/build.js --skip-app-build --win appx --publish=never
@@ -445,16 +459,16 @@ jobs:
           name: Install AWS CLI
           command: |
             # Install the CLI for the current user
-            
+
             pip install --quiet --upgrade --user awscli
-            
+
             # Add the user-Scripts dir to PATH for this step and the next.
-            
+
             $binDir = (python -m site --user-base) + "\Scripts"
             $Env:Path += ";$binDir"
 
             # Sanity check:
-            aws --version  
+            aws --version
 
       # Upload artifacts (S3)
       - run:

@@ -400,6 +400,7 @@ describe('SimplifiedProject', () => {
                 "objectType": "Sprite",
               },
               Object {
+                "animationNames": "My animation, My other animation, (animation without name, animation index is: 2)",
                 "behaviors": Array [
                   Object {
                     "behaviorName": "Animation",

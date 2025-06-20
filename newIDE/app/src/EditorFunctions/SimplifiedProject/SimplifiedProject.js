@@ -171,7 +171,10 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
       0,
       objectConfiguration.getAnimationsCount(),
       i => {
-        return objectConfiguration.getAnimationName(i);
+        return (
+          objectConfiguration.getAnimationName(i) ||
+          `(animation without name, animation index is: ${i})`
+        );
       }
     );
     if (animationNames.length > 0) {

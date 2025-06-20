@@ -58,7 +58,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
-import { renderAskAiContainer } from './EditorContainers/AskAi';
+import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
@@ -222,7 +222,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'ask-ai': renderAskAiContainer,
+  'ask-ai': renderAskAiEditorContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -1169,7 +1169,6 @@ const MainFrame = (props: Props) => {
     createProjectFromInAppTutorial,
     createProjectFromTutorial,
     createProjectFromCourseChapter,
-    createProjectFromAIGeneration,
   } = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
@@ -1204,15 +1203,17 @@ const MainFrame = (props: Props) => {
         openLeaderboardReplacerDialogIfNeeded(project, oldProjectId);
         configureMultiplayerLobbiesIfNeeded(project, oldProjectId);
       }
-      options.openAllScenes || options.openQuickCustomizationDialog
-        ? openAllScenes({
-            currentProject: project,
-            editorTabs,
-          })
-        : openSceneOrProjectManager({
-            currentProject: project,
-            editorTabs: editorTabs,
-          });
+      if (!options.dontOpenAnySceneOrProjectManager) {
+        options.openAllScenes || options.openQuickCustomizationDialog
+          ? openAllScenes({
+              currentProject: project,
+              editorTabs,
+            })
+          : openSceneOrProjectManager({
+              currentProject: project,
+              editorTabs: editorTabs,
+            });
+      }
       setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
@@ -1236,6 +1237,19 @@ const MainFrame = (props: Props) => {
     onGameRegistered: gamesList.fetchGames,
   });
 
+  const openAskAi = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
   const {
     onSelectExampleShortHeader,
     onSelectPrivateGameTemplateListingData,
@@ -1249,7 +1263,7 @@ const MainFrame = (props: Props) => {
     createEmptyProject,
     createProjectFromExample,
     createProjectFromPrivateGameTemplate,
-    createProjectFromAIGeneration,
+    openAskAi,
     storageProviders: props.storageProviders,
   });
 
@@ -2137,19 +2151,6 @@ const MainFrame = (props: Props) => {
     [setState, getEditorOpeningOptions]
   );
 
-  const openAskAi = React.useCallback(
-    () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
-          state.editorTabs,
-          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
-        ),
-      }));
-    },
-    [setState, getEditorOpeningOptions]
-  );
-
   const closeDialogsToOpenHomePage = React.useCallback(() => {
     setShareDialogOpen(false);
   }, []);
@@ -2467,6 +2468,18 @@ const MainFrame = (props: Props) => {
         const { editorRef } = editor;
         if (editorRef) {
           editorRef.onSceneObjectsDeleted(scene);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onSceneEventsModifiedOutsideEditor = React.useCallback(
+    (scene: gdLayout) => {
+      for (const editor of state.editorTabs.editors) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onSceneEventsModifiedOutsideEditor(scene);
         }
       }
     },
@@ -4113,16 +4126,16 @@ const MainFrame = (props: Props) => {
                         openSceneEditor: false,
                       });
                     },
+                    onOpenLayout: (sceneName: string) => {
+                      openLayout(sceneName, {
+                        openEventsEditor: false,
+                        openSceneEditor: true,
+                      });
+                    },
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
-                    onOpenLayout: name => {
-                      openLayout(name, {
-                        openEventsEditor: true,
-                        openSceneEditor: false,
-                      });
-                    },
                     resourceManagementProps,
                     onSave: saveProject,
                     canSave,
@@ -4161,6 +4174,7 @@ const MainFrame = (props: Props) => {
                         preventBackHome: true,
                       });
                     },
+                    onCreateEmptyProject: createEmptyProject,
                     onCreateProjectFromExample: createProjectFromExample,
                     onOpenProfile: onOpenProfileDialog,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
@@ -4212,6 +4226,7 @@ const MainFrame = (props: Props) => {
                     onEventsBasedObjectChildrenEdited: onEventsBasedObjectChildrenEdited,
                     onSceneObjectEdited: onSceneObjectEdited,
                     onSceneObjectsDeleted: onSceneObjectsDeleted,
+                    onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                     onExtensionInstalled: onExtensionInstalled,
                     gamesList,
                     gamesPlatformFrameTools,

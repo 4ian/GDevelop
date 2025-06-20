@@ -134,6 +134,7 @@ export type RenderEditorContainerProps = {|
     i18n: I18nType,
     isQuickCustomization?: boolean
   ) => Promise<void>,
+  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
     CourseChapter,
@@ -155,6 +156,9 @@ export type RenderEditorContainerProps = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+
+  // Events editing
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (

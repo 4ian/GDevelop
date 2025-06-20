@@ -148,6 +148,10 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   getLayout(): ?gdLayout {
     const { project, projectItemName } = this.props;
     if (

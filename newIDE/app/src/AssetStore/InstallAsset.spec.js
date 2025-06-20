@@ -4,7 +4,6 @@ import {
   addSerializedExtensionsToProject,
   getRequiredExtensionsFromAsset,
   installRequiredExtensions,
-  sanitizeObjectName,
   installPublicAsset,
   checkRequiredExtensionsUpdate,
   checkRequiredExtensionsUpdateForAssets,
@@ -43,19 +42,6 @@ Asset.getPublicAsset = jest.fn();
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 describe('InstallAsset', () => {
-  test('sanitizeObjectName', () => {
-    expect(sanitizeObjectName('')).toBe('UnnamedObject');
-    expect(sanitizeObjectName('HelloWorld')).toBe('HelloWorld');
-    expect(sanitizeObjectName('Hello World')).toBe('HelloWorld');
-    expect(sanitizeObjectName('hello world')).toBe('HelloWorld');
-    expect(sanitizeObjectName('hello world12')).toBe('HelloWorld12');
-    expect(sanitizeObjectName('12 hello world')).toBe('_12HelloWorld');
-    expect(sanitizeObjectName('/-=hello/-=world/-=')).toBe('HelloWorld');
-    expect(sanitizeObjectName('  hello/-=world/-=')).toBe('HelloWorld');
-    expect(sanitizeObjectName('9hello/-=world/-=')).toBe('_9helloWorld');
-    expect(sanitizeObjectName('  9hello/-=world/-=')).toBe('_9helloWorld');
-  });
-
   describe('addAssetToProject', () => {
     it('installs an object asset in the project, without renaming it if not needed', async () => {
       const { project } = makeTestProject(gd);

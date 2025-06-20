@@ -27,17 +27,6 @@ export type CompactTextAreaFieldProps = {|
   markdownDescription?: ?string,
   value: string,
   onChange: (newValue: string) => void,
-  onBlur?: ({
-    currentTarget: {
-      value: string,
-    },
-  }) => void,
-  onFocus?: ({
-    currentTarget: {
-      value: string,
-    },
-    preventDefault: () => void,
-  }) => void,
   onSubmit?: () => void,
   id?: string,
   disabled?: boolean,

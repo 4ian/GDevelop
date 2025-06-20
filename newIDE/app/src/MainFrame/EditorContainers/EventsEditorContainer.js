@@ -67,6 +67,12 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    if (this.getLayout() === scene) {
+      if (this.editor) this.editor.onEventsModifiedOutsideEditor();
+    }
+  }
+
   forceInGameEditorHotReload({
     projectDataOnlyExport,
   }: {|

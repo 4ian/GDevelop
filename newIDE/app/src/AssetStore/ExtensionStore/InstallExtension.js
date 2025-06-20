@@ -10,6 +10,7 @@ import { addSerializedExtensionsToProject } from '../InstallAsset';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { t } from '@lingui/macro';
 import Window from '../../Utils/Window';
+import { retryIfFailed } from '../../Utils/RetryIfFailed';
 
 /**
  * Download and add the extension in the project.
@@ -21,7 +22,9 @@ export const installExtension = async (
   extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<boolean> => {
   try {
-    const serializedExtension = await getExtension(extensionShortHeader);
+    const serializedExtension = await retryIfFailed({ times: 2 }, () =>
+      getExtension(extensionShortHeader)
+    );
     await addSerializedExtensionsToProject(
       eventsFunctionsExtensionsState,
       project,

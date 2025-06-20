@@ -50,6 +50,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   forceInGameEditorHotReload({
     projectDataOnlyExport,
   }: {|

@@ -66,7 +66,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName, editorId } = this.props;
+      const { projectItemName } = this.props;
       const layout = this.getLayout();
       this.props.setPreviewedLayout({
         layoutName: layout ? layout.getName() : null,
@@ -200,6 +200,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (editor) {
       editor.forceUpdateObjectsList();
     }
+  }
+
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
   }
 
   getExternalLayout(): ?gdExternalLayout {

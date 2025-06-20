@@ -36,7 +36,7 @@ export const OpenAndNotAuthenticated = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -65,7 +65,7 @@ export const OpenAndAuthenticated = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -95,7 +95,7 @@ export const Opening = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -126,7 +126,7 @@ export const LimitsReached = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
         }
@@ -155,7 +155,7 @@ export const FromExample = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -184,7 +184,7 @@ export const FromExampleWithoutGoingBack = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         selectedExampleShortHeader={geometryMonsterExampleShortHeader}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -214,7 +214,7 @@ export const FromPrivateGameTemplate = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()
@@ -245,7 +245,7 @@ export const FromPrivateGameTemplateWithoutGoingBack = () => {
         onClose={() => action('click on close')()}
         onCreateEmptyProject={() => action('create empty')()}
         onCreateFromExample={() => action('create from example')()}
-        onCreateFromAIGeneration={() => action('create from AI generation')()}
+        onOpenAskAi={() => action('open ask AI')()}
         selectedExampleShortHeader={null}
         onCreateProjectFromPrivateGameTemplate={() =>
           action('create project from private game template')()

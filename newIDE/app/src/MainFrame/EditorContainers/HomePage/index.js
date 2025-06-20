@@ -174,6 +174,7 @@ export type HomePageEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   forceInGameEditorHotReload: ({| projectDataOnlyExport: boolean |}) => void,
 |};
 
@@ -490,6 +491,13 @@ export const HomePage = React.memo<Props>(
         // No thing to be done.
       }, []);
 
+      const onSceneEventsModifiedOutsideEditor = React.useCallback(
+        (scene: gdLayout) => {
+          // No thing to be done.
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
@@ -497,6 +505,7 @@ export const HomePage = React.memo<Props>(
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
         onSceneObjectsDeleted,
+        onSceneEventsModifiedOutsideEditor,
         forceInGameEditorHotReload: noop,
       }));
 

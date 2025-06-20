@@ -357,6 +357,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };
 
+  onEventsModifiedOutsideEditor = () => {
+    console.info(
+      'Events were modified outside of the editor - dropping selection and storing this in history.'
+    );
+    this.setState(
+      {
+        // It's important to immediately clear the selection as it could contain references
+        // to events that have been deleted/invalidated in memory.
+        selection: clearSelection(),
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+      },
+      () => {
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: [],
+          positionAfterAction: [],
+        });
+      }
+    );
+  };
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
@@ -1449,16 +1470,20 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           eventsHistory: newEventsHistory,
         },
         () => {
-          // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
-          eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
-          // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-          // (at least some, because they are different objects in memory).
-          // While they are recomputed when rendered, scroll again to be sure we don't end
-          // up at the very beginning (if everything was recomputed from 0) or at
-          // an offset too large.
-          setTimeout(() => {
-            eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
-          }, 70);
+          const row = positions.positionsBeforeAction[0];
+
+          if (row !== undefined) {
+            // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+            eventsTree.scrollToRow(row);
+            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
+            // (at least some, because they are different objects in memory).
+            // While they are recomputed when rendered, scroll again to be sure we don't end
+            // up at the very beginning (if everything was recomputed from 0) or at
+            // an offset too large.
+            setTimeout(() => {
+              eventsTree.scrollToRow(row);
+            }, 70);
+          }
           this.updateToolbar();
         }
       );
@@ -1504,16 +1529,20 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           eventsHistory: newEventsHistory,
         },
         () => {
-          // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
-          eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
-          // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-          // (at least some, because they are different objects in memory).
-          // While they are recomputed when rendered, scroll again to be sure we don't end
-          // up at the very beginning (if everything was recomputed from 0) or at
-          // an offset too large.
-          setTimeout(() => {
-            eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
-          }, 70);
+          const row = positions.positionsBeforeAction[0];
+
+          if (row !== undefined) {
+            // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+            eventsTree.scrollToRow(row);
+            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
+            // (at least some, because they are different objects in memory).
+            // While they are recomputed when rendered, scroll again to be sure we don't end
+            // up at the very beginning (if everything was recomputed from 0) or at
+            // an offset too large.
+            setTimeout(() => {
+              eventsTree.scrollToRow(row);
+            }, 70);
+          }
           this.updateToolbar();
         }
       );
@@ -2201,6 +2230,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
+  onEventsModifiedOutsideEditor: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2209,6 +2239,7 @@ const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
     onResourceExternallyChanged,
+    onEventsModifiedOutsideEditor,
   }));
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
@@ -2218,6 +2249,9 @@ const EventsSheet = (props, ref) => {
   const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
+  };
+  const onEventsModifiedOutsideEditor = () => {
+    if (component.current) component.current.onEventsModifiedOutsideEditor();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

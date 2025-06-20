@@ -1,11 +1,11 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
-import { ToolbarGroup } from '../../../UI/Toolbar';
-import AddIcon from '../../../UI/CustomSvgIcons/Add';
-import HistoryIcon from '../../../UI/CustomSvgIcons/History';
-import RaisedButton from '../../../UI/RaisedButton';
-import IconButton from '../../../UI/IconButton';
+import { ToolbarGroup } from '../UI/Toolbar';
+import AddIcon from '../UI/CustomSvgIcons/Add';
+import HistoryIcon from '../UI/CustomSvgIcons/History';
+import RaisedButton from '../UI/RaisedButton';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   onStartNewChat: () => void,

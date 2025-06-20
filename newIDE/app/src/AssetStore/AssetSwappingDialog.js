@@ -52,7 +52,6 @@ function AssetSwappingDialog({
   ] = React.useState<boolean>(false);
   const installAsset = useInstallAsset({
     project,
-    objectsContainer,
     resourceManagementProps,
     onExtensionInstalled,
   });
@@ -76,7 +75,10 @@ function AssetSwappingDialog({
 
       setIsAssetBeingInstalled(true);
       try {
-        const installAssetOutput = await installAsset(openedAssetShortHeader);
+        const installAssetOutput = await installAsset({
+          assetShortHeader: openedAssetShortHeader,
+          objectsContainer,
+        });
         if (!installAssetOutput) {
           throw new Error('Failed to install asset');
         }

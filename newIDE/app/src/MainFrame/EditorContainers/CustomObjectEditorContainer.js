@@ -47,7 +47,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   componentDidMount() {
     if (this.props.isActive) {
-      const { projectItemName, editorId } = this.props;
+      const { projectItemName } = this.props;
       this.props.setPreviewedLayout({
         layoutName: null,
         externalLayoutName: null,
@@ -151,6 +151,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 
   onSceneObjectEdited(scene: gdLayout, objectWithContext: ObjectWithContext) {
+    // No thing to be done.
+  }
+
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
     // No thing to be done.
   }
 

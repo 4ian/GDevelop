@@ -2,25 +2,25 @@
 import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import ButtonBase from '@material-ui/core/ButtonBase';
-import { Line, Column } from '../../../UI/Grid';
-import { ColumnStackLayout } from '../../../UI/Layout';
-import Text from '../../../UI/Text';
+import { Line, Column } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
+import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import {
   getAiRequests,
   type AiRequest,
-} from '../../../Utils/GDevelopServices/Generation';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import Paper from '../../../UI/Paper';
-import ScrollView from '../../../UI/ScrollView';
-import FlatButton from '../../../UI/FlatButton';
-import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
-import EmptyMessage from '../../../UI/EmptyMessage';
-import CircularProgress from '../../../UI/CircularProgress';
+} from '../Utils/GDevelopServices/Generation';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import Paper from '../UI/Paper';
+import ScrollView from '../UI/ScrollView';
+import FlatButton from '../UI/FlatButton';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import EmptyMessage from '../UI/EmptyMessage';
+import CircularProgress from '../UI/CircularProgress';
 import formatDate from 'date-fns/format';
-import DrawerTopBar from '../../../UI/DrawerTopBar';
-import PlaceholderError from '../../../UI/PlaceholderError';
-import { textEllipsisStyle } from '../../../UI/TextEllipsis';
+import DrawerTopBar from '../UI/DrawerTopBar';
+import PlaceholderError from '../UI/PlaceholderError';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 type Props = {|
   open: boolean,
@@ -61,8 +61,15 @@ const getFirstUserRequestText = (aiRequest: AiRequest): string => {
   if (!aiRequest.output || aiRequest.output.length === 0) return '';
 
   // Find the first user message
-  const userMessage = aiRequest.output.find(message => message.role === 'user');
-  if (!userMessage) return '';
+  const userMessage = aiRequest.output.find(
+    message => message.type === 'message' && message.role === 'user'
+  );
+  if (
+    !userMessage ||
+    userMessage.type !== 'message' ||
+    userMessage.role !== 'user'
+  )
+    return '';
 
   // Extract text from user message content
   return userMessage.content

@@ -29,7 +29,8 @@ import { DragHandleIcon } from '../../UI/DragHandle';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import Clipboard, { SafeExtractor } from '../../Utils/Clipboard';
+import Clipboard from '../../Utils/Clipboard';
+import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,

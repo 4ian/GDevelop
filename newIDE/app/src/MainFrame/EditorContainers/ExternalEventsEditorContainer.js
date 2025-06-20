@@ -94,6 +94,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   forceInGameEditorHotReload({
     projectDataOnlyExport,
   }: {|

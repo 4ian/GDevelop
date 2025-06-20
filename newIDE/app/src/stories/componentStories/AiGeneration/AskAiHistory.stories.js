@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import paperDecorator from '../../PaperDecorator';
-import { AskAiHistoryContent } from '../../../MainFrame/EditorContainers/AskAi/AskAiHistory';
+import { AskAiHistoryContent } from '../../../AiGeneration/AskAiHistory';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 
 // Re-use fake AI request data from AiRequestChat.stories.js
@@ -83,6 +83,8 @@ const createFakeAiRequest = ({
   gameProjectJson: 'FAKE DATA',
   output,
   error,
+  lastUserMessagePriceInCredits: 5,
+  totalPriceInCredits: 5,
 });
 
 export default {

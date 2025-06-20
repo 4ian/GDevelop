@@ -23,6 +23,7 @@ type SimplifiedObject = {|
   objectType: string,
   behaviors?: Array<SimplifiedBehavior>,
   objectVariables?: Array<SimplifiedVariable>,
+  animationNames?: string,
 |};
 
 type SimplifiedObjectGroup = {|
@@ -163,6 +164,18 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     }
     if (objectVariables.length > 0) {
       simplifiedObject.objectVariables = objectVariables;
+    }
+
+    const objectConfiguration = object.getConfiguration();
+    const animationNames = mapFor(
+      0,
+      objectConfiguration.getAnimationsCount(),
+      i => {
+        return objectConfiguration.getAnimationName(i);
+      }
+    );
+    if (animationNames.length > 0) {
+      simplifiedObject.animationNames = animationNames.join(', ');
     }
 
     return simplifiedObject;

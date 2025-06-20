@@ -42,7 +42,7 @@ type Props = {|
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onUpdateBehaviorsSharedData: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   isBehaviorListLocked: boolean,
 
   // For instances:

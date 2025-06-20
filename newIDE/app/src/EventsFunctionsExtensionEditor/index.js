@@ -89,7 +89,7 @@ type Props = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 type State = {|

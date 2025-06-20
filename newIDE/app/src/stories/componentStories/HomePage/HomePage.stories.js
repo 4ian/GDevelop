@@ -146,6 +146,7 @@ const WrappedHomePage = ({
                   iframeErrored: false,
                   renderGamesPlatformFrame: () => null,
                 }}
+                onExtensionInstalled={action('onExtensionInstalled')}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

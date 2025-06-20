@@ -99,6 +99,8 @@ jobs:
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
+            echo "All retries for deployment failed!" >&2
+            exit 1
 
       - run:
           name: Deploy to S3 (latest)
@@ -109,6 +111,8 @@ jobs:
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
+            echo "All retries for deployment failed!" >&2
+            exit 1
 
   # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:

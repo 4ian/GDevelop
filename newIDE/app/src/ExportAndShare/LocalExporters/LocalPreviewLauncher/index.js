@@ -321,16 +321,17 @@ export default class LocalPreviewLauncher extends React.Component<
           command: 'hotReload',
         });
       });
-
-      if (
-        this.state.hotReloadsCount % 16 === 0 &&
-        this._hotReloadSubscriptionChecker
-      ) {
-        this._hotReloadSubscriptionChecker.checkUserHasSubscription();
+      if (!previewOptions.isForInGameEdition) {
+        if (
+          this.state.hotReloadsCount % 16 === 0 &&
+          this._hotReloadSubscriptionChecker
+        ) {
+          this._hotReloadSubscriptionChecker.checkUserHasSubscription();
+        }
+        this.setState(state => ({
+          hotReloadsCount: state.hotReloadsCount + 1,
+        }));
       }
-      this.setState(state => ({
-        hotReloadsCount: state.hotReloadsCount + 1,
-      }));
     } else {
       if (previewOptions.isForInGameEdition) {
         attachToPreview({

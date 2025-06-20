@@ -97,8 +97,18 @@ export type AssetSearchAndInstallOptions = {|
 |};
 
 export type EditorCallbacks = {|
-  onOpenLayout: (sceneName: string) => void,
-  onOpenEvents: (sceneName: string) => void,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
 |};
 
 /**
@@ -280,7 +290,13 @@ const createObject: EditorFunction = {
           Create object <b>{object_name}</b> in scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}
           </Link>
@@ -455,10 +471,17 @@ const inspectObjectProperties: EditorFunction = {
           Inspecting properties of object <b>{object_name}</b> in scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}
           </Link>
+          .
         </Trans>
       ),
     };
@@ -532,7 +555,13 @@ const changeObjectProperty: EditorFunction = {
             <b>{object_name}</b> (in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
@@ -636,10 +665,17 @@ const addBehavior: EditorFunction = {
             <b>{object_name}</b> in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
+            .
           </Trans>
         ),
       };
@@ -953,7 +989,13 @@ const changeBehaviorProperty: EditorFunction = {
             on object <b>{object_name}</b> (in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
@@ -1124,7 +1166,13 @@ const describeInstances: EditorFunction = {
           Inspecting instances of scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}.
           </Link>
@@ -1304,10 +1352,17 @@ const readSceneEvents: EditorFunction = {
           Inspecting event sheet of scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'events',
+              })
+            }
           >
-            {scene_name}.
+            {scene_name}
           </Link>
+          .
         </Trans>
       ),
     };
@@ -1338,7 +1393,7 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderForEditor: ({ args, shouldShowDetails }) => {
+  renderForEditor: ({ args, shouldShowDetails, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const objectsListArgument = SafeExtractor.extractStringProperty(
@@ -1380,7 +1435,24 @@ const addSceneEvents: EditorFunction = {
 
     if (eventsDescription) {
       return {
-        text: <Trans>Add or rework events of scene {scene_name}</Trans>,
+        text: (
+          <Trans>
+            Add or rework{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
+        ),
         details,
         hasDetailsToShow: true,
       };
@@ -1388,7 +1460,20 @@ const addSceneEvents: EditorFunction = {
       return {
         text: (
           <Trans>
-            Adapt events of scene {scene_name}: "{placementHint}".
+            Adapt{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>{' '}
+            ("{placementHint}").
           </Trans>
         ),
         details,
@@ -1396,7 +1481,24 @@ const addSceneEvents: EditorFunction = {
       };
     } else {
       return {
-        text: <Trans>Modify events of scene {scene_name}.</Trans>,
+        text: (
+          <Trans>
+            Modify{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
+        ),
         details,
         hasDetailsToShow: true,
       };
@@ -1595,13 +1697,20 @@ const createScene: EditorFunction = {
     return {
       text: (
         <Trans>
-          Create a new scene called{' '}
+          Create a new scene called <b>{scene_name}</b>.{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
-            {scene_name}.
+            Click to open it
           </Link>
+          .
         </Trans>
       ),
     };

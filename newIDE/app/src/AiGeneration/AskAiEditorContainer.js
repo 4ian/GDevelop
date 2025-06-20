@@ -112,6 +112,7 @@ const useProcessFunctionCalls = ({
   i18n,
   project,
   resourceManagementProps,
+  editorCallbacks,
   selectedAiRequest,
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
@@ -122,6 +123,7 @@ const useProcessFunctionCalls = ({
   i18n: I18nType,
   project: gdProject | null,
   resourceManagementProps: ResourceManagementProps,
+  editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
   onSendEditorFunctionCallResults: () => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
@@ -190,6 +192,7 @@ const useProcessFunctionCalls = ({
 
       const editorFunctionCallResults = await processEditorFunctionCalls({
         project,
+        editorCallbacks,
         functionCalls: functionCalls.map(functionCall => ({
           name: functionCall.name,
           arguments: functionCall.arguments,
@@ -225,6 +228,7 @@ const useProcessFunctionCalls = ({
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
       triggerSendEditorFunctionCallResults,
+      editorCallbacks,
     ]
   );
 
@@ -457,8 +461,18 @@ type Props = {|
     i18n: I18nType,
     isQuickCustomization?: boolean
   ) => Promise<void>,
-  onOpenLayout: (sceneName: string) => void,
-  onOpenEvents: (sceneName: string) => void,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
@@ -497,7 +511,6 @@ export const AskAiEditor = React.memo<Props>(
         onCreateEmptyProject,
         onCreateProjectFromExample,
         onOpenLayout,
-        onOpenEvents,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
       }: Props,
@@ -506,9 +519,8 @@ export const AskAiEditor = React.memo<Props>(
       const editorCallbacks: EditorCallbacks = React.useMemo(
         () => ({
           onOpenLayout,
-          onOpenEvents,
         }),
-        [onOpenLayout, onOpenEvents]
+        [onOpenLayout]
       );
 
       const {
@@ -944,6 +956,7 @@ export const AskAiEditor = React.memo<Props>(
         project,
         resourceManagementProps,
         selectedAiRequest,
+        editorCallbacks,
         onSendEditorFunctionCallResults,
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
@@ -1041,7 +1054,6 @@ export const renderAskAiEditorContainer = (
         onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}
-        onOpenEvents={props.onOpenEvents}
         onSceneEventsModifiedOutsideEditor={
           props.onSceneEventsModifiedOutsideEditor
         }

@@ -668,7 +668,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             alignItems="stretch"
             noMargin
           >
-            {isAutoProcessingFunctionCalls &&
+            {aiRequest.mode === 'agent' &&
+            isAutoProcessingFunctionCalls &&
             (hasWorkingFunctionCalls ||
               isSending ||
               aiRequest.status === 'working') ? (
@@ -698,7 +699,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                   </LineStackLayout>
                 </Column>
               </Paper>
-            ) : !isAutoProcessingFunctionCalls &&
+            ) : aiRequest.mode === 'agent' &&
+              !isAutoProcessingFunctionCalls &&
               allFunctionCallsToProcess.length > 0 ? (
               <Paper background="dark" variant="outlined" square>
                 <Column>

@@ -3,6 +3,7 @@ import { type EventsGenerationResult } from '.';
 import {
   editorFunctions,
   type EditorFunction,
+  type EditorCallbacks,
   type EditorFunctionCall,
   type EditorFunctionGenericOutput,
   type EventsGenerationOptions,
@@ -29,6 +30,7 @@ export type EditorFunctionCallResult =
 export type ProcessEditorFunctionCallsOptions = {|
   project: gdProject,
   functionCalls: Array<EditorFunctionCall>,
+  editorCallbacks: EditorCallbacks,
   ignore: boolean,
   generateEvents: (
     options: EventsGenerationOptions
@@ -45,6 +47,7 @@ export type ProcessEditorFunctionCallsOptions = {|
 export const processEditorFunctionCalls = async ({
   functionCalls,
   project,
+  editorCallbacks,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   ignore,
@@ -139,6 +142,16 @@ export const processEditorFunctionCalls = async ({
         success,
         output,
       });
+
+      if (success && args) {
+        if (typeof args.scene_name === 'string') {
+          editorCallbacks.onOpenLayout(args.scene_name, {
+            openEventsEditor: true,
+            openSceneEditor: true,
+            focusWhenOpened: 'none',
+          });
+        }
+      }
     } catch (error) {
       results.push({
         status: 'finished',

@@ -1923,16 +1923,32 @@ const MainFrame = (props: Props) => {
       {
         openEventsEditor,
         openSceneEditor,
-      }: {| openEventsEditor: boolean, openSceneEditor: boolean |}
+        focusWhenOpened,
+      }: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |}
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
         name,
+        dontFocusTab: !(
+          focusWhenOpened === 'scene' ||
+          focusWhenOpened === 'scene-or-events-otherwise'
+        ),
       });
       const eventsEditorOptions = getEditorOpeningOptions({
         kind: 'layout events',
         name,
-        dontFocusTab: openSceneEditor,
+        dontFocusTab: !(
+          focusWhenOpened === 'events' ||
+          (focusWhenOpened === 'scene-or-events-otherwise' && !openSceneEditor)
+        ),
       });
 
       const tabsWithSceneEditor = openSceneEditor
@@ -1948,9 +1964,18 @@ const MainFrame = (props: Props) => {
   const openLayout = React.useCallback(
     (
       name: string,
-      options?: {| openEventsEditor: boolean, openSceneEditor: boolean |} = {
+      options?: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |} = {
         openEventsEditor: true,
         openSceneEditor: true,
+        focusWhenOpened: 'scene',
       },
       editorTabs?: EditorTabsState
     ): void => {
@@ -1962,6 +1987,7 @@ const MainFrame = (props: Props) => {
           {
             openEventsEditor: options.openEventsEditor,
             openSceneEditor: options.openSceneEditor,
+            focusWhenOpened: options.focusWhenOpened,
           }
         ),
       }));
@@ -2457,6 +2483,7 @@ const MainFrame = (props: Props) => {
         {
           openSceneEditor: true,
           openEventsEditor: true,
+          focusWhenOpened: 'scene',
         },
         editorTabs
       );
@@ -2490,6 +2517,7 @@ const MainFrame = (props: Props) => {
           {
             openSceneEditor: true,
             openEventsEditor: true,
+            focusWhenOpened: 'scene',
           }
         );
       }
@@ -2520,6 +2548,7 @@ const MainFrame = (props: Props) => {
       openLayout(firstLayout, {
         openSceneEditor: true,
         openEventsEditor: true,
+        focusWhenOpened: 'scene',
       });
 
       setIsLoadingProject(false);
@@ -3980,14 +4009,10 @@ const MainFrame = (props: Props) => {
                       openLayout(sceneName, {
                         openEventsEditor: true,
                         openSceneEditor: false,
+                        focusWhenOpened: 'events',
                       });
                     },
-                    onOpenLayout: (sceneName: string) => {
-                      openLayout(sceneName, {
-                        openEventsEditor: false,
-                        openSceneEditor: true,
-                      });
-                    },
+                    onOpenLayout: openLayout,
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,

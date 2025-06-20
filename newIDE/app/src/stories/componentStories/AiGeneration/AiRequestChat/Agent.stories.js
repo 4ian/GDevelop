@@ -9,6 +9,7 @@ import {
   agentAiRequestWithFailedAndIgnoredFunctionCallOutputs,
   agentAiRequestWithFunctionCallToDo,
 } from '../../../../fixtures/GDevelopServicesTestData/FakeAiRequests';
+import { action } from '@storybook/addon-actions';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Agent',
@@ -18,8 +19,7 @@ export default {
 
 const commonProps = {
   editorCallbacks: {
-    onOpenLayout: () => {},
-    onOpenEvents: () => {},
+    onOpenLayout: action('onOpenLayout'),
   },
   project: null,
   quota: {

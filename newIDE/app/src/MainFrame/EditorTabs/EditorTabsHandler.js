@@ -485,3 +485,12 @@ export const hasEditorTabOpenedWithKey = (
 ) => {
   return !!editorTabsState.editors.find(editor => editor.key === key);
 };
+
+export const getOpenedAskAiEditor = (
+  state: EditorTabsState
+): AskAiEditorInterface | null => {
+  const editor = state.editors.find(editor => editor.key === 'ask-ai');
+
+  // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+  return (editor && editor.editorRef) || null;
+};

@@ -49,6 +49,7 @@ import {
   moveTabToTheRightOfHoveredTab,
   getCustomObjectEditor,
   hasEditorTabOpenedWithKey,
+  getOpenedAskAiEditor,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -1226,13 +1227,21 @@ const MainFrame = (props: Props) => {
 
   const openAskAi = React.useCallback(
     () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
-          state.editorTabs,
-          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
-        ),
-      }));
+      setState(state => {
+        const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (askAiEditor) {
+          askAiEditor.startNewChat();
+        }
+
+        // Open or focus the AI editor.
+        return {
+          ...state,
+          editorTabs: openEditorTab(
+            state.editorTabs,
+            getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+          ),
+        };
+      });
     },
     [setState, getEditorOpeningOptions]
   );

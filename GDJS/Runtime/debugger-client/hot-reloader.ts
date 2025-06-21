@@ -472,14 +472,16 @@ namespace gdjs {
             newExternalLayoutData.associatedLayout
           );
 
-          const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
-            oldProjectData,
-            oldLayoutData ? oldLayoutData.objects : []
-          );
-          const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
-            newProjectData,
-            newLayoutData ? newLayoutData.objects : []
-          );
+          const oldObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              oldProjectData,
+              oldLayoutData ? oldLayoutData.objects : []
+            );
+          const newObjectDataList =
+            HotReloader.resolveCustomObjectConfigurations(
+              newProjectData,
+              newLayoutData ? newLayoutData.objects : []
+            );
 
           sceneStack._stack.forEach((runtimeScene) => {
             this._hotReloadRuntimeSceneInstances(

@@ -221,7 +221,10 @@ namespace gdjs {
           this._logs.push({
             kind: 'fatal',
             message:
-              'Unexpected error happened while hot-reloading: ' + error.message,
+              'Unexpected error happened while hot-reloading: ' +
+              error.message +
+              '\n' +
+              error.stack,
           });
         }
       }
@@ -469,13 +472,22 @@ namespace gdjs {
             newExternalLayoutData.associatedLayout
           );
 
+          const oldObjectDataList = HotReloader.resolveCustomObjectConfigurations(
+            oldProjectData,
+            oldLayoutData ? oldLayoutData.objects : []
+          );
+          const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
+            newProjectData,
+            newLayoutData ? newLayoutData.objects : []
+          );
+
           sceneStack._stack.forEach((runtimeScene) => {
             this._hotReloadRuntimeSceneInstances(
               oldProjectData,
               newProjectData,
               changedRuntimeBehaviors,
-              oldLayoutData ? oldLayoutData.objects : [],
-              newLayoutData ? newLayoutData.objects : [],
+              oldObjectDataList,
+              newObjectDataList,
               oldExternalLayoutData.instances,
               newExternalLayoutData.instances,
               runtimeScene

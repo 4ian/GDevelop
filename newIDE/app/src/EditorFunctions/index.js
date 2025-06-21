@@ -1199,8 +1199,16 @@ const describeInstances: EditorFunction = {
 
       getInstancesInLayoutForLayer(initialInstances, layerName).forEach(
         instance => {
+          const serializedInstance = serializeToJSObject(instance);
           instances.push({
-            ...serializeToJSObject(instance),
+            ...serializedInstance,
+            // Replace persistentUuid by id:
+            persistentUuid: instance.getPersistentUuid(),
+            id: instance.getPersistentUuid().slice(0, 10),
+            // For now, don't expose these:
+            initialVariables: undefined,
+            numberProperties: undefined,
+            stringProperties: undefined,
           });
         }
       );
@@ -1213,21 +1221,81 @@ const describeInstances: EditorFunction = {
   },
 };
 
+const iterateOnInstances = (initialInstances, callback) => {
+  const instanceGetter = new gd.InitialInstanceJSFunctor();
+  // $FlowFixMe - invoke is not writable
+  instanceGetter.invoke = instancePtr => {
+    // $FlowFixMe - wrapPointer is not exposed
+    const instance: gdInitialInstance = gd.wrapPointer(
+      instancePtr,
+      gd.InitialInstance
+    );
+    callback(instance);
+  };
+  // $FlowFixMe - JSFunctor is incompatible with Functor
+  initialInstances.iterateOverInstances(instanceGetter);
+  instanceGetter.delete();
+};
+
 /**
- * Places a new 2D instance in a scene
+ * Places new instance(s), or move/erase existing instances, of an existing object onto a specified 2D layer
+ * within a scene using a virtual brush at given X, Y coordinates.
+ * Can also be used to resize, rotate, change opacity or Z order of existing 2D instance(s).
+ * Existing instances identifiers can be found by calling `describe_instances` (`id` field for each instance).
  */
-const put2dInstance: EditorFunction = {
+const put2dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
-    const x = extractRequiredNumber(args, 'x');
-    const y = extractRequiredNumber(args, 'y');
+    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const brush_position = SafeExtractor.extractStringProperty(
+      args,
+      'brush_position'
+    );
+    const brush_size = SafeExtractor.extractStringProperty(args, 'brush_size');
+    const brush_rotation = SafeExtractor.extractNumberProperty(
+      args,
+      'brush_rotation'
+    );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    const new_instances_count = SafeExtractor.extractNumberProperty(
+      args,
+      'new_instances_count'
+    );
+    const instances_z_order = SafeExtractor.extractNumberProperty(
+      args,
+      'instances_z_order'
+    );
+    const instances_size = SafeExtractor.extractStringProperty(
+      args,
+      'instances_size'
+    );
+
+    const existingInstanceCount = existing_instance_ids
+      ? existing_instance_ids.split(',').length
+      : 0;
+
+    if (brush_kind === 'erase') {
+      // TODO: add brush information
+      return {
+        text: (
+          <Trans>
+            Erase ${existingInstanceCount} instances of object {object_name}{' '}
+            (layer: {layer_name || 'base'}) in scene {scene_name}.
+          </Trans>
+        ),
+      };
+    }
 
     return {
+      // TODO: add brush information
       text: (
         <Trans>
-          Add instance of object {object_name} at position {x};{y} (layer:{' '}
+          Add instance of object {object_name} at {x};{y} (layer:{' '}
           {layer_name || 'base'}) in scene {scene_name}.
         </Trans>
       ),
@@ -1237,8 +1305,32 @@ const put2dInstance: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
-    const x = extractRequiredNumber(args, 'x');
-    const y = extractRequiredNumber(args, 'y');
+    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const brush_position = SafeExtractor.extractStringProperty(
+      args,
+      'brush_position'
+    );
+    const brush_size = SafeExtractor.extractStringProperty(args, 'brush_size');
+    const brush_rotation = SafeExtractor.extractNumberProperty(
+      args,
+      'brush_rotation'
+    );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    const new_instances_count = SafeExtractor.extractNumberProperty(
+      args,
+      'new_instances_count'
+    );
+    const instances_z_order = SafeExtractor.extractNumberProperty(
+      args,
+      'instances_z_order'
+    );
+    const instances_size = SafeExtractor.extractStringProperty(
+      args,
+      'instances_size'
+    );
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1260,36 +1352,225 @@ const put2dInstance: EditorFunction = {
       );
     }
 
+    const existingInstanceIds = existing_instance_ids
+      ? existing_instance_ids.split(',')
+      : [];
+    const brushPosition = brush_position
+      ? brush_position.split(',').map(Number)
+      : [0, 0];
+    const brushSize = brush_size ? Number(brush_size) : 0;
+
     const initialInstances = layout.getInitialInstances();
-    const instance = initialInstances.insertNewInitialInstance();
 
-    instance.setObjectName(object_name);
-    instance.setLayer(layer_name);
-    instance.setX(x);
-    instance.setY(y);
+    if (brush_kind === 'erase') {
+      // Iterate on existing instances and remove them, and/or those inside the brush radius.
+      const instancesToDelete = new Set();
 
-    return makeGenericSuccess(
-      `Added instance of object "${object_name}" at position (${x}, ${y}) on layer "${layer_name ||
-        'base'}"`
-    );
+      iterateOnInstances(initialInstances, instance => {
+        if (instance.getLayer() !== layer_name) return;
+        if (instance.getObjectName() !== object_name) return;
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        ) {
+          instancesToDelete.add(instance);
+          return;
+        }
+        if (brushSize === 0) {
+          if (
+            instance.getX() === brushPosition[0] &&
+            instance.getY() === brushPosition[1]
+          ) {
+            instancesToDelete.add(instance);
+            return;
+          }
+        } else {
+          const distance = Math.sqrt(
+            Math.pow(instance.getX() - brushPosition[0], 2) +
+              Math.pow(instance.getY() - brushPosition[1], 2)
+          );
+          if (distance <= brushSize) {
+            instancesToDelete.add(instance);
+            return;
+          }
+        }
+      });
+
+      instancesToDelete.forEach(instance => {
+        initialInstances.removeInstance(instance);
+      });
+    } else {
+      const newInstancesCount =
+        new_instances_count !== null ? new_instances_count : 0;
+      const brushRotationInRad =
+        ((parseFloat(brush_rotation) || 0) * Math.PI) / 180;
+
+      // Create the array of existing instances to move/modify, and new instances to create.
+      const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
+      iterateOnInstances(initialInstances, instance => {
+        if (instance.getLayer() !== layer_name) return;
+        if (instance.getObjectName() !== object_name) return;
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        ) {
+          modifiedAndCreatedInstances.push(instance);
+        }
+      });
+      for (let i = 0; i < newInstancesCount; i++) {
+        const instance = initialInstances.insertNewInitialInstance();
+        instance.setObjectName(object_name);
+        instance.setLayer(layer_name);
+        modifiedAndCreatedInstances.push(instance);
+      }
+
+      // Paint the new/modified instances with the brush.
+      if (brush_kind === 'line') {
+        const instancesCount = modifiedAndCreatedInstances.length;
+        const lineLength = brushSize;
+        const newInstancePosition = [
+          brushPosition[0] - (lineLength / 2) * Math.cos(brushRotationInRad),
+          brushPosition[1] - (lineLength / 2) * Math.sin(brushRotationInRad),
+        ];
+        const deltaX =
+          instancesCount > 1
+            ? (lineLength * Math.cos(brushRotationInRad)) / (instancesCount - 1)
+            : 0;
+        const deltaY =
+          instancesCount > 1
+            ? (lineLength * Math.sin(brushRotationInRad)) / (instancesCount - 1)
+            : 0;
+
+        modifiedAndCreatedInstances.forEach((instance, i) => {
+          instance.setX(newInstancePosition[0] + i * deltaX);
+          instance.setY(newInstancePosition[1] + i * deltaY);
+        });
+      } else if (brush_kind === 'random_in_circle') {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const randomRadius = Math.random() * brushSize;
+          const randomAngle = Math.random() * 2 * Math.PI;
+
+          instance.setX(
+            brushPosition[0] + randomRadius * Math.cos(randomAngle)
+          );
+          instance.setY(
+            brushPosition[1] + randomRadius * Math.sin(randomAngle)
+          );
+        });
+      } else {
+        if (brush_kind !== 'point') {
+          console.warn(
+            'Unknown brush kind: ' +
+              brush_kind +
+              " - assuming it's point brush instead."
+          );
+        }
+
+        modifiedAndCreatedInstances.forEach(instance => {
+          instance.setX(brushPosition[0]);
+          instance.setY(brushPosition[1]);
+        });
+      }
+
+      const instancesSize = instances_size
+        ? instances_size.split(',').map(Number)
+        : null;
+      const instancesRotation = SafeExtractor.extractNumberProperty(
+        args,
+        'instances_rotation'
+      );
+      const instancesOpacity = SafeExtractor.extractNumberProperty(
+        args,
+        'instances_opacity'
+      );
+
+      modifiedAndCreatedInstances.forEach(instance => {
+        if (instancesSize) {
+          instance.setHasCustomSize(true);
+          instance.setCustomWidth(instancesSize[0]);
+          instance.setCustomHeight(instancesSize[1]);
+        }
+        if (instances_z_order !== null) {
+          instance.setZOrder(instances_z_order);
+        }
+        if (instancesRotation !== null) {
+          instance.setAngle(instancesRotation);
+        }
+        if (instancesOpacity !== null) {
+          instance.setOpacity(instancesOpacity);
+        }
+      });
+
+      // TODO: output new positions and sizes?
+      return makeGenericSuccess(
+        `Added ${newInstancesCount} instance${
+          newInstancesCount > 1 ? 's' : ''
+        } of object "${object_name}" using ${brush_kind} brush at (${brush_position}) on layer "${layer_name ||
+          'base'}"`
+      );
+    }
   },
 };
 
 /**
- * Places a new 3D instance in a scene
+ * Places new instance(s), or move/erase existing instances, of an existing object
+ * onto a specified 3D layer within a scene using a virtual brush at given X, Y, Z coordinates.
+ * Can also be used to resize, rotate existing 3D instance(s).
+ * Existing instances identifiers can be found by calling `describe_instances` (`id` field for each instance).
  */
-const put3dInstance: EditorFunction = {
+const put3dInstances: EditorFunction = {
   renderForEditor: ({ args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
-    const x = extractRequiredNumber(args, 'x');
-    const y = extractRequiredNumber(args, 'y');
-    const z = extractRequiredNumber(args, 'z');
+    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const brush_position = SafeExtractor.extractStringProperty(
+      args,
+      'brush_position'
+    );
+    const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
+    const brush_rotation = SafeExtractor.extractStringProperty(
+      args,
+      'brush_rotation'
+    );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    const new_instances_count = SafeExtractor.extractNumberProperty(
+      args,
+      'new_instances_count'
+    );
+    const instances_size = SafeExtractor.extractStringProperty(
+      args,
+      'instances_size'
+    );
+
+    const existingInstanceCount = existing_instance_ids
+      ? existing_instance_ids.split(',').length
+      : 0;
+    const brushCoords = brush_position ? brush_position.split(',') : ['0', '0', '0'];
+    const x = brushCoords[0] || '0';
+    const y = brushCoords[1] || '0';
+    const z = brushCoords[2] || '0';
+
+    if (brush_kind === 'erase') {
+      return {
+        text: (
+          <Trans>
+            Erase {existingInstanceCount} instances of object {object_name}{' '}
+            (layer: {layer_name || 'base'}) in scene {scene_name}.
+          </Trans>
+        ),
+      };
+    }
+
     return {
       text: (
         <Trans>
-          Add instance of object {object_name} at position {x};{y};{z} (layer:{' '}
+          Add instance of object {object_name} at position {x},{y},{z} (layer:{' '}
           {layer_name || 'base'}) in scene {scene_name}.
         </Trans>
       ),
@@ -1299,9 +1580,32 @@ const put3dInstance: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const layer_name = extractRequiredString(args, 'layer_name');
-    const x = extractRequiredNumber(args, 'x');
-    const y = extractRequiredNumber(args, 'y');
-    const z = extractRequiredNumber(args, 'z');
+    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const brush_position = SafeExtractor.extractStringProperty(
+      args,
+      'brush_position'
+    );
+    const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
+    const brush_rotation = SafeExtractor.extractStringProperty(
+      args,
+      'brush_rotation'
+    );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    const new_instances_count = SafeExtractor.extractNumberProperty(
+      args,
+      'new_instances_count'
+    );
+    const instances_size = SafeExtractor.extractStringProperty(
+      args,
+      'instances_size'
+    );
+    const instances_rotation = SafeExtractor.extractStringProperty(
+      args,
+      'instances_rotation'
+    );
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeGenericFailure(`Scene not found: "${scene_name}".`);
@@ -1323,19 +1627,187 @@ const put3dInstance: EditorFunction = {
       );
     }
 
+    const existingInstanceIds = existing_instance_ids
+      ? existing_instance_ids.split(',')
+      : [];
+    const brushPosition = brush_position
+      ? brush_position.split(',').map(Number)
+      : [0, 0, 0];
+    const brushSize = brush_size || 0;
+    const brushRotationAngles = brush_rotation
+      ? brush_rotation.split(',').map(coord => parseFloat(coord) || 0)
+      : [0, 0, 0];
+
     const initialInstances = layout.getInitialInstances();
-    const instance = initialInstances.insertNewInitialInstance();
 
-    instance.setObjectName(object_name);
-    instance.setLayer(layer_name);
-    instance.setX(x);
-    instance.setY(y);
-    instance.setZ(z);
+    if (brush_kind === 'erase') {
+      // Iterate on existing instances and remove them, and/or those inside the brush radius.
+      const instancesToDelete = new Set();
 
-    return makeGenericSuccess(
-      `Added 3D instance of object "${object_name}" at position (${x}, ${y}, ${z}) on layer "${layer_name ||
-        'base'}"`
-    );
+      iterateOnInstances(initialInstances, instance => {
+        if (instance.getLayer() !== layer_name) return;
+        if (instance.getObjectName() !== object_name) return;
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        ) {
+          instancesToDelete.add(instance);
+          return;
+        }
+        if (brushSize === 0) {
+          if (
+            instance.getX() === brushPosition[0] &&
+            instance.getY() === brushPosition[1] &&
+            instance.getZ() === brushPosition[2]
+          ) {
+            instancesToDelete.add(instance);
+            return;
+          }
+        } else {
+          const distance = Math.sqrt(
+            Math.pow(instance.getX() - brushPosition[0], 2) +
+              Math.pow(instance.getY() - brushPosition[1], 2) +
+              Math.pow(instance.getZ() - brushPosition[2], 2)
+          );
+          if (distance <= brushSize) {
+            instancesToDelete.add(instance);
+            return;
+          }
+        }
+      });
+
+      instancesToDelete.forEach(instance => {
+        initialInstances.removeInstance(instance);
+      });
+
+      return makeGenericSuccess(
+        `Erased ${instancesToDelete.size} instance${
+          instancesToDelete.size > 1 ? 's' : ''
+        } of object "${object_name}" on layer "${layer_name || 'base'}"`
+      );
+    } else {
+      const newInstancesCount =
+        new_instances_count !== null ? new_instances_count : 0;
+
+      // Create the array of existing instances to move/modify, and new instances to create.
+      const modifiedAndCreatedInstances: Array<gdInitialInstance> = [];
+      iterateOnInstances(initialInstances, instance => {
+        if (instance.getLayer() !== layer_name) return;
+        if (instance.getObjectName() !== object_name) return;
+        if (
+          existingInstanceIds.some(id =>
+            instance.getPersistentUuid().startsWith(id)
+          )
+        ) {
+          modifiedAndCreatedInstances.push(instance);
+        }
+      });
+      for (let i = 0; i < newInstancesCount; i++) {
+        const instance = initialInstances.insertNewInitialInstance();
+        instance.setObjectName(object_name);
+        instance.setLayer(layer_name);
+        modifiedAndCreatedInstances.push(instance);
+      }
+
+      // Paint the new/modified instances with the brush.
+      if (brush_kind === 'line') {
+        const instancesCount = modifiedAndCreatedInstances.length;
+        const lineLength = brushSize;
+
+        // Convert brush rotation from degrees to radians
+        const rotationX = (brushRotationAngles[0] * Math.PI) / 180;
+        const rotationY = (brushRotationAngles[1] * Math.PI) / 180;
+        const rotationZ = (brushRotationAngles[2] * Math.PI) / 180;
+
+        // For simplicity, we'll create a line along the primary axis defined by the rotation
+        const directionX = Math.cos(rotationY) * Math.cos(rotationZ);
+        const directionY = Math.cos(rotationY) * Math.sin(rotationZ);
+        const directionZ = Math.sin(rotationY);
+
+        const newInstancePosition = [
+          brushPosition[0] - (lineLength / 2) * directionX,
+          brushPosition[1] - (lineLength / 2) * directionY,
+          brushPosition[2] - (lineLength / 2) * directionZ,
+        ];
+        const deltaX =
+          instancesCount > 1
+            ? (lineLength * directionX) / (instancesCount - 1)
+            : 0;
+        const deltaY =
+          instancesCount > 1
+            ? (lineLength * directionY) / (instancesCount - 1)
+            : 0;
+        const deltaZ =
+          instancesCount > 1
+            ? (lineLength * directionZ) / (instancesCount - 1)
+            : 0;
+
+        modifiedAndCreatedInstances.forEach((instance, i) => {
+          instance.setX(newInstancePosition[0] + i * deltaX);
+          instance.setY(newInstancePosition[1] + i * deltaY);
+          instance.setZ(newInstancePosition[2] + i * deltaZ);
+        });
+      } else if (brush_kind === 'random_in_sphere') {
+        modifiedAndCreatedInstances.forEach(instance => {
+          const randomRadius = Math.random() * brushSize;
+          const randomTheta = Math.random() * 2 * Math.PI; // Azimuthal angle
+          const randomPhi = Math.acos(2 * Math.random() - 1); // Polar angle
+
+          instance.setX(
+            brushPosition[0] + randomRadius * Math.sin(randomPhi) * Math.cos(randomTheta)
+          );
+          instance.setY(
+            brushPosition[1] + randomRadius * Math.sin(randomPhi) * Math.sin(randomTheta)
+          );
+          instance.setZ(
+            brushPosition[2] + randomRadius * Math.cos(randomPhi)
+          );
+        });
+      } else {
+        if (brush_kind !== 'point') {
+          console.warn(
+            'Unknown brush kind: ' +
+              brush_kind +
+              " - assuming it's point brush instead."
+          );
+        }
+
+        modifiedAndCreatedInstances.forEach(instance => {
+          instance.setX(brushPosition[0]);
+          instance.setY(brushPosition[1]);
+          instance.setZ(brushPosition[2]);
+        });
+      }
+
+      const instancesSizeArray = instances_size
+        ? instances_size.split(',').map(Number)
+        : null;
+      const instancesRotationArray = instances_rotation
+        ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
+        : null;
+
+      modifiedAndCreatedInstances.forEach(instance => {
+        if (instancesSizeArray && instancesSizeArray.length >= 3) {
+          instance.setHasCustomSize(true);
+          instance.setCustomWidth(instancesSizeArray[0]);
+          instance.setCustomHeight(instancesSizeArray[1]);
+          instance.setCustomDepth(instancesSizeArray[2]);
+        }
+        if (instancesRotationArray && instancesRotationArray.length >= 3) {
+          instance.setRotationX(instancesRotationArray[0]);
+          instance.setRotationY(instancesRotationArray[1]);
+          instance.setRotationZ(instancesRotationArray[2]);
+        }
+      });
+
+      return makeGenericSuccess(
+        `Added ${newInstancesCount} instance${
+          newInstancesCount > 1 ? 's' : ''
+        } of object "${object_name}" using ${brush_kind} brush at (${brushPosition.join(',')}) on layer "${layer_name ||
+          'base'}"`
+      );
+    }
   },
 };
 
@@ -1931,8 +2403,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
   inspect_behavior_properties: inspectBehaviorProperties,
   change_behavior_property: changeBehaviorProperty,
   describe_instances: describeInstances,
-  put_2d_instance: put2dInstance,
-  put_3d_instance: put3dInstance,
+  put_2d_instances: put2dInstances,
+  put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,
   add_scene_events: addSceneEvents,
   create_scene: createScene,

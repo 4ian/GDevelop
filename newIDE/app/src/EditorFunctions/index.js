@@ -52,6 +52,7 @@ export type EditorFunctionGenericOutput = {|
   message?: string,
   eventsForSceneNamed?: string,
   eventsAsText?: string,
+  instancesForSceneNamed?: string,
   objectName?: string,
   behaviorName?: string,
   properties?: any,
@@ -149,19 +150,6 @@ const extractRequiredString = (args: any, propertyName: string): string => {
   if (value === null) {
     throw new Error(
       `Missing or invalid required string argument: ${propertyName}`
-    );
-  }
-  return value;
-};
-
-/**
- * Helper function to safely extract required number arguments
- */
-const extractRequiredNumber = (args: any, propertyName: string): number => {
-  const value = SafeExtractor.extractNumberProperty(args, propertyName);
-  if (value === null) {
-    throw new Error(
-      `Missing or invalid required number argument: ${propertyName}`
     );
   }
   return value;
@@ -1217,6 +1205,7 @@ const describeInstances: EditorFunction = {
     return {
       success: true,
       instances: instances,
+      instancesForSceneNamed: scene_name,
     };
   },
 };

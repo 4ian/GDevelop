@@ -77,14 +77,14 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
   }
   if(propertyName == "isCastingShadow")
   {
-    isCastingShadow = newValue.To<bool>();
+    isCastingShadow = newValue == "1";
     return true;
   }
-if(propertyName == "isReceivingShadow")
-{
-  isReceivingShadow = newValue.To<bool>();
-  return true;
-}
+  if(propertyName == "isReceivingShadow")
+  {
+    isReceivingShadow = newValue == "1";
+    return true;
+  }
 
   return false;
 }
@@ -188,14 +188,14 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetGroup(_("Animations"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetSecond());
 
-      objectProperties["isCastingShadow"]
-      .SetValue(gd::String::From(isCastingShadow))
+  objectProperties["isCastingShadow"]
+      .SetValue(isCastingShadow ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Shadow Casting"))
       .SetGroup(_("Shadows"));
 
-      objectProperties["isReceivingShadow"]
-      .SetValue(gd::String::From(isReceivingShadow))
+  objectProperties["isReceivingShadow"]
+      .SetValue(isReceivingShadow ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Shadow receiving"))
       .SetGroup(_("Shadows"));

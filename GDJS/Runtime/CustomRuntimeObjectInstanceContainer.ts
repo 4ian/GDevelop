@@ -53,7 +53,6 @@ namespace gdjs {
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
-      this.getRenderer().setLayerIndex(layer, this._orderedLayers.length - 1);
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {

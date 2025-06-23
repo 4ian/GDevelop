@@ -11,7 +11,7 @@ import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
 import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
-import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -22,7 +22,7 @@ import {
   type EditorCallbacks,
 } from '../../EditorFunctions';
 import Link from '../../UI/Link';
-import { LineStackLayout } from '../../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../UI/Paper';
@@ -142,59 +142,64 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             )}
           </div>
         </Tooltip>
-        <LineStackLayout noMargin alignItems="baseline">
-          <Text>{text || 'Working...'}</Text>
-          {hasDetailsToShow && (
-            <Text size="body-small" color="secondary">
-              <Link
-                color="inherit"
-                href={'#'}
-                onClick={() => setShowDetails(!showDetails)}
-              >
-                <Trans>Details</Trans>
-                {details ? (
-                  <ChevronArrowBottom
-                    fontSize="small"
-                    style={{
-                      verticalAlign: 'middle',
-                    }}
-                  />
-                ) : (
-                  <ChevronArrowRight
-                    fontSize="small"
-                    style={{
-                      verticalAlign: 'middle',
-                    }}
-                  />
-                )}
-              </Link>
-            </Text>
-          )}
-        </LineStackLayout>
-        {!isFinished && !isWorking && (
-          <RaisedButtonWithSplitMenu
-            primary
-            onClick={() => onProcessFunctionCalls([functionCall])}
-            label={<Trans>Apply</Trans>}
-            buildMenuTemplate={i18n => [
-              {
-                label: i18n._(t`Ignore this`),
-                click: () => {
-                  onProcessFunctionCalls([functionCall], {
-                    ignore: true,
-                  });
-                },
-              },
-            ]}
-          />
-        )}
-        {functionCallResultIsErrored && (
-          <RaisedButton
-            color="primary"
-            onClick={() => onProcessFunctionCalls([functionCall])}
-            label={<Trans>Retry</Trans>}
-          />
-        )}
+        <ResponsiveLineStackLayout justifyContent="space-between" expand noOverflowParent>
+          <LineStackLayout noMargin alignItems="baseline">
+            <Text>{text || 'Working...'}</Text>
+            {hasDetailsToShow && (
+              <Text size="body-small" color="secondary">
+                <Link
+                  color="inherit"
+                  href={'#'}
+                  onClick={() => setShowDetails(!showDetails)}
+                >
+                  <Trans>Details</Trans>
+                  {details ? (
+                    <ChevronArrowBottom
+                      fontSize="small"
+                      style={{
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                  ) : (
+                    <ChevronArrowRight
+                      fontSize="small"
+                      style={{
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                  )}
+                </Link>
+              </Text>
+            )}
+          </LineStackLayout>
+          <LineStackLayout noMargin alignItems="baseline" justifyContent="flex-end" neverShrink>
+            {!isFinished && !isWorking && (
+              <FlatButtonWithSplitMenu
+                primary
+                style={{ flexShrink: 0 }}
+                onClick={() => onProcessFunctionCalls([functionCall])}
+                label={<Trans>Execute this action</Trans>}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: i18n._(t`Ignore this`),
+                    click: () => {
+                      onProcessFunctionCalls([functionCall], {
+                        ignore: true,
+                      });
+                    },
+                  },
+                ]}
+              />
+            )}
+            {functionCallResultIsErrored && (
+              <RaisedButton
+                color="primary"
+                onClick={() => onProcessFunctionCalls([functionCall])}
+                label={<Trans>Retry</Trans>}
+              />
+            )}
+          </LineStackLayout>
+        </ResponsiveLineStackLayout>
       </LineStackLayout>
       {details && (
         <div className={classes.detailsPaperContainer}>

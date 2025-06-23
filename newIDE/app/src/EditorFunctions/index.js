@@ -1399,6 +1399,8 @@ const put2dInstances: EditorFunction = {
           return;
         }
 
+        if (!brushPosition) return;
+
         if (brushSize === 0) {
           if (
             instance.getX() === brushPosition[0] &&

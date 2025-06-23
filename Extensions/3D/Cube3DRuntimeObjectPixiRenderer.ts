@@ -80,17 +80,16 @@ namespace gdjs {
         .fill(0)
         .map((_, index) =>
           getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
-      );
+        );
       const boxMesh = new THREE.Mesh(geometry, materials);
-      
-        
-        super(runtimeObject, instanceContainer, boxMesh);
-        this._boxMesh = boxMesh;
-        this._cube3DRuntimeObject = runtimeObject;
-        
-        boxMesh.receiveShadow = this._cube3DRuntimeObject._isCastingShadow;
-        boxMesh.castShadow = this._cube3DRuntimeObject._isReceivingShadow;
-        this.updateSize();
+
+      super(runtimeObject, instanceContainer, boxMesh);
+      this._boxMesh = boxMesh;
+      this._cube3DRuntimeObject = runtimeObject;
+
+      boxMesh.receiveShadow = this._cube3DRuntimeObject._isCastingShadow;
+      boxMesh.castShadow = this._cube3DRuntimeObject._isReceivingShadow;
+      this.updateSize();
       this.updatePosition();
       this.updateRotation();
       this.updateTint();
@@ -116,13 +115,12 @@ namespace gdjs {
         new THREE.BufferAttribute(new Float32Array(tints), 3)
       );
     }
-    updateShadowCasting()
-    {
+    updateShadowCasting() {
       this._boxMesh.castShadow = this._cube3DRuntimeObject._isCastingShadow;
     }
-    updateShadowReceiving()
-    {
-      this._boxMesh.receiveShadow = this._cube3DRuntimeObject._isReceivingShadow;
+    updateShadowReceiving() {
+      this._boxMesh.receiveShadow =
+        this._cube3DRuntimeObject._isReceivingShadow;
     }
 
     updateFace(faceIndex: integer) {

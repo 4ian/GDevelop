@@ -436,17 +436,17 @@ namespace gdjs {
       ) {
         this.setMaterialType(newObjectData.content.materialType);
       }
-      if(
-        oldObjectData.content.isCastingShadow !== 
+      if (
+        oldObjectData.content.isCastingShadow !==
         newObjectData.content.isCastingShadow
-      ){
-        this.updateShadowCasting(newObjectData.content.isCastingShadow)
-        
+      ) {
+        this.updateShadowCasting(newObjectData.content.isCastingShadow);
       }
-      if(oldObjectData.content.isReceivingShadow !== newObjectData.content.isReceivingShadow)
-      {
-                this.updateShadowReceiving(newObjectData.content.isReceivingShadow)
-
+      if (
+        oldObjectData.content.isReceivingShadow !==
+        newObjectData.content.isReceivingShadow
+      ) {
+        this.updateShadowReceiving(newObjectData.content.isReceivingShadow);
       }
 
       return true;
@@ -549,18 +549,15 @@ namespace gdjs {
       this._materialType = newMaterialType;
       this._renderer._updateMaterials();
     }
-    updateShadowCasting(value: boolean)
-    {
+    updateShadowCasting(value: boolean) {
       this._isCastingShadow = value;
       this._renderer.updateShadowCasting();
     }
-    updateShadowReceiving(value: boolean)
-    {
+    updateShadowReceiving(value: boolean) {
       this._isReceivingShadow = value;
       this._renderer.updateShadowReceiving();
     }
   }
-
 
   export namespace Cube3DRuntimeObject {
     export enum MaterialType {

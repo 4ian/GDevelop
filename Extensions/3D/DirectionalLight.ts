@@ -38,13 +38,15 @@ namespace gdjs {
             this.light.shadow.camera.top = 500;
             this.light.shadow.camera.bottom = -500;
             this.light.position.set(0, 10, 0);
-            this.light.target.position.set(0,100,0);
+            this.light.target.position.set(0, 100, 0);
             this.rotationObject = new THREE.Group();
-            this.rotationObject.position.set(0,0,0);
-            this.rotationObject.rotation.set(0,0,0);
+            this.rotationObject.position.set(0, 0, 0);
+            this.rotationObject.rotation.set(0, 0, 0);
             this.rotationObject.add(this.light);
-            const shadowCameraHelper = new THREE.CameraHelper(this.light.shadow.camera);
-    this.rotationObject.add(shadowCameraHelper);
+            const shadowCameraHelper = new THREE.CameraHelper(
+              this.light.shadow.camera
+            );
+            this.rotationObject.add(shadowCameraHelper);
             this.light.shadow.camera.updateProjectionMatrix();
             this.updateRotation();
           }
@@ -88,23 +90,23 @@ namespace gdjs {
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any { 
+          updatePreRender(target: gdjs.EffectsTarget): any {
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
-const y = layer.getCameraY();
-const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
+            const y = layer.getCameraY();
+            const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
-this.rotationObject.position.set( //This is probably wrong : our axis management require to add an abstraction layer here I think
-  x,
-  z + 100, 
-  -y        
-);
-this.light.target.position.set(
+            this.rotationObject.position.set(
+              //This is probably wrong : our axis management require to add an abstraction layer here I think
+              x,
+              z + 100,
+              -y
+            );
+            this.light.target.position.set(
               -layer.getCameraY(),
               layer.getCameraZ(layer.getInitialCamera3DFieldOfView()),
               -layer.getCameraX()
-);
-
+            );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {

@@ -677,7 +677,6 @@ const Model3DEditor = ({
           <Text size="block-title">Shadows</Text>
           <Column noMargin expand>
             <PropertyCheckbox
-            
               objectConfiguration={objectConfiguration}
               propertyName="isCastingShadow"
             />

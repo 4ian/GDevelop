@@ -365,13 +365,11 @@ namespace gdjs {
       return this._renderer.hasAnimationEnded();
     }
 
-    setCastShadow(value: boolean): void
-    {
+    setCastShadow(value: boolean): void {
       this._castShadow = value;
     }
 
-    setReceiveShadow(value: boolean) : void
-    {
+    setReceiveShadow(value: boolean): void {
       this._receiveShadow = value;
     }
 

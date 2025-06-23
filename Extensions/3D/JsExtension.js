@@ -1087,14 +1087,14 @@ module.exports = {
         .addExtraInfo('StandardWithoutMetalness')
         .setLabel(_('Material type'));
 
-        objectProperties
+      objectProperties
         .getOrCreate('isCastingShadow')
         .setValue(objectContent.isCastingShadow)
         .setType('boolean')
         .setLabel(_('Shadow casting'))
         .setGroup(_('Shadows'));
 
-        objectProperties
+      objectProperties
         .getOrCreate('isReceivingShadow')
         .setValue(objectContent.isReceivingShadow)
         .setType('boolean')
@@ -1927,19 +1927,21 @@ module.exports = {
         .setLabel(_('Rotation (in degrees)'))
         .setType('number')
         .setGroup(_('Orientation'));
-        properties.getOrCreate('castShadow')
+      properties
+        .getOrCreate('castShadow')
         .setValue('true')
         .setLabel(_('Casting shadows'))
         .setType('boolean')
         .setGroup(_('Shadows'));
-        properties.getOrCreate('shadowQuality')
-        .setValue("Medium")
-        .addExtraInfo("Low")
-        .addExtraInfo("Medium")
-        .addExtraInfo("High")
-        .setLabel(_("Shadow quality"))
+      properties
+        .getOrCreate('shadowQuality')
+        .setValue('Medium')
+        .addExtraInfo('Low')
+        .addExtraInfo('Medium')
+        .addExtraInfo('High')
+        .setLabel(_('Shadow quality'))
         .setType('choice')
-        .setGroup(_("Shadows"))
+        .setGroup(_('Shadows'));
     }
     {
       const effect = extension

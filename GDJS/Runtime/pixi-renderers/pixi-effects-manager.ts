@@ -17,7 +17,7 @@ namespace gdjs {
     getName: () => string;
     getRendererObject: () => RendererObjectInterface | null | undefined;
     get3DRendererObject: () => THREE.Object3D | null | undefined;
-    getRuntimeLayer:() => gdjs.RuntimeLayer;
+    getRuntimeLayer: () => gdjs.RuntimeLayer;
   }
 
   /**

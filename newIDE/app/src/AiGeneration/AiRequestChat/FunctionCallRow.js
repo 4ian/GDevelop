@@ -108,6 +108,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
       details = result.details;
       hasDetailsToShow = result.hasDetailsToShow;
     } catch (error) {
+      console.error('Error rendering function call:', error);
       text = (
         <Trans>
           The editor was unable to display the operation ({functionCall.name})

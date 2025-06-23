@@ -154,8 +154,8 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._initializeFromObjectData(objectData);
       this._reinitializeRenderer();
+      this._initializeFromObjectData(objectData);
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
@@ -171,6 +171,13 @@ namespace gdjs {
           oldObjectData.animatable || [],
           newObjectData.animatable || []
         );
+      }
+      if (oldObjectData.variant !== newObjectData.variant) {
+        this._reinitializeRenderer();
+        this._initializeFromObjectData(newObjectData);
+
+        // The generated code calls the onCreated super implementation at the end.
+        this.onCreated();
       }
       return true;
     }

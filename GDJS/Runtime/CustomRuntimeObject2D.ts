@@ -8,7 +8,6 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
-      this.getRenderer().reinitialize(this, parent);
     }
 
     protected override _createRender(): gdjs.CustomRuntimeObject2DRenderer {

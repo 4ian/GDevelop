@@ -158,7 +158,9 @@ namespace gdjs {
       this._reinitializeRenderer();
       this._initializeFromObjectData(objectData);
 
-      // The generated code calls the onCreated super implementation at the end.
+      // When changing the variant, the instance is like a new instance.
+      // We call again `onCreated` at the end, like done by the constructor
+      // the first time it's created.
       this.onCreated();
     }
 

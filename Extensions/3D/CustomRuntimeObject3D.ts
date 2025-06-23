@@ -34,7 +34,6 @@ namespace gdjs {
       objectData: gdjs.Object3DData & gdjs.CustomObjectConfiguration
     ) {
       super(parent, objectData);
-      this._renderer.reinitialize(this, parent);
     }
 
     protected override _createRender() {

@@ -14,6 +14,7 @@ namespace gdjs {
     animatable?: SpriteAnimationData[];
     variant: string;
     childrenContent?: { [objectName: string]: ObjectConfiguration & any };
+    isInnerAreaFollowingParentSize: boolean;
   };
 
   /**
@@ -146,8 +147,8 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._initializeFromObjectData(objectData);
       this._reinitializeRenderer();
+      this._initializeFromObjectData(objectData);
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
@@ -163,6 +164,24 @@ namespace gdjs {
           oldObjectData.animatable || [],
           newObjectData.animatable || []
         );
+      }
+      if (oldObjectData.variant !== newObjectData.variant) {
+        const width = this.getWidth();
+        const height = this.getHeight();
+
+        this._reinitializeRenderer();
+        this._initializeFromObjectData(newObjectData);
+
+        // The generated code calls the onCreated super implementation at the end.
+        this.onCreated();
+
+        if (
+          oldObjectData.isInnerAreaFollowingParentSize &&
+          newObjectData.isInnerAreaFollowingParentSize
+        ) {
+          this.setWidth(width);
+          this.setHeight(height);
+        }
       }
       return true;
     }

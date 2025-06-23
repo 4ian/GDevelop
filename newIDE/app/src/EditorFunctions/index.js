@@ -1576,7 +1576,7 @@ const put2dInstances: EditorFunction = {
       return makeGenericSuccess(
         `Added ${newInstancesCount} instance${
           newInstancesCount > 1 ? 's' : ''
-        } of object "${object_name}" using ${brush_kind} brush at ${brush_position.join(
+        } of object "${object_name}" using ${brush_kind} brush at ${brushPosition.join(
           ', '
         )} on layer "${layer_name || 'base'}"`
       );

@@ -171,10 +171,9 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             </Text>
           )}
         </LineStackLayout>
-        {!isFinished && (
+        {!isFinished && !isWorking && (
           <RaisedButtonWithSplitMenu
             primary
-            disabled={isWorking}
             onClick={() => onProcessFunctionCalls([functionCall])}
             label={<Trans>Apply</Trans>}
             buildMenuTemplate={i18n => [

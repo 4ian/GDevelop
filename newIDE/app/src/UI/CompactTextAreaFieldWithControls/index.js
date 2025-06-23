@@ -19,6 +19,8 @@ export type CompactTextAreaFieldWithControlsProps = {|
   rows?: number,
   maxLength?: number,
   controls: React.Node,
+  hasNeonCorner?: boolean,
+  hasAnimatedNeonCorner?: boolean,
 |};
 
 export const CompactTextAreaFieldWithControls = ({
@@ -32,6 +34,8 @@ export const CompactTextAreaFieldWithControls = ({
   maxLength,
   onSubmit,
   controls,
+  hasNeonCorner,
+  hasAnimatedNeonCorner,
 }: CompactTextAreaFieldWithControlsProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
@@ -48,6 +52,9 @@ export const CompactTextAreaFieldWithControls = ({
           <div
             className={classNames({
               [classes.compactTextAreaField]: true,
+              [classes.neonCorner]: hasNeonCorner,
+              [classes.animatedNeonCorner]:
+                hasNeonCorner && hasAnimatedNeonCorner,
             })}
           >
             <textarea

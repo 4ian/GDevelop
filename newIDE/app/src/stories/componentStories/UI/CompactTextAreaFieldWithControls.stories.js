@@ -11,7 +11,6 @@ import RaisedButton from '../../../UI/RaisedButton';
 import MessagesIcon from '../../../UI/CustomSvgIcons/Messages';
 import CompactSelectField from '../../../UI/CompactSelectField';
 import SelectOption from '../../../UI/SelectOption';
-import SelectField from '../../../UI/SelectField';
 
 export default {
   title: 'UI Building Blocks/CompactTextAreaFieldWithControls',

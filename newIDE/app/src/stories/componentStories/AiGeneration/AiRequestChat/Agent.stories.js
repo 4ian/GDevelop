@@ -176,6 +176,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -199,6 +200,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -228,6 +230,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -261,17 +264,18 @@ export const WorkingAiRequestWithFinishedFunctionCall = () => (
       {({ i18n }) => (
         <AiRequestChat
           i18n={i18n}
+          {...commonProps}
           aiRequest={{
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'working',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
             output: fakeOutputWithFunctionCall,
             error: null,
           }}
-          {...commonProps}
           editorFunctionCallResults={[
             {
               status: 'finished',
@@ -301,6 +305,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -331,6 +336,7 @@ export const ReadyAiRequestWithFailedFunctionCall = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -365,6 +371,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',
@@ -389,6 +396,7 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
             createdAt: '',
             updatedAt: '',
             id: 'fake-working-new-ai-request',
+            mode: 'agent',
             status: 'ready',
             userId: 'fake-user-id',
             gameProjectJson: 'FAKE DATA',

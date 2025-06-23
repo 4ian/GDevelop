@@ -235,7 +235,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetAngle",
                 _("Angle"),
-                _("Change the angle of rotation of an object (in degrees)."),
+                _("Change the angle of rotation of an object (in degrees). For "
+                  "3D objects, this is the rotation around the Z axis."),
                 _("the angle"),
                 _("Angle"),
                 "res/actions/direction24_black.png",
@@ -250,7 +251,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("Rotate",
                 _("Rotate"),
                 _("Rotate an object, clockwise if the speed is positive, "
-                  "counterclockwise otherwise."),
+                  "counterclockwise otherwise. For 3D objects, this is the "
+                  "rotation around the Z axis."),
                 _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/rotate24_black.png",
@@ -634,7 +636,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Compare the angle of the specified object."),
+                   _("Compare the angle, in degrees, of the specified object. "
+                     "For 3D objects, this is the angle around the Z axis."),
                    _("the angle (in degrees)"),
                    _("Angle"),
                    "res/conditions/direction24_black.png",
@@ -1268,7 +1271,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("Angle",
                     _("Angle"),
-                    _("Current angle, in degrees, of the object"),
+                    _("Current angle, in degrees, of the object. For 3D "
+                      "objects, this is the angle around the Z axis."),
                     _("Angle"),
                     "res/actions/direction_black.png")
       .AddParameter("object", _("Object"));

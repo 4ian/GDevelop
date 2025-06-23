@@ -520,10 +520,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>
                   The AI agent will build simple games or features for you.{' '}
                   <Link
-                    href={getHelpLink('/interface/ask-ai')}
+                    href={getHelpLink('/interface/ai')}
                     color="secondary"
                     onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                      Window.openExternalURL(getHelpLink('/interface/ai'))
                     }
                   >
                     It can inspect your game objects and events.
@@ -535,10 +535,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>
                   The AI chat is experimental and still being improved.{' '}
                   <Link
-                    href={getHelpLink('/interface/ask-ai')}
+                    href={getHelpLink('/interface/ai')}
                     color="secondary"
                     onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                      Window.openExternalURL(getHelpLink('/interface/ai'))
                     }
                   >
                     It has access to your game objects but not events.

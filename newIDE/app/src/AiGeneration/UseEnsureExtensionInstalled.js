@@ -33,7 +33,7 @@ export const useEnsureExtensionInstalled = ({
         const extensionShortHeader =
           translatedExtensionShortHeadersByName[extensionName];
         if (!extensionShortHeader) {
-          throw new Error("Can't find extension with the required name.");
+          throw new Error(`Can't find extension named ${extensionName}.`);
         }
 
         await installExtension(

@@ -97,8 +97,18 @@ export type AssetSearchAndInstallOptions = {|
 |};
 
 export type EditorCallbacks = {|
-  onOpenLayout: (sceneName: string) => void,
-  onOpenEvents: (sceneName: string) => void,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
 |};
 
 /**
@@ -280,7 +290,13 @@ const createObject: EditorFunction = {
           Create object <b>{object_name}</b> in scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}
           </Link>
@@ -455,10 +471,17 @@ const inspectObjectProperties: EditorFunction = {
           Inspecting properties of object <b>{object_name}</b> in scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}
           </Link>
+          .
         </Trans>
       ),
     };
@@ -532,7 +555,13 @@ const changeObjectProperty: EditorFunction = {
             <b>{object_name}</b> (in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
@@ -636,10 +665,17 @@ const addBehavior: EditorFunction = {
             <b>{object_name}</b> in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
+            .
           </Trans>
         ),
       };
@@ -953,7 +989,13 @@ const changeBehaviorProperty: EditorFunction = {
             on object <b>{object_name}</b> (in scene{' '}
             <Link
               href="#"
-              onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'scene',
+                })
+              }
             >
               {scene_name}
             </Link>
@@ -1124,7 +1166,13 @@ const describeInstances: EditorFunction = {
           Inspecting instances of scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
             {scene_name}.
           </Link>
@@ -1304,10 +1352,17 @@ const readSceneEvents: EditorFunction = {
           Inspecting event sheet of scene{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'events',
+              })
+            }
           >
-            {scene_name}.
+            {scene_name}
           </Link>
+          .
         </Trans>
       ),
     };
@@ -1338,7 +1393,7 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderForEditor: ({ args, shouldShowDetails }) => {
+  renderForEditor: ({ args, shouldShowDetails, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const objectsListArgument = SafeExtractor.extractStringProperty(
@@ -1380,7 +1435,24 @@ const addSceneEvents: EditorFunction = {
 
     if (eventsDescription) {
       return {
-        text: <Trans>Add or rework events of scene {scene_name}</Trans>,
+        text: (
+          <Trans>
+            Add or rework{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
+        ),
         details,
         hasDetailsToShow: true,
       };
@@ -1388,7 +1460,20 @@ const addSceneEvents: EditorFunction = {
       return {
         text: (
           <Trans>
-            Adapt events of scene {scene_name}: "{placementHint}".
+            Adapt{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>{' '}
+            ("{placementHint}").
           </Trans>
         ),
         details,
@@ -1396,7 +1481,24 @@ const addSceneEvents: EditorFunction = {
       };
     } else {
       return {
-        text: <Trans>Modify events of scene {scene_name}.</Trans>,
+        text: (
+          <Trans>
+            Modify{' '}
+            <Link
+              href="#"
+              onClick={() =>
+                editorCallbacks.onOpenLayout(scene_name, {
+                  openEventsEditor: true,
+                  openSceneEditor: true,
+                  focusWhenOpened: 'events',
+                })
+              }
+            >
+              events of scene {scene_name}
+            </Link>
+            .
+          </Trans>
+        ),
         details,
         hasDetailsToShow: true,
       };
@@ -1429,31 +1531,6 @@ const addSceneEvents: EditorFunction = {
     const scene = project.getLayout(sceneName);
     const currentSceneEvents = scene.getEvents();
 
-    // Validate objectsList:
-    if (objectsList) {
-      const objectsListArray = objectsList
-        .split(',')
-        .map(object => object.trim());
-      const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
-        project,
-        scene
-      );
-
-      const missingObjectOrGroupNames = objectsListArray.filter(
-        object =>
-          !projectScopedContainers
-            .getObjectsContainersList()
-            .hasObjectOrGroupNamed(object)
-      );
-      if (missingObjectOrGroupNames.length > 0) {
-        return makeGenericFailure(
-          `Object (or group) called "${missingObjectOrGroupNames.join(
-            ', '
-          )}" does not exist in the scene (or project). Please create the objects first if needed, or fix the objects_list or the description of the events to generate.`
-        );
-      }
-    }
-
     const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
     });
@@ -1479,14 +1556,27 @@ const addSceneEvents: EditorFunction = {
       }
 
       const aiGeneratedEvent = eventsGenerationResult.aiGeneratedEvent;
-      if (aiGeneratedEvent.error) {
+
+      const makeAiGeneratedEventFailure = (
+        message: string,
+        details?: {|
+          generatedEventsErrorDiagnostics: string,
+        |}
+      ) => {
         return {
           success: false,
-          message: `Infrastructure error when generating events (${
-            aiGeneratedEvent.error.message
-          }). Consider trying again or a different approach.`,
+          message,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          ...details,
         };
+      };
+
+      if (aiGeneratedEvent.error) {
+        return makeAiGeneratedEventFailure(
+          `Infrastructure error when generating events (${
+            aiGeneratedEvent.error.message
+          }). Consider trying again or a different approach.`
+        );
       }
 
       const changes = aiGeneratedEvent.changes;
@@ -1494,7 +1584,7 @@ const addSceneEvents: EditorFunction = {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'No generated events found and no other information was given.';
-        return makeGenericFailure(
+        return makeAiGeneratedEventFailure(
           `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
         );
       }
@@ -1506,62 +1596,90 @@ const addSceneEvents: EditorFunction = {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'This probably means what you asked for is not possible or does not work like this.';
-        return {
-          success: false,
-          message: `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
-          aiGeneratedEventId: aiGeneratedEvent.id,
-          generatedEventsErrorDiagnostics: changes
-            .map(change => change.diagnosticLines.join('\n'))
-            .join('\n\n'),
-        };
+        return makeAiGeneratedEventFailure(
+          `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
+          {
+            generatedEventsErrorDiagnostics: changes
+              .map(change => change.diagnosticLines.join('\n'))
+              .join('\n\n'),
+          }
+        );
       }
 
-      for (const change of changes) {
-        for (const extensionName of change.extensionNames || []) {
+      try {
+        const extensionNames = new Set();
+        for (const change of changes) {
+          for (const extensionName of change.extensionNames || []) {
+            extensionNames.add(extensionName);
+          }
+        }
+        for (const extensionName of extensionNames) {
           await ensureExtensionInstalled({ extensionName });
         }
+      } catch (e) {
+        return makeAiGeneratedEventFailure(
+          `Error when installing extensions: ${
+            e.message
+          }. Consider trying again or a different approach.`
+        );
       }
-
-      for (const change of changes) {
-        addUndeclaredVariables({
-          project,
-          scene,
-          undeclaredVariables: change.undeclaredVariables,
-        });
-
-        const objectNames = Object.keys(change.undeclaredObjectVariables);
-        for (const objectName of objectNames) {
-          const undeclaredVariables =
-            change.undeclaredObjectVariables[objectName];
-          addObjectUndeclaredVariables({
+      try {
+        for (const change of changes) {
+          addUndeclaredVariables({
             project,
             scene,
-            objectName,
-            undeclaredVariables,
+            undeclaredVariables: change.undeclaredVariables,
           });
+
+          const objectNames = Object.keys(change.undeclaredObjectVariables);
+          for (const objectName of objectNames) {
+            const undeclaredVariables =
+              change.undeclaredObjectVariables[objectName];
+            addObjectUndeclaredVariables({
+              project,
+              scene,
+              objectName,
+              undeclaredVariables,
+            });
+          }
         }
+
+        applyEventsChanges(
+          project,
+          currentSceneEvents,
+          changes,
+          aiGeneratedEvent.id
+        );
+        onSceneEventsModifiedOutsideEditor(scene);
+
+        const resultMessage =
+          aiGeneratedEvent.resultMessage ||
+          'Properly modified or added new event(s).';
+        return {
+          success: true,
+          message: resultMessage,
+          aiGeneratedEventId: aiGeneratedEvent.id,
+        };
+      } catch (error) {
+        console.error(
+          `Unexpected error when adding events from an AI Generated Event (id: ${
+            aiGeneratedEvent.id
+          }):`,
+          error
+        );
+        return makeAiGeneratedEventFailure(
+          `An unexpected error happened in the GDevelop editor while adding generated events: ${
+            error.message
+          }. Consider a different approach.`
+        );
       }
-
-      applyEventsChanges(
-        project,
-        currentSceneEvents,
-        changes,
-        aiGeneratedEvent.id
-      );
-      onSceneEventsModifiedOutsideEditor(scene);
-
-      const resultMessage =
-        aiGeneratedEvent.resultMessage ||
-        'Properly modified or added new event(s).';
-      return {
-        success: true,
-        message: resultMessage,
-        aiGeneratedEventId: aiGeneratedEvent.id,
-      };
     } catch (error) {
-      console.error('Error in addSceneEvents with AI generation:', error);
+      console.error(
+        'Unexpected error when creating AI Generated Event:',
+        error
+      );
       return makeGenericFailure(
-        `An unexpected error happened in the GDevelop editor while adding generated events: ${
+        `An unexpected error happened in the GDevelop editor while creating generated events: ${
           error.message
         }. Consider a different approach.`
       );
@@ -1579,13 +1697,20 @@ const createScene: EditorFunction = {
     return {
       text: (
         <Trans>
-          Create a new scene called{' '}
+          Create a new scene called <b>{scene_name}</b>.{' '}
           <Link
             href="#"
-            onClick={() => editorCallbacks.onOpenLayout(scene_name)}
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              })
+            }
           >
-            {scene_name}.
+            Click to open it
           </Link>
+          .
         </Trans>
       ),
     };

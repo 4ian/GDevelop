@@ -933,9 +933,16 @@ namespace gdjs {
       const oldObjects = objects.map((objectData) =>
         runtimeInstanceContainer._objects.get(objectData.name)
       );
+
+      const projectData: ProjectData = gdjs.projectData;
+      const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
+        projectData,
+        objects
+      );
+
       this._hotReloadRuntimeSceneObjects(
         oldObjects,
-        objects,
+        newObjectDataList,
         runtimeInstanceContainer
       );
       // Update the GameData

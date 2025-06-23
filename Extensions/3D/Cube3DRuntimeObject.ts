@@ -25,6 +25,8 @@ namespace gdjs {
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
       tint: string | undefined;
+      isCastingShadow: boolean;
+      isReceivingShadow: boolean;
       materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
@@ -73,6 +75,8 @@ namespace gdjs {
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
       gdjs.Cube3DRuntimeObject.MaterialType.Basic;
     _tint: string;
+    _isCastingShadow: boolean;
+    _isReceivingShadow: boolean;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -121,6 +125,8 @@ namespace gdjs {
       ];
 
       this._tint = objectData.content.tint || '255;255;255';
+      this._isCastingShadow = objectData.content.isCastingShadow || false;
+      this._isReceivingShadow = objectData.content.isReceivingShadow || false;
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType
@@ -430,6 +436,18 @@ namespace gdjs {
       ) {
         this.setMaterialType(newObjectData.content.materialType);
       }
+      if(
+        oldObjectData.content.isCastingShadow !== 
+        newObjectData.content.isCastingShadow
+      ){
+        this.updateShadowCasting(newObjectData.content.isCastingShadow)
+        
+      }
+      if(oldObjectData.content.isReceivingShadow !== newObjectData.content.isReceivingShadow)
+      {
+                this.updateShadowReceiving(newObjectData.content.isReceivingShadow)
+
+      }
 
       return true;
     }
@@ -531,7 +549,18 @@ namespace gdjs {
       this._materialType = newMaterialType;
       this._renderer._updateMaterials();
     }
+    updateShadowCasting(value: boolean)
+    {
+      this._isCastingShadow = value;
+      this._renderer.updateShadowCasting();
+    }
+    updateShadowReceiving(value: boolean)
+    {
+      this._isReceivingShadow = value;
+      this._renderer.updateShadowReceiving();
+    }
   }
+
 
   export namespace Cube3DRuntimeObject {
     export enum MaterialType {

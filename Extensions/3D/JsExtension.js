@@ -1089,14 +1089,14 @@ module.exports = {
 
       objectProperties
         .getOrCreate('isCastingShadow')
-        .setValue(objectContent.isCastingShadow)
+        .setValue(objectContent.isCastingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow casting'))
         .setGroup(_('Shadows'));
 
       objectProperties
         .getOrCreate('isReceivingShadow')
-        .setValue(objectContent.isReceivingShadow)
+        .setValue(objectContent.isReceivingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow receiving'))
         .setGroup(_('Shadows'));
@@ -2534,6 +2534,9 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getRotationY()),
           RenderedInstance.toRad(this._instance.getAngle())
         );
+
+        this._threeObject.castShadow = object.content.isCastingShadow;
+        this._threeObject.receiveShadow = object.content.isReceivingShadow;
 
         let materialsDirty = false;
         let uvMappingDirty = false;

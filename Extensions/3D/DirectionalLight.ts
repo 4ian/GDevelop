@@ -20,25 +20,31 @@ namespace gdjs {
           light: THREE.DirectionalLight;
           rotationObject: THREE.Group;
           _isEnabled: boolean = false;
+          _isCastingShadow: boolean = true;
           top: string = 'Y-';
           elevation: float = 45;
           rotation: float = 0;
-          shadowSize: float = 1024;
+          shadowSize: float = 1024; //1024 == medium quality
 
           constructor() {
             this.light = new THREE.DirectionalLight();
-            this.light.castShadow = true;
+            this.light.castShadow = this._isCastingShadow;
             this.light.shadow.mapSize.width = this.shadowSize;
             this.light.shadow.mapSize.height = this.shadowSize;
-            this.light.shadow.camera.near = 3;
+            this.light.shadow.camera.near = 1;
             this.light.shadow.camera.far = 10000;
-            this.light.shadow.camera.right = 1000;
-            this.light.shadow.camera.left = -1000;
-            this.light.shadow.camera.top = 1000;
-            this.light.shadow.camera.bottom = -1000;
-            this.light.position.set(1, 0, 0);
+            this.light.shadow.camera.right = 500;
+            this.light.shadow.camera.left = -500;
+            this.light.shadow.camera.top = 500;
+            this.light.shadow.camera.bottom = -500;
+            this.light.position.set(0, 10, 0);
+            this.light.target.position.set(0,100,0);
             this.rotationObject = new THREE.Group();
+            this.rotationObject.position.set(0,0,0);
+            this.rotationObject.rotation.set(0,0,0);
             this.rotationObject.add(this.light);
+            const shadowCameraHelper = new THREE.CameraHelper(this.light.shadow.camera);
+    this.rotationObject.add(shadowCameraHelper);
             this.light.shadow.camera.updateProjectionMatrix();
             this.updateRotation();
           }
@@ -65,6 +71,7 @@ namespace gdjs {
               return false;
             }
             scene.add(this.rotationObject);
+            scene.add(this.light.target);
             this._isEnabled = true;
             return true;
           }
@@ -77,10 +84,28 @@ namespace gdjs {
               return false;
             }
             scene.remove(this.rotationObject);
+            scene.remove(this.light.target);
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any { 
+            const layer = target.getRuntimeLayer();
+            const x = layer.getCameraX();
+const y = layer.getCameraY();
+const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
+
+this.rotationObject.position.set( //This is probably wrong : our axis management require to add an abstraction layer here I think
+  x,
+  z + 100, 
+  -y        
+);
+this.light.target.position.set(
+              -layer.getCameraY(),
+              layer.getCameraZ(layer.getInitialCamera3DFieldOfView()),
+              -layer.getCameraX()
+);
+
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
               this.light.intensity = value;

@@ -265,8 +265,6 @@ namespace gdjs {
 
       // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
-      threeObject.castShadow = true;
-      threeObject.receiveShadow = true;
       threeObject.rotation.order = 'ZYX';
       const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
       threeObject.add(root);
@@ -304,6 +302,8 @@ namespace gdjs {
      * Replace materials to better work with lights (or no light).
      */
     private _replaceMaterials(threeObject: THREE.Object3D) {
+      threeObject.castShadow = this._model3DRuntimeObject._castShadow;
+      threeObject.receiveShadow = this._model3DRuntimeObject._receiveShadow;
       if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness

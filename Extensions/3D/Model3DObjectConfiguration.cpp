@@ -23,7 +23,7 @@ Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(0), rotationY(0),
       rotationZ(0), modelResourceName(""), materialType("StandardWithoutMetalness"),
       originLocation("ModelOrigin"), centerLocation("ModelOrigin"),
-      keepAspectRatio(true), crossfadeDuration(0.1f) {}
+      keepAspectRatio(true), crossfadeDuration(0.1f), isCastingShadow(true), isReceivingShadow(true) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
                                                 const gd::String &newValue) {
@@ -75,6 +75,16 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
     crossfadeDuration = newValue.To<double>();
     return true;
   }
+  if(propertyName == "isCastingShadow")
+  {
+    isCastingShadow = newValue.To<bool>();
+    return true;
+  }
+if(propertyName == "isReceivingShadow")
+{
+  isReceivingShadow = newValue.To<bool>();
+  return true;
+}
 
   return false;
 }
@@ -178,6 +188,20 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetGroup(_("Animations"))
       .SetMeasurementUnit(gd::MeasurementUnit::GetSecond());
 
+      objectProperties["isCastingShadow"]
+      .SetValue(gd::String::From(isCastingShadow))
+      .SetType("boolean")
+      .SetLabel(_("Shadow Casting"))
+      .SetGroup(_("Shadows"));
+
+      objectProperties["isReceivingShadow"]
+      .SetValue(gd::String::From(isReceivingShadow))
+      .SetType("boolean")
+      .SetLabel(_("Shadow receiving"))
+      .SetGroup(_("Shadows"));
+
+      
+
   return objectProperties;
 }
 
@@ -210,6 +234,8 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   centerLocation = content.GetStringAttribute("centerLocation");
   keepAspectRatio = content.GetBoolAttribute("keepAspectRatio");
   crossfadeDuration = content.GetDoubleAttribute("crossfadeDuration");
+  isCastingShadow = content.GetBoolAttribute("isCastingShadow");
+  isReceivingShadow = content.GetBoolAttribute("isReceivingShadow");
 
   RemoveAllAnimations();
   auto &animationsElement = content.GetChild("animations");
@@ -239,6 +265,8 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
   content.SetAttribute("crossfadeDuration", crossfadeDuration);
+  content.SetAttribute("castShadow", isCastingShadow);
+  content.SetAttribute("receiveShadow", isReceivingShadow);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

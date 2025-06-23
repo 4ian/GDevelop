@@ -38,6 +38,8 @@ namespace gdjs {
         | 'BottomCenterY';
       animations: Model3DAnimation[];
       crossfadeDuration: float;
+      castShadow: boolean;
+      receiveShadow: boolean;
     };
   }
 
@@ -101,6 +103,8 @@ namespace gdjs {
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
     _crossfadeDuration: float = 0;
+    _castShadow: boolean = true;
+    _receiveShadow: boolean = true;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -126,6 +130,9 @@ namespace gdjs {
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
+
+      this._castShadow = objectData.content.castShadow;
+      this._receiveShadow = objectData.content.receiveShadow;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -356,6 +363,16 @@ namespace gdjs {
      */
     hasAnimationEnded(): boolean {
       return this._renderer.hasAnimationEnded();
+    }
+
+    setCastShadow(value: boolean): void
+    {
+      this._castShadow = value;
+    }
+
+    setReceiveShadow(value: boolean) : void
+    {
+      this._receiveShadow = value;
     }
 
     setCrossfadeDuration(duration: number): void {

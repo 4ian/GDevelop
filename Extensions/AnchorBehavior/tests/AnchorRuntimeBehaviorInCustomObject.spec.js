@@ -14,6 +14,7 @@ describe('gdjs.AnchorRuntimeBehavior', () => {
       effects: [],
       content: {},
       childrenContent: {},
+      isInnerAreaFollowingParentSize: false,
     });
     runtimeScene.addObject(customObject);
     customObject.setPosition(500, 250);

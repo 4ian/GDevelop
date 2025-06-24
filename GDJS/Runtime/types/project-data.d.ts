@@ -229,7 +229,7 @@ declare interface EventsBasedObjectVariantData extends InstanceContainerData {
   /**
    * A value shared by every object instances.
    *
-   * @see gdjs.CustomRuntimeObjectInstanceContainer._originalInnerArea
+   * @see gdjs.CustomRuntimeObjectInstanceContainer._initialInnerArea
    **/
   _initialInnerArea: {
     min: [float, float, float];

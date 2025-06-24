@@ -142,7 +142,11 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
             )}
           </div>
         </Tooltip>
-        <ResponsiveLineStackLayout justifyContent="space-between" expand noOverflowParent>
+        <ResponsiveLineStackLayout
+          justifyContent="space-between"
+          expand
+          noOverflowParent
+        >
           <LineStackLayout noMargin alignItems="baseline">
             <Text>{text || 'Working...'}</Text>
             {hasDetailsToShow && (
@@ -172,7 +176,12 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
               </Text>
             )}
           </LineStackLayout>
-          <LineStackLayout noMargin alignItems="baseline" justifyContent="flex-end" neverShrink>
+          <LineStackLayout
+            noMargin
+            alignItems="baseline"
+            justifyContent="flex-end"
+            neverShrink
+          >
             {!isFinished && !isWorking && (
               <FlatButtonWithSplitMenu
                 primary

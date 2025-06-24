@@ -94,25 +94,29 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: |
             export PATH=~/.local/bin:$PATH
-            for i in 1 2 3; do
+            for i in 1 2 3 4 5 6 7; do
               aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ && break
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
-            echo "All retries for deployment failed!" >&2
-            exit 1
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
 
       - run:
           name: Deploy to S3 (latest)
           command: |
             export PATH=~/.local/bin:$PATH
-            for i in 1 2 3; do
+            for i in 1 2 3 4 5 6 7; do
               aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/ && break
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
-            echo "All retries for deployment failed!" >&2
-            exit 1
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
 
   # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:

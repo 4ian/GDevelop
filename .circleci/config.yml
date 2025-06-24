@@ -18,7 +18,7 @@ jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
     macos:
-      xcode: 14.2.0
+      xcode: 16.4.0
     resource_class: m4pro.medium
     steps:
       - checkout

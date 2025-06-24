@@ -20,7 +20,6 @@ namespace gdjs {
           light: THREE.DirectionalLight;
           rotationObject: THREE.Group;
           _isEnabled: boolean = false;
-          _isCastingShadow: boolean = true;
           top: string = 'Y-';
           elevation: float = 45;
           rotation: float = 0;
@@ -28,7 +27,6 @@ namespace gdjs {
 
           constructor() {
             this.light = new THREE.DirectionalLight();
-            this.light.castShadow = this._isCastingShadow;
             this.light.shadow.mapSize.width = this.shadowSize;
             this.light.shadow.mapSize.height = this.shadowSize;
             this.light.shadow.camera.near = 1;
@@ -139,6 +137,34 @@ namespace gdjs {
               this.top = value;
               this.updateRotation();
             }
+            if(parameterName === 'shadowQuality')
+            {
+              console.log("il y a un paramètre shadowQuality");
+              if(value === 'Low')
+              {
+                this.light.shadow.mapSize.height = 64;
+                this.light.shadow.mapSize.width = 64;
+                this.light.shadow.map = null; // Force la recréation du shadow map
+
+                this.light.shadow.needsUpdate = true;
+              }
+              if(value === 'Medium')
+              {
+                this.light.shadow.mapSize.width = 1024;
+                this.light.shadow.mapSize.height = 1024;
+                                this.light.shadow.map = null; // Force la recréation du shadow map
+                this.light.shadow.needsUpdate = true;
+
+              }
+              if(value === 'High')
+              {
+                this.light.shadow.mapSize.width = 4096;
+                this.light.shadow.mapSize.height = 4096;
+                                this.light.shadow.map = null; // Force la recréation du shadow map
+                this.light.shadow.needsUpdate = true;
+
+              }
+            }
           }
           updateColorParameter(parameterName: string, value: number): void {
             if (parameterName === 'color') {
@@ -151,7 +177,13 @@ namespace gdjs {
             }
             return 0;
           }
-          updateBooleanParameter(parameterName: string, value: boolean): void {}
+          updateBooleanParameter(parameterName: string, value: boolean): void {
+            if(parameterName === 'isCastingShadow')
+            {
+              this.light.castShadow = value;
+            }
+          }
+          
           updateRotation() {
             if (this.top === 'Z+') {
               // 0° is a light from the right of the screen.

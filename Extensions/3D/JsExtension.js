@@ -1928,9 +1928,9 @@ module.exports = {
         .setType('number')
         .setGroup(_('Orientation'));
       properties
-        .getOrCreate('castShadow')
+        .getOrCreate('isCastingShadow')
         .setValue('true')
-        .setLabel(_('Casting shadows'))
+        .setLabel(_('Shadow casting'))
         .setType('boolean')
         .setGroup(_('Shadows'));
       properties

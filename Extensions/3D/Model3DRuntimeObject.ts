@@ -127,8 +127,8 @@ namespace gdjs {
         objectData.content.materialType
       );
 
-      this._isCastingShadow = objectData.content.isCastingShadow;
-      this._isReceivingShadow = objectData.content.isReceivingShadow;
+      this.setIsCastingShadow(objectData.content.isCastingShadow);
+      this.setIsReceivingShadow(objectData.content.isReceivingShadow);
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
@@ -205,13 +205,13 @@ namespace gdjs {
         oldObjectData.content.isCastingShadow !==
         newObjectData.content.isCastingShadow
       ) {
-        this._isCastingShadow = newObjectData.content.isCastingShadow;
+        this.setIsCastingShadow(newObjectData.content.isCastingShadow);
       }
       if (
         oldObjectData.content.isReceivingShadow !==
         newObjectData.content.isReceivingShadow
       ) {
-        this._isReceivingShadow = newObjectData.content.isReceivingShadow;
+        this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       return true;
     }
@@ -376,12 +376,14 @@ namespace gdjs {
       return this._renderer.hasAnimationEnded();
     }
 
-    setIsCastShadow(value: boolean): void {
+    setIsCastingShadow(value: boolean): void {
       this._isCastingShadow = value;
+      this._renderer._updateShadow();
     }
 
-    setIsReceiveShadow(value: boolean): void {
+    setIsReceivingShadow(value: boolean): void {
       this._isReceivingShadow = value;
+      this._renderer._updateShadow();
     }
 
     setCrossfadeDuration(duration: number): void {

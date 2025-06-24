@@ -114,7 +114,7 @@ namespace gdjs {
       // Legacy events-based objects don't have any instance in their default
       // variant since there wasn't a graphical editor at the time.
       // In this case, the editor doesn't allow to choose a variant, but a
-      // variant can be set if a user rolled back the extension.
+      // variant may have stayed after a user rolled back the extension.
       // This variant must be ignored to match what the editor shows.
       const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
         eventsBasedObjectData.defaultVariant.instances.length == 0;

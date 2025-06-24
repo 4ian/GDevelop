@@ -350,6 +350,7 @@ function LeaderboardAppearanceDialog({
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
                 recommendedPlanIdIfNoSubscription="gdevelop_silver"
+                placementId="leaderboards-customization"
               >
                 <Line>
                   <Column noMargin>
@@ -406,6 +407,7 @@ function LeaderboardAppearanceDialog({
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
                 recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                placementId="leaderboards-customization"
               >
                 <Line>
                   <Column noMargin>

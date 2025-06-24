@@ -656,6 +656,7 @@ const PrivateAssetPackInformationPage = ({
                                           analyticsMetadata: {
                                             reason: 'Claim asset pack',
                                             recommendedPlanId: 'gdevelop_gold',
+                                            placementId: 'claim-asset-pack',
                                           },
                                           filter: 'individual',
                                         })

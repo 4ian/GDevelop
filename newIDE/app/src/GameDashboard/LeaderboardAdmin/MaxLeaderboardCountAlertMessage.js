@@ -47,6 +47,7 @@ const MaxLeaderboardCountAlertMessage = () => {
       <Column expand>
         <GetSubscriptionCard
           subscriptionDialogOpeningReason="Leaderboard count per game limit reached"
+          placementId="leaderboards"
           label={
             !hasValidSubscription ? (
               <Trans>Upgrade to GDevelop Premium</Trans>

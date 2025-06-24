@@ -638,6 +638,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                             analyticsMetadata: {
                               reason: 'Manage subscription as teacher',
                               recommendedPlanId: 'gdevelop_education',
+                              placementId: 'education',
                             },
                             filter: 'education',
                           })

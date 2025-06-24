@@ -252,13 +252,13 @@ namespace gdjs {
               };
           this._objectInitialPositions.set(object, initialPosition);
         }
-        object.setX(initialPosition.x + movement.translationX);
-        object.setY(initialPosition.y + movement.translationY);
+        object.setX(Math.round(initialPosition.x + movement.translationX));
+        object.setY(Math.round(initialPosition.y + movement.translationY));
         object.setAngle(initialPosition.angle + movement.rotationZ);
         object.setWidth(initialPosition.width * movement.scaleX);
         object.setHeight(initialPosition.height * movement.scaleY);
         if (is3D(object)) {
-          object.setZ(initialPosition.z + movement.translationZ);
+          object.setZ(Math.round(initialPosition.z + movement.translationZ));
           object.setRotationX(initialPosition.rotationX + movement.rotationX);
           object.setRotationY(initialPosition.rotationY + movement.rotationY);
           object.setDepth(initialPosition.depth * movement.scaleZ);

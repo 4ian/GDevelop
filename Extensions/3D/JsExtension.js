@@ -2535,9 +2535,6 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
-        this._threeObject.castShadow = object.content.isCastingShadow;
-        this._threeObject.receiveShadow = object.content.isReceivingShadow;
-
         let materialsDirty = false;
         let uvMappingDirty = false;
         let tintDirty = false;

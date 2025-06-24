@@ -286,6 +286,10 @@ namespace gdjs {
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(threeObject);
       this._threeObject = threeObject;
+      this._threeObject.traverse((child) => {
+        child.castShadow = this._model3DRuntimeObject._isCastingShadow;
+        child.receiveShadow = this._model3DRuntimeObject._isReceivingShadow;
+      });
 
       // Start the current animation on the new 3D object.
       this._animationMixer = new THREE.AnimationMixer(root);
@@ -302,8 +306,6 @@ namespace gdjs {
      * Replace materials to better work with lights (or no light).
      */
     private _replaceMaterials(threeObject: THREE.Object3D) {
-      threeObject.castShadow = this._model3DRuntimeObject._castShadow;
-      threeObject.receiveShadow = this._model3DRuntimeObject._receiveShadow;
       if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness

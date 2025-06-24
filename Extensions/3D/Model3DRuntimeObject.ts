@@ -38,8 +38,8 @@ namespace gdjs {
         | 'BottomCenterY';
       animations: Model3DAnimation[];
       crossfadeDuration: float;
-      castShadow: boolean;
-      receiveShadow: boolean;
+      isCastingShadow: boolean;
+      isReceivingShadow: boolean;
     };
   }
 
@@ -103,8 +103,8 @@ namespace gdjs {
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
     _crossfadeDuration: float = 0;
-    _castShadow: boolean = true;
-    _receiveShadow: boolean = true;
+    _isCastingShadow: boolean = false;
+    _isReceivingShadow: boolean = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -131,8 +131,8 @@ namespace gdjs {
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
 
-      this._castShadow = objectData.content.castShadow;
-      this._receiveShadow = objectData.content.receiveShadow;
+      this._isCastingShadow = objectData.content.isCastingShadow;
+      this._isReceivingShadow = objectData.content.isReceivingShadow;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -201,6 +201,18 @@ namespace gdjs {
         this._centerPoint = getPointForLocation(
           newObjectData.content.centerLocation
         );
+      }
+      if (
+        oldObjectData.content.isCastingShadow !==
+        newObjectData.content.isCastingShadow
+      ) {
+        this._isCastingShadow = newObjectData.content.isCastingShadow;
+      }
+      if (
+        oldObjectData.content.isReceivingShadow !==
+        newObjectData.content.isReceivingShadow
+      ) {
+        this._isReceivingShadow = newObjectData.content.isReceivingShadow;
       }
       return true;
     }
@@ -366,11 +378,11 @@ namespace gdjs {
     }
 
     setCastShadow(value: boolean): void {
-      this._castShadow = value;
+      this._isCastingShadow = value;
     }
 
     setReceiveShadow(value: boolean): void {
-      this._receiveShadow = value;
+      this._isReceivingShadow = value;
     }
 
     setCrossfadeDuration(duration: number): void {

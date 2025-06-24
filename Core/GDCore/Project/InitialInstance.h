@@ -377,7 +377,7 @@ class GD_CORE_API InitialInstance {
    * \brief Reset the persistent UUID used to recognize
    * the same initial instance between serialization.
    */
-  const gd::String& GetPersistentUuid() { return persistentUuid; };
+  const gd::String& GetPersistentUuid() const { return persistentUuid; }
   ///@}
 
  private:

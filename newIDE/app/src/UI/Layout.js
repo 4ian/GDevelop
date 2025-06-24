@@ -94,6 +94,7 @@ type LineStackLayoutProps = {|
   children: React.Node,
   useLargeSpacer?: boolean,
   overflow?: 'hidden', // allows children Text components to use text ellipsis when they are too long
+  neverShrink?: boolean,
 |};
 
 export const LineStackLayout = ({
@@ -105,6 +106,7 @@ export const LineStackLayout = ({
   children,
   useLargeSpacer,
   overflow,
+  neverShrink,
 }: LineStackLayoutProps) => {
   let isFirstChild = true;
   return (
@@ -115,6 +117,7 @@ export const LineStackLayout = ({
       expand={expand}
       noMargin={noMargin}
       overflow={overflow}
+      neverShrink={neverShrink}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;

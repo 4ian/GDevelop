@@ -791,6 +791,19 @@ export const AskAiEditor = React.memo<Props>(
         ]
       );
 
+      const hasFunctionsCallsToProcess = React.useMemo(
+        () =>
+          selectedAiRequest
+            ? getFunctionCallsToProcess({
+                aiRequest: selectedAiRequest,
+                editorFunctionCallResults: getEditorFunctionCallResults(
+                  selectedAiRequest.id
+                ),
+              }).length > 0
+            : false,
+        [selectedAiRequest, getEditorFunctionCallResults]
+      );
+
       // Send the results of the function call outputs, if any, and the user message (if any).
       const onSendMessage = React.useCallback(
         async ({ userMessage }: {| userMessage: string |}) => {
@@ -813,6 +826,7 @@ export const AskAiEditor = React.memo<Props>(
           // If anything is not finished yet, stop there (we only send all
           // results at once, AI do not support partial results).
           if (hasUnfinishedResult) return;
+          if (hasFunctionsCallsToProcess) return;
 
           // If nothing to send, stop there.
           if (functionCallOutputs.length === 0 && !userMessage) return;
@@ -915,6 +929,7 @@ export const AskAiEditor = React.memo<Props>(
           setLastSendError,
           onRefreshLimits,
           project,
+          hasFunctionsCallsToProcess,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(

@@ -1412,7 +1412,7 @@ interface InitialInstance {
     void SetDefaultDepth(double depth);
 
     [Ref] InitialInstance ResetPersistentUuid();
-    [Const, Value] DOMString GetPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 
     void UpdateCustomProperty(
         [Const] DOMString name,

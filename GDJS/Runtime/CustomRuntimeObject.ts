@@ -150,7 +150,9 @@ namespace gdjs {
       this._reinitializeRenderer();
       this._initializeFromObjectData(objectData);
 
-      // The generated code calls the onCreated super implementation at the end.
+      // When changing the variant, the instance is like a new instance.
+      // We call again `onCreated` at the end, like done by the constructor
+      // the first time it's created.
       this.onCreated();
     }
 
@@ -168,6 +170,18 @@ namespace gdjs {
       if (oldObjectData.variant !== newObjectData.variant) {
         const width = this.getWidth();
         const height = this.getHeight();
+        const hasInnerAreaChanged =
+          oldObjectData.isInnerAreaFollowingParentSize &&
+          this._instanceContainer._initialInnerArea &&
+          this._innerArea &&
+          (this._instanceContainer._initialInnerArea.min[0] !==
+            this._innerArea.min[0] ||
+            this._instanceContainer._initialInnerArea.min[1] !==
+              this._innerArea.min[1] ||
+            this._instanceContainer._initialInnerArea.max[0] !==
+              this._innerArea.max[0] ||
+            this._instanceContainer._initialInnerArea.max[1] !==
+              this._innerArea.max[1]);
 
         this._reinitializeRenderer();
         this._initializeFromObjectData(newObjectData);
@@ -175,10 +189,8 @@ namespace gdjs {
         // The generated code calls the onCreated super implementation at the end.
         this.onCreated();
 
-        if (
-          oldObjectData.isInnerAreaFollowingParentSize &&
-          newObjectData.isInnerAreaFollowingParentSize
-        ) {
+        // Keep the custom size
+        if (hasInnerAreaChanged) {
           this.setWidth(width);
           this.setHeight(height);
         }

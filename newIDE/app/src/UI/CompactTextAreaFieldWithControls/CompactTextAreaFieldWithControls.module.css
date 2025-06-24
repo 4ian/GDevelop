@@ -49,7 +49,8 @@
 .container:not(.disabled):not(.errored):hover .compactTextAreaField::before {
   border-bottom: 1px solid var(--theme-text-field-hover-border-color);
 }
-.container:not(.disabled):not(.errored):focus-within .compactTextAreaField::before {
+.container:not(.disabled):not(.errored):focus-within
+  .compactTextAreaField::before {
   border-bottom: 1px solid var(--theme-text-field-active-border-color);
 }
 
@@ -89,4 +90,75 @@
 .compactTextAreaField input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Animated corner neon */
+.neonCorner {
+  background: var(--theme-text-field-default-background-color);
+  border-radius: 4px;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.neonCorner textarea {
+  position: relative;
+  z-index: 3;
+}
+.neonCorner div {
+  position: relative;
+  z-index: 3;
+}
+
+.neonCorner::before {
+  content: '';
+  position: absolute;
+  left: -100px;
+  width: calc(100% + 200px);
+  background: conic-gradient(
+    from 90deg,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    #b07bf7,
+    #d2b5ff,
+    transparent,
+    transparent,
+    transparent,
+    transparent
+  );
+  rotate: 0deg;
+  z-index: 1;
+}
+
+.animatedNeonCorner::before {
+  animation: rotateNeon 3s linear infinite;
+}
+
+.container.errored:not(.disabled) .neonCorner::before {
+  background: none;
+}
+
+.neonCorner::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  background: var(--theme-text-field-default-background-color);
+  border-radius: 3px;
+  z-index: 2;
+}
+
+@keyframes rotateNeon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

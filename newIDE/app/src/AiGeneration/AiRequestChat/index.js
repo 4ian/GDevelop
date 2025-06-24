@@ -37,7 +37,6 @@ import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import { FeedbackBanner } from './FeedbackBanner';
-import LeftLoader from '../../UI/LeftLoader';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -437,6 +436,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isSending}
+                    hasNeonCorner
+                    hasAnimatedNeonCorner={isSending}
                     errored={!!lastSendError}
                     onChange={userRequestText =>
                       setUserRequestTextPerRequestId(
@@ -460,35 +461,32 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                           alignItems="center"
                           justifyContent="flex-end"
                         >
-                          <LeftLoader isLoading={isSending}>
-                            <RaisedButton
-                              color="primary"
-                              icon={<Send />}
-                              label={
-                                newAiRequestMode === 'agent' ? (
-                                  hasOpenedProject ? (
-                                    <Trans>Build this on my game</Trans>
-                                  ) : (
-                                    <Trans>Start building the game</Trans>
-                                  )
+                          <RaisedButton
+                            color="primary"
+                            icon={<Send />}
+                            label={
+                              newAiRequestMode === 'agent' ? (
+                                hasOpenedProject ? (
+                                  <Trans>Build this on my game</Trans>
                                 ) : (
-                                  <Trans>Send question</Trans>
+                                  <Trans>Start building the game</Trans>
                                 )
-                              }
-                              style={{ flexShrink: 0 }}
-                              disabled={
-                                isSending ||
-                                !userRequestTextPerAiRequestId[aiRequestId]
-                              }
-                              onClick={() => {
-                                onStartNewAiRequest({
-                                  mode: newAiRequestMode,
-                                  userRequest:
-                                    userRequestTextPerAiRequestId[''],
-                                });
-                              }}
-                            />
-                          </LeftLoader>
+                              ) : (
+                                <Trans>Send question</Trans>
+                              )
+                            }
+                            style={{ flexShrink: 0 }}
+                            disabled={
+                              isSending ||
+                              !userRequestTextPerAiRequestId[aiRequestId]
+                            }
+                            onClick={() => {
+                              onStartNewAiRequest({
+                                mode: newAiRequestMode,
+                                userRequest: userRequestTextPerAiRequestId[''],
+                              });
+                            }}
+                          />
                         </LineStackLayout>
                       </Column>
                     }
@@ -520,10 +518,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>
                   The AI agent will build simple games or features for you.{' '}
                   <Link
-                    href={getHelpLink('/interface/ask-ai')}
+                    href={getHelpLink('/interface/ai')}
                     color="secondary"
                     onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                      Window.openExternalURL(getHelpLink('/interface/ai'))
                     }
                   >
                     It can inspect your game objects and events.
@@ -535,10 +533,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 <Trans>
                   The AI chat is experimental and still being improved.{' '}
                   <Link
-                    href={getHelpLink('/interface/ask-ai')}
+                    href={getHelpLink('/interface/ai')}
                     color="secondary"
                     onClick={() =>
-                      Window.openExternalURL(getHelpLink('/interface/ask-ai'))
+                      Window.openExternalURL(getHelpLink('/interface/ai'))
                     }
                   >
                     It has access to your game objects but not events.
@@ -575,11 +573,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       aiRequest,
       editorFunctionCallResults,
     });
+    const isPausedAndHasFunctionCallsToProcess =
+      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
 
     const lastMessageIndex = aiRequest.output.length - 1;
     const lastMessage = aiRequest.output[lastMessageIndex];
     const shouldDisplayFeedbackBanner =
       !hasWorkingFunctionCalls &&
+      !isPausedAndHasFunctionCallsToProcess &&
       !isSending &&
       aiRequest.status === 'ready' &&
       aiRequest.mode === 'agent' &&
@@ -673,14 +674,14 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             (hasWorkingFunctionCalls ||
               isSending ||
               aiRequest.status === 'working') ? (
-              <Paper background="dark" variant="outlined" square>
+              <Paper background="dark" variant="outlined">
                 <Column>
                   <LineStackLayout
                     justifyContent="space-between"
                     alignItems="center"
                   >
                     <LineStackLayout alignItems="center" noMargin>
-                      <CircularProgress variant="indeterminate" size={10} />
+                      <CircularProgress variant="indeterminate" size={12} />
                       <Text size="body" color="secondary" noMargin>
                         <Trans>The AI is building your request.</Trans>
                       </Text>
@@ -700,9 +701,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 </Column>
               </Paper>
             ) : aiRequest.mode === 'agent' &&
-              !isAutoProcessingFunctionCalls &&
-              allFunctionCallsToProcess.length > 0 ? (
-              <Paper background="dark" variant="outlined" square>
+              isPausedAndHasFunctionCallsToProcess ? (
+              <Paper background="dark" variant="outlined">
                 <Column>
                   <LineStackLayout
                     justifyContent="space-between"
@@ -722,9 +722,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                           onProcessFunctionCalls(allFunctionCallsToProcess);
                         }}
                       >
-                        <Trans>
-                          Apply everything and continue autonomously
-                        </Trans>
+                        <Trans>Resume all</Trans>
                       </Link>
                     </Text>
                   </LineStackLayout>
@@ -736,6 +734,8 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               value={userRequestTextPerAiRequestId[aiRequestId] || ''}
               disabled={isSending || isForAnotherProject}
               errored={!!lastSendError}
+              hasNeonCorner
+              hasAnimatedNeonCorner={isSending}
               onChange={userRequestText =>
                 setUserRequestTextPerRequestId(
                   userRequestTextPerAiRequestId => ({

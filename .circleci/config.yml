@@ -18,13 +18,13 @@ jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
     macos:
-      xcode: 14.2.0
-    resource_class: macos.m1.large.gen1
+      xcode: 16.4.0
+    resource_class: m4pro.medium
     steps:
       - checkout
       # Install Rosetta for AWS CLI and disable TSO to speed up S3 uploads (https://support.circleci.com/hc/en-us/articles/19334402064027-Troubleshooting-slow-uploads-to-S3-for-jobs-using-an-m1-macOS-resource-class)
       - macos/install-rosetta
-      - run: sudo sysctl net.inet.tcp.tso=0
+      # - run: sudo sysctl net.inet.tcp.tso=0
 
       # Install a recent version of npm to workaround a notarization issue because of a symlink made by npm: https://github.com/electron-userland/electron-builder/issues/7755
       # Node.js v20.14.0 comes with npm v10.7.0.
@@ -94,25 +94,29 @@ jobs:
           name: Deploy to S3 (specific commit)
           command: |
             export PATH=~/.local/bin:$PATH
-            for i in 1 2 3; do
+            for i in 1 2 3 4 5 6 7; do
               aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ && break
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
-            echo "All retries for deployment failed!" >&2
-            exit 1
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
 
       - run:
           name: Deploy to S3 (latest)
           command: |
             export PATH=~/.local/bin:$PATH
-            for i in 1 2 3; do
+            for i in 1 2 3 4 5 6 7; do
               aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/ && break
               echo "Retry $i failed... retrying in 10 seconds"
               sleep 10
             done
-            echo "All retries for deployment failed!" >&2
-            exit 1
+            if [ $i -eq 7 ]; then
+              echo "All retries for deployment failed!" >&2
+              exit 1
+            fi
 
   # Build the app for Linux (using a pre-built GDevelop.js library).
   build-linux:

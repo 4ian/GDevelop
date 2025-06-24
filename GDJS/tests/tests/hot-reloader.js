@@ -100,6 +100,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
     effects: [],
     content: {},
     childrenContent: {},
+    isInnerAreaFollowingParentSize: false,
   };
 
   /** @type {LayerData} */

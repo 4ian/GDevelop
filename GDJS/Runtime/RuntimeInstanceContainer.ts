@@ -811,6 +811,8 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._allInstancesList = [];
       this._instancesRemoved = [];
+      this._layersCameraCoordinates = {};
+      this._initialBehaviorSharedData = new Hashtable();
     }
   }
 }

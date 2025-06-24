@@ -173,6 +173,7 @@ const CurrentUsageDisplayer = ({
             }
             hideButton={cannotUpgradeSubscription}
             recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            placementId="builds"
           >
             <Line>
               {!isFeatureLocked ? (
@@ -219,6 +220,7 @@ const CurrentUsageDisplayer = ({
                 }
           }
           recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          placementId="builds"
         >
           <Line>
             {!isFeatureLocked ? (

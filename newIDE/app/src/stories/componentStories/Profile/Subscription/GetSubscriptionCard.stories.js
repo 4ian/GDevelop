@@ -17,7 +17,10 @@ export default {
 
 export const Default = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
-    <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
+    <GetSubscriptionCard
+      placementId="builds"
+      subscriptionDialogOpeningReason="Build limit reached"
+    >
       <Line>
         <Column noMargin>
           <Text noMargin>
@@ -32,6 +35,7 @@ export const Default = () => (
 export const CustomLabel = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
+      placementId="builds"
       subscriptionDialogOpeningReason="Build limit reached"
       label="Upgrade your subscription"
     >
@@ -49,6 +53,7 @@ export const CustomLabel = () => (
 export const ButtonHidden = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
+      placementId="builds"
       subscriptionDialogOpeningReason="Build limit reached"
       hideButton
     >
@@ -66,6 +71,7 @@ export const ButtonHidden = () => (
 export const PayWithCreditsOptions = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
+      placementId="builds"
       subscriptionDialogOpeningReason="Build limit reached"
       payWithCreditsOptions={{
         label: 'Purchase with 100 credits',
@@ -86,6 +92,7 @@ export const PayWithCreditsOptions = () => (
 export const ForceColumnLayout = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
+      placementId="builds"
       subscriptionDialogOpeningReason="Build limit reached"
       forceColumnLayout
     >

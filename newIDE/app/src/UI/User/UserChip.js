@@ -32,6 +32,7 @@ const GetPremiumButton = () => {
           analyticsMetadata: {
             reason: 'Account get premium',
             recommendedPlanId: 'gdevelop_silver',
+            placementId: 'account-get-premium',
           },
         });
       }}

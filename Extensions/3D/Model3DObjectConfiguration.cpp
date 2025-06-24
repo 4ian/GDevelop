@@ -191,7 +191,7 @@ Model3DObjectConfiguration::GetProperties() const {
   objectProperties["isCastingShadow"]
       .SetValue(isCastingShadow ? "true" : "false")
       .SetType("boolean")
-      .SetLabel(_("Shadow Casting"))
+      .SetLabel(_("Shadow casting"))
       .SetGroup(_("Shadows"));
 
   objectProperties["isReceivingShadow"]
@@ -265,8 +265,8 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
   content.SetAttribute("crossfadeDuration", crossfadeDuration);
-  content.SetAttribute("castShadow", isCastingShadow);
-  content.SetAttribute("receiveShadow", isReceivingShadow);
+  content.SetAttribute("isCastingShadow", isCastingShadow);
+  content.SetAttribute("isReceivingShadow", isReceivingShadow);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

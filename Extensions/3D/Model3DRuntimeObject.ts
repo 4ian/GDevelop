@@ -127,12 +127,11 @@ namespace gdjs {
         objectData.content.materialType
       );
 
+      this._isCastingShadow = objectData.content.isCastingShadow;
+      this._isReceivingShadow = objectData.content.isReceivingShadow;
       this.onModelChanged(objectData);
 
       this._crossfadeDuration = objectData.content.crossfadeDuration || 0;
-
-      this._isCastingShadow = objectData.content.isCastingShadow;
-      this._isReceivingShadow = objectData.content.isReceivingShadow;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -377,11 +376,11 @@ namespace gdjs {
       return this._renderer.hasAnimationEnded();
     }
 
-    setCastShadow(value: boolean): void {
+    setIsCastShadow(value: boolean): void {
       this._isCastingShadow = value;
     }
 
-    setReceiveShadow(value: boolean): void {
+    setIsReceiveShadow(value: boolean): void {
       this._isReceivingShadow = value;
     }
 

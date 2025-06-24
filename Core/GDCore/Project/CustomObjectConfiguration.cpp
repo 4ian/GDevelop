@@ -250,25 +250,28 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
 
-  if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
+  if (IsForcedToOverrideEventsBasedObjectChildrenConfiguration()) {
+    for (auto &childObject : eventsBasedObject.GetObjects().GetObjects()) {
+      auto &configuration = GetChildObjectConfiguration(childObject->GetName());
+      configuration.ExposeResources(worker);
+    }
+  }
+  else if (eventsBasedObject.GetVariants().HasVariantNamed(variantName)) {
+    for (auto &childObject : eventsBasedObject.GetVariants()
+                                 .GetVariant(variantName)
+                                 .GetObjects()
+                                 .GetObjects()) {
+      childObject->GetConfiguration().ExposeResources(worker);
+    }
+  } else if (isMarkedAsOverridingEventsBasedObjectChildrenConfiguration) {
     for (auto &childObject : eventsBasedObject.GetObjects().GetObjects()) {
       auto &configuration = GetChildObjectConfiguration(childObject->GetName());
       configuration.ExposeResources(worker);
     }
   } else {
-    if (variantName.empty() ||
-        !eventsBasedObject.GetVariants().HasVariantNamed(variantName)) {
-      for (auto &childObject :
-           eventsBasedObject.GetDefaultVariant().GetObjects().GetObjects()) {
-        childObject->GetConfiguration().ExposeResources(worker);
-      }
-    } else {
-      for (auto &childObject : eventsBasedObject.GetVariants()
-                                   .GetVariant(variantName)
-                                   .GetObjects()
-                                   .GetObjects()) {
-        childObject->GetConfiguration().ExposeResources(worker);
-      }
+    for (auto &childObject :
+         eventsBasedObject.GetDefaultVariant().GetObjects().GetObjects()) {
+      childObject->GetConfiguration().ExposeResources(worker);
     }
   }
 }

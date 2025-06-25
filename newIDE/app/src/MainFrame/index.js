@@ -2521,6 +2521,8 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  // TODO Register to ResourcesWatcher and make the Runtime forget about
+  // already loaded resources.
   const onResourceUsageChanged = React.useCallback(
     () => {
       const { editorRef } = getCurrentTab(state.editorTabs);

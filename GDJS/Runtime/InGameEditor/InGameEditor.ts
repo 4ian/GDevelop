@@ -380,6 +380,8 @@ namespace gdjs {
     }
 
     _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {
+      // TODO Find a way to generalize this. Probably by using something like
+      // the scene stack but dedicated to the editor that can handle custom object tabs.
       return (
         this._editedInstanceContainer ||
         this._runtimeGame.getSceneStack().getCurrentScene()

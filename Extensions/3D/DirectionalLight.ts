@@ -93,17 +93,60 @@ namespace gdjs {
             const x = layer.getCameraX();
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
-
-            this.rotationObject.position.set(
-              //This is probably wrong : our axis management require to add an abstraction layer here I think
-              x,
-              z + 100,
-              -y
+            console.log(
+              'position du rotationObject : ' + this.rotationObject.position.x,
+              this.rotationObject.position.y,
+              this.rotationObject.position.z
             );
-            this.light.target.position.set(
-              -layer.getCameraY(),
-              layer.getCameraZ(layer.getInitialCamera3DFieldOfView()),
-              -layer.getCameraX()
+
+            if (this.top === 'Y-') {
+              const posLightX =
+                x +
+                5000 *
+                  Math.cos(gdjs.toRad(this.rotation + 90)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              const posLightY = y - 5000 * Math.sin(gdjs.toRad(this.elevation));
+              const posLightZ =
+                z +
+                5000 *
+                  Math.sin(gdjs.toRad(this.rotation + 90)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              this.light.position.set(posLightX, -posLightY, posLightZ);
+              console.log('position de la camera :' + x, y, z);
+              console.log(
+                'position de la light :' + this.light.position.x,
+                this.light.position.y,
+                this.light.position.z
+              );
+
+              this.light.target.position.set(x, -y, z);
+            } else {
+              const posLightX =
+                x +
+                5000 *
+                  Math.cos(gdjs.toRad(this.rotation + 90)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              const posLightY =
+                y +
+                5000 *
+                  Math.sin(gdjs.toRad(this.rotation)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              const posLightZ =
+                z + 5000 * Math.sin(gdjs.toRad(this.elevation + 90));
+              this.light.position.set(posLightX, posLightY, posLightZ);
+              console.log('position de la camera :' + x, -y, z);
+              console.log(
+                'position de la light :' + this.light.position.x,
+                this.light.position.y,
+                this.light.position.z
+              );
+
+              this.light.target.position.set(x, -y, z);
+            }
+            console.log(
+              'position de la target :' + this.light.target.position.x,
+              this.light.target.position.y,
+              this.light.target.position.z
             );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
@@ -172,8 +215,6 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
               this.light.castShadow = value;
-              if (value === false) {
-              }
             }
           }
 

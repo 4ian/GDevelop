@@ -324,11 +324,10 @@ namespace gdjs {
       return this._originalModel.animations[animationIndex].name;
     }
 
-    _updateShadow()
-    {
+    _updateShadow() {
       this._threeObject.traverse((child) => {
-      child.castShadow = this._model3DRuntimeObject._isCastingShadow;
-      child.receiveShadow = this._model3DRuntimeObject._isReceivingShadow;
+        child.castShadow = this._model3DRuntimeObject._isCastingShadow;
+        child.receiveShadow = this._model3DRuntimeObject._isReceivingShadow;
       });
     }
 

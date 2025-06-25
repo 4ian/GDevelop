@@ -102,13 +102,13 @@ namespace gdjs {
             if (this.top === 'Y-') {
               const posLightX =
                 x +
-                5000 *
+                1000 *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              const posLightY = y - 5000 * Math.sin(gdjs.toRad(this.elevation));
+              const posLightY = y - 1000 * Math.sin(gdjs.toRad(this.elevation));
               const posLightZ =
                 z +
-                5000 *
+                1000 *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               this.light.position.set(posLightX, -posLightY, posLightZ);
@@ -121,24 +121,23 @@ namespace gdjs {
 
               this.light.target.position.set(x, -y, z);
               console.log(
-              'position de la target :' + this.light.target.position.x,
-              this.light.target.position.y,
-              this.light.target.position.z
-            );
-            
+                'position de la target :' + this.light.target.position.x,
+                this.light.target.position.y,
+                this.light.target.position.z
+              );
             } else {
               const posLightX =
                 x +
-                5000 *
+                1000 *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightY =
                 y +
-                5000 *
+                1000 *
                   Math.sin(gdjs.toRad(this.rotation)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightZ =
-                z + 5000 * Math.sin(gdjs.toRad(this.elevation + 90));
+                z + 1000 * Math.sin(gdjs.toRad(this.elevation + 90));
 
               this.light.position.set(posLightX, -posLightY, posLightZ);
               console.log('position de la camera :' + x, y, z);

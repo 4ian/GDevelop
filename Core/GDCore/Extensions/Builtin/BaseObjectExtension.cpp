@@ -1575,7 +1575,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("Create",
                  _("Create an object"),
-                 _("Create an object at specified position"),
+                 _("Create an object at specified position. The created object "
+                   "will be taken into account for the next step(s)."),
                  _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
                    "(layer: _PARAM4_)"),
                  "",

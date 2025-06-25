@@ -229,6 +229,11 @@ namespace gdjs {
         }
       }
 
+      // Refresh the editedInstanceDataList reference.
+      if (this._runtimeGame.isInGameEdition()) {
+        this._runtimeGame._reconnectInGameEditor();
+      }
+
       logger.info(
         'Hot reload finished with logs:',
         this._logs.map((log) => '\n' + log.kind + ': ' + log.message)

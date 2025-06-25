@@ -1143,6 +1143,21 @@ namespace gdjs {
       }
     }
 
+    _reconnectInGameEditor() {
+      const initialRuntimeGameStatus =
+        this.getAdditionalOptions().initialRuntimeGameStatus;
+      if (!initialRuntimeGameStatus) {
+        return;
+      }
+      this._forceToSwitchToSceneOrVariant(
+        initialRuntimeGameStatus.editorId,
+        initialRuntimeGameStatus.sceneName,
+        initialRuntimeGameStatus.injectedExternalLayoutName,
+        initialRuntimeGameStatus.eventsBasedObjectType,
+        initialRuntimeGameStatus.eventsBasedObjectVariantName
+      );
+    }
+
     _switchToSceneOrVariant(
       editorId: string | null,
       sceneName: string | null,
@@ -1150,22 +1165,38 @@ namespace gdjs {
       eventsBasedObjectType: string | null,
       eventsBasedObjectVariantName: string | null
     ) {
-      const runtimeGameOptions = this.getAdditionalOptions();
-      if (runtimeGameOptions.initialRuntimeGameStatus) {
+      const initialRuntimeGameStatus =
+        this.getAdditionalOptions().initialRuntimeGameStatus;
+      if (initialRuntimeGameStatus) {
         // Skip changing the scene if we're already on the state that is being requested.
         if (
-          runtimeGameOptions.initialRuntimeGameStatus.sceneName === sceneName &&
-          runtimeGameOptions.initialRuntimeGameStatus
-            .injectedExternalLayoutName === externalLayoutName &&
-          runtimeGameOptions.initialRuntimeGameStatus.eventsBasedObjectType ===
+          initialRuntimeGameStatus.sceneName === sceneName &&
+          initialRuntimeGameStatus.injectedExternalLayoutName ===
+            externalLayoutName &&
+          initialRuntimeGameStatus.eventsBasedObjectType ===
             eventsBasedObjectType &&
-          runtimeGameOptions.initialRuntimeGameStatus
-            .eventsBasedObjectVariantName === eventsBasedObjectVariantName
+          initialRuntimeGameStatus.eventsBasedObjectVariantName ===
+            eventsBasedObjectVariantName
         ) {
           return;
         }
       }
+      this._forceToSwitchToSceneOrVariant(
+        editorId,
+        sceneName,
+        externalLayoutName,
+        eventsBasedObjectType,
+        eventsBasedObjectVariantName
+      );
+    }
 
+    _forceToSwitchToSceneOrVariant(
+      editorId: string | null,
+      sceneName: string | null,
+      externalLayoutName: string | null,
+      eventsBasedObjectType: string | null,
+      eventsBasedObjectVariantName: string | null
+    ) {
       let editedInstanceDataList: Array<InstanceData> | null = null;
       if (eventsBasedObjectType) {
         const eventsBasedObjectVariantData =
@@ -1241,7 +1272,7 @@ namespace gdjs {
       // Update initialRuntimeGameStatus so that a hard reload
       // will come back to the same state, and so that we can check later
       // if the game is already on the state that is being requested.
-      runtimeGameOptions.initialRuntimeGameStatus = {
+      this.getAdditionalOptions().initialRuntimeGameStatus = {
         isPaused: this.isPaused(),
         isInGameEdition: this.isInGameEdition(),
         sceneName: sceneName,

@@ -336,6 +336,9 @@ namespace gdjs {
     private _wasMovingSelectionLastFrame = false;
 
     private _selectionBox: THREE_ADDONS.SelectionBox | null = null;
+    private _selectionBoxElement: HTMLDivElement;
+    private _selectionBoxStartCursorX: float = 0;
+    private _selectionBoxStartCursorY: float = 0;
 
     // The selected objects.
     private _selection = new Selection();
@@ -356,6 +359,10 @@ namespace gdjs {
 
     constructor(game: RuntimeGame) {
       this._runtimeGame = game;
+      this._selectionBoxElement = document.createElement('div');
+      this._selectionBoxElement.style.position = 'fixed';
+      this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
+      this._selectionBoxElement.style.border = '1px solid #f2a63c';
     }
 
     getEditorId(): string {
@@ -899,6 +906,14 @@ namespace gdjs {
             this._getNormalizedScreenY(cursorY),
             0.5
           );
+          const minX = Math.min(this._selectionBoxStartCursorX, cursorX);
+          const minY = Math.min(this._selectionBoxStartCursorY, cursorY);
+          const maxX = Math.max(this._selectionBoxStartCursorX, cursorX);
+          const maxY = Math.max(this._selectionBoxStartCursorY, cursorY);
+          this._selectionBoxElement.style.left = minX + 'px';
+          this._selectionBoxElement.style.top = minY + 'px';
+          this._selectionBoxElement.style.width = maxX - minX + 'px';
+          this._selectionBoxElement.style.height = maxY - minY + 'px';
         } else {
           this._selectionBox = new THREE_ADDONS.SelectionBox(
             threeCamera,
@@ -909,33 +924,55 @@ namespace gdjs {
             this._getNormalizedScreenY(cursorY),
             0.5
           );
+          const domElementContainer = runtimeGame
+            .getRenderer()
+            .getDomElementContainer();
+          if (domElementContainer) {
+            this._selectionBoxElement.style.left = cursorX + 'px';
+            this._selectionBoxElement.style.top = cursorY + 'px';
+            this._selectionBoxElement.style.width = '0px';
+            this._selectionBoxElement.style.height = '0px';
+            domElementContainer.appendChild(this._selectionBoxElement);
+          }
+          this._selectionBoxStartCursorX = cursorX;
+          this._selectionBoxStartCursorY = cursorY;
         }
       }
       if (
-        inputManager.isMouseButtonReleased(0) &&
-        this._selectionBox &&
-        !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
-        !this._hasSelectionActuallyMoved
+        (inputManager.isMouseButtonReleased(0) ||
+          this._hasSelectionActuallyMoved) &&
+        this._selectionBox
       ) {
-        const objects = new Set<gdjs.RuntimeObject>();
-        for (const selectThreeObject of this._selectionBox.select()) {
-          // TODO Select the object if all its meshes are inside the rectangle
-          // instead of if any is.
-          const object = this._getObject(selectThreeObject);
-          if (object) {
-            objects.add(object);
+        if (
+          !this._selectionBox.endPoint.equals(this._selectionBox.startPoint) &&
+          !this._hasSelectionActuallyMoved
+        ) {
+          const objects = new Set<gdjs.RuntimeObject>();
+          for (const selectThreeObject of this._selectionBox.select()) {
+            // TODO Select the object if all its meshes are inside the rectangle
+            // instead of if any is.
+            const object = this._getObject(selectThreeObject);
+            if (object) {
+              objects.add(object);
+            }
           }
-        }
-        if (!isShiftPressed(inputManager)) {
-          this._selection.clear();
-        }
-        if (layer.isVisible() && !layer._initialLayerData.isLocked) {
-          for (const object of objects) {
-            // TODO Check if the object is locked
-            this._selection.add(object);
+          if (!isShiftPressed(inputManager)) {
+            this._selection.clear();
+          }
+          if (layer.isVisible() && !layer._initialLayerData.isLocked) {
+            for (const object of objects) {
+              // TODO Check if the object is locked
+              this._selection.add(object);
+            }
           }
         }
         this._selectionBox = null;
+        const domElementContainer = runtimeGame
+          .getRenderer()
+          .getDomElementContainer();
+        if (domElementContainer) {
+          domElementContainer.removeChild(this._selectionBoxElement);
+        }
         this._sendSelectionUpdate();
       }
     }

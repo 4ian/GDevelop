@@ -140,7 +140,11 @@ namespace gdjs {
               const posLightZ = z + 1000 * Math.sin(gdjs.toRad(this.elevation));
 
               this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.shadow.camera.position.set(posLightX, posLightY, posLightZ);
+              this.light.shadow.camera.position.set(
+                posLightX,
+                posLightY,
+                posLightZ
+              );
               this.light.shadow.camera.updateProjectionMatrix();
               console.log('position de la camera :' + x, y, z);
               console.log(

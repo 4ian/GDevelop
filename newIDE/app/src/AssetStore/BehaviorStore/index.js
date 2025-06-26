@@ -27,13 +27,20 @@ import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { getIDEVersion } from '../../Version';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   return async (
     project: gdProject,
     behaviorShortHeader: BehaviorShortHeader
   ): Promise<boolean> => {
+    if (currentlyRunningInAppTutorial) {
+      return false;
+    }
     return await showConfirmation({
       title: t`Extension update`,
       message:

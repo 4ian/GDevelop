@@ -109,7 +109,10 @@ namespace gdjs {
         if (!scene) {
           return;
         }
-        scene.unloadScene();
+        this._unloadSceneAndPossiblyResources({
+          scene,
+          newSceneName: null,
+        });
       }
 
       // Tell the new current scene it's being resumed
@@ -143,18 +146,9 @@ namespace gdjs {
         return this._loadNewScene(newSceneName, externalLayoutName);
       }
 
-      const wasUnloaded = this._scenesWithUnloadedAssets.has(newSceneName);
       this._isNextLayoutLoading = true;
-
-      const loadPromise = wasUnloaded
-        ? this._runtimeGame.loadSceneAssetsBySceneName(newSceneName)
-        : this._runtimeGame.loadSceneAssets(newSceneName);
-
-      loadPromise.then(() => {
+      this._runtimeGame.loadSceneAssets(newSceneName).then(() => {
         this._loadNewScene(newSceneName);
-        if (wasUnloaded) {
-          this._scenesWithUnloadedAssets.delete(newSceneName);
-        }
         this._isNextLayoutLoading = false;
       });
 
@@ -204,7 +198,8 @@ namespace gdjs {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            // TODO: pass newSceneName to avoid unloading its resources?.
+            this._unloadSceneAndPossiblyResources({scene, newSceneName});
           }
         }
       } else {
@@ -212,7 +207,8 @@ namespace gdjs {
         if (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            // TODO: pass newSceneName to avoid unloading its resources?.
+            this._unloadSceneAndPossiblyResources({scene, newSceneName});
           }
         }
       }
@@ -390,12 +386,42 @@ namespace gdjs {
      * Unload all the scenes and clear the stack.
      */
     dispose(): void {
-      for (const item of this._stack) {
-        item.unloadScene();
+      while (this._stack.length > 0) {
+        const scene = this._stack.pop();
+        if (scene) {
+          this._unloadSceneAndPossiblyResources({
+            scene,
+            newSceneName: null,
+          });
+        }
       }
 
-      this._stack.length = 0;
       this._wasDisposed = true;
+    }
+
+    private _unloadSceneAndPossiblyResources({
+      scene,
+      newSceneName,
+    }: {
+      scene: gdjs.RuntimeScene;
+      newSceneName: string | null;
+    }): void {
+      const unloadedSceneName = scene.getName();
+      const shouldUnloadAssets =
+        scene.getUnloadAssetsOnSceneExit() &&
+        newSceneName !== scene.getName() &&
+        this._stack.every((scene) => scene.getName() !== unloadedSceneName);
+
+      scene.unloadScene();
+      // After this point, `scene` is no longer valid and should not be used anymore.
+      // It was "disposed".
+
+      if (shouldUnloadAssets) {
+        this._runtimeGame.getResourceLoader().unloadSceneResources({
+          unloadedSceneName,
+          newSceneName,
+        });
+      }
     }
 
     private _throwIfDisposed(): void {

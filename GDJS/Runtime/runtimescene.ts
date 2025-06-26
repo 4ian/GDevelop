@@ -323,10 +323,6 @@ namespace gdjs {
       this.networkId = null;
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;
-
-      if (this._unloadAssetsOnSceneExit) {
-        this._runtimeGame.getResourceLoader().disposeScene(this._name);
-      }
     }
 
     /**

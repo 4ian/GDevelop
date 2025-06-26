@@ -37,6 +37,7 @@ namespace gdjs {
             this.light.shadow.camera.bottom = -500;
             this.light.position.set(0, 10, 0);
             this.light.target.position.set(0, 100, 0);
+            this.light.shadow.needsUpdate = true;
             this.rotationObject = new THREE.Group();
             this.rotationObject.position.set(0, 0, 0);
             this.rotationObject.rotation.set(0, 0, 0);
@@ -91,7 +92,7 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
-            const y = layer.getCameraY();
+            const y = -layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
             console.log(
               'position du rotationObject : ' + this.rotationObject.position.x,
@@ -111,7 +112,7 @@ namespace gdjs {
                 1000 *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              this.light.position.set(posLightX, -posLightY, posLightZ);
+              this.light.position.set(posLightX, posLightY, posLightZ);
               console.log('position de la camera :' + x, y, z);
               console.log(
                 'position de la light :' + this.light.position.x,
@@ -119,7 +120,7 @@ namespace gdjs {
                 this.light.position.z
               );
 
-              this.light.target.position.set(x, -y, z);
+              this.light.target.position.set(x, y, z);
               console.log(
                 'position de la target :' + this.light.target.position.x,
                 this.light.target.position.y,
@@ -134,12 +135,13 @@ namespace gdjs {
               const posLightY =
                 y +
                 1000 *
-                  Math.sin(gdjs.toRad(this.rotation)) *
+                  Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              const posLightZ =
-                z + 1000 * Math.sin(gdjs.toRad(this.elevation + 90));
+              const posLightZ = z + 1000 * Math.sin(gdjs.toRad(this.elevation));
 
-              this.light.position.set(posLightX, -posLightY, posLightZ);
+              this.light.position.set(posLightX, posLightY, posLightZ);
+              this.light.shadow.camera.position.set(posLightX, posLightY, posLightZ);
+              this.light.shadow.camera.updateProjectionMatrix();
               console.log('position de la camera :' + x, y, z);
               console.log(
                 'position de la light :' + this.light.position.x,
@@ -147,13 +149,16 @@ namespace gdjs {
                 this.light.position.z
               );
 
-              this.light.target.position.set(x, -y, z);
+              this.light.target.position.set(x, y, z);
             }
             console.log(
               'position de la target :' + this.light.target.position.x,
               this.light.target.position.y,
               this.light.target.position.z
             );
+
+            console.log('élévation : ' + this.elevation);
+            console.log('rotation :' + this.rotation);
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -225,15 +230,15 @@ namespace gdjs {
           }
 
           updateRotation() {
-            if (this.top === 'Z+') {
-              // 0° is a light from the right of the screen.
-              this.rotationObject.rotation.z = gdjs.toRad(this.rotation);
-              this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
-            } else {
-              // 0° becomes a light from Z+.
-              this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
-              this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
-            }
+            // if (this.top === 'Z+') {
+            //   // 0° is a light from the right of the screen.
+            //   this.rotationObject.rotation.z = gdjs.toRad(this.rotation);
+            //   this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
+            // } else {
+            //   // 0° becomes a light from Z+.
+            //   this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
+            //   this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
+            // }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
             return {

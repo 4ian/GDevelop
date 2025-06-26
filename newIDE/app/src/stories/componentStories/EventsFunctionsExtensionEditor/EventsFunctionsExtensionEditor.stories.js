@@ -42,6 +42,7 @@ export const Default = () => (
         )}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
         onExtensionInstalled={action('extension installed')}
+        onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -76,6 +77,9 @@ export const WithObjectEditor = () => {
             )}
             hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
             onExtensionInstalled={action('extension installed')}
+            onEventBasedObjectTypeChanged={action(
+              'onEventBasedObjectTypeChanged'
+            )}
           />
         </FixedHeightFlexContainer>
       </DragAndDropContextProvider>

@@ -89,6 +89,7 @@ type Props = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => void,
+  onEventBasedObjectTypeChanged: () => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -817,6 +818,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // It can happen when an event-based object is deleted and another one is
     // renamed to replace it.
     this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject);
+    this.props.onEventBasedObjectTypeChanged();
   };
 
   _onDeleteEventsBasedBehavior = (
@@ -1602,6 +1604,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onSelectExtensionSceneVariables={() => this._editVariables()}
                 onOpenCustomObjectEditor={this.props.onOpenCustomObjectEditor}
+                onEventBasedObjectTypeChanged={
+                  this.props.onEventBasedObjectTypeChanged
+                }
               />
             )}
           </I18n>

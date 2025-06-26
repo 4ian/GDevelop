@@ -514,6 +514,7 @@ type Props = {|
   onSelectExtensionProperties: () => void,
   onSelectExtensionGlobalVariables: () => void,
   onSelectExtensionSceneVariables: () => void,
+  onEventBasedObjectTypeChanged: () => void,
 |};
 
 const EventsFunctionsList = React.forwardRef<
@@ -549,6 +550,7 @@ const EventsFunctionsList = React.forwardRef<
       onSelectExtensionGlobalVariables,
       onSelectExtensionSceneVariables,
       onOpenCustomObjectEditor,
+      onEventBasedObjectTypeChanged,
     }: Props,
     ref
   ) => {
@@ -816,6 +818,7 @@ const EventsFunctionsList = React.forwardRef<
             // We focus it so the user can edit the name directly.
             onSelectEventsBasedObject(newEventsBasedObject);
             editName(objectItemId);
+            onEventBasedObjectTypeChanged();
           }
         );
       },

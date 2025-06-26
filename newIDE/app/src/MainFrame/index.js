@@ -2434,6 +2434,24 @@ const MainFrame = (props: Props) => {
     );
   };
 
+  const onEventBasedObjectTypeChanged = React.useCallback(
+    () => {
+      const { editorRef } = getCurrentTab(state.editorTabs);
+      if (editorRef) {
+        editorRef.forceInGameEditorHotReload({ projectDataOnlyExport: false });
+      }
+    },
+    [state.editorTabs]
+  );
+
+  const onExtractAsEventBasedObject = (
+    extensionName: string,
+    eventsBasedObjectName: string
+  ) => {
+    onEventBasedObjectTypeChanged();
+    onOpenEventBasedObjectEditor(extensionName, eventsBasedObjectName);
+  };
+
   const onOpenEventBasedObjectVariantEditor = (
     extensionName: string,
     eventsBasedObjectName: string,
@@ -4255,7 +4273,7 @@ const MainFrame = (props: Props) => {
                     },
                     openBehaviorEvents: openBehaviorEvents,
                     onExtractAsExternalLayout: onExtractAsExternalLayout,
-                    onExtractAsEventBasedObject: onOpenEventBasedObjectEditor,
+                    onExtractAsEventBasedObject: onExtractAsEventBasedObject,
                     onOpenEventBasedObjectEditor: onOpenEventBasedObjectEditor,
                     onOpenEventBasedObjectVariantEditor: onOpenEventBasedObjectVariantEditor,
                     onDeleteEventsBasedObjectVariant: deleteEventsBasedObjectVariant,
@@ -4264,6 +4282,7 @@ const MainFrame = (props: Props) => {
                     onSceneObjectsDeleted: onSceneObjectsDeleted,
                     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                     onExtensionInstalled: onExtensionInstalled,
+                    onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
                     gamesList,
                     gamesPlatformFrameTools,
                   })}

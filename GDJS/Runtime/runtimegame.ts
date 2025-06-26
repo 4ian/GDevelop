@@ -1029,7 +1029,7 @@ namespace gdjs {
             ?.eventsBasedObjectVariantName || null;
         const editorId =
           this._options.initialRuntimeGameStatus?.editorId || null;
-        this._switchToSceneOrVariant(
+        this._forceToSwitchToSceneOrVariant(
           editorId,
           sceneName,
           externalLayoutName,

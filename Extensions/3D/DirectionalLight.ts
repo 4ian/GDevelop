@@ -89,7 +89,7 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
-            const y = -layer.getCameraY();
+            const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
             console.log(
               'position du rotationObject : ' + this.rotationObject.position.x,
@@ -103,7 +103,7 @@ namespace gdjs {
                 1000 *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              const posLightY = y - 1000 * Math.sin(gdjs.toRad(this.elevation));
+              const posLightY = y + 1000 * Math.sin(gdjs.toRad(this.elevation));
               const posLightZ =
                 z +
                 1000 *
@@ -130,7 +130,7 @@ namespace gdjs {
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightY =
-                y +
+                y -
                 1000 *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));

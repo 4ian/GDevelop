@@ -732,6 +732,9 @@ namespace gdjs {
 
       if (
         !freeCameraControl.isEnabled() &&
+        !isControlOrCmdPressed(inputManager) &&
+        !isAltPressed(inputManager) &&
+        !isShiftPressed(inputManager) &&
         (inputManager.isKeyPressed(W_KEY) ||
           inputManager.isKeyPressed(S_KEY) ||
           inputManager.isKeyPressed(A_KEY) ||
@@ -2075,40 +2078,46 @@ namespace gdjs {
         // Either arrow keys (move in the camera plane) or WASD ("FPS move" + Q/E for up/down).
         const moveSpeed = isShiftPressed(inputManager) ? 12 : 6;
 
-        if (inputManager.isKeyPressed(LEFT_KEY)) {
-          moveCameraByVector(right, -moveSpeed);
-        }
-        if (inputManager.isKeyPressed(RIGHT_KEY)) {
-          moveCameraByVector(right, moveSpeed);
-        }
-        if (inputManager.isKeyPressed(UP_KEY)) {
-          moveCameraByVector(up, moveSpeed);
-        }
-        if (inputManager.isKeyPressed(DOWN_KEY)) {
-          moveCameraByVector(up, -moveSpeed);
-        }
-        // Forward/back
-        if (inputManager.isKeyPressed(W_KEY)) {
-          moveCameraByVector(forward, moveSpeed);
-        }
-        if (inputManager.isKeyPressed(S_KEY)) {
-          moveCameraByVector(forward, -moveSpeed);
-        }
+        if (
+          !isControlOrCmdPressed(inputManager) &&
+          !isAltPressed(inputManager) &&
+          !isShiftPressed(inputManager)
+        ) {
+          if (inputManager.isKeyPressed(LEFT_KEY)) {
+            moveCameraByVector(right, -moveSpeed);
+          }
+          if (inputManager.isKeyPressed(RIGHT_KEY)) {
+            moveCameraByVector(right, moveSpeed);
+          }
+          if (inputManager.isKeyPressed(UP_KEY)) {
+            moveCameraByVector(up, moveSpeed);
+          }
+          if (inputManager.isKeyPressed(DOWN_KEY)) {
+            moveCameraByVector(up, -moveSpeed);
+          }
+          // Forward/back
+          if (inputManager.isKeyPressed(W_KEY)) {
+            moveCameraByVector(forward, moveSpeed);
+          }
+          if (inputManager.isKeyPressed(S_KEY)) {
+            moveCameraByVector(forward, -moveSpeed);
+          }
 
-        // Left/right (strafe)
-        if (inputManager.isKeyPressed(A_KEY)) {
-          moveCameraByVector(right, -moveSpeed);
-        }
-        if (inputManager.isKeyPressed(D_KEY)) {
-          moveCameraByVector(right, moveSpeed);
-        }
+          // Left/right (strafe)
+          if (inputManager.isKeyPressed(A_KEY)) {
+            moveCameraByVector(right, -moveSpeed);
+          }
+          if (inputManager.isKeyPressed(D_KEY)) {
+            moveCameraByVector(right, moveSpeed);
+          }
 
-        // Up/down
-        if (inputManager.isKeyPressed(Q_KEY)) {
-          moveCameraByVector(up, -moveSpeed);
-        }
-        if (inputManager.isKeyPressed(E_KEY)) {
-          moveCameraByVector(up, moveSpeed);
+          // Up/down
+          if (inputManager.isKeyPressed(Q_KEY)) {
+            moveCameraByVector(up, -moveSpeed);
+          }
+          if (inputManager.isKeyPressed(E_KEY)) {
+            moveCameraByVector(up, moveSpeed);
+          }
         }
 
         // Space + click: move the camera on its plane.

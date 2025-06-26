@@ -125,7 +125,7 @@ module.exports = [
     "languageCode": "hi_IN",
     "languageName": "Hindi",
     "languageNativeName": "हिन्दी",
-    "translationRatio": 0.9793231037109588
+    "translationRatio": 0.9794319294809011
   },
   {
     "languageCode": "hu_HU",

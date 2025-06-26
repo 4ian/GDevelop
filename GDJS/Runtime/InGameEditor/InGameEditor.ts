@@ -1467,7 +1467,7 @@ namespace gdjs {
           if (isLayer3D) {
             const cameraX = selectedLayer.getCameraX();
             const cameraY = selectedLayer.getCameraY();
-            const cameraZ = gdjs.scene3d.camera.getCameraZ(
+            const cameraZ = getCameraZ(
               currentScene,
               selectedLayer.getName(),
               0
@@ -1588,11 +1588,7 @@ namespace gdjs {
 
       const cameraX = layer.getCameraX();
       const cameraY = layer.getCameraY();
-      const cameraZ = gdjs.scene3d.camera.getCameraZ(
-        currentScene,
-        layer.getName(),
-        0
-      );
+      const cameraZ = getCameraZ(currentScene, layer.getName(), 0);
 
       const cursorX = gdjs.evtTools.input.getCursorX(
         currentScene,
@@ -1916,7 +1912,9 @@ namespace gdjs {
   }
 
   class OrbitCameraControl implements CameraControl {
-    target: THREE.Vector3 = new THREE.Vector3();
+    //@ts-ignore
+    target: THREE.Vector3 =
+      typeof THREE === 'undefined' ? null : new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 90;
     distance: float = 800;
@@ -2004,31 +2002,26 @@ namespace gdjs {
 
       layer.setCameraX(this.getCameraX());
       layer.setCameraY(this.getCameraY());
-      gdjs.scene3d.camera.setCameraZ(
-        currentScene,
-        this.getCameraZ(),
-        layerName,
-        0
-      );
-      gdjs.scene3d.camera.setCameraRotationX(
-        currentScene,
-        90 - this.elevationAngle,
-        layerName,
-        0
-      );
-      gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
+      setCameraZ(currentScene, this.getCameraZ(), layerName, 0);
+      setCameraRotationX(currentScene, 90 - this.elevationAngle, layerName, 0);
+      setCameraRotationY(currentScene, 0, layerName, 0);
       layer.setCameraRotation(this.rotationAngle);
     }
   }
 
   class FreeCameraControl implements CameraControl {
-    position: THREE.Vector3 = new THREE.Vector3();
+    //@ts-ignore
+    position: THREE.Vector3 =
+      typeof THREE === 'undefined' ? null : new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 30;
     private _isEnabled: boolean = true;
-
-    private _euler: THREE.Euler;
-    private _rotationMatrix: THREE.Matrix4 = new THREE.Matrix4();
+    //@ts-ignore
+    private _euler: THREE.Euler =
+      typeof THREE === 'undefined' ? null : new THREE.Euler(0, 0, 0, 'ZYX');
+    //@ts-ignore
+    private _rotationMatrix: THREE.Matrix4 =
+      typeof THREE === 'undefined' ? null : new THREE.Matrix4();
 
     private _runtimeGame: gdjs.RuntimeGame;
     private _lastCursorX: float = 0;
@@ -2037,8 +2030,6 @@ namespace gdjs {
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._runtimeGame = runtimeGame;
-      this._euler = new THREE.Euler();
-      this._euler.order = 'ZYX';
     }
 
     isEnabled(): boolean {
@@ -2165,19 +2156,9 @@ namespace gdjs {
 
       layer.setCameraX(this.position.x);
       layer.setCameraY(this.position.y);
-      gdjs.scene3d.camera.setCameraZ(
-        currentScene,
-        this.position.z,
-        layerName,
-        0
-      );
-      gdjs.scene3d.camera.setCameraRotationX(
-        currentScene,
-        90 - this.elevationAngle,
-        layerName,
-        0
-      );
-      gdjs.scene3d.camera.setCameraRotationY(currentScene, 0, layerName, 0);
+      setCameraZ(currentScene, this.position.z, layerName, 0);
+      setCameraRotationX(currentScene, 90 - this.elevationAngle, layerName, 0);
+      setCameraRotationY(currentScene, 0, layerName, 0);
       layer.setCameraRotation(this.rotationAngle);
     }
 
@@ -2216,4 +2197,85 @@ namespace gdjs {
       return { right, up, forward };
     }
   }
+
+  const getCameraZ = (
+    runtimeScene: RuntimeScene,
+    layerName: string,
+    cameraIndex: integer
+  ): float => {
+    return gdjs.scene3d.camera
+      ? gdjs.scene3d.camera.getCameraZ(runtimeScene, layerName, cameraIndex)
+      : 0;
+  };
+
+  const setCameraZ = (
+    runtimeScene: RuntimeScene,
+    z: float,
+    layerName: string,
+    cameraIndex: integer
+  ) => {
+    if (gdjs.scene3d.camera) {
+      gdjs.scene3d.camera.setCameraZ(runtimeScene, z, layerName, cameraIndex);
+    }
+  };
+
+  const getCameraRotationX = (
+    runtimeScene: RuntimeScene,
+    layerName: string,
+    cameraIndex: integer
+  ): float => {
+    return gdjs.scene3d.camera
+      ? gdjs.scene3d.camera.getCameraRotationX(
+          runtimeScene,
+          layerName,
+          cameraIndex
+        )
+      : 0;
+  };
+
+  const setCameraRotationX = (
+    runtimeScene: RuntimeScene,
+    angle: float,
+    layerName: string,
+    cameraIndex: integer
+  ) => {
+    if (gdjs.scene3d.camera) {
+      gdjs.scene3d.camera.setCameraRotationX(
+        runtimeScene,
+        angle,
+        layerName,
+        cameraIndex
+      );
+    }
+  };
+
+  const getCameraRotationY = (
+    runtimeScene: RuntimeScene,
+    layerName: string,
+    cameraIndex: integer
+  ): float => {
+    return gdjs.scene3d.camera
+      ? gdjs.scene3d.camera.getCameraRotationY(
+          runtimeScene,
+          layerName,
+          cameraIndex
+        )
+      : 0;
+  };
+
+  const setCameraRotationY = (
+    runtimeScene: RuntimeScene,
+    angle: float,
+    layerName: string,
+    cameraIndex: integer
+  ) => {
+    if (gdjs.scene3d.camera) {
+      gdjs.scene3d.camera.setCameraRotationY(
+        runtimeScene,
+        angle,
+        layerName,
+        cameraIndex
+      );
+    }
+  };
 }

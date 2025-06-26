@@ -35,7 +35,6 @@ namespace gdjs {
             this.light.shadow.camera.left = -1000;
             this.light.shadow.camera.top = 1000;
             this.light.shadow.camera.bottom = -1000;
-            this.light.shadow.needsUpdate = true;
             this.rotationObject = new THREE.Group();
             this.rotationObject.position.set(0, 0, 0);
             this.rotationObject.rotation.set(0, 0, 0);

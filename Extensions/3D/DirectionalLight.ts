@@ -6,6 +6,7 @@ namespace gdjs {
     r: number;
     t: string;
   }
+  const shadowHelper = false;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DirectionalLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -18,12 +19,11 @@ namespace gdjs {
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
           light: THREE.DirectionalLight;
-          rotationObject: THREE.Group;
           _isEnabled: boolean = false;
           top: string = 'Y-';
           elevation: float = 45;
           rotation: float = 0;
-          shadowSize: float = 1024; //1024 == medium quality
+          shadowSize: float = 1024;
 
           constructor() {
             this.light = new THREE.DirectionalLight();
@@ -35,16 +35,8 @@ namespace gdjs {
             this.light.shadow.camera.left = -1000;
             this.light.shadow.camera.top = 1000;
             this.light.shadow.camera.bottom = -1000;
-            this.rotationObject = new THREE.Group();
-            this.rotationObject.position.set(0, 0, 0);
-            this.rotationObject.rotation.set(0, 0, 0);
-            this.rotationObject.add(this.light);
-            const shadowCameraHelper = new THREE.CameraHelper(
-              this.light.shadow.camera
-            );
-            this.rotationObject.add(shadowCameraHelper);
+
             this.light.shadow.camera.updateProjectionMatrix();
-            this.updateRotation();
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -68,8 +60,15 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.add(this.rotationObject);
+            scene.add(this.light);
             scene.add(this.light.target);
+            if (shadowHelper) {
+              const shadowCameraHelper = new THREE.CameraHelper(
+                this.light.shadow.camera
+              );
+              scene.add(shadowCameraHelper);
+            }
+
             this._isEnabled = true;
             return true;
           }
@@ -81,7 +80,7 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.remove(this.rotationObject);
+            scene.remove(this.light);
             scene.remove(this.light.target);
             this._isEnabled = false;
             return true;
@@ -89,13 +88,8 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
-            const y = layer.getCameraY();
+            const y = -layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
-            console.log(
-              'position du rotationObject : ' + this.rotationObject.position.x,
-              this.rotationObject.position.y,
-              this.rotationObject.position.z
-            );
 
             if (this.top === 'Y-') {
               const posLightX =
@@ -110,19 +104,7 @@ namespace gdjs {
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               this.light.position.set(posLightX, -posLightY, posLightZ);
-              console.log('position de la camera :' + x, y, z);
-              console.log(
-                'position de la light :' + this.light.position.x,
-                this.light.position.y,
-                this.light.position.z
-              );
-
               this.light.target.position.set(x, -y, z);
-              console.log(
-                'position de la target :' + this.light.target.position.x,
-                this.light.target.position.y,
-                this.light.target.position.z
-              );
             } else {
               const posLightX =
                 x +
@@ -137,33 +119,16 @@ namespace gdjs {
               const posLightZ = z + 1000 * Math.sin(gdjs.toRad(this.elevation));
 
               this.light.position.set(posLightX, -posLightY, posLightZ);
-              console.log('position de la camera :' + x, y, z);
-              console.log(
-                'position de la light :' + this.light.position.x,
-                this.light.position.y,
-                this.light.position.z
-              );
-
               this.light.target.position.set(x, -y, z);
             }
-            console.log(
-              'position de la target :' + this.light.target.position.x,
-              this.light.target.position.y,
-              this.light.target.position.z
-            );
-
-            console.log('élévation : ' + this.elevation);
-            console.log('rotation :' + this.rotation);
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
               this.light.intensity = value;
             } else if (parameterName === 'elevation') {
               this.elevation = value;
-              this.updateRotation();
             } else if (parameterName === 'rotation') {
               this.rotation = value;
-              this.updateRotation();
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -181,10 +146,6 @@ namespace gdjs {
               this.light.color = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
-            }
-            if (parameterName === 'top') {
-              this.top = value;
-              this.updateRotation();
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'Low') {
@@ -224,17 +185,6 @@ namespace gdjs {
             }
           }
 
-          updateRotation() {
-            // if (this.top === 'Z+') {
-            //   // 0° is a light from the right of the screen.
-            //   this.rotationObject.rotation.z = gdjs.toRad(this.rotation);
-            //   this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
-            // } else {
-            //   // 0° becomes a light from Z+.
-            //   this.rotationObject.rotation.y = gdjs.toRad(this.rotation - 90);
-            //   this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
-            // }
-          }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
             return {
               i: this.light.intensity,
@@ -250,7 +200,6 @@ namespace gdjs {
             this.elevation = syncData.e;
             this.rotation = syncData.r;
             this.top = syncData.t;
-            this.updateRotation();
           }
         })();
       }

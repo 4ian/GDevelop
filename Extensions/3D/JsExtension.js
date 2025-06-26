@@ -1942,6 +1942,18 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('frustumSize')
+        .setValue('4000')
+        .setLabel(_('Shadow frustum size'))
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('distanceFromCamera')
+        .setValue('1500')
+        .setLabel(_("Distance from layer's camera"))
+        .setType('number')
+        .setAdvanced(true);
     }
     {
       const effect = extension

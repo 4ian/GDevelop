@@ -24,17 +24,27 @@ namespace gdjs {
           elevation: float = 45;
           rotation: float = 0;
           shadowSize: float = 1024;
-
+          distanceFromCamera: float = 1500;
+          frustumSize: float = 4000;
+          shadowCameraHelper: THREE.CameraHelper | null;
           constructor() {
             this.light = new THREE.DirectionalLight();
             this.light.shadow.mapSize.width = this.shadowSize;
             this.light.shadow.mapSize.height = this.shadowSize;
             this.light.shadow.camera.near = 1;
-            this.light.shadow.camera.far = 10000;
-            this.light.shadow.camera.right = 1000;
-            this.light.shadow.camera.left = -1000;
-            this.light.shadow.camera.top = 1000;
-            this.light.shadow.camera.bottom = -1000;
+            this.light.shadow.camera.far = this.distanceFromCamera + 1000;
+            this.light.shadow.camera.right = this.frustumSize / 2;
+            this.light.shadow.camera.left = -this.frustumSize / 2;
+            this.light.shadow.camera.top = this.frustumSize / 2;
+            this.light.shadow.camera.bottom = -this.frustumSize / 2;
+
+            if (shadowHelper) {
+              this.shadowCameraHelper = new THREE.CameraHelper(
+                this.light.shadow.camera
+              );
+            } else {
+              this.shadowCameraHelper = null;
+            }
 
             this.light.shadow.camera.updateProjectionMatrix();
           }
@@ -62,11 +72,8 @@ namespace gdjs {
             }
             scene.add(this.light);
             scene.add(this.light.target);
-            if (shadowHelper) {
-              const shadowCameraHelper = new THREE.CameraHelper(
-                this.light.shadow.camera
-              );
-              scene.add(shadowCameraHelper);
+            if (this.shadowCameraHelper) {
+              scene.add(this.shadowCameraHelper);
             }
 
             this._isEnabled = true;
@@ -82,44 +89,51 @@ namespace gdjs {
             }
             scene.remove(this.light);
             scene.remove(this.light.target);
+            if (this.shadowCameraHelper) {
+              scene.remove(this.shadowCameraHelper);
+            }
             this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
-            const y = -layer.getCameraY();
+            const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
             if (this.top === 'Y-') {
               const posLightX =
                 x +
-                1000 *
-                  Math.cos(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
-              const posLightY = y + 1000 * Math.sin(gdjs.toRad(this.elevation));
-              const posLightZ =
-                z +
-                1000 *
-                  Math.sin(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
-              this.light.position.set(posLightX, -posLightY, posLightZ);
-              this.light.target.position.set(x, -y, z);
-            } else {
-              const posLightX =
-                x +
-                1000 *
+                this.distanceFromCamera *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightY =
                 y -
-                1000 *
+                this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
+              const posLightZ =
+                z +
+                this.distanceFromCamera *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              const posLightZ = z + 1000 * Math.sin(gdjs.toRad(this.elevation));
+              this.light.position.set(posLightX, posLightY, posLightZ);
+              this.light.target.position.set(x, y, z);
+            } else {
+              const posLightX =
+                x +
+                this.distanceFromCamera *
+                  Math.cos(gdjs.toRad(this.rotation + 90)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              const posLightY =
+                y +
+                this.distanceFromCamera *
+                  Math.sin(gdjs.toRad(this.rotation + 90)) *
+                  Math.cos(gdjs.toRad(this.elevation));
+              const posLightZ =
+                z +
+                this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
 
-              this.light.position.set(posLightX, -posLightY, posLightZ);
-              this.light.target.position.set(x, -y, z);
+              this.light.position.set(posLightX, posLightY, posLightZ);
+              this.light.target.position.set(x, y, z);
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {
@@ -129,6 +143,10 @@ namespace gdjs {
               this.elevation = value;
             } else if (parameterName === 'rotation') {
               this.rotation = value;
+            } else if (parameterName === 'distanceFromCamera') {
+              this.distanceFromCamera = value;
+            } else if (parameterName === 'frustumSize') {
+              this.frustumSize = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -138,6 +156,10 @@ namespace gdjs {
               return this.elevation;
             } else if (parameterName === 'rotation') {
               return this.rotation;
+            } else if (parameterName === 'distanceFromCamera') {
+              return this.distanceFromCamera;
+            } else if (parameterName === 'frustumSize') {
+              return this.frustumSize;
             }
             return 0;
           }

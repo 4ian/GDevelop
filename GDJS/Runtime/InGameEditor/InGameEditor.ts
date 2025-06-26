@@ -357,12 +357,20 @@ namespace gdjs {
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
 
-    constructor(game: RuntimeGame) {
+    constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
       this._selectionBoxElement = document.createElement('div');
       this._selectionBoxElement.style.position = 'fixed';
       this._selectionBoxElement.style.backgroundColor = '#f2a63c44';
       this._selectionBoxElement.style.border = '1px solid #f2a63c';
+
+      for (const layoutData of projectData.layouts) {
+        for (const layerData of layoutData.layers) {
+          if (layerData.cameraType === 'orthographic') {
+            layerData.cameraType = 'perspective';
+          }
+        }
+      }
     }
 
     getEditorId(): string {

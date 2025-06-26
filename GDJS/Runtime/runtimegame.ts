@@ -295,7 +295,7 @@ namespace gdjs {
         getGlobalResourceNames(data),
         data.layouts
       );
-      this._inGameEditor = new gdjs.InGameEditor(this);
+      this._inGameEditor = new gdjs.InGameEditor(this, data);
       this._debuggerClient = gdjs.DebuggerClient
         ? new gdjs.DebuggerClient(this)
         : null;

@@ -37,8 +37,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/position24_black.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Angle"))
       .SetIcon("res/actions/direction24_black.png");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
-      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size")).SetIcon(
+      "res/actions/scale24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -838,14 +838,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced()
       .SetRelevantForLayoutEventsOnly();
 
-  obj.AddAction(
-         "PushBooleanToObjectVariable",
-         _("Add value to object array variable"),
-         _("Adds a boolean to the end of an object array variable."),
-         _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables ❯ Arrays and structures"),
-         "res/actions/var24.png",
-         "res/actions/var.png")
+  obj.AddAction("PushBooleanToObjectVariable",
+                _("Add value to object array variable"),
+                _("Adds a boolean to the end of an object array variable."),
+                _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+                _("Variables ❯ Arrays and structures"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
@@ -1575,8 +1574,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("Create",
                  _("Create an object"),
-                 _("Create an object at specified position. The created object "
-                   "will be taken into account for the next step(s)."),
+                 _("Create an instance of the object at the specified position."
+                   "The created object instance will be available for the next "
+                   "actions and sub-events."),
                  _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
                    "(layer: _PARAM4_)"),
                  "",

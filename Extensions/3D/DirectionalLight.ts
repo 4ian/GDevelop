@@ -31,12 +31,10 @@ namespace gdjs {
             this.light.shadow.mapSize.height = this.shadowSize;
             this.light.shadow.camera.near = 1;
             this.light.shadow.camera.far = 10000;
-            this.light.shadow.camera.right = 500;
-            this.light.shadow.camera.left = -500;
-            this.light.shadow.camera.top = 500;
-            this.light.shadow.camera.bottom = -500;
-            this.light.position.set(0, 10, 0);
-            this.light.target.position.set(0, 100, 0);
+            this.light.shadow.camera.right = 1000;
+            this.light.shadow.camera.left = -1000;
+            this.light.shadow.camera.top = 1000;
+            this.light.shadow.camera.bottom = -1000;
             this.light.shadow.needsUpdate = true;
             this.rotationObject = new THREE.Group();
             this.rotationObject.position.set(0, 0, 0);
@@ -112,7 +110,7 @@ namespace gdjs {
                 1000 *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
-              this.light.position.set(posLightX, posLightY, posLightZ);
+              this.light.position.set(posLightX, -posLightY, posLightZ);
               console.log('position de la camera :' + x, y, z);
               console.log(
                 'position de la light :' + this.light.position.x,
@@ -120,7 +118,7 @@ namespace gdjs {
                 this.light.position.z
               );
 
-              this.light.target.position.set(x, y, z);
+              this.light.target.position.set(x, -y, z);
               console.log(
                 'position de la target :' + this.light.target.position.x,
                 this.light.target.position.y,
@@ -139,13 +137,7 @@ namespace gdjs {
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightZ = z + 1000 * Math.sin(gdjs.toRad(this.elevation));
 
-              this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.shadow.camera.position.set(
-                posLightX,
-                posLightY,
-                posLightZ
-              );
-              this.light.shadow.camera.updateProjectionMatrix();
+              this.light.position.set(posLightX, -posLightY, posLightZ);
               console.log('position de la camera :' + x, y, z);
               console.log(
                 'position de la light :' + this.light.position.x,
@@ -153,7 +145,7 @@ namespace gdjs {
                 this.light.position.z
               );
 
-              this.light.target.position.set(x, y, z);
+              this.light.target.position.set(x, -y, z);
             }
             console.log(
               'position de la target :' + this.light.target.position.x,

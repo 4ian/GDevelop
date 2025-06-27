@@ -1947,7 +1947,8 @@ module.exports = {
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
         .setType('number')
-        .setGroup(_('Shadows'));
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('distanceFromCamera')
         .setValue('1500')

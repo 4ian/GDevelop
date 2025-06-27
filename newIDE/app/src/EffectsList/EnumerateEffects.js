@@ -37,7 +37,6 @@ export const enumerateEffectsMetadata = (
         .map((effectMetadata: gdEffectMetadata) => {
           const effectType = effectMetadata.getType();
 
-          // Convert the effect type properties to a PropertiesEditor Schema.
           const properties = effectMetadata.getProperties();
           const parameterNames = properties.keys().toJSArray();
           const parametersSchema: Schema = parameterNames
@@ -49,6 +48,8 @@ export const enumerateEffectsMetadata = (
               const getLabel = () => propertyLabel;
               const getDescription = () => propertyDescription;
               const getExtraDescription = () => parameterName;
+              const advanced = property.isAdvanced();
+              const defaultValue = property.getValue();
 
               if (valueType === 'number') {
                 return {
@@ -61,6 +62,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'boolean') {
                 return {
@@ -73,11 +76,11 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'resource') {
-                // Resource is a "string" (with a selector in the UI)
                 const kind: ResourceKind =
-                  // $FlowFixMe - assume the passed resource kind is always valid.
                   property.getExtraInfo().toJSArray()[0] || '';
                 return {
                   name: parameterName,
@@ -90,6 +93,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'color') {
                 return {
@@ -102,6 +107,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'choice') {
                 const choices = property
@@ -119,6 +126,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else {
                 console.error(

@@ -52,6 +52,7 @@ import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
+import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 
 const gd: libGDevelop = global.gd;
 
@@ -131,14 +132,12 @@ const Effect = React.forwardRef(
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
     const preferences = React.useContext(PreferencesContext);
     const showEffectParameterNames =
       preferences.values.showEffectParameterNames;
     const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
 
     const forceUpdate = useForceUpdate();
-
     const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
     const renameEffect = React.useCallback(
@@ -167,6 +166,7 @@ const Effect = React.forwardRef(
           });
           return;
         }
+
         const oldName = effect.getName();
         effect.setName(newName);
         forceUpdate();
@@ -187,6 +187,41 @@ const Effect = React.forwardRef(
     const effectMetadata = getEnumeratedEffectMetadata(
       allEffectMetadata,
       effectType
+    );
+
+    const [
+      showAdvancedProperties,
+      setShowAdvancedProperties,
+    ] = React.useState<boolean>(false);
+
+    const parametersSchema = effectMetadata?.parametersSchema || [];
+    const basicPropertiesSchema = React.useMemo(
+      () => parametersSchema.filter(param => !param.advanced),
+      [parametersSchema]
+    );
+    const advancedPropertiesSchema = React.useMemo(
+      () => parametersSchema.filter(param => param.advanced),
+      [parametersSchema]
+    );
+
+    const areAdvancedPropertiesModified = React.useMemo(
+      () => {
+        return advancedPropertiesSchema.some(param => {
+          const current =
+            param.valueType === 'number'
+              ? effect.getDoubleParameter(param.name)
+              : param.valueType === 'boolean'
+              ? effect.getBooleanParameter(param.name)
+              : effect.getStringParameter(param.name);
+
+          if (param.valueType === 'boolean') {
+            return (current === 'true') !== (param.defaultValue === 'true');
+          }
+
+          return current !== param.defaultValue;
+        });
+      },
+      [advancedPropertiesSchema, effect]
     );
 
     return (
@@ -285,33 +320,61 @@ const Effect = React.forwardRef(
               />
               <Spacer />
             </div>
-            {effectType && (
+            {effectMetadata && (
               <Line expand noMargin>
                 <Column expand>
-                  {effectMetadata ? (
-                    <React.Fragment>
-                      <Line>
-                        <BackgroundText>
-                          <MarkdownText source={effectMetadata.description} />
-                        </BackgroundText>
-                      </Line>
-                      <PropertiesEditor
-                        key={effect.getEffectType()}
-                        instances={[effect]}
-                        schema={effectMetadata.parametersSchema}
-                        project={project}
-                        resourceManagementProps={resourceManagementProps}
-                        renderExtraDescriptionText={
-                          showEffectParameterNames
-                            ? parameterName =>
-                                i18n._(
-                                  t`Property name in events: \`${parameterName}\` `
-                                )
-                            : undefined
-                        }
-                      />
-                    </React.Fragment>
-                  ) : null}
+                  <Line>
+                    <BackgroundText>
+                      <MarkdownText source={effectMetadata.description} />
+                    </BackgroundText>
+                  </Line>
+                  <PropertiesEditor
+                    key={effect.getEffectType() + '-basic'}
+                    instances={[effect]}
+                    schema={basicPropertiesSchema}
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    renderExtraDescriptionText={
+                      showEffectParameterNames
+                        ? parameterName =>
+                            i18n._(
+                              t`Property name in events: \`${parameterName}\` `
+                            )
+                        : undefined
+                    }
+                  />
+                  {advancedPropertiesSchema.length > 0 && (
+                    <Accordion
+                      defaultExpanded={
+                        areAdvancedPropertiesModified || showAdvancedProperties
+                      }
+                      onToggle={expanded => setShowAdvancedProperties(expanded)}
+                    >
+                      <AccordionHeader>
+                        <Text size="sub-title">
+                          <Trans>Advanced properties</Trans>
+                        </Text>
+                      </AccordionHeader>
+                      <AccordionBody disableGutters>
+                        <PropertiesEditor
+                          key={effect.getEffectType() + '-advanced'}
+                          instances={[effect]}
+                          schema={advancedPropertiesSchema}
+                          project={project}
+                          resourceManagementProps={resourceManagementProps}
+                          renderExtraDescriptionText={
+                            showEffectParameterNames
+                              ? parameterName =>
+                                  i18n._(
+                                    t`Property name in events: \`${parameterName}\` `
+                                  )
+                              : undefined
+                          }
+                        />
+                      </AccordionBody>
+                    </Accordion>
+                  )}
+
                   <Spacer />
                 </Column>
               </Line>

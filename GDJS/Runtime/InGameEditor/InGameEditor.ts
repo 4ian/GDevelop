@@ -326,6 +326,30 @@ namespace gdjs {
     // Dragged new object:
     private _draggedNewObject: gdjs.RuntimeObject | null = null;
     private _draggedSelectedObject: gdjs.RuntimeObject | null = null;
+    private _draggedSelectedObjectInitialX: float = 0;
+    private _draggedSelectedObjectInitialY: float = 0;
+    private _draggedSelectedObjectInitialZ: float = 0;
+    private _draggedSelectedObjectTotalDelta: {
+      translationX: float;
+      translationY: float;
+      translationZ: float;
+      rotationX: float;
+      rotationY: float;
+      rotationZ: float;
+      scaleX: float;
+      scaleY: float;
+      scaleZ: float;
+    } = {
+      translationX: 0,
+      translationY: 0,
+      translationZ: 0,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      scaleX: 1,
+      scaleY: 1,
+      scaleZ: 1,
+    };
 
     constructor(game: RuntimeGame, projectData: ProjectData) {
       this._runtimeGame = game;
@@ -740,7 +764,9 @@ namespace gdjs {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const closestIntersect = this._getClosestIntersectionUnderCursor();
+      const closestIntersect = this._getClosestIntersectionUnderCursor(
+        this._selection.getSelectedObjects()
+      );
       let cursorX = 0;
       let cursorY = 0;
       let cursorZ = 0;
@@ -798,6 +824,12 @@ namespace gdjs {
         const object = this.getObjectUnderCursor();
         if (object && this._selection.getSelectedObjects().includes(object)) {
           this._draggedSelectedObject = object;
+          this._draggedSelectedObjectInitialX = object.getX();
+          this._draggedSelectedObjectInitialY = object.getY();
+          this._draggedSelectedObjectInitialZ = is3D(object)
+            ? object.getZ()
+            : 0;
+          this._objectMover.startMove();
         }
       }
 
@@ -805,30 +837,57 @@ namespace gdjs {
         return;
       }
 
+      let isIntersectionFound = false;
+      let intersectionX: float = 0;
+      let intersectionY: float = 0;
+      let intersectionZ: float = 0;
       if (is3D(this._draggedSelectedObject)) {
-        const closestIntersect = this._getClosestIntersectionUnderCursor();
+        const closestIntersect = this._getClosestIntersectionUnderCursor(
+          this._selection.getSelectedObjects()
+        );
         if (closestIntersect) {
-          this._draggedSelectedObject.setX(closestIntersect.point.x);
-          this._draggedSelectedObject.setY(-closestIntersect.point.y);
-          this._draggedSelectedObject.setZ(closestIntersect.point.z);
+          isIntersectionFound = true;
+          intersectionX = closestIntersect.point.x;
+          intersectionY = -closestIntersect.point.y;
+          intersectionZ = closestIntersect.point.z;
         } else {
           const projectedCursor = this._getProjectedCursor();
           if (projectedCursor) {
-            this._draggedSelectedObject.setX(projectedCursor[0]);
-            this._draggedSelectedObject.setY(projectedCursor[1]);
-            this._draggedSelectedObject.setZ(0);
+            isIntersectionFound = true;
+            intersectionX = projectedCursor[0];
+            intersectionY = projectedCursor[1];
+            intersectionZ = 0;
           }
         }
       } else {
         const projectedCursor = this._getProjectedCursor();
         if (projectedCursor) {
-          this._draggedSelectedObject.setX(projectedCursor[0]);
-          this._draggedSelectedObject.setY(projectedCursor[1]);
+          isIntersectionFound = true;
+          intersectionX = projectedCursor[0];
+          intersectionY = projectedCursor[1];
         }
       }
+      if (isIntersectionFound) {
+        this._draggedSelectedObjectTotalDelta.translationX =
+          intersectionX - this._draggedSelectedObjectInitialX;
+        this._draggedSelectedObjectTotalDelta.translationY =
+          intersectionY - this._draggedSelectedObjectInitialY;
+        this._draggedSelectedObjectTotalDelta.translationZ =
+          intersectionZ - this._draggedSelectedObjectInitialZ;
+      } else {
+        this._draggedSelectedObjectTotalDelta.translationX = 0;
+        this._draggedSelectedObjectTotalDelta.translationY = 0;
+        this._draggedSelectedObjectTotalDelta.translationZ = 0;
+      }
+      console.log(this._draggedSelectedObjectTotalDelta);
+      this._objectMover.move(
+        this._selection.getSelectedObjects(),
+        this._draggedSelectedObjectTotalDelta
+      );
 
       if (inputManager.isMouseButtonReleased(0)) {
         this._draggedSelectedObject = null;
+        this._objectMover.endMove();
         this._sendSelectionUpdate();
       }
     }
@@ -1519,7 +1578,9 @@ namespace gdjs {
               0
             );
 
-            const closestIntersect = this._getClosestIntersectionUnderCursor();
+            const closestIntersect = this._getClosestIntersectionUnderCursor([
+              this._draggedNewObject,
+            ]);
             if (closestIntersect && !is3D(this._draggedNewObject)) {
               // Avoid to create a 2D object hidden under a 3D one.
               this.cancelDragNewInstance();
@@ -1582,7 +1643,9 @@ namespace gdjs {
       }
 
       if (is3D(this._draggedNewObject)) {
-        const closestIntersect = this._getClosestIntersectionUnderCursor();
+        const closestIntersect = this._getClosestIntersectionUnderCursor([
+          this._draggedNewObject,
+        ]);
         if (closestIntersect) {
           this._draggedNewObject.setX(closestIntersect.point.x);
           this._draggedNewObject.setY(-closestIntersect.point.y);
@@ -1720,7 +1783,9 @@ namespace gdjs {
       this._selection.clear();
     }
 
-    private _getClosestIntersectionUnderCursor(): THREE.Intersection | null {
+    private _getClosestIntersectionUnderCursor(
+      excludedObjects?: Array<gdjs.RuntimeObject>
+    ): THREE.Intersection | null {
       const runtimeGame = this._runtimeGame;
       const firstIntersectsByLayer: {
         [layerName: string]: null | {
@@ -1745,15 +1810,15 @@ namespace gdjs {
           child.layers.set(1);
         }
       }
-      let draggedNewObjectPreviousMask = 0;
-      const draggedObject =
-        this._draggedNewObject || this._draggedSelectedObject;
-      if (draggedObject && is3D(draggedObject)) {
-        const draggedRendererObject = draggedObject.get3DRendererObject();
-        if (draggedRendererObject) {
-          draggedNewObjectPreviousMask = draggedRendererObject.layers.mask;
-          draggedRendererObject.layers.set(1);
-          draggedRendererObject.traverse((object) => object.layers.set(1));
+      if (excludedObjects) {
+        for (const excludedObject of excludedObjects) {
+          if (is3D(excludedObject)) {
+            const draggedRendererObject = excludedObject.get3DRendererObject();
+            if (draggedRendererObject) {
+              draggedRendererObject.layers.set(1);
+              draggedRendererObject.traverse((object) => object.layers.set(1));
+            }
+          }
         }
       }
 
@@ -1796,13 +1861,15 @@ namespace gdjs {
         }
       }
       // Also reset the layer of the object being added.
-      if (draggedObject && is3D(draggedObject)) {
-        const draggedRendererObject = draggedObject.get3DRendererObject();
-        if (draggedRendererObject) {
-          draggedRendererObject.layers.mask = draggedNewObjectPreviousMask;
-          draggedRendererObject.traverse(
-            (object) => (object.layers.mask = draggedNewObjectPreviousMask)
-          );
+      if (excludedObjects) {
+        for (const excludedObject of excludedObjects) {
+          if (is3D(excludedObject)) {
+            const draggedRendererObject = excludedObject.get3DRendererObject();
+            if (draggedRendererObject) {
+              draggedRendererObject.layers.set(0);
+              draggedRendererObject.traverse((object) => object.layers.set(0));
+            }
+          }
         }
       }
 

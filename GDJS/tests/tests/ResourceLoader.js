@@ -3,7 +3,7 @@
 /**
  * Tests for gdjs.ResourceLoader.
  */
-describe.only('gdjs.ResourceLoader', () => {
+describe('gdjs.ResourceLoader', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   /** @returns {LayoutData} */
@@ -26,7 +26,7 @@ describe.only('gdjs.ResourceLoader', () => {
   };
 
   /**
-   * Enhanced mocked resource manager that tracks disposed resources
+   * Mocked resources manager for resources of kind "fake-resource-kind-for-testing-only".
    */
   class EnhancedMockedResourceManager {
     loadResourcePromises = new Map();
@@ -125,9 +125,9 @@ describe.only('gdjs.ResourceLoader', () => {
     }
 
     getResourceKinds() {
-      return ['fake-heavy-resource-kind'];
+      return ['fake-resource-kind-for-testing-only'];
     }
-  };
+  }
 
   const gameSettingsWithThreeScenes = {
     layouts: [
@@ -147,35 +147,35 @@ describe.only('gdjs.ResourceLoader', () => {
     resources: {
       resources: [
         {
-          kind: 'fake-heavy-resource-kind',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'scene1-resource1.png',
           metadata: '',
           file: 'scene1-resource1.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource-kind',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'scene1-resource2.png',
           metadata: '',
           file: 'scene1-resource2.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource-kind',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'scene2-resource1.png',
           metadata: '',
           file: 'scene2-resource1.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource-kind',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'scene3-resource1.png',
           metadata: '',
           file: 'scene3-resource1.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource-kind',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'shared-resource.png',
           metadata: '',
           file: 'shared-resource.png',
@@ -187,15 +187,12 @@ describe.only('gdjs.ResourceLoader', () => {
 
   it('should load first scene resources, then others in background', async () => {
     const mockedResourceManager = new EnhancedMockedResourceManager();
-    // @ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      // @ts-ignore
-      'fake-heavy-resource-kind',
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
-
-    const resourceLoader = runtimeGame._resourcesLoader;
 
     // Initially, no scene assets should be loaded
     expect(resourceLoader.areSceneAssetsLoaded('Scene1')).to.be(false);
@@ -267,15 +264,12 @@ describe.only('gdjs.ResourceLoader', () => {
 
   it('should unload only resources unique to the unloaded scene', async () => {
     const mockedResourceManager = new EnhancedMockedResourceManager();
-    // @ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      // @ts-ignore
-      'fake-heavy-resource-kind',
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
-
-    const resourceLoader = runtimeGame._resourcesLoader;
 
     // Load all resources for all scenes
     resourceLoader.loadGlobalAndFirstSceneResources('Scene1', () => {});
@@ -292,21 +286,9 @@ describe.only('gdjs.ResourceLoader', () => {
     await delay(10);
 
     // Verify all resources are loaded
-    expect(
-      mockedResourceManager.isResourceLoaded('scene1-resource1.png')
-    ).to.be(true);
-    expect(
-      mockedResourceManager.isResourceLoaded('scene1-resource2.png')
-    ).to.be(true);
-    expect(
-      mockedResourceManager.isResourceLoaded('scene2-resource1.png')
-    ).to.be(true);
-    expect(
-      mockedResourceManager.isResourceLoaded('scene3-resource1.png')
-    ).to.be(true);
-    expect(mockedResourceManager.isResourceLoaded('shared-resource.png')).to.be(
-      true
-    );
+    expect(resourceLoader.areSceneAssetsReady('Scene1')).to.be(true);
+    expect(resourceLoader.areSceneAssetsReady('Scene2')).to.be(true);
+    expect(resourceLoader.areSceneAssetsReady('Scene3')).to.be(true);
 
     // Verify no resources are disposed initially
     expect(
@@ -363,15 +345,12 @@ describe.only('gdjs.ResourceLoader', () => {
 
   it('should unload shared resources only when no other scene uses them', async () => {
     const mockedResourceManager = new EnhancedMockedResourceManager();
-    // @ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      // @ts-ignore
-      'fake-heavy-resource-kind',
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
-
-    const resourceLoader = runtimeGame._resourcesLoader;
 
     // Load all resources for all scenes
     resourceLoader.loadAllResources(() => {});
@@ -417,15 +396,12 @@ describe.only('gdjs.ResourceLoader', () => {
 
   it('should handle background scene loading progress correctly', async () => {
     const mockedResourceManager = new EnhancedMockedResourceManager();
-    // @ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      // @ts-ignore
-      'fake-heavy-resource-kind',
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
-
-    const resourceLoader = runtimeGame._resourcesLoader;
 
     // Initially progress should be 0
     expect(resourceLoader.getSceneLoadingProgress('Scene1')).to.be(0);

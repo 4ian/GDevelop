@@ -731,11 +731,18 @@ namespace gdjs {
       return this._spineAtlasManager;
     }
 
+    injectMockResourceManagerForTesting(
+      resourceKind: ResourceKind,
+      resourceManager: ResourceManager
+    ) {
+      this._resourceManagersMap.set(resourceKind, resourceManager);
+    }
+
     /**
      * Get the map of resources that are only used in the scene that is being unloaded,
      * and that are not used in any other loaded scene (or the scene that is coming next).
      */
-    _getResourcesByKindOnlyUsedInUnloadedScene({
+    private _getResourcesByKindOnlyUsedInUnloadedScene({
       unloadedSceneName,
       newSceneName,
     }: {

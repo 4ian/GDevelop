@@ -438,4 +438,5 @@ declare type ResourceKind =
   | 'bitmapFont'
   | 'model3D'
   | 'atlas'
-  | 'spine';
+  | 'spine'
+  | 'fake-resource-kind-for-testing-only';

@@ -72,6 +72,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     initialInstances,
     selectedLayer,
     onSelectInstances,
+    onInstancesModified,
     onExtensionInstalled,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
@@ -471,6 +472,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                     instances={initialInstances}
                     selectedInstances={selectedInstances}
                     onSelectInstances={selectInstances}
+                    onInstancesModified={onInstancesModified || noop}
                     ref={instancesListRef}
                   />
                 </Paper>

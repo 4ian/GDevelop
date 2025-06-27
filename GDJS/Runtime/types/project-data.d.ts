@@ -258,7 +258,8 @@ declare interface InstancePersistentUuidData {
 
 declare interface InstanceData extends InstancePersistentUuidData {
   layer: string;
-  locked: boolean;
+  locked?: boolean;
+  sealed?: boolean;
   name: string;
 
   x: number;

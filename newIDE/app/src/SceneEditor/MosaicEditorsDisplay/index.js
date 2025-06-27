@@ -361,6 +361,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           instances={initialInstances}
           selectedInstances={selectedInstances}
           onSelectInstances={selectInstances}
+          onInstancesModified={onInstancesModified || noop}
           ref={instancesListRef}
         />
       ),

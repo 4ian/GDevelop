@@ -952,7 +952,7 @@ namespace gdjs {
       );
       // Update the GameData
       for (let index = 0; index < objects.length; index++) {
-        Object.assign(oldObjects[index], objects[index]);
+        HotReloader.assignOrDelete(oldObjects[index], objects[index]);
       }
     }
 
@@ -1244,7 +1244,7 @@ namespace gdjs {
       );
       // Update the GameData
       for (let index = 0; index < newLayers.length; index++) {
-        Object.assign(oldLayers[index], newLayers[index]);
+        HotReloader.assignOrDelete(oldLayers[index], newLayers[index]);
       }
     }
 
@@ -1784,6 +1784,17 @@ namespace gdjs {
 
       // true if both NaN, false otherwise
       return a !== a && b !== b;
+    }
+
+    static assignOrDelete(target: any, source: any): void {
+      Object.assign(target, source);
+      for (const key in target) {
+        if (Object.prototype.hasOwnProperty.call(target, key)) {
+          if (source[key] === undefined) {
+            delete target[key];
+          }
+        }
+      }
     }
   }
 }

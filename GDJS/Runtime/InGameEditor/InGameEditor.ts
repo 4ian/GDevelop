@@ -115,45 +115,6 @@ namespace gdjs {
   const shouldDragSelectedObject = (inputManager: gdjs.InputManager) =>
     isAltPressed(inputManager);
 
-  const getInstanceDataFromRuntimeObject = (
-    runtimeObject: gdjs.RuntimeObject
-  ): InstanceData | null => {
-    if (gdjs.Base3DHandler.is3D(runtimeObject)) {
-      if (!runtimeObject.persistentUuid) return null;
-
-      const instanceData: InstanceData = {
-        name: runtimeObject.getName(),
-        zOrder: runtimeObject.getZOrder(),
-        persistentUuid: runtimeObject.persistentUuid,
-        x: runtimeObject.getX(),
-        y: runtimeObject.getY(),
-        z: runtimeObject.getZ(),
-        layer: runtimeObject.getLayer(),
-        angle: runtimeObject.getAngle(),
-        rotationY: runtimeObject.getRotationY(),
-        rotationX: runtimeObject.getRotationX(),
-        customSize: runtimeObject.getScale() !== 1,
-        width: runtimeObject.getWidth(),
-        height: runtimeObject.getHeight(),
-        depth: runtimeObject.getDepth(),
-        locked: false, // TODO
-        // TODO: how to transmit/should we transmit other properties?
-        numberProperties: [],
-        stringProperties: [],
-        initialVariables: [],
-        // @ts-ignore
-        defaultWidth: runtimeObject.getOriginalWidth(),
-        defaultHeight: runtimeObject.getOriginalHeight(),
-        defaultDepth: runtimeObject.getOriginalDepth(),
-      };
-
-      return instanceData;
-    } else {
-      // TODO: handle 2D objects/instances.
-      return null;
-    }
-  };
-
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
@@ -186,6 +147,12 @@ namespace gdjs {
   }
 
   class ObjectMover {
+    editor: InGameEditor;
+
+    constructor(editor: InGameEditor) {
+      this.editor = editor;
+    }
+
     _objectInitialPositions: Map<
       gdjs.RuntimeObject,
       {
@@ -225,6 +192,9 @@ namespace gdjs {
       }
     ) {
       selectedObjects.forEach((object) => {
+        if (this.editor.isInstanceLocked(object)) {
+          return;
+        }
         let initialPosition = this._objectInitialPositions.get(object);
         if (!initialPosition) {
           initialPosition = is3D(object)
@@ -346,7 +316,7 @@ namespace gdjs {
       RuntimeObjectWith3D,
       { container: THREE.Group; box: THREE.BoxHelper }
     > = new Map();
-    private _objectMover = new ObjectMover();
+    private _objectMover = new ObjectMover(this);
 
     private _wasMouseRightButtonPressed = false;
     private _wasMouseLeftButtonPressed = false;
@@ -972,8 +942,9 @@ namespace gdjs {
           }
           if (layer.isVisible() && !layer._initialLayerData.isLocked) {
             for (const object of objects) {
-              // TODO Check if the object is locked
-              this._selection.add(object);
+              if (!this.isInstanceSealed(object)) {
+                this._selection.add(object);
+              }
             }
           }
         }
@@ -1018,7 +989,10 @@ namespace gdjs {
             const layer = editedInstanceContainer.getLayer(
               objectUnderCursor.getLayer()
             );
-            if (!layer._initialLayerData.isLocked) {
+            if (
+              !layer._initialLayerData.isLocked &&
+              !this.isInstanceSealed(objectUnderCursor)
+            ) {
               this._selection.toggle(objectUnderCursor);
             }
           }
@@ -1073,7 +1047,8 @@ namespace gdjs {
       if (
         objectUnderCursor &&
         is3D(objectUnderCursor) &&
-        !this._selectionBoxes.has(objectUnderCursor)
+        !this._selectionBoxes.has(objectUnderCursor) &&
+        !this.isInstanceSealed(objectUnderCursor)
       ) {
         this._createBoundingBoxIfNeeded(objectUnderCursor);
       }
@@ -1303,7 +1278,7 @@ namespace gdjs {
       const updatedInstances = this._selection
         .getSelectedObjects()
         .map((object) => {
-          const instance = getInstanceDataFromRuntimeObject(object);
+          const instance = this.getInstanceDataFromRuntimeObject(object);
           if (instance) {
             // Avoid to clear these properties when assigning it to the old InstanceData.
             // @ts-ignore
@@ -1320,7 +1295,7 @@ namespace gdjs {
       const addedInstances =
         options && options.addedObjects
           ? options.addedObjects
-              .map((object) => getInstanceDataFromRuntimeObject(object))
+              .map((object) => this.getInstanceDataFromRuntimeObject(object))
               .filter(isDefined)
           : [];
 
@@ -1341,6 +1316,47 @@ namespace gdjs {
       });
     }
 
+    private getInstanceDataFromRuntimeObject(
+      runtimeObject: gdjs.RuntimeObject
+    ): InstanceData | null {
+      if (gdjs.Base3DHandler.is3D(runtimeObject)) {
+        if (!runtimeObject.persistentUuid) return null;
+
+        const oldData = this._getInstanceData(runtimeObject.persistentUuid);
+        const instanceData: InstanceData = {
+          name: runtimeObject.getName(),
+          zOrder: runtimeObject.getZOrder(),
+          persistentUuid: runtimeObject.persistentUuid,
+          x: runtimeObject.getX(),
+          y: runtimeObject.getY(),
+          z: runtimeObject.getZ(),
+          layer: runtimeObject.getLayer(),
+          angle: runtimeObject.getAngle(),
+          rotationY: runtimeObject.getRotationY(),
+          rotationX: runtimeObject.getRotationX(),
+          customSize: runtimeObject.getScale() !== 1,
+          width: runtimeObject.getWidth(),
+          height: runtimeObject.getHeight(),
+          depth: runtimeObject.getDepth(),
+          locked: oldData ? oldData.locked : false,
+          sealed: oldData ? oldData.sealed : false,
+          // TODO: how to transmit/should we transmit other properties?
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+          // @ts-ignore
+          defaultWidth: runtimeObject.getOriginalWidth(),
+          defaultHeight: runtimeObject.getOriginalHeight(),
+          defaultDepth: runtimeObject.getOriginalDepth(),
+        };
+
+        return instanceData;
+      } else {
+        // TODO: handle 2D objects/instances.
+        return null;
+      }
+    }
+
     private _removeInstances(
       removedInstances: Array<{ persistentUuid: string | null }>
     ) {
@@ -1358,15 +1374,34 @@ namespace gdjs {
 
     private _updateInstances(updatedInstances: Array<InstanceData>) {
       for (const updatedInstance of updatedInstances) {
-        // TODO: Might be worth indexing instances data
-        const oldInstance = this._editedInstanceDataList.find(
-          (oldInstance) =>
-            oldInstance.persistentUuid === updatedInstance.persistentUuid
+        const oldInstance = this._getInstanceData(
+          updatedInstance.persistentUuid
         );
         if (oldInstance) {
-          Object.assign(oldInstance, updatedInstance);
+          gdjs.HotReloader.assignOrDelete(oldInstance, updatedInstance);
         }
       }
+    }
+
+    private _getInstanceData(
+      persistentUuid: string | null
+    ): InstanceData | null {
+      // TODO: Might be worth indexing instances data
+      return persistentUuid
+        ? this._editedInstanceDataList.find(
+            (instanceData) => instanceData.persistentUuid === persistentUuid
+          ) || null
+        : null;
+    }
+
+    isInstanceLocked(object: gdjs.RuntimeObject): boolean {
+      const instanceData = this._getInstanceData(object.persistentUuid);
+      return !!instanceData && !!instanceData.locked;
+    }
+
+    isInstanceSealed(object: gdjs.RuntimeObject): boolean {
+      const instanceData = this._getInstanceData(object.persistentUuid);
+      return !!instanceData && !!instanceData.sealed;
     }
 
     private _addInstances(addedInstances: Array<InstanceData>) {

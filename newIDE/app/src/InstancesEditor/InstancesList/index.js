@@ -76,6 +76,7 @@ type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
   onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
+  onInstancesModified: (Array<gdInitialInstance>) => void,
 |};
 
 class InstancesList extends Component<Props, State> {
@@ -161,13 +162,12 @@ class InstancesList extends Component<Props, State> {
           if (instance.isSealed()) {
             instance.setSealed(false);
             instance.setLocked(false);
-            return;
-          }
-          if (instance.isLocked()) {
+          } else if (instance.isLocked()) {
             instance.setSealed(true);
-            return;
+          } else {
+            instance.setLocked(true);
           }
-          instance.setLocked(true);
+          this.props.onInstancesModified([instance]);
         }}
       >
         {instance.isLocked() && instance.isSealed() ? (

@@ -35,5 +35,13 @@ namespace gdjs {
      * Using the manager after calling this method is undefined behavior.
      */
     dispose(): void;
+
+    /**
+     * Should clear all specified in resourcesList resources, data, loaders stored by this manager.
+     * Using the manager after calling this method is undefined behavior.
+     * @param resourcesList The list of specific resources that need to be clear
+     */
+    // TODO: rename to `unloadByResourcesList`?
+    disposeByResourcesList(resourcesList: ResourceData[]): void;
   }
 }

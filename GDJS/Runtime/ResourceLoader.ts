@@ -5,6 +5,7 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug');
 
   const addSearchParameterToUrl = (
     url: string,
@@ -319,17 +320,14 @@ namespace gdjs {
      * scenes.
      */
     async loadAllSceneInBackground(): Promise<void> {
-      console.log('loadAllSceneInBackground called.');
       if (this.currentLoadingSceneName) {
-        console.log('Already loading something - skipping.');
         return;
       }
 
+      debugLogger.log('Loading all scene resources, in background.');
       while (this._sceneToLoadQueue.length > 0) {
-        console.log(
-          'loadAllSceneInBackground. Still to load:',
-          this._sceneToLoadQueue.length,
-          this._sceneToLoadQueue
+        debugLogger.log(
+          `Still resources of ${this._sceneToLoadQueue.length} scenes to load: ${this._sceneToLoadQueue.map((task) => task.sceneName).join(', ')}`
         );
         const task = this._sceneToLoadQueue[this._sceneToLoadQueue.length - 1];
         if (task === undefined) {
@@ -337,11 +335,12 @@ namespace gdjs {
         }
         this.currentLoadingSceneName = task.sceneName;
         if (!this.areSceneAssetsLoaded(task.sceneName)) {
-          console.log('_doLoadSceneResources for ', task.sceneName);
+          debugLogger.log(`Loading resources for scene ${task.sceneName}.`);
           await this._doLoadSceneResources(
             task.sceneName,
             async (count, total) => task.onProgress(count, total)
           );
+
           // A scene may have been moved last while awaiting resources to be
           // downloaded (see _prioritizeScene).
           this._sceneToLoadQueue.splice(
@@ -353,7 +352,7 @@ namespace gdjs {
           this._sceneToLoadQueue.pop();
         }
       }
-      console.log('loadAllSceneInBackground. Done loading everything:');
+      debugLogger.log(`Scene resources loading finished.`);
       this.currentLoadingSceneName = '';
     }
 
@@ -456,18 +455,25 @@ namespace gdjs {
       sceneName: string,
       onProgress?: (count: number, total: number) => void
     ): Promise<void> {
-      console.log('loadSceneResources', sceneName);
+      debugLogger.log(
+        `Prioritization of loading of resources for scene ${sceneName} was requested.`
+      );
+
       this._isLoadingInForeground = true;
       const task = this._prioritizeScene(sceneName);
       return new Promise<void>((resolve, reject) => {
         if (!task) {
           this._isLoadingInForeground = false;
-          console.log('resolve immediately for ', sceneName);
+          debugLogger.log(
+            `Loading of resources for scene ${sceneName} was immediately resolved.`
+          );
           resolve();
           return;
         }
         task.registerCallback(() => {
-          console.log('resolve later for ', sceneName);
+          debugLogger.log(
+            `Loading of resources for scene ${sceneName} just finished.`
+          );
           this._isLoadingInForeground = false;
           resolve();
         }, onProgress);
@@ -495,7 +501,9 @@ namespace gdjs {
       newSceneName: string | null;
     }): void {
       if (!unloadedSceneName) return;
-      console.log('unloadSceneResources', { unloadedSceneName, newSceneName });
+      debugLogger.log(
+        `Unloading of resources for scene ${unloadedSceneName} was requested.`
+      );
 
       const sceneUniqueResourcesByKindMap =
         this._getResourcesByKindOnlyUsedInUnloadedScene({
@@ -507,8 +515,11 @@ namespace gdjs {
         ._resourceManagersMap) {
         const resources =
           sceneUniqueResourcesByKindMap.get(kindResourceManager);
-        console.log('disposing', kindResourceManager, resources);
         if (resources) {
+          debugLogger.log(
+            `Unloading of resources of kind ${kindResourceManager} for scene ${unloadedSceneName}: `,
+            resources.map((resource) => resource.name).join(', ')
+          );
           resourceManager.disposeByResourcesList(resources);
         }
       }
@@ -530,11 +541,15 @@ namespace gdjs {
       const sceneState = this._sceneLoadingStates.get(sceneName);
       if (!sceneState) return null;
       if (sceneState.status === 'loaded' || sceneState.status === 'ready') {
-        console.log('Called _prioritizeScene but the scene is already loaded.');
-        // The scene is already loaded.
+        debugLogger.log(
+          `Scene ${sceneName} is already loaded. Skipping prioritization.`
+        );
+
+        // The scene is already loaded, nothing to do.
         return null;
       }
 
+      // The scene is not loaded: either prioritize it or add it to the loading queue.
       const taskIndex = this._sceneToLoadQueue.findIndex(
         (task) => task.sceneName === sceneName
       );

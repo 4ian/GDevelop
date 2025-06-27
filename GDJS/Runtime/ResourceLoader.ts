@@ -389,6 +389,9 @@ namespace gdjs {
             (await onProgress(loadedCount, sceneState.resourceNames.length));
         }
       );
+      debugLogger.log(
+        `Loading (but not processing) of resources for scene ${sceneName} finished. ${loadedCount} resources loaded.`
+      );
       sceneState.status = 'ready';
     }
 

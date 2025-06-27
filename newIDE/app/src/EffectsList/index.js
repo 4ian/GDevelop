@@ -348,7 +348,6 @@ const Effect = React.forwardRef(
                       defaultExpanded={
                         areAdvancedPropertiesModified || showAdvancedProperties
                       }
-                      onToggle={expanded => setShowAdvancedProperties(expanded)}
                     >
                       <AccordionHeader>
                         <Text size="sub-title">

@@ -113,6 +113,7 @@ export class DebuggerEditorContainer extends React.Component<
           }
           id="Debugger"
           title={<Trans>Debugger</Trans>}
+          placementId="debugger"
           mode="try"
         />
       </React.Fragment>

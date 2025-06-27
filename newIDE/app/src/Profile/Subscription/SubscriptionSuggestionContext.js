@@ -5,6 +5,7 @@ import SubscriptionDialog from './SubscriptionDialog';
 import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
+  type SubscriptionPlacementId,
 } from '../../Utils/Analytics/EventSender';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import {
@@ -26,6 +27,7 @@ export type SubscriptionType = 'individual' | 'team' | 'education';
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
   recommendedPlanId?: string,
+  placementId: SubscriptionPlacementId,
   preStep?: 'subscriptionChecker',
 |};
 

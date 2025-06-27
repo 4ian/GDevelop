@@ -451,6 +451,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     {rightButton &&
                       (rightButton.primary ? (
                         <TreeViewRightPrimaryButton
+                          id={rightButton.id}
                           onClick={e => {
                             e.stopPropagation();
                             if (rightButton.click) {

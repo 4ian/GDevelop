@@ -38,6 +38,7 @@ export const NotAuthenticatedTryMode = () => {
         id="Preview over wifi"
         onChangeSubscription={action('change subscription')}
         mode="try"
+        placementId="gdevelop-branding"
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -59,6 +60,7 @@ export const NotAuthenticatedMandatoryMode = () => {
         id="Preview over wifi"
         onChangeSubscription={action('change subscription')}
         mode="mandatory"
+        placementId="gdevelop-branding"
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -82,6 +84,7 @@ export const UserWithNoSubscription = () => {
         id="Preview over wifi"
         onChangeSubscription={action('change subscription')}
         mode="mandatory"
+        placementId="gdevelop-branding"
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -103,6 +106,7 @@ export const UserWithGoldSubscription = () => {
         id="Preview over wifi"
         onChangeSubscription={action('change subscription')}
         mode="mandatory"
+        placementId="gdevelop-branding"
       />
     </AuthenticatedUserContext.Provider>
   );

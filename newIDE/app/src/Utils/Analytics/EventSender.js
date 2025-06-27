@@ -390,6 +390,26 @@ export type SubscriptionDialogDisplayReason =
   | 'AI requests (subscribe)'
   | 'AI requests (upgrade)';
 
+export type SubscriptionPlacementId =
+  | 'builds'
+  | 'debugger'
+  | 'gdevelop-branding'
+  | 'generate-from-prompt'
+  | 'hot-reloading'
+  | 'leaderboards-customization'
+  | 'leaderboards'
+  | 'max-projects-reached'
+  | 'opening-from-link'
+  | 'preview-wifi'
+  | 'profile'
+  | 'invite-collaborators'
+  | 'version-history'
+  | 'claim-asset-pack'
+  | 'unlock-course-chapter'
+  | 'account-get-premium'
+  | 'education'
+  | 'ai-requests';
+
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata
 ) => {

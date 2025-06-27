@@ -37,6 +37,7 @@ import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import { FeedbackBanner } from './FeedbackBanner';
+import classNames from 'classnames';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 5;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 10;
@@ -330,6 +331,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const subscriptionBanner =
       quota && quota.limitReached && increaseQuotaOffering !== 'none' ? (
         <GetSubscriptionCard
+          placementId="ai-requests"
           subscriptionDialogOpeningReason={
             increaseQuotaOffering === 'subscribe'
               ? 'AI requests (subscribe)'
@@ -386,7 +388,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
 
     if (!aiRequest) {
       return (
-        <div className={classes.newChatContainer}>
+        <div
+          className={classNames({
+            [classes.newChatContainer]: true,
+            // Move the entire screen up when the soft keyboard is open:
+            'avoid-soft-keyboard': true,
+          })}
+        >
           <ColumnStackLayout justifyContent="center" expand>
             <Line noMargin justifyContent="center">
               <RobotIcon rotating size={40} />
@@ -620,11 +628,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     ) : null;
 
     return (
-      <Column
-        expand
-        alignItems="stretch"
-        justifyContent="stretch"
-        useFullHeight
+      <div
+        className={classNames({
+          [classes.aiRequestChatContainer]: true,
+        })}
       >
         <ScrollView ref={scrollViewRef} style={styles.chatScrollView}>
           <ChatMessages
@@ -663,6 +670,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
             });
           }}
+          className={classNames({
+            // Move the form up when the soft keyboard is open:
+            'avoid-soft-keyboard': true,
+          })}
         >
           <ColumnStackLayout
             justifyContent="stretch"
@@ -798,7 +809,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             </Column>
           </ColumnStackLayout>
         </form>
-      </Column>
+      </div>
     );
   }
 );

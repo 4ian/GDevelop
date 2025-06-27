@@ -174,6 +174,7 @@ const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
                       analyticsMetadata: {
                         reason: 'Unlock course chapter',
                         recommendedPlanId: 'gdevelop_silver',
+                        placementId: 'unlock-course-chapter',
                       },
                     })
                   }

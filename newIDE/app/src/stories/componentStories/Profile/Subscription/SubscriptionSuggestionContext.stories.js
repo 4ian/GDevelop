@@ -32,6 +32,7 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
         analyticsMetadata: {
           reason: 'Cloud Project limit reached',
           recommendedPlanId: 'gdevelop_silver',
+          placementId: 'max-projects-reached',
         },
       });
     },

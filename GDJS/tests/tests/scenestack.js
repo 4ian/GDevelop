@@ -24,6 +24,7 @@ describe('gdjs.SceneStack', () => {
     };
   };
 
+  /** @type {{layouts?: LayoutData[], resources?: ResourcesData}} */
   const gameSettings = {
     layouts: [
       createSceneData('Scene 1', []),
@@ -148,6 +149,7 @@ describe('gdjs.SceneStack', () => {
     gdjs._unregisterCallback(onRuntimeSceneResumed);
   });
 
+  /** @type {{layouts?: LayoutData[], resources?: ResourcesData}} */
   const gameSettingsWithHeavyResource = {
     layouts: [
       createSceneData('Scene 1', [{ name: 'fake-heavy-resource1.png' }]),

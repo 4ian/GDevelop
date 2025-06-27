@@ -1006,6 +1006,7 @@ namespace gdjs {
               }
             }
           }
+          this._sendSelectionUpdate();
         }
         this._selectionBox = null;
         const domElementContainer = runtimeGame
@@ -1014,7 +1015,6 @@ namespace gdjs {
         if (domElementContainer) {
           domElementContainer.removeChild(this._selectionBoxElement);
         }
-        this._sendSelectionUpdate();
       }
     }
 

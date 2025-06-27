@@ -113,7 +113,7 @@ namespace gdjs {
   };
 
   const shouldDragSelectedObject = (inputManager: gdjs.InputManager) =>
-    isAltPressed(inputManager);
+    isAltPressed(inputManager) || isControlOrCmdPressed(inputManager);
 
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
@@ -121,6 +121,12 @@ namespace gdjs {
     add(object: gdjs.RuntimeObject) {
       if (!this._selectedObjects.includes(object)) {
         this._selectedObjects.push(object);
+      }
+    }
+
+    addAll(objects: RuntimeObject[]) {
+      for (const object of objects) {
+        this.add(object);
       }
     }
 
@@ -821,8 +827,14 @@ namespace gdjs {
         inputManager.isMouseButtonPressed(0) &&
         !this._draggedSelectedObject
       ) {
-        const object = this.getObjectUnderCursor();
+        let object = this.getObjectUnderCursor();
         if (object && this._selection.getSelectedObjects().includes(object)) {
+          if (isControlOrCmdPressed(inputManager)) {
+            object = this._duplicateSelectedObjects(object);
+            if (!object) {
+              return;
+            }
+          }
           this._draggedSelectedObject = object;
           this._draggedSelectedObjectInitialX = object.getX();
           this._draggedSelectedObjectInitialY = object.getY();
@@ -890,6 +902,44 @@ namespace gdjs {
         this._objectMover.endMove();
         this._sendSelectionUpdate();
       }
+    }
+
+    private _duplicateSelectedObjects(
+      objectUnderCursor: gdjs.RuntimeObject
+    ): gdjs.RuntimeObject | null {
+      const editedInstanceContainer = this._getEditedInstanceContainer();
+      if (!editedInstanceContainer) return null;
+      let newObjectUnderCursor: gdjs.RuntimeObject | null = null;
+      const addedObjects: Array<gdjs.RuntimeObject> = [];
+      for (const selectedObject of this._selection.getSelectedObjects()) {
+        const newObject = editedInstanceContainer.createObject(
+          selectedObject.getName()
+        );
+        if (!newObject) return null;
+        newObject.persistentUuid = gdjs.makeUuid();
+        newObject.setLayer(selectedObject.getLayer());
+        newObject.setX(selectedObject.getX());
+        newObject.setY(selectedObject.getY());
+        newObject.setAngle(selectedObject.getAngle());
+        newObject.setWidth(selectedObject.getWidth());
+        newObject.setHeight(selectedObject.getHeight());
+        if (is3D(newObject) && is3D(selectedObject)) {
+          newObject.setZ(selectedObject.getZ());
+          newObject.setRotationX(selectedObject.getRotationX());
+          newObject.setRotationY(selectedObject.getRotationY());
+          newObject.setDepth(selectedObject.getDepth());
+        }
+        addedObjects.push(newObject);
+        if (selectedObject === objectUnderCursor) {
+          newObjectUnderCursor = newObject;
+        }
+      }
+      this._selection.clear();
+      this._selection.addAll(addedObjects);
+      this._sendSelectionUpdate({
+        addedObjects,
+      });
+      return newObjectUnderCursor;
     }
 
     private _handleSelectionMovement() {

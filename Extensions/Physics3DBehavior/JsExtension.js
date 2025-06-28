@@ -1270,7 +1270,7 @@ module.exports = {
         .addParameter('expression', _('Application point on Z axis'))
         .setParameterLongDescription(
           _(
-            'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+            'Use `MassCenterX`, `MassCenterY` and `MassCenterZ` expressions to avoid any rotation.'
           )
         )
         .getCodeExtraInformation()
@@ -1544,6 +1544,19 @@ module.exports = {
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .getCodeExtraInformation()
         .setFunctionName('getMassCenterY');
+
+      aut
+        .addExpression(
+          'MassCenterZ',
+          _('Mass center Z'),
+          _('Mass center Z'),
+          '',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getMassCenterZ');
     }
     // Collision
     extension

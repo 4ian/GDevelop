@@ -232,12 +232,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter(
           "stringWithSelector",
+          _("Date part"),
+          "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"fullyear\", "
+          "\"wday\", \"mday\", \"yday\", \"timestamp\"]")
+      .SetParameterLongDescription(
           _("Hour: hour - Minutes: min - Seconds: sec - Day of month: "
-            "mday - Months since January: mon - Year since 1900: year - Days "
-            "since Sunday: wday - Days since Jan 1st: yday - Timestamp (ms): "
-            "timestamp\""),
-          "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
-          "\"yday\", \"timestamp\"]");
+            "mday - Months since January (January being 0): mon - Year: "
+            "fullyear - Year since 1900: year - Days since Sunday: wday - Days "
+            "since Jan 1st: yday - Timestamp (ms): timestamp\""));
 }
 
 }  // namespace gd

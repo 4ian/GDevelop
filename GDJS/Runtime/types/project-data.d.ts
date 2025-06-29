@@ -169,6 +169,7 @@ declare interface LayoutData extends InstanceContainerData {
   title: string;
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
+  shouldUnloadAssetsWhenUnloaded?: boolean;
 }
 
 declare interface LayoutNetworkSyncData {
@@ -437,4 +438,5 @@ declare type ResourceKind =
   | 'bitmapFont'
   | 'model3D'
   | 'atlas'
-  | 'spine';
+  | 'spine'
+  | 'fake-resource-kind-for-testing-only';

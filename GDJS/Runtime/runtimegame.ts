@@ -364,6 +364,14 @@ namespace gdjs {
     }
 
     /**
+     * Get the gdjs.ResourceLoader of the RuntimeGame.
+     * @return The resource loader.
+     */
+    getResourceLoader(): gdjs.ResourceLoader {
+      return this._resourcesLoader;
+    }
+
+    /**
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */
@@ -835,6 +843,7 @@ namespace gdjs {
       sceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      console.log('loadSceneAssets', sceneName);
       await this._loadAssetsWithLoadingScreen(
         /* isFirstLayout = */ false,
         async (onProgress) => {

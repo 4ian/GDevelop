@@ -6,7 +6,7 @@
 describe('gdjs.SceneStack', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  const createSene = (name, usedResources) => {
+  const createSceneData = (name, usedResources) => {
     return {
       r: 0,
       v: 0,
@@ -24,10 +24,13 @@ describe('gdjs.SceneStack', () => {
     };
   };
 
+  /** @type {{layouts?: LayoutData[], resources?: ResourcesData}} */
   const gameSettings = {
     layouts: [
-      createSene('Scene 1', []),
-      createSene('Scene 2', [{ name: 'base/tests-utils/assets/64x64.jpg' }]),
+      createSceneData('Scene 1', []),
+      createSceneData('Scene 2', [
+        { name: 'base/tests-utils/assets/64x64.jpg' },
+      ]),
     ],
     resources: {
       resources: [
@@ -43,11 +46,11 @@ describe('gdjs.SceneStack', () => {
   };
 
   it('should support pushing, replacing and popping scenes', async () => {
-    //@ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettings);
     let sceneStack = runtimeGame._sceneStack;
     // Async asset loading is not tested here.
-    await runtimeGame._resourcesLoader.loadAllResources(() => {});
+    const resourcesLoader = runtimeGame.getResourceLoader();
+    await resourcesLoader.loadAllResources(() => {});
 
     // Set up some scene callbacks.
     /** @type gdjs.RuntimeScene | null  */
@@ -146,38 +149,39 @@ describe('gdjs.SceneStack', () => {
     gdjs._unregisterCallback(onRuntimeSceneResumed);
   });
 
+  /** @type {{layouts?: LayoutData[], resources?: ResourcesData}} */
   const gameSettingsWithHeavyResource = {
     layouts: [
-      createSene('Scene 1', [{ name: 'fake-heavy-resource1.png' }]),
-      createSene('Scene 2', [{ name: 'fake-heavy-resource2.png' }]),
-      createSene('Scene 3', [{ name: 'fake-heavy-resource3.png' }]),
-      createSene('Scene 4', [{ name: 'fake-heavy-resource4.png' }]),
+      createSceneData('Scene 1', [{ name: 'fake-heavy-resource1.png' }]),
+      createSceneData('Scene 2', [{ name: 'fake-heavy-resource2.png' }]),
+      createSceneData('Scene 3', [{ name: 'fake-heavy-resource3.png' }]),
+      createSceneData('Scene 4', [{ name: 'fake-heavy-resource4.png' }]),
     ],
     resources: {
       resources: [
         {
-          kind: 'fake-heavy-resource',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'fake-heavy-resource1.png',
           metadata: '',
           file: 'fake-heavy-resource1.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'fake-heavy-resource2.png',
           metadata: '',
           file: 'fake-heavy-resource2.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'fake-heavy-resource3.png',
           metadata: '',
           file: 'fake-heavy-resource3.png',
           userAdded: true,
         },
         {
-          kind: 'fake-heavy-resource',
+          kind: 'fake-resource-kind-for-testing-only',
           name: 'fake-heavy-resource4.png',
           metadata: '',
           file: 'fake-heavy-resource4.png',
@@ -189,11 +193,11 @@ describe('gdjs.SceneStack', () => {
 
   it('can start a layout when all its assets are already downloaded', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
-    //@ts-ignore
+
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      //@ts-ignore
-      'fake-heavy-resource',
+    const resourcesLoader = runtimeGame.getResourceLoader();
+    resourcesLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
     let sceneStack = runtimeGame._sceneStack;
@@ -299,11 +303,11 @@ describe('gdjs.SceneStack', () => {
 
   it('can start a layout while assets loading and wait them to finish', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
-    //@ts-ignore
+
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      //@ts-ignore
-      'fake-heavy-resource',
+    const resourcesLoader = runtimeGame.getResourceLoader();
+    resourcesLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
     let sceneStack = runtimeGame._sceneStack;
@@ -404,11 +408,10 @@ describe('gdjs.SceneStack', () => {
 
   it("can start a layout which assets loading didn't stated yet and wait them to finish", async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
-    //@ts-ignore
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithHeavyResource);
-    runtimeGame._resourcesLoader._resourceManagersMap.set(
-      //@ts-ignore
-      'fake-heavy-resource',
+    const resourcesLoader = runtimeGame.getResourceLoader();
+    resourcesLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
       mockedResourceManager
     );
     let sceneStack = runtimeGame._sceneStack;

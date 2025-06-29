@@ -25,8 +25,6 @@ namespace gdjs {
     lai: number;
     lei: number;
     asps: number;
-    wid: number;
-    hei: number;
   };
 
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
@@ -147,9 +145,11 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TilemapNetworkSyncData {
+    getNetworkSyncData(
+      syncOptions: GetNetworkSyncDataOptions
+    ): TilemapNetworkSyncData {
       return {
-        ...super.getNetworkSyncData(),
+        ...super.getNetworkSyncData(syncOptions),
         op: this._opacity,
         tmjf: this._tilemapJsonFile,
         tsjf: this._tilesetJsonFile,
@@ -158,13 +158,14 @@ namespace gdjs {
         lai: this._layerIndex,
         lei: this._levelIndex,
         asps: this._animationSpeedScale,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
     }
 
-    updateFromNetworkSyncData(networkSyncData: TilemapNetworkSyncData): void {
-      super.updateFromNetworkSyncData(networkSyncData);
+    updateFromNetworkSyncData(
+      networkSyncData: TilemapNetworkSyncData,
+      options: UpdateFromNetworkSyncDataOptions
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData, options);
 
       if (networkSyncData.op !== undefined) {
         this.setOpacity(networkSyncData.op);
@@ -189,12 +190,6 @@ namespace gdjs {
       }
       if (networkSyncData.asps !== undefined) {
         this.setAnimationSpeedScale(networkSyncData.asps);
-      }
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
       }
     }
 

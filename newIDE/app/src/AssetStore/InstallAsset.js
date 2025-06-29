@@ -104,7 +104,9 @@ export const installResource = (
   if (newResource.getKind() === 'image') {
     // $FlowExpectedError[prop-missing] - We know the resource is an ImageResource and has the setSmooth method.
     newResource.setSmooth(
-      project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
+      project.getScaleMode() !== 'nearest' &&
+        project.getScaleMode() !== 'magnified' &&
+        !isPixelArt(asset)
     );
   }
 

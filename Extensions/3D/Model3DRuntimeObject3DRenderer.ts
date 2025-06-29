@@ -286,6 +286,7 @@ namespace gdjs {
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(threeObject);
       this._threeObject = threeObject;
+      this._updateShadow();
 
       // Start the current animation on the new 3D object.
       this._animationMixer = new THREE.AnimationMixer(root);
@@ -321,6 +322,13 @@ namespace gdjs {
 
     getAnimationName(animationIndex: integer) {
       return this._originalModel.animations[animationIndex].name;
+    }
+
+    _updateShadow() {
+      this._threeObject.traverse((child) => {
+        child.castShadow = this._model3DRuntimeObject._isCastingShadow;
+        child.receiveShadow = this._model3DRuntimeObject._isReceivingShadow;
+      });
     }
 
     /**

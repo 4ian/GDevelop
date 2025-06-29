@@ -859,7 +859,9 @@ module.exports = {
         propertyName === 'rightFaceResourceRepeat' ||
         propertyName === 'topFaceResourceRepeat' ||
         propertyName === 'bottomFaceResourceRepeat' ||
-        propertyName === 'enableTextureTransparency'
+        propertyName === 'enableTextureTransparency' ||
+        propertyName === 'isCastingShadow' ||
+        propertyName === 'isReceivingShadow'
       ) {
         objectContent[propertyName] = newValue === '1';
         return true;
@@ -1089,6 +1091,20 @@ module.exports = {
         .addExtraInfo('StandardWithoutMetalness')
         .setLabel(_('Material type'));
 
+      objectProperties
+        .getOrCreate('isCastingShadow')
+        .setValue(objectContent.isCastingShadow ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Shadow casting'))
+        .setGroup(_('Shadows'));
+
+      objectProperties
+        .getOrCreate('isReceivingShadow')
+        .setValue(objectContent.isReceivingShadow ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Shadow receiving'))
+        .setGroup(_('Shadows'));
+
       return objectProperties;
     };
     Cube3DObject.content = {
@@ -1118,6 +1134,8 @@ module.exports = {
       bottomFaceResourceRepeat: false,
       materialType: 'Basic',
       tint: '255;255;255',
+      castShadow: true,
+      receiveShadow: true,
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (
@@ -1913,6 +1931,34 @@ module.exports = {
         .setLabel(_('Rotation (in degrees)'))
         .setType('number')
         .setGroup(_('Orientation'));
+      properties
+        .getOrCreate('isCastingShadow')
+        .setValue('true')
+        .setLabel(_('Shadow casting'))
+        .setType('boolean')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowQuality')
+        .setValue('Medium')
+        .addExtraInfo('Low')
+        .addExtraInfo('Medium')
+        .addExtraInfo('High')
+        .setLabel(_('Shadow quality'))
+        .setType('choice')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('frustumSize')
+        .setValue('4000')
+        .setLabel(_('Shadow frustum size'))
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('distanceFromCamera')
+        .setValue('1500')
+        .setLabel(_("Distance from layer's camera"))
+        .setType('number')
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2379,6 +2425,8 @@ module.exports = {
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
       _tint = '';
+      _castShadow = true;
+      _receiveShadow = true;
 
       constructor(
         project,
@@ -3210,6 +3258,8 @@ module.exports = {
 
         this._threeObject = new THREE.Group();
         this._threeObject.rotation.order = 'ZYX';
+        this._threeObject.castShadow = true;
+        this._threeObject.receiveShadow = true;
         this._threeGroup.add(this._threeObject);
       }
 

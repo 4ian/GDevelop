@@ -674,6 +674,17 @@ const Model3DEditor = ({
               propertyName="crossfadeDuration"
             />
           </Column>
+          <Text size="block-title">Shadows</Text>
+          <Column noMargin expand>
+            <PropertyCheckbox
+              objectConfiguration={objectConfiguration}
+              propertyName="isCastingShadow"
+            />
+            <PropertyCheckbox
+              objectConfiguration={objectConfiguration}
+              propertyName="isReceivingShadow"
+            />
+          </Column>
           <Column noMargin expand useFullHeight>
             {model3DConfiguration.getAnimationsCount() === 0 ? (
               <Column noMargin expand justifyContent="center">

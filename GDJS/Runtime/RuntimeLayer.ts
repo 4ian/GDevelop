@@ -116,6 +116,9 @@ namespace gdjs {
       }
     }
 
+    getRuntimeLayer(): gdjs.RuntimeLayer {
+      return this;
+    }
     getRenderer(): gdjs.LayerRenderer {
       return this._renderer;
     }

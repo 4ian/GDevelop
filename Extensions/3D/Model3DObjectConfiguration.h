@@ -160,6 +160,8 @@ public:
   const gd::String& GetCenterLocation() const { return centerLocation; };
 
   bool shouldKeepAspectRatio() const { return keepAspectRatio; };
+  bool shouldCastShadow() const { return isCastingShadow; };
+  bool shouldReceiveShadow() const { return isReceivingShadow; };
   ///@}
 
 protected:
@@ -182,6 +184,8 @@ private:
   gd::String centerLocation;
 
   bool keepAspectRatio;
+  bool isCastingShadow;
+  bool isReceivingShadow;
 
   std::vector<Model3DAnimation> animations;
   static Model3DAnimation badAnimation; //< Bad animation when an out of bound

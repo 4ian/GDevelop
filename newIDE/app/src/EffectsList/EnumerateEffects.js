@@ -37,6 +37,7 @@ export const enumerateEffectsMetadata = (
         .map((effectMetadata: gdEffectMetadata) => {
           const effectType = effectMetadata.getType();
 
+          // Convert the effect type properties to a PropertiesEditor Schema.
           const properties = effectMetadata.getProperties();
           const parameterNames = properties.keys().toJSArray();
           const parametersSchema: Schema = parameterNames
@@ -80,7 +81,9 @@ export const enumerateEffectsMetadata = (
                   defaultValue,
                 };
               } else if (valueType === 'resource') {
+                // Resource is a "string" (with a selector in the UI)
                 const kind: ResourceKind =
+                  // $FlowFixMe - assume the passed resource kind is always valid.
                   property.getExtraInfo().toJSArray()[0] || '';
                 return {
                   name: parameterName,

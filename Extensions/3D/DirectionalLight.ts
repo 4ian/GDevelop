@@ -96,6 +96,10 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            if (!target.getRuntimeLayer) {
+              console.error("Unable to get directional light's layer.");
+              return;
+            }
             const layer = target.getRuntimeLayer();
             const x = layer.getCameraX();
             const y = layer.getCameraY();

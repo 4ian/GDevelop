@@ -110,6 +110,7 @@ export type EditorCallbacks = {|
         | 'none',
     |}
   ) => void,
+  onSave?: () => Promise<void>,
 |};
 
 /**

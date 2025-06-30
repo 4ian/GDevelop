@@ -19,6 +19,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { serializeToJSON } from '../Utils/Serializer';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
@@ -454,6 +455,7 @@ type Props = {|
   storageProvider: ?StorageProvider,
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
+  onSave?: () => Promise<void>,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
@@ -509,6 +511,7 @@ export const AskAiEditor = React.memo<Props>(
         fileMetadata,
         storageProvider,
         i18n,
+        onSave,
         onCreateEmptyProject,
         onCreateProjectFromExample,
         onOpenLayout,
@@ -520,8 +523,9 @@ export const AskAiEditor = React.memo<Props>(
       const editorCallbacks: EditorCallbacks = React.useMemo(
         () => ({
           onOpenLayout,
+          onSave,
         }),
-        [onOpenLayout]
+        [onOpenLayout, onSave]
       );
 
       const {
@@ -552,6 +556,31 @@ export const AskAiEditor = React.memo<Props>(
           setSelectedAiRequestId(null);
         },
         [setSelectedAiRequestId]
+      );
+
+      const onRestoreInitialProject = React.useCallback(
+        async () => {
+          if (!selectedAiRequest || !selectedAiRequest.initialProjectStateJson || !project) {
+            return;
+          }
+
+          try {
+            const serializedProject = gd.Serializer.fromJSObject(
+              JSON.parse(selectedAiRequest.initialProjectStateJson)
+            );
+            project.unserializeFrom(serializedProject);
+            
+            // Save the restored project
+            if (onSave) {
+              await onSave();
+            }
+            
+            console.info('Project restored to initial state');
+          } catch (error) {
+            console.error('Error restoring project to initial state:', error);
+          }
+        },
+        [selectedAiRequest, project, onSave]
       );
 
       const onOpenHistory = React.useCallback(() => {
@@ -695,6 +724,20 @@ export const AskAiEditor = React.memo<Props>(
 
             // Request is now ready to be started.
             try {
+              // For agent mode, save the project and store initial state
+              let initialProjectStateJson = null;
+              if (mode === 'agent' && project && onSave) {
+                try {
+                  // Save the project first
+                  await onSave();
+                  // Store the initial project state for restoration
+                  initialProjectStateJson = serializeToJSON(project);
+                } catch (error) {
+                  console.error('Error saving project before starting AI agent:', error);
+                  // Continue anyway, but without initial state storage
+                }
+              }
+
               const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
               const simplifiedProjectJson = project
                 ? JSON.stringify(
@@ -728,7 +771,13 @@ export const AskAiEditor = React.memo<Props>(
 
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);
-              updateAiRequest(aiRequest.id, aiRequest);
+              
+              // Add the initial project state to the AI request for local storage
+              const aiRequestWithInitialState = {
+                ...aiRequest,
+                initialProjectStateJson,
+              };
+              updateAiRequest(aiRequest.id, aiRequestWithInitialState);
 
               // Select the new AI request just created - unless the user switched to another one
               // in the meantime.
@@ -1027,6 +1076,7 @@ export const AskAiEditor = React.memo<Props>(
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
                 onStartNewChat={onStartNewChat}
+                onRestoreInitialProject={onRestoreInitialProject}
               />
             </div>
           </Paper>
@@ -1068,6 +1118,7 @@ export const renderAskAiEditorContainer = (
         storageProvider={props.storageProvider}
         setToolbar={props.setToolbar}
         isActive={props.isActive}
+        onSave={props.onSave}
         onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}

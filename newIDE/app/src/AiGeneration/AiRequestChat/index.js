@@ -80,6 +80,7 @@ type Props = {
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
   onStartNewChat: () => void,
+  onRestoreInitialProject?: () => Promise<void>,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -234,6 +235,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onSendMessage,
       onSendFeedback,
       onStartNewChat,
+      onRestoreInitialProject,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -634,6 +636,29 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         })}
       >
         <ScrollView ref={scrollViewRef} style={styles.chatScrollView}>
+          {aiRequest &&
+            aiRequest.mode === 'agent' &&
+            aiRequest.initialProjectStateJson &&
+            onRestoreInitialProject && (
+              <Paper background="dark" variant="outlined" style={{ marginBottom: 8 }}>
+                <Column>
+                  <LineStackLayout
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Text size="body" color="secondary" noMargin>
+                      <Trans>Click here to restore the project as it was at the beginning</Trans>
+                    </Text>
+                    <RaisedButton
+                      size="small"
+                      color="secondary"
+                      label={<Trans>Restore project</Trans>}
+                      onClick={onRestoreInitialProject}
+                    />
+                  </LineStackLayout>
+                </Column>
+              </Paper>
+            )}
           <ChatMessages
             aiRequest={aiRequest}
             onSendFeedback={onSendFeedback}

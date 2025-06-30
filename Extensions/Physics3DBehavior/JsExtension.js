@@ -274,7 +274,7 @@ module.exports = {
           .setLabel('Fixed Rotation')
           .setDescription(
             _(
-              "If enabled, the object won't rotate and will stay at the same angle. Useful for characters for example."
+              "If enabled, the object won't rotate and will stay at the same angle."
             )
           )
           .setGroup(_('Movement'));
@@ -845,7 +845,7 @@ module.exports = {
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
-        .addParameter('yesorno', _('Treat as bullet?'), '', false)
+        .addParameter('yesorno', _('Treat as bullet'), '', false)
         .setDefaultValue('false')
         .getCodeExtraInformation()
         .setFunctionName('setBullet');
@@ -870,7 +870,7 @@ module.exports = {
           'SetFixedRotation',
           _('Fixed rotation'),
           _(
-            "Enable or disable an object fixed rotation. If enabled the object won't be able to rotate."
+            "Enable or disable an object fixed rotation. If enabled the object won't be able to rotate. This action has no effect on characters."
           ),
           _('Set _PARAM0_ fixed rotation: _PARAM2_'),
           _('Dynamics'),
@@ -879,7 +879,7 @@ module.exports = {
         )
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
-        .addParameter('yesorno', _('Fixed rotation?'), '', false)
+        .addParameter('yesorno', _('Fixed rotation'), '', false)
         .setDefaultValue('false')
         .getCodeExtraInformation()
         .setFunctionName('setFixedRotation');
@@ -1054,7 +1054,7 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .addParameter('expression', _('Layer (1 - 8)'))
-        .addParameter('yesorno', _('Enable?'), '', false)
+        .addParameter('yesorno', _('Enable'), '', false)
         .setDefaultValue('true')
         .getCodeExtraInformation()
         .setFunctionName('enableLayer');
@@ -1090,7 +1090,7 @@ module.exports = {
         .addParameter('object', _('Object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
         .addParameter('expression', _('Mask (1 - 8)'))
-        .addParameter('yesorno', _('Enable?'), '', false)
+        .addParameter('yesorno', _('Enable'), '', false)
         .setDefaultValue('true')
         .getCodeExtraInformation()
         .setFunctionName('enableMask');

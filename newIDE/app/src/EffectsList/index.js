@@ -53,6 +53,7 @@ import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
+import { type Field } from '../CompactPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -189,36 +190,37 @@ const Effect = React.forwardRef(
       effectType
     );
 
-    const [
-      showAdvancedProperties,
-      setShowAdvancedProperties,
-    ] = React.useState<boolean>(false);
-
-    const parametersSchema = effectMetadata?.parametersSchema || [];
+    const parametersSchema = effectMetadata && effectMetadata.parametersSchema;
     const basicPropertiesSchema = React.useMemo(
-      () => parametersSchema.filter(param => !param.advanced),
+      () =>
+        parametersSchema
+          ? parametersSchema.filter(param => param.valueType && !param.advanced)
+          : [],
       [parametersSchema]
     );
     const advancedPropertiesSchema = React.useMemo(
-      () => parametersSchema.filter(param => param.advanced),
+      () =>
+        parametersSchema
+          ? parametersSchema.filter(param => param.valueType && param.advanced)
+          : [],
       [parametersSchema]
     );
 
     const areAdvancedPropertiesModified = React.useMemo(
       () => {
-        return advancedPropertiesSchema.some(param => {
+        return advancedPropertiesSchema.some((field: Field) => {
+          const name = field.valueType ? field.name : null;
+          if (!name) return false;
+
           const current =
-            param.valueType === 'number'
-              ? effect.getDoubleParameter(param.name)
-              : param.valueType === 'boolean'
-              ? effect.getBooleanParameter(param.name)
-              : effect.getStringParameter(param.name);
+            field.valueType === 'number'
+              ? effect.getDoubleParameter(name)
+              : field.valueType === 'boolean'
+              ? effect.getBooleanParameter(name)
+              : effect.getStringParameter(name);
 
-          if (param.valueType === 'boolean') {
-            return (current === 'true') !== (param.defaultValue === 'true');
-          }
-
-          return current !== param.defaultValue;
+          const defaultValue = field.valueType ? field.defaultValue : null;
+          return current !== defaultValue;
         });
       },
       [advancedPropertiesSchema, effect]
@@ -345,31 +347,32 @@ const Effect = React.forwardRef(
                   />
                   {advancedPropertiesSchema.length > 0 && (
                     <Accordion
-                      defaultExpanded={
-                        areAdvancedPropertiesModified || showAdvancedProperties
-                      }
+                      defaultExpanded={areAdvancedPropertiesModified}
+                      noMargin
                     >
-                      <AccordionHeader>
+                      <AccordionHeader noMargin>
                         <Text size="sub-title">
                           <Trans>Advanced properties</Trans>
                         </Text>
                       </AccordionHeader>
                       <AccordionBody disableGutters>
-                        <PropertiesEditor
-                          key={effect.getEffectType() + '-advanced'}
-                          instances={[effect]}
-                          schema={advancedPropertiesSchema}
-                          project={project}
-                          resourceManagementProps={resourceManagementProps}
-                          renderExtraDescriptionText={
-                            showEffectParameterNames
-                              ? parameterName =>
-                                  i18n._(
-                                    t`Property name in events: \`${parameterName}\` `
-                                  )
-                              : undefined
-                          }
-                        />
+                        <Column expand noMargin>
+                          <PropertiesEditor
+                            key={effect.getEffectType() + '-advanced'}
+                            instances={[effect]}
+                            schema={advancedPropertiesSchema}
+                            project={project}
+                            resourceManagementProps={resourceManagementProps}
+                            renderExtraDescriptionText={
+                              showEffectParameterNames
+                                ? parameterName =>
+                                    i18n._(
+                                      t`Property name in events: \`${parameterName}\` `
+                                    )
+                                : undefined
+                            }
+                          />
+                        </Column>
                       </AccordionBody>
                     </Accordion>
                   )}

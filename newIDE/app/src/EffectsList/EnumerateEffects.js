@@ -64,7 +64,7 @@ export const enumerateEffectsMetadata = (
                   getDescription,
                   getExtraDescription,
                   advanced,
-                  defaultValue,
+                  defaultValue: parseFloat(defaultValue) || 0,
                 };
               } else if (valueType === 'boolean') {
                 return {
@@ -78,7 +78,7 @@ export const enumerateEffectsMetadata = (
                   getDescription,
                   getExtraDescription,
                   advanced,
-                  defaultValue,
+                  defaultValue: defaultValue === 'true',
                 };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)

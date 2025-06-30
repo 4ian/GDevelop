@@ -88,7 +88,7 @@ export type AiRequest = {
 
   lastUserMessagePriceInCredits?: number | null,
   totalPriceInCredits?: number | null,
-  initialProjectStateJson?: string | null,
+  initialProjectVersionId?: string | null,
 };
 
 export type AiGeneratedEventStats = {

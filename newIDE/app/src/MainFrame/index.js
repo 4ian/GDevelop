@@ -4028,6 +4028,7 @@ const MainFrame = (props: Props) => {
                     hotReloadPreviewButtonProps,
                     resourceManagementProps,
                     onSave: saveProject,
+                    onOpenCloudProjectOnSpecificVersion,
                     canSave,
                     onCreateEventsFunction,
                     openInstructionOrExpression,

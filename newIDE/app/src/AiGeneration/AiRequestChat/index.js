@@ -81,6 +81,7 @@ type Props = {
   setAutoProcessFunctionCalls: boolean => void,
   onStartNewChat: () => void,
   onRestoreInitialProject?: () => Promise<void>,
+  isCloudProject?: boolean,
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -236,6 +237,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onSendFeedback,
       onStartNewChat,
       onRestoreInitialProject,
+      isCloudProject,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -251,6 +253,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     }: Props,
     ref
   ) => {
+    const [isRestoring, setIsRestoring] = React.useState(false);
     // TODO: store the default mode in the user preferences?
     const [newAiRequestMode, setNewAiRequestMode] = React.useState<
       'chat' | 'agent'
@@ -638,8 +641,9 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         <ScrollView ref={scrollViewRef} style={styles.chatScrollView}>
           {aiRequest &&
             aiRequest.mode === 'agent' &&
-            aiRequest.initialProjectStateJson &&
-            onRestoreInitialProject && (
+            aiRequest.initialProjectVersionId &&
+            onRestoreInitialProject &&
+            isCloudProject && (
               <Paper background="dark" variant="outlined" style={{ marginBottom: 8 }}>
                 <Column>
                   <LineStackLayout
@@ -653,7 +657,18 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                       size="small"
                       color="secondary"
                       label={<Trans>Restore project</Trans>}
-                      onClick={onRestoreInitialProject}
+                      disabled={isRestoring}
+                      onClick={async () => {
+                        if (!onRestoreInitialProject) return;
+                        setIsRestoring(true);
+                        try {
+                          await onRestoreInitialProject();
+                        } catch (error) {
+                          console.error('Error in restore button:', error);
+                        } finally {
+                          setIsRestoring(false);
+                        }
+                      }}
                     />
                   </LineStackLayout>
                 </Column>

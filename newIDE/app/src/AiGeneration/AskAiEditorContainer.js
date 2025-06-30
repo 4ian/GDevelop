@@ -19,7 +19,8 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { Toolbar } from './Toolbar';
 import { AskAiHistory } from './AskAiHistory';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
-import { serializeToJSON } from '../Utils/Serializer';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { t } from '@lingui/macro';
 import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
@@ -456,6 +457,12 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   i18n: I18nType,
   onSave?: () => Promise<void>,
+  onOpenCloudProjectOnSpecificVersion?: ({|
+    fileMetadata: FileMetadata,
+    versionId: string,
+    ignoreUnsavedChanges: boolean,
+    openingMessage: MessageDescriptor,
+  |}) => Promise<void>,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateProjectFromExample: (
     exampleShortHeader: ExampleShortHeader,
@@ -512,6 +519,7 @@ export const AskAiEditor = React.memo<Props>(
         storageProvider,
         i18n,
         onSave,
+        onOpenCloudProjectOnSpecificVersion,
         onCreateEmptyProject,
         onCreateProjectFromExample,
         onOpenLayout,
@@ -560,27 +568,30 @@ export const AskAiEditor = React.memo<Props>(
 
       const onRestoreInitialProject = React.useCallback(
         async () => {
-          if (!selectedAiRequest || !selectedAiRequest.initialProjectStateJson || !project) {
+          if (!selectedAiRequest || !selectedAiRequest.initialProjectVersionId || !fileMetadata || !onOpenCloudProjectOnSpecificVersion) {
+            return;
+          }
+
+          // Only restore for cloud projects
+          if (!storageProvider || storageProvider.internalName !== 'Cloud') {
+            console.warn('Project restoration is only available for cloud projects');
             return;
           }
 
           try {
-            const serializedProject = gd.Serializer.fromJSObject(
-              JSON.parse(selectedAiRequest.initialProjectStateJson)
-            );
-            project.unserializeFrom(serializedProject);
+            await onOpenCloudProjectOnSpecificVersion({
+              fileMetadata,
+              versionId: selectedAiRequest.initialProjectVersionId,
+              ignoreUnsavedChanges: true,
+              openingMessage: i18n._(t`Restoring project to initial state...`),
+            });
             
-            // Save the restored project
-            if (onSave) {
-              await onSave();
-            }
-            
-            console.info('Project restored to initial state');
+            console.info('Project restored to initial version');
           } catch (error) {
-            console.error('Error restoring project to initial state:', error);
+            console.error('Error restoring project to initial version:', error);
           }
         },
-        [selectedAiRequest, project, onSave]
+        [selectedAiRequest, fileMetadata, onOpenCloudProjectOnSpecificVersion, storageProvider, i18n]
       );
 
       const onOpenHistory = React.useCallback(() => {
@@ -724,17 +735,17 @@ export const AskAiEditor = React.memo<Props>(
 
             // Request is now ready to be started.
             try {
-              // For agent mode, save the project and store initial state
-              let initialProjectStateJson = null;
-              if (mode === 'agent' && project && onSave) {
+              // For agent mode on cloud projects, save the project and store initial version
+              let initialProjectVersionId = null;
+              if (mode === 'agent' && project && onSave && fileMetadata && storageProvider?.internalName === 'Cloud') {
                 try {
-                  // Save the project first
+                  // Save the project first to create a version
                   await onSave();
-                  // Store the initial project state for restoration
-                  initialProjectStateJson = serializeToJSON(project);
+                  // Store the current version ID for restoration
+                  initialProjectVersionId = fileMetadata.version || null;
                 } catch (error) {
                   console.error('Error saving project before starting AI agent:', error);
-                  // Continue anyway, but without initial state storage
+                  // Continue anyway, but without initial version storage
                 }
               }
 
@@ -772,12 +783,12 @@ export const AskAiEditor = React.memo<Props>(
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);
               
-              // Add the initial project state to the AI request for local storage
-              const aiRequestWithInitialState = {
+              // Add the initial project version to the AI request for local storage
+              const aiRequestWithInitialVersion = {
                 ...aiRequest,
-                initialProjectStateJson,
+                initialProjectVersionId,
               };
-              updateAiRequest(aiRequest.id, aiRequestWithInitialState);
+              updateAiRequest(aiRequest.id, aiRequestWithInitialVersion);
 
               // Select the new AI request just created - unless the user switched to another one
               // in the meantime.
@@ -1077,6 +1088,7 @@ export const AskAiEditor = React.memo<Props>(
                 editorCallbacks={editorCallbacks}
                 onStartNewChat={onStartNewChat}
                 onRestoreInitialProject={onRestoreInitialProject}
+                isCloudProject={storageProvider?.internalName === 'Cloud'}
               />
             </div>
           </Paper>
@@ -1119,6 +1131,7 @@ export const renderAskAiEditorContainer = (
         setToolbar={props.setToolbar}
         isActive={props.isActive}
         onSave={props.onSave}
+        onOpenCloudProjectOnSpecificVersion={props.onOpenCloudProjectOnSpecificVersion}
         onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}

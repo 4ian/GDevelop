@@ -733,7 +733,7 @@ namespace gdjs {
     }
 
     setWheelOffsetZ(wheelOffsetZ: float): void {
-      this._wheelOffsetY = wheelOffsetZ;
+      this._wheelOffsetZ = wheelOffsetZ;
       this._updateWheels();
     }
 
@@ -783,11 +783,11 @@ namespace gdjs {
     }
 
     hasFrontWheelDrive(): boolean {
-      return this._hasBackWheelDrive;
+      return this._hasFrontWheelDrive;
     }
 
     setFrontWheelDrive(hasFrontWheelDrive: boolean): void {
-      this._hasBackWheelDrive = hasFrontWheelDrive;
+      this._hasFrontWheelDrive = hasFrontWheelDrive;
       this.invalidateShape();
     }
 

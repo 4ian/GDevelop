@@ -18,6 +18,7 @@ declare interface ProjectData {
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
+  areEffectsHiddenInEditor?: boolean;
 }
 
 declare interface EventsFunctionsVariablesData {

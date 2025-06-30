@@ -56,6 +56,20 @@ namespace gdjs {
     max: [float, float, float];
   };
 
+  const defaultEffectsData: EffectData[] = [
+    {
+      effectType: 'Scene3D::HemisphereLight',
+      name: '3D Light',
+      doubleParameters: { elevation: 45, intensity: 1, rotation: 0 },
+      stringParameters: {
+        groundColor: '64;64;64',
+        skyColor: '255;255;255',
+        top: 'Y-',
+      },
+      booleanParameters: {},
+    },
+  ];
+
   // TODO: factor this?
   const isMacLike =
     typeof navigator !== 'undefined' &&
@@ -368,6 +382,13 @@ namespace gdjs {
         for (const layerData of layoutData.layers) {
           if (layerData.cameraType === 'orthographic') {
             layerData.cameraType = 'perspective';
+          }
+        }
+      }
+      if (projectData.areEffectsHiddenInEditor) {
+        for (const layoutData of projectData.layouts) {
+          for (const layerData of layoutData.layers) {
+            layerData.effects = defaultEffectsData;
           }
         }
       }
@@ -1981,6 +2002,10 @@ namespace gdjs {
         threeObject = threeObject.parent || null;
       }
       return null;
+    }
+
+    static getDefaultEffectsData(): Array<EffectData> {
+      return defaultEffectsData;
     }
 
     updateAndRender() {

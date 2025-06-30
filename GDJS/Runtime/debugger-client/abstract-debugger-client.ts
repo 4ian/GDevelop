@@ -285,8 +285,15 @@ namespace gdjs {
           const editedInstanceContainer =
             runtimeGame._inGameEditor._getEditedInstanceContainer();
           if (editedInstanceContainer) {
+            const layersData =
+              data.payload.areEffectsHidden && gdjs.InGameEditor
+                ? data.payload.layers.map((layerData: LayerData) => ({
+                    ...layerData,
+                    effects: gdjs.InGameEditor.getDefaultEffectsData(),
+                  }))
+                : data.payload.layers;
             that._hotReloader.hotReloadRuntimeSceneLayers(
-              data.payload.layers,
+              layersData,
               editedInstanceContainer
             );
           }

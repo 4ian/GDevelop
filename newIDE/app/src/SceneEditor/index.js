@@ -1259,12 +1259,33 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onLayersModified = () => {
+    if (this.props.project.areEffectsHiddenInEditor()) {
+      return;
+    }
     const { previewDebuggerServer, layersContainer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadLayers',
           payload: {
+            layers: mapFor(0, layersContainer.getLayersCount(), i => {
+              const layer = layersContainer.getLayerAt(i);
+              return serializeToJSObject(layer);
+            }),
+          },
+        });
+      });
+    }
+  };
+
+  _onLayersVisibilityInEditorChanged = () => {
+    const { previewDebuggerServer, layersContainer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadLayers',
+          payload: {
+            areEffectsHidden: this.props.project.areEffectsHiddenInEditor(),
             layers: mapFor(0, layersContainer.getLayersCount(), i => {
               const layer = layersContainer.getLayerAt(i);
               return serializeToJSObject(layer);
@@ -2438,6 +2459,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onLayerRenamed={this._onLayerRenamed}
                 onLayersModified={this._onLayersModified}
+                onLayersVisibilityInEditorChanged={
+                  this._onLayersVisibilityInEditorChanged
+                }
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={this._onSelectLayer}
                 tileMapTileSelection={this.state.tileMapTileSelection}

@@ -19,6 +19,7 @@ import Add from '../UI/CustomSvgIcons/Add';
 import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
 import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import Toggle from '../UI/Toggle';
 
 const gd: libGDevelop = global.gd;
 
@@ -226,6 +227,7 @@ type Props = {|
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
   onCreateLayer: () => void,
+  onLayersVisibilityInEditorChanged: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
   // Preview:
@@ -247,7 +249,7 @@ const hasLightingLayer = (layersContainer: gdLayersContainer) => {
 
 const LayersList = React.forwardRef<Props, LayersListInterface>(
   (props, ref) => {
-    const { eventsFunctionsExtension, eventsBasedObject } = props;
+    const { eventsFunctionsExtension, eventsBasedObject, project } = props;
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -320,21 +322,35 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             )}
           </FullSizeMeasurer>
           <Column>
-            <Line justifyContent="flex-end" expand>
-              <RaisedButtonWithSplitMenu
-                label={<Trans>Add a layer</Trans>}
-                id="add-layer-button"
-                primary
-                onClick={addLayer}
-                icon={<Add />}
-                buildMenuTemplate={i18n => [
-                  {
-                    label: i18n._(t`Add lighting layer`),
-                    enabled: !isLightingLayerPresent,
-                    click: addLightingLayer,
-                  },
-                ]}
-              />
+            <Line noMargin>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => {
+                    project.setEffectsHiddenInEditor(!check);
+                    props.onLayersVisibilityInEditorChanged();
+                    forceUpdate();
+                  }}
+                  toggled={!project.areEffectsHiddenInEditor()}
+                  labelPosition="right"
+                  label={<Trans>Show effects</Trans>}
+                />
+              </Line>
+              <Line justifyContent="flex-end" expand>
+                <RaisedButtonWithSplitMenu
+                  label={<Trans>Add a layer</Trans>}
+                  id="add-layer-button"
+                  primary
+                  onClick={addLayer}
+                  icon={<Add />}
+                  buildMenuTemplate={i18n => [
+                    {
+                      label: i18n._(t`Add lighting layer`),
+                      enabled: !isLightingLayerPresent,
+                      click: addLightingLayer,
+                    },
+                  ]}
+                />
+              </Line>
             </Line>
           </Column>
         </ScrollView>

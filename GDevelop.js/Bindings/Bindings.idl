@@ -601,6 +601,8 @@ interface Project {
     boolean IsFolderProject();
     void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
+    boolean AreEffectsHiddenInEditor();
+    void SetEffectsHiddenInEditor(boolean enable);
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();

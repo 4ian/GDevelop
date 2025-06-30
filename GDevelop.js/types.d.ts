@@ -564,6 +564,8 @@ export class Project extends EmscriptenObject {
   isFolderProject(): boolean;
   setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  areEffectsHiddenInEditor(): boolean;
+  setEffectsHiddenInEditor(enable: boolean): void;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
   getExtensionProperties(): ExtensionProperties;

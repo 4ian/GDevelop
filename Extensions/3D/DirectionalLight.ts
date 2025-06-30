@@ -32,7 +32,7 @@ namespace gdjs {
             this.light.shadow.mapSize.width = this.shadowSize;
             this.light.shadow.mapSize.height = this.shadowSize;
             this.light.shadow.camera.near = 1;
-            this.light.shadow.camera.far = this.distanceFromCamera + 1000;
+            this.light.shadow.camera.far = this.distanceFromCamera + 10000;
             this.light.shadow.camera.right = this.frustumSize / 2;
             this.light.shadow.camera.left = -this.frustumSize / 2;
             this.light.shadow.camera.top = this.frustumSize / 2;
@@ -105,39 +105,42 @@ namespace gdjs {
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
+            const roundedX = Math.floor(x / 100) * 100;
+            const roundedY = Math.floor(y / 100) * 100;
+            const roundedZ = Math.floor(z / 100) * 100;
             if (this.top === 'Y-') {
               const posLightX =
-                x +
+                roundedX +
                 this.distanceFromCamera *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightY =
-                y -
+                roundedY -
                 this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
               const posLightZ =
-                z +
+                roundedZ +
                 this.distanceFromCamera *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.target.position.set(x, y, z);
+              this.light.target.position.set(roundedX, roundedY, roundedZ);
             } else {
               const posLightX =
-                x +
+                roundedX +
                 this.distanceFromCamera *
                   Math.cos(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightY =
-                y +
+                roundedY +
                 this.distanceFromCamera *
                   Math.sin(gdjs.toRad(this.rotation + 90)) *
                   Math.cos(gdjs.toRad(this.elevation));
               const posLightZ =
-                z +
+                roundedZ +
                 this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
 
               this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.target.position.set(x, y, z);
+              this.light.target.position.set(roundedX, roundedY, roundedZ);
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {

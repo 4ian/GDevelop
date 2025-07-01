@@ -56,10 +56,37 @@ const styles = {
 const specializationLabels = {
   'game-development': <Trans>Game Development specialization</Trans>,
   'interaction-design': <Trans>Interaction Design specialization</Trans>,
+  marketing: <Trans>Marketing specialization</Trans>,
 };
 const specializationColors = {
   'game-development': '#5CB0FF',
   'interaction-design': '#CAC84E',
+  marketing: '#FD3AE6',
+};
+
+const getSpecializationConfig = (
+  specializationId: string
+): {| label: React.Node, color: string |} => {
+  let label = specializationLabels[specializationId];
+  if (!label) {
+    console.warn(
+      `No label found for specializationId "${specializationId}". Using default label.`
+    );
+    // Make each word uppercase and replace dashes with spaces
+    label = (
+      <Trans>
+        {specializationId
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())}{' '}
+        specialization
+      </Trans>
+    );
+  }
+  const color = specializationColors[specializationId] || '#4F28CD';
+  return {
+    label,
+    color,
+  };
 };
 
 type Props = {|
@@ -69,6 +96,9 @@ type Props = {|
 |};
 
 const CourseCard = ({ completion, course, onClick }: Props) => {
+  const specializationConfig = getSpecializationConfig(
+    course ? course.specializationId : 'loading'
+  );
   return (
     <I18n>
       {({ i18n }) => (
@@ -108,8 +138,7 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
                       <span
                         style={{
                           ...styles.specializationDot,
-                          backgroundColor:
-                            specializationColors[course.specializationId],
+                          backgroundColor: specializationConfig.color,
                         }}
                       />
                       <Text
@@ -119,7 +148,7 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
                         color="secondary"
                         style={textEllipsisStyle}
                       >
-                        {specializationLabels[course.specializationId]}
+                        {specializationConfig.label}
                       </Text>
                     </LineStackLayout>
                     {completion && (

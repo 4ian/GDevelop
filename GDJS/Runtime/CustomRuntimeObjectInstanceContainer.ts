@@ -24,7 +24,7 @@ namespace gdjs {
      *
      * @see gdjs.CustomRuntimeObject._innerArea
      **/
-    private _initialInnerArea: {
+    _initialInnerArea: {
       min: [float, float, float];
       max: [float, float, float];
     } | null = null;
@@ -47,6 +47,9 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
+      if (this._layers.containsKey(layerData.name)) {
+        return;
+      }
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
@@ -71,6 +74,10 @@ namespace gdjs {
         this.onDestroyFromScene(this._parent);
       }
 
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        !eventsBasedObjectVariantData.name &&
+        eventsBasedObjectVariantData.instances.length == 0;
+
       this._setOriginalInnerArea(eventsBasedObjectVariantData);
 
       // Registering objects
@@ -80,7 +87,12 @@ namespace gdjs {
         ++i
       ) {
         const childObjectData = eventsBasedObjectVariantData.objects[i];
-        if (customObjectData.childrenContent) {
+        // The children configuration override only applies to the default variant.
+        if (
+          customObjectData.childrenContent &&
+          (!eventsBasedObjectVariantData.name ||
+            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
+        ) {
           this.registerObject({
             ...childObjectData,
             // The custom object overrides its events-based object configuration.
@@ -183,7 +195,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDeletedFromScene(this);
+        object.onDeletedFromScene();
         // The object can free all its resource directly...
         object.onDestroyed();
       }

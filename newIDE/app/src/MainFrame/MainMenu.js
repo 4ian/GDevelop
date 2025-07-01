@@ -263,7 +263,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         ? []
         : [
             {
-              label: i18n._(t`Ask AI (GDevelop chatbot)`),
+              label: i18n._(t`Ask AI (AI agent and chatbot)`),
               onClickSendEvent: 'main-menu-open-ask-ai',
             },
           ]),

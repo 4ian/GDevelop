@@ -455,6 +455,7 @@ const useVersionHistory = ({
                     forceColumnLayout
                     filter="team"
                     recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                    placementId="version-history"
                   >
                     <Text>
                       <Trans>

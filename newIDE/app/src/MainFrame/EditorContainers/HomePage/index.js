@@ -28,7 +28,6 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 import { incrementGetStartedSectionViewCount } from '../../../Utils/Analytics/LocalStats';
 import {
   sendUserSurveyHidden,
@@ -153,6 +152,9 @@ type Props = {|
     templateId?: string
   ) => Promise<void>,
 
+  // Asset store
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+
   // Project save
   onSave: () => Promise<void>,
   canSave: boolean,
@@ -169,6 +171,8 @@ export type HomePageEditorInterface = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -204,6 +208,7 @@ export const HomePage = React.memo<Props>(
         onOpenTemplateFromCourseChapter,
         gamesList,
         gamesPlatformFrameTools,
+        onExtensionInstalled,
       }: Props,
       ref
     ) => {
@@ -291,9 +296,6 @@ export const HomePage = React.memo<Props>(
             : games.find(game => game.id === openedGameId),
         [games, openedGameId]
       );
-      const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
-        includeLegacy: false,
-      });
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
@@ -482,12 +484,25 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
+        // No thing to be done.
+      }, []);
+
+      const onSceneEventsModifiedOutsideEditor = React.useCallback(
+        (scene: gdLayout) => {
+          // No thing to be done.
+        },
+        []
+      );
+
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
         forceUpdateEditor,
         onEventsBasedObjectChildrenEdited,
         onSceneObjectEdited,
+        onSceneObjectsDeleted,
+        onSceneEventsModifiedOutsideEditor,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {
@@ -586,9 +601,6 @@ export const HomePage = React.memo<Props>(
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}
-                      subscriptionPlansWithPricingSystems={
-                        subscriptionPlansWithPricingSystems
-                      }
                       onOpenProfile={onOpenProfile}
                       onCreateProjectFromExample={onCreateProjectFromExample}
                       askToCloseProject={askToCloseProject}
@@ -640,6 +652,7 @@ export const HomePage = React.memo<Props>(
                         onOpenPrivateGameTemplateListingData
                       }
                       onOpenProfile={onOpenProfile}
+                      onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
                   {activeTab === 'team-view' &&
@@ -725,5 +738,6 @@ export const renderHomePageContainer = (
     resourceManagementProps={props.resourceManagementProps}
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
+    onExtensionInstalled={props.onExtensionInstalled}
   />
 );

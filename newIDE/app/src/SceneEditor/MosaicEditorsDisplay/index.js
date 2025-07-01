@@ -96,6 +96,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     initialInstances,
     selectedLayer,
     onSelectInstances,
+    onExtensionInstalled,
   } = props;
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -229,6 +230,7 @@ const MosaicEditorsDisplay = React.forwardRef<
         addSerializedInstances: editor
           ? editor.addSerializedInstances
           : () => [],
+        snapSelection: editor ? editor.snapSelection : noop,
       },
     };
   });
@@ -426,6 +428,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               unsavedChanges={props.unsavedChanges}
               hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
               isListLocked={isCustomVariant}
+              onExtensionInstalled={onExtensionInstalled}
             />
           )}
         </I18n>

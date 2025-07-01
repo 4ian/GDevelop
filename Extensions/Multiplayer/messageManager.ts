@@ -1340,7 +1340,7 @@ namespace gdjs {
           debugLogger.info(
             `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
           );
-          instance.deleteFromScene(runtimeScene);
+          instance.deleteFromScene();
 
           debugLogger.info(
             `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
@@ -2280,7 +2280,7 @@ namespace gdjs {
                 behavior.getActionOnPlayerDisconnect();
               if (actionOnPlayerDisconnect === 'DestroyObject') {
                 // No need to remove the ownership, as the destroy message will be sent to all players.
-                instance.deleteFromScene(runtimeScene);
+                instance.deleteFromScene();
               } else if (actionOnPlayerDisconnect === 'GiveOwnershipToHost') {
                 // Removing the ownership will send a message to all players.
                 behavior.removeObjectOwnership();

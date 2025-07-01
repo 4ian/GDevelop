@@ -371,6 +371,7 @@ export default class LocalPreviewLauncher extends React.Component<
           }
           id="Preview over wifi"
           title={<Trans>Preview over wifi</Trans>}
+          placementId="preview-wifi"
           mode="try"
           isNotShownDuringInAppTutorial
         />
@@ -382,6 +383,7 @@ export default class LocalPreviewLauncher extends React.Component<
           title={
             <Trans>Live preview (apply changes to the running preview)</Trans>
           }
+          placementId="hot-reloading"
           mode="try"
           isNotShownDuringInAppTutorial
         />

@@ -987,6 +987,7 @@ export class MeasurementUnit extends EmscriptenObject {
   static getPixel(): MeasurementUnit;
   static getPixelSpeed(): MeasurementUnit;
   static getPixelAcceleration(): MeasurementUnit;
+  static getAngularSpeed(): MeasurementUnit;
   static getNewton(): MeasurementUnit;
   static getDefaultMeasurementUnitsCount(): number;
   static getDefaultMeasurementUnitAtIndex(index: number): MeasurementUnit;
@@ -1166,6 +1167,7 @@ export class InitialInstance extends EmscriptenObject {
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
   resetPersistentUuid(): InitialInstance;
+  getPersistentUuid(): string;
   updateCustomProperty(name: string, value: string, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
   getCustomProperties(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): MapStringPropertyDescriptor;
   getRawDoubleProperty(name: string): number;
@@ -1739,6 +1741,8 @@ export class PlatformExtension extends EmscriptenObject {
   getAllSourceFiles(): VectorSourceFileMetadata;
   static getNamespaceSeparator(): string;
   static getBehaviorFullType(extensionName: string, behaviorName: string): string;
+  static getExtensionFromFullBehaviorType(type: string): string;
+  static getBehaviorNameFromFullBehaviorType(type: string): string;
   static getObjectFullType(extensionName: string, objectName: string): string;
   static getExtensionFromFullObjectType(type: string): string;
   static getObjectNameFromFullObjectType(type: string): string;
@@ -1779,6 +1783,8 @@ export class BaseEvent extends EmscriptenObject {
   setFolded(folded: boolean): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
+  getAiGeneratedEventId(): string;
+  setAiGeneratedEventId(aiGeneratedEventId: string): void;
 }
 
 export class StandardEvent extends BaseEvent {
@@ -1993,6 +1999,7 @@ export class WholeProjectRefactorer extends EmscriptenObject {
   static getLayoutAndExternalLayoutLayerInstancesCount(project: Project, layout: Layout, layerName: string): number;
   static renameLeaderboards(project: Project, leaderboardIdMap: MapStringString): void;
   static findAllLeaderboardIds(project: Project): SetString;
+  static updateBehaviorsSharedData(project: Project): void;
 }
 
 export class ObjectTools extends EmscriptenObject {

@@ -256,6 +256,7 @@ function LeaderboardOptionsDialog({
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
                 recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                placementId="leaderboards-customization"
               >
                 <Line>
                   <Column noMargin>

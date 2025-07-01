@@ -21,7 +21,8 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
 import { serializeToJSObject } from '../Utils/Serializer';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import Clipboard from '../Utils/Clipboard';
+import { SafeExtractor } from '../Utils/SafeExtractor';
 import Window from '../Utils/Window';
 import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
@@ -80,6 +81,7 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
+import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -118,6 +120,9 @@ type Props = {|
     eventsBasedObject: gdEventsBasedObject
   ) => void,
 
+  onObjectsDeleted: () => void,
+  onObjectGroupsDeleted: () => void,
+
   setToolbar: (?React.Node) => void,
   resourceManagementProps: ResourceManagementProps,
   isActive: boolean,
@@ -137,7 +142,7 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -972,7 +977,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext: ObjectWithContext[],
     done: boolean => void
   ) => {
-    const { project, layout, eventsBasedObject, onObjectEdited } = this.props;
+    const { project, layout, eventsBasedObject, onObjectsDeleted } = this.props;
 
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
@@ -1004,12 +1009,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       }
     });
 
+    // Note: done() actually does the deletion of the objects,
+    // so ensure objectsWithContext are not used after this call.
     done(true);
+    onObjectsDeleted();
 
-    objectsWithContext.forEach(objectWithContext => {
-      // TODO Avoid to do this N times.
-      onObjectEdited(objectWithContext);
-    });
     // We modified the selection, so force an update of editors dealing with it.
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -1206,8 +1210,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
+    // done() actually does the deletion of the object group,
+    // so ensure groupWithContext is not used after this call.
     done(true);
-    this.props.onObjectGroupEdited(groupWithContext);
+    this.props.onObjectGroupsDeleted();
   };
 
   _onRenameObjectGroup = (
@@ -1576,6 +1582,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit children`),
+              enabled:
+                getVariant(
+                  project.getEventsBasedObject(object.getType()),
+                  gd.asCustomObjectConfiguration(object.getConfiguration())
+                ).getAssetStoreAssetId() === '',
               click: () => {
                 const customObjectConfiguration = gd.asCustomObjectConfiguration(
                   object.getConfiguration()
@@ -1648,7 +1659,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         position: [0, 0],
         copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
         serializedInstances: serializedSelection,
-        preventSnapToGrid: true,
         doesObjectExistInContext:
           // Instance duplication can only be done in the same scene, so no need to check
           () => true,
@@ -1703,6 +1713,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             .hasObjectNamed(objectName),
       }
     );
+    editorDisplay.instancesHandlers.snapSelection(newInstances);
 
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
@@ -1801,7 +1812,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   updateBehaviorsSharedData = () => {
     const { layout, project } = this.props;
     if (layout) {
-      layout.updateBehaviorsSharedData(project);
+      gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
     } else {
       // TODO EBO: refactoring for custom objects.
     }

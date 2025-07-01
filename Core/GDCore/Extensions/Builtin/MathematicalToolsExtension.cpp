@@ -72,7 +72,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
 
   extension
       .AddExpression("normalize",
-                     _("Normalize a value between `min` and `max` to a value between 0 and 1."),
+                     _("Normalize a value between `min` and `max` to a value "
+                       "between 0 and 1."),
                      _("Remap a value between 0 and 1."),
                      "",
                      "res/mathfunction.png")
@@ -124,7 +125,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("mod",
                      _("Modulo"),
-                     _("x mod y"),
+                     _("Compute \"x mod y\". GDevelop does NOT support the \% "
+                       "operator. Use this mod(x, y) function instead."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("x (as in x mod y)"))
@@ -184,11 +186,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("asinh",
-                     _("Arcsine"),
-                     _("Arcsine"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "asinh", _("Arcsine"), _("Arcsine"), "", "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -218,11 +217,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("cbrt",
-                     _("Cube root"),
-                     _("Cube root"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "cbrt", _("Cube root"), _("Cube root"), "", "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -260,12 +256,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"), "", true);
 
   extension
-      .AddExpression("cos",
-                     _("Cosine"),
-                     _("Cosine of an angle (in radian). "
-                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "cos",
+          _("Cosine"),
+          _("Cosine of an angle (in radian). "
+            "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
+          "",
+          "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -293,29 +290,20 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("int",
-                     _("Round"),
-                     _("Round a number"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "int", _("Round"), _("Round a number"), "", "res/mathfunction.png")
       .SetHidden()
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("rint",
-                     _("Round"),
-                     _("Round a number"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "rint", _("Round"), _("Round a number"), "", "res/mathfunction.png")
       .SetHidden()
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("round",
-                     _("Round"),
-                     _("Round a number"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "round", _("Round"), _("Round a number"), "", "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -324,8 +312,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Round a number to the Nth decimal place"),
                      "",
                      "res/mathfunction.png")
-      .AddParameter("expression", _("Expression"))
-      .AddParameter("expression", _("Expression"), "", true);
+      .AddParameter("expression", _("Number to Round"))
+      .AddParameter("expression", _("Decimal Places"), "", true);
 
   extension
       .AddExpression("exp",
@@ -336,19 +324,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("log",
-                     _("Logarithm"),
-                     _("Logarithm"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "log", _("Logarithm"), _("Logarithm"), "", "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("ln",
-                     _("Logarithm"),
-                     _("Logarithm"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "ln", _("Logarithm"), _("Logarithm"), "", "res/mathfunction.png")
       .SetHidden()
       .AddParameter("expression", _("Expression"));
 
@@ -387,11 +369,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("The exponent (n in x^n)"));
 
   extension
-      .AddExpression("sec",
-                     _("Secant"),
-                     _("Secant"),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "sec", _("Secant"), _("Secant"), "", "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -403,12 +382,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("sin",
-                     _("Sine"),
-                     _("Sine of an angle (in radian). "
-                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "sin",
+          _("Sine"),
+          _("Sine of an angle (in radian). "
+            "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
+          "",
+          "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -428,12 +408,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
-      .AddExpression("tan",
-                     _("Tangent"),
-                     _("Tangent of an angle (in radian). "
-                       "If you want to use degrees, use`ToRad`: `tan(ToRad(45))`."),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "tan",
+          _("Tangent"),
+          _("Tangent of an angle (in radian). "
+            "If you want to use degrees, use`ToRad`: `tan(ToRad(45))`."),
+          "",
+          "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
 
   extension
@@ -463,26 +444,28 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("x (in a+(b-a)*x)"));
 
   extension
-      .AddExpression("XFromAngleAndDistance",
-                     _("X position from angle and distance"),
-                     _("Compute the X position when given an angle and distance "
-                      "relative to the origin (0;0). This is also known as "
-                      "getting the cartesian coordinates of a 2D vector, using "
-                      "its polar coordinates."),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "XFromAngleAndDistance",
+          _("X position from angle and distance"),
+          _("Compute the X position when given an angle and distance "
+            "relative to the origin (0;0). This is also known as "
+            "getting the cartesian coordinates of a 2D vector, using "
+            "its polar coordinates."),
+          "",
+          "res/mathfunction.png")
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
   extension
-      .AddExpression("YFromAngleAndDistance",
-                     _("Y position from angle and distance"),
-                     _("Compute the Y position when given an angle and distance "
-                      "relative to the origin (0;0). This is also known as "
-                      "getting the cartesian coordinates of a 2D vector, using "
-                      "its polar coordinates."),
-                     "",
-                     "res/mathfunction.png")
+      .AddExpression(
+          "YFromAngleAndDistance",
+          _("Y position from angle and distance"),
+          _("Compute the Y position when given an angle and distance "
+            "relative to the origin (0;0). This is also known as "
+            "getting the cartesian coordinates of a 2D vector, using "
+            "its polar coordinates."),
+          "",
+          "res/mathfunction.png")
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
@@ -497,7 +480,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("lerpAngle",
                      _("Lerp (Linear interpolation) between two angles"),
-                     _("Linearly interpolates between two angles (in degrees) by taking the shortest direction around the circle."),
+                     _("Linearly interpolates between two angles (in degrees) "
+                       "by taking the shortest direction around the circle."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Starting angle, in degrees"))

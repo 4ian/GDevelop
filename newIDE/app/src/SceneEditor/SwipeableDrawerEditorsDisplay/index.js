@@ -72,6 +72,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     initialInstances,
     selectedLayer,
     onSelectInstances,
+    onExtensionInstalled,
   } = props;
   const selectedInstances = props.instancesSelection.getSelectedInstances();
   const { values } = React.useContext(PreferencesContext);
@@ -222,6 +223,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
         addSerializedInstances: editor
           ? editor.addSerializedInstances
           : () => [],
+        snapSelection: editor ? editor.snapSelection : noop,
       },
     };
   });
@@ -372,6 +374,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                         props.hotReloadPreviewButtonProps
                       }
                       isListLocked={isCustomVariant}
+                      onExtensionInstalled={onExtensionInstalled}
                     />
                   )}
                 </I18n>

@@ -34,6 +34,7 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("viewpoint", "TopDown");
   behaviorContent.SetAttribute("customIsometryAngle", 30);
   behaviorContent.SetAttribute("movementAngleOffset", 0);
+  behaviorContent.SetAttribute("useLegacyTurnBack", false);
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
@@ -89,10 +90,20 @@ TopDownMovementBehavior::GetProperties(
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties["IgnoreDefaultControls"]
-      .SetLabel(_("Default controls"))
+      .SetLabel(_("Disable default keyboard controls"))
+      .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden)
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
-                    ? "false"
-                    : "true")
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties["UseLegacyTurnBack"]
+      .SetLabel(_("Only use acceleration to turn back "
+                  "(deprecated — best left unchecked)"))
+      .SetGroup(_("Deprecated options"))
+      .SetDeprecated()
+      .SetValue(behaviorContent.GetBoolAttribute("useLegacyTurnBack", true)
+                    ? "true"
+                    : "false")
       .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
@@ -145,7 +156,7 @@ bool TopDownMovementBehavior::UpdateProperty(
     const gd::String& name,
     const gd::String& value) {
   if (name == "IgnoreDefaultControls") {
-    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
+    behaviorContent.SetAttribute("ignoreDefaultControls", (value == "1"));
     return true;
   }
   if (name == "AllowDiagonals") {
@@ -155,6 +166,9 @@ bool TopDownMovementBehavior::UpdateProperty(
   if (name == "RotateObject") {
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
+  }
+  if (name == "UseLegacyTurnBack") {
+    behaviorContent.SetAttribute("useLegacyTurnBack", (value == "1"));
   }
   if (name == "Viewpoint") {
     // Fix the offset angle when switching between top-down and isometry

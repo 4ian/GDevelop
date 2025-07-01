@@ -16,6 +16,7 @@ import { isNativeMobileApp } from '../../Utils/Platform';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import GetSubscriptionCard from './GetSubscriptionCard';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { type SubscriptionPlacementId } from '../../Utils/Analytics/EventSender';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
@@ -29,6 +30,7 @@ type Props = {|
     | 'Debugger'
     | 'Hot reloading'
     | 'Preview over wifi',
+  placementId: SubscriptionPlacementId,
   onChangeSubscription?: () => Promise<void> | void,
   mode: 'try' | 'mandatory',
   isNotShownDuringInAppTutorial?: boolean,
@@ -39,7 +41,14 @@ const SubscriptionChecker = React.forwardRef<
   SubscriptionCheckerInterface
 >(
   (
-    { mode, id, title, onChangeSubscription, isNotShownDuringInAppTutorial },
+    {
+      mode,
+      id,
+      title,
+      onChangeSubscription,
+      placementId,
+      isNotShownDuringInAppTutorial,
+    },
     ref
   ) => {
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -122,6 +131,7 @@ const SubscriptionChecker = React.forwardRef<
               setDialogOpen(false);
             }}
             recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            placementId={placementId}
           >
             <Column noMargin expand>
               <Text>

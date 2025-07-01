@@ -46,7 +46,7 @@ namespace gdjs {
           layer.getCameraY() + layer.getCameraHeight() / 2
       ) {
         //We are outside the camera area.
-        this.owner.deleteFromScene(instanceContainer);
+        this.owner.deleteFromScene();
       }
     }
 

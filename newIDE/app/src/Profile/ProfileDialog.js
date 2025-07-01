@@ -32,7 +32,7 @@ const ProfileDialog = ({ onClose }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
-  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+  const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
     includeLegacy: true,
     authenticatedUser,
   });
@@ -184,9 +184,7 @@ const ProfileDialog = ({ onClose }: Props) => {
             {isStudentAccount ? null : (
               <SubscriptionDetails
                 subscription={authenticatedUser.subscription}
-                subscriptionPlansWithPricingSystems={
-                  subscriptionPlansWithPricingSystems
-                }
+                subscriptionPlansWithPricingSystems={getSubscriptionPlansWithPricingSystems()}
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
               />

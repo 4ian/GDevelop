@@ -17,6 +17,8 @@ declare class gdBaseEvent extends gdBaseEvent {
   setFolded(folded: boolean): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
+  getAiGeneratedEventId(): string;
+  setAiGeneratedEventId(aiGeneratedEventId: string): void;
   delete(): void;
   ptr: number;
 };

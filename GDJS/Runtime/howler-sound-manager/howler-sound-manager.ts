@@ -397,58 +397,66 @@ namespace gdjs {
         document.addEventListener(
           'pause',
           function () {
-            const soundList = that._freeSounds.concat(that._freeMusics);
-            for (let key in that._sounds) {
-              if (that._sounds.hasOwnProperty(key)) {
-                soundList.push(that._sounds[key]);
-              }
-            }
-            for (let key in that._musics) {
-              if (that._musics.hasOwnProperty(key)) {
-                soundList.push(that._musics[key]);
-              }
-            }
-            for (let i = 0; i < soundList.length; i++) {
-              const sound = soundList[i];
-              if (!sound.paused() && !sound.stopped()) {
-                sound.pause();
-                that._pausedSounds.push(sound);
-              }
-            }
-            that._paused = true;
+            that.pauseAllActiveSounds();
           },
           false
         );
         document.addEventListener(
           'resume',
           function () {
-            try {
-              for (let i = 0; i < that._pausedSounds.length; i++) {
-                const sound = that._pausedSounds[i];
-                if (!sound.stopped()) {
-                  sound.play();
-                }
-              }
-            } catch (error) {
-              if (
-                error.message &&
-                typeof error.message === 'string' &&
-                error.message.startsWith('Maximum call stack size exceeded')
-              ) {
-                console.warn(
-                  'An error occurred when resuming paused sounds while the game was in background:',
-                  error
-                );
-              } else {
-                throw error;
-              }
-            }
-            that._pausedSounds.length = 0;
-            that._paused = false;
+            that.resumeAllActiveSounds();
           },
           false
         );
       });
+    }
+
+    pauseAllActiveSounds(): void {
+      const soundList = this._freeSounds.concat(this._freeMusics);
+      for (let key in this._sounds) {
+        if (this._sounds.hasOwnProperty(key)) {
+          soundList.push(this._sounds[key]);
+        }
+      }
+      for (let key in this._musics) {
+        if (this._musics.hasOwnProperty(key)) {
+          soundList.push(this._musics[key]);
+        }
+      }
+      for (let i = 0; i < soundList.length; i++) {
+        const sound = soundList[i];
+        if (!sound.paused() && !sound.stopped()) {
+          sound.pause();
+          this._pausedSounds.push(sound);
+        }
+      }
+      this._paused = true;
+    }
+
+    resumeAllActiveSounds(): void {
+      try {
+        for (let i = 0; i < this._pausedSounds.length; i++) {
+          const sound = this._pausedSounds[i];
+          if (!sound.stopped()) {
+            sound.play();
+          }
+        }
+      } catch (error) {
+        if (
+          error.message &&
+          typeof error.message === 'string' &&
+          error.message.startsWith('Maximum call stack size exceeded')
+        ) {
+          console.warn(
+            'An error occurred when resuming paused sounds while the game was in background:',
+            error
+          );
+        } else {
+          throw error;
+        }
+      }
+      this._pausedSounds.length = 0;
+      this._paused = false;
     }
 
     getResourceKinds(): ResourceKind[] {

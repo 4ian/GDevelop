@@ -13,7 +13,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
-import { type AskAiEditorInterface } from '../EditorContainers/AskAi';
+import { type AskAiEditorInterface } from '../../AiGeneration/AskAiEditorContainer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
 
@@ -484,4 +484,13 @@ export const hasEditorTabOpenedWithKey = (
   key: string
 ) => {
   return !!editorTabsState.editors.find(editor => editor.key === key);
+};
+
+export const getOpenedAskAiEditor = (
+  state: EditorTabsState
+): AskAiEditorInterface | null => {
+  const editor = state.editors.find(editor => editor.key === 'ask-ai');
+
+  // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+  return (editor && editor.editorRef) || null;
 };

@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 
 void DestroyOutsideBehavior::InitializeContent(gd::SerializerElement& content) {
-  content.SetAttribute("extraBorder", 0);
+  content.SetAttribute("extraBorder", 300);
 }
 
 #if defined(GD_IDE_ONLY)

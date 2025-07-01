@@ -26,7 +26,10 @@ type Props = {|
   options: ChooseResourceOptions,
   resourceSources: Array<ResourceSource>,
   onClose: () => void,
-  onChooseResources: (resources: Array<gdResource>) => void,
+  onChooseResources: ({|
+    selectedResources: Array<gdResource>,
+    selectedSourceName: string,
+  |}) => void,
 |};
 
 export const NewResourceDialog = ({
@@ -113,10 +116,16 @@ export const NewResourceDialog = ({
             resourcesImporationBehavior:
               preferences.values.resourcesImporationBehavior,
           });
-          onChooseResources(resources);
+          onChooseResources({
+            selectedResources: resources,
+            selectedSourceName: initialSource.name,
+          });
         } catch (error) {
           console.error('Unexpected error from a resource source:', error);
-          onChooseResources([]);
+          onChooseResources({
+            selectedResources: [],
+            selectedSourceName: initialSource.name,
+          });
         }
       })();
     },

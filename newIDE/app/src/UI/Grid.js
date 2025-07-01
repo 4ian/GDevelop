@@ -16,6 +16,7 @@ export const Line = (props: {|
   expand?: boolean,
   overflow?: string,
   useFullHeight?: boolean,
+  neverShrink?: boolean,
   id?: string,
 |}) => (
   <div
@@ -36,6 +37,7 @@ export const Line = (props: {|
       // in some rare cases (CompactInstancePropertiesEditor when in the
       // mosaic editor for instance).
       minWidth: 0,
+      flexShrink: props.neverShrink ? 0 : undefined,
     }}
   >
     {props.children}

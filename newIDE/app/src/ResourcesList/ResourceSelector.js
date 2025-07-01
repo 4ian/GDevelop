@@ -103,6 +103,15 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       setForceShowResourceSources,
     ] = React.useState<boolean>(false);
 
+    const storageProvider = resourceManagementProps.getStorageProvider();
+    const resourceSources = resourceManagementProps.resourceSources
+      .filter(source => source.kind === resourceKind)
+      .filter(
+        ({ onlyForStorageProvider }) =>
+          !onlyForStorageProvider ||
+          onlyForStorageProvider === storageProvider.internalName
+      );
+
     const focus: FieldFocusFunction = React.useCallback(options => {
       if (autoCompleteRef.current) autoCompleteRef.current.focus(options);
     }, []);
@@ -216,18 +225,26 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     });
 
     const addFrom = React.useCallback(
-      async (source: ResourceSource) => {
+      async (initialResourceSource: ResourceSource) => {
         try {
-          if (!source) return;
+          if (!initialResourceSource) return;
 
-          const resources = await resourceManagementProps.onChooseResource({
-            initialSourceName: source.name,
+          const {
+            selectedResources,
+            selectedSourceName,
+          } = await resourceManagementProps.onChooseResource({
+            initialSourceName: initialResourceSource.name,
             multiSelection: false,
             resourceKind: resourceKind,
           });
 
-          if (!resources.length) return;
-          const resource = resources[0];
+          if (!selectedResources.length) return;
+          const selectedResourceSource = resourceSources.find(
+            source => source.name === selectedSourceName
+          );
+          if (!selectedResourceSource) return;
+
+          const resource = selectedResources[0];
 
           const resourceName: string = resource.getName();
 
@@ -237,7 +254,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           if (autoCompleteRef.current)
             autoCompleteRef.current.forceInputValueTo(resourceName);
 
-          if (source.shouldCreateResource) {
+          if (selectedResourceSource.shouldCreateResource) {
             applyResourceDefaults(project, resource);
 
             // addResource will check if a resource with the same name exists, and if it is
@@ -246,7 +263,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
             // Important, we are responsible for deleting the resources that were given to us.
             // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-            resources.forEach(resource => resource.delete());
+            selectedResources.forEach(resource => resource.delete());
 
             await resourceManagementProps.onFetchNewlyAddedResources();
             triggerResourcesHaveChanged();
@@ -264,35 +281,26 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         resourceKind,
         onChangeResourceName,
         triggerResourcesHaveChanged,
+        resourceSources,
       ]
     );
 
     const getResourceSourceItems = React.useCallback(
       (): DataSource => {
-        const sources = resourceManagementProps.resourceSources || [];
-        const storageProvider = resourceManagementProps.getStorageProvider();
-
         return [
-          ...sources
-            .filter(source => source.kind === resourceKind)
-            .filter(
-              ({ onlyForStorageProvider }) =>
-                !onlyForStorageProvider ||
-                onlyForStorageProvider === storageProvider.internalName
-            )
-            .map(source => ({
-              text: '',
-              value: '',
-              translatableValue: source.displayName,
-              renderIcon: () => <Add />,
-              onClick: () => addFrom(source),
-            })),
+          ...resourceSources.map(source => ({
+            text: '',
+            value: '',
+            translatableValue: source.displayName,
+            renderIcon: () => <Add />,
+            onClick: () => addFrom(source),
+          })),
           {
             type: 'separator',
           },
         ];
       },
-      [addFrom, resourceManagementProps, resourceKind]
+      [addFrom, resourceSources]
     );
 
     const editWith = React.useCallback(

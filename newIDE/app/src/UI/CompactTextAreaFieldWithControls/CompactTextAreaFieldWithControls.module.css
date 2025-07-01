@@ -1,0 +1,164 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 4px;
+}
+
+.compactTextAreaField {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(--theme-text-field-default-background-color);
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0px;
+
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.container.disabled .compactTextAreaField {
+  color: var(--theme-text-field-disabled-color);
+}
+
+.container.errored:not(.disabled) .compactTextAreaField {
+  border: none;
+  outline: 1px solid var(--theme-text-field-default-error);
+}
+.container.errored:not(.disabled):hover .compactTextAreaField {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+.container.errored:not(.disabled):focus-within .compactTextAreaField {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+
+.compactTextAreaField::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: '';
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.container:not(.disabled):not(.errored):hover .compactTextAreaField::before {
+  border-bottom: 1px solid var(--theme-text-field-hover-border-color);
+}
+.container:not(.disabled):not(.errored):focus-within
+  .compactTextAreaField::before {
+  border-bottom: 1px solid var(--theme-text-field-active-border-color);
+}
+
+.compactTextAreaField textarea {
+  outline: none;
+  border: none;
+  padding: 4px 8px;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: inherit;
+  flex: 1;
+  caret-color: var(--theme-text-field-active-caret-color);
+  min-width: 0px;
+  border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
+
+  min-height: 21px;
+  max-height: 200px;
+  resize: none;
+}
+
+.compactTextAreaField textarea::placeholder {
+  color: var(--theme-text-field-placeholder-color);
+}
+
+.label {
+  display: flex;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.compactTextAreaField input::-webkit-outer-spin-button,
+.compactTextAreaField input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Animated corner neon */
+.neonCorner {
+  background: var(--theme-text-field-default-background-color);
+  border-radius: 4px;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.neonCorner textarea {
+  position: relative;
+  z-index: 3;
+}
+.neonCorner div {
+  position: relative;
+  z-index: 3;
+}
+
+.neonCorner::before {
+  content: '';
+  position: absolute;
+  left: -100px;
+  width: calc(100% + 200px);
+  background: conic-gradient(
+    from 90deg,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    #b07bf7,
+    #d2b5ff,
+    transparent,
+    transparent,
+    transparent,
+    transparent
+  );
+  rotate: 0deg;
+  z-index: 1;
+}
+
+.animatedNeonCorner::before {
+  animation: rotateNeon 3s linear infinite;
+}
+
+.container.errored:not(.disabled) .neonCorner::before {
+  background: none;
+}
+
+.neonCorner::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  background: var(--theme-text-field-default-background-color);
+  border-radius: 3px;
+  z-index: 2;
+}
+
+@keyframes rotateNeon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

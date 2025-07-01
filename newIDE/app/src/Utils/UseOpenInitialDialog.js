@@ -43,6 +43,7 @@ const useOpenInitialDialog = ({
             analyticsMetadata: {
               reason: 'Landing dialog at opening',
               recommendedPlanId,
+              placementId: 'opening-from-link',
             },
           });
           removeRouteArguments(['initial-dialog', 'recommended-plan-id']);

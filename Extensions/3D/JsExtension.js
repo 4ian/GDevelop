@@ -21,7 +21,9 @@ module.exports = {
       .setExtensionInformation(
         'Scene3D',
         _('3D'),
-        _('Support for 3D in GDevelop.'),
+        _(
+          'Support for 3D in GDevelop: this provides 3D objects and the common features for all 3D objects.'
+        ),
         'Florian Rival',
         'MIT'
       )
@@ -36,7 +38,9 @@ module.exports = {
           'Base3DBehavior',
           _('3D capability'),
           'Object3D',
-          _('Move the object in 3D space.'),
+          _(
+            'Common features for all 3D objects: position in 3D space (including the Z axis, in addition to X and Y), size (including depth, in addition to width and height), rotation (on X and Y axis, in addition to the Z axis), scale (including Z axis, in addition to X and Y), flipping (on Z axis, in addition to horizontal (Y)/vertical (X) flipping).'
+          ),
           '',
           'res/conditions/3d_box.svg',
           'Base3DBehavior',

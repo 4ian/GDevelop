@@ -3,7 +3,10 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
+import {
+  type SubscriptionDialogDisplayReason,
+  type SubscriptionPlacementId,
+} from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
@@ -53,6 +56,7 @@ type Props = {|
     | 'gdevelop_startup'
     | 'gdevelop_education',
   canHide?: boolean,
+  placementId: SubscriptionPlacementId,
 |};
 
 const GetSubscriptionCard = ({
@@ -66,6 +70,7 @@ const GetSubscriptionCard = ({
   filter,
   recommendedPlanIdIfNoSubscription,
   canHide,
+  placementId,
 }: Props) => {
   const [isHidden, setIsHidden] = React.useState(false);
   const { subscription } = React.useContext(AuthenticatedUserContext);
@@ -116,6 +121,7 @@ const GetSubscriptionCard = ({
                       analyticsMetadata: {
                         reason: subscriptionDialogOpeningReason,
                         recommendedPlanId: actualPlanIdToRecommend,
+                        placementId,
                       },
                       filter,
                     });

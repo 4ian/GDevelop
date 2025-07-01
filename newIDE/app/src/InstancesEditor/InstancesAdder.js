@@ -1,5 +1,5 @@
 // @flow
-import { roundPosition } from '../Utils/GridHelpers';
+import { roundPositionsToGrid } from '../Utils/GridHelpers';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 const gd: libGDevelop = global.gd;
@@ -8,29 +8,6 @@ type Props = {|
   instances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
 |};
-
-const roundPositionsToGrid = (
-  pos: [number, number],
-  instancesEditorSettings: InstancesEditorSettings
-): [number, number] => {
-  const newPos = pos;
-
-  if (instancesEditorSettings.grid && instancesEditorSettings.snap) {
-    roundPosition(
-      newPos,
-      instancesEditorSettings.gridWidth,
-      instancesEditorSettings.gridHeight,
-      instancesEditorSettings.gridOffsetX,
-      instancesEditorSettings.gridOffsetY,
-      instancesEditorSettings.gridType
-    );
-  } else {
-    newPos[0] = Math.round(newPos[0]);
-    newPos[1] = Math.round(newPos[1]);
-  }
-
-  return newPos;
-};
 
 /**
  * Allow to add instances on the scene. Supports "temporary" instances,
@@ -56,14 +33,12 @@ export default class InstancesAdder {
     position,
     copyReferential,
     serializedInstances,
-    preventSnapToGrid = false,
     addInstancesInTheForeground = false,
     doesObjectExistInContext,
   }: {|
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
-    preventSnapToGrid?: boolean,
     addInstancesInTheForeground?: boolean,
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
@@ -78,18 +53,8 @@ export default class InstancesAdder {
         const instance = new gd.InitialInstance();
         unserializeFromJSObject(instance, serializedInstance);
         if (!doesObjectExistInContext(instance.getObjectName())) return null;
-        const desiredPosition = [
-          instance.getX() - copyReferential[0] + position[0],
-          instance.getY() - copyReferential[1] + position[1],
-        ];
-        const newPos = preventSnapToGrid
-          ? desiredPosition
-          : roundPositionsToGrid(
-              desiredPosition,
-              this._instancesEditorSettings
-            );
-        instance.setX(newPos[0]);
-        instance.setY(newPos[1]);
+        instance.setX(instance.getX() - copyReferential[0] + position[0]);
+        instance.setY(instance.getY() - copyReferential[1] + position[1]);
         if (addInstancesInTheForeground) {
           if (
             addedInstancesLowestZOrder === null ||

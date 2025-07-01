@@ -26,6 +26,32 @@ const getVariant = (
     : eventBasedObject.getDefaultVariant();
 };
 
+const getChildObjectConfiguration = (
+  childObjectName: string,
+  eventBasedObject: gdEventsBasedObject,
+  customObjectConfiguration: gdCustomObjectConfiguration,
+  variant: gdEventsBasedObjectVariant
+): gdObjectConfiguration | null => {
+  // Legacy events-based objects don't have any instance in their default
+  // variant since there wasn't a graphical editor at the time.
+  // In this case, the editor doesn't allow to choose a variant, but a
+  // variant may have stayed after a user rolled back the extension.
+  // This variant must be ignored to match what the editor shows.
+  if (
+    customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
+    (variant === eventBasedObject.getDefaultVariant() &&
+      customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration())
+  ) {
+    return customObjectConfiguration.getChildObjectConfiguration(
+      childObjectName
+    );
+  }
+  const childObjects = variant.getObjects();
+  return childObjects.hasObjectNamed(childObjectName)
+    ? childObjects.getObject(childObjectName).getConfiguration()
+    : null;
+};
+
 type PropertyMappingRule = {
   targetChild: string,
   targetProperty: string,
@@ -189,26 +215,40 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     };
   }
 
+  _getChildObjectConfiguration = (
+    childObjectName: string
+  ): gdObjectConfiguration | null => {
+    const eventBasedObject = this.eventBasedObject;
+    if (!eventBasedObject) {
+      return null;
+    }
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      this._associatedObjectConfiguration
+    );
+    const variant = getVariant(eventBasedObject, customObjectConfiguration);
+    if (!variant) {
+      return null;
+    }
+    return getChildObjectConfiguration(
+      childObjectName,
+      eventBasedObject,
+      customObjectConfiguration,
+      variant
+    );
+  };
+
   getRendererOfInstance = (
     instance: gdInitialInstance
   ): RenderedInstance | Rendered3DInstance => {
     let renderedInstance = this.renderedInstances.get(instance.ptr);
     if (!renderedInstance) {
       // No renderer associated yet, the instance must have been just created!...
-      let childObjectConfiguration = null;
-      const variant = this.getVariant();
-      if (variant) {
-        const childObjects = variant.getObjects();
-        if (childObjects.hasObjectNamed(instance.getObjectName())) {
-          const childObject = childObjects.getObject(instance.getObjectName());
-          childObjectConfiguration = childObject.getConfiguration();
-        }
-      }
-      // Apply property mapping rules on the child instance.
-      const childPropertyOverridings = new Map<string, string>();
+
       const customObjectConfiguration = gd.asCustomObjectConfiguration(
         this._associatedObjectConfiguration
       );
+      // Apply property mapping rules on the child instance.
+      const childPropertyOverridings = new Map<string, string>();
       const customObjectProperties = customObjectConfiguration.getProperties();
       for (const propertyMappingRule of this._propertyMappingRules) {
         if (propertyMappingRule.targetChild !== instance.getObjectName()) {
@@ -229,6 +269,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         }
       }
       //...so let's create a renderer.
+      const childObjectConfiguration = this._getChildObjectConfiguration(
+        instance.getObjectName()
+      );
       renderedInstance = childObjectConfiguration
         ? ObjectsRenderingService.createNewInstanceRenderer(
             this._project,
@@ -353,16 +396,16 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const childObjects = variant.getObjects();
     for (let i = 0; i < childObjects.getObjectsCount(); i++) {
       const childObject = childObjects.getObjectAt(i);
-      const childObjectConfiguration =
-        customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
-        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()
-          ? customObjectConfiguration.getChildObjectConfiguration(
-              childObject.getName()
-            )
-          : variant
-              .getObjects()
-              .getObject(childObject.getName())
-              .getConfiguration();
+
+      const childObjectConfiguration = getChildObjectConfiguration(
+        childObject.getName(),
+        eventBasedObject,
+        customObjectConfiguration,
+        variant
+      );
+      if (!childObjectConfiguration) {
+        continue;
+      }
       const childType = childObjectConfiguration.getType();
       if (
         childType === 'Sprite' ||

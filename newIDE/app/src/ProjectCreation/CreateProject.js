@@ -67,18 +67,6 @@ export const createNewEmptyProject = (): NewProjectSource => {
   };
 };
 
-export const createNewProjectFromAIGeneratedProject = (
-  generatedProjectUrl: string
-): NewProjectSource => {
-  sendNewGameCreated({
-    exampleUrl: generatedProjectUrl,
-    exampleSlug: 'generated-project',
-  });
-  const newProjectSource = getNewProjectSourceFromUrl(generatedProjectUrl);
-  newProjectSource.templateSlug = 'generated-project';
-  return newProjectSource;
-};
-
 export const createNewProjectFromTutorialTemplate = (
   tutorialTemplateUrl: string,
   tutorialId: string

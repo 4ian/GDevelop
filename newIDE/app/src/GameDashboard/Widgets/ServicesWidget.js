@@ -98,6 +98,7 @@ const ServicesWidget = ({
                       analyticsMetadata: {
                         reason: 'Leaderboard count per game limit reached',
                         recommendedPlanId: 'gdevelop_silver',
+                        placementId: 'leaderboards',
                       },
                     })
                   }

@@ -678,7 +678,7 @@ namespace gdjs {
       }
 
       // Notify the object it was removed from the container
-      obj.onDeletedFromScene(this);
+      obj.onDeletedFromScene();
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {
@@ -811,6 +811,8 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._allInstancesList = [];
       this._instancesRemoved = [];
+      this._layersCameraCoordinates = {};
+      this._initialBehaviorSharedData = new Hashtable();
     }
   }
 }

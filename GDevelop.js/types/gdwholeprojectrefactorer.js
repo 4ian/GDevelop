@@ -63,6 +63,7 @@ declare class gdWholeProjectRefactorer {
   static getLayoutAndExternalLayoutLayerInstancesCount(project: gdProject, layout: gdLayout, layerName: string): number;
   static renameLeaderboards(project: gdProject, leaderboardIdMap: gdMapStringString): void;
   static findAllLeaderboardIds(project: gdProject): gdSetString;
+  static updateBehaviorsSharedData(project: gdProject): void;
   delete(): void;
   ptr: number;
 };

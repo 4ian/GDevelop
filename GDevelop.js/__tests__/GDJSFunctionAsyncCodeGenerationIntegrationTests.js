@@ -1153,7 +1153,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete an object while the task is running.
-      myObjectA1.deleteFromScene(runtimeScene);
+      myObjectA1.deleteFromScene();
 
       // Process the tasks (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -1175,8 +1175,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete other objects while the task is running.
-      myObjectA3.deleteFromScene(runtimeScene);
-      myObjectB1.deleteFromScene(runtimeScene);
+      myObjectA3.deleteFromScene();
+      myObjectB1.deleteFromScene();
 
       // Process the tasks again (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -1291,7 +1291,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete an object while the task is running.
-      myObjectA1.deleteFromScene(runtimeScene);
+      myObjectA1.deleteFromScene();
 
       // Process the tasks (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -1315,8 +1315,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete other objects while the task is running.
-      myObjectA3.deleteFromScene(runtimeScene);
-      myObjectB1.deleteFromScene(runtimeScene);
+      myObjectA3.deleteFromScene();
+      myObjectB1.deleteFromScene();
 
       // Process the tasks again (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -1632,7 +1632,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete an object while the task is running.
-      myObjectA1.deleteFromScene(runtimeScene);
+      myObjectA1.deleteFromScene();
 
       // Process the tasks (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -1656,8 +1656,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
 
       // Delete other objects while the task is running.
-      myObjectA3.deleteFromScene(runtimeScene);
-      myObjectB1.deleteFromScene(runtimeScene);
+      myObjectA3.deleteFromScene();
+      myObjectB1.deleteFromScene();
 
       // Process the tasks again (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -2132,8 +2132,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const newMyObjectA = runtimeScene.getObjects('MyObjectA')[3];
 
       // Delete some objects while the second Wait task is running.
-      myObjectA1.deleteFromScene(runtimeScene);
-      myObjectB1.deleteFromScene(runtimeScene);
+      myObjectA1.deleteFromScene();
+      myObjectB1.deleteFromScene();
 
       // Process the tasks again (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -2285,9 +2285,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const newMyObjectA2 = runtimeScene.getObjects('MyObjectA')[4];
 
       // Delete some objects while the second Wait task is running.
-      myObjectA1.deleteFromScene(runtimeScene);
-      myObjectB1.deleteFromScene(runtimeScene);
-      newMyObjectA1.deleteFromScene(runtimeScene);
+      myObjectA1.deleteFromScene();
+      myObjectB1.deleteFromScene();
+      newMyObjectA1.deleteFromScene();
 
       // Process the tasks again (after faking it's finished).
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();

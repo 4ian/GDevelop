@@ -90,6 +90,14 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
+  onSceneObjectsDeleted(scene: gdLayout) {
+    // No thing to be done.
+  }
+
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   getExternalEvents(): ?gdExternalEvents {
     const { project, projectItemName } = this.props;
     if (!project || !projectItemName) return null;

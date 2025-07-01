@@ -55,7 +55,18 @@ export type RenderEditorContainerProps = {|
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
+  onOpenLayout: (
+    sceneName: string,
+    options?: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
   onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -131,6 +142,7 @@ export type RenderEditorContainerProps = {|
     i18n: I18nType,
     isQuickCustomization?: boolean
   ) => Promise<void>,
+  onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onOpenTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   onOpenTemplateFromCourseChapter: (
     CourseChapter,
@@ -151,6 +163,10 @@ export type RenderEditorContainerProps = {|
     scene: gdLayout,
     objectWithContext: ObjectWithContext
   ) => void,
+  onSceneObjectsDeleted: (scene: gdLayout) => void,
+
+  // Events editing
+  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (
@@ -166,7 +182,7 @@ export type RenderEditorContainerProps = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,

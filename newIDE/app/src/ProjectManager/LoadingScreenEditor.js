@@ -238,6 +238,7 @@ export const LoadingScreenEditor = ({
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Disable GDevelop splash at startup"
                 recommendedPlanIdIfNoSubscription="gdevelop_silver"
+                placementId="gdevelop-branding"
               >
                 <Text>
                   <Trans>
@@ -555,6 +556,7 @@ export const LoadingScreenEditor = ({
             mode="mandatory"
             id="Disable GDevelop splash at startup"
             title={<Trans>Disable GDevelop splash at startup</Trans>}
+            placementId="gdevelop-branding"
           />
         </ColumnStackLayout>
       )}

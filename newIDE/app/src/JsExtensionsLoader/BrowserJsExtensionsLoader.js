@@ -191,6 +191,16 @@ const jsExtensions = [
   },
 ];
 
+const getExpectedNumberOfJSExtensionModules = ({
+  filterExamples,
+}: {|
+  filterExamples: boolean,
+|}): number => {
+  return jsExtensions.filter(
+    ({ name }) => !filterExamples || !name.includes('Example')
+  ).length;
+};
+
 type MakeExtensionsLoaderArguments = {|
   objectsEditorService: typeof ObjectsEditorService,
   objectsRenderingService: typeof ObjectsRenderingService,
@@ -210,52 +220,57 @@ export default function makeExtensionsLoader({
   return {
     loadAllExtensions(
       _: TranslationFunction
-    ): Promise<
-      Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
-    > {
-      return Promise.resolve(
-        jsExtensions
-          .filter(({ name }) => !filterExamples || !name.includes('Example'))
-          .map(({ name, extensionModule, objectsRenderingServiceModules }) => {
-            if (
-              objectsEditorService &&
-              extensionModule.registerEditorConfigurations
-            ) {
-              extensionModule.registerEditorConfigurations(
-                objectsEditorService
-              );
-            }
+    ): Promise<{|
+      results: Array<{|
+        extensionModulePath: string,
+        result: ExtensionLoadingResult,
+      |}>,
+      expectedNumberOfJSExtensionModulesLoaded: number,
+    |}> {
+      const results = jsExtensions
+        .filter(({ name }) => !filterExamples || !name.includes('Example'))
+        .map(({ name, extensionModule, objectsRenderingServiceModules }) => {
+          if (
+            objectsEditorService &&
+            extensionModule.registerEditorConfigurations
+          ) {
+            extensionModule.registerEditorConfigurations(objectsEditorService);
+          }
 
-            if (objectsRenderingService) {
-              if (objectsRenderingServiceModules) {
-                for (const requirePath in objectsRenderingServiceModules) {
-                  objectsRenderingService.registerModule(
-                    requirePath,
-                    objectsRenderingServiceModules[requirePath]
-                  );
-                }
-              }
-              if (extensionModule.registerInstanceRenderers) {
-                extensionModule.registerInstanceRenderers(
-                  objectsRenderingService
+          if (objectsRenderingService) {
+            if (objectsRenderingServiceModules) {
+              for (const requirePath in objectsRenderingServiceModules) {
+                objectsRenderingService.registerModule(
+                  requirePath,
+                  objectsRenderingServiceModules[requirePath]
                 );
               }
-              if (extensionModule.registerClearCache) {
-                extensionModule.registerClearCache(objectsRenderingService);
-              }
             }
+            if (extensionModule.registerInstanceRenderers) {
+              extensionModule.registerInstanceRenderers(
+                objectsRenderingService
+              );
+            }
+            if (extensionModule.registerClearCache) {
+              extensionModule.registerClearCache(objectsRenderingService);
+            }
+          }
 
-            return {
-              extensionModulePath: 'internal-extension://' + name,
-              result: loadExtension(
-                _,
-                gd,
-                gd.JsPlatform.get(),
-                extensionModule
-              ),
-            };
-          })
+          return {
+            extensionModulePath: 'internal-extension://' + name,
+            result: loadExtension(_, gd, gd.JsPlatform.get(), extensionModule),
+          };
+        });
+      const expectedNumberOfJSExtensionModulesLoaded = getExpectedNumberOfJSExtensionModules(
+        {
+          filterExamples,
+        }
       );
+
+      return Promise.resolve({
+        results,
+        expectedNumberOfJSExtensionModulesLoaded,
+      });
     },
   };
 }

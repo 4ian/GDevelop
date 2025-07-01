@@ -26,6 +26,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -172,6 +173,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               slopeMaxAngle: 60,
               jumpSustainTime: 0.2,
               useLegacyTrajectory: false,
+              useRepeatedJump: false,
             },
           ],
           effects: [],
@@ -287,6 +289,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: true,
+            useRepeatedJump: true,
           },
         ],
         effects: [],
@@ -383,6 +386,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: true,
+            useRepeatedJump: true,
           },
         ],
         effects: [],
@@ -481,6 +485,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: true,
+            useRepeatedJump: true,
           },
         ],
         effects: [],
@@ -555,6 +560,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     let runtimeScene;
     let object;
     let platform;
+    /** @type {gdjs.PlatformerObjectRuntimeBehavior} */
+    let characterBehavior;
 
     beforeEach(function () {
       runtimeScene = makePlatformerTestRuntimeScene();
@@ -578,6 +585,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -585,6 +593,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
       object.setPosition(0, -32);
+      characterBehavior = object.getBehavior('auto1');
 
       // Put a platform.
       platform = addPlatformObject(runtimeScene);
@@ -642,6 +651,48 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
       }
       expect(object.getY()).to.be(-30);
+    });
+
+    it('can only jump once while the jump key is held', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(characterBehavior.isFalling()).to.be(false);
+      expect(characterBehavior.isFallingWithoutJumping()).to.be(false);
+      expect(characterBehavior.isMoving()).to.be(false);
+
+      // The character jumps a first time.
+      for (let i = 0; i < 80; ++i) {
+        characterBehavior.simulateJumpKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        characterBehavior.isJumping(true);
+      }
+      // The character lands back on the floor
+      // while the player holds the jump key.
+      for (let i = 0; i < 4; ++i) {
+        characterBehavior.simulateJumpKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      characterBehavior.isOnFloor(true);
+      expect(object.getY()).to.be(-30);
+
+      // The character doesn't jump a 2nd time.
+      characterBehavior.simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      characterBehavior.isOnFloor(true);
+
+      // The player release the jump key.
+      runtimeScene.renderAndStep(1000 / 60);
+      characterBehavior.isOnFloor(true);
+
+      // The character can now jump again.
+      characterBehavior.simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      characterBehavior.isJumping(true);
     });
 
     it('can jump, and only sustain the jump while key held', function () {
@@ -1126,6 +1177,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             canGoDownFromJumpthru: true,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -1467,6 +1519,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -1497,6 +1550,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
           {
             type: 'PlatformBehavior::PlatformBehavior',
@@ -1637,6 +1691,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -1758,6 +1813,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -1843,6 +1899,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],
@@ -1921,6 +1978,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
             useLegacyTrajectory: false,
+            useRepeatedJump: false,
           },
         ],
         effects: [],

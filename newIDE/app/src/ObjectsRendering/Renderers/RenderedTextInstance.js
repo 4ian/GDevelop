@@ -192,7 +192,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._styleFontDirty = false;
     }
 
-    if (this._instance.hasCustomSize()) {
+    if (this._instance.hasCustomSize() && this._pixiObject.width !== 0) {
       const alignmentX =
         this._textAlignment === 'right'
           ? 1

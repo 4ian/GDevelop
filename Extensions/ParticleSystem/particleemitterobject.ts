@@ -560,7 +560,7 @@ namespace gdjs {
         !this._isEmissionPaused &&
         this._renderer._mayHaveEndedEmission()
       ) {
-        this.deleteFromScene(instanceContainer);
+        this.deleteFromScene();
       }
       if (
         this.jumpForwardInTimeOnCreation > 0 &&

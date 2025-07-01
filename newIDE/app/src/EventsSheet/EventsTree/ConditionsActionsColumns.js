@@ -67,13 +67,15 @@ const ConditionsActionsColumns = (props: Props) => {
     );
   }
 
+  const conditionWidth =
+    getConditionWidthRatio(props.eventsSheetWidth) * props.eventsSheetWidth -
+    props.leftIndentWidth;
+
   return (
     <div style={styles.twoColumnsContainer} className={props.className}>
       {props.renderConditionsList({
         style: {
-          width: `${getConditionWidthRatio(props.eventsSheetWidth) *
-            props.eventsSheetWidth -
-            props.leftIndentWidth}px`,
+          width: `${conditionWidth}px`,
         },
         className: conditionsContainer,
       })}

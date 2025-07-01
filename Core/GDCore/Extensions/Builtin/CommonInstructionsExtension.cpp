@@ -59,36 +59,44 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   // end of compatibility code
 
   extension
-      .AddCondition("Or",
-                    _("Or"),
-                    _("Check if one of the sub conditions is true"),
-                    _("If one of these conditions is true:"),
-                    "",
-                    "res/conditions/or24_black.png",
-                    "res/conditions/or_black.png")
-      .SetCanHaveSubInstructions()
-      .MarkAsAdvanced();
-
-  extension
-      .AddCondition("And",
-                    _("And"),
-                    _("Check if all sub conditions are true"),
-                    _("If all of these conditions are true:"),
-                    "",
-                    "res/conditions/and24_black.png",
-                    "res/conditions/and_black.png")
+      .AddCondition(
+          "Or",
+          _("Or"),
+          _("Checks if at least one sub-condition is true. If no "
+            "sub-condition is specified, it will always be false. "
+            "This is rarely used — multiple events and sub-events are "
+            "usually a better approach."),
+          _("If one of these conditions is true:"),
+          "",
+          "res/conditions/or24_black.png",
+          "res/conditions/or_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
   extension
       .AddCondition(
-          "Not",
-          _("Not"),
-          _("Return the contrary of the result of the sub conditions"),
-          _("Invert the logical result of these conditions:"),
+          "And",
+          _("And"),
+          _("Checks if all sub-conditions are true. If no sub-condition is "
+            "specified, it will always be false. This is rarely needed, as "
+            "events already check all conditions before running actions."),
+          _("If all of these conditions are true:"),
           "",
-          "res/conditions/not24_black.png",
-          "res/conditions/not_black.png")
+          "res/conditions/and24_black.png",
+          "res/conditions/and_black.png")
+      .SetCanHaveSubInstructions()
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("Not",
+                    _("Not"),
+                    _("Returns the opposite of the sub-condition(s) result. "
+                      "This is rarely needed, as most conditions can be "
+                      "inverted or expressed more simply."),
+                    _("Invert the logical result of these conditions:"),
+                    "",
+                    "res/conditions/not24_black.png",
+                    "res/conditions/not_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 

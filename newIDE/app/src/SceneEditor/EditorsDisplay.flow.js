@@ -98,7 +98,7 @@ export type SceneEditorsDisplayProps = {|
     i18n: I18nType,
     objectOrGroupName: string
   ) => boolean,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,
@@ -173,9 +173,9 @@ export type SceneEditorsDisplayInterface = {|
       position: [number, number],
       copyReferential: [number, number],
       serializedInstances: Array<Object>,
-      preventSnapToGrid?: boolean,
       addInstancesInTheForeground?: boolean,
       doesObjectExistInContext: string => boolean,
     |}) => Array<gdInitialInstance>,
+    snapSelection: (instances: gdInitialInstance[]) => void,
   |},
 |};

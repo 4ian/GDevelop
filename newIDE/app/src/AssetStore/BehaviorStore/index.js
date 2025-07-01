@@ -1,7 +1,12 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import semverGreaterThan from 'semver/functions/gt';
 import SearchBar from '../../UI/SearchBar';
+import {
+  getBreakingChanges,
+  isCompatibleWithGDevelopVersion,
+} from '../../Utils/Extension/ExtensionCompatibilityChecker.js';
 import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
@@ -16,21 +21,38 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
-import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
+import { getIDEVersion } from '../../Version';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
-  return async (): Promise<boolean> => {
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
+  return async (
+    project: gdProject,
+    behaviorShortHeader: BehaviorShortHeader
+  ): Promise<boolean> => {
+    if (currentlyRunningInAppTutorial) {
+      return false;
+    }
     return await showConfirmation({
       title: t`Extension update`,
-      message: t`This behavior needs an extension update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
+      message:
+        behaviorShortHeader.tier === 'reviewed'
+          ? // Reviewed extensions are closely watched
+            // and any breaking change will be added to the extension metadata.
+            t`This behavior can be updated with new features and fixes.${'\n\n'}Do you want to update it now ?`
+          : // Community extensions are checked as much as possible
+            // but we can't ensure every breaking changes will be added to the extension metadata.
+            t`This behavior can be updated. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
       confirmButtonLabel: t`Update the extension`,
-      dismissButtonLabel: t`Cancel`,
+      dismissButtonLabel: t`Skip the update`,
     });
   };
 };
@@ -40,15 +62,14 @@ type Props = {|
   project: gdProject,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
-  installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
-  deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
+  installedBehaviorMetadataList: Array<BehaviorShortHeader>,
+  deprecatedBehaviorMetadataList: Array<BehaviorShortHeader>,
   onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
 |};
 
-const getBehaviorType = (
-  behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
-) => behaviorShortHeader.type;
+const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
+  behaviorShortHeader.type;
 
 export const BehaviorStore = ({
   isInstalling,
@@ -119,9 +140,7 @@ export const BehaviorStore = ({
   );
 
   const getExtensionsMatches = React.useCallback(
-    (
-      extensionShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
-    ): SearchMatch[] => {
+    (extensionShortHeader: BehaviorShortHeader): SearchMatch[] => {
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(
         result => result.item.type === extensionShortHeader.type
@@ -138,20 +157,60 @@ export const BehaviorStore = ({
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const installAndChoose = React.useCallback(
-    async (
-      behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
-    ) => {
+    async (behaviorShortHeader: BehaviorShortHeader) => {
+      if (behaviorShortHeader.tier === 'installed') {
+        // The extension is not in the repository.
+        // It's either built-in or user made.
+        // It can't be updated.
+        onChoose(behaviorShortHeader.type);
+        return;
+      }
       const isExtensionAlreadyInstalled =
         behaviorShortHeader.extensionName &&
         project.hasEventsFunctionsExtensionNamed(
           behaviorShortHeader.extensionName
         );
       if (isExtensionAlreadyInstalled) {
-        const shouldUpdateExtension = await showExtensionUpdateConfirmation();
+        const installedVersion = project
+          .getEventsFunctionsExtension(behaviorShortHeader.extensionName)
+          .getVersion();
+        // repository version <= installed version
+        if (!semverGreaterThan(behaviorShortHeader.version, installedVersion)) {
+          // The extension is already up to date.
+          onChoose(behaviorShortHeader.type);
+          return;
+        }
+        if (
+          !isCompatibleWithGDevelopVersion(
+            getIDEVersion(),
+            behaviorShortHeader.gdevelopVersion
+          )
+        ) {
+          // Don't suggest to update the extension if the editor can't understand it.
+          onChoose(behaviorShortHeader.type);
+          return;
+        }
+        const breakingChanges = getBreakingChanges(
+          installedVersion,
+          behaviorShortHeader
+        );
+        if (breakingChanges && breakingChanges.length > 0) {
+          // Don't suggest to update the extension if it would break the project.
+          onChoose(behaviorShortHeader.type);
+          return;
+        }
+        const shouldUpdateExtension = await showExtensionUpdateConfirmation(
+          project,
+          behaviorShortHeader
+        );
         if (!shouldUpdateExtension) {
+          onChoose(behaviorShortHeader.type);
           return;
         }
       }
+      // Behaviors from the store that are not compatible with the editor are
+      // greyed out in the list and can't be chosen by users.
+      // No need to check `isCompatibleWithGDevelopVersion`.
 
       if (behaviorShortHeader.url) {
         sendExtensionAddedToProject(behaviorShortHeader.name);

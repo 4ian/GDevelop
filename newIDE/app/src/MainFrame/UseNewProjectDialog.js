@@ -30,10 +30,7 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
-  createProjectFromAIGeneration: (
-    projectFileUrl: string,
-    newProjectSetup: NewProjectSetup
-  ) => Promise<void>,
+  openAskAi: () => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -44,7 +41,7 @@ const useNewProjectDialog = ({
   createEmptyProject,
   createProjectFromExample,
   createProjectFromPrivateGameTemplate,
-  createProjectFromAIGeneration,
+  openAskAi,
   storageProviders,
 }: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
@@ -179,6 +176,14 @@ const useNewProjectDialog = ({
     [onSelectExampleShortHeader, removeRouteArguments]
   );
 
+  const onOpenAskAi = React.useCallback(
+    () => {
+      closeNewProjectDialog();
+      openAskAi();
+    },
+    [closeNewProjectDialog, openAskAi]
+  );
+
   const renderNewProjectDialog = () => {
     return (
       <>
@@ -192,14 +197,7 @@ const useNewProjectDialog = ({
             onCreateProjectFromPrivateGameTemplate={
               createProjectFromPrivateGameTemplate
             }
-            onCreateFromAIGeneration={async (
-              generatedProject,
-              projectSetup
-            ) => {
-              const projectFileUrl = generatedProject.fileUrl;
-              if (!projectFileUrl) return;
-              await createProjectFromAIGeneration(projectFileUrl, projectSetup);
-            }}
+            onOpenAskAi={onOpenAskAi}
             storageProviders={storageProviders}
             selectedExampleShortHeader={selectedExampleShortHeader}
             onSelectExampleShortHeader={exampleShortHeader =>

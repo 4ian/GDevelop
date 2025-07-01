@@ -241,6 +241,7 @@ const EducationMarketingSection = ({
         analyticsMetadata: {
           reason: 'Callout in Classroom tab',
           recommendedPlanId: 'gdevelop_education',
+          placementId: 'education',
         },
       });
     },
@@ -313,6 +314,7 @@ const EducationMarketingSection = ({
                     tutorials={educationTutorials}
                     // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
                     onSelectTutorial={() => {}}
+                    onSelectCourse={() => {}}
                     // In this marketing view, users are not allowed to open tutorials so no need to specify this prop.
                     onOpenTemplateFromTutorial={async () => {}}
                     isLocked

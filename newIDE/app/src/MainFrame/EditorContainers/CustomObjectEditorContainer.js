@@ -106,6 +106,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
+  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+    // No thing to be done.
+  }
+
   saveUiSettings = () => {
     // const layout = this.getCustomObject();
     // const editor = this.editor;
@@ -237,7 +241,13 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           onObjectEdited={() =>
             this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
           }
+          onObjectsDeleted={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
           onObjectGroupEdited={() =>
+            this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
+          }
+          onObjectGroupsDeleted={() =>
             this.props.onEventsBasedObjectChildrenEdited(eventsBasedObject)
           }
           onEventsBasedObjectChildrenEdited={

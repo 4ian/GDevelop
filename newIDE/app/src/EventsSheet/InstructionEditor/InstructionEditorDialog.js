@@ -71,7 +71,7 @@ type Props = {|
   anchorEl?: any, // Unused
   canPasteInstructions: boolean, // Unused
   onPasteInstructions: () => void, // Unused
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const getInitialStepName = (isNewInstruction: boolean): StepName => {

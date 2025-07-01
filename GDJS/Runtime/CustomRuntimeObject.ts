@@ -14,6 +14,7 @@ namespace gdjs {
     animatable?: SpriteAnimationData[];
     variant: string;
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
+    isInnerAreaFollowingParentSize: boolean;
   };
 
   /**
@@ -105,8 +106,25 @@ namespace gdjs {
         return;
       }
 
-      let usedVariantData: EventsBasedObjectVariantData = eventsBasedObjectData;
-      if (customObjectData.variant) {
+      if (!eventsBasedObjectData.defaultVariant) {
+        eventsBasedObjectData.defaultVariant = {
+          ...eventsBasedObjectData,
+          name: '',
+        };
+      }
+      // Legacy events-based objects don't have any instance in their default
+      // variant since there wasn't a graphical editor at the time.
+      // In this case, the editor doesn't allow to choose a variant, but a
+      // variant may have stayed after a user rolled back the extension.
+      // This variant must be ignored to match what the editor shows.
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        eventsBasedObjectData.defaultVariant.instances.length == 0;
+      let usedVariantData: EventsBasedObjectVariantData =
+        eventsBasedObjectData.defaultVariant;
+      if (
+        customObjectData.variant &&
+        !isForcedToOverrideEventsBasedObjectChildrenConfiguration
+      ) {
         for (
           let variantIndex = 0;
           variantIndex < eventsBasedObjectData.variants.length;
@@ -147,10 +165,12 @@ namespace gdjs {
     override reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
-      this._initializeFromObjectData(objectData);
       this._reinitializeRenderer();
+      this._initializeFromObjectData(objectData);
 
-      // The generated code calls the onCreated super implementation at the end.
+      // When changing the variant, the instance is like a new instance.
+      // We call again `onCreated` at the end, like done by the constructor
+      // the first time it's created.
       this.onCreated();
     }
 
@@ -164,6 +184,34 @@ namespace gdjs {
           oldObjectData.animatable || [],
           newObjectData.animatable || []
         );
+      }
+      if (oldObjectData.variant !== newObjectData.variant) {
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const hasInnerAreaChanged =
+          oldObjectData.isInnerAreaFollowingParentSize &&
+          this._instanceContainer._initialInnerArea &&
+          this._innerArea &&
+          (this._instanceContainer._initialInnerArea.min[0] !==
+            this._innerArea.min[0] ||
+            this._instanceContainer._initialInnerArea.min[1] !==
+              this._innerArea.min[1] ||
+            this._instanceContainer._initialInnerArea.max[0] !==
+              this._innerArea.max[0] ||
+            this._instanceContainer._initialInnerArea.max[1] !==
+              this._innerArea.max[1]);
+
+        this._reinitializeRenderer();
+        this._initializeFromObjectData(newObjectData);
+
+        // The generated code calls the onCreated super implementation at the end.
+        this.onCreated();
+
+        // Keep the custom size
+        if (hasInnerAreaChanged) {
+          this.setWidth(width);
+          this.setHeight(height);
+        }
       }
       return true;
     }
@@ -199,13 +247,13 @@ namespace gdjs {
       }
     }
 
-    override onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    override onDeletedFromScene(): void {
       // Let subclasses do something before the object is destroyed.
-      this.onDestroy(parent);
+      this.onDestroy(this._runtimeScene);
       // Let behaviors do something before the object is destroyed.
-      super.onDeletedFromScene(parent);
+      super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(parent);
+      this._instanceContainer.onDestroyFromScene(this._runtimeScene);
     }
 
     override update(parent: gdjs.RuntimeInstanceContainer): void {

@@ -1,6 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import TextField from '../UI/TextField';
 import RaisedButton from '../UI/RaisedButton';
@@ -26,6 +25,8 @@ import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import SceneVariable from '../UI/CustomSvgIcons/SceneVariable';
+import SelectOption from '../UI/SelectOption';
+import SelectField from '../UI/SelectField';
 
 const gd: libGDevelop = global.gd;
 
@@ -58,10 +59,12 @@ const ScenePropertiesDialog = ({
     setShouldStopSoundsOnStartup,
   ] = React.useState<boolean>(layout.stopSoundsOnStartup());
 
-  const [
-    shouldUnloadAssetsAfterExit,
-    setShouldUnloadAssetsAfterExit,
-  ] = React.useState<boolean>(layout.shouldUnloadAssetsWhenUnloaded());
+  const [resourcesPreloading, setResourcesPreloading] = React.useState<string>(
+    layout.getResourcesPreloading()
+  );
+  const [resourcesUnloading, setResourcesUnloading] = React.useState<string>(
+    layout.getResourcesUnloading()
+  );
 
   const [backgroundColor, setBackgroundColor] = React.useState<?RGBColor>({
     r: layout.getBackgroundColorRed(),
@@ -75,7 +78,8 @@ const ScenePropertiesDialog = ({
       if (open && layout) {
         setWindowTitle(layout.getWindowDefaultTitle());
         setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
-        setShouldUnloadAssetsAfterExit(layout.shouldUnloadAssetsWhenUnloaded());
+        setResourcesPreloading(layout.getResourcesPreloading());
+        setResourcesUnloading(layout.getResourcesUnloading());
         setBackgroundColor({
           r: layout.getBackgroundColorRed(),
           g: layout.getBackgroundColorGreen(),
@@ -89,8 +93,8 @@ const ScenePropertiesDialog = ({
 
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
-    layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
-    layout.setShouldUnloadAssetsWhenUnloaded(shouldUnloadAssetsAfterExit);
+    layout.setResourcesPreloading(resourcesPreloading);
+    layout.setResourcesUnloading(resourcesUnloading);
     layout.setBackgroundColor(
       backgroundColor ? backgroundColor.r : 0,
       backgroundColor ? backgroundColor.g : 0,
@@ -250,11 +254,29 @@ const ScenePropertiesDialog = ({
           }
           onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
         />
-        <Checkbox
-          checked={shouldUnloadAssetsAfterExit}
-          label={<Trans>Unload assets after the exit scene</Trans>}
-          onCheck={(e, check) => setShouldUnloadAssetsAfterExit(check)}
-        />
+        <SelectField
+          floatingLabelText={<Trans>Resources preloading</Trans>}
+          fullWidth
+          value={resourcesPreloading}
+          onChange={e => setResourcesPreloading(e.target.value)}
+        >
+          <SelectOption value="inherit" label={t`Use the project setting`} />
+          <SelectOption
+            value="at-startup"
+            label={t`Always preload at startup`}
+          />
+          <SelectOption value="never" label={t`Never preload`} />
+        </SelectField>
+        <SelectField
+          floatingLabelText={<Trans>Resources unloading</Trans>}
+          fullWidth
+          value={resourcesUnloading}
+          onChange={e => setResourcesUnloading(e.target.value)}
+        >
+          <SelectOption value="inherit" label={t`Use the project setting`} />
+          <SelectOption value="at-scene-exit" label={t`Unload at scene exit`} />
+          <SelectOption value="never" label={t`Never unload`} />
+        </SelectField>
         <ColorField
           floatingLabelText={<Trans>Scene background color</Trans>}
           fullWidth

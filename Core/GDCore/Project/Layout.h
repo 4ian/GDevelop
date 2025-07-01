@@ -351,16 +351,34 @@ class GD_CORE_API Layout {
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
 
   /**
-   * Set if the scene must unload all assets after exit scene 
+   * Set when the scene must preload its resources: `at-startup`, `never` or
+   * `inherit` (default).
    */
-  void SetShouldUnloadAssetsWhenUnloaded(bool enable = false) {
-    shouldUnloadAssetsWhenUnloaded = enable;
+  void SetResourcesPreloading(gd::String resourcesPreloading_) {
+    resourcesPreloading = resourcesPreloading_;
   }
 
   /**
-   * Return true if the scene must unload all assets after the exit scene
+   * Get when the scene must preload its resources: `at-startup`, `never` or
+   * `inherit` (default).
    */
-  bool ShouldUnloadAssetsWhenUnloaded() const { return shouldUnloadAssetsWhenUnloaded; }
+  const gd::String& GetResourcesPreloading() const {
+    return resourcesPreloading;
+  }
+
+  /**
+   * Set when the scene must unload its resources: `at-scene-exit`, `never` or
+   * `inherit` (default).
+   */
+  void SetResourcesUnloading(gd::String resourcesUnloading_) {
+    resourcesUnloading = resourcesUnloading_;
+  }
+
+  /**
+   * Get when the scene must unload its resources: `at-scene-exit`, `never` or
+   * `inherit` (default).
+   */
+  const gd::String& GetResourcesUnloading() const { return resourcesUnloading; }
   ///@}
 
   /** \name Saving and loading
@@ -393,7 +411,10 @@ class GD_CORE_API Layout {
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup = true;  ///< True to make the scene stop all sounds at
                                     ///< startup.
-  bool shouldUnloadAssetsWhenUnloaded = false; ///< True to unload scene assets after exit scene
+  gd::String
+      resourcesPreloading;  ///< `at-startup`, `never` or `inherit` (default).
+  gd::String
+      resourcesUnloading;  ///< `at-scene-exit`, `never` or `inherit` (default).
   bool standardSortMethod = true;   ///< True to sort objects using standard sort.
   bool disableInputWhenNotFocused = true;  /// If set to true, the input must be
                                            /// disabled when the window do not have the

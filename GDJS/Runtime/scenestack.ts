@@ -12,7 +12,6 @@ namespace gdjs {
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
     _wasDisposed: boolean = false;
-    _scenesWithUnloadedAssets: Set<string>;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -22,7 +21,6 @@ namespace gdjs {
         throw 'SceneStack must be constructed with a gdjs.RuntimeGame.';
       }
       this._runtimeGame = runtimeGame;
-      this._scenesWithUnloadedAssets = new Set<string>();
     }
 
     /**
@@ -69,8 +67,6 @@ namespace gdjs {
           request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
           request === gdjs.SceneChangeRequest.CLEAR_SCENES
         ) {
-          currentScene.getUnloadAssetsOnSceneExit() &&
-            this._scenesWithUnloadedAssets.add(currentScene.getName());
           this.replace(
             currentScene.getRequestedScene(),
             request === gdjs.SceneChangeRequest.CLEAR_SCENES
@@ -405,8 +401,16 @@ namespace gdjs {
       newSceneName: string | null;
     }): void {
       const unloadedSceneName = scene.getName();
-      const shouldUnloadAssets =
-        scene.getUnloadAssetsOnSceneExit() &&
+
+      const resourcesUnloading = scene.getResourcesUnloading();
+      const resolvedResourcesUnloading =
+        resourcesUnloading === 'inherit'
+          ? this._runtimeGame.getSceneResourcesUnloading()
+          : resourcesUnloading;
+
+      const shouldUnloadResources =
+        resolvedResourcesUnloading === 'at-scene-exit' &&
+        // Unload resources only if it's the last scene with this name in the stack.
         newSceneName !== scene.getName() &&
         this._stack.every((scene) => scene.getName() !== unloadedSceneName);
 
@@ -414,7 +418,7 @@ namespace gdjs {
       // After this point, `scene` is no longer valid and should not be used anymore.
       // It was "disposed".
 
-      if (shouldUnloadAssets) {
+      if (shouldUnloadResources) {
         this._runtimeGame.getResourceLoader().unloadSceneResources({
           unloadedSceneName,
           newSceneName,

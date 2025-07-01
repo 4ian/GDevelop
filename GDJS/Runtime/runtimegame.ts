@@ -184,6 +184,9 @@ namespace gdjs {
      */
     _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
+    _sceneResourcesPreloading: 'at-startup' | 'never';
+    _sceneResourcesUnloading: 'at-scene-exit' | 'never';
+
     /**
      * Optional client to connect to a debugger server.
      */
@@ -223,6 +226,11 @@ namespace gdjs {
       this._data = data;
       this._updateSceneAndExtensionsData();
 
+      this._sceneResourcesPreloading =
+        this._data.properties.sceneResourcesPreloading || 'at-startup';
+      this._sceneResourcesUnloading =
+        this._data.properties.sceneResourcesUnloading || 'never';
+
       this._resourcesLoader = new gdjs.ResourceLoader(
         this,
         data.resources.resources,
@@ -245,6 +253,7 @@ namespace gdjs {
       this._antialiasingMode = this._data.properties.antialiasingMode;
       this._isAntialisingEnabledOnMobile =
         this._data.properties.antialisingEnabledOnMobile;
+
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -773,6 +782,22 @@ namespace gdjs {
     }
 
     /**
+     * Returns the scene resources preloading mode.
+     * It can be overriden by each scene.
+     */
+    getSceneResourcesPreloading(): 'at-startup' | 'never' {
+      return this._sceneResourcesPreloading;
+    }
+
+    /**
+     * Returns the scene resources unloading mode.
+     * It can be overriden by each scene.
+     */
+    getSceneResourcesUnloading(): 'at-scene-exit' | 'never' {
+      return this._sceneResourcesUnloading;
+    }
+
+    /**
      * Load all assets needed to display the 1st scene, displaying progress in
      * renderer.
      */
@@ -843,7 +868,6 @@ namespace gdjs {
       sceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
-      console.log('loadSceneAssets', sceneName);
       await this._loadAssetsWithLoadingScreen(
         /* isFirstLayout = */ false,
         async (onProgress) => {

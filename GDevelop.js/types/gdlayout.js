@@ -32,8 +32,10 @@ declare class gdLayout {
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   setStopSoundsOnStartup(enable: boolean): void;
   stopSoundsOnStartup(): boolean;
-  setShouldUnloadAssetsWhenUnloaded(enable: boolean): void;
-  shouldUnloadAssetsWhenUnloaded(): boolean;
+  setResourcesPreloading(resourcesPreloading: string): void;
+  getResourcesPreloading(): string;
+  setResourcesUnloading(resourcesUnloading: string): void;
+  getResourcesUnloading(): string;
   delete(): void;
   ptr: number;
 };

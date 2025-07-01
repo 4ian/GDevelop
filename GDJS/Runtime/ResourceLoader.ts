@@ -236,7 +236,16 @@ namespace gdjs {
       this._sceneToLoadQueue.length = 0;
       for (let index = layoutDataArray.length - 1; index >= 0; index--) {
         const layoutData = layoutDataArray[index];
-        this._sceneToLoadQueue.push(new SceneLoadingTask(layoutData.name));
+
+        const resourcesPreloading = layoutData.resourcesPreloading || 'inherit';
+        const resolvedResourcesPreloading =
+          resourcesPreloading === 'inherit'
+            ? this._runtimeGame.getSceneResourcesPreloading()
+            : resourcesPreloading;
+
+        if (resolvedResourcesPreloading === 'at-startup') {
+          this._sceneToLoadQueue.push(new SceneLoadingTask(layoutData.name));
+        }
       }
 
       this._resources.clear();
@@ -327,7 +336,7 @@ namespace gdjs {
       debugLogger.log('Loading all scene resources, in background.');
       while (this._sceneToLoadQueue.length > 0) {
         debugLogger.log(
-          `Still resources of ${this._sceneToLoadQueue.length} scenes to load: ${this._sceneToLoadQueue.map((task) => task.sceneName).join(', ')}`
+          `Still resources of ${this._sceneToLoadQueue.length} scene(s) to load: ${this._sceneToLoadQueue.map((task) => task.sceneName).join(', ')}`
         );
         const task = this._sceneToLoadQueue[this._sceneToLoadQueue.length - 1];
         if (task === undefined) {
@@ -335,10 +344,15 @@ namespace gdjs {
         }
         this.currentLoadingSceneName = task.sceneName;
         if (!this.areSceneAssetsLoaded(task.sceneName)) {
-          debugLogger.log(`Loading resources for scene ${task.sceneName}.`);
+          debugLogger.log(
+            `Loading (but not processing) resources for scene ${task.sceneName}.`
+          );
           await this._doLoadSceneResources(
             task.sceneName,
             async (count, total) => task.onProgress(count, total)
+          );
+          debugLogger.log(
+            `Done loading (but not processing) resources for scene ${task.sceneName}.`
           );
 
           // A scene may have been moved last while awaiting resources to be
@@ -388,9 +402,6 @@ namespace gdjs {
           onProgress &&
             (await onProgress(loadedCount, sceneState.resourceNames.length));
         }
-      );
-      debugLogger.log(
-        `Loading (but not processing) of resources for scene ${sceneName} finished. ${loadedCount} resources loaded.`
       );
       sceneState.status = 'ready';
     }
@@ -526,6 +537,10 @@ namespace gdjs {
           resourceManager.unloadResourcesList(resources);
         }
       }
+
+      debugLogger.log(
+        `Unloading of resources for scene ${unloadedSceneName} finished.`
+      );
 
       const sceneState = this._sceneLoadingStates.get(unloadedSceneName);
       if (sceneState) {

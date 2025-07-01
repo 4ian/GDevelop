@@ -423,6 +423,8 @@ type Props = {|
   onOpenHomePage: () => void,
   toggleProjectManager: () => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onSceneAdded: () => void,
+  onExternalLayoutAdded: () => void,
 
   // Main menu
   mainMenuCallbacks: MainMenuCallbacks,
@@ -466,6 +468,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       mainMenuCallbacks,
       buildMainMenuProps,
       onExtensionInstalled,
+      onSceneAdded,
+      onExternalLayoutAdded,
     },
     ref
   ) => {
@@ -646,6 +650,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         newScene.updateBehaviorsSharedData(project);
         addDefaultLightToAllLayers(newScene);
 
+        onSceneAdded();
+
         onProjectItemModified();
 
         const sceneItemId = getSceneTreeViewItemId(newScene);
@@ -663,7 +669,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // We focus it so the user can edit the name directly.
         editName(sceneItemId);
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [project, onProjectItemModified, editName, scrollToItem, onSceneAdded]
     );
 
     const onCreateNewExtension = React.useCallback(
@@ -780,6 +786,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           newName,
           index + 1
         );
+
+        onExternalLayoutAdded();
+
         onProjectItemModified();
 
         const externalLayoutItemId = getExternalLayoutTreeViewItemId(
@@ -802,7 +811,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         // We focus it so the user can edit the name directly.
         editName(externalLayoutItemId);
       },
-      [project, onProjectItemModified, editName, scrollToItem]
+      [
+        project,
+        onProjectItemModified,
+        editName,
+        scrollToItem,
+        onExternalLayoutAdded,
+      ]
     );
 
     const onTreeModified = React.useCallback(

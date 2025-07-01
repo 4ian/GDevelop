@@ -8,7 +8,7 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
@@ -81,25 +81,8 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    const { editorId, project } = this.props;
-    if (!project) {
-      return;
-    }
-    this.props.setPreviewedLayout({
-      layoutName: project.getFirstLayout(),
-      externalLayoutName: null,
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
-    });
-
     if (gameEditorMode === 'embedded-game') {
-      switchToSceneEdition({
-        editorId,
-        sceneName: project.getFirstLayout(),
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-        hotReload: true,
+      setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });
     }

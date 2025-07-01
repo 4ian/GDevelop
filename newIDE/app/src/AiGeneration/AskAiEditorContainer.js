@@ -48,7 +48,7 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { switchToSceneEdition } from '../EmbeddedGame/EmbeddedGameFrame';
+import { setEditorHotReloadNeeded } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -452,7 +452,6 @@ const styles = {
 type Props = {|
   isActive: boolean,
   project: gdProject | null,
-  editorId: string,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
   storageProvider: ?StorageProvider,
@@ -479,12 +478,6 @@ type Props = {|
   ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  setPreviewedLayout: ({|
-    layoutName: string | null,
-    externalLayoutName: string | null,
-    eventsBasedObjectType: string | null,
-    eventsBasedObjectVariantName: string | null,
-  |}) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -525,8 +518,6 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
-        setPreviewedLayout,
-        editorId,
       }: Props,
       ref
     ) => {
@@ -603,29 +594,13 @@ export const AskAiEditor = React.memo<Props>(
 
       const forceInGameEditorHotReload = React.useCallback(
         ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
-          if (!project) {
-            return;
-          }
-          setPreviewedLayout({
-            layoutName: project.getFirstLayout(),
-            externalLayoutName: null,
-            eventsBasedObjectType: null,
-            eventsBasedObjectVariantName: null,
-          });
-
           if (gameEditorMode === 'embedded-game') {
-            switchToSceneEdition({
-              editorId,
-              sceneName: project.getFirstLayout(),
-              externalLayoutName: null,
-              eventsBasedObjectType: null,
-              eventsBasedObjectVariantName: null,
-              hotReload: true,
+            setEditorHotReloadNeeded({
               projectDataOnlyExport,
             });
           }
         },
-        [editorId, project, setPreviewedLayout]
+        []
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -1104,7 +1079,6 @@ export const renderAskAiEditorContainer = (
         ref={props.ref}
         i18n={i18n}
         project={props.project || null}
-        editorId={props.editorId}
         resourceManagementProps={props.resourceManagementProps}
         fileMetadata={props.fileMetadata}
         storageProvider={props.storageProvider}
@@ -1117,7 +1091,6 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
-        setPreviewedLayout={props.setPreviewedLayout}
       />
     )}
   </I18n>

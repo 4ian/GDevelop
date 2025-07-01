@@ -44,7 +44,7 @@ import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
-import { switchToSceneEdition } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { setEditorHotReloadNeeded } from '../../../EmbeddedGame/EmbeddedGameFrame';
 
 const noop = () => {};
 
@@ -108,7 +108,6 @@ const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 type Props = {|
   project: ?gdProject,
-  editorId: string,
   fileMetadata: ?FileMetadata,
 
   isActive: boolean,
@@ -117,12 +116,6 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
   storageProviders: Array<StorageProvider>,
-  setPreviewedLayout: ({|
-    layoutName: string | null,
-    externalLayoutName: string | null,
-    eventsBasedObjectType: string | null,
-    eventsBasedObjectVariantName: string | null,
-  |}) => void,
 
   // Games
   gamesList: GamesList,
@@ -222,8 +215,6 @@ export const HomePage = React.memo<Props>(
         gamesList,
         gamesPlatformFrameTools,
         onExtensionInstalled,
-        setPreviewedLayout,
-        editorId,
       }: Props,
       ref
     ) => {
@@ -486,29 +477,13 @@ export const HomePage = React.memo<Props>(
 
       const forceInGameEditorHotReload = React.useCallback(
         ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
-          if (!project) {
-            return;
-          }
-          setPreviewedLayout({
-            layoutName: project.getFirstLayout(),
-            externalLayoutName: null,
-            eventsBasedObjectType: null,
-            eventsBasedObjectVariantName: null,
-          });
-
           if (gameEditorMode === 'embedded-game') {
-            switchToSceneEdition({
-              editorId,
-              sceneName: project.getFirstLayout(),
-              externalLayoutName: null,
-              eventsBasedObjectType: null,
-              eventsBasedObjectVariantName: null,
-              hotReload: true,
+            setEditorHotReloadNeeded({
               projectDataOnlyExport,
             });
           }
         },
-        [editorId, project, setPreviewedLayout]
+        []
       );
 
       React.useImperativeHandle(ref, () => ({
@@ -720,7 +695,6 @@ export const renderHomePageContainer = (
   <HomePage
     ref={props.ref}
     project={props.project}
-    editorId={props.editorId}
     fileMetadata={props.fileMetadata}
     isActive={props.isActive}
     projectItemName={props.projectItemName}
@@ -757,6 +731,5 @@ export const renderHomePageContainer = (
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
     onExtensionInstalled={props.onExtensionInstalled}
-    setPreviewedLayout={props.setPreviewedLayout}
   />
 );

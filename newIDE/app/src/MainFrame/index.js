@@ -1471,14 +1471,41 @@ const MainFrame = (props: Props) => {
         hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
     }
     if (hasEventsBasedObject) {
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: false,
+      });
+    }
+  };
+
+  const hotReloadInGameEditorIfNeeded = React.useCallback(
+    ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
       const { editorRef } = getCurrentTab(state.editorTabs);
       if (editorRef) {
         editorRef.forceInGameEditorHotReload({
-          projectDataOnlyExport: false,
+          projectDataOnlyExport,
         });
       }
-    }
-  };
+    },
+    [state.editorTabs]
+  );
+
+  const onSceneAdded = React.useCallback(
+    () => {
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
+  const onExternalLayoutAdded = React.useCallback(
+    () => {
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
 
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
@@ -1510,8 +1537,12 @@ const MainFrame = (props: Props) => {
       if (inAppTutorialOrchestratorRef.current) {
         inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
       }
-      if (shouldChangeProjectFirstLayout)
+      if (shouldChangeProjectFirstLayout) {
         currentProject.setFirstLayout(uniqueNewName);
+      }
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+      });
       _onProjectItemModified();
     });
   };
@@ -1542,6 +1573,9 @@ const MainFrame = (props: Props) => {
         oldName,
         uniqueNewName
       );
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+      });
       _onProjectItemModified();
     });
   };
@@ -2435,13 +2469,11 @@ const MainFrame = (props: Props) => {
 
   const onEventBasedObjectTypeChanged = React.useCallback(
     () => {
-      console.log('onEventBasedObjectTypeChanged');
-      const { editorRef } = getCurrentTab(state.editorTabs);
-      if (editorRef) {
-        editorRef.forceInGameEditorHotReload({ projectDataOnlyExport: false });
-      }
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: false,
+      });
     },
-    [state.editorTabs]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const onExtractAsEventBasedObject = (
@@ -2543,12 +2575,11 @@ const MainFrame = (props: Props) => {
   // already loaded resources.
   const onResourceUsageChanged = React.useCallback(
     () => {
-      const { editorRef } = getCurrentTab(state.editorTabs);
-      if (editorRef) {
-        editorRef.forceInGameEditorHotReload({ projectDataOnlyExport: true });
-      }
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+      });
     },
-    [state.editorTabs]
+    [hotReloadInGameEditorIfNeeded]
   );
 
   const _onProjectItemModified = () => {
@@ -4051,6 +4082,8 @@ const MainFrame = (props: Props) => {
             );
           }}
           onExtensionInstalled={onExtensionInstalled}
+          onSceneAdded={onSceneAdded}
+          onExternalLayoutAdded={onExternalLayoutAdded}
           onShareProject={() => openShareDialog()}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}

@@ -90,7 +90,6 @@ const WrappedHomePage = ({
             <TutorialStateProvider>
               <HomePage
                 project={project}
-                editorId={'Home'}
                 fileMetadata={null}
                 isActive={true}
                 projectItemName={null}
@@ -148,7 +147,6 @@ const WrappedHomePage = ({
                   renderGamesPlatformFrame: () => null,
                 }}
                 onExtensionInstalled={action('onExtensionInstalled')}
-                setPreviewedLayout={action('setPreviewedLayout')}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

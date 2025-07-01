@@ -413,6 +413,7 @@ namespace gdjs {
       // The 3D scene is rebuilt and the inner area marker is lost in the process.
       this._threeInnerArea = null;
       this._innerArea = null;
+      this._selectedLayerName = '';
     }
 
     _getEditedInstanceContainer(): gdjs.RuntimeInstanceContainer | null {

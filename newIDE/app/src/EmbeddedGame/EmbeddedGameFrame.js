@@ -22,6 +22,9 @@ type SwitchToSceneEditionOptions = {|
 
 let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
+let onSetEditorHotReloadNeeded:
+  | null
+  | (({| projectDataOnlyExport: boolean |}) => void) = null;
 
 export const attachToPreview = ({
   previewIndexHtmlLocation,
@@ -52,6 +55,18 @@ export const switchToSceneEdition = ({
   });
 };
 
+export const setEditorHotReloadNeeded = ({
+  projectDataOnlyExport,
+}: {|
+  projectDataOnlyExport: boolean,
+|}) => {
+  if (!onSetEditorHotReloadNeeded)
+    throw new Error('No EmbeddedGameFrame registered.');
+  onSetEditorHotReloadNeeded({
+    projectDataOnlyExport,
+  });
+};
+
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   onLaunchPreviewForInGameEdition: ({|
@@ -76,6 +91,7 @@ export const EmbeddedGameFrame = ({
     setPreviewIndexHtmlLocation,
   ] = React.useState<string>('');
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
+  const neededHotReload = React.useRef<'None' | 'Data' | 'Full'>('None');
 
   React.useEffect(
     () => {
@@ -84,6 +100,19 @@ export const EmbeddedGameFrame = ({
         setPreviewIndexHtmlLocation(options.previewIndexHtmlLocation);
         if (iframeRef.current) {
           iframeRef.current.contentWindow.focus();
+        }
+      };
+      onSetEditorHotReloadNeeded = ({
+        projectDataOnlyExport,
+      }: {|
+        projectDataOnlyExport: boolean,
+      |}) => {
+        if (projectDataOnlyExport) {
+          if (neededHotReload.current === 'None') {
+            neededHotReload.current = 'Data';
+          }
+        } else {
+          neededHotReload.current = 'Full';
         }
       };
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
@@ -99,7 +128,11 @@ export const EmbeddedGameFrame = ({
           projectDataOnlyExport,
         } = options;
 
-        if (!previewIndexHtmlLocation || hotReload) {
+        const shouldHotReload = hotReload || neededHotReload.current !== 'None';
+        const shouldOnlyExportProjectData =
+          projectDataOnlyExport && neededHotReload.current !== 'Full';
+
+        if (!previewIndexHtmlLocation || shouldHotReload) {
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
@@ -117,8 +150,9 @@ export const EmbeddedGameFrame = ({
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
             hotReload,
-            projectDataOnlyExport,
+            projectDataOnlyExport: shouldOnlyExportProjectData,
           });
+          neededHotReload.current = 'None';
         } else {
           console.info(
             eventsBasedObjectType

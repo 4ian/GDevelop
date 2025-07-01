@@ -6,7 +6,7 @@ import {
 } from './BaseEditor';
 import ResourcesEditor from '../../ResourcesEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
@@ -53,25 +53,8 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    const { editorId, project } = this.props;
-    if (!project) {
-      return;
-    }
-    this.props.setPreviewedLayout({
-      layoutName: project.getFirstLayout(),
-      externalLayoutName: null,
-      eventsBasedObjectType: null,
-      eventsBasedObjectVariantName: null,
-    });
-
     if (gameEditorMode === 'embedded-game') {
-      switchToSceneEdition({
-        editorId,
-        sceneName: project.getFirstLayout(),
-        externalLayoutName: null,
-        eventsBasedObjectType: null,
-        eventsBasedObjectVariantName: null,
-        hotReload: true,
+      setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });
     }

@@ -329,7 +329,10 @@ app.on('ready', function() {
 
   onLocalGDJSDevelopmentWatcherRuntimeUpdated(() => {
     log.info('Notifying the editor that the GDJS runtime has been updated.');
-    mainWindow.webContents.send('local-gdjs-development-watcher-runtime-updated', null);
+    mainWindow.webContents.send(
+      'local-gdjs-development-watcher-runtime-updated',
+      null
+    );
   });
 
   // DebuggerServer events:

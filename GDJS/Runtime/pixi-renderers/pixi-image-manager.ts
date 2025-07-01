@@ -3,6 +3,7 @@
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+let lavaMaterial: THREE.ShaderMaterial;
 namespace gdjs {
   const logger = new gdjs.Logger('PIXI Image manager');
 
@@ -234,29 +235,96 @@ namespace gdjs {
         vertexColors: boolean;
       }
     ): THREE.Material {
-      const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
-        forceBasicMaterial ? 1 : 0
-      }|${vertexColors ? 1 : 0}`;
+      // const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
+      //   forceBasicMaterial ? 1 : 0
+      // }`;
 
-      const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
-      if (loadedThreeMaterial) return loadedThreeMaterial;
+      // const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
+      // if (loadedThreeMaterial) return loadedThreeMaterial;
 
-      const material = forceBasicMaterial
-        ? new THREE.MeshBasicMaterial({
-            map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
-            vertexColors,
-          })
-        : new THREE.MeshStandardMaterial({
-            map: this.getThreeTexture(resourceName),
-            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: useTransparentTexture,
-            metalness: 0,
-            vertexColors,
-          });
-      this._loadedThreeMaterials.put(cacheKey, material);
-      return material;
+      // const material = forceBasicMaterial
+      //   ? new THREE.MeshBasicMaterial({
+      //       map: this.getThreeTexture(resourceName),
+      //       side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      //       transparent: useTransparentTexture,
+      //       vertexColors: true,
+      //     })
+      //   : new THREE.MeshStandardMaterial({
+      //       map: this.getThreeTexture(resourceName),
+      //       side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      //       transparent: useTransparentTexture,
+      //       metalness: 0,
+      //       vertexColors: true,
+      //     });
+      //     this._loadedThreeMaterials.put(cacheKey, material);
+      let tex1 = new THREE.TextureLoader().load(
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/cloudLava.png'
+      );
+      tex1.wrapS = THREE.RepeatWrapping;
+      tex1.wrapT = THREE.RepeatWrapping;
+      let text2 = new THREE.TextureLoader().load(
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/GDJS/Runtime/pixi-renderers/tileLava.jpg'
+      );
+      text2.wrapS = THREE.RepeatWrapping;
+      text2.wrapT = THREE.RepeatWrapping;
+      lavaMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: time },
+          fogDensity: { value: 0.001 },
+          fogColor: { value: new THREE.Vector3(0.1, 0.1, 0.1) },
+          texture1: { value: tex1 },
+          texture2: { value: text2 },
+          uvScale: { value: new THREE.Vector2(1, 1) },
+        },
+        vertexShader: `uniform vec2 uvScale;
+        varying vec2 vUv;
+    
+        void main()
+        {
+          vUv = uvScale * uv;
+          vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+          gl_Position = projectionMatrix * mvPosition;
+        }`,
+        fragmentShader: `uniform float time;
+        uniform float fogDensity;
+        uniform vec3 fogColor;
+        uniform sampler2D texture1;
+        uniform sampler2D texture2;
+    
+        varying vec2 vUv;
+    
+        void main( void ) {
+          vec2 position = -1.0 + 2.0 * vUv;
+    
+          vec4 noise = texture2D( texture1, vUv );
+          vec2 T1 = vUv + vec2( 1.5, - 1.5 ) * time * 0.02;
+          vec2 T2 = vUv + vec2( - 0.5, 2.0 ) * time * 0.01;
+    
+          T1.x += noise.x * 2.0;
+          T1.y += noise.y * 2.0;
+          T2.x -= noise.y * 0.2;
+          T2.y += noise.z * 0.2;
+    
+          float p = texture2D( texture1, T1 * 2.0 ).a;
+    
+          vec4 color = texture2D( texture2, T2 * 2.0 );
+          vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
+    
+          if( temp.r > 1.0 ) { temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+          if( temp.g > 1.0 ) { temp.rb += temp.g - 1.0; }
+          if( temp.b > 1.0 ) { temp.rg += temp.b - 1.0; }
+    
+          gl_FragColor = temp;
+    
+          float depth = gl_FragCoord.z / gl_FragCoord.w;
+          const float LOG2 = 1.442695;
+          float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
+          fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+    
+          gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+        }`,
+      });
+      return lavaMaterial;
     }
 
     /**

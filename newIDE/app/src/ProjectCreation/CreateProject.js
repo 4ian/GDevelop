@@ -39,6 +39,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setStringParameter('top', 'Z+');
   directionalLight.setDoubleParameter('elevation', 45);
   directionalLight.setDoubleParameter('rotation', 0);
+  directionalLight.setBooleanParameter('isCastingShadow', true);
 
   const ambientLight = layer.getEffects().insertNewEffect('3D Light', 0);
   ambientLight.setEffectType('Scene3D::AmbientLight');

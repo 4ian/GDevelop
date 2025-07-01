@@ -162,5 +162,29 @@ namespace gdjs {
         this._invalidModel.scene.clear();
       }
     }
+
+    /**
+     * Unload the specified list of resources:
+     * this clears the models, resources loaded and destroy 3D models loaders in this manager.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
+     * @param resourcesList The list of specific resources
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedThreeModel = this._loadedThreeModels.get(resourceData);
+        if (loadedThreeModel) {
+          loadedThreeModel.scene.clear();
+          this._loadedThreeModels.delete(resourceData);
+        }
+
+        const downloadedArrayBuffer =
+          this._downloadedArrayBuffers.get(resourceData);
+        if (downloadedArrayBuffer) {
+          this._downloadedArrayBuffers.delete(resourceData);
+        }
+      });
+    }
   }
 }

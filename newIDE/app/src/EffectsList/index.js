@@ -167,7 +167,6 @@ const Effect = React.forwardRef(
           });
           return;
         }
-
         const oldName = effect.getName();
         effect.setName(newName);
         forceUpdate();

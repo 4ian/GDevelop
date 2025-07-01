@@ -212,7 +212,6 @@ namespace gdjs {
               this.light.castShadow = value;
             }
           }
-
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
             return {
               i: this.light.intensity,

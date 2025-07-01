@@ -164,11 +164,14 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the scene is disposed.
-     * Clear the models, resources loaded and destroy 3D models loaders in this manager.
+     * Unload the specified list of resources:
+     * this clears the models, resources loaded and destroy 3D models loaders in this manager.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
      * @param resourcesList The list of specific resources
      */
-    disposeByResourcesList(resourcesList: ResourceData[]): void {
+    unloadResourcesList(resourcesList: ResourceData[]): void {
       resourcesList.forEach((resourceData) => {
         const loadedThreeModel = this._loadedThreeModels.get(resourceData);
         if (loadedThreeModel) {
@@ -176,9 +179,8 @@ namespace gdjs {
           this._loadedThreeModels.delete(resourceData);
         }
 
-        const downloadedArrayBuffer = this._downloadedArrayBuffers.get(
-          resourceData
-        );
+        const downloadedArrayBuffer =
+          this._downloadedArrayBuffers.get(resourceData);
         if (downloadedArrayBuffer) {
           this._downloadedArrayBuffers.delete(resourceData);
         }

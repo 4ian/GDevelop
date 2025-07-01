@@ -523,7 +523,7 @@ namespace gdjs {
             `Unloading of resources of kind ${kindResourceManager} for scene ${unloadedSceneName}: `,
             resources.map((resource) => resource.name).join(', ')
           );
-          resourceManager.disposeByResourcesList(resources);
+          resourceManager.unloadResourcesList(resources);
         }
       }
 

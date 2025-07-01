@@ -207,11 +207,14 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the scene is disposed.
-     * Clear caches of loaded font families.
+     * Unload the specified list of resources:
+     * this clears the caches of loaded font families.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
      * @param resourcesList The list of specific resources
      */
-    disposeByResourcesList(resourcesList: ResourceData[]): void {
+    unloadResourcesList(resourcesList: ResourceData[]): void {
       resourcesList.forEach((resourceData) => {
         const resource = this._loadedFontFamily.get(resourceData);
         if (resource) {

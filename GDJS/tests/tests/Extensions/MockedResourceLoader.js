@@ -94,7 +94,7 @@ gdjs.MockedResourceManager = class MockedResourceManager {
   /**
    * Dispose specific resources
    */
-  disposeByResourcesList(resourcesList) {
+  unloadResourcesList(resourcesList) {
     for (const resource of resourcesList) {
       this.disposedResources.add(resource.name);
       this.loadedResources.delete(resource.name);

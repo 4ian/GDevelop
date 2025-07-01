@@ -521,11 +521,14 @@ namespace gdjs {
     }
 
     /**
-     * To be called when the scene is disposed.
-     * Clear caches of loaded textures and materials.
+     * Unload the specified list of resources:
+     * this clears the cache of loaded textures associated to these resources.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
      * @param resourcesList The list of specific resources
      */
-    disposeByResourcesList(resourcesList: ResourceData[]): void {
+    unloadResourcesList(resourcesList: ResourceData[]): void {
       resourcesList.forEach((resourceData) => {
         const resourceName = resourceData.name;
         const resource = this._loadedTextures.get(resourceData);

@@ -198,8 +198,7 @@ namespace gdjs {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            // TODO: pass newSceneName to avoid unloading its resources?.
-            this._unloadSceneAndPossiblyResources({scene, newSceneName});
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       } else {
@@ -207,8 +206,7 @@ namespace gdjs {
         if (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            // TODO: pass newSceneName to avoid unloading its resources?.
-            this._unloadSceneAndPossiblyResources({scene, newSceneName});
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       }

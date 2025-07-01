@@ -142,7 +142,8 @@ namespace gdjs {
         this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
-      this._unloadAssetsOnSceneExit = sceneData.shouldUnloadAssetsWhenUnloaded || false;
+      this._unloadAssetsOnSceneExit =
+        sceneData.shouldUnloadAssetsWhenUnloaded || false;
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GDJS Tests</title>
+  
+  <!-- expect.js for compatibility -->
+  <script src="./node_modules/expect.js/index.js"></script>
+  
+  <!-- GDJS game engine files (Order is important) -->
+  <script src="../../newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/logger.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/gd.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/libs/rbush.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/three.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi-filters-tools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi-image-manager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi-bitmapfont-manager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/layer-pixi-renderer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/loadingscreen-pixi-renderer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/runtimegame-pixi-renderer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/RuntimeInstanceContainer-pixi-renderer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/runtimescene-pixi-renderer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/howler-sound-manager/howler.min.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/howler-sound-manager/howler-sound-manager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/Model3DManager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/jsonmanager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/ResourceLoader.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/ResourceCache.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/timemanager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/polygon.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/runtimeobject.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/RuntimeInstanceContainer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/runtimescene.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/scenestack.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/profiler.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/force.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/RuntimeLayer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/layer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/RuntimeCustomObjectLayer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/timer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/inputmanager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/capturemanager.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/runtimegame.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/runtimewatermark.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/variable.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/variablescontainer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/oncetriggers.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/runtimebehavior.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/SpriteAnimator.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/spriteruntimeobject.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject2D.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/CustomRuntimeObjectInstanceContainer.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/commontools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/runtimescenetools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/networktools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/objecttools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/cameratools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/soundtools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js"></script>
+  <script src="../../newIDE/app/resources/GDJS/Runtime/affinetransformation.js"></script>
+
+  <!-- Test extensions -->
+  <script src="./tests/Extensions/MockedResourceLoader.js"></script>
+  <script src="./tests/Extensions/TestRuntimeScene.js"></script>
+  <script src="./tests/Extensions/testruntimebehavior.js"></script>
+  <script src="./tests/Extensions/testruntimeobject.js"></script>
+  <script src="./tests/Extensions/testruntimeobjectwithfakerenderer.js"></script>
+  <script src="./tests/Extensions/testspriteruntimeobject.js"></script>
+
+  <!-- Test helpers -->
+  <script src="../../Extensions/PlatformBehavior/tests/PlatformerTestHelper.js"></script>
+
+  <!-- Test utilities -->
+  <script src="./tests-utils/init.pixiruntimegamewithassets.js"></script>
+  <script src="./tests-utils/init.pixiruntimegame.js"></script>
+  <script src="./tests-utils/MockedCustomObject.js"></script>
+</head>
+<body>
+  <div id="vitest-ui"></div>
+</body>
+</html>

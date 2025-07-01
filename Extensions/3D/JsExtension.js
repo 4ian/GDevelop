@@ -1081,7 +1081,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('materialType')
-        .setValue(objectContent.materialType || 'Basic')
+        .setValue(objectContent.materialType || 'StandardWithoutMetalness')
         .setType('choice')
         .addExtraInfo('Basic')
         .addExtraInfo('StandardWithoutMetalness')

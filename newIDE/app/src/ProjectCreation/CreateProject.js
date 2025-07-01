@@ -36,7 +36,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
  directionalLight.setDoubleParameter('distanceFromCamera', 1500);
  directionalLight.setDoubleParameter('frustumSize', 4000);
   directionalLight.setDoubleParameter('intensity', 1);
-  directionalLight.setStringParameter('top', 'Y-');
+  directionalLight.setStringParameter('top', 'Z+');
   directionalLight.setDoubleParameter('elevation', 45);
   directionalLight.setDoubleParameter('rotation', 0);
 

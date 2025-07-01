@@ -29,7 +29,7 @@ const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
 };
 
 export const addDefaultLightToLayer = (layer: gdLayer): void => {
-  const directionalLight = layer.getEffects().insertNewEffect('3D Light', 0);
+  const directionalLight = layer.getEffects().insertNewEffect('3D Sun Light', 0);
   directionalLight.setEffectType('Scene3D::DirectionalLight');
   directionalLight.setStringParameter('color', '255;255;255');
   directionalLight.setStringParameter('shadowQuality', 'Medium');
@@ -41,7 +41,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setDoubleParameter('rotation', 0);
   directionalLight.setBooleanParameter('isCastingShadow', true);
 
-  const ambientLight = layer.getEffects().insertNewEffect('3D Light', 0);
+  const ambientLight = layer.getEffects().insertNewEffect('3D Ammbient Light', 0);
   ambientLight.setEffectType('Scene3D::AmbientLight');
   ambientLight.setStringParameter('color', '255;255;255');
   ambientLight.setDoubleParameter('intensity', 0.75);

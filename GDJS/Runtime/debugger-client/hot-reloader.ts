@@ -935,8 +935,9 @@ namespace gdjs {
       objects: ObjectData[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const oldObjects = objects.map((objectData) =>
-        runtimeInstanceContainer._objects.get(objectData.name)
+      const oldObjects: Array<ObjectData | null> = objects.map(
+        (objectData) =>
+          runtimeInstanceContainer._objects.get(objectData.name) || null
       );
 
       const projectData: ProjectData = gdjs.projectData;
@@ -952,20 +953,28 @@ namespace gdjs {
       );
       // Update the GameData
       for (let index = 0; index < objects.length; index++) {
-        HotReloader.assignOrDelete(oldObjects[index], objects[index]);
+        const oldObjectData = oldObjects[index];
+        // When the object is new, the hot-reload call `registerObject`
+        // so `_objects` is already updated.
+        if (oldObjectData) {
+          HotReloader.assignOrDelete(oldObjectData, objects[index]);
+        }
       }
     }
 
     _hotReloadRuntimeSceneObjects(
-      oldObjects: ObjectData[],
+      oldObjects: Array<ObjectData | null>,
       newObjects: ObjectData[],
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       oldObjects.forEach((oldObjectData) => {
+        if (!oldObjectData) {
+          return;
+        }
         const name = oldObjectData.name;
-        const newObjectData = newObjects.filter(
+        const newObjectData = newObjects.find(
           (objectData) => objectData.name === name
-        )[0];
+        );
 
         // Note: if an object is renamed in the editor, it will be considered as removed,
         // and the new object name as a new object to register.
@@ -987,9 +996,9 @@ namespace gdjs {
       });
       newObjects.forEach((newObjectData) => {
         const name = newObjectData.name;
-        const oldObjectData = oldObjects.filter(
-          (layerData) => layerData.name === name
-        )[0];
+        const oldObjectData = oldObjects.find(
+          (layerData) => layerData && layerData.name === name
+        );
         if (
           (!oldObjectData || oldObjectData.type !== newObjectData.type) &&
           !runtimeInstanceContainer.isObjectRegistered(name)

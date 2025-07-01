@@ -30,6 +30,21 @@
   justify-content: center;
 
   animation: new-chat-appear 0.5s;
+
+  margin-bottom: var(--safe-area-inset-bottom);
+}
+
+.aiRequestChatContainer {
+  display: flex;
+  margin-left: 8px;
+  margin-right: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  flex: 1 1 0%;
+  min-height: 0px;
+
+  margin-bottom: var(--safe-area-inset-bottom);
 }
 
 .thinkingText {

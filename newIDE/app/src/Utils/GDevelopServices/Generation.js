@@ -73,6 +73,7 @@ export type AiRequest = {
   createdAt: string,
   updatedAt: string,
   userId: string,
+  gameId?: string | null,
   gameProjectJson?: string | null,
   status: GenerationStatus,
   mode?: 'chat' | 'agent',

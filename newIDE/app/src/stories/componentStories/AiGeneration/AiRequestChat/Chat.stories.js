@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import paperDecorator from '../../../PaperDecorator';
 import { AiRequestChat } from '../../../../AiGeneration/AiRequestChat';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
+import { action } from '@storybook/addon-actions';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/Chat',
@@ -13,8 +14,7 @@ export default {
 
 const commonProps = {
   editorCallbacks: {
-    onOpenLayout: () => {},
-    onOpenEvents: () => {},
+    onOpenLayout: action('onOpenLayout'),
   },
   project: null,
   quota: {
@@ -45,6 +45,7 @@ const commonProps = {
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
+  onStartNewChat: () => {},
 };
 
 export const NewAiRequest = () => (

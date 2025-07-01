@@ -325,7 +325,7 @@ export const useManageObjectBehaviors = ({
   onSizeUpdated?: ?() => void,
   onBehaviorsUpdated?: ?() => void,
   onUpdateBehaviorsSharedData: () => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -623,7 +623,7 @@ type Props = {|
     extensionName: string,
     behaviorName: string
   ) => Promise<void>,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   isListLocked: boolean,
 |};
 

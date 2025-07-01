@@ -49,6 +49,7 @@ import {
   moveTabToTheRightOfHoveredTab,
   getCustomObjectEditor,
   hasEditorTabOpenedWithKey,
+  getOpenedAskAiEditor,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -1226,13 +1227,21 @@ const MainFrame = (props: Props) => {
 
   const openAskAi = React.useCallback(
     () => {
-      setState(state => ({
-        ...state,
-        editorTabs: openEditorTab(
-          state.editorTabs,
-          getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
-        ),
-      }));
+      setState(state => {
+        const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
+        if (askAiEditor) {
+          askAiEditor.startNewChat();
+        }
+
+        // Open or focus the AI editor.
+        return {
+          ...state,
+          editorTabs: openEditorTab(
+            state.editorTabs,
+            getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+          ),
+        };
+      });
     },
     [setState, getEditorOpeningOptions]
   );
@@ -1282,28 +1291,6 @@ const MainFrame = (props: Props) => {
     if (!toolbar.current || !isCurrentTab) return;
 
     toolbar.current.setEditorToolbar(editorToolbar);
-  };
-
-  const onInstallExtension = (extensionName: string) => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    // Close the extension tab before updating/reinstalling the extension.
-    const eventsFunctionsExtensionName = extensionName;
-
-    if (
-      currentProject.hasEventsFunctionsExtensionNamed(
-        eventsFunctionsExtensionName
-      )
-    ) {
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
-          eventsFunctionsExtensionName
-        ),
-      }));
-    }
   };
 
   const deleteLayout = (layout: gdLayout) => {
@@ -1412,31 +1399,60 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const onExtensionInstalled = (extensionName: string) => {
+  const onInstallExtension = (extensionName: string) => {
+    const { currentProject } = state;
+    if (!currentProject) return;
+
+    // Close the extension tab before updating/reinstalling the extension.
+    // This is especially important when the extension tab in selected.
+    const eventsFunctionsExtensionName = extensionName;
+
+    if (
+      currentProject.hasEventsFunctionsExtensionNamed(
+        eventsFunctionsExtensionName
+      )
+    ) {
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          eventsFunctionsExtensionName
+        ),
+      }));
+    }
+  };
+
+  const onExtensionInstalled = (extensionNames: Array<string>) => {
     const { currentProject } = state;
     if (!currentProject) {
       return;
     }
-    const eventsBasedObjects = currentProject
-      .getEventsFunctionsExtension(extensionName)
-      .getEventsBasedObjects();
-    for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
-      const eventsBasedObject = eventsBasedObjects.getAt(index);
-      gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
-        currentProject,
-        eventsBasedObject
-      );
+    for (const extensionName of extensionNames) {
+      const eventsBasedObjects = currentProject
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedObjects();
+      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+        const eventsBasedObject = eventsBasedObjects.getAt(index);
+        gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+          currentProject,
+          eventsBasedObject
+        );
+      }
+
+      // Close extension tab because `onInstallExtension` is not necessarily
+      // called when the extension tab is not selected.
+
+      // TODO Open the closed tabs back
+      // It would be safer to close the tabs before the extension is installed
+      // but it would make opening them back more complicated.
+      setState(state => ({
+        ...state,
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          state.editorTabs,
+          extensionName
+        ),
+      }));
     }
-    // TODO Open the closed tabs back
-    // It would be safer to close the tabs before the extension is installed
-    // but it would make opening them back more complicated.
-    setState(state => ({
-      ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        extensionName
-      ),
-    }));
   };
 
   const renameLayout = (oldName: string, newName: string) => {
@@ -1916,16 +1932,32 @@ const MainFrame = (props: Props) => {
       {
         openEventsEditor,
         openSceneEditor,
-      }: {| openEventsEditor: boolean, openSceneEditor: boolean |}
+        focusWhenOpened,
+      }: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |}
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
         name,
+        dontFocusTab: !(
+          focusWhenOpened === 'scene' ||
+          focusWhenOpened === 'scene-or-events-otherwise'
+        ),
       });
       const eventsEditorOptions = getEditorOpeningOptions({
         kind: 'layout events',
         name,
-        dontFocusTab: openSceneEditor,
+        dontFocusTab: !(
+          focusWhenOpened === 'events' ||
+          (focusWhenOpened === 'scene-or-events-otherwise' && !openSceneEditor)
+        ),
       });
 
       const tabsWithSceneEditor = openSceneEditor
@@ -1941,9 +1973,18 @@ const MainFrame = (props: Props) => {
   const openLayout = React.useCallback(
     (
       name: string,
-      options?: {| openEventsEditor: boolean, openSceneEditor: boolean |} = {
+      options?: {|
+        openEventsEditor: boolean,
+        openSceneEditor: boolean,
+        focusWhenOpened:
+          | 'scene-or-events-otherwise'
+          | 'scene'
+          | 'events'
+          | 'none',
+      |} = {
         openEventsEditor: true,
         openSceneEditor: true,
+        focusWhenOpened: 'scene',
       },
       editorTabs?: EditorTabsState
     ): void => {
@@ -1955,6 +1996,7 @@ const MainFrame = (props: Props) => {
           {
             openEventsEditor: options.openEventsEditor,
             openSceneEditor: options.openSceneEditor,
+            focusWhenOpened: options.focusWhenOpened,
           }
         ),
       }));
@@ -2450,6 +2492,7 @@ const MainFrame = (props: Props) => {
         {
           openSceneEditor: true,
           openEventsEditor: true,
+          focusWhenOpened: 'scene',
         },
         editorTabs
       );
@@ -2483,6 +2526,7 @@ const MainFrame = (props: Props) => {
           {
             openSceneEditor: true,
             openEventsEditor: true,
+            focusWhenOpened: 'scene',
           }
         );
       }
@@ -2513,6 +2557,7 @@ const MainFrame = (props: Props) => {
       openLayout(firstLayout, {
         openSceneEditor: true,
         openEventsEditor: true,
+        focusWhenOpened: 'scene',
       });
 
       setIsLoadingProject(false);
@@ -3973,14 +4018,10 @@ const MainFrame = (props: Props) => {
                       openLayout(sceneName, {
                         openEventsEditor: true,
                         openSceneEditor: false,
+                        focusWhenOpened: 'events',
                       });
                     },
-                    onOpenLayout: (sceneName: string) => {
-                      openLayout(sceneName, {
-                        openEventsEditor: false,
-                        openSceneEditor: true,
-                      });
-                    },
+                    onOpenLayout: openLayout,
                     onOpenTemplateFromTutorial: openTemplateFromTutorial,
                     onOpenTemplateFromCourseChapter: openTemplateFromCourseChapter,
                     previewDebuggerServer,
@@ -4395,6 +4436,7 @@ const MainFrame = (props: Props) => {
             currentProject.getProjectUuid()
           )}
           onScreenshotsClaimed={onGameScreenshotsClaimed}
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
       <CustomDragLayer />

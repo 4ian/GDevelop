@@ -31,6 +31,7 @@ export const Default = () => {
               onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
               objectsContainer={testProject.testLayout.getObjects()}
               resourceManagementProps={fakeResourceManagementProps}
+              onExtensionInstalled={action('onExtensionInstalled')}
             />
           )}
         </I18n>

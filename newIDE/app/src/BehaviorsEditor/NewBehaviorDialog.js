@@ -32,7 +32,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
-  onExtensionInstalled: (extensionName: string) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export default function NewBehaviorDialog({
@@ -190,7 +190,7 @@ export default function NewBehaviorDialog({
         behaviorShortHeader
       );
       if (wasExtensionInstalled) {
-        onExtensionInstalled(behaviorShortHeader.extensionName);
+        onExtensionInstalled([behaviorShortHeader.extensionName]);
       }
       return wasExtensionInstalled;
     } finally {

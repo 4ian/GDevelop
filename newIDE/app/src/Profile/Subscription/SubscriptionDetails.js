@@ -341,7 +341,10 @@ const SubscriptionDetails = ({
                     primary
                     onClick={() => {
                       openSubscriptionDialog({
-                        analyticsMetadata: { reason: 'Consult profile' },
+                        analyticsMetadata: {
+                          reason: 'Consult profile',
+                          placementId: 'profile',
+                        },
                       });
                     }}
                     disabled={isManageSubscriptionLoading}
@@ -390,6 +393,7 @@ const SubscriptionDetails = ({
           <GetSubscriptionCard
             label={<Trans>Choose a subscription</Trans>}
             subscriptionDialogOpeningReason="Consult profile"
+            placementId="profile"
           >
             <Text noMargin>
               <Trans>
@@ -440,7 +444,10 @@ const SubscriptionDetails = ({
                       color={buttonColor}
                       onClick={() =>
                         openSubscriptionDialog({
-                          analyticsMetadata: { reason: 'Consult profile' },
+                          analyticsMetadata: {
+                            reason: 'Consult profile',
+                            placementId: 'profile',
+                          },
                           filter: key,
                         })
                       }
@@ -458,6 +465,7 @@ const SubscriptionDetails = ({
           label={<Trans>Choose a subscription</Trans>}
           subscriptionDialogOpeningReason="Consult profile"
           recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          placementId="profile"
         >
           <Text noMargin>
             <Trans>

@@ -1169,6 +1169,7 @@ export class InitialInstance extends EmscriptenObject {
   setCustomDepth(depth: number): void;
   getCustomDepth(): number;
   resetPersistentUuid(): InitialInstance;
+  getPersistentUuid(): string;
   updateCustomProperty(name: string, value: string, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
   getCustomProperties(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): MapStringPropertyDescriptor;
   getRawDoubleProperty(name: string): number;

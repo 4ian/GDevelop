@@ -16,6 +16,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       name: 'MyCustomObject',
       type: 'MyExtension::MyEventsBasedObject',
       variant: '',
+      isInnerAreaFollowingParentSize: false,
       variables: [],
       behaviors: [],
       effects: [],

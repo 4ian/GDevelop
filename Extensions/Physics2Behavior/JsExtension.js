@@ -818,7 +818,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Treat as bullet?'), '', false)
+      .addParameter('yesorno', _('Treat as bullet'), '', false)
       .setDefaultValue('false')
       .getCodeExtraInformation()
       .setFunctionName('setBullet');
@@ -852,7 +852,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Fixed rotation?'), '', false)
+      .addParameter('yesorno', _('Fixed rotation'), '', false)
       .setDefaultValue('false')
       .getCodeExtraInformation()
       .setFunctionName('setFixedRotation');
@@ -886,7 +886,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('yesorno', _('Can sleep?'), '', false)
+      .addParameter('yesorno', _('Can sleep'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
@@ -1296,7 +1296,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Layer (1 - 16)'))
-      .addParameter('yesorno', _('Enable?'), '', false)
+      .addParameter('yesorno', _('Enable'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('enableLayer');
@@ -1332,7 +1332,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Mask (1 - 16)'))
-      .addParameter('yesorno', _('Enable?'), '', false)
+      .addParameter('yesorno', _('Enable'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('enableMask');
@@ -2409,7 +2409,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableRevoluteJointLimits');
 
@@ -2488,7 +2488,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableRevoluteJointMotor');
 
@@ -2727,7 +2727,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enablePrismaticJointLimits');
 
@@ -2806,7 +2806,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enablePrismaticJointMotor');
 
@@ -3486,7 +3486,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Joint ID'))
-      .addParameter('yesorno', _('Enable?'))
+      .addParameter('yesorno', _('Enable'))
       .getCodeExtraInformation()
       .setFunctionName('enableWheelJointMotor');
 

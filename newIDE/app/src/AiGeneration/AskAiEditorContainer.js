@@ -112,15 +112,18 @@ const useProcessFunctionCalls = ({
   i18n,
   project,
   resourceManagementProps,
+  editorCallbacks,
   selectedAiRequest,
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
   onSceneEventsModifiedOutsideEditor,
+  onExtensionInstalled,
 }: {|
   i18n: I18nType,
   project: gdProject | null,
   resourceManagementProps: ResourceManagementProps,
+  editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
   onSendEditorFunctionCallResults: () => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
@@ -129,6 +132,7 @@ const useProcessFunctionCalls = ({
     Array<EditorFunctionCallResult>
   ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -137,6 +141,7 @@ const useProcessFunctionCalls = ({
   const { searchAndInstallAsset } = useSearchAndInstallAsset({
     project,
     resourceManagementProps,
+    onExtensionInstalled,
   });
   const { generateEvents } = useGenerateEvents({ project });
 
@@ -187,6 +192,7 @@ const useProcessFunctionCalls = ({
 
       const editorFunctionCallResults = await processEditorFunctionCalls({
         project,
+        editorCallbacks,
         functionCalls: functionCalls.map(functionCall => ({
           name: functionCall.name,
           arguments: functionCall.arguments,
@@ -222,6 +228,7 @@ const useProcessFunctionCalls = ({
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
       triggerSendEditorFunctionCallResults,
+      editorCallbacks,
     ]
   );
 
@@ -454,9 +461,20 @@ type Props = {|
     i18n: I18nType,
     isQuickCustomization?: boolean
   ) => Promise<void>,
-  onOpenLayout: (sceneName: string) => void,
-  onOpenEvents: (sceneName: string) => void,
+  onOpenLayout: (
+    sceneName: string,
+    options: {|
+      openEventsEditor: boolean,
+      openSceneEditor: boolean,
+      focusWhenOpened:
+        | 'scene-or-events-otherwise'
+        | 'scene'
+        | 'events'
+        | 'none',
+    |}
+  ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -470,6 +488,7 @@ export type AskAiEditorInterface = {|
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  startNewChat: () => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -493,17 +512,16 @@ export const AskAiEditor = React.memo<Props>(
         onCreateEmptyProject,
         onCreateProjectFromExample,
         onOpenLayout,
-        onOpenEvents,
         onSceneEventsModifiedOutsideEditor,
+        onExtensionInstalled,
       }: Props,
       ref
     ) => {
       const editorCallbacks: EditorCallbacks = React.useMemo(
         () => ({
           onOpenLayout,
-          onOpenEvents,
         }),
-        [onOpenLayout, onOpenEvents]
+        [onOpenLayout]
       );
 
       const {
@@ -580,6 +598,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
+        startNewChat: onStartNewChat,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
@@ -770,6 +789,19 @@ export const AskAiEditor = React.memo<Props>(
         ]
       );
 
+      const hasFunctionsCallsToProcess = React.useMemo(
+        () =>
+          selectedAiRequest
+            ? getFunctionCallsToProcess({
+                aiRequest: selectedAiRequest,
+                editorFunctionCallResults: getEditorFunctionCallResults(
+                  selectedAiRequest.id
+                ),
+              }).length > 0
+            : false,
+        [selectedAiRequest, getEditorFunctionCallResults]
+      );
+
       // Send the results of the function call outputs, if any, and the user message (if any).
       const onSendMessage = React.useCallback(
         async ({ userMessage }: {| userMessage: string |}) => {
@@ -792,6 +824,7 @@ export const AskAiEditor = React.memo<Props>(
           // If anything is not finished yet, stop there (we only send all
           // results at once, AI do not support partial results).
           if (hasUnfinishedResult) return;
+          if (hasFunctionsCallsToProcess) return;
 
           // If nothing to send, stop there.
           if (functionCallOutputs.length === 0 && !userMessage) return;
@@ -894,6 +927,7 @@ export const AskAiEditor = React.memo<Props>(
           setLastSendError,
           onRefreshLimits,
           project,
+          hasFunctionsCallsToProcess,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
@@ -939,11 +973,13 @@ export const AskAiEditor = React.memo<Props>(
         project,
         resourceManagementProps,
         selectedAiRequest,
+        editorCallbacks,
         onSendEditorFunctionCallResults,
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         onSceneEventsModifiedOutsideEditor,
         i18n,
+        onExtensionInstalled,
       });
 
       return (
@@ -990,6 +1026,7 @@ export const AskAiEditor = React.memo<Props>(
                 }}
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
+                onStartNewChat={onStartNewChat}
               />
             </div>
           </Paper>
@@ -1034,10 +1071,10 @@ export const renderAskAiEditorContainer = (
         onCreateEmptyProject={props.onCreateEmptyProject}
         onCreateProjectFromExample={props.onCreateProjectFromExample}
         onOpenLayout={props.onOpenLayout}
-        onOpenEvents={props.onOpenEvents}
         onSceneEventsModifiedOutsideEditor={
           props.onSceneEventsModifiedOutsideEditor
         }
+        onExtensionInstalled={props.onExtensionInstalled}
       />
     )}
   </I18n>

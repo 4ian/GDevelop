@@ -742,7 +742,7 @@ const TreeView = <Item: ItemBaseAttributes>(
           //   the elements to highlight
           // - on mobile it avoids jumping screens. This can happen when an item
           //   name is edited, the keyboard opens and reduces the window height
-          //   making the item disappear (because or virtualization).
+          //   making the item disappear (because of virtualization).
           overscanCount={20}
         >
           {TreeViewRow}

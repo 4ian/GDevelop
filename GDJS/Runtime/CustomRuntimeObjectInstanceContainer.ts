@@ -24,7 +24,7 @@ namespace gdjs {
      *
      * @see gdjs.CustomRuntimeObject._innerArea
      **/
-    private _initialInnerArea: {
+    _initialInnerArea: {
       min: [float, float, float];
       max: [float, float, float];
     } | null = null;
@@ -47,6 +47,9 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
+      if (this._layers.containsKey(layerData.name)) {
+        return;
+      }
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
@@ -71,6 +74,10 @@ namespace gdjs {
         this.onDestroyFromScene(this._parent);
       }
 
+      const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
+        !eventsBasedObjectVariantData.name &&
+        eventsBasedObjectVariantData.instances.length == 0;
+
       this._setOriginalInnerArea(eventsBasedObjectVariantData);
 
       // Registering objects
@@ -83,7 +90,8 @@ namespace gdjs {
         // The children configuration override only applies to the default variant.
         if (
           customObjectData.childrenContent &&
-          !eventsBasedObjectVariantData.name
+          (!eventsBasedObjectVariantData.name ||
+            isForcedToOverrideEventsBasedObjectChildrenConfiguration)
         ) {
           this.registerObject({
             ...childObjectData,

@@ -326,6 +326,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
             <GetSubscriptionCard
               subscriptionDialogOpeningReason="Add collaborators on project"
               recommendedPlanIdIfNoSubscription="gdevelop_startup"
+              placementId="invite-collaborators"
             >
               <Text>
                 <Trans>

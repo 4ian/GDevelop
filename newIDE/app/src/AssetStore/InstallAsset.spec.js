@@ -1034,6 +1034,7 @@ describe('InstallAsset', () => {
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
+          onExtensionInstalled: () => {},
         })
       ).rejects.toMatchObject({
         // It's just because the mock doesn't reloadProjectEventsFunctionsExtensions.
@@ -1069,6 +1070,7 @@ describe('InstallAsset', () => {
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           project,
+          onExtensionInstalled: () => {},
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
@@ -1109,6 +1111,7 @@ describe('InstallAsset', () => {
         shouldUpdateExtension: true,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
         project,
+        onExtensionInstalled: () => {},
       });
 
       // No extensions fetched because the extension is already installed.

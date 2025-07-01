@@ -241,6 +241,7 @@ const EducationMarketingSection = ({
         analyticsMetadata: {
           reason: 'Callout in Classroom tab',
           recommendedPlanId: 'gdevelop_education',
+          placementId: 'education',
         },
       });
     },

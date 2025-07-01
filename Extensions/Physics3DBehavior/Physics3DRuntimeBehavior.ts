@@ -927,9 +927,7 @@ namespace gdjs {
       const angularVelocityY = angularVelocity.GetY();
       const angularVelocityZ = angularVelocity.GetZ();
 
-      let bodyID = this._body.GetID();
-      bodyInterface.RemoveBody(bodyID);
-      bodyInterface.DestroyBody(bodyID);
+      this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
       this._currentContacts.length = 0;
@@ -938,7 +936,7 @@ namespace gdjs {
       if (!this._body) {
         return;
       }
-      bodyID = this._body.GetID();
+      const bodyID = this._body.GetID();
       bodyInterface.SetLinearVelocity(
         bodyID,
         this.getVec3(linearVelocityX, linearVelocityY, linearVelocityZ)

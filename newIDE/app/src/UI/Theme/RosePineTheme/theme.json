@@ -518,7 +518,7 @@
       },
       "default": {
         "background-color": {
-          "value": "rgba(255, 255, 255, 0.09)"
+          "value": "#333141"
         },
         "error": {
           "value": "#FF8569",

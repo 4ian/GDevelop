@@ -28,6 +28,11 @@ const styles = {
 
 const ESTIMATED_ROW_HEIGHT = 90;
 
+// Keep overscanCount relatively high so that:
+// - during in-app tutorials we make sure the tooltip displayer finds
+//   the elements to highlight
+const OVERSCAN_CELLS_COUNT = 25;
+
 /** A virtualized list of search results, caching the searched item heights. */
 export const ListSearchResults = <SearchItem>({
   disableAutoTranslate,
@@ -145,6 +150,24 @@ export const ListSearchResults = <SearchItem>({
                 rowCount={searchItems.length}
                 cellRenderer={renderRow}
                 style={styles.grid}
+                // We override this function to avoid a bug in react-virtualized
+                // where the overscanCellsCount is not taken into account after a scroll
+                // see https://github.com/bvaughn/react-virtualized/issues/1582#issuecomment-785073746
+                overscanIndicesGetter={({
+                  cellCount,
+                  overscanCellsCount,
+                  startIndex,
+                  stopIndex,
+                }) => ({
+                  overscanStartIndex: Math.max(
+                    0,
+                    startIndex - OVERSCAN_CELLS_COUNT
+                  ),
+                  overscanStopIndex: Math.min(
+                    cellCount - 1,
+                    stopIndex + OVERSCAN_CELLS_COUNT
+                  ),
+                })}
               />
             );
           }}

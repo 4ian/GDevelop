@@ -48,8 +48,11 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import { switchToSceneEdition } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
@@ -449,6 +452,7 @@ const styles = {
 type Props = {|
   isActive: boolean,
   project: gdProject | null,
+  editorId: string,
   resourceManagementProps: ResourceManagementProps,
   fileMetadata: ?FileMetadata,
   storageProvider: ?StorageProvider,
@@ -475,6 +479,12 @@ type Props = {|
   ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -515,6 +525,8 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
+        setPreviewedLayout,
+        editorId,
       }: Props,
       ref
     ) => {
@@ -589,6 +601,33 @@ export const AskAiEditor = React.memo<Props>(
         [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
       );
 
+      const forceInGameEditorHotReload = React.useCallback(
+        ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
+          if (!project) {
+            return;
+          }
+          setPreviewedLayout({
+            layoutName: project.getFirstLayout(),
+            externalLayoutName: null,
+            eventsBasedObjectType: null,
+            eventsBasedObjectVariantName: null,
+          });
+
+          if (gameEditorMode === 'embedded-game') {
+            switchToSceneEdition({
+              editorId,
+              sceneName: project.getFirstLayout(),
+              externalLayoutName: null,
+              eventsBasedObjectType: null,
+              eventsBasedObjectVariantName: null,
+              hotReload: true,
+              projectDataOnlyExport,
+            });
+          }
+        },
+        [editorId, project, setPreviewedLayout]
+      );
+
       React.useEffect(updateToolbar, [updateToolbar]);
 
       React.useImperativeHandle(ref, () => ({
@@ -600,7 +639,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
         startNewChat: onStartNewChat,
-        forceInGameEditorHotReload: noop,
+        forceInGameEditorHotReload,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
@@ -1065,6 +1104,7 @@ export const renderAskAiEditorContainer = (
         ref={props.ref}
         i18n={i18n}
         project={props.project || null}
+        editorId={props.editorId}
         resourceManagementProps={props.resourceManagementProps}
         fileMetadata={props.fileMetadata}
         storageProvider={props.storageProvider}
@@ -1077,6 +1117,7 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
+        setPreviewedLayout={props.setPreviewedLayout}
       />
     )}
   </I18n>

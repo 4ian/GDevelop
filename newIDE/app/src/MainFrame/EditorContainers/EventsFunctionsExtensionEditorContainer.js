@@ -6,6 +6,7 @@ import {
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const styles = {
   container: {
@@ -18,6 +19,8 @@ const styles = {
     minWidth: 0,
   },
 };
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 export class EventsFunctionsExtensionEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsFunctionsExtensionEditor;
@@ -59,7 +62,28 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    // No thing to be done.
+    const { editorId, project } = this.props;
+    if (!project) {
+      return;
+    }
+    this.props.setPreviewedLayout({
+      layoutName: project.getFirstLayout(),
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
+
+    if (gameEditorMode === 'embedded-game') {
+      switchToSceneEdition({
+        editorId,
+        sceneName: project.getFirstLayout(),
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+        hotReload: true,
+        projectDataOnlyExport,
+      });
+    }
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {

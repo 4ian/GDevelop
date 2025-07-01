@@ -11,6 +11,9 @@ import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../Profile/Subscription/SubscriptionChecker';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
+import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
 
 type State = {|
   subscriptionChecked: boolean,
@@ -70,7 +73,28 @@ export class DebuggerEditorContainer extends React.Component<
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    // No thing to be done.
+    const { editorId, project } = this.props;
+    if (!project) {
+      return;
+    }
+    this.props.setPreviewedLayout({
+      layoutName: project.getFirstLayout(),
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
+
+    if (gameEditorMode === 'embedded-game') {
+      switchToSceneEdition({
+        editorId,
+        sceneName: project.getFirstLayout(),
+        externalLayoutName: null,
+        eventsBasedObjectType: null,
+        eventsBasedObjectVariantName: null,
+        hotReload: true,
+        projectDataOnlyExport,
+      });
+    }
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.

@@ -44,6 +44,7 @@ import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
+import { switchToSceneEdition } from '../../../EmbeddedGame/EmbeddedGameFrame';
 
 const noop = () => {};
 
@@ -103,8 +104,11 @@ const styles = {
   },
 };
 
+const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
+
 type Props = {|
   project: ?gdProject,
+  editorId: string,
   fileMetadata: ?FileMetadata,
 
   isActive: boolean,
@@ -113,6 +117,12 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
   storageProviders: Array<StorageProvider>,
+  setPreviewedLayout: ({|
+    layoutName: string | null,
+    externalLayoutName: string | null,
+    eventsBasedObjectType: string | null,
+    eventsBasedObjectVariantName: string | null,
+  |}) => void,
 
   // Games
   gamesList: GamesList,
@@ -212,6 +222,8 @@ export const HomePage = React.memo<Props>(
         gamesList,
         gamesPlatformFrameTools,
         onExtensionInstalled,
+        setPreviewedLayout,
+        editorId,
       }: Props,
       ref
     ) => {
@@ -472,41 +484,42 @@ export const HomePage = React.memo<Props>(
         [updateToolbar, activeTab, hideTabsTitleBarAndEditorToolbar, isMobile]
       );
 
-      const forceUpdateEditor = React.useCallback(() => {
-        // No updates to be done
-      }, []);
+      const forceInGameEditorHotReload = React.useCallback(
+        ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
+          if (!project) {
+            return;
+          }
+          setPreviewedLayout({
+            layoutName: project.getFirstLayout(),
+            externalLayoutName: null,
+            eventsBasedObjectType: null,
+            eventsBasedObjectVariantName: null,
+          });
 
-      const onEventsBasedObjectChildrenEdited = React.useCallback(() => {
-        // No thing to be done
-      }, []);
-
-      const onSceneObjectEdited = React.useCallback(
-        (scene: gdLayout, objectWithContext: ObjectWithContext) => {
-          // No thing to be done
+          if (gameEditorMode === 'embedded-game') {
+            switchToSceneEdition({
+              editorId,
+              sceneName: project.getFirstLayout(),
+              externalLayoutName: null,
+              eventsBasedObjectType: null,
+              eventsBasedObjectVariantName: null,
+              hotReload: true,
+              projectDataOnlyExport,
+            });
+          }
         },
-        []
-      );
-
-      const onSceneObjectsDeleted = React.useCallback((scene: gdLayout) => {
-        // No thing to be done.
-      }, []);
-
-      const onSceneEventsModifiedOutsideEditor = React.useCallback(
-        (scene: gdLayout) => {
-          // No thing to be done.
-        },
-        []
+        [editorId, project, setPreviewedLayout]
       );
 
       React.useImperativeHandle(ref, () => ({
         getProject,
         updateToolbar,
-        forceUpdateEditor,
-        onEventsBasedObjectChildrenEdited,
-        onSceneObjectEdited,
-        onSceneObjectsDeleted,
-        onSceneEventsModifiedOutsideEditor,
-        forceInGameEditorHotReload: noop,
+        forceUpdateEditor: noop,
+        onEventsBasedObjectChildrenEdited: noop,
+        onSceneObjectEdited: noop,
+        onSceneObjectsDeleted: noop,
+        onSceneEventsModifiedOutsideEditor: noop,
+        forceInGameEditorHotReload,
       }));
 
       const onUserSurveyStarted = React.useCallback(() => {
@@ -707,6 +720,7 @@ export const renderHomePageContainer = (
   <HomePage
     ref={props.ref}
     project={props.project}
+    editorId={props.editorId}
     fileMetadata={props.fileMetadata}
     isActive={props.isActive}
     projectItemName={props.projectItemName}
@@ -743,5 +757,6 @@ export const renderHomePageContainer = (
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
     onExtensionInstalled={props.onExtensionInstalled}
+    setPreviewedLayout={props.setPreviewedLayout}
   />
 );

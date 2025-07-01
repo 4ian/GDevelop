@@ -1128,10 +1128,10 @@ module.exports = {
       rightFaceResourceRepeat: false,
       topFaceResourceRepeat: false,
       bottomFaceResourceRepeat: false,
-      materialType: 'Basic',
+      materialType: 'StandardWithoutMetalness',
       tint: '255;255;255',
-      castShadow: true,
-      receiveShadow: true,
+      isCastingShadow: true,
+      isReceivingShadow: true,
     };
 
     Cube3DObject.updateInitialInstanceProperty = function (

@@ -125,8 +125,8 @@ namespace gdjs {
       ];
 
       this._tint = objectData.content.tint || '255;255;255';
-      this._isCastingShadow = objectData.content.isCastingShadow || true;
-      this._isReceivingShadow = objectData.content.isReceivingShadow || true;
+      this._isCastingShadow = objectData.content.isCastingShadow || false;
+      this._isReceivingShadow = objectData.content.isReceivingShadow || false;
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType

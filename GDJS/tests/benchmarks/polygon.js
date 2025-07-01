@@ -1,6 +1,6 @@
 describe('gdjs.Polygon', function() {
   it('benchmark gdjs.Polygon.collisionTest between two polygons', function() {
-    this.timeout(20000);
+    vi.setTimeout(20000);
     var rect1 = gdjs.Polygon.createRectangle(32, 40);
     var rect2 = gdjs.Polygon.createRectangle(32, 40);
     var rect3 = gdjs.Polygon.createRectangle(32, 40);

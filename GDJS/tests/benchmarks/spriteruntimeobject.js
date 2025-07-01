@@ -65,7 +65,7 @@ describe('gdjs.SpriteRuntimeObject', function () {
     });
 
   it('benchmark getAABB of rotated vs non rotated sprite, with custom hitboxes, origin and center', function () {
-    this.timeout(20000);
+    vi.setTimeout(20000);
     const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
 
     const benchmarkSuite = makeBenchmarkSuite({

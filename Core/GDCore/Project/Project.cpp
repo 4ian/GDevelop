@@ -74,7 +74,9 @@ Project::Project()
       gdMinorVersion(gd::VersionWrapper::Minor()),
       gdBuildVersion(gd::VersionWrapper::Build()),
       variables(gd::VariablesContainer::SourceType::Global),
-      objectsContainer(gd::ObjectsContainer::SourceType::Global) {}
+      objectsContainer(gd::ObjectsContainer::SourceType::Global),
+      sceneResourcesPreloading("at-startup"),
+      sceneResourcesUnloading("never") {}
 
 Project::~Project() {}
 
@@ -1166,6 +1168,13 @@ void Project::SerializeTo(SerializerElement& element) const {
   else
     std::cout << "ERROR: The project current platform is NULL.";
 
+  if (sceneResourcesPreloading != "at-startup") {
+    propElement.SetAttribute("sceneResourcesPreloading", sceneResourcesPreloading);
+  }
+  if (sceneResourcesUnloading != "never") {
+    propElement.SetAttribute("sceneResourcesUnloading", sceneResourcesUnloading);
+  }
+
   resourcesManager.SerializeTo(element.AddChild("resources"));
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
@@ -1307,6 +1316,9 @@ void Project::Init(const gd::Project& game) {
   variables = game.GetVariables();
 
   projectFile = game.GetProjectFile();
+
+  sceneResourcesPreloading = game.sceneResourcesPreloading;
+  sceneResourcesUnloading = game.sceneResourcesUnloading;
 }
 
 }  // namespace gd

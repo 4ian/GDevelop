@@ -103,8 +103,8 @@ namespace gdjs {
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
     _crossfadeDuration: float = 0;
-    _isCastingShadow: boolean = false;
-    _isReceivingShadow: boolean = false;
+    _isCastingShadow: boolean = true;
+    _isReceivingShadow: boolean = true;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,

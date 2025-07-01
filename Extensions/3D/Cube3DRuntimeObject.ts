@@ -73,10 +73,10 @@ namespace gdjs {
       string,
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
-      gdjs.Cube3DRuntimeObject.MaterialType.Basic;
+      gdjs.Cube3DRuntimeObject.MaterialType.StandardWithoutMetalness;
     _tint: string;
-    _isCastingShadow: boolean;
-    _isReceivingShadow: boolean;
+    _isCastingShadow: boolean = true;
+    _isReceivingShadow: boolean = true;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -125,8 +125,8 @@ namespace gdjs {
       ];
 
       this._tint = objectData.content.tint || '255;255;255';
-      this._isCastingShadow = objectData.content.isCastingShadow || false;
-      this._isReceivingShadow = objectData.content.isReceivingShadow || false;
+      this._isCastingShadow = objectData.content.isCastingShadow || true;
+      this._isReceivingShadow = objectData.content.isReceivingShadow || true;
 
       this._materialType = this._convertMaterialType(
         objectData.content.materialType

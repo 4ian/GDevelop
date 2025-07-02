@@ -36,7 +36,7 @@ namespace gd {
 
 gd::BehaviorsSharedData Layout::badBehaviorSharedData("", "");
 
-Layout::Layout(const Layout &other)
+Layout::Layout(const Layout& other)
     : objectsContainer(gd::ObjectsContainer::SourceType::Scene) {
   Init(other);
 }
@@ -54,6 +54,8 @@ Layout::Layout()
       backgroundColorG(209),
       backgroundColorB(209),
       stopSoundsOnStartup(true),
+      resourcesPreloading("inherit"),
+      resourcesUnloading("inherit"),
       standardSortMethod(true),
       disableInputWhenNotFocused(true),
       variables(gd::VariablesContainer::SourceType::Scene),
@@ -244,6 +246,10 @@ void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("title", GetWindowDefaultTitle());
   element.SetAttribute("standardSortMethod", standardSortMethod);
   element.SetAttribute("stopSoundsOnStartup", stopSoundsOnStartup);
+  if (resourcesPreloading != "inherit")
+    element.SetAttribute("resourcesPreloading", resourcesPreloading);
+  if (resourcesUnloading != "inherit")
+    element.SetAttribute("resourcesUnloading", resourcesUnloading);
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
 
@@ -304,6 +310,10 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetStringAttribute("title", "(No title)", "titre"));
   standardSortMethod = element.GetBoolAttribute("standardSortMethod");
   stopSoundsOnStartup = element.GetBoolAttribute("stopSoundsOnStartup");
+  resourcesPreloading =
+      element.GetStringAttribute("resourcesPreloading", "inherit");
+  resourcesUnloading =
+      element.GetStringAttribute("resourcesUnloading", "inherit");
   disableInputWhenNotFocused =
       element.GetBoolAttribute("disableInputWhenNotFocused");
 
@@ -391,6 +401,8 @@ void Layout::Init(const Layout& other) {
   standardSortMethod = other.standardSortMethod;
   title = other.title;
   stopSoundsOnStartup = other.stopSoundsOnStartup;
+  resourcesPreloading = other.resourcesPreloading;
+  resourcesUnloading = other.resourcesUnloading;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
   initialInstances = other.initialInstances;
   layers = other.layers;

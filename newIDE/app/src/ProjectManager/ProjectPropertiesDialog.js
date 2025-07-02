@@ -80,6 +80,8 @@ type ProjectProperties = {|
   androidIconResourceNames: Array<string>,
   androidWindowSplashScreenAnimatedIconResourceName: string,
   iosIconResourceNames: Array<string>,
+  sceneResourcesPreloading: string,
+  sceneResourcesUnloading: string,
 |};
 
 const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
@@ -118,6 +120,8 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     iosIconResourceNames: iosIconSizes.map(size =>
       platformSpecificAssets.get('ios', `icon-${size}`)
     ),
+    sceneResourcesPreloading: project.getSceneResourcesPreloading(),
+    sceneResourcesUnloading: project.getSceneResourcesUnloading(),
   };
 };
 
@@ -151,6 +155,8 @@ function applyPropertiesToProject(
     androidIconResourceNames,
     androidWindowSplashScreenAnimatedIconResourceName,
     iosIconResourceNames,
+    sceneResourcesPreloading,
+    sceneResourcesUnloading,
   } = newProperties;
   project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
   project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
@@ -177,6 +183,8 @@ function applyPropertiesToProject(
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
+  project.setSceneResourcesPreloading(sceneResourcesPreloading);
+  project.setSceneResourcesUnloading(sceneResourcesUnloading);
 
   const platformSpecificAssets = project.getPlatformSpecificAssets();
   desktopIconSizes.forEach((size, index) => {
@@ -287,6 +295,14 @@ const ProjectPropertiesDialog = (props: Props) => {
   >(
     iosIconSizes.map(size => platformSpecificAssets.get('ios', `icon-${size}`))
   );
+  const [
+    sceneResourcesPreloading,
+    setSceneResourcesPreloading,
+  ] = React.useState<string>(initialProperties.sceneResourcesPreloading);
+  const [
+    sceneResourcesUnloading,
+    setSceneResourcesUnloading,
+  ] = React.useState<string>(initialProperties.sceneResourcesUnloading);
 
   const { isMobile } = useResponsiveWindowSize();
 
@@ -347,6 +363,8 @@ const ProjectPropertiesDialog = (props: Props) => {
         androidIconResourceNames,
         androidWindowSplashScreenAnimatedIconResourceName,
         iosIconResourceNames,
+        sceneResourcesPreloading,
+        sceneResourcesUnloading,
       }
     );
 
@@ -825,6 +843,43 @@ const ProjectPropertiesDialog = (props: Props) => {
                   <SelectOption
                     value={'folder-project'}
                     label={t`Multiple files, saved in folder next to the main file`}
+                  />
+                </SelectField>
+                <Text size="block-title">
+                  <Trans>Resources loading</Trans>
+                </Text>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>Background preloading of scene resources</Trans>
+                  }
+                  value={sceneResourcesPreloading}
+                  onChange={e => setSceneResourcesPreloading(e.target.value)}
+                  helperMarkdownText={i18n._(
+                    t`This can be customized for each scene in the scene properties dialog.`
+                  )}
+                >
+                  <SelectOption
+                    value="at-startup"
+                    label={t`Preload at startup (default)`}
+                  />
+                  <SelectOption value="never" label={t`Don't preload`} />
+                </SelectField>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>Unloading of scene resources</Trans>
+                  }
+                  value={sceneResourcesUnloading}
+                  onChange={e => setSceneResourcesUnloading(e.target.value)}
+                >
+                  <SelectOption
+                    value="never"
+                    label={t`Never unload (default)`}
+                  />
+                  <SelectOption
+                    value="at-scene-exit"
+                    label={t`Unload at scene exit`}
                   />
                 </SelectField>
                 <ExtensionsProperties project={project} />

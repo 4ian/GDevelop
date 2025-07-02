@@ -205,6 +205,28 @@ namespace gdjs {
       this._loadedFontFamily.clear();
       this._loadedFontFamilySet.clear();
     }
+
+    /**
+     * Unload the specified list of resources:
+     * this clears the caches of loaded font families.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
+     * @param resourcesList The list of specific resources
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const resource = this._loadedFontFamily.get(resourceData);
+        if (resource) {
+          this._loadedFontFamily.delete(resourceData);
+        }
+
+        const fontName = this._getFontFamilyFromFilename(resourceData);
+        if (fontName) {
+          this._loadedFontFamilySet.delete(fontName);
+        }
+      });
+    }
   }
 
   //Register the class to let the engine use it.

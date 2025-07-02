@@ -23,6 +23,7 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
+    _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
@@ -141,6 +142,7 @@ namespace gdjs {
         this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
       }
       this._name = sceneData.name;
+      this._resourcesUnloading = sceneData.resourcesUnloading || 'inherit';
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -576,6 +578,13 @@ namespace gdjs {
      */
     getName(): string {
       return this._name;
+    }
+
+    /**
+     * Get the strategy to unload resources of this scene.
+     */
+    getResourcesUnloading(): 'at-scene-exit' | 'never' | 'inherit' {
+      return this._resourcesUnloading;
     }
 
     /**

@@ -939,6 +939,28 @@ namespace gdjs {
     dispose(): void {
       this.unloadAll();
     }
+
+    /**
+     * Unload the specified list of resources:
+     * this unloads all audio from the specified resources from memory.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
+     * @param resourcesList The list of specific resources
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const musicRes = this._loadedMusics.get(resourceData);
+        if (musicRes) {
+          this.unloadAudio(resourceData.name, true);
+        }
+
+        const soundRes = this._loadedSounds.get(resourceData);
+        if (soundRes) {
+          this.unloadAudio(resourceData.name, false);
+        }
+      });
+    }
   }
 
   // Register the class to let the engine use it.

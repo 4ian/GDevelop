@@ -195,11 +195,35 @@ namespace gdjs {
     }
     /**
      * To be called when the game is disposed.
-     * Clear the Spine Atlases loaded in this manager.
+     * Clear the Spine atlases loaded in this manager.
      */
     dispose(): void {
       this._loadedSpineAtlases.clear();
       this._loadingSpineAtlases.clear();
+    }
+
+    /**
+     * Unload the specified list of resources:
+     * this clears the Spine atlases loaded in this manager.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
+     * @param resourcesList The list of specific resources
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedSpineAtlas = this._loadedSpineAtlases.get(resourceData);
+        if (loadedSpineAtlas) {
+          loadedSpineAtlas.dispose();
+          this._loadedSpineAtlases.delete(resourceData);
+        }
+
+        const loadingSpineAtlas = this._loadingSpineAtlases.get(resourceData);
+        if (loadingSpineAtlas) {
+          loadingSpineAtlas.then((atl) => atl.dispose());
+          this._loadingSpineAtlases.delete(resourceData);
+        }
+      });
     }
   }
 }

@@ -208,5 +208,26 @@ namespace gdjs {
       this._loadedJsons.clear();
       this._callbacks.clear();
     }
+
+    /**
+     * Unload the specified list of resources:
+     * this clears the JSONs loaded in this manager.
+     *
+     * Usually called when scene resoures are unloaded.
+     * @param resourcesList The list of specific resources
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void {
+      resourcesList.forEach((resourceData) => {
+        const loadedJson = this._loadedJsons.get(resourceData);
+        if (loadedJson) {
+          this._loadedJsons.delete(resourceData);
+        }
+
+        const callback = this._callbacks.get(resourceData);
+        if (callback) {
+          this._callbacks.delete(resourceData);
+        }
+      });
+    }
   }
 }

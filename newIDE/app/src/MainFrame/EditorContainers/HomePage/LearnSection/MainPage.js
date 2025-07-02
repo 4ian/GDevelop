@@ -273,7 +273,7 @@ const MainPage = ({
                     </GridListTile>
                   );
                 })
-              : new Array(2).fill(0).map((_, index) => (
+              : new Array(5).fill(0).map((_, index) => (
                   <GridListTile key={`skeleton-course-${index}`}>
                     <CourseCard course={null} completion={null} />
                   </GridListTile>

@@ -2431,6 +2431,9 @@ const MainFrame = (props: Props) => {
   };
 
   const onExtractAsExternalLayout = (name: string) => {
+    hotReloadInGameEditorIfNeeded({
+      projectDataOnlyExport: true,
+    });
     openExternalLayout(name);
   };
 

@@ -1450,7 +1450,7 @@ namespace gdjs {
     private getInstanceDataFromRuntimeObject(
       runtimeObject: gdjs.RuntimeObject
     ): InstanceData | null {
-      if (gdjs.Base3DHandler.is3D(runtimeObject)) {
+      if (is3D(runtimeObject)) {
         if (!runtimeObject.persistentUuid) return null;
 
         const oldData = this._getInstanceData(runtimeObject.persistentUuid);

@@ -237,6 +237,8 @@ namespace gdjs {
     ): gdjs.RuntimeScene | null {
       const clear =
         deprecatedClear || typeof options === 'string' ? false : options.clear;
+      const newSceneName =
+        typeof options === 'string' ? options : options.sceneName;
 
       this._throwIfDisposed();
       if (!!clear) {

@@ -2425,8 +2425,6 @@ module.exports = {
       _backFaceUpThroughWhichAxisRotation = 'X';
       _shouldUseTransparentTexture = false;
       _tint = '';
-      _castShadow = true;
-      _receiveShadow = true;
 
       constructor(
         project,

@@ -5,7 +5,7 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('ResourceLoader');
-  const debugLogger = new gdjs.Logger('ResourceLoader - debug');
+  const debugLogger = new gdjs.Logger('ResourceLoader - debug').enable(false);
 
   const addSearchParameterToUrl = (
     url: string,

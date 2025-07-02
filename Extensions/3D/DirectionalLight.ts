@@ -27,6 +27,7 @@ namespace gdjs {
           distanceFromCamera: float = 1500;
           frustumSize: float = 4000;
           shadowCameraHelper: THREE.CameraHelper | null;
+
           constructor() {
             this.light = new THREE.DirectionalLight();
             this.light.shadow.mapSize.width = this.shadowSize;

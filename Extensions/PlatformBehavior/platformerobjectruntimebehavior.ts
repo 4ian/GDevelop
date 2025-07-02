@@ -486,7 +486,16 @@ namespace gdjs {
       this._state.beforeMovingX();
 
       //Ensure the object is not stuck
-      if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
+      const hasPopOutOfPlatform = this._separateFromPlatforms(
+        this._potentialCollidingObjects,
+        true
+      );
+      if (hasPopOutOfPlatform && !this._jumpKey) {
+        // TODO This is probably unnecessary because because `_canJump` is
+        // already set to true when entering the `OnFloor` state.
+        // This is wrongly allowing double jumps when the character is flipped
+        // with an offset center.
+
         //After being unstuck, the object must be able to jump again.
         this._canJump = true;
       }

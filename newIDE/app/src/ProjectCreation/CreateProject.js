@@ -37,7 +37,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setStringParameter('shadowQuality', 'Medium');
   directionalLight.setDoubleParameter('distanceFromCamera', 1500);
   directionalLight.setDoubleParameter('frustumSize', 4000);
-  directionalLight.setDoubleParameter('intensity', 1);
+  directionalLight.setDoubleParameter('intensity', 0.75);
   directionalLight.setStringParameter('top', 'Z+');
   directionalLight.setDoubleParameter('elevation', 45);
   directionalLight.setDoubleParameter('rotation', 0);
@@ -48,7 +48,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
     .insertNewEffect('3D Ammbient Light', 0);
   ambientLight.setEffectType('Scene3D::AmbientLight');
   ambientLight.setStringParameter('color', '255;255;255');
-  ambientLight.setDoubleParameter('intensity', 0.75);
+  ambientLight.setDoubleParameter('intensity', 0.25);
 };
 
 export const addDefaultLightToAllLayers = (layout: gdLayout): void => {

@@ -35,5 +35,15 @@ namespace gdjs {
      * Using the manager after calling this method is undefined behavior.
      */
     dispose(): void;
+
+    /**
+     * Should clear all specified resources data and anything stored by this manager
+     * for these resources.
+     *
+     * Usually called when scene resoures are unloaded.
+     *
+     * @param resourcesList The list of specific resources that need to be clear
+     */
+    unloadResourcesList(resourcesList: ResourceData[]): void;
   }
 }

@@ -66,6 +66,7 @@ namespace gdjs {
    */
   export class Logger {
     private readonly group: string;
+    private enabled: boolean = true;
 
     /**
      * Create a new logger with the given group name.
@@ -76,19 +77,28 @@ namespace gdjs {
     }
 
     log(...messages: any[]): void {
+      if (!this.enabled) return;
       loggerOutput.log(this.group, objectsToString(messages), 'info');
     }
 
     info(...messages: any[]): void {
+      if (!this.enabled) return;
       loggerOutput.log(this.group, objectsToString(messages), 'info');
     }
 
     warn(...messages: any[]): void {
+      if (!this.enabled) return;
       loggerOutput.log(this.group, objectsToString(messages), 'warning');
     }
 
     error(...messages: any[]): void {
+      if (!this.enabled) return;
       loggerOutput.log(this.group, objectsToString(messages), 'error');
+    }
+
+    enable(enabled: boolean): gdjs.Logger {
+      this.enabled = enabled;
+      return this;
     }
 
     /**

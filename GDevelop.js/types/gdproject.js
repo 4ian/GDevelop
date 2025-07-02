@@ -109,6 +109,10 @@ declare class gdProject {
   getVariables(): gdVariablesContainer;
   getObjects(): gdObjectsContainer;
   getResourcesManager(): gdResourcesManager;
+  setSceneResourcesPreloading(resourcesPreloading: string): void;
+  getSceneResourcesPreloading(): string;
+  setSceneResourcesUnloading(resourcesUnloading: string): void;
+  getSceneResourcesUnloading(): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   getWholeProjectDiagnosticReport(): gdWholeProjectDiagnosticReport;

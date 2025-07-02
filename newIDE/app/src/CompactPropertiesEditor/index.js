@@ -52,6 +52,10 @@ export type ValueFieldCommonProperties = {|
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
+
+  // Only used for effects for now:
+  advanced?: boolean,
+  defaultValue?: string | number | boolean,
 |};
 
 // "Primitive" value fields are "simple" fields.

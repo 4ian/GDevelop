@@ -1,9 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import TextField from '../UI/TextField';
 import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -26,6 +26,9 @@ import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import SceneVariable from '../UI/CustomSvgIcons/SceneVariable';
+import SelectOption from '../UI/SelectOption';
+import SelectField from '../UI/SelectField';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -57,6 +60,14 @@ const ScenePropertiesDialog = ({
     shouldStopSoundsOnStartup,
     setShouldStopSoundsOnStartup,
   ] = React.useState<boolean>(layout.stopSoundsOnStartup());
+
+  const [resourcesPreloading, setResourcesPreloading] = React.useState<string>(
+    layout.getResourcesPreloading()
+  );
+  const [resourcesUnloading, setResourcesUnloading] = React.useState<string>(
+    layout.getResourcesUnloading()
+  );
+
   const [backgroundColor, setBackgroundColor] = React.useState<?RGBColor>({
     r: layout.getBackgroundColorRed(),
     g: layout.getBackgroundColorGreen(),
@@ -69,6 +80,8 @@ const ScenePropertiesDialog = ({
       if (open && layout) {
         setWindowTitle(layout.getWindowDefaultTitle());
         setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
+        setResourcesPreloading(layout.getResourcesPreloading());
+        setResourcesUnloading(layout.getResourcesUnloading());
         setBackgroundColor({
           r: layout.getBackgroundColorRed(),
           g: layout.getBackgroundColorGreen(),
@@ -82,7 +95,8 @@ const ScenePropertiesDialog = ({
 
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
-    layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
+    layout.setResourcesPreloading(resourcesPreloading);
+    layout.setResourcesUnloading(resourcesUnloading);
     layout.setBackgroundColor(
       backgroundColor ? backgroundColor.r : 0,
       backgroundColor ? backgroundColor.g : 0,
@@ -111,6 +125,11 @@ const ScenePropertiesDialog = ({
   const allBehaviorSharedDataNames = layout
     .getAllBehaviorSharedDataNames()
     .toJSArray();
+
+  const areAdvancedPropertiesModified =
+    resourcesPreloading !== 'inherit' ||
+    resourcesUnloading !== 'inherit' ||
+    windowTitle !== '';
 
   const propertiesEditors = allBehaviorSharedDataNames
     .map(behaviorName => {
@@ -143,6 +162,7 @@ const ScenePropertiesDialog = ({
             key={behaviorName}
             defaultExpanded
             id={`behavior-parameters-${behaviorName}`}
+            noMargin
           >
             <AccordionHeader
               actions={[
@@ -152,6 +172,7 @@ const ScenePropertiesDialog = ({
                   helpPagePath={behaviorMetadata.getHelpPath()}
                 />,
               ]}
+              noMargin
             >
               {iconUrl ? (
                 <IconContainer
@@ -171,7 +192,7 @@ const ScenePropertiesDialog = ({
                 />
               </Column>
             </AccordionHeader>
-            <AccordionBody>
+            <AccordionBody disableGutters>
               <Column
                 expand
                 noMargin
@@ -228,20 +249,6 @@ const ScenePropertiesDialog = ({
       maxWidth="sm"
     >
       <ColumnStackLayout expand noMargin>
-        <TextField
-          floatingLabelText={<Trans>Window title</Trans>}
-          fullWidth
-          type="text"
-          value={windowTitle}
-          onChange={(e, value) => setWindowTitle(value)}
-        />
-        <Checkbox
-          checked={shouldStopSoundsOnStartup}
-          label={
-            <Trans>Stop music and sounds at the beginning of this scene</Trans>
-          }
-          onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
-        />
         <ColorField
           floatingLabelText={<Trans>Scene background color</Trans>}
           fullWidth
@@ -251,18 +258,76 @@ const ScenePropertiesDialog = ({
             setBackgroundColor(rgbStringAndAlphaToRGBColor(color))
           }
         />
+        <Checkbox
+          checked={shouldStopSoundsOnStartup}
+          label={
+            <Trans>Stop music and sounds at the beginning of this scene</Trans>
+          }
+          onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
+        />
         {!some(propertiesEditors) && (
           <EmptyMessage>
             <Trans>
-              Any additional properties will appear here if you add behaviors to
-              objects, like Physics behavior.
+              Additional properties will appear here when you add behaviors to
+              objects, such as the 2D or 3D Physics Engine.
             </Trans>
           </EmptyMessage>
         )}
         {propertiesEditors}
+        <Accordion defaultExpanded={areAdvancedPropertiesModified} noMargin>
+          <AccordionHeader noMargin>
+            <Text size="sub-title">
+              <Trans>Advanced settings</Trans>
+            </Text>
+          </AccordionHeader>
+          <AccordionBody disableGutters>
+            <ColumnStackLayout expand noMargin>
+              <SelectField
+                floatingLabelText={<Trans>Resources preloading</Trans>}
+                fullWidth
+                value={resourcesPreloading}
+                onChange={e => setResourcesPreloading(e.target.value)}
+              >
+                <SelectOption
+                  value="inherit"
+                  label={t`Use the project setting`}
+                />
+                <SelectOption
+                  value="at-startup"
+                  label={t`Always preload at startup`}
+                />
+                <SelectOption value="never" label={t`Never preload`} />
+              </SelectField>
+              <SelectField
+                floatingLabelText={<Trans>Resources unloading</Trans>}
+                fullWidth
+                value={resourcesUnloading}
+                onChange={e => setResourcesUnloading(e.target.value)}
+              >
+                <SelectOption
+                  value="inherit"
+                  label={t`Use the project setting`}
+                />
+                <SelectOption
+                  value="at-scene-exit"
+                  label={t`Unload at scene exit`}
+                />
+                <SelectOption value="never" label={t`Never unload`} />
+              </SelectField>
+              <TextField
+                floatingLabelText={<Trans>Window title</Trans>}
+                fullWidth
+                type="text"
+                value={windowTitle}
+                onChange={(e, value) => setWindowTitle(value)}
+              />
+            </ColumnStackLayout>
+          </AccordionBody>
+        </Accordion>
         {onOpenMoreSettings && (
-          <RaisedButton
-            label={<Trans>Open advanced settings</Trans>}
+          <FlatButton
+            label={<Trans>Open more settings</Trans>}
+            primary
             fullWidth
             onClick={() => {
               if (onOpenMoreSettings) onOpenMoreSettings();

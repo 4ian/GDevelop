@@ -292,7 +292,7 @@ export type Course = {|
   id: string,
   durationInWeeks: number,
   chaptersTargetCount: number,
-  specializationId: 'game-development' | 'interaction-design',
+  specializationId: 'game-development' | 'interaction-design' | 'marketing',
   newUntil?: number,
 
   imageUrlByLocale: MessageByLocale,

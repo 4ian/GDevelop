@@ -97,6 +97,8 @@ namespace gdjs {
               !gdjs.evtTools.common.isMobile()),
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
         });
+        this._threeRenderer.shadowMap.enabled = true;
+        this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.pixelRatio = window.devicePixelRatio;

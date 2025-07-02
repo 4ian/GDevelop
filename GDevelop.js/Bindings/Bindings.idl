@@ -668,6 +668,11 @@ interface Project {
     [Ref] ObjectsContainer GetObjects();
     [Ref] ResourcesManager GetResourcesManager();
 
+    void SetSceneResourcesPreloading([Const] DOMString resourcesPreloading);
+    [Const, Ref] DOMString GetSceneResourcesPreloading();
+    void SetSceneResourcesUnloading([Const] DOMString resourcesUnloading);
+    [Const, Ref] DOMString GetSceneResourcesUnloading();
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
@@ -1004,6 +1009,11 @@ interface Layout {
 
     void SetStopSoundsOnStartup(boolean enable);
     boolean StopSoundsOnStartup();
+
+    void SetResourcesPreloading([Const] DOMString resourcesPreloading);
+    [Const, Ref] DOMString GetResourcesPreloading();
+    void SetResourcesUnloading([Const] DOMString resourcesUnloading);
+    [Const, Ref] DOMString GetResourcesUnloading();
 };
 
 interface ExternalEvents {

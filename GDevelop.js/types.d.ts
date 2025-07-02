@@ -621,6 +621,10 @@ export class Project extends EmscriptenObject {
   getVariables(): VariablesContainer;
   getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesManager;
+  setSceneResourcesPreloading(resourcesPreloading: string): void;
+  getSceneResourcesPreloading(): string;
+  setSceneResourcesUnloading(resourcesUnloading: string): void;
+  getSceneResourcesUnloading(): string;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
@@ -825,6 +829,10 @@ export class Layout extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   setStopSoundsOnStartup(enable: boolean): void;
   stopSoundsOnStartup(): boolean;
+  setResourcesPreloading(resourcesPreloading: string): void;
+  getResourcesPreloading(): string;
+  setResourcesUnloading(resourcesUnloading: string): void;
+  getResourcesUnloading(): string;
 }
 
 export class ExternalEvents extends EmscriptenObject {

@@ -349,6 +349,36 @@ class GD_CORE_API Layout {
    * launched
    */
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
+
+  /**
+   * Set when the scene must preload its resources: `at-startup`, `never` or
+   * `inherit` (default).
+   */
+  void SetResourcesPreloading(gd::String resourcesPreloading_) {
+    resourcesPreloading = resourcesPreloading_;
+  }
+
+  /**
+   * Get when the scene must preload its resources: `at-startup`, `never` or
+   * `inherit` (default).
+   */
+  const gd::String& GetResourcesPreloading() const {
+    return resourcesPreloading;
+  }
+
+  /**
+   * Set when the scene must unload its resources: `at-scene-exit`, `never` or
+   * `inherit` (default).
+   */
+  void SetResourcesUnloading(gd::String resourcesUnloading_) {
+    resourcesUnloading = resourcesUnloading_;
+  }
+
+  /**
+   * Get when the scene must unload its resources: `at-scene-exit`, `never` or
+   * `inherit` (default).
+   */
+  const gd::String& GetResourcesUnloading() const { return resourcesUnloading; }
   ///@}
 
   /** \name Saving and loading
@@ -381,6 +411,10 @@ class GD_CORE_API Layout {
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup = true;  ///< True to make the scene stop all sounds at
                                     ///< startup.
+  gd::String
+      resourcesPreloading;  ///< `at-startup`, `never` or `inherit` (default).
+  gd::String
+      resourcesUnloading;  ///< `at-scene-exit`, `never` or `inherit` (default).
   bool standardSortMethod = true;   ///< True to sort objects using standard sort.
   bool disableInputWhenNotFocused = true;  /// If set to true, the input must be
                                            /// disabled when the window do not have the

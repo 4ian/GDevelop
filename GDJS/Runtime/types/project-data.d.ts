@@ -170,6 +170,8 @@ declare interface LayoutData extends InstanceContainerData {
   title: string;
   behaviorsSharedData: BehaviorSharedData[];
   usedResources: ResourceReference[];
+  resourcesPreloading?: 'at-startup' | 'never' | 'inherit';
+  resourcesUnloading?: 'at-scene-exit' | 'never' | 'inherit';
 }
 
 declare interface LayoutNetworkSyncData {
@@ -376,6 +378,8 @@ declare interface ProjectPropertiesData {
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
   projectUuid?: string;
+  sceneResourcesPreloading?: 'at-startup' | 'never';
+  sceneResourcesUnloading?: 'at-scene-exit' | 'never';
 }
 
 declare interface ExtensionProperty {
@@ -443,4 +447,5 @@ declare type ResourceKind =
   | 'bitmapFont'
   | 'model3D'
   | 'atlas'
-  | 'spine';
+  | 'spine'
+  | 'fake-resource-kind-for-testing-only';

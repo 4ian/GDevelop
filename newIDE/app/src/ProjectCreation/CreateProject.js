@@ -29,14 +29,26 @@ const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
 };
 
 export const addDefaultLightToLayer = (layer: gdLayer): void => {
-  const light = layer.getEffects().insertNewEffect('3D Light', 0);
-  light.setEffectType('Scene3D::HemisphereLight');
-  light.setStringParameter('skyColor', '255;255;255');
-  light.setStringParameter('groundColor', '64;64;64');
-  light.setDoubleParameter('intensity', 1);
-  light.setStringParameter('top', 'Y-');
-  light.setDoubleParameter('elevation', 45);
-  light.setDoubleParameter('rotation', 0);
+  const directionalLight = layer
+    .getEffects()
+    .insertNewEffect('3D Sun Light', 0);
+  directionalLight.setEffectType('Scene3D::DirectionalLight');
+  directionalLight.setStringParameter('color', '255;255;255');
+  directionalLight.setStringParameter('shadowQuality', 'Medium');
+  directionalLight.setDoubleParameter('distanceFromCamera', 1500);
+  directionalLight.setDoubleParameter('frustumSize', 4000);
+  directionalLight.setDoubleParameter('intensity', 0.75);
+  directionalLight.setStringParameter('top', 'Z+');
+  directionalLight.setDoubleParameter('elevation', 45);
+  directionalLight.setDoubleParameter('rotation', 0);
+  directionalLight.setBooleanParameter('isCastingShadow', true);
+
+  const ambientLight = layer
+    .getEffects()
+    .insertNewEffect('3D Ammbient Light', 0);
+  ambientLight.setEffectType('Scene3D::AmbientLight');
+  ambientLight.setStringParameter('color', '255;255;255');
+  ambientLight.setDoubleParameter('intensity', 0.25);
 };
 
 export const addDefaultLightToAllLayers = (layout: gdLayout): void => {

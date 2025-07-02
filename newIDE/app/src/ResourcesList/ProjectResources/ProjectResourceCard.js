@@ -156,7 +156,7 @@ export const ProjectResourceCard = ({
       >
         {renderResourcePreview()}
         <div style={styles.titleContainer}>
-          <Text noMargin style={styles.title}>
+          <Text noMargin style={styles.title} color="inherit">
             {resourceName}
           </Text>
         </div>

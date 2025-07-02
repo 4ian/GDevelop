@@ -978,6 +978,37 @@ class GD_CORE_API Project {
    */
   ResourcesManager& GetResourcesManager() { return resourcesManager; }
 
+  /**
+   * Set when the scenes must preload their resources: `at-startup`, `never`
+   * (default).
+   */
+  void SetSceneResourcesPreloading(gd::String sceneResourcesPreloading_) {
+    sceneResourcesPreloading = sceneResourcesPreloading_;
+  }
+
+  /**
+   * Get when the scenes must preload their resources: `at-startup`, `never`
+   * (default).
+   */
+  const gd::String& GetSceneResourcesPreloading() const {
+    return sceneResourcesPreloading;
+  }
+
+  /**
+   * Set when the scenes must unload their resources: `at-scene-exit`, `never`
+   * (default).
+   */
+  void SetSceneResourcesUnloading(gd::String sceneResourcesUnloading_) {
+    sceneResourcesUnloading = sceneResourcesUnloading_;
+  }
+
+  /**
+   * Get when the scenes must unload their resources: `at-scene-exit`, `never`
+   * (default).
+   */
+  const gd::String& GetSceneResourcesUnloading() const {
+    return sceneResourcesUnloading;
+  }
   ///@}
 
   /** \name Variable management
@@ -1135,6 +1166,10 @@ class GD_CORE_API Project {
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;
+  gd::String sceneResourcesPreloading;  ///< `at-startup` or `never`
+                                        ///< (default: `at-startup`).
+  gd::String sceneResourcesUnloading;   ///< `at-scene-exit` or `never`
+                                        ///< (default: `never`).
   mutable unsigned int gdMajorVersion =
       0;  ///< The GD major version used the last
           ///< time the project was saved.

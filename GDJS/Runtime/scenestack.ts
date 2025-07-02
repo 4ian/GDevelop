@@ -74,10 +74,14 @@ namespace gdjs {
           this.pop();
         } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
           this.push(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.REPLACE_SCENE) {
-          this.replace(currentScene.getRequestedScene());
-        } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
-          this.replace(currentScene.getRequestedScene(), true);
+        } else if (
+          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
+          request === gdjs.SceneChangeRequest.CLEAR_SCENES
+        ) {
+          this.replace(
+            currentScene.getRequestedScene(),
+            request === gdjs.SceneChangeRequest.CLEAR_SCENES
+          );
         } else {
           logger.error('Unrecognized change in scene stack: ' + request);
         }
@@ -117,7 +121,10 @@ namespace gdjs {
         if (!scene) {
           return;
         }
-        scene.unloadScene();
+        this._unloadSceneAndPossiblyResources({
+          scene,
+          newSceneName: null,
+        });
       }
 
       // Tell the new current scene it's being resumed
@@ -180,6 +187,7 @@ namespace gdjs {
         });
         this._isNextLayoutLoading = false;
       });
+
       return null;
     }
 
@@ -236,7 +244,7 @@ namespace gdjs {
         while (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       } else {
@@ -244,7 +252,7 @@ namespace gdjs {
         if (this._stack.length !== 0) {
           let scene = this._stack.pop();
           if (scene) {
-            scene.unloadScene();
+            this._unloadSceneAndPossiblyResources({ scene, newSceneName });
           }
         }
       }
@@ -425,12 +433,50 @@ namespace gdjs {
      * Unload all the scenes and clear the stack.
      */
     dispose(): void {
-      for (const item of this._stack) {
-        item.unloadScene();
+      while (this._stack.length > 0) {
+        const scene = this._stack.pop();
+        if (scene) {
+          this._unloadSceneAndPossiblyResources({
+            scene,
+            newSceneName: null,
+          });
+        }
       }
 
-      this._stack.length = 0;
       this._wasDisposed = true;
+    }
+
+    private _unloadSceneAndPossiblyResources({
+      scene,
+      newSceneName,
+    }: {
+      scene: gdjs.RuntimeScene;
+      newSceneName: string | null;
+    }): void {
+      const unloadedSceneName = scene.getName();
+
+      const resourcesUnloading = scene.getResourcesUnloading();
+      const resolvedResourcesUnloading =
+        resourcesUnloading === 'inherit'
+          ? this._runtimeGame.getSceneResourcesUnloading()
+          : resourcesUnloading;
+
+      const shouldUnloadResources =
+        resolvedResourcesUnloading === 'at-scene-exit' &&
+        // Unload resources only if it's the last scene with this name in the stack.
+        newSceneName !== scene.getName() &&
+        this._stack.every((scene) => scene.getName() !== unloadedSceneName);
+
+      scene.unloadScene();
+      // After this point, `scene` is no longer valid and should not be used anymore.
+      // It was "disposed".
+
+      if (shouldUnloadResources) {
+        this._runtimeGame.getResourceLoader().unloadSceneResources({
+          unloadedSceneName,
+          newSceneName,
+        });
+      }
     }
 
     private _throwIfDisposed(): void {

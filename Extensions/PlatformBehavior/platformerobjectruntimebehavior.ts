@@ -491,9 +491,9 @@ namespace gdjs {
         true
       );
       if (hasPopOutOfPlatform && !this._jumpKey) {
-        // TODO This is probably unnecessary because because `_canJump` is
-        // already set to true when entering the `OnFloor` state.
-        // This is wrongly allowing double jumps when the character is flipped
+        // TODO This is probably unnecessary because `_canJump` is already set
+        // to true when entering the `OnFloor` state.
+        // This is wrongly allowing double jumps when characters are flipped
         // with an offset center.
 
         //After being unstuck, the object must be able to jump again.

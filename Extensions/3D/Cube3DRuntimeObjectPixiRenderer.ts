@@ -81,13 +81,14 @@ namespace gdjs {
         .map((_, index) =>
           getFaceMaterial(runtimeObject, materialIndexToFaceIndex[index])
         );
-
       const boxMesh = new THREE.Mesh(geometry, materials);
 
       super(runtimeObject, instanceContainer, boxMesh);
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
+      boxMesh.receiveShadow = this._cube3DRuntimeObject._isCastingShadow;
+      boxMesh.castShadow = this._cube3DRuntimeObject._isReceivingShadow;
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
@@ -113,6 +114,13 @@ namespace gdjs {
         'color',
         new THREE.BufferAttribute(new Float32Array(tints), 3)
       );
+    }
+    updateShadowCasting() {
+      this._boxMesh.castShadow = this._cube3DRuntimeObject._isCastingShadow;
+    }
+    updateShadowReceiving() {
+      this._boxMesh.receiveShadow =
+        this._cube3DRuntimeObject._isReceivingShadow;
     }
 
     updateFace(faceIndex: integer) {

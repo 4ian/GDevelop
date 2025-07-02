@@ -49,6 +49,8 @@ export const enumerateEffectsMetadata = (
               const getLabel = () => propertyLabel;
               const getDescription = () => propertyDescription;
               const getExtraDescription = () => parameterName;
+              const advanced = property.isAdvanced();
+              const defaultValue = property.getValue();
 
               if (valueType === 'number') {
                 return {
@@ -61,6 +63,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue: parseFloat(defaultValue) || 0,
                 };
               } else if (valueType === 'boolean') {
                 return {
@@ -73,6 +77,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue: defaultValue === 'true',
                 };
               } else if (valueType === 'resource') {
                 // Resource is a "string" (with a selector in the UI)
@@ -90,6 +96,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'color') {
                 return {
@@ -102,6 +110,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else if (valueType === 'choice') {
                 const choices = property
@@ -119,6 +129,8 @@ export const enumerateEffectsMetadata = (
                   getLabel,
                   getDescription,
                   getExtraDescription,
+                  advanced,
+                  defaultValue,
                 };
               } else {
                 console.error(

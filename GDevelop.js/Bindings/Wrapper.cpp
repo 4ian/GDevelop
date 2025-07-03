@@ -481,6 +481,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
+typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice;
 
 // Customize some functions implementation thanks to WRAPPED_* macros
 // The original names will be reconstructed in the js file (see postjs.js)

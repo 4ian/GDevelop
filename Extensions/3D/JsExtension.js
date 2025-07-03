@@ -889,8 +889,8 @@ module.exports = {
         .getOrCreate('facesOrientation')
         .setValue(objectContent.facesOrientation || 'Y')
         .setType('choice')
-        .addExtraInfo('Y')
-        .addExtraInfo('Z')
+        .addChoice('Y', 'Y')
+        .addChoice('Z', 'Z')
         .setLabel(_('Faces orientation'))
         .setDescription(
           _(
@@ -950,8 +950,8 @@ module.exports = {
         .getOrCreate('backFaceUpThroughWhichAxisRotation')
         .setValue(objectContent.backFaceUpThroughWhichAxisRotation || 'X')
         .setType('choice')
-        .addExtraInfo('X')
-        .addExtraInfo('Y')
+        .addChoice('X', 'X')
+        .addChoice('Y', 'Y')
         .setLabel(_('Back face orientation'))
         .setDescription(
           _(
@@ -1087,8 +1087,8 @@ module.exports = {
         .getOrCreate('materialType')
         .setValue(objectContent.materialType || 'StandardWithoutMetalness')
         .setType('choice')
-        .addExtraInfo('Basic')
-        .addExtraInfo('StandardWithoutMetalness')
+        .addChoice('Basic', _('Basic (no lighting, no shadows)'))
+        .addChoice('StandardWithoutMetalness', _('Standard (without metalness)'))
         .setLabel(_('Material type'));
 
       objectProperties
@@ -1940,9 +1940,9 @@ module.exports = {
       properties
         .getOrCreate('shadowQuality')
         .setValue('medium')
-        .addExtraInfo('low')
-        .addExtraInfo('medium')
-        .addExtraInfo('high')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));

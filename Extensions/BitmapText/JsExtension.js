@@ -61,9 +61,9 @@ module.exports = {
         .getOrCreate('align')
         .setValue(objectContent.align)
         .setType('choice')
-        .addExtraInfo('left')
-        .addExtraInfo('center')
-        .addExtraInfo('right')
+        .addChoice('left', _('Left'))
+        .addChoice('center', _('Center'))
+        .addChoice('right', _('Right'))
         .setLabel(_('Alignment'))
         .setGroup(_('Appearance'));
 
@@ -74,9 +74,9 @@ module.exports = {
         .getOrCreate('verticalTextAlignment')
         .setValue(objectContent.verticalTextAlignment)
         .setType('choice')
-        .addExtraInfo('top')
-        .addExtraInfo('center')
-        .addExtraInfo('bottom')
+        .addChoice('top', _('Top'))
+        .addChoice('center', _('Center'))
+        .addChoice('bottom', _('Bottom'))
         .setLabel(_('Vertical alignment'))
         .setGroup(_('Appearance'));
 

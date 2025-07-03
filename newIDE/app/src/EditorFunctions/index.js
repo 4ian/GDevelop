@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { getInstancesInLayoutForLayer } from '../Utils/Layout';
-import { mapFor } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
@@ -251,7 +251,10 @@ const makeShortTextForNamedProperty = (
 
   const choices =
     type.toLowerCase() === 'choice'
-      ? property.getExtraInfo().toJSArray()
+      ? [
+          ...mapVector(property.getChoices(), choice => choice.getValue()),
+          ...property.getExtraInfo().toJSArray(),
+        ]
       : null;
   const information = [
     type,

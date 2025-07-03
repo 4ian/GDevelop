@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { mapFor } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
@@ -112,14 +112,19 @@ const createField = (
     };
   } else if (valueType === 'choice') {
     // Choice is a "string" (with a selector for the user in the UI)
-    const choices = property
+    const choices = mapVector(property.getChoices(), choice => ({
+      value: choice.getValue(),
+      label: choice.getLabel(),
+    }));
+    const deprecatedChoices = property
       .getExtraInfo()
       .toJSArray()
       .map(value => ({ value, label: value }));
+
     return {
       name,
       valueType: 'string',
-      getChoices: () => choices,
+      getChoices: () => [...choices, ...deprecatedChoices],
       getValue: (instance: Instance): string => {
         return getProperties(instance)
           .get(name)

@@ -1,5 +1,5 @@
 // @flow
-import { mapFor } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import { type Schema } from '../CompactPropertiesEditor';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
@@ -114,14 +114,18 @@ export const enumerateEffectsMetadata = (
                   defaultValue,
                 };
               } else if (valueType === 'choice') {
-                const choices = property
+                const choices = mapVector(property.getChoices(), choice => ({
+                  value: choice.getValue(),
+                  label: choice.getLabel(),
+                }));
+                const deprecatedChoices = property
                   .getExtraInfo()
                   .toJSArray()
                   .map(value => ({ value, label: value }));
                 return {
                   name: parameterName,
                   valueType: 'string',
-                  getChoices: () => choices,
+                  getChoices: () => [...choices, ...deprecatedChoices],
                   getValue: (effect: gdEffect) =>
                     effect.getStringParameter(parameterName),
                   setValue: (effect: gdEffect, newValue: string) =>

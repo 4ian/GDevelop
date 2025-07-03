@@ -105,6 +105,8 @@ declare class libGDevelop {
   EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
   LayersContainer: Class<gdLayersContainer>;
+  PropertyDescriptorChoice: Class<gdPropertyDescriptorChoice>;
+  VectorPropertyDescriptorChoice: Class<gdVectorPropertyDescriptorChoice>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
   MeasurementUnit: Class<gdMeasurementUnit>;
   MeasurementBaseUnit: Class<gdMeasurementBaseUnit>;

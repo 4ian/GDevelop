@@ -177,19 +177,19 @@ namespace gdjs {
               );
             }
             if (parameterName === 'shadowQuality') {
-              if (value === 'Low') {
+              if (value === 'low') {
                 this.light.shadow.mapSize.set(512, 512);
                 this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
                 this.light.shadow.map = null;
                 this.light.shadow.needsUpdate = true;
               }
-              if (value === 'Medium') {
+              if (value === 'medium') {
                 this.light.shadow.mapSize.set(1024, 1024);
                 this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
                 this.light.shadow.map = null;
                 this.light.shadow.needsUpdate = true;
               }
-              if (value === 'High') {
+              if (value === 'high') {
                 this.light.shadow.mapSize.set(2048, 2048);
                 this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
                 this.light.shadow.map = null;

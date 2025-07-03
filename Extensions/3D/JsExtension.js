@@ -1939,10 +1939,10 @@ module.exports = {
         .setGroup(_('Shadows'));
       properties
         .getOrCreate('shadowQuality')
-        .setValue('Medium')
-        .addExtraInfo('Low')
-        .addExtraInfo('Medium')
-        .addExtraInfo('High')
+        .setValue('medium')
+        .addExtraInfo('low')
+        .addExtraInfo('medium')
+        .addExtraInfo('high')
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));

@@ -1,36 +1,26 @@
-/*
- * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
- * reserved. This project is released under the MIT License.
- */
+// GDevelop Core
+// Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com)
+// This project is released under the MIT License.
+
 #include "ArbitraryBehaviorSharedDataWorker.h"
-
-#include <iostream>
-#include <map>
-#include <memory>
-#include <vector>
-
 #include "GDCore/Project/BehaviorsSharedData.h"
-#include "GDCore/String.h"
-
-using namespace std;
 
 namespace gd {
 
-ArbitraryBehaviorSharedDataWorker::~ArbitraryBehaviorSharedDataWorker() {}
+ArbitraryBehaviorSharedDataWorker::~ArbitraryBehaviorSharedDataWorker() = default;
 
+// Visit all shared behavior data, applying DoVisitSharedDatas and then each shared data individually.
 void ArbitraryBehaviorSharedDataWorker::VisitSharedDatas(
-    const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
-        &sharedDatas) {
+    const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>& sharedDatas) {
   DoVisitSharedDatas(sharedDatas);
-
-  for (auto &behaviorSharedDataContent : sharedDatas) {
-    VisitSharedData(*behaviorSharedDataContent.second);
+  for (const auto& pair : sharedDatas) {
+    VisitSharedData(*pair.second);
   }
 }
 
+// Visit a single shared behavior data.
 void ArbitraryBehaviorSharedDataWorker::VisitSharedData(
-    gd::BehaviorsSharedData &sharedData) {
+    gd::BehaviorsSharedData& sharedData) {
   DoVisitSharedData(sharedData);
 }
 

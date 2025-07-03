@@ -1088,7 +1088,10 @@ module.exports = {
         .setValue(objectContent.materialType || 'StandardWithoutMetalness')
         .setType('choice')
         .addChoice('Basic', _('Basic (no lighting, no shadows)'))
-        .addChoice('StandardWithoutMetalness', _('Standard (without metalness)'))
+        .addChoice(
+          'StandardWithoutMetalness',
+          _('Standard (without metalness)')
+        )
         .setLabel(_('Material type'));
 
       objectProperties

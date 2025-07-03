@@ -160,9 +160,9 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
   objectProperties["textAlignment"]
       .SetValue(textAlignment)
       .SetType("choice")
-      .AddExtraInfo("left")
-      .AddExtraInfo("center")
-      .AddExtraInfo("right")
+      .AddChoice("left", _("Left"))
+      .AddChoice("center", _("Center"))
+      .AddChoice("right", _("Right"))
       .SetLabel(_("Alignment"))
       .SetDescription(_("Alignment of the text when multiple lines are displayed"))
       .SetGroup(_("Font"))
@@ -171,9 +171,9 @@ std::map<gd::String, gd::PropertyDescriptor> TextObject::GetProperties() const {
   objectProperties["verticalTextAlignment"]
       .SetValue(verticalTextAlignment)
       .SetType("choice")
-      .AddExtraInfo("top")
-      .AddExtraInfo("center")
-      .AddExtraInfo("bottom")
+      .AddChoice("top", _("Top"))
+      .AddChoice("center", _("Center"))
+      .AddChoice("bottom", _("Bottom"))
       .SetLabel(_("Vertical alignment"))
       .SetGroup(_("Font"))
       .SetQuickCustomizationVisibility(gd::QuickCustomization::Hidden);

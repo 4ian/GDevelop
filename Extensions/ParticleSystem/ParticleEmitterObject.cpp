@@ -194,9 +194,9 @@ ParticleEmitterObject::GetProperties() const {
                 : GetRendererType() == Line ? "Line"
                                             : "Image")
       .SetType("choice")
-      .AddExtraInfo("Circle")
-      .AddExtraInfo("Line")
-      .AddExtraInfo("Image")
+      .AddChoice("Circle", _("Circle"))
+      .AddChoice("Line", _("Line"))
+      .AddChoice("Image", _("Image"))
       .SetLabel(_("Particle type"))
       .SetHasImpactOnOtherProperties(true);
 

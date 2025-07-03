@@ -176,6 +176,17 @@
         "name": "NewSprite3",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "file": "assets/Tractor Shovel.glb",
+        "kind": "model3D",
+        "metadata": "",
+        "name": "Tractor Shovel.glb",
+        "userAdded": false,
+        "origin": {
+          "identifier": "https://asset-resources.gdevelop.io/public-resources/3D Cars/b97157c3e512a8b584921e72412fc0b55ddc4042af980d14113d22b0a8ed2e01_Tractor Shovel.glb",
+          "name": "Tractor Shovel.glb"
+        }
       }
     ],
     "resourceFolders": []
@@ -1114,7 +1125,7 @@
           "persistentUuid": "5de33b8b-c91f-436d-befa-e1d3cd9643df",
           "width": 345,
           "x": 496,
-          "y": 217,
+          "y": 216,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -1132,6 +1143,24 @@
           "x": 609,
           "y": 77,
           "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 111,
+          "height": 122,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Tractor_Shovel",
+          "persistentUuid": "35b767df-8402-469e-b2a6-b9183ea18f1a",
+          "rotationX": 45,
+          "width": 177,
+          "x": 782,
+          "y": 169,
+          "zOrder": 4,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1324,6 +1353,31 @@
               ]
             }
           ]
+        },
+        {
+          "assetStoreId": "f275d664d65258b0302460c4fdf47436a46f1ff89af70b8671efd78cd26adf7f",
+          "name": "Tractor_Shovel",
+          "type": "Scene3D::Model3DObject",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "centerLocation": "ModelOrigin",
+            "crossfadeDuration": 0.10000000149011612,
+            "depth": 72,
+            "height": 72,
+            "isCastingShadow": false,
+            "isReceivingShadow": false,
+            "keepAspectRatio": true,
+            "materialType": "StandardWithoutMetalness",
+            "modelResourceName": "Tractor Shovel.glb",
+            "originLocation": "ModelOrigin",
+            "rotationX": 90,
+            "rotationY": 0,
+            "rotationZ": -90,
+            "width": 72,
+            "animations": []
+          }
         }
       ],
       "objectsFolderStructure": {
@@ -1337,6 +1391,9 @@
           },
           {
             "objectName": "NewSprite2"
+          },
+          {
+            "objectName": "Tractor_Shovel"
           }
         ]
       },

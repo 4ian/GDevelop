@@ -18,36 +18,63 @@ namespace gdjs {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          light: THREE.DirectionalLight;
-          _isEnabled: boolean = false;
-          top: string = 'Y-';
-          elevation: float = 45;
-          rotation: float = 0;
-          shadowSize: float = 1024;
-          distanceFromCamera: float = 1500;
-          frustumSize: float = 4000;
-          shadowCameraHelper: THREE.CameraHelper | null;
+          private _light: THREE.DirectionalLight;
+          private _isEnabled: boolean = false;
+          private _top: string = 'Y-';
+          private _elevation: float = 45;
+          private _rotation: float = 0;
+
+          private _shadowMapDirty = true;
+          private _shadowMapSize: float = 1024;
+
+          private _shadowCameraDirty = true;
+          private _distanceFromCamera: float = 1500;
+          private _frustumSize: float = 4000;
+          private _shadowCameraHelper: THREE.CameraHelper | null;
 
           constructor() {
-            this.light = new THREE.DirectionalLight();
-            this.light.shadow.mapSize.width = this.shadowSize;
-            this.light.shadow.mapSize.height = this.shadowSize;
-            this.light.shadow.camera.near = 1;
-            this.light.shadow.camera.far = this.distanceFromCamera + 10000;
-            this.light.shadow.camera.right = this.frustumSize / 2;
-            this.light.shadow.camera.left = -this.frustumSize / 2;
-            this.light.shadow.camera.top = this.frustumSize / 2;
-            this.light.shadow.camera.bottom = -this.frustumSize / 2;
+            this._light = new THREE.DirectionalLight();
 
             if (shadowHelper) {
-              this.shadowCameraHelper = new THREE.CameraHelper(
-                this.light.shadow.camera
+              this._shadowCameraHelper = new THREE.CameraHelper(
+                this._light.shadow.camera
               );
             } else {
-              this.shadowCameraHelper = null;
+              this._shadowCameraHelper = null;
             }
 
-            this.light.shadow.camera.updateProjectionMatrix();
+            this._light.shadow.camera.updateProjectionMatrix();
+          }
+
+          private _updateShadowCamera(): void {
+            if (!this._shadowCameraDirty) {
+              return;
+            }
+            this._shadowCameraDirty = false;
+
+            this._light.shadow.camera.near = 1;
+            this._light.shadow.camera.far = this._distanceFromCamera + 10000;
+            this._light.shadow.camera.right = this._frustumSize / 2;
+            this._light.shadow.camera.left = -this._frustumSize / 2;
+            this._light.shadow.camera.top = this._frustumSize / 2;
+            this._light.shadow.camera.bottom = -this._frustumSize / 2;
+          }
+
+          private _updateShadowMapSize(): void {
+            if (!this._shadowMapDirty) {
+              return;
+            }
+            this._shadowMapDirty = false;
+
+            this._light.shadow.mapSize.set(
+              this._shadowMapSize,
+              this._shadowMapSize
+            );
+
+            // Force the recreation of the shadow map texture:
+            this._light.shadow.map?.dispose();
+            this._light.shadow.map = null;
+            this._light.shadow.needsUpdate = true;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -71,10 +98,10 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.add(this.light);
-            scene.add(this.light.target);
-            if (this.shadowCameraHelper) {
-              scene.add(this.shadowCameraHelper);
+            scene.add(this._light);
+            scene.add(this._light.target);
+            if (this._shadowCameraHelper) {
+              scene.add(this._shadowCameraHelper);
             }
 
             this._isEnabled = true;
@@ -88,15 +115,18 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.remove(this.light);
-            scene.remove(this.light.target);
-            if (this.shadowCameraHelper) {
-              scene.remove(this.shadowCameraHelper);
+            scene.remove(this._light);
+            scene.remove(this._light.target);
+            if (this._shadowCameraHelper) {
+              scene.remove(this._shadowCameraHelper);
             }
             this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            this._updateShadowCamera();
+            this._updateShadowMapSize();
+
             if (!target.getRuntimeLayer) {
               return;
             }
@@ -108,126 +138,122 @@ namespace gdjs {
             const roundedX = Math.floor(x / 100) * 100;
             const roundedY = Math.floor(y / 100) * 100;
             const roundedZ = Math.floor(z / 100) * 100;
-            if (this.top === 'Y-') {
+            if (this._top === 'Y-') {
               const posLightX =
                 roundedX +
-                this.distanceFromCamera *
-                  Math.cos(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
+                this._distanceFromCamera *
+                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY -
-                this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
+                this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._elevation));
               const posLightZ =
                 roundedZ +
-                this.distanceFromCamera *
-                  Math.sin(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
-              this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.target.position.set(roundedX, roundedY, roundedZ);
+                this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation));
+              this._light.position.set(posLightX, posLightY, posLightZ);
+              this._light.target.position.set(roundedX, roundedY, roundedZ);
             } else {
               const posLightX =
                 roundedX +
-                this.distanceFromCamera *
-                  Math.cos(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
+                this._distanceFromCamera *
+                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY +
-                this.distanceFromCamera *
-                  Math.sin(gdjs.toRad(this.rotation + 90)) *
-                  Math.cos(gdjs.toRad(this.elevation));
+                this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._elevation));
               const posLightZ =
                 roundedZ +
-                this.distanceFromCamera * Math.sin(gdjs.toRad(this.elevation));
+                this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._elevation));
 
-              this.light.position.set(posLightX, posLightY, posLightZ);
-              this.light.target.position.set(roundedX, roundedY, roundedZ);
+              this._light.position.set(posLightX, posLightY, posLightZ);
+              this._light.target.position.set(roundedX, roundedY, roundedZ);
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this.light.intensity = value;
+              this._light.intensity = value;
             } else if (parameterName === 'elevation') {
-              this.elevation = value;
+              this._elevation = value;
             } else if (parameterName === 'rotation') {
-              this.rotation = value;
+              this._rotation = value;
             } else if (parameterName === 'distanceFromCamera') {
-              this.distanceFromCamera = value;
+              this._distanceFromCamera = value;
             } else if (parameterName === 'frustumSize') {
-              this.frustumSize = value;
+              this._frustumSize = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this.light.intensity;
+              return this._light.intensity;
             } else if (parameterName === 'elevation') {
-              return this.elevation;
+              return this._elevation;
             } else if (parameterName === 'rotation') {
-              return this.rotation;
+              return this._rotation;
             } else if (parameterName === 'distanceFromCamera') {
-              return this.distanceFromCamera;
+              return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
-              return this.frustumSize;
+              return this._frustumSize;
             }
             return 0;
           }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'color') {
-              this.light.color = new THREE.Color(
+              this._light.color = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
             }
             if (parameterName === 'shadowQuality') {
-              if (value === 'Low') {
-                this.light.shadow.mapSize.set(512, 512);
-                this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
-                this.light.shadow.map = null;
-                this.light.shadow.needsUpdate = true;
+              if (value === 'low' && this._shadowMapSize !== 512) {
+                this._shadowMapSize = 512;
+                this._shadowMapDirty = true;
               }
-              if (value === 'Medium') {
-                this.light.shadow.mapSize.set(1024, 1024);
-                this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
-                this.light.shadow.map = null;
-                this.light.shadow.needsUpdate = true;
+              if (value === 'medium' && this._shadowMapSize !== 1024) {
+                this._shadowMapSize = 1024;
+                this._shadowMapDirty = true;
               }
-              if (value === 'High') {
-                this.light.shadow.mapSize.set(2048, 2048);
-                this.light.shadow.map?.dispose(); //force the recreation of the shadow texture
-                this.light.shadow.map = null;
-                this.light.shadow.needsUpdate = true;
+              if (value === 'high' && this._shadowMapSize !== 2048) {
+                this._shadowMapSize = 2048;
+                this._shadowMapDirty = true;
               }
             }
           }
           updateColorParameter(parameterName: string, value: number): void {
             if (parameterName === 'color') {
-              this.light.color.setHex(value);
+              this._light.color.setHex(value);
             }
           }
           getColorParameter(parameterName: string): number {
             if (parameterName === 'color') {
-              return this.light.color.getHex();
+              return this._light.color.getHex();
             }
             return 0;
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
-              this.light.castShadow = value;
+              this._light.castShadow = value;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
             return {
-              i: this.light.intensity,
-              c: this.light.color.getHex(),
-              e: this.elevation,
-              r: this.rotation,
-              t: this.top,
+              i: this._light.intensity,
+              c: this._light.color.getHex(),
+              e: this._elevation,
+              r: this._rotation,
+              t: this._top,
             };
           }
           updateFromNetworkSyncData(syncData: any): void {
-            this.light.intensity = syncData.i;
-            this.light.color.setHex(syncData.c);
-            this.elevation = syncData.e;
-            this.rotation = syncData.r;
-            this.top = syncData.t;
+            this._light.intensity = syncData.i;
+            this._light.color.setHex(syncData.c);
+            this._elevation = syncData.e;
+            this._rotation = syncData.r;
+            this._top = syncData.t;
           }
         })();
       }

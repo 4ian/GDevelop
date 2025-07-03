@@ -946,6 +946,17 @@ export class LayersContainer extends EmscriptenObject {
   unserializeLayersFrom(element: SerializerElement): void;
 }
 
+export class PropertyDescriptorChoice extends EmscriptenObject {
+  constructor(value: string, label: string);
+  getValue(): string;
+  getLabel(): string;
+}
+
+export class VectorPropertyDescriptorChoice extends EmscriptenObject {
+  size(): number;
+  at(index: number): PropertyDescriptorChoice;
+}
+
 export class PropertyDescriptor extends EmscriptenObject {
   constructor(propValue: string);
   setValue(value: string): PropertyDescriptor;
@@ -958,6 +969,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   getDescription(): string;
   setGroup(label: string): PropertyDescriptor;
   getGroup(): string;
+  addChoice(value: string, label: string): PropertyDescriptor;
+  getChoices(): VectorPropertyDescriptorChoice;
   addExtraInfo(type: string): PropertyDescriptor;
   setExtraInfo(info: VectorString): PropertyDescriptor;
   getExtraInfo(): VectorString;

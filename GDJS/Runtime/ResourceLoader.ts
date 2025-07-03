@@ -424,7 +424,7 @@ namespace gdjs {
             (await onProgress(loadedCount, sceneState.resourceNames.length));
         }
       );
-      sceneState.status = 'ready';
+      sceneState.status = 'loaded';
     }
 
     private async _loadResource(resource: ResourceData): Promise<void> {

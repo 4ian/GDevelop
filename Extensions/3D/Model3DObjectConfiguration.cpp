@@ -153,19 +153,19 @@ Model3DObjectConfiguration::GetProperties() const {
   objectProperties["materialType"]
       .SetValue(materialType.empty() ? "Basic" : materialType)
       .SetType("choice")
-      .AddExtraInfo("Basic")
-      .AddExtraInfo("StandardWithoutMetalness")
-      .AddExtraInfo("KeepOriginal")
+      .AddChoice("Basic", _("Basic (no lighting, no shadows)"))
+      .AddChoice("StandardWithoutMetalness", _("Standard (without metalness)"))
+      .AddChoice("KeepOriginal", _("Keep original"))
       .SetLabel(_("Material"));
 
   objectProperties["originLocation"]
       .SetValue(originLocation.empty() ? "TopLeft" : originLocation)
       .SetType("choice")
-      .AddExtraInfo("ModelOrigin")
-      .AddExtraInfo("TopLeft")
-      .AddExtraInfo("ObjectCenter")
-      .AddExtraInfo("BottomCenterZ")
-      .AddExtraInfo("BottomCenterY")
+      .AddChoice("ModelOrigin", _("Model origin"))
+      .AddChoice("TopLeft", _("Top left"))
+      .AddChoice("ObjectCenter", _("Object center"))
+      .AddChoice("BottomCenterZ", _("Bottom center (Z)"))
+      .AddChoice("BottomCenterY", _("Bottom center (Y)"))
       .SetLabel(_("Origin point"))
       .SetGroup(_("Points"))
       .SetAdvanced(true);
@@ -173,10 +173,10 @@ Model3DObjectConfiguration::GetProperties() const {
   objectProperties["centerLocation"]
       .SetValue(centerLocation.empty() ? "ObjectCenter" : centerLocation)
       .SetType("choice")
-      .AddExtraInfo("ModelOrigin")
-      .AddExtraInfo("ObjectCenter")
-      .AddExtraInfo("BottomCenterZ")
-      .AddExtraInfo("BottomCenterY")
+      .AddChoice("ModelOrigin", _("Model origin"))
+      .AddChoice("ObjectCenter", _("Object center"))
+      .AddChoice("BottomCenterZ", _("Bottom center (Z)"))
+      .AddChoice("BottomCenterY", _("Bottom center (Y)"))
       .SetLabel(_("Center point"))
       .SetGroup(_("Points"))
       .SetAdvanced(true);
@@ -200,7 +200,7 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetLabel(_("Shadow receiving"))
       .SetGroup(_("Shadows"));
 
-      
+
 
   return objectProperties;
 }

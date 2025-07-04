@@ -136,7 +136,16 @@ describe('gdjs.ResourceLoader', () => {
 
     // Scene2 should now be loaded
     expect(resourceLoader.areSceneAssetsLoaded('Scene2')).to.be(true);
+    expect(resourceLoader.areSceneAssetsReady('Scene2')).to.be(false);
+
+    // Scene 2 resources can be processed so the scene is fully ready:
+    resourceLoader.loadAndProcessSceneResources('Scene2');
+    await delay(10);
+
+    expect(resourceLoader.areSceneAssetsLoaded('Scene2')).to.be(true);
     expect(resourceLoader.areSceneAssetsReady('Scene2')).to.be(true);
+
+    // Scene 3 resources are not loaded nor processed yet:
     expect(resourceLoader.areSceneAssetsLoaded('Scene3')).to.be(false);
     expect(resourceLoader.areSceneAssetsReady('Scene3')).to.be(false);
 
@@ -154,7 +163,14 @@ describe('gdjs.ResourceLoader', () => {
     mockedResourceManager.markPendingResourcesAsLoaded('scene3-resource1.png');
     await delay(10);
 
-    // All scenes should now be loaded
+    // Scene3 should now be loaded
+    expect(resourceLoader.areSceneAssetsLoaded('Scene3')).to.be(true);
+    expect(resourceLoader.areSceneAssetsReady('Scene3')).to.be(false);
+
+    // Scene3 resources can be processed so the scene is fully ready:
+    resourceLoader.loadAndProcessSceneResources('Scene3');
+    await delay(10);
+
     expect(resourceLoader.areSceneAssetsLoaded('Scene3')).to.be(true);
     expect(resourceLoader.areSceneAssetsReady('Scene3')).to.be(true);
   });

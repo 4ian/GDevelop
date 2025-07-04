@@ -142,7 +142,7 @@ namespace gdjs {
             skybox.position.set(0, 0, 0);
             skybox.frustumCulled = false;
 
-            //scene.add(skybox);
+            scene.add(skybox);
             scene.add(this._light);
             scene.add(this._light.target);
             if (this._shadowCameraHelper) {

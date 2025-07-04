@@ -112,22 +112,22 @@ namespace gdjs {
             const skyboxGeo = new THREE.BoxGeometry(10000, 10000, 10000);
 
             const ft = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.png'
             );
             const bk = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.png'
             );
             const up = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.png'
             );
             const dn = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.png'
             );
             const rt = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.png'
             );
             const lf = new THREE.TextureLoader().load(
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.bmp'
+              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.png'
             );
 
             const materialArray = [

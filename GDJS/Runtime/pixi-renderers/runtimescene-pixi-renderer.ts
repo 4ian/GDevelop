@@ -39,12 +39,12 @@ namespace gdjs {
       this.loader = new THREE.CubeTextureLoader();
 
       this.texture = this.loader.load([
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.bmp', // px
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.bmp', // nx
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.bmp', // py
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.bmp', // ny
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.bmp', // pz
-        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.bmp', // nz
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.png', // px
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.png', // nx
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.png', // py
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.png', // ny
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.png', // pz
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.png', // nz
       ]);
     }
 

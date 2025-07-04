@@ -26,6 +26,7 @@ namespace gdjs {
 
           private _shadowMapDirty = true;
           private _shadowMapSize: float = 1024;
+          private _minimumShadowBias: float = 0;
 
           private _shadowCameraDirty = true;
           private _distanceFromCamera: float = 1500;
@@ -65,17 +66,6 @@ namespace gdjs {
               return;
             }
             this._shadowMapDirty = false;
-
-            // Avoid shadow acne due to depth buffer precision. We choose a value
-            // small enough to avoid "peter panning" but not too small to avoid
-            // shadow acne on low/medium quality shadow maps.
-            // If needed, this could become a parameter of the effect.
-            this._light.shadow.bias =
-              this._shadowMapSize < 1024
-                ? -0.002
-                : this._shadowMapSize < 2048
-                  ? -0.001
-                  : -0.0008;
 
             this._light.shadow.mapSize.set(
               this._shadowMapSize,
@@ -135,9 +125,21 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            // Apply any update to the camera or shadow map size.
             this._updateShadowCamera();
             this._updateShadowMapSize();
 
+            // Avoid shadow acne due to depth buffer precision.
+            const biasMultiplier =
+              this._shadowMapSize < 1024
+                ? 2
+                : this._shadowMapSize < 2048
+                  ? 1.25
+                  : 1;
+            this._light.shadow.bias = -this._minimumShadowBias * biasMultiplier;
+
+            // Apply update to the light position and its target.
+            // By doing this, the shadows are "following" the GDevelop camera.
             if (!target.getRuntimeLayer) {
               return;
             }
@@ -197,6 +199,8 @@ namespace gdjs {
               this._distanceFromCamera = value;
             } else if (parameterName === 'frustumSize') {
               this._frustumSize = value;
+            } else if (parameterName === 'minimumShadowBias') {
+              this._minimumShadowBias = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -210,6 +214,8 @@ namespace gdjs {
               return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
               return this._frustumSize;
+            } else if (parameterName === 'minimumShadowBias') {
+              return this._minimumShadowBias;
             }
             return 0;
           }

@@ -1950,6 +1950,18 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('minimumShadowBias')
+        .setValue('0')
+        .setLabel(_('Shadow bias'))
+        .setDescription(
+          _(
+            'Use this to avoid "shadow acne" due to depth buffer precision. Choose a value small enough like 0.001 to avoid creating distance between shadows and objects but not too small to avoid shadow glitches on low/medium quality. This value is used for high quality, and multiplied by 1.25 for medium quality and 2 for low quality.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))

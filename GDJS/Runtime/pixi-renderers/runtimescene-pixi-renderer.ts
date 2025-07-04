@@ -11,6 +11,8 @@ namespace gdjs {
     private _profilerText: PIXI.Text | null = null;
     private _showCursorAtNextRender: boolean = false;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
+    private loader: THREE.CubeTextureLoader;
+    private texture: THREE.CubeTexture;
     private _layerRenderingMetrics: {
       rendered2DLayersCount: number;
       rendered3DLayersCount: number;
@@ -33,6 +35,17 @@ namespace gdjs {
       this._threeRenderer = this._runtimeGameRenderer
         ? this._runtimeGameRenderer.getThreeRenderer()
         : null;
+
+      this.loader = new THREE.CubeTextureLoader();
+
+      this.texture = this.loader.load([
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.bmp', // px
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.bmp', // nx
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.bmp', // py
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.bmp', // ny
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.bmp', // pz
+        'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.bmp', // nz
+      ]);
     }
 
     onGameResolutionResized() {
@@ -209,9 +222,11 @@ namespace gdjs {
                 );
                 threeRenderer.resetState();
                 if (this._runtimeScene.getClearCanvas()) threeRenderer.clear();
-                threeScene.background = new THREE.Color(
-                  this._runtimeScene.getBackgroundColor()
-                );
+
+                threeScene.background = this.texture;
+                // threeScene.background = new THREE.Color(
+                //   this._runtimeScene.getBackgroundColor()
+                // );
 
                 isFirstRender = false;
               } else {

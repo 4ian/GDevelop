@@ -131,27 +131,18 @@ namespace gdjs {
             );
 
             const materialArray = [
-    new THREE.MeshBasicMaterial({ map: rt, side: THREE.BackSide }), // Right
-    new THREE.MeshBasicMaterial({ map: lf, side: THREE.BackSide }), // Left
-    new THREE.MeshBasicMaterial({ map: up, side: THREE.BackSide }), // Top
-    new THREE.MeshBasicMaterial({ map: dn, side: THREE.BackSide }), // Bottom
-    new THREE.MeshBasicMaterial({ map: bk, side: THREE.BackSide }), // Front
-    new THREE.MeshBasicMaterial({ map: ft, side: THREE.BackSide }), // Back
-];
+              new THREE.MeshBasicMaterial({ map: rt, side: THREE.BackSide }), // Right
+              new THREE.MeshBasicMaterial({ map: up, side: THREE.BackSide }), // Left
+              new THREE.MeshBasicMaterial({ map: lf, side: THREE.BackSide }), // Top
+              new THREE.MeshBasicMaterial({ map: dn, side: THREE.BackSide }), // Bottom
+              new THREE.MeshBasicMaterial({ map: bk, side: THREE.BackSide }), // Front
+              new THREE.MeshBasicMaterial({ map: ft, side: THREE.BackSide }), // Back
+            ];
             const skybox = new THREE.Mesh(skyboxGeo, materialArray);
             skybox.position.set(0, 0, 0);
             skybox.frustumCulled = false;
-            const loader = new THREE.CubeTextureLoader();
-            const texture = loader.load([
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_east.bmp', // px
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_west.bmp', // nx
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_up.bmp', // py
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_down.bmp', // ny
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_north.bmp', // pz
-              'C:/Users/Utilisateur/Desktop/Gdevelop/GDevelop/Extensions/3D/clouds1_south.bmp', // nz
-            ]);
-            scene.background = texture;
-            scene.add(skybox);
+
+            //scene.add(skybox);
             scene.add(this._light);
             scene.add(this._light.target);
             if (this._shadowCameraHelper) {

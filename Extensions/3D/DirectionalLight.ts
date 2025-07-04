@@ -74,8 +74,8 @@ namespace gdjs {
               this._shadowMapSize < 1024
                 ? -0.002
                 : this._shadowMapSize < 2048
-                ? -0.001
-                : -0.0008;
+                  ? -0.001
+                  : -0.0008;
 
             this._light.shadow.mapSize.set(
               this._shadowMapSize,

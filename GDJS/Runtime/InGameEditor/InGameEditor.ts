@@ -101,6 +101,9 @@ namespace gdjs {
     );
   };
 
+  const isSpacePressed = (inputManager: gdjs.InputManager) =>
+    inputManager.isKeyPressed(SPACE_KEY);
+
   const shouldDeleteSelection = (inputManager: gdjs.InputManager) => {
     return (
       inputManager.isKeyPressed(DEL_KEY) ||
@@ -1010,7 +1013,8 @@ namespace gdjs {
 
       if (
         inputManager.isMouseButtonPressed(0) &&
-        !shouldDragSelectedObject(inputManager)
+        !shouldDragSelectedObject(inputManager) &&
+        !isSpacePressed(inputManager)
       ) {
         if (this._wasMouseLeftButtonPressed && this._selectionBox) {
           this._selectionBox.endPoint.set(
@@ -2300,7 +2304,7 @@ namespace gdjs {
 
         // Space + click: move the camera on its plane.
         if (
-          inputManager.isKeyPressed(SPACE_KEY) &&
+          isSpacePressed(inputManager) &&
           inputManager.isMouseButtonPressed(0)
         ) {
           const xDelta = this._lastCursorX - inputManager.getCursorX();

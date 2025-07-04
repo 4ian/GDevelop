@@ -66,6 +66,17 @@ namespace gdjs {
             }
             this._shadowMapDirty = false;
 
+            // Avoid shadow acne due to depth buffer precision. We choose a value
+            // small enough to avoid "peter panning" but not too small to avoid
+            // shadow acne on low/medium quality shadow maps.
+            // If needed, this could become a parameter of the effect.
+            this._light.shadow.bias =
+              this._shadowMapSize < 1024
+                ? -0.002
+                : this._shadowMapSize < 2048
+                  ? -0.001
+                  : -0.0008;
+
             this._light.shadow.mapSize.set(
               this._shadowMapSize,
               this._shadowMapSize

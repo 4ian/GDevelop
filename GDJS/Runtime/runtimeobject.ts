@@ -614,8 +614,11 @@ namespace gdjs {
     }
 
     /**
-     * Called when the object is destroyed (because it is removed from a scene or the scene
-     * is being unloaded). If you redefine this function, **make sure to call the original method**
+     * Called when the object is deleted (because it is removed from a scene or
+     * the scene is being unloaded). The object is not actually destroyed and
+     * can still be used by events.
+     *
+     * If you redefine this function, **make sure to call the original method**
      * (`RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
      */
     onDeletedFromScene(): void {
@@ -635,6 +638,10 @@ namespace gdjs {
       this.clearEffects();
     }
 
+    /**
+     * Called on deleted objects after all events has been executed for the
+     * current frame and the object can be safely destroyed.
+     */
     onDestroyed(): void {}
 
     /**

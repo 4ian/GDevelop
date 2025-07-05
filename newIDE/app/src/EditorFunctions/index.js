@@ -112,6 +112,11 @@ export type EditorCallbacks = {|
   ) => void,
 |};
 
+export type SceneEventsOutsideEditorChanges = {|
+  scene: gdLayout,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
 /**
  * A function that does something in the editor on the given project.
  */
@@ -132,7 +137,9 @@ export type EditorFunction = {|
     generateEvents: (
       options: EventsGenerationOptions
     ) => Promise<EventsGenerationResult>,
-    onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+    onSceneEventsModifiedOutsideEditor: (
+      changes: SceneEventsOutsideEditorChanges
+    ) => void,
     ensureExtensionInstalled: (options: {|
       extensionName: string,
     |}) => Promise<void>,
@@ -2236,7 +2243,10 @@ const addSceneEvents: EditorFunction = {
           changes,
           aiGeneratedEvent.id
         );
-        onSceneEventsModifiedOutsideEditor(scene);
+        onSceneEventsModifiedOutsideEditor({
+          scene,
+          newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
+        });
 
         const resultMessage =
           aiGeneratedEvent.resultMessage ||

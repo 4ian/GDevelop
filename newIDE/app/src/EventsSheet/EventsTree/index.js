@@ -16,6 +16,7 @@ import {
   eventsTree,
   eventsTreeWithSearchResults,
   handle,
+  aiGeneratedEventHandle,
   icon,
 } from './ClassNames';
 import {
@@ -134,6 +135,7 @@ type EventsContainerProps = {|
   windowSize: WindowSizeType,
 
   idPrefix: string,
+  highlightedAiGeneratedEventIds: Set<string>,
 |};
 
 /**
@@ -151,6 +153,7 @@ const EventContainer = (props: EventsContainerProps) => {
     onEventContextMenu,
     projectScopedContainersAccessor,
     onUpdate,
+    highlightedAiGeneratedEventIds,
   } = props;
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -204,7 +207,16 @@ const EventContainer = (props: EventsContainerProps) => {
     >
       {!!EventComponent && (
         <div style={styles.eventComponentContainer}>
-          {props.connectDragSource(<div className={handle} />)}
+          {props.connectDragSource(
+            <div
+              className={classNames({
+                [handle]: true,
+                [aiGeneratedEventHandle]: highlightedAiGeneratedEventIds.has(
+                  event.getAiGeneratedEventId()
+                ),
+              })}
+            />
+          )}
           <div style={styles.container}>
             <EventComponent
               project={project}
@@ -348,6 +360,8 @@ type EventsTreeProps = {|
 
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
+
+  highlightedAiGeneratedEventIds: Set<string>,
 |};
 
 export type EventsTreeInterface = {|
@@ -770,6 +784,9 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   connectDragSource={connectDragSource}
                   windowSize={props.windowSize}
                   idPrefix={`event-${node.relativeNodePath.join('-')}`}
+                  highlightedAiGeneratedEventIds={
+                    props.highlightedAiGeneratedEventIds
+                  }
                 />
                 {draggedNode && (
                   <DropContainer

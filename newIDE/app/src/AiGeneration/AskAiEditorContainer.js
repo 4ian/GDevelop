@@ -2,7 +2,10 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
-import { type RenderEditorContainerPropsWithRef } from '../MainFrame/EditorContainers/BaseEditor';
+import {
+  type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+} from '../MainFrame/EditorContainers/BaseEditor';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
@@ -131,7 +134,9 @@ const useProcessFunctionCalls = ({
     string,
     Array<EditorFunctionCallResult>
   ) => void,
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |}) => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
@@ -473,7 +478,9 @@ type Props = {|
         | 'none',
     |}
   ) => void,
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
@@ -487,7 +494,9 @@ export type AskAiEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
   startNewChat: () => void,
 |};
 

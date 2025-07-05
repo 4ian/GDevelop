@@ -9,6 +9,7 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type SceneEventsOutsideEditorChanges,
 } from '.';
 
 export type EditorFunctionCallResult =
@@ -35,7 +36,9 @@ export type ProcessEditorFunctionCallsOptions = {|
   generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
   ensureExtensionInstalled: (options: {|
     extensionName: string,
   |}) => Promise<void>,

@@ -2,7 +2,10 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
+import {
+  type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+} from '../BaseEditor';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -172,7 +175,9 @@ export type HomePageEditorInterface = {|
     objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    scene: SceneEventsOutsideEditorChanges
+  ) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -489,7 +494,7 @@ export const HomePage = React.memo<Props>(
       }, []);
 
       const onSceneEventsModifiedOutsideEditor = React.useCallback(
-        (scene: gdLayout) => {
+        (changes: SceneEventsOutsideEditorChanges) => {
           // No thing to be done.
         },
         []

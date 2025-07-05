@@ -5,6 +5,7 @@ import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -57,9 +58,13 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     // No thing to be done.
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
-    if (this.getLayout() === scene) {
-      if (this.editor) this.editor.onEventsModifiedOutsideEditor();
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
+    if (this.getLayout() === changes.scene) {
+      if (this.editor)
+        this.editor.onEventsModifiedOutsideEditor({
+          newOrChangedAiGeneratedEventIds:
+            changes.newOrChangedAiGeneratedEventIds,
+        });
     }
   }
 

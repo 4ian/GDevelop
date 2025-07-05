@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import {
@@ -106,7 +107,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     // No thing to be done.
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
 

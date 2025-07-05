@@ -7,6 +7,7 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import ExternalPropertiesDialog, {
   type ExternalProperties,
@@ -94,7 +95,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
 

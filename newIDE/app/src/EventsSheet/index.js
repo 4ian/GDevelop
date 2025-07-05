@@ -119,6 +119,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 
 const gd: libGDevelop = global.gd;
 
@@ -165,6 +166,7 @@ type ComponentProps = {|
   tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
   shortcutMap: ShortcutMap,
+  highlightedAiGeneratedEventIds: Set<string>,
 |};
 
 type State = {|
@@ -1876,6 +1878,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       tutorials,
       hotReloadPreviewButtonProps,
       windowSize,
+      highlightedAiGeneratedEventIds,
     } = this.props;
     if (!project) return null;
 
@@ -2031,6 +2034,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   fontSize={preferences.values.eventsSheetZoomLevel}
                   preferences={preferences}
                   tutorials={tutorials}
+                  highlightedAiGeneratedEventIds={
+                    highlightedAiGeneratedEventIds
+                  }
                 />
               )}
               {this.state.showSearchPanel && (
@@ -2227,10 +2233,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 }
 
+type OutOfEditorChanges = {|
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
-  onEventsModifiedOutsideEditor: () => void,
+  onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2242,6 +2252,11 @@ const EventsSheet = (props, ref) => {
     onEventsModifiedOutsideEditor,
   }));
 
+  const {
+    highlightedAiGeneratedEventIds,
+    addNewAiGeneratedEventIds,
+  } = useHighlightedAiGeneratedEvent({ isActive: props.isActive });
+
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
@@ -2250,7 +2265,8 @@ const EventsSheet = (props, ref) => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
   };
-  const onEventsModifiedOutsideEditor = () => {
+  const onEventsModifiedOutsideEditor = (changes: OutOfEditorChanges) => {
+    addNewAiGeneratedEventIds(changes.newOrChangedAiGeneratedEventIds);
     if (component.current) component.current.onEventsModifiedOutsideEditor();
   };
 
@@ -2269,6 +2285,7 @@ const EventsSheet = (props, ref) => {
       leaderboardsManager={leaderboardsManager}
       shortcutMap={shortcutMap}
       windowSize={windowSize}
+      highlightedAiGeneratedEventIds={highlightedAiGeneratedEventIds}
       {...props}
     />
   );

@@ -107,7 +107,7 @@ namespace gdjs {
       | 'NOT_ENOUGH_PLAYERS'
       | 'UNKNOWN'
       | null = null;
-    let _lobbyId: string | null = null;
+    export let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
 
     let _shouldEndLobbyWhenHostLeaves = false;
@@ -1696,7 +1696,35 @@ namespace gdjs {
         }
       }
     };
+	
+	export const getLobbyID = (): string => {
+      return _lobbyId || "0";
+    };
+	
+	export const authenticateAndQuickJoinWithLobbyID = async(
+	  runtimeScene: gdjs.RuntimeScene,
+      lobbyID: string
+    ) => {
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+      if (!playerId || !playerToken) {
+        _isWaitingForLogin = true;
+        const { status } =
+          await gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene)
+            .promise;
+        _isWaitingForLogin = false;
 
+        if (status === 'logged') {
+			_actionAfterJoiningLobby = 'JOIN_GAME';
+			handleJoinLobbyEvent(runtimeScene, lobbyID);
+        }
+
+        return;
+      }
+		_actionAfterJoiningLobby = 'JOIN_GAME';
+		handleJoinLobbyEvent(runtimeScene, lobbyID);
+	}
+	
     export const authenticateAndQuickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,
       displayLoader: boolean,

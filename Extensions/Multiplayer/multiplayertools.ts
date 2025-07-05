@@ -107,7 +107,7 @@ namespace gdjs {
       | 'NOT_ENOUGH_PLAYERS'
       | 'UNKNOWN'
       | null = null;
-    export let _lobbyId: string | null = null;
+    let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
 
     let _shouldEndLobbyWhenHostLeaves = false;
@@ -1697,12 +1697,12 @@ namespace gdjs {
       }
     };
 	
-	export const getLobbyID = (): string => {
-      return _lobbyId || "0";
+    export const getLobbyID = (): string => {
+      return _lobbyId || "";
     };
 	
-	export const authenticateAndQuickJoinWithLobbyID = async(
-	  runtimeScene: gdjs.RuntimeScene,
+    export const authenticateAndQuickJoinWithLobbyID = async(
+      runtimeScene: gdjs.RuntimeScene,
       lobbyID: string
     ) => {
       const playerId = gdjs.playerAuthentication.getUserId();

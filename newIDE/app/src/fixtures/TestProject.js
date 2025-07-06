@@ -467,7 +467,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evt = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-  testLayout
+  const evt2 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
   testLayout
@@ -491,6 +491,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   var evtWithInvalidParameters = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  evt2.setAiGeneratedEventId('fake-ai-generated-event-id-1');
 
   const groupEvent = gd.asGroupEvent(evt6);
   groupEvent.setName('Group #1');

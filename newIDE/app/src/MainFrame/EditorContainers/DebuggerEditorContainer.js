@@ -6,6 +6,7 @@ import Debugger from '../../Debugger';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
@@ -61,7 +62,7 @@ export class DebuggerEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
 

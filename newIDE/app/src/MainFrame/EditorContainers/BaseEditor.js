@@ -28,6 +28,11 @@ export type EditorContainerExtraProps = {|
   storageProviders?: Array<StorageProvider>,
 |};
 
+export type SceneEventsOutsideEditorChanges = {|
+  scene: gdLayout,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
@@ -166,7 +171,9 @@ export type RenderEditorContainerProps = {|
   onSceneObjectsDeleted: (scene: gdLayout) => void,
 
   // Events editing
-  onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
+  onSceneEventsModifiedOutsideEditor: (
+    changes: SceneEventsOutsideEditorChanges
+  ) => void,
 
   onExtractAsExternalLayout: (name: string) => void,
   onExtractAsEventBasedObject: (

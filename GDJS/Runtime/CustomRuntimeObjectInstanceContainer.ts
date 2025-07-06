@@ -71,7 +71,7 @@ namespace gdjs {
       eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
       if (this._isLoaded) {
-        this.onDestroyFromScene(this._parent);
+        this.onDeletedFromScene(this._parent);
       }
 
       const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
@@ -186,7 +186,7 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (!this._isLoaded) {
         return;
       }
@@ -199,7 +199,7 @@ namespace gdjs {
       this._isLoaded = false;
     }
 
-    _destroy() {
+    override _destroy() {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];

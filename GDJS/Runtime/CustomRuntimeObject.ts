@@ -253,7 +253,7 @@ namespace gdjs {
       // Let behaviors do something before the object is destroyed.
       super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(this._runtimeScene);
+      this._instanceContainer.onDeletedFromScene(this._runtimeScene);
     }
 
     override onDestroyed(): void {

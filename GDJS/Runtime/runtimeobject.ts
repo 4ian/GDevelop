@@ -292,7 +292,7 @@ namespace gdjs {
 
     /**
      * Called to reset the object to its default state. This is used for objects that are
-     * "recycled": they are dismissed (at which point `onDestroyFromScene` is called) but still
+     * "recycled": they are dismissed (at which point `onDeletedFromScene` is called) but still
      * stored in a cache to be reused next time an object must be created. At this point,
      * `reinitialize` will be called. The object must then work as if it was a newly constructed
      * object.
@@ -596,7 +596,7 @@ namespace gdjs {
     /**
      * Remove an object from a scene.
      *
-     * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
+     * Do not change/redefine this method. Instead, redefine the onDeletedFromScene method.
      */
     deleteFromScene(): void {
       if (this._livingOnScene) {
@@ -619,7 +619,7 @@ namespace gdjs {
      * can still be used by events.
      *
      * If you redefine this function, **make sure to call the original method**
-     * (`RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
+     * (`RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);`).
      */
     onDeletedFromScene(): void {
       const theLayer = this._runtimeScene.getLayer(this.layer);

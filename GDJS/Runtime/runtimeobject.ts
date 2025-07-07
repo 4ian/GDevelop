@@ -619,7 +619,7 @@ namespace gdjs {
      * can still be used by events.
      *
      * If you redefine this function, **make sure to call the original method**
-     * (`RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);`).
+     * (`super.onDeletedFromScene();`).
      */
     onDeletedFromScene(): void {
       const theLayer = this._runtimeScene.getLayer(this.layer);

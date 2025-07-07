@@ -34,14 +34,15 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
     .insertNewEffect('3D Sun Light', 0);
   directionalLight.setEffectType('Scene3D::DirectionalLight');
   directionalLight.setStringParameter('color', '255;255;255');
-  directionalLight.setStringParameter('shadowQuality', 'medium');
-  directionalLight.setDoubleParameter('distanceFromCamera', 1500);
-  directionalLight.setDoubleParameter('frustumSize', 4000);
   directionalLight.setDoubleParameter('intensity', 0.75);
   directionalLight.setStringParameter('top', 'Z+');
   directionalLight.setDoubleParameter('elevation', 40);
   directionalLight.setDoubleParameter('rotation', 300);
   directionalLight.setBooleanParameter('isCastingShadow', true);
+  directionalLight.setStringParameter('shadowQuality', 'medium');
+  directionalLight.setDoubleParameter('minimumShadowBias', 0.0001);
+  directionalLight.setDoubleParameter('distanceFromCamera', 1500);
+  directionalLight.setDoubleParameter('frustumSize', 4000);
 
   const ambientLight = layer
     .getEffects()

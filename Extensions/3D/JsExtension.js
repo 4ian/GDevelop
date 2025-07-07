@@ -1952,7 +1952,7 @@ module.exports = {
         .setGroup(_('Shadows'));
       properties
         .getOrCreate('minimumShadowBias')
-        .setValue('0')
+        .setValue('0.0001')
         .setLabel(_('Shadow bias'))
         .setDescription(
           _(

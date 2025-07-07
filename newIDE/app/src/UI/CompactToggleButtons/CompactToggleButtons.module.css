@@ -3,6 +3,7 @@
   align-items: center;
   background-color: var(--theme-text-field-default-background-color);
   flex: 1;
+  border-radius: 4px;
 }
 
 .compactToggleButton {
@@ -18,6 +19,21 @@
   min-width: 0px;
   margin: 3px;
   border: 0;
+}
+
+.label {
+  font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--theme-text-default-color);
+  transition: color 0.1s linear;
+}
+
+.active .label {
+  color: var(--theme-icon-button-selected-color);
 }
 
 .separator {

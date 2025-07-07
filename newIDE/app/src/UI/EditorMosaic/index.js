@@ -469,7 +469,7 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
             className={classNames({
               'mosaic-gd-theme': true,
               'mosaic-blueprint-theme': true,
-              'opaque': !isTransparent,
+              opaque: !isTransparent,
               // Move the entire mosaic up when the soft keyboard is open:
               'avoid-soft-keyboard': true,
             })}

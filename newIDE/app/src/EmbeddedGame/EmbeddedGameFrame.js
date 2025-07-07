@@ -25,6 +25,7 @@ let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 let onSetEditorHotReloadNeeded:
   | null
   | (({| projectDataOnlyExport: boolean |}) => void) = null;
+let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 
 export const attachToPreview = ({
   previewIndexHtmlLocation,
@@ -67,6 +68,12 @@ export const setEditorHotReloadNeeded = ({
   });
 };
 
+export const preventGameFramePointerEvents = (enabled: boolean) => {
+  if (!onPreventGameFramePointerEvents)
+    throw new Error('No EmbeddedGameFrame registered.');
+  onPreventGameFramePointerEvents(enabled);
+};
+
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
@@ -92,6 +99,10 @@ export const EmbeddedGameFrame = ({
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,
   ] = React.useState<string>('');
+  const [
+    isPointerEventsPrevented,
+    setIsPointerEventsPrevented,
+  ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
   const neededHotReload = React.useRef<'None' | 'Data' | 'Full'>('None');
 
@@ -103,6 +114,9 @@ export const EmbeddedGameFrame = ({
         if (iframeRef.current) {
           iframeRef.current.contentWindow.focus();
         }
+      };
+      onPreventGameFramePointerEvents = (enabled: boolean) => {
+        setIsPointerEventsPrevented(enabled);
       };
       onSetEditorHotReloadNeeded = ({
         projectDataOnlyExport,
@@ -265,7 +279,10 @@ export const EmbeddedGameFrame = ({
             return connectDropTarget(
               <div
                 style={{
-                  display: canDrop ? 'flex' : 'none',
+                  // Display the div that acts either as a drop target or as a "blocker"
+                  // to avoid the iframe stealing drag/resize mouse/touch events.
+                  display:
+                    canDrop || isPointerEventsPrevented ? 'flex' : 'none',
                   position: 'absolute',
                   top: 0,
                   left: 0,

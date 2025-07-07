@@ -75,7 +75,11 @@ export class ExternalLayoutEditorContainer extends React.Component<
       });
 
       // TODO: redundant check?
-      if (this.props.gameEditorMode === 'embedded-game' && layout && projectItemName) {
+      if (
+        this.props.gameEditorMode === 'embedded-game' &&
+        layout &&
+        projectItemName
+      ) {
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
@@ -125,7 +129,11 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectVariantName: null,
     });
 
-    if (this.props.gameEditorMode === 'embedded-game' && layout && projectItemName) {
+    if (
+      this.props.gameEditorMode === 'embedded-game' &&
+      layout &&
+      projectItemName
+    ) {
       switchToSceneEdition({
         editorId,
         sceneName: layout.getName(),

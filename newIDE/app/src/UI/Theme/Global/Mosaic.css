@@ -1,7 +1,11 @@
 /* Mosaic layout */
 .mosaic-gd-theme.mosaic {
-  /* background-color: var(--mosaic-layout-background-color) !important; */
   background-color: transparent !important;
+}
+
+.mosaic-gd-theme.mosaic.opaque {
+  background-color: var(--mosaic-layout-background-color) !important;
+  pointer-events: all;
 }
 
 .mosaic-drop-target .drop-target-container {
@@ -14,8 +18,15 @@
   box-shadow: none !important;
 }
 
+.mosaic-gd-theme .mosaic-window-toolbar {
+  border-top-right-radius: 4px !important;
+  border-top-left-radius: 4px !important;
+}
+
 .mosaic-gd-theme .mosaic-window-body {
   background: var(--mosaic-layout-background-color) !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
 }
 
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
@@ -38,10 +49,6 @@
 
 .mosaic-gd-theme .mosaic-split {
   pointer-events: all;
-}
-
-.mosaic-gd-theme .mosaic-split.-column {
-  background-color: var(--mosaic-layout-background-color) !important;
 }
 
 /* Separator draggable background (horizontal split) */

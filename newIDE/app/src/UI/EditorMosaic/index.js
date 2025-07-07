@@ -2,7 +2,7 @@
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import {
-  MosaicWindow as RMMosaicWindow,
+  MosaicWindow,
   MosaicWithoutDragDropContext,
   getLeaves,
 } from 'react-mosaic-component';
@@ -265,19 +265,6 @@ const renderMosaicWindowPreview = props => (
   </div>
 );
 
-/**
- * A window that can be used in a EditorMosaic, with a close button
- * by default in the toolbarControls and a preview when the window is
- * dragged.
- */
-const MosaicWindow = (props: any) => (
-  <RMMosaicWindow
-    {...props}
-    toolbarControls={props.toolbarControls || defaultToolbarControls}
-    renderPreview={renderMosaicWindowPreview}
-  />
-);
-
 export type EditorMosaicInterface = {|
   getOpenedEditorNames: () => Array<string>,
   toggleEditor: (
@@ -301,6 +288,9 @@ type Props = {|
   limitToOneSecondaryEditor?: boolean,
   onOpenedEditorsChanged?: () => void,
   onPersistNodes?: EditorMosaicNode => void,
+  isTransparent?: boolean,
+  onDragOrResizedStarted?: () => void,
+  onDragOrResizedEnded?: () => void,
 |};
 
 /**
@@ -317,9 +307,13 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
       limitToOneSecondaryEditor,
       onOpenedEditorsChanged,
       onPersistNodes,
+      onDragOrResizedStarted,
+      onDragOrResizedEnded,
+      isTransparent,
     },
     ref
   ) => {
+    const isResizing = React.useRef(false);
     const [mosaicNode, setMosaicNode] = React.useState<?EditorMosaicNode>(
       initialNodes
     );
@@ -443,6 +437,31 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
       [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]
     );
 
+    const onChange = React.useCallback(
+      nodes => {
+        if (!isResizing.current) {
+          if (onDragOrResizedStarted) {
+            onDragOrResizedStarted();
+          }
+          isResizing.current = true;
+        }
+        setMosaicNode(nodes);
+      },
+      [isResizing, onDragOrResizedStarted]
+    );
+
+    const onRelease = React.useCallback(
+      () => {
+        if (isResizing.current) {
+          if (onDragOrResizedEnded) {
+            onDragOrResizedEnded();
+          }
+          isResizing.current = false;
+        }
+      },
+      [isResizing, onDragOrResizedEnded]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -450,6 +469,7 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
             className={classNames({
               'mosaic-gd-theme': true,
               'mosaic-blueprint-theme': true,
+              'opaque': !isTransparent,
               // Move the entire mosaic up when the soft keyboard is open:
               'avoid-soft-keyboard': true,
             })}
@@ -474,15 +494,20 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
                 <MosaicWindow
                   path={path}
                   title={i18n._(editor.title)}
-                  toolbarControls={editor.toolbarControls}
+                  onDragStart={onDragOrResizedStarted}
+                  onDragEnd={onDragOrResizedEnded}
+                  toolbarControls={
+                    editor.toolbarControls || defaultToolbarControls
+                  }
+                  renderPreview={renderMosaicWindowPreview}
                 >
                   {editor.renderEditor()}
                 </MosaicWindow>
               );
             }}
             value={mosaicNode}
-            onChange={setMosaicNode}
-            onRelease={setMosaicNode}
+            onChange={onChange}
+            onRelease={onRelease}
           />
         )}
       </I18n>

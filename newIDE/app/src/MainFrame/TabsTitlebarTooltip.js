@@ -88,10 +88,7 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
   ) {
     title = editorTab.projectItemName;
     subtitle = editorKindToLabel[editorTab.kind];
-  } else if (
-    editorTab.kind === 'custom object' &&
-    editorTab.projectItemName
-  ) {
+  } else if (editorTab.kind === 'custom object' && editorTab.projectItemName) {
     const nameParts = editorTab.projectItemName.split('::');
     const customObjectName = nameParts[1];
     if (customObjectName) {

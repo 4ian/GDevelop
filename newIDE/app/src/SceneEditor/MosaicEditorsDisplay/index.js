@@ -34,6 +34,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
+import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -513,6 +514,13 @@ const MosaicEditorsDisplay = React.forwardRef<
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }
+      isTransparent={gameEditorMode === 'embedded-game'}
+      onDragOrResizedStarted={() => {
+        preventGameFramePointerEvents(true);
+      }}
+      onDragOrResizedEnded={() => {
+        preventGameFramePointerEvents(false);
+      }}
       onOpenedEditorsChanged={props.onOpenedEditorsChanged}
       onPersistNodes={node => setDefaultEditorMosaicNode('scene-editor', node)}
       ref={editorMosaicRef}

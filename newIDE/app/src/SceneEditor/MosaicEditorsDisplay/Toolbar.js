@@ -28,6 +28,8 @@ import {
 } from '../utils';
 
 type Props = {|
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   toggleObjectsList: () => void,
   isObjectsListShown: boolean,
   toggleObjectGroupsList: () => void,
@@ -77,6 +79,15 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        <input
+          type="checkbox"
+          checked={props.gameEditorMode === 'embedded-game'}
+          onChange={e =>
+            props.setGameEditorMode(
+              e.target.checked ? 'embedded-game' : 'instances-editor'
+            )
+          }
+        />
         <IconButton
           size="small"
           color="default"

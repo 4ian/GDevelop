@@ -1795,9 +1795,16 @@ namespace gdjs {
       return a !== a && b !== b;
     }
 
-    static assignOrDelete(target: any, source: any): void {
+    static assignOrDelete(
+      target: any,
+      source: any,
+      ignoreKeys: string[] = []
+    ): void {
       Object.assign(target, source);
       for (const key in target) {
+        if (ignoreKeys.includes(key)) {
+          continue;
+        }
         if (Object.prototype.hasOwnProperty.call(target, key)) {
           if (source[key] === undefined) {
             delete target[key];

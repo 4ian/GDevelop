@@ -52,8 +52,6 @@ import { setEditorHotReloadNeeded } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 const useEditorFunctionCallResultsPerRequest = () => {
   const [
     editorFunctionCallResultsPerRequest,
@@ -478,6 +476,7 @@ type Props = {|
   ) => void,
   onSceneEventsModifiedOutsideEditor: (scene: gdLayout) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export type AskAiEditorInterface = {|
@@ -518,6 +517,7 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
+        gameEditorMode,
       }: Props,
       ref
     ) => {
@@ -600,7 +600,7 @@ export const AskAiEditor = React.memo<Props>(
             });
           }
         },
-        []
+        [gameEditorMode]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -1091,6 +1091,7 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
+        gameEditorMode={props.gameEditorMode}
       />
     )}
   </I18n>

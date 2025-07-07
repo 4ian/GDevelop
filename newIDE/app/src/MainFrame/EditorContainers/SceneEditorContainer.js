@@ -14,8 +14,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
 
@@ -41,7 +39,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         eventsBasedObjectVariantName: null,
       });
 
-      if (gameEditorMode === 'embedded-game' && projectItemName) {
+      // TODO: redundant check?
+      if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
@@ -81,7 +80,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
-    if (gameEditorMode === 'embedded-game' && projectItemName) {
+    if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
       switchToSceneEdition({
         editorId,
         sceneName: projectItemName,
@@ -194,6 +193,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return (
       <SceneEditor
         editorId={this.props.editorId}
+        gameEditorMode={this.props.gameEditorMode}
+        setGameEditorMode={this.props.setGameEditorMode}
         setToolbar={this.props.setToolbar}
         resourceManagementProps={this.props.resourceManagementProps}
         unsavedChanges={this.props.unsavedChanges}

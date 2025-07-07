@@ -30,6 +30,8 @@ export type EditorContainerExtraProps = {|
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   projectItemName: ?string,
   editorId: string,
   project: ?gdProject,

@@ -254,6 +254,22 @@ const findStorageProviderFor = (
   return storageProvider;
 };
 
+const shouldRemovePointerEvents = (
+  kind: EditorKind,
+  gameEditorMode: 'embedded-game' | 'instances-editor'
+) => {
+  if (gameEditorMode === 'embedded-game') {
+    // Scene editors can have an embedded game, so they redefine manually
+    // which components can have clicks/touches.
+    return (
+      kind === 'layout' ||
+      kind === 'external layout' ||
+      kind === 'custom object'
+    );
+  }
+  return false;
+};
+
 /**
  * Compares a React reference to the current project (truth source)
  * and a project stored in a variable (coming probably from a React state).
@@ -503,6 +519,11 @@ const MainFrame = (props: Props) => {
     setQuickCustomizationDialogOpenedFromGameId,
   ] = React.useState<?string>(null);
 
+  // TODO: move to a preference.
+  const [gameEditorMode, setGameEditorMode] = React.useState<
+    'embedded-game' | 'instances-editor'
+  >('embedded-game');
+
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -658,13 +679,6 @@ const MainFrame = (props: Props) => {
           <RobotIcon size={16} />
         ) : null;
 
-      // Scene editors can have an embedded game, so they redefine manually
-      // which components can have clicks/touches.
-      const removePointerEvents =
-        kind === 'layout' ||
-        kind === 'external layout' ||
-        kind === 'custom object';
-
       const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'start page'
@@ -682,10 +696,10 @@ const MainFrame = (props: Props) => {
             )
           : null,
         closable,
-        removePointerEvents,
         label,
         projectItemName: name,
         tabOptions,
+        kind,
         renderEditorContainer: editorKindToRenderer[kind],
         extraEditorProps,
         key,
@@ -4029,6 +4043,7 @@ const MainFrame = (props: Props) => {
         )}
       <EmbeddedGameFrame
         key={currentProject ? currentProject.ptr : 0}
+        enabled={gameEditorMode === 'embedded-game'}
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
       />
@@ -4188,11 +4203,11 @@ const MainFrame = (props: Props) => {
             <TabContentContainer
               key={editorTab.key}
               active={isCurrentTab}
-              // Deactivate pointer events when the play tab is active, so the iframe
-              // can be interacted with.
               removePointerEvents={
+                // Deactivate pointer events when the play tab is active, so the iframe
+                // can be interacted with.
                 gamesPlatformFrameTools.iframeVisible ||
-                editorTab.removePointerEvents
+                shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
               }
             >
               <CommandsContextScopedProvider active={isCurrentTab}>
@@ -4202,6 +4217,8 @@ const MainFrame = (props: Props) => {
                 >
                   {editorTab.renderEditorContainer({
                     editorId: editorTab.key,
+                    gameEditorMode,
+                    setGameEditorMode,
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,

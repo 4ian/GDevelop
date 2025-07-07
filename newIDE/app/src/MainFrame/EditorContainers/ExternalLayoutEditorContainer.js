@@ -29,8 +29,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 const styles = {
   container: {
     display: 'flex',
@@ -75,7 +73,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
         eventsBasedObjectVariantName: null,
       });
 
-      if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
+      // TODO: redundant check?
+      if (this.props.gameEditorMode === 'embedded-game' && layout && projectItemName) {
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
@@ -125,7 +124,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectVariantName: null,
     });
 
-    if (gameEditorMode === 'embedded-game' && layout && projectItemName) {
+    if (this.props.gameEditorMode === 'embedded-game' && layout && projectItemName) {
       switchToSceneEdition({
         editorId,
         sceneName: layout.getName(),
@@ -294,6 +293,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
         {layout && (
           <SceneEditor
             editorId={this.props.editorId}
+            gameEditorMode={this.props.gameEditorMode}
+            setGameEditorMode={this.props.setGameEditorMode}
             setToolbar={this.props.setToolbar}
             resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}

@@ -1412,19 +1412,7 @@ namespace gdjs {
 
       const updatedInstances = this._selection
         .getSelectedObjects()
-        .map((object) => {
-          const instance = this.getInstanceDataFromRuntimeObject(object);
-          if (instance) {
-            // Avoid to clear these properties when assigning it to the old InstanceData.
-            // @ts-ignore
-            delete instance.initialVariables;
-            // @ts-ignore
-            delete instance.numberProperties;
-            // @ts-ignore
-            delete instance.stringProperties;
-          }
-          return instance;
-        })
+        .map((object) => this.getInstanceDataFromRuntimeObject(object))
         .filter(isDefined);
 
       const addedInstances =
@@ -1457,6 +1445,13 @@ namespace gdjs {
       if (is3D(runtimeObject)) {
         if (!runtimeObject.persistentUuid) return null;
 
+        const width = runtimeObject.getWidth();
+        const height = runtimeObject.getHeight();
+        const depth = runtimeObject.getDepth();
+        const defaultWidth = runtimeObject.getOriginalWidth();
+        const defaultHeight = runtimeObject.getOriginalHeight();
+        const defaultDepth = runtimeObject.getOriginalDepth();
+
         const oldData = this._getInstanceData(runtimeObject.persistentUuid);
         const instanceData: InstanceData = {
           name: runtimeObject.getName(),
@@ -1469,10 +1464,13 @@ namespace gdjs {
           angle: runtimeObject.getAngle(),
           rotationY: runtimeObject.getRotationY(),
           rotationX: runtimeObject.getRotationX(),
-          customSize: runtimeObject.getScale() !== 1,
-          width: runtimeObject.getWidth(),
-          height: runtimeObject.getHeight(),
-          depth: runtimeObject.getDepth(),
+          customSize:
+            width !== defaultWidth ||
+            height !== defaultHeight ||
+            depth !== defaultDepth,
+          width,
+          height,
+          depth,
           locked: oldData ? oldData.locked : false,
           sealed: oldData ? oldData.sealed : false,
           // TODO: how to transmit/should we transmit other properties?
@@ -1480,9 +1478,9 @@ namespace gdjs {
           stringProperties: [],
           initialVariables: [],
           // @ts-ignore
-          defaultWidth: runtimeObject.getOriginalWidth(),
-          defaultHeight: runtimeObject.getOriginalHeight(),
-          defaultDepth: runtimeObject.getOriginalDepth(),
+          defaultWidth,
+          defaultHeight,
+          defaultDepth,
         };
 
         return instanceData;
@@ -1513,7 +1511,12 @@ namespace gdjs {
           updatedInstance.persistentUuid
         );
         if (oldInstance) {
-          gdjs.HotReloader.assignOrDelete(oldInstance, updatedInstance);
+          gdjs.HotReloader.assignOrDelete(oldInstance, updatedInstance, [
+            // These are never modified by the InGameEditor, so don't update them:
+            'initialVariables',
+            'numberProperties',
+            'stringProperties',
+          ]);
         }
       }
     }

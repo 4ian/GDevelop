@@ -23,8 +23,6 @@ const styles = {
   },
 };
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 // TODO: move to function component
 export class CustomObjectEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -55,7 +53,8 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
         eventsBasedObjectVariantName: this.getVariantName(),
       });
 
-      if (gameEditorMode === 'embedded-game' && projectItemName) {
+      // TODO: redundant check?
+      if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
@@ -105,7 +104,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       eventsBasedObjectVariantName: this.getVariantName(),
     });
 
-    if (gameEditorMode === 'embedded-game' && projectItemName) {
+    if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
       switchToSceneEdition({
         editorId,
         sceneName: null,
@@ -269,6 +268,8 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       <div style={styles.container}>
         <SceneEditor
           editorId={this.props.editorId}
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
           setToolbar={this.props.setToolbar}
           resourceManagementProps={this.props.resourceManagementProps}
           unsavedChanges={this.props.unsavedChanges}

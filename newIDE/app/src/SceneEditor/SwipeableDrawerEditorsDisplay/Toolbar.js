@@ -16,6 +16,8 @@ import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   toggleObjectsList: () => void,
   toggleObjectGroupsList: () => void,
   toggleProperties: () => void,
@@ -58,6 +60,15 @@ const Toolbar = React.memo<Props>(function(props) {
         setupGrid={props.openSetupGrid}
         canDeleteSelection={props.selectedInstancesCount !== 0}
         onOpenSceneVariables={props.onOpenSceneVariables}
+      />
+      <input
+        type="checkbox"
+        checked={props.gameEditorMode === 'embedded-game'}
+        onChange={e =>
+          props.setGameEditorMode(
+            e.target.checked ? 'embedded-game' : 'instances-editor'
+          )
+        }
       />
       <IconButton
         size="small"

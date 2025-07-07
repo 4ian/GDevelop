@@ -122,6 +122,8 @@ const styles = {
 
 type Props = {|
   editorId: string,
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   layout: gdLayout | null,
@@ -179,7 +181,6 @@ type Props = {|
 |};
 
 type State = {|
-  gameEditorMode: 'embedded-game' | 'instances-editor',
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
@@ -236,7 +237,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.instancesSelection = new InstancesSelection();
     this.state = {
-      gameEditorMode: 'embedded-game',
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
@@ -359,6 +359,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         persistentUuid
       );
       if (!instance) return;
+
       instance.setX(x);
       instance.setY(y);
       instance.setZ(z);
@@ -490,6 +491,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -525,6 +528,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     } else {
       this.props.setToolbar(
         <SwipeableDrawerEditorsDisplayToolbar
+          gameEditorMode={this.props.gameEditorMode}
+          setGameEditorMode={this.props.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -1690,7 +1695,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorDisplay.viewControls.zoomToInitialPosition();
 
     const visibleScreenArea = editorDisplay.getInstanceEditorArea();
-    if (this.state.gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
@@ -1712,7 +1717,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorDisplay.viewControls.zoomToFitContent();
 
     const visibleScreenArea = editorDisplay.getInstanceEditorArea();
-    if (this.state.gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
@@ -1734,7 +1739,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     editorDisplay.viewControls.zoomToFitSelection();
 
     const visibleScreenArea = editorDisplay.getInstanceEditorArea();
-    if (this.state.gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
@@ -1880,7 +1885,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomInFactor);
 
-    if (this.state.gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
@@ -1898,7 +1903,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editorDisplay)
       this.editorDisplay.viewControls.zoomBy(zoomOutFactor);
 
-    if (this.state.gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       const { previewDebuggerServer } = this.props;
       if (!previewDebuggerServer) return;
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
@@ -2431,7 +2436,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <EditorsDisplay
                 ref={ref => (this.editorDisplay = ref)}
-                gameEditorMode={this.state.gameEditorMode}
+                gameEditorMode={this.props.gameEditorMode}
                 project={project}
                 layout={layout}
                 eventsFunctionsExtension={eventsFunctionsExtension}

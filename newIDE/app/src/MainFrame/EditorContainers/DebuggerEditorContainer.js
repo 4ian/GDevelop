@@ -13,8 +13,6 @@ import SubscriptionChecker, {
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 type State = {|
   subscriptionChecked: boolean,
 |};
@@ -73,7 +71,7 @@ export class DebuggerEditorContainer extends React.Component<
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    if (gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });

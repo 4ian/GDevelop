@@ -104,8 +104,6 @@ const styles = {
   },
 };
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 type Props = {|
   project: ?gdProject,
   fileMetadata: ?FileMetadata,
@@ -165,6 +163,8 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
+
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export type HomePageEditorInterface = {|
@@ -215,6 +215,7 @@ export const HomePage = React.memo<Props>(
         gamesList,
         gamesPlatformFrameTools,
         onExtensionInstalled,
+        gameEditorMode,
       }: Props,
       ref
     ) => {
@@ -483,7 +484,7 @@ export const HomePage = React.memo<Props>(
             });
           }
         },
-        []
+        [gameEditorMode]
       );
 
       React.useImperativeHandle(ref, () => ({
@@ -731,5 +732,6 @@ export const renderHomePageContainer = (
     gamesList={props.gamesList}
     gamesPlatformFrameTools={props.gamesPlatformFrameTools}
     onExtensionInstalled={props.onExtensionInstalled}
+    gameEditorMode={props.gameEditorMode}
   />
 );

@@ -69,6 +69,7 @@ export const setEditorHotReloadNeeded = ({
 
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
+  enabled: boolean,
   onLaunchPreviewForInGameEdition: ({|
     editorId: string,
     sceneName: string | null,
@@ -85,6 +86,7 @@ const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 export const EmbeddedGameFrame = ({
   previewDebuggerServer,
   onLaunchPreviewForInGameEdition,
+  enabled,
 }: Props) => {
   const [
     previewIndexHtmlLocation,
@@ -117,6 +119,7 @@ export const EmbeddedGameFrame = ({
       };
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
         if (!previewDebuggerServer) return;
+        if (!enabled) return;
 
         const {
           editorId,
@@ -181,6 +184,7 @@ export const EmbeddedGameFrame = ({
       previewDebuggerServer,
       previewIndexHtmlLocation,
       onLaunchPreviewForInGameEdition,
+      enabled,
     ]
   );
 

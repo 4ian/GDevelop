@@ -7,7 +7,6 @@ import Popper from '@material-ui/core/Popper';
 
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import {
-  getEditorTabMetadata,
   type EditorTab,
   type EditorKind,
 } from './EditorTabs/EditorTabsHandler';
@@ -61,8 +60,6 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
     styles.tooltip
   );
 
-  const editorTabMetadata = getEditorTabMetadata(editorTab);
-
   React.useEffect(
     () => {
       const timeoutId = setTimeout(() => {
@@ -87,22 +84,22 @@ const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
       'external layout',
       'external events',
       'events functions extension',
-    ].includes(editorTabMetadata.editorKind)
+    ].includes(editorTab.kind)
   ) {
-    title = editorTabMetadata.projectItemName;
-    subtitle = editorKindToLabel[editorTabMetadata.editorKind];
+    title = editorTab.projectItemName;
+    subtitle = editorKindToLabel[editorTab.kind];
   } else if (
-    editorTabMetadata.editorKind === 'custom object' &&
-    editorTabMetadata.projectItemName
+    editorTab.kind === 'custom object' &&
+    editorTab.projectItemName
   ) {
-    const nameParts = editorTabMetadata.projectItemName.split('::');
+    const nameParts = editorTab.projectItemName.split('::');
     const customObjectName = nameParts[1];
     if (customObjectName) {
       title = customObjectName;
-      subtitle = editorKindToLabel[editorTabMetadata.editorKind];
+      subtitle = editorKindToLabel[editorTab.kind];
     }
   } else {
-    title = editorKindToLabel[editorTabMetadata.editorKind];
+    title = editorKindToLabel[editorTab.kind];
   }
 
   return (

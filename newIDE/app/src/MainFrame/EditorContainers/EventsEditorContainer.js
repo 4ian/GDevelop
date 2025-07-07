@@ -10,8 +10,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
 
@@ -81,7 +79,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    if (gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });

@@ -8,8 +8,6 @@ import ResourcesEditor from '../../ResourcesEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?ResourcesEditor;
 
@@ -53,7 +51,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    if (gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });

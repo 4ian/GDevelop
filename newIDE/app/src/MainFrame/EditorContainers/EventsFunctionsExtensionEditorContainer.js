@@ -20,8 +20,6 @@ const styles = {
   },
 };
 
-const gameEditorMode = 'embedded-game'; // TODO: move to a preference.
-
 export class EventsFunctionsExtensionEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsFunctionsExtensionEditor;
 
@@ -62,7 +60,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }: {|
     projectDataOnlyExport: boolean,
   |}) {
-    if (gameEditorMode === 'embedded-game') {
+    if (this.props.gameEditorMode === 'embedded-game') {
       setEditorHotReloadNeeded({
         projectDataOnlyExport,
       });

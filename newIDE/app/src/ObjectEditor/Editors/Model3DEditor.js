@@ -668,16 +668,14 @@ const Model3DEditor = ({
                 </Trans>
               </AlertMessage>
             )}
-          <Column noMargin expand>
-            <PropertyCheckbox
-              objectConfiguration={objectConfiguration}
-              propertyName="isCastingShadow"
-            />
-            <PropertyCheckbox
-              objectConfiguration={objectConfiguration}
-              propertyName="isReceivingShadow"
-            />
-          </Column>
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isCastingShadow"
+          />
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isReceivingShadow"
+          />
           <Text size="block-title">Animations</Text>
           <Column noMargin expand>
             <PropertyField

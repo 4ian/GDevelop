@@ -231,16 +231,14 @@ const Cube3DEditor = ({
             key="StandardWithoutMetalness"
           />
         </SelectField>
-        <Column noMargin expand>
-          <PropertyCheckbox
-            objectConfiguration={objectConfiguration}
-            propertyName="isCastingShadow"
-          />
-          <PropertyCheckbox
-            objectConfiguration={objectConfiguration}
-            propertyName="isReceivingShadow"
-          />
-        </Column>
+        <PropertyCheckbox
+          objectConfiguration={objectConfiguration}
+          propertyName="isCastingShadow"
+        />
+        <PropertyCheckbox
+          objectConfiguration={objectConfiguration}
+          propertyName="isReceivingShadow"
+        />
         {properties.get('materialType').getValue() !== 'Basic' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">

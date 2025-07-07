@@ -4,6 +4,7 @@ import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { setEditorHotReloadNeeded } from '../../EmbeddedGame/EmbeddedGameFrame';
@@ -51,7 +52,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
 

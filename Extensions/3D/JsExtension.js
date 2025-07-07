@@ -1094,21 +1094,22 @@ module.exports = {
           'StandardWithoutMetalness',
           _('Standard (without metalness)')
         )
-        .setLabel(_('Material type'));
+        .setLabel(_('Material type'))
+        .setGroup(_('Lighting'));
 
       objectProperties
         .getOrCreate('isCastingShadow')
         .setValue(objectContent.isCastingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow casting'))
-        .setGroup(_('Shadows'));
+        .setGroup(_('Lighting'));
 
       objectProperties
         .getOrCreate('isReceivingShadow')
         .setValue(objectContent.isReceivingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow receiving'))
-        .setGroup(_('Shadows'));
+        .setGroup(_('Lighting'));
 
       return objectProperties;
     };
@@ -1938,7 +1939,7 @@ module.exports = {
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('isCastingShadow')
-        .setValue('true')
+        .setValue('false')
         .setLabel(_('Shadow casting'))
         .setType('boolean')
         .setGroup(_('Shadows'));
@@ -1951,6 +1952,18 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('minimumShadowBias')
+        .setValue('0')
+        .setLabel(_('Shadow bias'))
+        .setDescription(
+          _(
+            'Use this to avoid "shadow acne" due to depth buffer precision. Choose a value small enough like 0.001 to avoid creating distance between shadows and objects but not too small to avoid shadow glitches on low/medium quality. This value is used for high quality, and multiplied by 1.25 for medium quality and 2 for low quality.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('frustumSize')
         .setValue('4000')

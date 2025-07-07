@@ -314,7 +314,7 @@ namespace gdjs {
       this.onGameResolutionResized();
     }
 
-    _destroy() {
+    override _destroy() {
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the RuntimeScene is released immediately.
       super._destroy();

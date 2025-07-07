@@ -588,6 +588,17 @@
       }
     },
     "rst": {
+      "ai-generated-event-move-handle": {
+        "gradient-color-1": {
+          "value": "#381522"
+        },
+        "gradient-color-2": {
+          "value": "#e77f7c"
+        },
+        "gradient-color-3": {
+          "value": "#381522"
+        }
+      },
       "move-handle": {
         "background-color": {
           "value": "#ebbcba"

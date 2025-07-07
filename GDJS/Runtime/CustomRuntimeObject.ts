@@ -235,7 +235,12 @@ namespace gdjs {
       // Let behaviors do something before the object is destroyed.
       super.onDeletedFromScene();
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(this._runtimeScene);
+      this._instanceContainer.onDeletedFromScene(this._runtimeScene);
+    }
+
+    override onDestroyed(): void {
+      this._instanceContainer._destroy();
+      super.onDestroyed();
     }
 
     override update(parent: gdjs.RuntimeInstanceContainer): void {
@@ -258,6 +263,8 @@ namespace gdjs {
 
     /**
      * This method is called when the preview is being hot-reloaded.
+     *
+     * Custom objects implement this method with code generated from events.
      */
     onHotReloading(parent: gdjs.RuntimeInstanceContainer) {}
 
@@ -266,6 +273,8 @@ namespace gdjs {
 
     /**
      * This method is called each tick after events are done.
+     *
+     * Custom objects implement this method with code generated from events.
      * @param parent The instanceContainer owning the object
      */
     doStepPostEvents(parent: gdjs.RuntimeInstanceContainer) {}
@@ -273,6 +282,8 @@ namespace gdjs {
     /**
      * This method is called when the object is being removed from its parent
      * container and is about to be destroyed/reused later.
+     *
+     * Custom objects implement this method with code generated from events.
      */
     onDestroy(parent: gdjs.RuntimeInstanceContainer) {}
 

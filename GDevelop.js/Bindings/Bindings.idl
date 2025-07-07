@@ -1061,10 +1061,13 @@ interface Effect {
 
   void SetDoubleParameter([Const] DOMString name, double value);
   double GetDoubleParameter([Const] DOMString name);
+  boolean HasDoubleParameter([Const] DOMString name);
   void SetStringParameter([Const] DOMString name, [Const] DOMString value);
   [Const, Ref] DOMString GetStringParameter([Const] DOMString name);
+  boolean HasStringParameter([Const] DOMString name);
   void SetBooleanParameter([Const] DOMString name, boolean value);
   boolean GetBooleanParameter([Const] DOMString name);
+  boolean HasBooleanParameter([Const] DOMString name);
   [Const, Ref] MapStringDouble GetAllDoubleParameters();
   [Const, Ref] MapStringString GetAllStringParameters();
   [Const, Ref] MapStringBoolean GetAllBooleanParameters();

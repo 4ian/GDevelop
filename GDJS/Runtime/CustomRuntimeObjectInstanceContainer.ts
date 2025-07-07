@@ -71,7 +71,7 @@ namespace gdjs {
       eventsBasedObjectVariantData: EventsBasedObjectVariantData
     ) {
       if (this._isLoaded) {
-        this.onDestroyFromScene(this._parent);
+        this.onDeletedFromScene(this._parent);
       }
 
       const isForcedToOverrideEventsBasedObjectChildrenConfiguration =
@@ -186,26 +186,25 @@ namespace gdjs {
      *
      * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (!this._isLoaded) {
         return;
       }
-
       // Notify the objects they are being destroyed
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         object.onDeletedFromScene();
-        // The object can free all its resource directly...
-        object.onDestroyed();
       }
-      // ...as its container cache `_instancesRemoved` is also destroy.
-      this._destroy();
-
       this._isLoaded = false;
     }
 
-    _destroy() {
+    override _destroy() {
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
+        object.onDestroyed();
+      }
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the container is released immediately.
       super._destroy();

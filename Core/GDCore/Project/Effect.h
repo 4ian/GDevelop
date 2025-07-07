@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EFFECT_H
-#define GDCORE_EFFECT_H
+#pragma once
 #include <map>
 namespace gd {
 class SerializerElement;
@@ -43,6 +42,10 @@ class GD_CORE_API Effect {
     return doubleParameters[name];
   }
 
+  bool HasDoubleParameter(const gd::String& name) {
+    return doubleParameters.find(name) != doubleParameters.end();
+  }
+
   void SetStringParameter(const gd::String& name, const gd::String& value) {
     stringParameters[name] = value;
   }
@@ -51,12 +54,20 @@ class GD_CORE_API Effect {
     return stringParameters[name];
   }
 
+  bool HasStringParameter(const gd::String& name) {
+    return stringParameters.find(name) != stringParameters.end();
+  }
+
   void SetBooleanParameter(const gd::String& name, bool value) {
     booleanParameters[name] = value;
   }
 
   bool GetBooleanParameter(const gd::String& name) {
     return booleanParameters[name];
+  }
+
+  bool HasBooleanParameter(const gd::String& name) {
+    return booleanParameters.find(name) != booleanParameters.end();
   }
 
   const std::map<gd::String, double>& GetAllDoubleParameters() const {
@@ -97,4 +108,3 @@ class GD_CORE_API Effect {
 };
 
 }  // namespace gd
-#endif

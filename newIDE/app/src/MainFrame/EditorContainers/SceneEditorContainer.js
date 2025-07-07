@@ -9,6 +9,7 @@ import {
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -147,7 +148,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  onSceneEventsModifiedOutsideEditor(scene: gdLayout) {
+  onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
   }
 

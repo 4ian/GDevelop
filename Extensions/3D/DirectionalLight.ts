@@ -26,6 +26,7 @@ namespace gdjs {
 
           private _shadowMapDirty = true;
           private _shadowMapSize: float = 1024;
+          private _minimumShadowBias: float = 0;
 
           private _shadowCameraDirty = true;
           private _distanceFromCamera: float = 1500;
@@ -124,9 +125,21 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            // Apply any update to the camera or shadow map size.
             this._updateShadowCamera();
             this._updateShadowMapSize();
 
+            // Avoid shadow acne due to depth buffer precision.
+            const biasMultiplier =
+              this._shadowMapSize < 1024
+                ? 2
+                : this._shadowMapSize < 2048
+                  ? 1.25
+                  : 1;
+            this._light.shadow.bias = -this._minimumShadowBias * biasMultiplier;
+
+            // Apply update to the light position and its target.
+            // By doing this, the shadows are "following" the GDevelop camera.
             if (!target.getRuntimeLayer) {
               return;
             }
@@ -142,7 +155,7 @@ namespace gdjs {
               const posLightX =
                 roundedX +
                 this._distanceFromCamera *
-                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY -
@@ -151,7 +164,7 @@ namespace gdjs {
               const posLightZ =
                 roundedZ +
                 this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.sin(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation));
               this._light.position.set(posLightX, posLightY, posLightZ);
               this._light.target.position.set(roundedX, roundedY, roundedZ);
@@ -159,12 +172,12 @@ namespace gdjs {
               const posLightX =
                 roundedX +
                 this._distanceFromCamera *
-                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY +
                 this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.sin(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightZ =
                 roundedZ +
@@ -186,6 +199,8 @@ namespace gdjs {
               this._distanceFromCamera = value;
             } else if (parameterName === 'frustumSize') {
               this._frustumSize = value;
+            } else if (parameterName === 'minimumShadowBias') {
+              this._minimumShadowBias = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -199,6 +214,8 @@ namespace gdjs {
               return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
               return this._frustumSize;
+            } else if (parameterName === 'minimumShadowBias') {
+              return this._minimumShadowBias;
             }
             return 0;
           }
@@ -207,6 +224,9 @@ namespace gdjs {
               this._light.color = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
+            }
+            if (parameterName === 'top') {
+              this._top = value;
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {

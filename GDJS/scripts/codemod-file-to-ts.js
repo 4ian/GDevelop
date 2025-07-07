@@ -225,7 +225,7 @@ const identifyClassNames = (code) => {
     .replace(/(  hide\w*\(.*\))(: any)? {/g, '$1: void {')
     .replace(/(  reset\w*\(.*\))(: any)? {/g, '$1: void {')
     .replace(/(  deleteFromScene\w*\(.*\))(: any)? {/g, '$1: void {')
-    .replace(/(  onDestroyFromScene\w*\(.*\))(: any)? {/g, '$1: void {')
+    .replace(/(  onDeletedFromScene\w*\(.*\))(: any)? {/g, '$1: void {')
     .replace(/(  enable\w*\(.*\))(: any)? {/g, '$1: void {')
     // Members:
     .replace(/(\w*): any = (\d)/g, '$1: number = $2')

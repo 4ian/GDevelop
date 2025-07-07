@@ -78,6 +78,9 @@ export const DefaultMediumScreenScopeInLayout = () => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedAiGeneratedEventIds={
+            new Set(['fake-ai-generated-event-id-1'])
+          }
         />
       </FixedHeightFlexContainer>
     </div>
@@ -131,6 +134,9 @@ export const DefaultSmallScreenScopeInLayout = () => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedAiGeneratedEventIds={
+            new Set(['fake-ai-generated-event-id-1'])
+          }
         />
       </FixedHeightFlexContainer>
     </div>
@@ -181,6 +187,9 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedAiGeneratedEventIds={
+            new Set(['fake-ai-generated-event-id-1'])
+          }
         />
       </FixedHeightFlexContainer>
     </div>
@@ -234,6 +243,9 @@ export const EmptySmallScreenScopeInALayout = () => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedAiGeneratedEventIds={
+            new Set(['fake-ai-generated-event-id-1'])
+          }
         />
       </FixedHeightFlexContainer>
     </div>

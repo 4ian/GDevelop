@@ -61,7 +61,10 @@ import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObje
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
+import {
+  type RenderEditorContainerPropsWithRef,
+  type SceneEventsOutsideEditorChanges,
+} from './EditorContainers/BaseEditor';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -2577,11 +2580,11 @@ const MainFrame = (props: Props) => {
   );
 
   const onSceneEventsModifiedOutsideEditor = React.useCallback(
-    (scene: gdLayout) => {
+    (changes: SceneEventsOutsideEditorChanges) => {
       for (const editor of state.editorTabs.editors) {
         const { editorRef } = editor;
         if (editorRef) {
-          editorRef.onSceneEventsModifiedOutsideEditor(scene);
+          editorRef.onSceneEventsModifiedOutsideEditor(changes);
         }
       }
     },

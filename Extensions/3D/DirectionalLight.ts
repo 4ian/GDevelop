@@ -155,7 +155,7 @@ namespace gdjs {
               const posLightX =
                 roundedX +
                 this._distanceFromCamera *
-                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY -
@@ -164,7 +164,7 @@ namespace gdjs {
               const posLightZ =
                 roundedZ +
                 this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.sin(gdjs.toRad(-this._rotation + 90)) *
                   Math.cos(gdjs.toRad(this._elevation));
               this._light.position.set(posLightX, posLightY, posLightZ);
               this._light.target.position.set(roundedX, roundedY, roundedZ);
@@ -172,12 +172,12 @@ namespace gdjs {
               const posLightX =
                 roundedX +
                 this._distanceFromCamera *
-                  Math.cos(gdjs.toRad(this._rotation + 90)) *
+                  Math.cos(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightY =
                 roundedY +
                 this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._rotation + 90)) *
+                  Math.sin(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation));
               const posLightZ =
                 roundedZ +
@@ -224,6 +224,9 @@ namespace gdjs {
               this._light.color = new THREE.Color(
                 gdjs.rgbOrHexStringToNumber(value)
               );
+            }
+            if (parameterName === 'top') {
+              this._top = value;
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {

@@ -57,7 +57,9 @@ export const enumerateEffectsMetadata = (
                   name: parameterName,
                   valueType: 'number',
                   getValue: (effect: gdEffect) =>
-                    effect.getDoubleParameter(parameterName),
+                    effect.hasDoubleParameter(parameterName)
+                      ? effect.getDoubleParameter(parameterName)
+                      : parseFloat(defaultValue) || 0,
                   setValue: (effect: gdEffect, newValue: number) =>
                     effect.setDoubleParameter(parameterName, newValue),
                   getLabel,
@@ -71,7 +73,9 @@ export const enumerateEffectsMetadata = (
                   name: parameterName,
                   valueType: 'boolean',
                   getValue: (effect: gdEffect) =>
-                    effect.getBooleanParameter(parameterName),
+                    effect.hasBooleanParameter(parameterName)
+                      ? effect.getBooleanParameter(parameterName)
+                      : defaultValue === '1',
                   setValue: (effect: gdEffect, newValue: boolean) =>
                     effect.setBooleanParameter(parameterName, newValue),
                   getLabel,
@@ -90,7 +94,9 @@ export const enumerateEffectsMetadata = (
                   valueType: 'resource',
                   resourceKind: kind,
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
@@ -104,7 +110,9 @@ export const enumerateEffectsMetadata = (
                   name: parameterName,
                   valueType: 'color',
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,
@@ -127,7 +135,9 @@ export const enumerateEffectsMetadata = (
                   valueType: 'string',
                   getChoices: () => [...choices, ...deprecatedChoices],
                   getValue: (effect: gdEffect) =>
-                    effect.getStringParameter(parameterName),
+                    effect.hasStringParameter(parameterName)
+                      ? effect.getStringParameter(parameterName)
+                      : defaultValue,
                   setValue: (effect: gdEffect, newValue: string) =>
                     effect.setStringParameter(parameterName, newValue),
                   getLabel,

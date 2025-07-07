@@ -21,6 +21,7 @@ import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnit
 import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
 import AlertMessage from '../../UI/AlertMessage';
 import { hasLight } from './Model3DEditor';
+import { PropertyCheckbox } from './PropertyFields';
 
 const facesProperties = [
   {
@@ -210,6 +211,7 @@ const Cube3DEditor = ({
             />
           ))}
         </SelectField>
+        <Text size="block-title">Lighting</Text>
         <SelectField
           value={properties.get('materialType').getValue()}
           floatingLabelText={properties.get('materialType').getLabel()}
@@ -229,6 +231,16 @@ const Cube3DEditor = ({
             key="StandardWithoutMetalness"
           />
         </SelectField>
+        <Column noMargin expand>
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isCastingShadow"
+          />
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isReceivingShadow"
+          />
+        </Column>
         {properties.get('materialType').getValue() !== 'Basic' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">

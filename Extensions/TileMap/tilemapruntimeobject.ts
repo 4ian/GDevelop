@@ -347,6 +347,14 @@ namespace gdjs {
       this.setHeight(newHeight);
     }
 
+    override getOriginalWidth(): float {
+      return this._renderer.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this._renderer.getTileMapHeight();
+    }
+
     /**
      * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      *

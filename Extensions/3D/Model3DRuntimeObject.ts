@@ -278,9 +278,9 @@ namespace gdjs {
         rotationX,
         rotationY,
         rotationZ,
-        this._getOriginalWidth(),
-        this._getOriginalHeight(),
-        this._getOriginalDepth(),
+        this.getOriginalWidth(),
+        this.getOriginalHeight(),
+        this.getOriginalDepth(),
         keepAspectRatio
       );
     }

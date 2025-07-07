@@ -341,6 +341,12 @@ namespace gdjs {
       return this._initialInnerArea ? this._initialInnerArea.max[1] : 0;
     }
 
+    _getInitialInnerAreaDepth(): float {
+      return this._initialInnerArea
+        ? this._initialInnerArea.max[2] - this._initialInnerArea.min[2]
+        : 0;
+    }
+
     getViewportWidth(): float {
       return this._customObject.getUnscaledWidth();
     }

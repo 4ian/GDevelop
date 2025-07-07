@@ -44,6 +44,8 @@ namespace gdjs {
 
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
+    _objectData: TiledSpriteObjectData;
+
     /**
      * @param instanceContainer The container the object belongs to.
      * @param tiledSpriteObjectData The initial properties of the object
@@ -53,6 +55,7 @@ namespace gdjs {
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
       super(instanceContainer, tiledSpriteObjectData);
+      this._objectData = tiledSpriteObjectData;
       this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
         this,
         instanceContainer,
@@ -68,6 +71,7 @@ namespace gdjs {
     }
 
     updateFromObjectData(oldObjectData, newObjectData): boolean {
+      this._objectData = newObjectData;
       if (oldObjectData.texture !== newObjectData.texture) {
         this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
@@ -228,6 +232,14 @@ namespace gdjs {
     setSize(width: float, height: float): void {
       this.setWidth(width);
       this.setHeight(height);
+    }
+
+    override getOriginalWidth(): float {
+      return this._objectData.width;
+    }
+
+    override getOriginalHeight(): float {
+      return this._objectData.height;
     }
 
     /**

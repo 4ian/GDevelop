@@ -393,31 +393,6 @@ namespace gdjs {
     }
 
     /**
-     * Return the width of the object for a scale of 1.
-     *
-     * It can't be 0.
-     */
-    _getOriginalWidth(): float {
-      return this._originalWidth;
-    }
-
-    /**
-     * Return the height of the object for a scale of 1.
-     *
-     * It can't be 0.
-     */
-    _getOriginalHeight(): float {
-      return this._originalHeight;
-    }
-
-    /**
-     * Return the object size on the Z axis (called "depth") when the scale equals 1.
-     */
-    _getOriginalDepth(): float {
-      return this._originalDepth;
-    }
-
-    /**
      * Set the width of the object for a scale of 1.
      */
     _setOriginalWidth(originalWidth: float): void {

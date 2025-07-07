@@ -431,6 +431,14 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
+    override getOriginalWidth(): float {
+      return this._renderer.getTileMapWidth();
+    }
+
+    override getOriginalHeight(): float {
+      return this._renderer.getTileMapHeight();
+    }
+
     getScaleX(): float {
       return this._renderer.getScaleX();
     }

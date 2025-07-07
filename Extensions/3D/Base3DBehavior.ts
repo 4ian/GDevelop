@@ -117,7 +117,8 @@ namespace gdjs {
     getUnrotatedAABBMaxZ(): number;
 
     /**
-     * Get the object size on the Z axis (called "depth") for a scale of 1.
+     * Return the depth of the object before any custom size is applied.
+     * @return The depth of the object
      */
     getOriginalDepth(): float;
   }

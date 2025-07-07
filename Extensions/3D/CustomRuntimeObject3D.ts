@@ -284,11 +284,7 @@ namespace gdjs {
     }
 
     getOriginalDepth(): float {
-      const initialInnerArea = this._instanceContainer._initialInnerArea;
-      return (
-        (initialInnerArea ? initialInnerArea.min[2] : 0) -
-        (initialInnerArea ? initialInnerArea.min[2] : 0)
-      );
+      return this._instanceContainer._getInitialInnerAreaDepth();
     }
 
     override _updateUntransformedHitBoxes(): void {

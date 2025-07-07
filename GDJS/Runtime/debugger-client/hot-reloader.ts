@@ -738,7 +738,6 @@ namespace gdjs {
           // scene (see `_hotReloadRuntimeInstanceContainer` call from
           // `_hotReloadRuntimeSceneInstances`).
           objects: mergedChildObjectDataList,
-          childrenContent: mergedChildObjectDataList,
         };
         return mergedObjectConfiguration;
       });

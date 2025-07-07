@@ -1937,7 +1937,7 @@ module.exports = {
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('isCastingShadow')
-        .setValue('true')
+        .setValue('false')
         .setLabel(_('Shadow casting'))
         .setType('boolean')
         .setGroup(_('Shadows'));

@@ -495,40 +495,6 @@ const Model3DEditor = ({
             }}
             id={`model3d-object-modelResourceName`}
           />
-          <SelectField
-            value={properties.get('materialType').getValue()}
-            floatingLabelText={properties.get('materialType').getLabel()}
-            helperMarkdownText={properties.get('materialType').getDescription()}
-            onChange={(event, index, newValue) => {
-              onChangeProperty('materialType', newValue);
-            }}
-          >
-            <SelectOption
-              label={t`No lighting effect`}
-              value="Basic"
-              key="Basic"
-            />
-            <SelectOption
-              label={t`Emit all ambient light`}
-              value="StandardWithoutMetalness"
-              key="StandardWithoutMetalness"
-            />
-            <SelectOption
-              label={t`Keep model material`}
-              value="KeepOriginal"
-              key="KeepOriginal"
-            />
-          </SelectField>
-          {properties.get('materialType').getValue() !== 'Basic' &&
-            !hasLight(layout) && (
-              <AlertMessage kind="error">
-                <Trans>
-                  Make sure to set up a light in the effects of the layer or
-                  choose "No lighting effect" - otherwise the object will appear
-                  black.
-                </Trans>
-              </AlertMessage>
-            )}
           <Text size="block-title" noMargin>
             <Trans>Default orientation</Trans>
           </Text>
@@ -667,22 +633,54 @@ const Model3DEditor = ({
               />
             </SelectField>
           </ResponsiveLineStackLayout>
+          <Text size="block-title">Lighting</Text>
+          <SelectField
+            value={properties.get('materialType').getValue()}
+            floatingLabelText={properties.get('materialType').getLabel()}
+            helperMarkdownText={properties.get('materialType').getDescription()}
+            onChange={(event, index, newValue) => {
+              onChangeProperty('materialType', newValue);
+            }}
+          >
+            <SelectOption
+              label={t`No lighting effect`}
+              value="Basic"
+              key="Basic"
+            />
+            <SelectOption
+              label={t`Emit all ambient light`}
+              value="StandardWithoutMetalness"
+              key="StandardWithoutMetalness"
+            />
+            <SelectOption
+              label={t`Keep model material`}
+              value="KeepOriginal"
+              key="KeepOriginal"
+            />
+          </SelectField>
+          {properties.get('materialType').getValue() !== 'Basic' &&
+            !hasLight(layout) && (
+              <AlertMessage kind="error">
+                <Trans>
+                  Make sure to set up a light in the effects of the layer or
+                  choose "No lighting effect" - otherwise the object will appear
+                  black.
+                </Trans>
+              </AlertMessage>
+            )}
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isCastingShadow"
+          />
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="isReceivingShadow"
+          />
           <Text size="block-title">Animations</Text>
           <Column noMargin expand>
             <PropertyField
               objectConfiguration={objectConfiguration}
               propertyName="crossfadeDuration"
-            />
-          </Column>
-          <Text size="block-title">Shadows</Text>
-          <Column noMargin expand>
-            <PropertyCheckbox
-              objectConfiguration={objectConfiguration}
-              propertyName="isCastingShadow"
-            />
-            <PropertyCheckbox
-              objectConfiguration={objectConfiguration}
-              propertyName="isReceivingShadow"
             />
           </Column>
           <Column noMargin expand useFullHeight>

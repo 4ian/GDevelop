@@ -156,7 +156,8 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddChoice("Basic", _("Basic (no lighting, no shadows)"))
       .AddChoice("StandardWithoutMetalness", _("Standard (without metalness)"))
       .AddChoice("KeepOriginal", _("Keep original"))
-      .SetLabel(_("Material"));
+      .SetLabel(_("Material"))
+      .SetGroup(_("Lighting"));
 
   objectProperties["originLocation"]
       .SetValue(originLocation.empty() ? "TopLeft" : originLocation)
@@ -192,13 +193,13 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetValue(isCastingShadow ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Shadow casting"))
-      .SetGroup(_("Shadows"));
+      .SetGroup(_("Lighting"));
 
   objectProperties["isReceivingShadow"]
       .SetValue(isReceivingShadow ? "true" : "false")
       .SetType("boolean")
       .SetLabel(_("Shadow receiving"))
-      .SetGroup(_("Shadows"));
+      .SetGroup(_("Lighting"));
 
 
 

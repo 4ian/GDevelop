@@ -866,10 +866,13 @@ export class Effect extends EmscriptenObject {
   isFolded(): boolean;
   setDoubleParameter(name: string, value: number): void;
   getDoubleParameter(name: string): number;
+  hasDoubleParameter(name: string): boolean;
   setStringParameter(name: string, value: string): void;
   getStringParameter(name: string): string;
+  hasStringParameter(name: string): boolean;
   setBooleanParameter(name: string, value: boolean): void;
   getBooleanParameter(name: string): boolean;
+  hasBooleanParameter(name: string): boolean;
   getAllDoubleParameters(): MapStringDouble;
   getAllStringParameters(): MapStringString;
   getAllBooleanParameters(): MapStringBoolean;

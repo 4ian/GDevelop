@@ -1092,21 +1092,22 @@ module.exports = {
           'StandardWithoutMetalness',
           _('Standard (without metalness)')
         )
-        .setLabel(_('Material type'));
+        .setLabel(_('Material type'))
+        .setGroup(_('Lighting'));
 
       objectProperties
         .getOrCreate('isCastingShadow')
         .setValue(objectContent.isCastingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow casting'))
-        .setGroup(_('Shadows'));
+        .setGroup(_('Lighting'));
 
       objectProperties
         .getOrCreate('isReceivingShadow')
         .setValue(objectContent.isReceivingShadow ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Shadow receiving'))
-        .setGroup(_('Shadows'));
+        .setGroup(_('Lighting'));
 
       return objectProperties;
     };
@@ -1936,7 +1937,7 @@ module.exports = {
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('isCastingShadow')
-        .setValue('true')
+        .setValue('false')
         .setLabel(_('Shadow casting'))
         .setType('boolean')
         .setGroup(_('Shadows'));

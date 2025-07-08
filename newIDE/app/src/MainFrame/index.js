@@ -1524,6 +1524,16 @@ const MainFrame = (props: Props) => {
     [hotReloadInGameEditorIfNeeded]
   );
 
+  const onEffectAdded = React.useCallback(
+    () => {
+      // Ensure the effect implementation is exported.
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: false,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
   const renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = state;
     const { i18n } = props;
@@ -4339,6 +4349,7 @@ const MainFrame = (props: Props) => {
                     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                     onExtensionInstalled: onExtensionInstalled,
                     onEventBasedObjectTypeChanged: onEventBasedObjectTypeChanged,
+                    onEffectAdded: onEffectAdded,
                     gamesList,
                     gamesPlatformFrameTools,
                   })}

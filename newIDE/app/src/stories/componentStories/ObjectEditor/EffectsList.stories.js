@@ -21,6 +21,7 @@ export const withSomeEffectsForAMixedLayer = () => (
         effectsContainer={testProject.layerWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -37,6 +38,7 @@ export const withSomeEffectsForA2DLayer = () => (
         effectsContainer={testProject.layerWith2DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -56,6 +58,7 @@ export const withSomeEffectsForA3DLayer = () => (
         effectsContainer={testProject.layerWith3DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -72,6 +75,7 @@ export const withSomeEffectsForAnObject = () => (
         effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -88,6 +92,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
         effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -104,6 +109,7 @@ export const withoutEffectsForAMixedLayer = () => (
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -129,6 +135,7 @@ export const withoutEffectsForA2DLayer = () => (
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -154,6 +161,7 @@ export const withoutEffectsForA3DLayer = () => (
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -170,6 +178,7 @@ export const withoutEffectsForAnObject = () => (
         effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
+        onEffectAdded={action('effect added')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

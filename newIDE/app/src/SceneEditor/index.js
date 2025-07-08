@@ -174,6 +174,7 @@ type Props = {|
     eventBasedObject: gdEventsBasedObject,
     variant: gdEventsBasedObjectVariant
   ) => void,
+  onEffectAdded: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1263,23 +1264,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  _onLayersModified = () => {
-    if (this.props.project.areEffectsHiddenInEditor()) {
-      return;
-    }
-    const { previewDebuggerServer, layersContainer } = this.props;
-    if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'hotReloadLayers',
-          payload: {
-            layers: mapFor(0, layersContainer.getLayersCount(), i => {
-              const layer = layersContainer.getLayerAt(i);
-              return serializeToJSObject(layer);
-            }),
-          },
+  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    const {
+      previewDebuggerServer,
+      layersContainer,
+      onEffectAdded,
+    } = this.props;
+    if (hasAnyEffectBeenAdded) {
+      // This triggers a full hot-reload. We don't need to reload layers specifically.
+      onEffectAdded();
+    } else {
+      if (this.props.project.areEffectsHiddenInEditor()) {
+        return;
+      }
+      if (previewDebuggerServer) {
+        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'hotReloadLayers',
+            payload: {
+              layers: mapFor(0, layersContainer.getLayersCount(), i => {
+                const layer = layersContainer.getLayerAt(i);
+                return serializeToJSObject(layer);
+              }),
+            },
+          });
         });
-      });
+      }
     }
   };
 
@@ -2463,7 +2473,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   selectedObjectFolderOrObjectsWithContext
                 }
                 onLayerRenamed={this._onLayerRenamed}
-                onLayersModified={this._onLayersModified}
+                onLayersModified={() => this._onLayersModified(false)}
                 onLayersVisibilityInEditorChanged={
                   this._onLayersVisibilityInEditorChanged
                 }
@@ -2598,12 +2608,18 @@ export default class SceneEditor extends React.Component<Props, State> {
                         onRename={newName => {
                           this._onRenameEditedObject(newName);
                         }}
-                        onApply={(hasResourceChanged: boolean) => {
+                        onApply={(
+                          hasResourceChanged: boolean,
+                          hasAnyEffectBeenAdded: boolean
+                        ) => {
                           if (editedObjectWithContext) {
                             this._onObjectEdited(
                               editedObjectWithContext,
                               hasResourceChanged
                             );
+                          }
+                          if (hasAnyEffectBeenAdded) {
+                            this.props.onEffectAdded();
                           }
                           this.editObject(null);
                         }}
@@ -2738,8 +2754,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                   layer={this.state.editedLayer}
                   initialInstances={initialInstances}
                   initialTab={this.state.editedLayerInitialTab}
-                  onApply={() => {
-                    this._onLayersModified();
+                  onApply={(hasAnyEffectBeenAdded: boolean) => {
+                    this._onLayersModified(hasAnyEffectBeenAdded);
                     this.setState({
                       editedLayer: null,
                     });

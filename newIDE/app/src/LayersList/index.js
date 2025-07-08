@@ -36,7 +36,7 @@ type LayersListBodyProps = {|
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
-  onEditEffects: (layer: ?gdLayer) => void,
+  onEditLayerEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
   onLayersModified: () => void,
   width: number,
@@ -57,7 +57,7 @@ const LayersListBody = ({
   eventsFunctionsExtension,
   eventsBasedObject,
   layersContainer,
-  onEditEffects,
+  onEditLayerEffects,
   onEdit,
   width,
   onLayerRenamed,
@@ -114,7 +114,7 @@ const LayersListBody = ({
         onSelect={() => onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
         effectsCount={getEffectsCount(project.getCurrentPlatform(), layer)}
-        onEditEffects={() => onEditEffects(layer)}
+        onEditLayerEffects={() => onEditLayerEffects(layer)}
         onEdit={() => onEdit(layer)}
         onBeginDrag={() => {
           draggedLayerIndexRef.current = i;
@@ -311,7 +311,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedObject={eventsBasedObject}
                 layersContainer={props.layersContainer}
-                onEditEffects={props.onEditLayerEffects}
+                onEditLayerEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
                 onLayersModified={props.onLayersModified}
                 onRemoveLayer={props.onRemoveLayer}

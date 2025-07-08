@@ -51,7 +51,7 @@ type Props = {|
   isLocked: boolean,
   onChangeLockState: boolean => void,
   effectsCount: number,
-  onEditEffects: () => void,
+  onEditLayerEffects: () => void,
   onEdit: () => void,
   width: number,
 |};
@@ -68,7 +68,7 @@ const LayerRow = ({
   isLocked,
   onChangeLockState,
   effectsCount,
-  onEditEffects,
+  onEditLayerEffects,
   onChangeVisibility,
   onBeginDrag,
   onDrop,
@@ -174,7 +174,7 @@ const LayerRow = ({
                           },
                           {
                             label: i18n._(t`Edit effects (${effectsCount})`),
-                            click: onEditEffects,
+                            click: onEditLayerEffects,
                           },
                           {
                             type: 'checkbox',
@@ -232,7 +232,7 @@ const LayerRow = ({
                         />
                         <IconButton
                           size="small"
-                          onClick={onEditEffects}
+                          onClick={onEditLayerEffects}
                           tooltip={t`Edit effects (${effectsCount})`}
                         >
                           <Badge badgeContent={effectsCount} color="primary">

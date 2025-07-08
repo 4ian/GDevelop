@@ -356,6 +356,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onDeleteEventsBasedObjectVariant={
               this.props.onDeleteEventsBasedObjectVariant
             }
+            onEffectAdded={this.props.onEffectAdded}
           />
         )}
         {!layout && (

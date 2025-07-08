@@ -38,7 +38,10 @@ type Props = {|
   open: boolean,
   object: ?gdObject,
 
-  onApply: (hasResourceChanged: boolean) => void,
+  onApply: (
+    hasResourceChanged: boolean,
+    hasAnyEffectBeenAdded: boolean
+  ) => void,
   onCancel: () => void,
 
   // Object renaming:
@@ -141,6 +144,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     }),
     [resourceManagementProps]
   );
+  const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
 
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
@@ -154,7 +158,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     props.editorComponent;
 
   const onApply = async () => {
-    props.onApply(hasResourceChanged);
+    props.onApply(hasResourceChanged, hasAnyEffectBeenAdded);
 
     const initialInstances =
       (layout && layout.getInitialInstances()) ||
@@ -411,6 +415,9 @@ const InnerDialog = (props: InnerDialogProps) => {
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
           }}
         />
       )}

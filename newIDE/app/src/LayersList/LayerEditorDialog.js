@@ -41,7 +41,7 @@ type Props = {|
   initialTab: 'properties' | 'effects',
 
   onCancel: () => void,
-  onApply: () => void,
+  onApply: (hasAnyEffectBeenAdded: boolean) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -94,6 +94,7 @@ const LayerEditorDialog = ({
     },
     [layer, initialInstances]
   );
+  const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
 
   const onChangeCamera3DFieldOfView = React.useCallback(
     value => {
@@ -199,12 +200,12 @@ const LayerEditorDialog = ({
         <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          onClick={onApply}
+          onClick={() => onApply(hasAnyEffectBeenAdded)}
           key={'Apply'}
         />,
       ]}
       onRequestClose={onCancelChanges}
-      onApply={onApply}
+      onApply={() => onApply(hasAnyEffectBeenAdded)}
       fullHeight
       flexColumnBody
       fixedContent={
@@ -482,6 +483,9 @@ const LayerEditorDialog = ({
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
+          }}
+          onEffectAdded={() => {
+            setAnyEffectBeenAdded(true);
           }}
         />
       )}

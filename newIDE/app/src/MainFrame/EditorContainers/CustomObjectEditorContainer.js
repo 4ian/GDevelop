@@ -328,6 +328,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           onDeleteEventsBasedObjectVariant={
             this.props.onDeleteEventsBasedObjectVariant
           }
+          onEffectAdded={this.props.onEffectAdded}
         />
       </div>
     );

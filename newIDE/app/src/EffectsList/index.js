@@ -388,16 +388,6 @@ const Effect = React.forwardRef(
   }
 );
 
-type Props = {|
-  project: gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  effectsContainer: gdEffectsContainer,
-  onEffectsUpdated: () => void,
-  onEffectsRenamed: (oldName: string, newName: string) => void,
-  target: 'object' | 'layer',
-  layerRenderingType: string,
-|};
-
 export const getEnumeratedEffectMetadata = (
   allEffectDescriptions: Array<EnumeratedEffectMetadata>,
   effectType: string
@@ -468,12 +458,14 @@ export const useManageEffects = ({
   effectsContainer,
   project,
   onEffectsUpdated,
+  onEffectAdded,
   onUpdate,
   target,
 }: {|
   effectsContainer: gdEffectsContainer,
   project: gdProject,
   onEffectsUpdated: () => void,
+  onEffectAdded: () => void,
   onUpdate: () => void,
   target: 'object' | 'layer',
 |}): UseManageEffectsState => {
@@ -558,8 +550,15 @@ export const useManageEffects = ({
       onUpdate();
       onEffectsUpdated();
       setJustAddedEffectName(newName);
+      onEffectAdded();
     },
-    [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
+    [
+      chooseEffectType,
+      effectsContainer,
+      onUpdate,
+      onEffectsUpdated,
+      onEffectAdded,
+    ]
   );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
@@ -800,6 +799,17 @@ export const useManageEffects = ({
   };
 };
 
+type Props = {|
+  project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  effectsContainer: gdEffectsContainer,
+  onEffectsUpdated: () => void,
+  onEffectsRenamed: (oldName: string, newName: string) => void,
+  onEffectAdded: () => void,
+  target: 'object' | 'layer',
+  layerRenderingType: string,
+|};
+
 /**
  * Display a list of effects and allow to add/remove/edit them.
  *
@@ -810,6 +820,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     onEffectsUpdated,
     onEffectsRenamed,
+    onEffectAdded,
     project,
     target,
   } = props;
@@ -838,6 +849,7 @@ export default function EffectsList(props: Props) {
     effectsContainer,
     project,
     onEffectsUpdated,
+    onEffectAdded,
     onUpdate: forceUpdate,
     target,
   });

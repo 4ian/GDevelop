@@ -27,7 +27,6 @@ import {
   OPEN_PROPERTIES_PANEL_BUTTON_ID,
 } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
-import Layers from '../../UI/CustomSvgIcons/Layers';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
 

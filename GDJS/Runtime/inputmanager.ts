@@ -149,6 +149,28 @@ namespace gdjs {
     }
 
     /**
+     * Release all keys that are currently pressed.
+     * Note: if you want to discard pressed keys without considering them as
+     * released, check `clearAllPressedKeys` instead.
+     */
+    releaseAllPressedKeys(): void {
+      for (const locationAwareKeyCode in this._pressedKeys.items) {
+        this._pressedKeys.put(locationAwareKeyCode, false);
+        this._releasedKeys.put(locationAwareKeyCode, true);
+      }
+    }
+
+    /**
+     * Clears all stored pressed keys without making the keys go through
+     * the release state.
+     * Note: prefer to use `releaseAllPressedKeys` instead, as it corresponds
+     * to a normal key release.
+     */
+    clearAllPressedKeys(): void {
+      this._pressedKeys.clear();
+    }
+
+    /**
      * Return the location-aware code of the last key that was pressed.
      * @return The location-aware code of the last key pressed.
      */
@@ -589,14 +611,6 @@ namespace gdjs {
      */
     isScrollingDown(): boolean {
       return this.getMouseWheelDelta() < 0;
-    }
-
-    /**
-     * Clears all stored pressed keys without making the keys go through
-     * the release state.
-     */
-    clearAllPressedKeys(): void {
-      this._pressedKeys.clear();
     }
 
     static _allTouchIds: Array<integer> = [];

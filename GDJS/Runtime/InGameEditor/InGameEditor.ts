@@ -31,6 +31,16 @@ namespace gdjs {
   const E_KEY = 69;
   const F_KEY = 70;
 
+  let hasWindowFocus = true;
+  if (typeof window !== 'undefined') {
+    window.addEventListener('focus', () => {
+      hasWindowFocus = true;
+    });
+    window.addEventListener('blur', () => {
+      hasWindowFocus = false;
+    });
+  }
+
   const transformControlsModes: ['translate', 'rotate', 'scale'] = [
     'translate',
     'rotate',
@@ -307,6 +317,9 @@ namespace gdjs {
       typeof THREE === 'undefined' ? null : new THREE.Raycaster();
 
     private _editorCameras = new Map<string, EditorCamera>();
+
+    /** Keep track of the focus to know if the game was blurred since the last frame. */
+    private _windowHadFocus = true;
 
     // The controls shown to manipulate the selection.
     private _selectionControls: {
@@ -2021,6 +2034,13 @@ namespace gdjs {
         this.getObjectUnderCursor();
 
       const inputManager = this._runtimeGame.getInputManager();
+
+      // Ensure we don't keep keys considered as pressed if the editor is blurred.
+      if (!hasWindowFocus && this._windowHadFocus) {
+        inputManager.releaseAllPressedKeys();
+      }
+      this._windowHadFocus = hasWindowFocus;
+
       if (
         !this._wasMouseLeftButtonPressed &&
         !this._wasMouseRightButtonPressed &&

@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { ToolbarGroup } from '../../UI/Toolbar';
@@ -71,7 +71,7 @@ const Toolbar = React.memo<Props>(function(props) {
           {
             id: '2d-instances-editor',
             renderIcon: className => <Grid2d className={className} />,
-            tooltip: 'Top-down, classic editor',
+            tooltip: <Trans>Top-down, classic editor</Trans>,
             label: '2D',
             onClick: () => {
               props.setGameEditorMode('instances-editor');
@@ -81,7 +81,7 @@ const Toolbar = React.memo<Props>(function(props) {
           {
             id: '3d-game-editor',
             renderIcon: className => <Grid3d className={className} />,
-            tooltip: '3D, real-time editor',
+            tooltip: <Trans>3D, real-time editor</Trans>,
             label: '3D',
             onClick: () => {
               props.setGameEditorMode('embedded-game');

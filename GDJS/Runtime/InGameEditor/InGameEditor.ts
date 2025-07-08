@@ -535,44 +535,8 @@ namespace gdjs {
       },
       margin: float
     ) {
-      if (objects.length === 0) {
-        this.zoomToFitArea(
-          {
-            minX: 0,
-            minY: 0,
-            minZ: 0,
-            maxX: this._runtimeGame.getOriginalWidth(),
-            maxY: this._runtimeGame.getOriginalHeight(),
-            maxZ: 0,
-          },
-          visibleScreenArea,
-          0.1
-        );
-      }
-      let minX = Number.MAX_VALUE;
-      let minY = Number.MAX_VALUE;
-      let minZ = Number.MAX_VALUE;
-      let maxX = Number.MIN_VALUE;
-      let maxY = Number.MIN_VALUE;
-      let maxZ = Number.MIN_VALUE;
-      for (const object of objects) {
-        const aabb = object.getAABB();
-        minX = Math.min(minX, aabb.min[0]);
-        minY = Math.min(minY, aabb.min[1]);
-        minZ = Math.min(minZ, is3D(object) ? object.getUnrotatedAABBMinZ() : 0);
-        maxX = Math.max(maxX, aabb.max[0]);
-        maxY = Math.max(maxY, aabb.max[1]);
-        maxZ = Math.max(maxZ, is3D(object) ? object.getUnrotatedAABBMaxZ() : 0);
-      }
-      this.zoomToFitArea(
-        {
-          minX,
-          minY,
-          minZ,
-          maxX,
-          maxY,
-          maxZ,
-        },
+      this._getEditorCamera().zoomToFitObjects(
+        objects,
         visibleScreenArea,
         margin
       );
@@ -595,87 +559,19 @@ namespace gdjs {
       },
       margin: float
     ) {
-      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
-      if (!currentScene) return;
-
-      const sceneAreaWidth = sceneArea.maxX - sceneArea.minX;
-      const sceneAreaHeight = sceneArea.maxY - sceneArea.minY;
-
-      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
-      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
-      const editorWidth =
-        (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedWidth;
-      const editorHeight =
-        (visibleScreenArea.maxY - visibleScreenArea.minY) * renderedHeight;
-      const isContentWider =
-        editorWidth * sceneAreaHeight < sceneAreaWidth * editorHeight;
-      const zoom =
-        (1 - 2 * margin) *
-        (isContentWider
-          ? editorWidth / sceneAreaWidth
-          : editorHeight / sceneAreaHeight);
-      const distance = this._getCameraZFromZoom(zoom);
-
-      const sceneAreaCenterX = (sceneArea.maxX + sceneArea.minX) / 2;
-      const sceneAreaCenterY = (sceneArea.maxY + sceneArea.minY) / 2;
-
-      // TODO Use this delta to rotate around the visible part of the screen.
-      // or maybe we don't care and this block can be removed.
-      const centerDeltaX =
-        (renderedWidth *
-          (0.5 * (-visibleScreenArea.minX + (1 - visibleScreenArea.maxX)))) /
-        zoom;
-      const centerDeltaY =
-        (renderedHeight *
-          (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
-        zoom;
-
-      this._getEditorCamera().switchToOrbitCamera();
-      const orbitCameraControl = this._getObitCameraControl();
-      orbitCameraControl.target.x = sceneAreaCenterX;
-      orbitCameraControl.target.y = sceneAreaCenterY;
-      orbitCameraControl.target.z = sceneArea.minZ;
-      orbitCameraControl.distance = distance;
-      orbitCameraControl.rotationAngle = 0;
-      orbitCameraControl.elevationAngle = 90;
+      this._getEditorCamera().zoomToFitArea(
+        sceneArea,
+        visibleScreenArea,
+        margin
+      );
     }
 
     zoomBy(zoomInFactor: float) {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const distanceDelta = zoomInFactor > 1 ? 200 : -200;
-      const orbitCameraControl = this._getObitCameraControl();
-      if (orbitCameraControl.isEnabled()) {
-        orbitCameraControl.distance = Math.min(
-          10,
-          orbitCameraControl.distance + distanceDelta
-        );
-      } else {
-        const freeCameraControl = this._getFreeCameraControl();
-        freeCameraControl.moveForward(distanceDelta);
-      }
+      this._getEditorCamera().zoomBy(zoomInFactor);
     }
-
-    /**
-     * Get the camera center Z position.
-     *
-     * @param zoom The camera zoom.
-     * @return The z position of the camera
-     */
-    private _getCameraZFromZoom = (zoom: float): float => {
-      // TODO Should the editor force this fov?
-      const fov = 45;
-      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
-      // The Z position is computed by taking the half height of the displayed rendering,
-      // and using the angle of the triangle defined by the field of view to compute the length
-      // of the triangle defining the distance between the camera and the rendering plane.
-      return (
-        (0.5 * this._runtimeGame.getGameResolutionHeight()) /
-        zoom /
-        Math.tan(0.5 * gdjs.toRad(fov))
-      );
-    };
 
     setSelectedObjects(persistentUuids: Array<string>) {
       const editedInstanceContainer = this._getEditedInstanceContainer();
@@ -716,36 +612,9 @@ namespace gdjs {
         return;
       }
 
-      const layer = this._getFirstLayer3D();
-      if (!layer) {
-        return;
-      }
-
-      // TODO Use this delta to rotate around the visible part of the screen.
-      // or maybe we don't care and this block can be removed.
-      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
-      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
-      const zoom = layer.getCameraZoom();
-      const centerDeltaX =
-        (renderedWidth *
-          (0.5 * (-visibleScreenArea.minX + (1 - visibleScreenArea.maxX)))) /
-        zoom;
-      const centerDeltaY =
-        (renderedHeight *
-          (0.5 * (-visibleScreenArea.minY + (1 - visibleScreenArea.maxY)))) /
-        zoom;
-
-      this._getEditorCamera().switchToOrbitCamera();
-
+      this._getEditorCamera().switchToOrbitAroundObject(object);
       // We keep the same camera distance.
-      const orbitCameraControl = this._getObitCameraControl();
-      orbitCameraControl.target.x = object.getCenterXInScene();
-      orbitCameraControl.target.y = object.getCenterYInScene();
-      orbitCameraControl.target.z = is3D(object)
-        ? object.getUnrotatedAABBMinZ()
-        : 0;
-      orbitCameraControl.rotationAngle = 0;
-      orbitCameraControl.elevationAngle = 90;
+      this._getEditorCamera().resetRotationToTopDown();
     }
 
     private _handleCameraMovement() {
@@ -753,23 +622,14 @@ namespace gdjs {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const orbitCameraControl = this._getObitCameraControl();
-      const freeCameraControl = this._getFreeCameraControl();
-
       const selectedObject = this._selection.getLastSelectedObject();
       if (inputManager.isKeyPressed(F_KEY) && selectedObject) {
-        this._getEditorCamera().switchToOrbitCamera();
-
         // TODO Use the center of the AABB of the whole selection instead
-        orbitCameraControl.target.x = selectedObject.getCenterXInScene();
-        orbitCameraControl.target.y = selectedObject.getCenterYInScene();
-        orbitCameraControl.target.z = is3D(selectedObject)
-          ? selectedObject.getCenterZInScene()
-          : 0;
+        this._getEditorCamera().switchToOrbitAroundObject(selectedObject);
       }
 
       if (
-        !freeCameraControl.isEnabled() &&
+        !this._getEditorCamera().isFreeCamera() &&
         !isControlOrCmdPressed(inputManager) &&
         !isAltPressed(inputManager) &&
         !isShiftPressed(inputManager) &&
@@ -780,14 +640,7 @@ namespace gdjs {
           inputManager.isKeyPressed(Q_KEY) ||
           inputManager.isKeyPressed(E_KEY))
       ) {
-        orbitCameraControl.setEnabled(false);
-        freeCameraControl.setEnabled(true);
-
-        freeCameraControl.position.x = orbitCameraControl.getCameraX();
-        freeCameraControl.position.y = orbitCameraControl.getCameraY();
-        freeCameraControl.position.z = orbitCameraControl.getCameraZ();
-        freeCameraControl.rotationAngle = orbitCameraControl.rotationAngle;
-        freeCameraControl.elevationAngle = orbitCameraControl.elevationAngle;
+        this._getEditorCamera().switchToFreeCamera();
       }
 
       this._getEditorCamera().step();
@@ -2077,27 +1930,40 @@ namespace gdjs {
       }
       return editorCamera;
     }
-
-    private _getObitCameraControl() {
-      return this._getEditorCamera().orbitCameraControl;
-    }
-
-    private _getFreeCameraControl() {
-      return this._getEditorCamera().freeCameraControl;
-    }
   }
 
   class EditorCamera implements CameraControl {
+    _runtimeGame: gdjs.RuntimeGame;
     orbitCameraControl: OrbitCameraControl;
     freeCameraControl: FreeCameraControl;
 
     constructor(runtimeGame: gdjs.RuntimeGame) {
+      this._runtimeGame = runtimeGame;
       this.orbitCameraControl = new OrbitCameraControl(runtimeGame);
       this.freeCameraControl = new FreeCameraControl(runtimeGame);
       this.freeCameraControl.setEnabled(false);
     }
 
-    switchToOrbitCamera(): void {
+    isFreeCamera(): boolean {
+      return this.freeCameraControl.isEnabled();
+    }
+
+    switchToOrbitAroundObject(object: gdjs.RuntimeObject): void {
+      this.switchToOrbitAroundPosition(
+        object.getCenterXInScene(),
+        object.getCenterYInScene(),
+        is3D(object) ? object.getUnrotatedAABBMinZ() : 0
+      );
+    }
+
+    switchToOrbitAroundPosition(
+      targetX: float,
+      targetY: float,
+      targetZ: float
+    ): void {
+      this.orbitCameraControl.target.x = targetX;
+      this.orbitCameraControl.target.y = targetY;
+      this.orbitCameraControl.target.z = targetZ;
       if (this.freeCameraControl.isEnabled()) {
         this.orbitCameraControl.rotationAngle =
           this.freeCameraControl.rotationAngle;
@@ -2106,6 +1972,28 @@ namespace gdjs {
       }
       this.orbitCameraControl.setEnabled(true);
       this.freeCameraControl.setEnabled(false);
+    }
+
+    switchToFreeCamera(): void {
+      this.orbitCameraControl.setEnabled(false);
+      this.freeCameraControl.setEnabled(true);
+
+      this.freeCameraControl.position.x = this.orbitCameraControl.getCameraX();
+      this.freeCameraControl.position.y = this.orbitCameraControl.getCameraY();
+      this.freeCameraControl.position.z = this.orbitCameraControl.getCameraZ();
+      this.freeCameraControl.rotationAngle =
+        this.orbitCameraControl.rotationAngle;
+      this.freeCameraControl.elevationAngle =
+        this.orbitCameraControl.elevationAngle;
+    }
+
+    resetRotationToTopDown(): void {
+      this.orbitCameraControl.resetRotationToTopDown();
+      this.freeCameraControl.resetRotationToTopDown();
+    }
+
+    setOrbitDistance(distance: number): void {
+      this.orbitCameraControl.distance = distance;
     }
 
     step(): void {
@@ -2120,11 +2008,164 @@ namespace gdjs {
         this.freeCameraControl.updateCamera(currentScene, layer);
       }
     }
+
+    zoomBy(zoomInFactor: float): void {
+      if (this.orbitCameraControl.isEnabled()) {
+        this.orbitCameraControl.zoomBy(zoomInFactor);
+      } else {
+        this.freeCameraControl.zoomBy(zoomInFactor);
+      }
+    }
+
+    zoomToInitialPosition(visibleScreenArea: {
+      minX: number;
+      minY: number;
+      maxX: number;
+      maxY: number;
+    }) {
+      this.zoomToFitArea(
+        {
+          minX: 0,
+          minY: 0,
+          minZ: 0,
+          maxX: this._runtimeGame.getOriginalWidth(),
+          maxY: this._runtimeGame.getOriginalHeight(),
+          maxZ: 0,
+        },
+        visibleScreenArea,
+        0.1
+      );
+    }
+
+    zoomToFitObjects(
+      objects: Array<RuntimeObject>,
+      visibleScreenArea: {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+      },
+      margin: float
+    ) {
+      if (objects.length === 0) {
+        this.zoomToFitArea(
+          {
+            minX: 0,
+            minY: 0,
+            minZ: 0,
+            maxX: this._runtimeGame.getOriginalWidth(),
+            maxY: this._runtimeGame.getOriginalHeight(),
+            maxZ: 0,
+          },
+          visibleScreenArea,
+          0.1
+        );
+      }
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let minZ = Number.MAX_VALUE;
+      let maxX = Number.MIN_VALUE;
+      let maxY = Number.MIN_VALUE;
+      let maxZ = Number.MIN_VALUE;
+      for (const object of objects) {
+        const aabb = object.getAABB();
+        minX = Math.min(minX, aabb.min[0]);
+        minY = Math.min(minY, aabb.min[1]);
+        minZ = Math.min(minZ, is3D(object) ? object.getUnrotatedAABBMinZ() : 0);
+        maxX = Math.max(maxX, aabb.max[0]);
+        maxY = Math.max(maxY, aabb.max[1]);
+        maxZ = Math.max(maxZ, is3D(object) ? object.getUnrotatedAABBMaxZ() : 0);
+      }
+      this.zoomToFitArea(
+        {
+          minX,
+          minY,
+          minZ,
+          maxX,
+          maxY,
+          maxZ,
+        },
+        visibleScreenArea,
+        margin
+      );
+    }
+
+    zoomToFitArea(
+      sceneArea: {
+        minX: number;
+        minY: number;
+        minZ: number;
+        maxX: number;
+        maxY: number;
+        maxZ: number;
+      },
+      visibleScreenArea: {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+      },
+      margin: float
+    ) {
+      const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
+      if (!currentScene) return;
+
+      const sceneAreaWidth = sceneArea.maxX - sceneArea.minX;
+      const sceneAreaHeight = sceneArea.maxY - sceneArea.minY;
+
+      const renderedWidth = this._runtimeGame.getGameResolutionWidth();
+      const renderedHeight = this._runtimeGame.getGameResolutionHeight();
+      const editorWidth =
+        (visibleScreenArea.maxX - visibleScreenArea.minX) * renderedWidth;
+      const editorHeight =
+        (visibleScreenArea.maxY - visibleScreenArea.minY) * renderedHeight;
+      const isContentWider =
+        editorWidth * sceneAreaHeight < sceneAreaWidth * editorHeight;
+      const zoom =
+        (1 - 2 * margin) *
+        (isContentWider
+          ? editorWidth / sceneAreaWidth
+          : editorHeight / sceneAreaHeight);
+      const distance = this._getCameraZFromZoom(zoom);
+
+      const sceneAreaCenterX = (sceneArea.maxX + sceneArea.minX) / 2;
+      const sceneAreaCenterY = (sceneArea.maxY + sceneArea.minY) / 2;
+
+      this.switchToOrbitAroundPosition(
+        sceneAreaCenterX,
+        sceneAreaCenterY,
+        sceneArea.minZ
+      );
+      this.resetRotationToTopDown();
+      this.setOrbitDistance(distance);
+    }
+
+    /**
+     * Get the camera center Z position.
+     *
+     * @param zoom The camera zoom.
+     * @return The z position of the camera
+     */
+    private _getCameraZFromZoom = (zoom: float): float => {
+      // TODO Should the editor force this fov?
+      const fov = 45;
+      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
+      // The Z position is computed by taking the half height of the displayed rendering,
+      // and using the angle of the triangle defined by the field of view to compute the length
+      // of the triangle defining the distance between the camera and the rendering plane.
+      return (
+        (0.5 * this._runtimeGame.getGameResolutionHeight()) /
+        zoom /
+        Math.tan(0.5 * gdjs.toRad(fov))
+      );
+    };
   }
 
   interface CameraControl {
     step(): void;
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void;
+    zoomBy(zoomInFactor: float): void;
+    resetRotationToTopDown(): void;
   }
 
   class OrbitCameraControl implements CameraControl {
@@ -2222,6 +2263,18 @@ namespace gdjs {
       setCameraRotationX(currentScene, 90 - this.elevationAngle, layerName, 0);
       setCameraRotationY(currentScene, 0, layerName, 0);
       layer.setCameraRotation(this.rotationAngle);
+    }
+
+    zoomBy(zoomInFactor: float) {
+      this.distance = Math.min(
+        10,
+        this.distance + zoomInFactor > 1 ? 200 : -200
+      );
+    }
+
+    resetRotationToTopDown() {
+      this.rotationAngle = 0;
+      this.elevationAngle = 90;
     }
   }
 
@@ -2417,6 +2470,15 @@ namespace gdjs {
       forward.normalize();
 
       return { right, up, forward };
+    }
+
+    zoomBy(zoomInFactor: float) {
+      this.moveForward(zoomInFactor > 1 ? 200 : -200);
+    }
+
+    resetRotationToTopDown() {
+      this.rotationAngle = 0;
+      this.elevationAngle = 90;
     }
   }
 

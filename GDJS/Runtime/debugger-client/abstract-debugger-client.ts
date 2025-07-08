@@ -411,40 +411,7 @@ namespace gdjs {
       } else if (data.command === 'hardReload') {
         // This usually means that the preview was modified so much that an entire reload
         // is needed, or that the runtime itself could have been modified.
-        try {
-          const reloadUrl = new URL(location.href);
-
-          // Construct the initial status to be restored.
-          const initialRuntimeGameStatus =
-            this._runtimegame.getAdditionalOptions().initialRuntimeGameStatus;
-          // We use empty strings to avoid `null` to become `"null"`.
-          const runtimeGameStatus: RuntimeGameStatus = {
-            editorId: initialRuntimeGameStatus?.editorId || '',
-            isPaused: this._runtimegame.isPaused(),
-            isInGameEdition: this._runtimegame.isInGameEdition(),
-            sceneName: initialRuntimeGameStatus?.sceneName || '',
-            injectedExternalLayoutName:
-              initialRuntimeGameStatus?.injectedExternalLayoutName || '',
-            skipCreatingInstancesFromScene:
-              initialRuntimeGameStatus?.skipCreatingInstancesFromScene || false,
-            eventsBasedObjectType:
-              initialRuntimeGameStatus?.eventsBasedObjectType || '',
-            eventsBasedObjectVariantName:
-              initialRuntimeGameStatus?.eventsBasedObjectVariantName || '',
-          };
-
-          reloadUrl.searchParams.set(
-            'runtimeGameStatus',
-            JSON.stringify(runtimeGameStatus)
-          );
-          location.replace(reloadUrl);
-        } catch (error) {
-          logger.error(
-            'Could not reload the game with the new initial status',
-            error
-          );
-          location.reload();
-        }
+        this.launchHardReload();
       } else {
         logger.info(
           'Unknown command "' + data.command + '" received by the debugger.'
@@ -789,6 +756,43 @@ namespace gdjs {
           },
         })
       );
+    }
+
+    launchHardReload(): void {
+      try {
+        const reloadUrl = new URL(location.href);
+
+        // Construct the initial status to be restored.
+        const initialRuntimeGameStatus =
+          this._runtimegame.getAdditionalOptions().initialRuntimeGameStatus;
+        // We use empty strings to avoid `null` to become `"null"`.
+        const runtimeGameStatus: RuntimeGameStatus = {
+          editorId: initialRuntimeGameStatus?.editorId || '',
+          isPaused: this._runtimegame.isPaused(),
+          isInGameEdition: this._runtimegame.isInGameEdition(),
+          sceneName: initialRuntimeGameStatus?.sceneName || '',
+          injectedExternalLayoutName:
+            initialRuntimeGameStatus?.injectedExternalLayoutName || '',
+          skipCreatingInstancesFromScene:
+            initialRuntimeGameStatus?.skipCreatingInstancesFromScene || false,
+          eventsBasedObjectType:
+            initialRuntimeGameStatus?.eventsBasedObjectType || '',
+          eventsBasedObjectVariantName:
+            initialRuntimeGameStatus?.eventsBasedObjectVariantName || '',
+        };
+
+        reloadUrl.searchParams.set(
+          'runtimeGameStatus',
+          JSON.stringify(runtimeGameStatus)
+        );
+        location.replace(reloadUrl);
+      } catch (error) {
+        logger.error(
+          'Could not reload the game with the new initial status',
+          error
+        );
+        location.reload();
+      }
     }
   }
 }

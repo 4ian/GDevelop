@@ -2,8 +2,11 @@
   display: flex;
   align-items: center;
   background-color: var(--theme-text-field-default-background-color);
-  flex: 1;
   border-radius: 4px;
+}
+
+.containerExpand {
+  flex: 1;
 }
 
 .compactToggleButton {

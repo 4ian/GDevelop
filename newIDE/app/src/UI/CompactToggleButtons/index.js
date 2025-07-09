@@ -18,18 +18,21 @@ export type CompactToggleButtonsProps = {|
   id: string,
   noSeparator?: boolean,
   buttons: CompactToggleButton[],
+  expand?: boolean,
 |};
 
 const CompactToggleButtons = ({
   id,
   noSeparator,
   buttons,
+  expand,
 }: CompactToggleButtonsProps) => {
   return (
     <div
       id={id}
       className={classNames({
         [classes.container]: true,
+        [classes.containerExpand]: expand,
       })}
     >
       {buttons.map((button, index) => (

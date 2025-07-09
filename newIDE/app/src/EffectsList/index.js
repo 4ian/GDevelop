@@ -211,6 +211,15 @@ const Effect = React.forwardRef(
         return advancedPropertiesSchema.some((field: Field) => {
           const name = field.valueType ? field.name : null;
           if (!name) return false;
+          if (
+            field.valueType === 'number'
+              ? !effect.hasDoubleParameter(name)
+              : field.valueType === 'boolean'
+              ? !effect.hasBooleanParameter(name)
+              : !effect.hasStringParameter(name)
+          ) {
+            return false;
+          }
 
           const current =
             field.valueType === 'number'

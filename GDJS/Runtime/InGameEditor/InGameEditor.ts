@@ -1689,8 +1689,10 @@ namespace gdjs {
           if (instance) {
             runtimeObject.setX(instance.x);
             runtimeObject.setY(instance.y);
-            runtimeObject.setWidth(instance.width);
-            runtimeObject.setHeight(instance.height);
+            if (instance.customSize) {
+              runtimeObject.setWidth(instance.width);
+              runtimeObject.setHeight(instance.height);
+            }
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
             if (is3D(runtimeObject)) {

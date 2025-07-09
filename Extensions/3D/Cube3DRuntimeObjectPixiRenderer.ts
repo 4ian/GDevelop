@@ -87,8 +87,8 @@ namespace gdjs {
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
-      boxMesh.receiveShadow = this._cube3DRuntimeObject._isCastingShadow;
-      boxMesh.castShadow = this._cube3DRuntimeObject._isReceivingShadow;
+      boxMesh.receiveShadow = this._cube3DRuntimeObject._isReceivingShadow;
+      boxMesh.castShadow = this._cube3DRuntimeObject._isCastingShadow;
       this.updateSize();
       this.updatePosition();
       this.updateRotation();

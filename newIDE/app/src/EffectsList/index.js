@@ -527,8 +527,11 @@ export const useManageEffects = ({
 
       onUpdate();
       onEffectsUpdated();
+      // Changing the type is like adding a new effect.
+      // TODO Make a new effect dialog like for objects or behaviors to make this clearer.
+      onEffectAdded();
     },
-    [allEffectMetadata, onUpdate, onEffectsUpdated]
+    [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
   );
 
   const _addEffect = React.useCallback(
@@ -550,15 +553,8 @@ export const useManageEffects = ({
       onUpdate();
       onEffectsUpdated();
       setJustAddedEffectName(newName);
-      onEffectAdded();
     },
-    [
-      chooseEffectType,
-      effectsContainer,
-      onUpdate,
-      onEffectsUpdated,
-      onEffectAdded,
-    ]
+    [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
   );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(

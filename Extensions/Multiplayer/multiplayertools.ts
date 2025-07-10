@@ -105,6 +105,7 @@ namespace gdjs {
     let _quickJoinLobbyFailureReason:
       | 'FULL'
       | 'NOT_ENOUGH_PLAYERS'
+      | 'DOES_NOT_EXIST'	  
       | 'UNKNOWN'
       | null = null;
     let _lobbyId: string | null = null;
@@ -1701,10 +1702,102 @@ namespace gdjs {
       return _lobbyId || "";
     };
 	
+    const quickJoinWithLobbyID = async(
+      runtimeScene: gdjs.RuntimeScene,
+      lobbyID: string,
+      displayLoader: boolean,
+      openLobbiesPageIfFailure: boolean
+    ) => {
+      if (_isQuickJoiningOrStartingAGame) return;
+      const _gameId = gdjs.projectData.properties.projectUuid;
+      if (!_gameId) {
+         logger.error('The game ID is missing, the quick join lobby action cannot continue.');
+        return;
+      }
+
+      _quickJoinLobbyFailureReason = null;
+      _isQuickJoiningOrStartingAGame = true;
+      if (displayLoader) {
+        gdjs.multiplayerComponents.displayLoader(runtimeScene, true);
+      }
+	  
+      const quickJoinWithLobbyIDRelativeUrl = `/play/game/${_gameId}/public-lobby/${lobbyID}`;
+	  
+      try {
+        const response = await gdjs.evtTools.network.retryIfFailed({ times: 2 }, () =>
+          fetchAsPlayer({
+            relativeUrl: quickJoinWithLobbyIDRelativeUrl,
+			method: 'GET',
+			dev: isUsingGDevelopDevelopmentEnvironment,
+		  })
+		);
+		
+		let full = false;
+		if (response.players.length === response.maxPlayers) {
+			full = true;
+		}
+		
+		if (!full) {
+			if (response.status === 'playing') {
+				_actionAfterJoiningLobby = 'JOIN_GAME';			
+			} else if (response.status === 'waiting') {
+				if (response.players.length === 0) {
+					_actionAfterJoiningLobby = 'START_GAME';
+				} else {
+					_actionAfterJoiningLobby = 'OPEN_LOBBY_PAGE';
+				}
+			} else {
+				throw new Error(
+				  `Lobby in wrong status: ${response.status}`
+				);
+			}
+		} else {
+			logger.error('Full.');
+			_quickJoinLobbyJustFailed = true;
+			_quickJoinLobbyFailureReason = 'FULL';
+			onLobbyQuickJoinFinished(runtimeScene);
+			if (openLobbiesPageIfFailure) {
+			  openLobbiesWindow(runtimeScene);
+			}
+			return;
+		}
+		handleJoinLobbyEvent(runtimeScene, lobbyID);
+      } catch (error) {
+		const errorCode = parseInt(error.message.match(/\d{3}/)?.[0]);
+		if (errorCode === 404) {
+            logger.error('Lobby does not exist.');
+			_quickJoinLobbyFailureReason = 'DOES_NOT_EXIST';
+		} else {
+			logger.error('An error occurred while joining a lobby:', error);
+			_quickJoinLobbyFailureReason = 'UNKNOWN';
+		}
+		_quickJoinLobbyJustFailed = true;
+		onLobbyQuickJoinFinished(runtimeScene);
+        if (openLobbiesPageIfFailure) {
+          openLobbiesWindow(runtimeScene);
+        }
+      }
+	}
+	
     export const authenticateAndQuickJoinWithLobbyID = async(
       runtimeScene: gdjs.RuntimeScene,
-      lobbyID: string
+      lobbyID: string,
+      displayLoader: boolean,
+      openLobbiesPageIfFailure: boolean
     ) => {
+      const requestDoneAt = Date.now();
+      if (_lastQuickJoinRequestDoneAt) {
+        if (requestDoneAt - _lastQuickJoinRequestDoneAt < 500) {
+          _lastQuickJoinRequestDoneAt = requestDoneAt;
+          logger.warn(
+            'Last request to quick join a lobby was sent too little time ago. Ignoring this one.'
+          );
+          return;
+        }
+      } else {
+        _lastQuickJoinRequestDoneAt = requestDoneAt;
+      }
+	  
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
@@ -1715,15 +1808,23 @@ namespace gdjs {
         _isWaitingForLogin = false;
 
         if (status === 'logged') {
-			_actionAfterJoiningLobby = 'JOIN_GAME';
-			handleJoinLobbyEvent(runtimeScene, lobbyID);
+		await quickJoinWithLobbyID(
+			runtimeScene,
+			lobbyID,
+			displayLoader,
+			openLobbiesPageIfFailure
+		);
         }
 
         return;
       }
-		_actionAfterJoiningLobby = 'JOIN_GAME';
-		handleJoinLobbyEvent(runtimeScene, lobbyID);
-	}
+        await quickJoinWithLobbyID(
+		runtimeScene,
+		lobbyID,
+		displayLoader,
+		openLobbiesPageIfFailure
+        );
+    }
 	
     export const authenticateAndQuickJoinLobby = async (
       runtimeScene: gdjs.RuntimeScene,

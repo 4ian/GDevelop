@@ -142,6 +142,24 @@ namespace gdjs {
   const shouldDragSelectedObject = (inputManager: gdjs.InputManager) =>
     isAltPressed(inputManager) || isControlOrCmdPressed(inputManager);
 
+  const freeCameraKeys = [
+    LEFT_KEY,
+    RIGHT_KEY,
+    UP_KEY,
+    DOWN_KEY,
+    W_KEY,
+    S_KEY,
+    A_KEY,
+    D_KEY,
+    Q_KEY,
+    E_KEY,
+  ];
+  const shouldSwitchToFreeCamera = (inputManager: gdjs.InputManager) =>
+    !isControlOrCmdPressed(inputManager) &&
+    !isAltPressed(inputManager) &&
+    !isShiftPressed(inputManager) &&
+    freeCameraKeys.some((key) => inputManager.isKeyPressed(key));
+
   class Selection {
     private _selectedObjects: Array<gdjs.RuntimeObject> = [];
 
@@ -630,15 +648,7 @@ namespace gdjs {
 
       if (
         !this._getEditorCamera().isFreeCamera() &&
-        !isControlOrCmdPressed(inputManager) &&
-        !isAltPressed(inputManager) &&
-        !isShiftPressed(inputManager) &&
-        (inputManager.isKeyPressed(W_KEY) ||
-          inputManager.isKeyPressed(S_KEY) ||
-          inputManager.isKeyPressed(A_KEY) ||
-          inputManager.isKeyPressed(D_KEY) ||
-          inputManager.isKeyPressed(Q_KEY) ||
-          inputManager.isKeyPressed(E_KEY))
+        shouldSwitchToFreeCamera(inputManager)
       ) {
         this._getEditorCamera().switchToFreeCamera();
       }

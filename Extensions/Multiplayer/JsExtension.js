@@ -32,6 +32,75 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/multiplayer.svg');
 
     extension
+      .addStrExpression(
+        'CurrentLobbyID',
+        _('Current lobby ID'),
+        _(
+          "Returns current lobby ID."
+        ),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getLobbyID');
+
+    extension
+      .addAction(
+        'QuickJoinWithLobbyID',
+        _('Join a specific lobby by its ID'),
+        _(
+          'Join a specific lobby. The player will join the game instantly if this is possible.'
+        ),
+        _('Join a specific lobby by its ID _PARAM1_'),
+        _('Lobbies'),
+        'JsPlatform/Extensions/multiplayer.svg',
+        'JsPlatform/Extensions/multiplayer.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Lobby ID'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Display loader while joining a lobby.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _('Display game lobbies if unable to join a specific one.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .setHelpPath('/all-features/multiplayer')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/peer.js')
+      .addIncludeFile('Extensions/Multiplayer/peerJsHelper.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayerVariablesManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.authenticateAndQuickJoinWithLobbyID');
+
+    extension
       .addAction(
         'QuickJoinLobby',
         _('Join the next available lobby'),

@@ -1916,11 +1916,11 @@ module.exports = {
         .setType('number');
       properties
         .getOrCreate('top')
-        .setValue('Y-')
+        .setValue('Z+')
         .setLabel(_('3D world top'))
         .setType('choice')
-        .addExtraInfo('Y-')
         .addExtraInfo('Z+')
+        .addExtraInfo('Y-')
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('elevation')
@@ -1974,6 +1974,7 @@ module.exports = {
         .setValue('1500')
         .setLabel(_("Distance from layer's camera"))
         .setType('number')
+        .setGroup(_('Shadows'))
         .setAdvanced(true);
     }
     {
@@ -2006,11 +2007,11 @@ module.exports = {
         .setType('number');
       properties
         .getOrCreate('top')
-        .setValue('Y-')
+        .setValue('Z+')
         .setLabel(_('3D world top'))
         .setType('choice')
-        .addExtraInfo('Y-')
         .addExtraInfo('Z+')
+        .addExtraInfo('Y-')
         .setGroup(_('Orientation'));
       properties
         .getOrCreate('elevation')

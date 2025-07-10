@@ -1692,17 +1692,25 @@ namespace gdjs {
             if (instance.customSize) {
               runtimeObject.setWidth(instance.width);
               runtimeObject.setHeight(instance.height);
+            } else {
+              runtimeObject.setWidth(runtimeObject.getOriginalWidth());
+              runtimeObject.setHeight(runtimeObject.getOriginalHeight());
             }
             runtimeObject.setAngle(instance.angle);
             runtimeObject.setLayer(instance.layer);
             if (is3D(runtimeObject)) {
-              if (instance.z !== undefined) runtimeObject.setZ(instance.z);
-              if (instance.rotationX !== undefined)
-                runtimeObject.setRotationX(instance.rotationX);
-              if (instance.rotationY !== undefined)
-                runtimeObject.setRotationY(instance.rotationY);
-              if (instance.depth !== undefined)
-                runtimeObject.setDepth(instance.depth);
+              runtimeObject.setZ(instance.z === undefined ? 0 : instance.z);
+              runtimeObject.setRotationX(
+                instance.rotationX == undefined ? 0 : instance.rotationX
+              );
+              runtimeObject.setRotationY(
+                instance.rotationY == undefined ? 0 : instance.rotationY
+              );
+              runtimeObject.setDepth(
+                instance.depth == undefined
+                  ? runtimeObject.getOriginalDepth()
+                  : instance.depth
+              );
             }
             runtimeObject.extraInitializationFromInitialInstance(instance);
           }

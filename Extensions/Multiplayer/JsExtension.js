@@ -69,7 +69,21 @@ module.exports = {
         'JsPlatform/Extensions/multiplayer.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-	  .addParameter('string', _('Lobby ID'), '', false)
+      .addParameter('string', _('Lobby ID'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Display loader while joining a lobby.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _('Display game lobbies if unable to join a specific one.'),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer/peer.js')

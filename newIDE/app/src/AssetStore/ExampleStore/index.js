@@ -22,6 +22,7 @@ import {
   isLinkedToStartingPointExampleShortHeader,
   isStartingPointExampleShortHeader,
 } from '../../ProjectCreation/EmptyAndStartingPointProjects';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   grid: {
@@ -95,6 +96,7 @@ const ExampleStore = ({
   const [localSearchText, setLocalSearchText] = React.useState(
     exampleStoreSearchText
   );
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
@@ -183,6 +185,7 @@ const ExampleStore = ({
           onSelectExampleShortHeader(exampleShortHeader);
         },
         i18n,
+        gdevelopTheme,
         privateGameTemplatesPeriodicity: 1,
         showOwnedGameTemplatesFirst: true,
       }).allGridItems;
@@ -194,6 +197,7 @@ const ExampleStore = ({
       onSelectPrivateGameTemplateListingData,
       onSelectExampleShortHeader,
       i18n,
+      gdevelopTheme,
       onlyShowGames,
       hideStartingPoints,
       allExampleShortHeaders,

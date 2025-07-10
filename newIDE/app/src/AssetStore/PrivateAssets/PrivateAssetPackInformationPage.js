@@ -211,10 +211,9 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
-  const [
-    displayPasswordPrompt,
-    setDisplayPasswordPrompt,
-  ] = React.useState<boolean>(false);
+  const [displayPasswordPrompt, setDisplayPasswordPrompt] = React.useState<
+    'redeem' | 'credits' | null
+  >(null);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const { isLandscape, isMediumScreen, windowSize } = useResponsiveWindowSize();
@@ -297,8 +296,14 @@ const PrivateAssetPackInformationPage = ({
 
   const onWillRedeemAssetPack = () => {
     // Password is required in dev environment only so that one cannot freely claim asset packs.
-    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    if (Window.isDev()) setDisplayPasswordPrompt('redeem');
     else onRedeemAssetPack();
+  };
+
+  const onWillBuyWithCredits = () => {
+    // Password is required in dev environment only so that one cannot freely claim asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt('credits');
+    else onClickBuyWithCredits();
   };
 
   const onRedeemAssetPack = React.useCallback(
@@ -704,7 +709,7 @@ const PrivateAssetPackInformationPage = ({
                               simulateAppStoreProduct={simulateAppStoreProduct}
                               isAlreadyReceived={isAlreadyReceived}
                               onClickBuy={onClickBuy}
-                              onClickBuyWithCredits={onClickBuyWithCredits}
+                              onClickBuyWithCredits={onWillBuyWithCredits}
                             />
                           )}
                         </>
@@ -797,8 +802,12 @@ const PrivateAssetPackInformationPage = ({
           ) : null}
           {displayPasswordPrompt && (
             <PasswordPromptDialog
-              onApply={onRedeemAssetPack}
-              onClose={() => setDisplayPasswordPrompt(false)}
+              onApply={
+                displayPasswordPrompt === 'redeem'
+                  ? onWillRedeemAssetPack
+                  : onClickBuyWithCredits
+              }
+              onClose={() => setDisplayPasswordPrompt(null)}
               passwordValue={password}
               setPasswordValue={setPassword}
             />

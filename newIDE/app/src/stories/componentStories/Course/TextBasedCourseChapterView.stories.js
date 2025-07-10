@@ -4,7 +4,10 @@ import { action } from '@storybook/addon-actions';
 import TextBasedCourseChapterView from '../../../Course/TextBasedCourseChapterView';
 
 import paperDecorator from '../../PaperDecorator';
-import { textBasedCourseChapter } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  premiumCourse,
+  textBasedCourseChapter,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Course/TextBasedCourseChapterView',
@@ -15,13 +18,14 @@ export default {
 export const Chapter1 = () => {
   return (
     <TextBasedCourseChapterView
+      course={premiumCourse}
       courseChapter={textBasedCourseChapter}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
-      onBuyWithCredits={action('onBuyWithCredits')}
+      onClickUnlock={() => action('onClickUnlock')()}
     />
   );
 };

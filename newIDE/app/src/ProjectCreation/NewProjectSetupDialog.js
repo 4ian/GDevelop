@@ -608,7 +608,7 @@ const NewProjectSetupDialog = ({
                     size="large"
                     color="success"
                     label={<Trans>Try the AI agent</Trans>}
-                    icon={<ArrowRight />}
+                    rightIcon={<ArrowRight />}
                     style={styles.tryAIAgentButton}
                     onClick={onOpenAskAi}
                   />

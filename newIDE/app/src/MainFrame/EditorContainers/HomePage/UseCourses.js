@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   listCourseChapters,
   listCourses,
@@ -9,16 +10,19 @@ import {
   type CourseChapter,
   type UserCourseProgress,
 } from '../../../Utils/GDevelopServices/Asset';
+import { type CourseListingData } from '../../../Utils/GDevelopServices/Shop';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   fetchUserCourseProgress,
   updateUserCourseProgress as doUpdateUserCourseProgress,
 } from '../../../Utils/GDevelopServices/User';
 import { useOptimisticState } from '../../../Utils/UseOptimisticState';
-import CourseChapterStoreContext from '../../../Course/CourseChapterStoreContext';
+import CourseStoreContext from '../../../Course/CourseStoreContext';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { buyProductWithCredits } from '../../../Utils/GDevelopServices/Shop';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import { selectMessageByLocale } from '../../../Utils/i18n/MessageByLocale';
+import { sendCourseBuyClicked } from '../../../Utils/Analytics/EventSender';
 
 export type CourseChapterCompletion = {|
   completedTasks: number,
@@ -36,6 +40,7 @@ const useCourses = () => {
     profile,
     limits,
     subscription,
+    coursePurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
   } = React.useContext(AuthenticatedUserContext);
@@ -45,7 +50,11 @@ const useCourses = () => {
   const userLanguage2LetterCode = language.split('_')[0].toLowerCase();
 
   const [courses, setCourses] = React.useState<?(Course[])>(null);
-  const { listedCourseChapters } = React.useContext(CourseChapterStoreContext);
+  const { listedCourses } = React.useContext(CourseStoreContext);
+  const [
+    purchasingCourseListingData,
+    setPurchasingCourseListingData,
+  ] = React.useState<?CourseListingData>(null);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
@@ -83,10 +92,15 @@ const useCourses = () => {
   |}>({});
   const userId = profile ? profile.id : null;
 
-  const fetchCourses = React.useCallback(async () => {
-    const fetchedCourses = await listCourses();
-    setCourses(fetchedCourses);
-  }, []);
+  const fetchCourses = React.useCallback(
+    async () => {
+      const fetchedCourses = await listCourses(getAuthorizationHeader, {
+        userId,
+      });
+      setCourses(fetchedCourses);
+    },
+    [userId, getAuthorizationHeader]
+  );
 
   const onSelectCourse = React.useCallback(
     (courseId: string | null) => {
@@ -138,11 +152,7 @@ const useCourses = () => {
         );
       }
     },
-    // A subscription change will change the displayed chapters sent by the backend.
-    // So the user subscription is added as a dependency to make sure the chapters are
-    // up to date with the user subscription.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [getAuthorizationHeader, userId, subscription, userLanguage2LetterCode]
+    [getAuthorizationHeader, userId, userLanguage2LetterCode]
   );
 
   const onCompleteTask = React.useCallback(
@@ -287,14 +297,9 @@ const useCourses = () => {
     [userProgressByCourseId, chaptersByCourseId, courses]
   );
 
-  const onBuyCourseChapterWithCredits = React.useCallback(
-    async (courseChapter: CourseChapter, password: string) => {
-      if (
-        !courseChapter.isLocked ||
-        !courseChapter.priceInCredits ||
-        !listedCourseChapters
-      )
-        return;
+  const onBuyCourse = React.useCallback(
+    async (course: Course, password: string, i18n: I18nType) => {
+      if (!course.isLocked || !listedCourses) return;
 
       if (!userId || !limits) {
         // User not logged in, suggest to log in.
@@ -302,19 +307,68 @@ const useCourses = () => {
         return;
       }
 
-      const currentCreditsAmount = limits.credits.userBalance.amount;
-      const listedCourseChapter = listedCourseChapters.find(
-        chapter => chapter.id === courseChapter.productId
+      const listedCourse = listedCourses.find(
+        listedCourse => listedCourse.id === course.id
       );
-      if (!listedCourseChapter) {
-        console.error(
-          `Couldn't find course chapter with id ${
-            courseChapter.productId
-          } in Shop API.`
-        );
+      if (!listedCourse) {
+        console.error(`Couldn't find course with id ${course.id} in Shop API.`);
         return;
       }
-      const priceForUsageType = listedCourseChapter.creditPrices.find(
+      const priceForUsageType = listedCourse.prices.find(
+        price => price.usageType === 'default'
+      );
+      if (!priceForUsageType) {
+        console.error('Unable to find the price for the default usage type');
+        return;
+      }
+      try {
+        sendCourseBuyClicked({
+          courseId: course.id,
+          courseName: course.titleByLocale.en,
+          currency: priceForUsageType ? priceForUsageType.currency : undefined,
+          usageType: 'default',
+        });
+
+        setPurchasingCourseListingData(listedCourse);
+      } catch (e) {
+        console.warn('Unable to send event', e);
+      }
+    },
+    [
+      userId,
+      limits,
+      listedCourses,
+      onOpenLoginDialog,
+      setPurchasingCourseListingData,
+    ]
+  );
+
+  const onBuyCourseWithCredits = React.useCallback(
+    async (course: Course, password: string, i18n: I18nType) => {
+      if (!course.isLocked || !listedCourses) return;
+
+      if (!userId || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
+
+      sendCourseBuyClicked({
+        courseId: course.id,
+        courseName: course.titleByLocale.en,
+        currency: 'CREDITS',
+        usageType: 'default',
+      });
+
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const listedCourse = listedCourses.find(
+        listedCourse => listedCourse.id === course.id
+      );
+      if (!listedCourse) {
+        console.error(`Couldn't find course with id ${course.id} in Shop API.`);
+        return;
+      }
+      const priceForUsageType = listedCourse.creditPrices.find(
         price => price.usageType === 'default'
       );
       if (!priceForUsageType) {
@@ -331,36 +385,41 @@ const useCourses = () => {
         return;
       }
 
+      const translatedCourseTitle = selectMessageByLocale(
+        i18n,
+        course.titleByLocale
+      );
+
       openCreditsUsageDialog({
-        title: <Trans>Purchase {courseChapter.title}</Trans>,
+        title: <Trans>Purchase {translatedCourseTitle}</Trans>,
         message: (
           <Trans>
-            You are about to use {creditsAmount} credits to purchase the chapter
-            "{courseChapter.title}". Continue?
+            You are about to use {creditsAmount} credits to purchase the course
+            "{translatedCourseTitle}". Continue?
           </Trans>
         ),
         onConfirm: async () => {
           await buyProductWithCredits(getAuthorizationHeader, {
-            productId: listedCourseChapter.id,
+            productId: listedCourse.id,
             usageType: 'default',
             userId,
             password,
           });
-          if (selectedCourseId) await fetchCourseChapters(selectedCourseId);
+          await Promise.all([fetchCourses(), fetchCourseChapters(course.id)]);
         },
-        successMessage: <Trans>🎉 You can now follow your new chapter!</Trans>,
+        successMessage: <Trans>🎉 You can now follow your new course!</Trans>,
       });
     },
     [
       userId,
       limits,
-      listedCourseChapters,
+      listedCourses,
       openCreditsPackageDialog,
       openCreditsUsageDialog,
       getAuthorizationHeader,
       onOpenLoginDialog,
+      fetchCourses,
       fetchCourseChapters,
-      selectedCourseId,
     ]
   );
 
@@ -375,15 +434,30 @@ const useCourses = () => {
         }
       })();
     },
-    // (Re)fetch course chapters when courses are defined and when fetchCourseChapters
-    // changes (see its dependencies).
+    // (Re)fetch course chapters when courses are refetched.
     [courses, fetchCourseChapters]
   );
 
-  const selectedCourse =
-    selectedCourseId && courses && areChaptersReady
-      ? courses.find(course => course.id === selectedCourseId) || null
-      : null;
+  React.useEffect(
+    () => {
+      (async () => {
+        if (subscription || coursePurchases) {
+          // Just to trigger a re-fetch of the courses when the user subscription changes,
+          // or when the user purchases a course.
+        }
+        await fetchCourses();
+      })();
+    },
+    [fetchCourses, subscription, coursePurchases]
+  );
+
+  const selectedCourse = React.useMemo(
+    () => {
+      if (!selectedCourseId || !courses || !areChaptersReady) return null;
+      return courses.find(course => course.id === selectedCourseId) || null;
+    },
+    [selectedCourseId, courses, areChaptersReady]
+  );
 
   return {
     courses,
@@ -396,7 +470,10 @@ const useCourses = () => {
     isTaskCompleted,
     getChapterCompletion,
     getCourseCompletion,
-    onBuyCourseChapterWithCredits,
+    onBuyCourseWithCredits,
+    onBuyCourse,
+    purchasingCourseListingData,
+    setPurchasingCourseListingData,
   };
 };
 

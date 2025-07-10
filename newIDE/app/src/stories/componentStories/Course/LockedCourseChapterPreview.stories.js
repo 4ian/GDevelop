@@ -4,7 +4,10 @@ import { action } from '@storybook/addon-actions';
 import LockedCourseChapterPreview from '../../../Course/LockedCourseChapterPreview';
 
 import paperDecorator from '../../PaperDecorator';
-import { lockedCourseChapter } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  lockedCourseChapter,
+  premiumCourse,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Course/LockedCourseChapterPreview',
@@ -15,11 +18,9 @@ export default {
 export const Default = () => {
   return (
     <LockedCourseChapterPreview
+      course={premiumCourse}
       courseChapter={lockedCourseChapter}
-      onBuyWithCredits={async () => {
-        action('onBuyWithCredits')();
-        throw new Error('Error buying product with credits.');
-      }}
+      onClickUnlock={() => action('onClickUnlock')()}
     />
   );
 };

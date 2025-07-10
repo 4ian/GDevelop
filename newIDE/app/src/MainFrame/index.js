@@ -4016,6 +4016,7 @@ const MainFrame = (props: Props) => {
                     hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
+                    onOpenAskAi: openAskAi,
                     onOpenExternalEvents: openExternalEvents,
                     onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {

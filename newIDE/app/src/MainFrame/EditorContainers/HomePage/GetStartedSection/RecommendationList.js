@@ -74,11 +74,11 @@ const getVideoTutorialsColumnsFromWidth = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 5 : 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
-      return 5;
+      return 4;
     case 'xlarge':
       return 6;
     default:
@@ -95,7 +95,7 @@ const getTutorialsLimitsFromWidth = (
     case 'medium':
       return 3;
     case 'large':
-      return 5;
+      return 4;
     case 'xlarge':
       return 5;
     default:
@@ -228,6 +228,11 @@ const RecommendationList = ({
   }: {
     tutorialId: string,
   }) => {
+    if (authenticatedUser.loginState === 'loggingIn') {
+      // Wait for login to finish to avoid showing an offline progress before the
+      // actual user's progress.
+      return 0;
+    }
     const tutorialProgress = getTutorialProgress({
       tutorialId,
       userId: authenticatedUser.profile

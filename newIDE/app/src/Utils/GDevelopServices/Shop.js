@@ -30,8 +30,18 @@ type ProductListingData = {|
   id: string,
   sellerId: string,
   isSellerGDevelop: boolean,
-  productType: 'ASSET_PACK' | 'GAME_TEMPLATE',
-  listing: 'ASSET_PACK' | 'GAME_TEMPLATE',
+  productType:
+    | 'ASSET_PACK'
+    | 'GAME_TEMPLATE'
+    | 'CREDITS_PACKAGE'
+    | 'COURSE_CHAPTER'
+    | 'COURSE',
+  listing:
+    | 'ASSET_PACK'
+    | 'GAME_TEMPLATE'
+    | 'CREDITS_PACKAGE'
+    | 'COURSE_CHAPTER'
+    | 'COURSE',
   name: string,
   description: string,
   categories: Array<string>,
@@ -101,6 +111,14 @@ export type CourseChapterListingData = {|
   listing: 'COURSE_CHAPTER',
 |};
 
+export type CourseListingData = {|
+  ...ProductListingData,
+  ...StripeAndPaypalSellableAttributes,
+  ...CreditsClaimableAttributes,
+  productType: 'COURSE',
+  listing: 'COURSE',
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -116,10 +134,15 @@ export type Purchase = {|
   paypalOrderId?: string,
   manualGiftReason?: string,
   creditsAmount?: number,
-  productType: 'ASSET_PACK' | 'GAME_TEMPLATE' | 'CREDITS_PACKAGE',
+  productType:
+    | 'ASSET_PACK'
+    | 'GAME_TEMPLATE'
+    | 'CREDITS_PACKAGE'
+    | 'COURSE'
+    | 'COURSE_CHAPTER',
 |};
 
-type ProductLicenseType = 'personal' | 'commercial' | 'unlimited';
+type ProductLicenseType = 'personal' | 'commercial' | 'unlimited' | 'default';
 export type ProductLicense = {|
   id: ProductLicenseType,
   nameByLocale: MessageByLocale,
@@ -174,6 +197,18 @@ export const listListedCourseChapters = async (): Promise<
   return courseChapters;
 };
 
+export const listListedCourses = async (): Promise<
+  Array<CourseListingData>
+> => {
+  const response = await client.get('/course');
+  const courses = response.data;
+  if (!Array.isArray(courses)) {
+    throw new Error('Invalid response from the courses API');
+  }
+
+  return courses;
+};
+
 export const listSellerAssetPacks = async ({
   sellerId,
 }: {|
@@ -208,7 +243,7 @@ export const listUserPurchases = async (
     role,
   }: {|
     userId: string,
-    productType: 'asset-pack' | 'game-template' | 'credits-package',
+    productType: 'asset-pack' | 'game-template' | 'credits-package' | 'course',
     role: 'receiver' | 'buyer',
   |}
 ): Promise<Array<Purchase>> => {

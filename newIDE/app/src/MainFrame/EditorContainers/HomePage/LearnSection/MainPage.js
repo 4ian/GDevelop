@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
-import { Line, Column, Spacer } from '../../../../UI/Grid';
+import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
@@ -27,24 +28,24 @@ import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import ImageTileRow from '../../../../UI/ImageTileRow';
-import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
+import {
+  formatTutorialToImageTileComponent,
+  TUTORIAL_CATEGORY_TEXTS,
+  type LearnCategory,
+} from '.';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ArrowRight from '../../../../UI/CustomSvgIcons/ArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
-import FlingGame from '../InAppTutorials/FlingGame';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
-import { EducationCard } from './EducationCard';
-import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import PreferencesContext from '../../../Preferences/PreferencesContext';
 import RaisedButton from '../../../../UI/RaisedButton';
 import Help from '../../../../UI/CustomSvgIcons/Help';
-import AnyQuestionDialog from '../AnyQuestionDialog';
 import Paper from '../../../../UI/Paper';
-import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 import CourseCard from './CourseCard';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import Link from '../../../../UI/Link';
+import CourseStoreContext from '../../../../Course/CourseStoreContext';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -88,11 +89,11 @@ const getTutorialsColumnsFromWidth = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 5 : 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
-      return 5;
+      return 4;
     case 'xlarge':
       return 6;
     default:
@@ -103,8 +104,8 @@ const getTutorialsColumnsFromWidth = (
 type TutorialsRowProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
-  category: TutorialCategory,
-  onSelectCategory: (TutorialCategory | null) => void,
+  category: TutorialCategory | 'all-tutorials',
+  onSelectCategory: (category: LearnCategory) => void,
   onSelectTutorial: (tutorial: Tutorial) => void,
 |};
 
@@ -114,45 +115,83 @@ export const TutorialsRow = ({
   category,
   onSelectCategory,
   onSelectTutorial,
-}: TutorialsRowProps) => (
-  <I18n>
-    {({ i18n }) => (
-      <ImageTileRow
-        title={TUTORIAL_CATEGORY_TEXTS[category].title}
-        description={TUTORIAL_CATEGORY_TEXTS[category].description}
-        items={tutorials
-          .filter(tutorial => tutorial.category === category)
-          .map(tutorial =>
-            formatTutorialToImageTileComponent({
-              i18n,
-              limits,
-              tutorial,
-              onSelectTutorial,
-            })
-          )}
-        onShowAll={() => onSelectCategory(category)}
-        showAllIcon={<ArrowRight fontSize="small" />}
-        getColumnsFromWindowSize={getTutorialsColumnsFromWidth}
-        getLimitFromWindowSize={getTutorialsColumnsFromWidth}
-      />
-    )}
-  </I18n>
-);
+}: TutorialsRowProps) => {
+  const title =
+    category === 'all-tutorials' ? (
+      <Trans>Public tutorials</Trans>
+    ) : (
+      TUTORIAL_CATEGORY_TEXTS[category].title
+    );
+  const description =
+    category === 'all-tutorials'
+      ? null
+      : TUTORIAL_CATEGORY_TEXTS[category].description;
+
+  const getItems = (i18n: I18nType) => {
+    let filteredTutorials = tutorials;
+    // If category is all, show 2 of each official category.
+    if (category === 'all-tutorials') {
+      const officialBeginnerTutorials = tutorials
+        .filter(tutorial => tutorial.category === 'official-beginner')
+        .slice(0, 2);
+      const officialIntermediateTutorials = tutorials
+        .filter(tutorial => tutorial.category === 'official-intermediate')
+        .slice(0, 2);
+      const officialAdvancedTutorials = tutorials
+        .filter(tutorial => tutorial.category === 'official-advanced')
+        .slice(0, 2);
+      filteredTutorials = [
+        ...officialBeginnerTutorials,
+        ...officialIntermediateTutorials,
+        ...officialAdvancedTutorials,
+      ];
+    } else {
+      filteredTutorials = tutorials.filter(
+        tutorial => tutorial.category === category
+      );
+    }
+    return filteredTutorials.map(tutorial =>
+      formatTutorialToImageTileComponent({
+        i18n,
+        limits,
+        tutorial,
+        onSelectTutorial,
+      })
+    );
+  };
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <ImageTileRow
+          title={title}
+          description={description}
+          items={getItems(i18n)}
+          onShowAll={() => onSelectCategory(category)}
+          showAllIcon={<ArrowRight fontSize="small" />}
+          getColumnsFromWindowSize={getTutorialsColumnsFromWidth}
+          getLimitFromWindowSize={getTutorialsColumnsFromWidth}
+        />
+      )}
+    </I18n>
+  );
+};
 
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
-  onSelectCategory: (TutorialCategory | null) => void,
+  onSelectCategory: (category: LearnCategory) => void,
   tutorials: Array<Tutorial>,
   selectInAppTutorial: (tutorialId: string) => void,
   previewedCourse: ?Course,
   courses: ?(Course[]),
   previewedCourseChapters: ?(CourseChapter[]),
-  onSelectCourse: (courseId: string | null) => void,
+  onSelectCourse: (courseId: string) => void,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
+  onOpenAskAi: () => void,
 |};
 
 const MainPage = ({
@@ -166,27 +205,29 @@ const MainPage = ({
   onSelectCourse,
   getCourseCompletion,
   getCourseChapterCompletion,
+  onOpenAskAi,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
-  const { onLoadInAppTutorialFromLocalFile } = React.useContext(
-    InAppTutorialContext
-  );
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
 
-  const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
-    false
-  );
-  const {
-    values: { showInAppTutorialDeveloperMode },
-  } = React.useContext(PreferencesContext);
+  const { listedCourses } = React.useContext(CourseStoreContext);
   const {
     windowSize,
     isMobile,
     isLandscape,
     isMediumScreen,
   } = useResponsiveWindowSize();
+
+  const displayedCourses = React.useMemo(
+    () => {
+      if (!courses) return null;
+      const numberOfColumns = getColumnsFromWindowSize(windowSize, isLandscape);
+      return courses.slice(0, numberOfColumns);
+    },
+    [courses, windowSize, isLandscape]
+  );
 
   const [
     selectedTutorial,
@@ -217,9 +258,36 @@ const MainPage = ({
     },
   ].filter(Boolean);
 
+  const numberOfColumns = getColumnsFromWindowSize(windowSize, isLandscape);
+
   return (
     <SectionContainer
-      title={<Trans>Your learning journey starts here</Trans>}
+      chipText={<Trans>Start for free</Trans>}
+      title={<Trans>Official Game Dev courses</Trans>}
+      titleAdornment={
+        <FlatButton
+          onClick={() => onSelectCategory('all-courses')}
+          label={<Trans>See all</Trans>}
+          rightIcon={<ArrowRight fontSize="small" />}
+        />
+      }
+      subtitleText={
+        <Trans>
+          Break into the{' '}
+          <Link
+            href={'https://gdevelop.io/blog/indie-mobile-creators-2025'}
+            onClick={() =>
+              Window.openExternalURL(
+                'https://gdevelop.io/blog/indie-mobile-creators-2025'
+              )
+            }
+          >
+            booming industry
+          </Link>{' '}
+          of casual gaming. Sharpen your skills and become a professional. Start
+          for free:
+        </Trans>
+      }
       customPaperStyle={{
         backgroundAttachment: 'local',
         backgroundRepeat: 'no-repeat',
@@ -233,108 +301,172 @@ const MainPage = ({
       }}
     >
       <SectionRow>
-        <CoursePreviewBanner
-          course={previewedCourse}
-          courseChapters={previewedCourseChapters}
-          getCourseCompletion={getCourseCompletion}
-          getCourseChapterCompletion={getCourseChapterCompletion}
-          onDisplayCourse={() => {
-            if (!previewedCourse) return;
-            onSelectCourse(previewedCourse.id);
-            onSelectCategory('course');
-          }}
-        />
-      </SectionRow>
-
-      <SectionRow>
-        <Text size="title">
-          <Trans>GameDev official specialization courses</Trans>
-        </Text>
         <Line>
           <GridList
-            cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+            cols={numberOfColumns}
             style={styles.grid}
             cellHeight="auto"
             spacing={ITEMS_SPACING * 2}
           >
-            {courses
-              ? courses.map(course => {
+            {displayedCourses && listedCourses
+              ? displayedCourses.map(course => {
                   const completion = getCourseCompletion(course.id);
+                  const courseListingData = listedCourses.find(
+                    listedCourse => listedCourse.id === course.id
+                  );
                   return (
                     <GridListTile key={course.id}>
                       <CourseCard
                         course={course}
+                        courseListingData={courseListingData}
                         completion={completion}
                         onClick={() => {
                           onSelectCourse(course.id);
-                          onSelectCategory('course');
                         }}
                       />
                     </GridListTile>
                   );
                 })
-              : new Array(5).fill(0).map((_, index) => (
+              : new Array(numberOfColumns).fill(0).map((_, index) => (
                   <GridListTile key={`skeleton-course-${index}`}>
-                    <CourseCard course={null} completion={null} />
+                    <CourseCard
+                      course={null}
+                      courseListingData={null}
+                      completion={null}
+                    />
                   </GridListTile>
                 ))}
           </GridList>
         </Line>
       </SectionRow>
       <SectionRow>
-        <Line justifyContent="space-between" noMargin alignItems="center">
-          <Text noMargin size="title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          {showInAppTutorialDeveloperMode && (
+        <LineStackLayout
+          justifyContent="space-between"
+          alignItems="center"
+          noMargin
+          expand
+        >
+          <Column noMargin>
+            <Text size="section-title">
+              <Trans>In-app tutorials</Trans>
+            </Text>
+          </Column>
+          <Column noMargin>
             <FlatButton
-              label={<Trans>Load local lesson</Trans>}
-              onClick={onLoadInAppTutorialFromLocalFile}
+              onClick={() => onSelectCategory('in-app-tutorials')}
+              label={<Trans>See all</Trans>}
+              rightIcon={<ArrowRight fontSize="small" />}
             />
-          )}
-        </Line>
-        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+          </Column>
+        </LineStackLayout>
+        <GuidedLessons
+          selectInAppTutorial={selectInAppTutorial}
+          showLimitedItems
+        />
+      </SectionRow>
+      <SectionRow>
+        <TutorialsRow
+          limits={limits}
+          category="all-tutorials"
+          onSelectCategory={onSelectCategory}
+          onSelectTutorial={setSelectedTutorial}
+          tutorials={tutorials}
+        />
+      </SectionRow>
+      <SectionRow>
+        <TutorialsRow
+          limits={limits}
+          category="full-game"
+          onSelectCategory={onSelectCategory}
+          onSelectTutorial={setSelectedTutorial}
+          tutorials={tutorials}
+        />
+      </SectionRow>
+      <SectionRow>
+        <LineStackLayout
+          justifyContent="space-between"
+          alignItems="center"
+          noMargin
+          expand
+        >
+          <Column noMargin>
+            <Text size="section-title">
+              <Trans>Want to know more?</Trans>
+            </Text>
+          </Column>
+          <LineStackLayout noMargin>
+            {!isMobile && (
+              <FlatButton
+                onClick={() => {
+                  Window.openExternalURL(
+                    'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+                  );
+                }}
+                primary
+                leftIcon={<Upload />}
+                label={
+                  isMediumScreen ? (
+                    <Trans>Submit an example</Trans>
+                  ) : (
+                    <Trans>Submit your project as an example</Trans>
+                  )
+                }
+              />
+            )}
+            {!isMobile && (
+              <FlatButton
+                onClick={() => {
+                  Window.openExternalURL(
+                    'https://airtable.com/shrv295oHlsuS69el'
+                  );
+                }}
+                primary
+                leftIcon={<TranslateIcon />}
+                label={
+                  isMediumScreen ? (
+                    <Trans>Submit a tutorial</Trans>
+                  ) : (
+                    <Trans>Submit a tutorial translated in your language</Trans>
+                  )
+                }
+              />
+            )}
+          </LineStackLayout>
+        </LineStackLayout>
       </SectionRow>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
           <Line noMargin>
             <GridList
-              cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+              cols={numberOfColumns}
               style={styles.grid}
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}
             >
-              {limits &&
-              limits.quotas['ask-question'] &&
-              limits.quotas['ask-question'].max > 0 ? (
-                <GridListTile cols={2} style={{ background: 'transparent' }}>
-                  <Paper
-                    background="light"
-                    style={{ display: 'flex', height: '100%' }}
-                  >
-                    <Column expand>
-                      <Line expand alignItems="flex-start">
-                        <Help />
-                        <ColumnStackLayout expand alignItems="flex-start">
-                          <Text noMargin size="block-title">
-                            <Trans>Blocked on GDevelop?</Trans>
-                          </Text>
-                          <RaisedButton
-                            label={
-                              <Trans>Ask any question, get an answer</Trans>
-                            }
-                            size="medium"
-                            color="success"
-                            onClick={() => {
-                              setIsAnyQuestionDialogOpen(true);
-                            }}
-                          />
-                        </ColumnStackLayout>
-                      </Line>
-                    </Column>
-                  </Paper>
-                </GridListTile>
-              ) : null}
+              <GridListTile cols={1} style={{ background: 'transparent' }}>
+                <Paper
+                  background="light"
+                  style={{ display: 'flex', height: '100%' }}
+                >
+                  <Column expand>
+                    <Line expand alignItems="flex-start">
+                      <Help />
+                      <ColumnStackLayout expand alignItems="flex-start">
+                        <Text noMargin size="block-title" align="left">
+                          <Trans>Blocked on GDevelop?</Trans>
+                        </Text>
+                        <RaisedButton
+                          size="large"
+                          color="success"
+                          label={<Trans>Ask the AI</Trans>}
+                          rightIcon={<ArrowRight />}
+                          onClick={onOpenAskAi}
+                        />
+                      </ColumnStackLayout>
+                    </Line>
+                  </Column>
+                </Paper>
+              </GridListTile>
               {helpItems.map((helpItem, index) => (
                 <GridListTile key={index}>
                   <CardWidget
@@ -365,162 +497,11 @@ const MainPage = ({
           </Line>
         </ColumnStackLayout>
       </SectionRow>
-      <>
-        <SectionRow>
-          <Line noMargin>
-            <Text size="title">
-              <Trans>Courses</Trans>
-            </Text>
-          </Line>
-          <Line noMargin>
-            <Text noMargin>
-              <Trans>Learn everything about GDevelop from the ground up</Trans>
-            </Text>
-          </Line>
-          {limits &&
-          limits.capabilities.classrooms &&
-          limits.capabilities.classrooms.hideUpgradeNotice ? null : (
-            <>
-              <Spacer />
-              <EducationCard
-                onSeeResources={() => onSelectCategory('education-curriculum')}
-              />
-            </>
-          )}
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="official-beginner"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="official-intermediate"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="official-advanced"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        <SectionRow>
-          <Text noMargin size="section-title">
-            <Trans>Create and Publish a Fling game</Trans>
-          </Text>
-          <Text size="body" color="secondary" noMargin>
-            <Trans>
-              3-part tutorial to creating and publishing a game from scratch.
-            </Trans>
-          </Text>
-          <FlingGame selectInAppTutorial={selectInAppTutorial} />
-        </SectionRow>
-        <SectionRow>
-          <LineStackLayout
-            justifyContent="space-between"
-            alignItems="center"
-            noMargin
-            expand
-          >
-            <Column noMargin>
-              <Text size="title">
-                <Trans>Guides and tutorials</Trans>
-              </Text>
-            </Column>
-            <LineStackLayout noMargin>
-              {!isMobile && (
-                <FlatButton
-                  onClick={() => {
-                    Window.openExternalURL(
-                      'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-                    );
-                  }}
-                  primary
-                  leftIcon={<Upload />}
-                  label={
-                    isMediumScreen ? (
-                      <Trans>Submit an example</Trans>
-                    ) : (
-                      <Trans>Submit your project as an example</Trans>
-                    )
-                  }
-                />
-              )}
-              {!isMobile && (
-                <FlatButton
-                  onClick={() => {
-                    Window.openExternalURL(
-                      'https://airtable.com/shrv295oHlsuS69el'
-                    );
-                  }}
-                  primary
-                  leftIcon={<TranslateIcon />}
-                  label={
-                    isMediumScreen ? (
-                      <Trans>Submit a tutorial</Trans>
-                    ) : (
-                      <Trans>
-                        Submit a tutorial translated in your language
-                      </Trans>
-                    )
-                  }
-                />
-              )}
-            </LineStackLayout>
-          </LineStackLayout>
-          <Line noMargin>
-            <Text noMargin>
-              <Trans>Learn by doing</Trans>
-            </Text>
-          </Line>
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="education-curriculum"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="full-game"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsRow
-            limits={limits}
-            category="game-mechanic"
-            onSelectCategory={onSelectCategory}
-            onSelectTutorial={setSelectedTutorial}
-            tutorials={tutorials}
-          />
-        </SectionRow>
-        {selectedTutorial && (
-          <PrivateTutorialViewDialog
-            tutorial={selectedTutorial}
-            onClose={() => setSelectedTutorial(null)}
-          />
-        )}
-      </>
-      {isAnyQuestionDialogOpen && (
-        <AnyQuestionDialog onClose={() => setIsAnyQuestionDialogOpen(false)} />
+      {selectedTutorial && (
+        <PrivateTutorialViewDialog
+          tutorial={selectedTutorial}
+          onClose={() => setSelectedTutorial(null)}
+        />
       )}
     </SectionContainer>
   );

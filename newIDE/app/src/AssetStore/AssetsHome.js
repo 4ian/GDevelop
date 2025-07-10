@@ -42,9 +42,9 @@ const getCategoryColumns = (
     case 'medium':
       return 3;
     case 'large':
-      return 4;
+      return 5;
     case 'xlarge':
-      return 6;
+      return 7;
     default:
       return 3;
   }
@@ -60,7 +60,7 @@ const getShopItemsColumns = (
     case 'medium':
       return 2;
     case 'large':
-      return 3;
+      return 4;
     case 'xlarge':
       return 5;
     default:

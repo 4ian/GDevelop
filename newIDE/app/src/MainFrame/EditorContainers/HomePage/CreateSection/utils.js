@@ -15,6 +15,7 @@ import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopS
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
+import { type GDevelopTheme } from '../../../../UI/Theme';
 import {
   ExampleTile,
   PrivateGameTemplateTile,
@@ -159,11 +160,13 @@ const formatGameTemplateListingDataForCarousel = ({
   gameTemplateListingData,
   onSelectGameTemplate,
   i18n,
+  gdevelopTheme,
   receivedGameTemplates,
 }: {|
   gameTemplateListingData: PrivateGameTemplateListingData,
   onSelectGameTemplate: PrivateGameTemplateListingData => void,
   i18n: I18nType,
+  gdevelopTheme: GDevelopTheme,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
 |}): CarouselThumbnail => {
   const isTemplateOwned =
@@ -186,6 +189,7 @@ const formatGameTemplateListingDataForCarousel = ({
     },
     overlayText: getProductPriceOrOwnedLabel({
       i18n,
+      gdevelopTheme,
       productListingData: gameTemplateListingData,
       owned: isTemplateOwned,
     }),
@@ -213,12 +217,14 @@ const formatItemForCarousel = ({
   onSelectGameTemplate,
   onSelectExample,
   i18n,
+  gdevelopTheme,
   receivedGameTemplates,
 }: {
   item: PrivateGameTemplateListingData | ExampleShortHeader,
   onSelectGameTemplate: PrivateGameTemplateListingData => void,
   onSelectExample: ExampleShortHeader => void,
   i18n: I18nType,
+  gdevelopTheme: GDevelopTheme,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
 }): CarouselThumbnail => {
   if (item.previewImageUrls) {
@@ -229,6 +235,7 @@ const formatItemForCarousel = ({
   } else {
     return formatGameTemplateListingDataForCarousel({
       i18n,
+      gdevelopTheme,
       onSelectGameTemplate: onSelectGameTemplate,
       gameTemplateListingData: item,
       receivedGameTemplates: receivedGameTemplates,
@@ -288,6 +295,7 @@ export const getExampleAndTemplateTiles = ({
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   i18n,
+  gdevelopTheme,
   numberOfItemsExclusivelyInCarousel = 0,
   numberOfItemsInCarousel = 0,
   privateGameTemplatesPeriodicity,
@@ -301,6 +309,7 @@ export const getExampleAndTemplateTiles = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
+  gdevelopTheme: GDevelopTheme,
   numberOfItemsExclusivelyInCarousel?: number,
   numberOfItemsInCarousel?: number,
   privateGameTemplatesPeriodicity: number,
@@ -407,6 +416,7 @@ export const getExampleAndTemplateTiles = ({
       onSelectGameTemplate: onSelectPrivateGameTemplateListingData,
       onSelectExample: onSelectExampleShortHeader,
       i18n,
+      gdevelopTheme,
       receivedGameTemplates,
     })
   );

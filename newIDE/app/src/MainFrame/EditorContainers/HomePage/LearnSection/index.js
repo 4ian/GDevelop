@@ -7,9 +7,10 @@ import {
   type Tutorial,
   canAccessTutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
@@ -27,6 +28,10 @@ import type {
   Course,
 } from '../../../../Utils/GDevelopServices/Asset';
 import type { CourseChapterCompletion, CourseCompletion } from '../UseCourses';
+import SectionContainer, { SectionRow } from '../SectionContainer';
+import TutorialsPage from './TutorialsPage';
+import InAppTutorialsPage from './InAppTutorialsPage';
+import CoursesPage from './CoursesPage';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -74,6 +79,30 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
 };
 
+const getChipColorFromTutorialCategory = (
+  category: TutorialCategory
+): string | null => {
+  if (category === 'official-beginner') return '#3BF7F4';
+  if (category === 'official-intermediate') return '#FFBC57';
+  if (category === 'official-advanced') return '#FF8569';
+  if (category === 'full-game') return '#FFBC57';
+  if (category === 'game-mechanic') return '#FFBC57';
+  return null;
+};
+
+const getChipTextFromTutorialCategory = (
+  category: TutorialCategory,
+  i18n: I18nType
+) => {
+  if (category === 'official-beginner') return i18n._(t`Beginner`);
+  if (category === 'official-intermediate') return i18n._(t`Intermediate`);
+  if (category === 'official-advanced') return i18n._(t`Advanced`);
+  if (category === 'full-game') return i18n._(t`Intermediate`);
+  if (category === 'game-mechanic') return i18n._(t`Intermediate`);
+
+  return null;
+};
+
 type FormatTutorialToImageTileComponentProps = {|
   i18n: I18nType,
   limits: ?Limits,
@@ -114,6 +143,8 @@ export const formatTutorialToImageTileComponent = ({
       ? formatDuration(tutorial.duration)
       : '\u{1F4D8}',
     overlayTextPosition: 'bottomRight',
+    chipText: getChipTextFromTutorialCategory(tutorial.category, i18n),
+    chipColor: getChipColorFromTutorialCategory(tutorial.category),
   };
 };
 
@@ -124,11 +155,18 @@ const styles = {
   },
 };
 
+export type LearnCategory =
+  | TutorialCategory
+  | null
+  | 'all-tutorials'
+  | 'all-courses'
+  | 'in-app-tutorials';
+
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  selectedCategory: TutorialCategory | null,
-  onSelectCategory: (TutorialCategory | null) => void,
+  selectedCategory: LearnCategory,
+  onSelectCategory: LearnCategory => void,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   previewedCourse: ?Course,
@@ -148,7 +186,19 @@ type Props = {|
     chapterId: string
   ) => CourseChapterCompletion | null,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
-  onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
+  onBuyCourseWithCredits: (
+    Course: Course,
+    password: string,
+    i18n: I18nType
+  ) => Promise<void>,
+  onBuyCourse: (
+    Course: Course,
+    password: string,
+    i18n: I18nType
+  ) => Promise<void>,
+  purchasingCourseListingData: ?CourseListingData,
+  setPurchasingCourseListingData: (CourseListingData | null) => void,
+  onOpenAskAi: () => void,
 |};
 
 const LearnSection = ({
@@ -168,7 +218,11 @@ const LearnSection = ({
   isCourseTaskCompleted,
   getCourseChapterCompletion,
   getCourseCompletion,
-  onBuyCourseChapterWithCredits,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  onOpenAskAi,
 }: Props) => {
   const {
     tutorials,
@@ -183,13 +237,22 @@ const LearnSection = ({
     [fetchTutorials]
   );
 
-  if (selectedCategory === 'course' && courseChapters && course) {
+  if (course) {
+    if (!courseChapters) {
+      return (
+        <SectionContainer flexBody>
+          <SectionRow expand>
+            <PlaceholderLoader />
+          </SectionRow>
+        </SectionContainer>
+      );
+    }
+
     return (
       <CourseSection
         course={course}
         courseChapters={courseChapters}
         onBack={() => {
-          onSelectCategory(null);
           onSelectCourse(null);
         }}
         onOpenTemplateFromCourseChapter={onOpenTemplateFromCourseChapter}
@@ -199,12 +262,16 @@ const LearnSection = ({
           getCourseChapterCompletion(course.id, chapterId)
         }
         getCourseCompletion={() => getCourseCompletion(course.id)}
-        onBuyCourseChapterWithCredits={onBuyCourseChapterWithCredits}
+        onBuyCourseWithCredits={onBuyCourseWithCredits}
+        onBuyCourse={onBuyCourse}
+        purchasingCourseListingData={purchasingCourseListingData}
+        setPurchasingCourseListingData={setPurchasingCourseListingData}
+        onOpenAskAi={onOpenAskAi}
       />
     );
   }
 
-  if (tutorialLoadingError)
+  if (tutorialLoadingError) {
     return (
       <Paper square style={styles.paper} background="dark">
         <PlaceholderError onRetry={fetchTutorials}>
@@ -215,8 +282,17 @@ const LearnSection = ({
         </PlaceholderError>
       </Paper>
     );
+  }
 
-  if (!tutorials) return <PlaceholderLoader />;
+  if (!tutorials) {
+    return (
+      <SectionContainer flexBody>
+        <SectionRow expand>
+          <PlaceholderLoader />
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
   return !selectedCategory ? (
     <MainPage
@@ -230,17 +306,32 @@ const LearnSection = ({
       previewedCourseChapters={previewedCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
+      onOpenAskAi={onOpenAskAi}
+    />
+  ) : selectedCategory === 'all-tutorials' ? (
+    <TutorialsPage onSelectCategory={onSelectCategory} tutorials={tutorials} />
+  ) : selectedCategory === 'in-app-tutorials' ? (
+    <InAppTutorialsPage
+      onBack={() => onSelectCategory(null)}
+      selectInAppTutorial={selectInAppTutorial}
+    />
+  ) : selectedCategory === 'all-courses' ? (
+    <CoursesPage
+      onBack={() => onSelectCategory(null)}
+      courses={courses}
+      onSelectCourse={onSelectCourse}
+      previewedCourse={previewedCourse}
+      previewedCourseChapters={previewedCourseChapters}
+      getCourseCompletion={getCourseCompletion}
+      getCourseChapterCompletion={getCourseChapterCompletion}
     />
   ) : (
     <TutorialsCategoryPage
-      onBack={() => onSelectCategory(null)}
+      onBack={() => onSelectCategory('all-tutorials')}
       category={selectedCategory}
       tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
-      onSelectCourse={(courseId: string) => {
-        onSelectCourse(courseId);
-        onSelectCategory('course');
-      }}
+      onSelectCourse={onSelectCourse}
     />
   );
 };

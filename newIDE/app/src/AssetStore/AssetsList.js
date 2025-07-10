@@ -79,7 +79,7 @@ const getShopItemsColumns = (
     case 'medium':
       return 2;
     case 'large':
-      return 3;
+      return 4;
     case 'xlarge':
       return 5;
     default:

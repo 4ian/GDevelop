@@ -219,6 +219,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshLimits: this._fetchUserLimits,
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshCoursePurchases: this._fetchUserCoursePurchases,
         onRefreshEarningsBalance: this._fetchEarningsBalance,
         onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
@@ -560,6 +561,22 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading asset pack purchases:', error);
       }
     );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'course',
+      role: 'receiver',
+    }).then(
+      coursePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            coursePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading course purchases:', error);
+      }
+    );
     this._fetchUserBadges();
     this._fetchAchievements();
     this._fetchUserNotifications();
@@ -846,6 +863,32 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading asset pack purchases:', error);
+    }
+  };
+
+  _fetchUserCoursePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const coursePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'course',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          coursePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading course purchases:', error);
     }
   };
 

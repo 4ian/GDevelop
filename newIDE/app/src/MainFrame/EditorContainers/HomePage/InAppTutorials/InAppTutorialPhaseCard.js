@@ -15,6 +15,18 @@ import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { Trans } from '@lingui/macro';
 
+const getChipColorFromDuration = (durationInMinutes: number) => {
+  if (durationInMinutes <= 2) return '#3BF7F4';
+  if (durationInMinutes <= 5) return '#FFBC57';
+  return '#FF8569';
+};
+
+const getChipTextFromDuration = (durationInMinutes: number) => {
+  if (durationInMinutes <= 2) return <Trans>Beginner</Trans>;
+  if (durationInMinutes <= 5) return <Trans>Intermediate</Trans>;
+  return <Trans>Advanced</Trans>;
+};
+
 const getImageSize = ({ isMobile }: { isMobile: boolean }) =>
   isMobile ? 90 : 130;
 
@@ -23,7 +35,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-    padding: '10px 10px 15px 10px',
+    padding: '8px 16px',
   },
   lockerImage: { height: 80, width: 80 },
   imageContainer: {
@@ -36,6 +48,9 @@ const styles = {
     paddingInlineStart: 12,
     textAlign: 'left',
     overflowWrap: 'anywhere',
+  },
+  chip: {
+    height: 24,
   },
 };
 
@@ -118,87 +133,105 @@ const InAppTutorialPhaseCard = ({
               }}
             >
               <ColumnStackLayout
+                noMargin
                 expand
-                justifyContent="flex-start"
+                justifyContent="space-between"
                 useFullHeight
+                noOverflowParent
               >
-                {progress && progress > 0 ? (
-                  progress !== 100 ? (
-                    <LineStackLayout alignItems="center" noMargin>
-                      <Text displayInlineAsSpan noMargin size="body2">
-                        {progress}%
-                      </Text>
-                      <ColoredLinearProgress value={progress} />
-                    </LineStackLayout>
-                  ) : (
+                <ColumnStackLayout
+                  noMargin
+                  expand
+                  justifyContent="flex-start"
+                  useFullHeight
+                  noOverflowParent
+                >
+                  <Text
+                    size="sub-title"
+                    noMargin
+                    color="primary"
+                    align="left"
+                    style={getTextStyle(shouldTextBeDisabled)}
+                  >
+                    {i18n._(title)}
+                  </Text>
+                  <Text noMargin align="left" color="secondary">
+                    {isMobile ? i18n._(shortDescription) : i18n._(description)}
+                  </Text>
+                  {keyPoints && <Divider />}
+                  {keyPoints && (
+                    <Column
+                      noMargin
+                      alignItems="flex-start"
+                      justifyContent="flex-start"
+                      expand
+                    >
+                      <ul style={styles.keyPointsList}>
+                        {keyPoints.map((keyPoint, index) => (
+                          <Text
+                            key={`key-point-${index}`}
+                            size="body2"
+                            noMargin
+                            style={getTextStyle(shouldTextBeDisabled)}
+                            color="secondary"
+                            displayAsListItem
+                          >
+                            {i18n._(keyPoint)}
+                          </Text>
+                        ))}
+                      </ul>
+                    </Column>
+                  )}
+                </ColumnStackLayout>
+                <Line justifyContent="space-between" alignItems="flex-end">
+                  <Chip
+                    style={{
+                      ...styles.chip,
+                      border: `1px solid ${getChipColorFromDuration(
+                        durationInMinutes || 0
+                      )}`,
+                    }}
+                    label={getChipTextFromDuration(durationInMinutes || 0)}
+                    variant="outlined"
+                  />
+                  {progress && progress > 0 ? (
+                    progress !== 100 ? (
+                      <LineStackLayout alignItems="center" noMargin>
+                        <Text displayInlineAsSpan noMargin size="body2">
+                          {progress}%
+                        </Text>
+                        <ColoredLinearProgress value={progress} />
+                      </LineStackLayout>
+                    ) : (
+                      <Line noMargin justifyContent="center">
+                        <Chip
+                          size="small"
+                          label={<Trans>Finished</Trans>}
+                          style={{
+                            backgroundColor:
+                              gdevelopTheme.statusIndicator.success,
+                            color: '#111111',
+                          }}
+                        />
+                      </Line>
+                    )
+                  ) : durationInMinutes ? (
                     <Line noMargin justifyContent="center">
                       <Chip
                         size="small"
-                        label={<Trans>Finished</Trans>}
-                        style={{
-                          backgroundColor:
-                            gdevelopTheme.statusIndicator.success,
-                          color: '#111111',
-                        }}
+                        label={
+                          durationInMinutes === 1 ? (
+                            <Trans>1 minute</Trans>
+                          ) : (
+                            <Trans>{durationInMinutes} minutes</Trans>
+                          )
+                        }
                       />
                     </Line>
-                  )
-                ) : durationInMinutes ? (
-                  <Line noMargin justifyContent="center">
-                    <Chip
-                      size="small"
-                      label={
-                        durationInMinutes === 1 ? (
-                          <Trans>1 minute</Trans>
-                        ) : (
-                          <Trans>{durationInMinutes} minutes</Trans>
-                        )
-                      }
-                    />
-                  </Line>
-                ) : (
-                  <Spacer />
-                )}
-                <Text
-                  size="block-title"
-                  noMargin
-                  style={getTextStyle(shouldTextBeDisabled)}
-                  color="primary"
-                >
-                  {i18n._(title)}
-                </Text>
-                <Text
-                  size="body"
-                  noMargin
-                  style={getTextStyle(shouldTextBeDisabled)}
-                  color="secondary"
-                >
-                  {isMobile ? i18n._(shortDescription) : i18n._(description)}
-                </Text>
-                {keyPoints && <Divider />}
-                {keyPoints && (
-                  <Column
-                    noMargin
-                    alignItems="flex-start"
-                    justifyContent="flex-start"
-                    expand
-                  >
-                    <ul style={styles.keyPointsList}>
-                      {keyPoints.map((keyPoint, index) => (
-                        <Text
-                          key={`key-point-${index}`}
-                          size="body2"
-                          noMargin
-                          style={getTextStyle(shouldTextBeDisabled)}
-                          color="secondary"
-                          displayAsListItem
-                        >
-                          {i18n._(keyPoint)}
-                        </Text>
-                      ))}
-                    </ul>
-                  </Column>
-                )}
+                  ) : (
+                    <Spacer />
+                  )}
+                </Line>
               </ColumnStackLayout>
             </div>
           </Column>

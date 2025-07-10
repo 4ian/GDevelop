@@ -126,7 +126,7 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
     case 'medium':
       return 3;
     case 'large':
-      return 5;
+      return 4;
     case 'xlarge':
       return 6;
     default:

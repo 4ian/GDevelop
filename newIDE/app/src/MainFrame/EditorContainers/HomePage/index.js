@@ -12,11 +12,10 @@ import {
   type StorageProvider,
 } from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import LearnSection from './LearnSection';
+import LearnSection, { type LearnCategory } from './LearnSection';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
-import { type TutorialCategory } from '../../../Utils/GDevelopServices/Tutorial';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
@@ -140,6 +139,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
+  onOpenAskAi: () => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
@@ -202,6 +202,7 @@ export const HomePage = React.memo<Props>(
         selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
+        onOpenAskAi,
         isActive,
         storageProviders,
         onSave,
@@ -269,12 +270,14 @@ export const HomePage = React.memo<Props>(
         isTaskCompleted,
         getChapterCompletion,
         getCourseCompletion,
-        onBuyCourseChapterWithCredits,
+        onBuyCourseWithCredits,
+        onBuyCourse,
+        purchasingCourseListingData,
+        setPurchasingCourseListingData,
       } = useCourses();
-      const [
-        learnCategory,
-        setLearnCategory,
-      ] = React.useState<TutorialCategory | null>(null);
+      const [learnCategory, setLearnCategory] = React.useState<LearnCategory>(
+        null
+      );
 
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -344,7 +347,6 @@ export const HomePage = React.memo<Props>(
               return;
             }
             onSelectCourse(courseId);
-            setLearnCategory('course');
             removeRouteArguments(['course-id']);
           }
 
@@ -639,9 +641,13 @@ export const HomePage = React.memo<Props>(
                       isCourseTaskCompleted={isTaskCompleted}
                       getCourseChapterCompletion={getChapterCompletion}
                       getCourseCompletion={getCourseCompletion}
-                      onBuyCourseChapterWithCredits={
-                        onBuyCourseChapterWithCredits
+                      onBuyCourseWithCredits={onBuyCourseWithCredits}
+                      onBuyCourse={onBuyCourse}
+                      purchasingCourseListingData={purchasingCourseListingData}
+                      setPurchasingCourseListingData={
+                        setPurchasingCourseListingData
                       }
+                      onOpenAskAi={onOpenAskAi}
                     />
                   )}
                   {activeTab === 'play' && (
@@ -735,6 +741,7 @@ export const renderHomePageContainer = (
     selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
+    onOpenAskAi={props.onOpenAskAi}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }

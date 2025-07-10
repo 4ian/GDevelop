@@ -558,7 +558,7 @@ const PrivateGameTemplateInformationPage = ({
                               simulateAppStoreProduct={simulateAppStoreProduct}
                               isAlreadyReceived={isAlreadyReceived}
                               onClickBuy={onClickBuy}
-                              onClickBuyWithCredits={onClickBuyWithCredits}
+                              onClickBuyWithCredits={onWillBuyWithCredits}
                             />
                           )}
                         </>
@@ -638,7 +638,7 @@ const PrivateGameTemplateInformationPage = ({
           ) : null}
           {displayPasswordPrompt && (
             <PasswordPromptDialog
-              onApply={onWillBuyWithCredits}
+              onApply={onClickBuyWithCredits}
               onClose={() => setDisplayPasswordPrompt(false)}
               passwordValue={password}
               setPasswordValue={setPassword}

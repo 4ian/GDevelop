@@ -5,14 +5,24 @@ import { I18n } from '@lingui/react';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 import { CardWidget } from '../CardWidget';
-import { Column, Line, Spacer } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import { Trans } from '@lingui/macro';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import { type CourseCompletion } from '../UseCourses';
 import { type Course } from '../../../../Utils/GDevelopServices/Asset';
+import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
+import Chip from '../../../../UI/Chip';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+
+export const getChipColorFromEnglishLevel = (englishLevel: string) => {
+  if (englishLevel.toLowerCase().includes('advanced')) return '#FF8569';
+  if (englishLevel.toLowerCase().includes('intermediate')) return '#FFBC57';
+  return '#3BF7F4';
+};
 
 const styles = {
   cardTextContainer: {
@@ -21,7 +31,7 @@ const styles = {
     justifyContent: 'center',
     padding: '8px 16px 8px 16px',
   },
-  image: { width: '100%' },
+  image: { width: '100%', aspectRatio: '16 / 9' },
   specializationDot: {
     width: 8,
     height: 8,
@@ -39,7 +49,6 @@ const styles = {
     alignItems: 'stretch',
     aspectRatio: '16 / 9',
     flexDirection: 'column',
-    flex: 1,
   },
   newLabel: {
     position: 'absolute',
@@ -50,6 +59,9 @@ const styles = {
     fontWeight: 'bold',
     color: 'white',
     padding: '2px 6px',
+  },
+  chip: {
+    height: 24,
   },
 };
 
@@ -64,7 +76,7 @@ const specializationColors = {
   marketing: '#FD3AE6',
 };
 
-const getSpecializationConfig = (
+export const getSpecializationConfig = (
   specializationId: string
 ): {| label: React.Node, color: string |} => {
   let label = specializationLabels[specializationId];
@@ -92,10 +104,17 @@ const getSpecializationConfig = (
 type Props = {|
   completion: ?CourseCompletion,
   course: ?Course,
+  courseListingData: ?CourseListingData,
   onClick?: () => void,
 |};
 
-const CourseCard = ({ completion, course, onClick }: Props) => {
+const CourseCard = ({
+  completion,
+  course,
+  courseListingData,
+  onClick,
+}: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
     course ? course.specializationId : 'loading'
   );
@@ -103,7 +122,7 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
     <I18n>
       {({ i18n }) => (
         <CardWidget onClick={onClick} size={'large'}>
-          {course && onClick ? (
+          {course && courseListingData && onClick ? (
             <Column expand noMargin noOverflowParent>
               <div style={styles.imageContainer}>
                 <img
@@ -151,25 +170,29 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
                         {specializationConfig.label}
                       </Text>
                     </LineStackLayout>
-                    {completion && (
-                      <LineStackLayout alignItems="center" noMargin>
-                        <ColoredLinearProgress
-                          value={
-                            (completion.completedChapters /
-                              completion.chapters) *
-                            100
-                          }
-                        />
-                        <Text
-                          displayInlineAsSpan
-                          size="body-small"
-                          noMargin
-                          color="secondary"
-                        >
-                          {completion.completedChapters}/{completion.chapters}
-                        </Text>
-                      </LineStackLayout>
-                    )}
+                    <LineStackLayout alignItems="center" noMargin>
+                      <ColoredLinearProgress
+                        value={
+                          completion
+                            ? (completion.completedChapters /
+                                completion.chapters) *
+                              100
+                            : 0
+                        }
+                      />
+                      <Text
+                        displayInlineAsSpan
+                        size="body-small"
+                        noMargin
+                        color="secondary"
+                      >
+                        {completion
+                          ? `${completion.completedChapters}/${
+                              completion.chapters
+                            }`
+                          : '-/-'}
+                      </Text>
+                    </LineStackLayout>
 
                     <Text
                       size="sub-title"
@@ -186,18 +209,31 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
                       )}
                     </Text>
                   </ColumnStackLayout>
-                  <Line justifyContent="space-between">
-                    <Text size="body-small" noMargin color="secondary">
-                      {selectMessageByLocale(i18n, course.levelByLocale)}
-                    </Text>
-                    <Text size="body-small" noMargin color="secondary">
-                      {course.durationInWeeks === 1 ? (
-                        <Trans>1 week</Trans>
-                      ) : (
-                        <Trans>{course.durationInWeeks} weeks</Trans>
-                      )}
-                    </Text>
-                  </Line>
+                  <div style={{ color: gdevelopTheme.text.color.secondary }}>
+                    <Line justifyContent="space-between" alignItems="flex-end">
+                      <Chip
+                        style={{
+                          ...styles.chip,
+                          border: `1px solid ${getChipColorFromEnglishLevel(
+                            course.levelByLocale.en
+                          )}`,
+                        }}
+                        label={selectMessageByLocale(
+                          i18n,
+                          course.levelByLocale
+                        )}
+                        variant="outlined"
+                      />
+                      {getProductPriceOrOwnedLabel({
+                        i18n,
+                        gdevelopTheme,
+                        productListingData: courseListingData,
+                        usageType: 'default',
+                        showBothPrices: 'column',
+                        owned: !course.isLocked,
+                      })}
+                    </Line>
+                  </div>
                 </ColumnStackLayout>
               </div>
             </Column>
@@ -211,10 +247,8 @@ const CourseCard = ({ completion, course, onClick }: Props) => {
                   <Skeleton height={20} />
                   <Skeleton height={20} />
                   <Skeleton height={30} />
-                  <Skeleton height={50} />
-                  <Spacer />
-                  <Skeleton height={15} />
-                  <Spacer />
+                  <Skeleton height={100} />
+                  <Skeleton height={45} />
                 </Column>
               </Line>
             </Column>

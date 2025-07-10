@@ -18,19 +18,18 @@ namespace gdjs {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          private _light: THREE.DirectionalLight;
-          private _isEnabled: boolean = false;
-          private _top: string = 'Y-';
+          private _top: string = 'Z+';
           private _elevation: float = 45;
           private _rotation: float = 0;
-
-          private _shadowMapDirty = true;
           private _shadowMapSize: float = 1024;
           private _minimumShadowBias: float = 0;
-
-          private _shadowCameraDirty = true;
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
+
+          private _isEnabled: boolean = false;
+          private _light: THREE.DirectionalLight;
+          private _shadowMapDirty = true;
+          private _shadowCameraDirty = true;
           private _shadowCameraHelper: THREE.CameraHelper | null;
 
           constructor() {

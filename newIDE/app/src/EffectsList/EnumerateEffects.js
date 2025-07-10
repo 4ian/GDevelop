@@ -75,7 +75,7 @@ export const enumerateEffectsMetadata = (
                   getValue: (effect: gdEffect) =>
                     effect.hasBooleanParameter(parameterName)
                       ? effect.getBooleanParameter(parameterName)
-                      : defaultValue === '1',
+                      : defaultValue === 'true',
                   setValue: (effect: gdEffect, newValue: boolean) =>
                     effect.setBooleanParameter(parameterName, newValue),
                   getLabel,

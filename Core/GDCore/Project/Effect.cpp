@@ -8,6 +8,8 @@
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
+  
+gd::String Effect::badStringParameterValue;
 
 void Effect::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());

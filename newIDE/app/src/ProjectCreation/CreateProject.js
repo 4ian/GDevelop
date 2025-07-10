@@ -46,7 +46,7 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
 
   const ambientLight = layer
     .getEffects()
-    .insertNewEffect('3D Ambient Light', 0);
+    .insertNewEffect('3D Ambient Hemisphere Light', 0);
   ambientLight.setEffectType('Scene3D::HemisphereLight');
   ambientLight.setStringParameter('skyColor', '255;255;255');
   ambientLight.setStringParameter('groundColor', '127;127;127');

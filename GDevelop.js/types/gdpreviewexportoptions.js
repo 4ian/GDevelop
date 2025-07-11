@@ -13,7 +13,6 @@ declare class gdPreviewExportOptions {
   setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
-  setShouldReloadResources(enable: boolean): gdPreviewExportOptions;
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;

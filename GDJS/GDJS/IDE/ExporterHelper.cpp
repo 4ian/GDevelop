@@ -275,8 +275,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
-  runtimeGameOptions.AddChild("shouldReloadResources")
-      .SetBoolValue(options.shouldReloadResources);
   runtimeGameOptions.AddChild("nativeMobileApp")
       .SetBoolValue(options.nativeMobileApp);
   runtimeGameOptions.AddChild("websocketDebuggerServerAddress")

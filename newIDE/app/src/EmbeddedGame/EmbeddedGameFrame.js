@@ -159,7 +159,7 @@ export const EmbeddedGameFrame = ({
             externalLayoutName,
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
-            hotReload,
+            hotReload: shouldHotReload,
             projectDataOnlyExport:
               projectDataOnlyExport && neededHotReload.current !== 'Full',
             shouldReloadResources:

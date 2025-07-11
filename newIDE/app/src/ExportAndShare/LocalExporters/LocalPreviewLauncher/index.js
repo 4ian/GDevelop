@@ -269,10 +269,6 @@ export default class LocalPreviewLauncher extends React.Component<
       // Only export project data if asked and if a hot-reloading is being done.
       shouldHotReload && previewOptions.projectDataOnlyExport
     );
-    previewExportOptions.setShouldReloadResources(
-      // Only reload resources if asked and if a hot-reloading is being done.
-      shouldHotReload && previewOptions.shouldReloadResources
-    );
 
     previewExportOptions.setFullLoadingScreen(previewOptions.fullLoadingScreen);
     previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
@@ -322,7 +318,10 @@ export default class LocalPreviewLauncher extends React.Component<
     if (shouldHotReload) {
       debuggerIds.forEach(debuggerId => {
         this.getPreviewDebuggerServer().sendMessage(debuggerId, {
-          command: 'hotReload',
+          // TODO Avoid to do a hard-reload for updating resource content.
+          command: previewOptions.shouldReloadResources
+            ? 'hardReload'
+            : 'hotReload',
         });
       });
       if (!previewOptions.isForInGameEdition) {

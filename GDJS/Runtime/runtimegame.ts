@@ -101,8 +101,6 @@ namespace gdjs {
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without events. */
     projectDataOnlyExport?: boolean;
-    /** if true, the resource should be unloaded before the hot-reload. */
-    shouldReloadResources?: boolean;
     /** if true, preview is launched from GDevelop native mobile app. */
     nativeMobileApp?: boolean;
     /** The address of the debugger server, to reach out using WebSocket. */

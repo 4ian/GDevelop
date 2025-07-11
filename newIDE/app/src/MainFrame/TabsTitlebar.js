@@ -53,7 +53,7 @@ type TabsTitlebarProps = {|
     onEditorTabClosing: () => void
   ) => React.Node,
   hasAskAiOpened: boolean,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -227,7 +227,7 @@ export default function TabsTitlebar({
           <TextButton
             icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
             label={'Ask AI'}
-            onClick={onOpenAskAi}
+            onClick={() => onOpenAskAi('agent')}
           />
         </div>
       ) : null}

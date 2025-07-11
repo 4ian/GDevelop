@@ -69,7 +69,7 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -384,7 +384,7 @@ const MainPage = ({
                               color="success"
                               label={<Trans>Ask the AI</Trans>}
                               rightIcon={<ArrowRight />}
-                              onClick={onOpenAskAi}
+                              onClick={() => onOpenAskAi('chat')}
                             />
                           </ColumnStackLayout>
                         </Line>

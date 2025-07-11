@@ -2627,11 +2627,8 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
-  // TODO Register to ResourcesWatcher and make the Runtime forget about
-  // already loaded resources.
   const onResourceExternallyChanged = React.useCallback(
     () => {
-      // TODO editorRef is `undefined` when the window is not focused so it doesn't do anything.
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
         shouldReloadResources: true,

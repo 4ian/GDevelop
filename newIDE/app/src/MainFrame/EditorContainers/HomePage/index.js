@@ -133,7 +133,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,
@@ -256,7 +256,6 @@ export const HomePage = React.memo<Props>(
         selectedCourse,
         courseChaptersByCourseId,
         onSelectCourse,
-        fetchCourses,
         areChaptersReady,
         onCompleteTask,
         isTaskCompleted,

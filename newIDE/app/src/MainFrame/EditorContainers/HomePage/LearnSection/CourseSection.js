@@ -115,7 +115,7 @@ type Props = {|
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
   simulateAppStoreProduct?: boolean,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
 |};
 
 const CourseSection = ({
@@ -432,7 +432,7 @@ const CourseSection = ({
                         <RaisedButton
                           primary
                           label={<Trans>Ask the AI</Trans>}
-                          onClick={onOpenAskAi}
+                          onClick={() => onOpenAskAi('chat')}
                         />
                       </ColumnStackLayout>
                     </Paper>

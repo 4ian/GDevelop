@@ -10,9 +10,7 @@ import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
 import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
-import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import Paper from '../../../../UI/Paper';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 import CourseSection from './CourseSection';
@@ -64,7 +62,7 @@ type Props = {|
   ) => Promise<void>,
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData

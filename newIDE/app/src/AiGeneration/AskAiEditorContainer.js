@@ -482,6 +482,7 @@ type Props = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  mode?: 'chat' | 'agent' | null,
 |};
 
 export type AskAiEditorInterface = {|
@@ -497,7 +498,7 @@ export type AskAiEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-  startNewChat: () => void,
+  startNewChat: (mode?: 'chat' | 'agent') => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -523,6 +524,7 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
+        mode,
       }: Props,
       ref
     ) => {
@@ -554,11 +556,27 @@ export const AskAiEditor = React.memo<Props>(
       ] = React.useState<NewAiRequestOptions | null>(null);
 
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
+      const [newChatMode, setNewChatMode] = React.useState<'chat' | 'agent'>(
+        mode || 'agent'
+      );
+
+      // Update newChatMode when mode prop changes
+      React.useEffect(
+        () => {
+          if (mode) {
+            setNewChatMode(mode);
+          }
+        },
+        [mode]
+      );
 
       const canStartNewChat = !!selectedAiRequestId;
       const onStartNewChat = React.useCallback(
-        () => {
+        (mode?: 'chat' | 'agent') => {
           setSelectedAiRequestId(null);
+          if (mode) {
+            setNewChatMode(mode);
+          }
         },
         [setSelectedAiRequestId]
       );
@@ -1026,6 +1044,7 @@ export const AskAiEditor = React.memo<Props>(
                     ? isAutoProcessingFunctionCalls(selectedAiRequest.id)
                     : false
                 }
+                initialMode={newChatMode}
                 setAutoProcessFunctionCalls={shouldAutoProcess => {
                   if (!selectedAiRequest) return;
                   setAutoProcessFunctionCalls(
@@ -1084,6 +1103,7 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
+        mode={props.extraEditorProps && props.extraEditorProps.mode}
       />
     )}
   </I18n>

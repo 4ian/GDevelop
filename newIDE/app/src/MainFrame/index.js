@@ -1505,13 +1505,7 @@ const MainFrame = (props: Props) => {
       shouldReloadResources: boolean,
     |}) => {
       const currentTab = getCurrentTab(state.editorTabs);
-      if (!currentTab) {
-        if (gameEditorMode === 'embedded-game') {
-          setEditorHotReloadNeeded(hotReloadProps);
-        }
-        return;
-      }
-      const { editorRef } = currentTab;
+      const editorRef = currentTab ? currentTab.editorRef : null;
       if (!editorRef) {
         if (gameEditorMode === 'embedded-game') {
           setEditorHotReloadNeeded(hotReloadProps);

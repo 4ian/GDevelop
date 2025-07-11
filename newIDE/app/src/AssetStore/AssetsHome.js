@@ -29,8 +29,9 @@ import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
 import { EarnCredits } from '../GameDashboard/Wallet/EarnCredits';
+import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWidget';
 
-const cellSpacing = 2;
+const cellSpacing = 10;
 
 const getCategoryColumns = (
   windowSize: WindowSizeType,
@@ -62,7 +63,7 @@ const getShopItemsColumns = (
     case 'large':
       return 4;
     case 'xlarge':
-      return 5;
+      return 6;
     default:
       return 2;
   }
@@ -118,9 +119,13 @@ export const shopCategories = {
   },
 };
 
+const MAX_COLUMNS = getShopItemsColumns('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
   grid: {
-    margin: '0 10px',
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
@@ -378,7 +383,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       >
         {openedShopCategory ? null : (
           <>
-            <Column>
+            <Column noMargin>
               <Line>
                 <Text size="block-title">
                   <Trans>Explore by category</Trans>
@@ -396,7 +401,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </>
         )}
         {displayPromotions ? (
-          <ColumnStackLayout>
+          <ColumnStackLayout noMargin>
             <Text size="block-title">
               <Trans>Promotions + Earn credits</Trans>
             </Text>
@@ -413,7 +418,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         ) : null}
         {allBundleTiles.length ? (
           <>
-            <Column>
+            <Column noMargin>
               <Line>
                 <Text size="block-title">
                   <Trans>Bundles</Trans>
@@ -431,7 +436,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </>
         ) : null}
         {openedShopCategoryTitle && (
-          <Column>
+          <Column noMargin>
             <Line>
               <Text size="block-title">{openedShopCategoryTitle}</Text>
             </Line>
@@ -440,7 +445,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         {!hideGameTemplates && (
           <>
             {!openedShopCategoryTitle && (
-              <Column>
+              <Column noMargin>
                 <Line>
                   <Text size="block-title">
                     <Trans>All game templates</Trans>
@@ -459,7 +464,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </>
         )}
         {!openedShopCategoryTitle && (
-          <Column>
+          <Column noMargin>
             <Line>
               <Text size="block-title">
                 <Trans>All asset packs</Trans>

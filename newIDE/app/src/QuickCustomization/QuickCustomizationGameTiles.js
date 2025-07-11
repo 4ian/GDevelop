@@ -8,15 +8,7 @@ import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { type QuickCustomizationRecommendation } from '../Utils/GDevelopServices/User';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
-
-const styles = {
-  grid: {
-    margin: 0,
-    // Remove the scroll capability of the grid, the scroll view handles it.
-    overflow: 'unset',
-  },
-  cellSpacing: 2,
-};
+import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWidget';
 
 const getColumnsCount = (windowSize: string, isLandscape: boolean) => {
   if (windowSize === 'small') {
@@ -28,6 +20,19 @@ const getColumnsCount = (windowSize: string, isLandscape: boolean) => {
   } else {
     return 6;
   }
+};
+
+const MAX_COLUMNS = getColumnsCount('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
+const ITEMS_SPACING = 5;
+const styles = {
+  grid: {
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
+    // Remove the scroll capability of the grid, the scroll view handles it.
+    overflow: 'unset',
+  },
 };
 
 type Props = {|
@@ -79,7 +84,7 @@ export const QuickCustomizationGameTiles = ({
           cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
-          spacing={styles.cellSpacing}
+          spacing={ITEMS_SPACING * 2}
         >
           {displayedExampleShortHeaders
             ? displayedExampleShortHeaders.map(

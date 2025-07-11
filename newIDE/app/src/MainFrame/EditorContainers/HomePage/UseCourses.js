@@ -43,6 +43,7 @@ const useCourses = () => {
     coursePurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
+    loginState,
   } = React.useContext(AuthenticatedUserContext);
   const {
     values: { language },
@@ -426,7 +427,7 @@ const useCourses = () => {
   React.useEffect(
     () => {
       (async () => {
-        if (courses) {
+        if (courses && loginState !== 'loggingIn') {
           await Promise.all(
             courses.map(course => fetchCourseChapters(course.id))
           );
@@ -435,7 +436,7 @@ const useCourses = () => {
       })();
     },
     // (Re)fetch course chapters when courses are refetched.
-    [courses, fetchCourseChapters]
+    [courses, fetchCourseChapters, loginState]
   );
 
   React.useEffect(
@@ -445,10 +446,12 @@ const useCourses = () => {
           // Just to trigger a re-fetch of the courses when the user subscription changes,
           // or when the user purchases a course.
         }
-        await fetchCourses();
+        if (loginState !== 'loggingIn') {
+          await fetchCourses();
+        }
       })();
     },
-    [fetchCourses, subscription, coursePurchases]
+    [fetchCourses, subscription, coursePurchases, loginState]
   );
 
   const selectedCourse = React.useMemo(

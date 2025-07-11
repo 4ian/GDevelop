@@ -64,8 +64,9 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
+import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 
-const cellSpacing = 8;
+const cellSpacing = 10;
 
 const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
   switch (windowSize) {
@@ -76,7 +77,7 @@ const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
     case 'large':
       return 4;
     case 'xlarge':
-      return 5;
+      return 6;
     default:
       return 3;
   }
@@ -108,11 +109,16 @@ const contentTypeToMessageDescriptor: {
   audio: t`audios`,
 };
 
+const MAX_COLUMNS = getPackColumns('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
   disabledText: { opacity: 0.6 },
   scrollview: { overflowX: 'hidden' },
   grid: {
-    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    overflow: 'hidden',
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
   leftColumnContainer: {
     flex: 3,
@@ -769,7 +775,7 @@ const PrivateAssetPackInformationPage = ({
                       <GridList
                         cols={getPackColumns(windowSize, isLandscape)}
                         cellHeight="auto"
-                        spacing={cellSpacing / 2}
+                        spacing={cellSpacing}
                         style={styles.grid}
                       >
                         {packsIncludedInBundleTiles}
@@ -789,7 +795,7 @@ const PrivateAssetPackInformationPage = ({
                         <GridList
                           cols={getPackColumns(windowSize, isLandscape)}
                           cellHeight="auto"
-                          spacing={cellSpacing / 2}
+                          spacing={cellSpacing}
                           style={styles.grid}
                         >
                           {otherPacksFromTheSameAuthorTiles}

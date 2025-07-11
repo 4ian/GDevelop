@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { Column, Line } from './Grid';
@@ -90,18 +89,6 @@ const styles = {
   },
 };
 
-// Styles to give a visible hover for the mouse cursor.
-const useStylesForTileHover = makeStyles(theme =>
-  createStyles({
-    tile: {
-      transition: 'transform 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'scale(1.02)',
-      },
-    },
-  })
-);
-
 type OverlayTextPosition =
   | 'topLeft'
   | 'topRight'
@@ -175,7 +162,6 @@ const ImageTileGrid = ({
   getLimitFromWindowSize,
 }: ImageTileGridProps) => {
   const { windowSize, isLandscape } = useResponsiveWindowSize();
-  const tileClasses = useStylesForTileHover();
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
   const limit = getLimitFromWindowSize
     ? getLimitFromWindowSize(windowSize, isLandscape)
@@ -214,7 +200,7 @@ const ImageTileGrid = ({
         {isLoading
           ? new Array(columns).fill(0).map((_, index) => (
               // Display tiles but with skeletons while the data is loading.
-              <GridListTile key={index} classes={tileClasses}>
+              <GridListTile key={index}>
                 <Skeleton
                   variant="rect"
                   width="100%"
@@ -224,7 +210,7 @@ const ImageTileGrid = ({
               </GridListTile>
             ))
           : itemsToDisplay.map((item, index) => (
-              <GridListTile key={index} classes={tileClasses}>
+              <GridListTile key={index}>
                 <CardWidget onClick={item.onClick} size="large">
                   <Column expand noMargin>
                     <div style={styles.imageContainer}>

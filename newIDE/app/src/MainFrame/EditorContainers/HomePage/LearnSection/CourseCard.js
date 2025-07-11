@@ -30,6 +30,9 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     padding: '8px 16px 8px 16px',
+    // Fix the height so that the card has a consistent height,
+    // When owned or not.
+    minHeight: 220,
   },
   image: { width: '100%', aspectRatio: '16 / 9' },
   specializationDot: {
@@ -79,7 +82,12 @@ const specializationColors = {
 export const getSpecializationConfig = (
   specializationId: string
 ): {| label: React.Node, color: string |} => {
-  let label = specializationLabels[specializationId];
+  let label =
+    specializationId === 'loading' ? (
+      <Trans>Loading</Trans>
+    ) : (
+      specializationLabels[specializationId]
+    );
   if (!label) {
     console.warn(
       `No label found for specializationId "${specializationId}". Using default label.`
@@ -248,7 +256,7 @@ const CourseCard = ({
                   <Skeleton height={20} />
                   <Skeleton height={30} />
                   <Skeleton height={100} />
-                  <Skeleton height={45} />
+                  <Skeleton height={50} />
                 </Column>
               </Line>
             </Column>

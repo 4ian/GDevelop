@@ -587,10 +587,7 @@ const CreateSection = ({
                         onSelectPrivateGameTemplateListingData
                       }
                       i18n={i18n}
-                      columnsCount={getExampleItemsColumns(
-                        windowSize,
-                        isLandscape
-                      )}
+                      getColumnsFromWindowSize={getExampleItemsColumns}
                       hideSearch
                       onlyShowGames
                     />

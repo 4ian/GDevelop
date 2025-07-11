@@ -59,8 +59,9 @@ import Play from '../../UI/CustomSvgIcons/Play';
 import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
+import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 
-const cellSpacing = 8;
+const cellSpacing = 10;
 
 const getTemplateColumns = (
   windowSize: WindowSizeType,
@@ -74,17 +75,21 @@ const getTemplateColumns = (
     case 'large':
       return 4;
     case 'xlarge':
-      return 5;
+      return 6;
     default:
       return 3;
   }
 };
-
+const MAX_COLUMNS = getTemplateColumns('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
   disabledText: { opacity: 0.6 },
   scrollview: { overflowX: 'hidden' },
   grid: {
-    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    overflow: 'hidden',
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
   },
   leftColumnContainer: {
     flex: 3,
@@ -605,7 +610,7 @@ const PrivateGameTemplateInformationPage = ({
                       <GridList
                         cols={getTemplateColumns(windowSize, isLandscape)}
                         cellHeight="auto"
-                        spacing={cellSpacing / 2}
+                        spacing={cellSpacing}
                         style={styles.grid}
                       >
                         {templatesIncludedInBundleTiles}
@@ -625,7 +630,7 @@ const PrivateGameTemplateInformationPage = ({
                         <GridList
                           cols={getTemplateColumns(windowSize, isLandscape)}
                           cellHeight="auto"
-                          spacing={cellSpacing / 2}
+                          spacing={cellSpacing}
                           style={styles.grid}
                         >
                           {otherTemplatesFromTheSameAuthorTiles}

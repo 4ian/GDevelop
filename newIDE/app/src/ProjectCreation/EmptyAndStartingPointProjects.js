@@ -17,13 +17,13 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import classes from './EmptyAndStartingPointProjects.module.css';
 import { getItemsColumns } from './NewProjectSetupDialog';
 
+const ITEMS_SPACING = 5;
 const getStyles = (theme: GDevelopTheme) => ({
   grid: {
-    margin: 0,
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
-  cellSpacing: 2,
 });
 
 type EmptyProjectTileProps = {|
@@ -130,7 +130,7 @@ const EmptyAndStartingPointProjects = ({
           cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
-          spacing={styles.cellSpacing}
+          spacing={ITEMS_SPACING * 2}
         >
           <EmptyProjectTile
             onSelectEmptyProject={onSelectEmptyProject}

@@ -59,6 +59,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
+          shouldReloadResources: false,
         });
       }
     }
@@ -78,24 +79,33 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       this._switchToSceneEdition({
         hotReload: false,
         projectDataOnlyExport: false,
+        shouldReloadResources: false,
       });
     }
   }
 
   forceInGameEditorHotReload({
     projectDataOnlyExport,
+    shouldReloadResources,
   }: {|
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) {
-    this._switchToSceneEdition({ hotReload: true, projectDataOnlyExport });
+    this._switchToSceneEdition({
+      hotReload: true,
+      projectDataOnlyExport,
+      shouldReloadResources,
+    });
   }
 
   _switchToSceneEdition({
     hotReload,
     projectDataOnlyExport,
+    shouldReloadResources,
   }: {|
     hotReload: boolean,
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}): void {
     const { projectItemName, editorId } = this.props;
     this.props.setPreviewedLayout({
@@ -114,6 +124,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
         eventsBasedObjectVariantName: this.getVariantName(),
         hotReload,
         projectDataOnlyExport,
+        shouldReloadResources,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();

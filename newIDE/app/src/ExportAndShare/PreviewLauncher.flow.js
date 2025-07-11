@@ -12,6 +12,7 @@ export type LaunchPreviewOptions = {
   networkPreview?: boolean,
   hotReload?: boolean,
   projectDataOnlyExport?: boolean,
+  shouldReloadResources?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   numberOfWindows?: number,
@@ -41,6 +42,7 @@ export type PreviewOptions = {|
   networkPreview: boolean,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
+  shouldReloadResources: boolean,
   fullLoadingScreen: boolean,
   fallbackAuthor: ?{ id: string, username: string },
   authenticatedPlayer: ?{

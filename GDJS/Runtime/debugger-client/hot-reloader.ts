@@ -168,12 +168,25 @@ namespace gdjs {
           gdjs.behaviorsTypes.items[behaviorTypeName];
       }
 
+      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
+      if (newRuntimeGameOptions.shouldReloadResources) {
+        this._runtimeGame.getResourceLoader().unloadAllResources();
+      }
+
       // Reload projectData and runtimeGameOptions stored by convention in data.js:
       await this._reloadScript('data.js');
 
       const newProjectData: ProjectData = gdjs.projectData;
 
-      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
+      if (newRuntimeGameOptions.shouldReloadResources) {
+        // TODO What if it is a custom object tab?
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+          currentScene ? currentScene.getName() : newProjectData.firstLayout
+        );
+      }
 
       if (gdjs.inAppTutorialMessage) {
         gdjs.inAppTutorialMessage.displayInAppTutorialMessage(

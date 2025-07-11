@@ -83,6 +83,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
         this._switchToSceneEdition({
           hotReload: false,
           projectDataOnlyExport: false,
+          shouldReloadResources: false,
         });
       }
     }
@@ -101,24 +102,33 @@ export class ExternalLayoutEditorContainer extends React.Component<
       this._switchToSceneEdition({
         hotReload: false,
         projectDataOnlyExport: false,
+        shouldReloadResources: false,
       });
     }
   }
 
   forceInGameEditorHotReload({
     projectDataOnlyExport,
+    shouldReloadResources,
   }: {|
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) {
-    this._switchToSceneEdition({ hotReload: true, projectDataOnlyExport });
+    this._switchToSceneEdition({
+      hotReload: true,
+      projectDataOnlyExport,
+      shouldReloadResources,
+    });
   }
 
   _switchToSceneEdition({
     hotReload,
     projectDataOnlyExport,
+    shouldReloadResources,
   }: {|
     hotReload: boolean,
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}): void {
     const { projectItemName, editorId } = this.props;
     const layout = this.getLayout();
@@ -142,6 +152,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
         eventsBasedObjectVariantName: null,
         hotReload,
         projectDataOnlyExport,
+        shouldReloadResources,
       });
       if (this.editor) {
         this.editor.onEditorReloaded();

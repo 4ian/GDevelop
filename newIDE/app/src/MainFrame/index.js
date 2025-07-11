@@ -204,11 +204,15 @@ import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
 import useHomepageWitchForRouting from './UseHomepageWitchForRouting';
-import { EmbeddedGameFrame } from '../EmbeddedGame/EmbeddedGameFrame';
+import {
+  EmbeddedGameFrame,
+  setEditorHotReloadNeeded,
+} from '../EmbeddedGame/EmbeddedGameFrame';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
+import { registerOnResourceExternallyChangedCallback } from '../MainFrame/ResourcesWatcher';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1490,26 +1494,40 @@ const MainFrame = (props: Props) => {
     if (hasEventsBasedObject) {
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: false,
+        shouldReloadResources: false,
       });
     }
   };
 
   const hotReloadInGameEditorIfNeeded = React.useCallback(
-    ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
-      const { editorRef } = getCurrentTab(state.editorTabs);
-      if (editorRef) {
-        editorRef.forceInGameEditorHotReload({
-          projectDataOnlyExport,
-        });
+    (hotReloadProps: {|
+      projectDataOnlyExport: boolean,
+      shouldReloadResources: boolean,
+    |}) => {
+      const currentTab = getCurrentTab(state.editorTabs);
+      if (!currentTab) {
+        if (gameEditorMode === 'embedded-game') {
+          setEditorHotReloadNeeded(hotReloadProps);
+        }
+        return;
       }
+      const { editorRef } = currentTab;
+      if (!editorRef) {
+        if (gameEditorMode === 'embedded-game') {
+          setEditorHotReloadNeeded(hotReloadProps);
+        }
+        return;
+      }
+      editorRef.forceInGameEditorHotReload(hotReloadProps);
     },
-    [state.editorTabs]
+    [state.editorTabs, gameEditorMode]
   );
 
   const onSceneAdded = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
+        shouldReloadResources: false,
       });
     },
     [hotReloadInGameEditorIfNeeded]
@@ -1519,6 +1537,7 @@ const MainFrame = (props: Props) => {
     () => {
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
+        shouldReloadResources: false,
       });
     },
     [hotReloadInGameEditorIfNeeded]
@@ -1529,6 +1548,7 @@ const MainFrame = (props: Props) => {
       // Ensure the effect implementation is exported.
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: false,
+        shouldReloadResources: false,
       });
     },
     [hotReloadInGameEditorIfNeeded]
@@ -1569,6 +1589,7 @@ const MainFrame = (props: Props) => {
       }
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
+        shouldReloadResources: false,
       });
       _onProjectItemModified();
     });
@@ -1602,6 +1623,7 @@ const MainFrame = (props: Props) => {
       );
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
+        shouldReloadResources: false,
       });
       _onProjectItemModified();
     });
@@ -1816,6 +1838,7 @@ const MainFrame = (props: Props) => {
       numberOfWindows,
       hotReload,
       projectDataOnlyExport,
+      shouldReloadResources,
       fullLoadingScreen,
       forceDiagnosticReport,
       launchCaptureOptions,
@@ -1895,6 +1918,7 @@ const MainFrame = (props: Props) => {
           networkPreview: !!networkPreview,
           hotReload: !!hotReload,
           projectDataOnlyExport: !!projectDataOnlyExport,
+          shouldReloadResources: !!shouldReloadResources,
           fullLoadingScreen: !!fullLoadingScreen,
           fallbackAuthor,
           authenticatedPlayer,
@@ -2017,6 +2041,7 @@ const MainFrame = (props: Props) => {
       eventsBasedObjectVariantName,
       hotReload,
       projectDataOnlyExport,
+      shouldReloadResources,
     }: {|
       editorId: string,
       sceneName: string | null,
@@ -2025,11 +2050,13 @@ const MainFrame = (props: Props) => {
       eventsBasedObjectVariantName: string | null,
       hotReload: boolean,
       projectDataOnlyExport: boolean,
+      shouldReloadResources: boolean,
     |}) => {
       launchPreview({
         networkPreview: false,
         hotReload,
         projectDataOnlyExport,
+        shouldReloadResources,
         forceDiagnosticReport: false,
         isForInGameEdition: {
           editorId,
@@ -2460,6 +2487,7 @@ const MainFrame = (props: Props) => {
   const onExtractAsExternalLayout = (name: string) => {
     hotReloadInGameEditorIfNeeded({
       projectDataOnlyExport: true,
+      shouldReloadResources: false,
     });
     openExternalLayout(name);
   };
@@ -2501,6 +2529,7 @@ const MainFrame = (props: Props) => {
     () => {
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: false,
+        shouldReloadResources: false,
       });
     },
     [hotReloadInGameEditorIfNeeded]
@@ -2603,10 +2632,22 @@ const MainFrame = (props: Props) => {
 
   // TODO Register to ResourcesWatcher and make the Runtime forget about
   // already loaded resources.
+  const onResourceExternallyChanged = React.useCallback(
+    () => {
+      // TODO editorRef is `undefined` when the window is not focused so it doesn't do anything.
+      hotReloadInGameEditorIfNeeded({
+        projectDataOnlyExport: true,
+        shouldReloadResources: true,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
   const onResourceUsageChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
         projectDataOnlyExport: true,
+        shouldReloadResources: false,
       });
     },
     [hotReloadInGameEditorIfNeeded]
@@ -3915,6 +3956,10 @@ const MainFrame = (props: Props) => {
           configureNewProjectActionsForProfile({
             fetchAndOpenNewProjectSetupDialogForExample,
           });
+
+          registerOnResourceExternallyChangedCallback(
+            onResourceExternallyChanged
+          );
         })
         .catch(() => {
           /* Ignore errors */

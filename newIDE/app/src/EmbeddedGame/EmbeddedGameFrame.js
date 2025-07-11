@@ -18,13 +18,17 @@ type SwitchToSceneEditionOptions = {|
   eventsBasedObjectVariantName: string | null,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
+  shouldReloadResources: boolean,
 |};
 
 let onAttachToPreview: null | (AttachToPreviewOptions => void) = null;
 let onSwitchToSceneEdition: null | (SwitchToSceneEditionOptions => void) = null;
 let onSetEditorHotReloadNeeded:
   | null
-  | (({| projectDataOnlyExport: boolean |}) => void) = null;
+  | (({|
+      projectDataOnlyExport: boolean,
+      shouldReloadResources: boolean,
+    |}) => void) = null;
 let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 
 export const attachToPreview = ({
@@ -34,38 +38,19 @@ export const attachToPreview = ({
   onAttachToPreview({ previewIndexHtmlLocation });
 };
 
-export const switchToSceneEdition = ({
-  editorId,
-  sceneName,
-  externalLayoutName,
-  eventsBasedObjectType,
-  eventsBasedObjectVariantName,
-  hotReload,
-  projectDataOnlyExport,
-}: SwitchToSceneEditionOptions) => {
+export const switchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
   if (!onSwitchToSceneEdition)
     throw new Error('No EmbeddedGameFrame registered.');
-  onSwitchToSceneEdition({
-    editorId,
-    sceneName,
-    externalLayoutName,
-    eventsBasedObjectType,
-    eventsBasedObjectVariantName,
-    hotReload,
-    projectDataOnlyExport,
-  });
+  onSwitchToSceneEdition(options);
 };
 
-export const setEditorHotReloadNeeded = ({
-  projectDataOnlyExport,
-}: {|
+export const setEditorHotReloadNeeded = (hotReloadProps: {|
   projectDataOnlyExport: boolean,
+  shouldReloadResources: boolean,
 |}) => {
   if (!onSetEditorHotReloadNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
-  onSetEditorHotReloadNeeded({
-    projectDataOnlyExport,
-  });
+  onSetEditorHotReloadNeeded(hotReloadProps);
 };
 
 export const preventGameFramePointerEvents = (enabled: boolean) => {
@@ -85,6 +70,7 @@ type Props = {|
     eventsBasedObjectVariantName: string | null,
     hotReload: boolean,
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) => void,
 |};
 
@@ -104,7 +90,9 @@ export const EmbeddedGameFrame = ({
     setIsPointerEventsPrevented,
   ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
-  const neededHotReload = React.useRef<'None' | 'Data' | 'Full'>('None');
+  const neededHotReload = React.useRef<
+    'None' | 'Data' | 'DataAndResources' | 'Full'
+  >('None');
 
   React.useEffect(
     () => {
@@ -120,8 +108,10 @@ export const EmbeddedGameFrame = ({
       };
       onSetEditorHotReloadNeeded = ({
         projectDataOnlyExport,
+        shouldReloadResources,
       }: {|
         projectDataOnlyExport: boolean,
+        shouldReloadResources: boolean,
       |}) => {
         if (projectDataOnlyExport) {
           if (neededHotReload.current === 'None') {
@@ -129,6 +119,11 @@ export const EmbeddedGameFrame = ({
           }
         } else {
           neededHotReload.current = 'Full';
+        }
+        if (shouldReloadResources) {
+          if (neededHotReload.current !== 'Full') {
+            neededHotReload.current = 'DataAndResources';
+          }
         }
       };
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
@@ -143,12 +138,10 @@ export const EmbeddedGameFrame = ({
           eventsBasedObjectVariantName,
           hotReload,
           projectDataOnlyExport,
+          shouldReloadResources,
         } = options;
 
         const shouldHotReload = hotReload || neededHotReload.current !== 'None';
-        const shouldOnlyExportProjectData =
-          projectDataOnlyExport && neededHotReload.current !== 'Full';
-
         if (!previewIndexHtmlLocation || shouldHotReload) {
           console.info(
             eventsBasedObjectType
@@ -167,7 +160,12 @@ export const EmbeddedGameFrame = ({
             eventsBasedObjectType,
             eventsBasedObjectVariantName,
             hotReload,
-            projectDataOnlyExport: shouldOnlyExportProjectData,
+            projectDataOnlyExport:
+              projectDataOnlyExport && neededHotReload.current !== 'Full',
+            shouldReloadResources:
+              shouldReloadResources ||
+              neededHotReload.current === 'DataAndResources' ||
+              neededHotReload.current === 'Full',
           });
           neededHotReload.current = 'None';
         } else {

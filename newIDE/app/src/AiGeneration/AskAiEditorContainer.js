@@ -500,7 +500,10 @@ export type AskAiEditorInterface = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   startNewChat: () => void,
-  forceInGameEditorHotReload: ({| projectDataOnlyExport: boolean |}) => void,
+  forceInGameEditorHotReload: ({|
+    projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
+  |}) => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -602,11 +605,12 @@ export const AskAiEditor = React.memo<Props>(
       );
 
       const forceInGameEditorHotReload = React.useCallback(
-        ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
+        (hotReloadProps: {|
+          projectDataOnlyExport: boolean,
+          shouldReloadResources: boolean,
+        |}) => {
           if (gameEditorMode === 'embedded-game') {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-            });
+            setEditorHotReloadNeeded(hotReloadProps);
           }
         },
         [gameEditorMode]

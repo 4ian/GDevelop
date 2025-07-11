@@ -56,15 +56,12 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-  }: {|
+  forceInGameEditorHotReload(hotReloadProps: {|
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) {
     if (this.props.gameEditorMode === 'embedded-game') {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-      });
+      setEditorHotReloadNeeded(hotReloadProps);
     }
   }
 

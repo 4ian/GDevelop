@@ -51,15 +51,12 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No thing to be done.
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-  }: {|
+  forceInGameEditorHotReload(hotReloadProps: {|
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) {
     if (this.props.gameEditorMode === 'embedded-game') {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-      });
+      setEditorHotReloadNeeded(hotReloadProps);
     }
   }
 

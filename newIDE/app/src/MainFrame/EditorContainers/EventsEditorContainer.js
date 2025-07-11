@@ -79,15 +79,12 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-  }: {|
+  forceInGameEditorHotReload(hotReloadProps: {|
     projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
   |}) {
     if (this.props.gameEditorMode === 'embedded-game') {
-      setEditorHotReloadNeeded({
-        projectDataOnlyExport,
-      });
+      setEditorHotReloadNeeded(hotReloadProps);
     }
   }
 

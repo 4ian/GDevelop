@@ -2971,6 +2971,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setEventsBasedObjectVariantName(eventsBasedObjectVariantName: string): PreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
+  setShouldReloadResources(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;

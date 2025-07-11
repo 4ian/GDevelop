@@ -43,6 +43,7 @@ struct PreviewExportOptions {
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
         projectDataOnlyExport(false),
+        shouldReloadResources(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
         isInGameEdition(false),
@@ -182,6 +183,14 @@ struct PreviewExportOptions {
    */
   PreviewExportOptions &SetProjectDataOnlyExport(bool enable) {
     projectDataOnlyExport = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Set if the hot-reload should reload resources.
+   */
+  PreviewExportOptions &SetShouldReloadResources(bool enable) {
+    shouldReloadResources = enable;
     return *this;
   }
 
@@ -343,6 +352,7 @@ struct PreviewExportOptions {
   bool nativeMobileApp;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
+  bool shouldReloadResources = false;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   bool isInGameEdition;

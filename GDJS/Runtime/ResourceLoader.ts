@@ -571,6 +571,24 @@ namespace gdjs {
     }
 
     /**
+     * To be called when hot-reloading resources.
+     */
+    unloadAllResources(): void {
+      debugLogger.log(`Unloading of all resources was requested.`);
+      for (const resource of this._resources.values()) {
+        console.log('Unload', resource.name);
+        const resourceManager = this._resourceManagersMap.get(resource.kind);
+        if (resourceManager) {
+          resourceManager.unloadResourcesList([resource]);
+        }
+      }
+      for (const sceneLoadingState of this._sceneLoadingStates.values()) {
+        sceneLoadingState.status = 'not-loaded';
+      }
+      debugLogger.log(`Unloading of all resources finished.`);
+    }
+
+    /**
      * Put a given scene at the end of the queue.
      *
      * When the scene that is currently loading in background is done,

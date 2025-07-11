@@ -792,7 +792,6 @@ namespace gdjs {
         this._draggedSelectedObjectTotalDelta.translationY = 0;
         this._draggedSelectedObjectTotalDelta.translationZ = 0;
       }
-      console.log(this._draggedSelectedObjectTotalDelta);
       this._objectMover.move(
         this._selection.getSelectedObjects(),
         this._draggedSelectedObjectTotalDelta

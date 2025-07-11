@@ -183,7 +183,10 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
-  forceInGameEditorHotReload: ({| projectDataOnlyExport: boolean |}) => void,
+  forceInGameEditorHotReload: ({|
+    projectDataOnlyExport: boolean,
+    shouldReloadResources: boolean,
+  |}) => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -482,11 +485,12 @@ export const HomePage = React.memo<Props>(
       );
 
       const forceInGameEditorHotReload = React.useCallback(
-        ({ projectDataOnlyExport }: {| projectDataOnlyExport: boolean |}) => {
+        (hotReloadProps: {|
+          projectDataOnlyExport: boolean,
+          shouldReloadResources: boolean,
+        |}) => {
           if (gameEditorMode === 'embedded-game') {
-            setEditorHotReloadNeeded({
-              projectDataOnlyExport,
-            });
+            setEditorHotReloadNeeded(hotReloadProps);
           }
         },
         [gameEditorMode]

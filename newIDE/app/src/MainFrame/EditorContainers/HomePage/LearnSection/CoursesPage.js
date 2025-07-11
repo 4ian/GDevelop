@@ -13,30 +13,11 @@ import { Line } from '../../../../UI/Grid';
 import { GridList, GridListTile } from '@material-ui/core';
 import CourseStoreContext from '../../../../Course/CourseStoreContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import {
-  useResponsiveWindowSize,
-  type WindowSizeType,
-} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import CourseCard from './CourseCard';
+import { getColumnsFromWindowSize } from './Utils';
 
-export const getColumnsFromWindowSize = (
-  windowSize: WindowSizeType,
-  isLandscape: boolean
-) => {
-  switch (windowSize) {
-    case 'small':
-      return isLandscape ? 4 : 2;
-    case 'medium':
-      return 3;
-    case 'large':
-      return 4;
-    case 'xlarge':
-      return 6;
-    default:
-      return 3;
-  }
-};
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;

@@ -5,15 +5,14 @@ import SectionContainer, { SectionRow } from '../SectionContainer';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
-import { TutorialsRow } from './MainPage';
-import { type LearnCategory } from '.';
+import TutorialsRow from './TutorialsRow';
+import { getColumnsFromWindowSize, type LearnCategory } from './Utils';
 
 type Props = {|
   onSelectCategory: (category: LearnCategory) => void,
-  tutorials: Array<Tutorial>,
 |};
 
-const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
+const TutorialsPage = ({ onSelectCategory }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [
     selectedTutorial,
@@ -30,7 +29,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="official-beginner"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           <SectionRow>
@@ -39,7 +38,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="official-intermediate"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           <SectionRow>
@@ -48,7 +47,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="official-advanced"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           <SectionRow>
@@ -57,7 +56,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="education-curriculum"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           <SectionRow>
@@ -66,7 +65,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="full-game"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           <SectionRow>
@@ -75,7 +74,7 @@ const TutorialsPage = ({ onSelectCategory, tutorials }: Props) => {
               category="game-mechanic"
               onSelectCategory={onSelectCategory}
               onSelectTutorial={setSelectedTutorial}
-              tutorials={tutorials}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
           {selectedTutorial && (

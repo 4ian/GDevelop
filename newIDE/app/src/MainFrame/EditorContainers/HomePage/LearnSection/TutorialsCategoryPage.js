@@ -8,7 +8,10 @@ import {
   type Tutorial,
   type TutorialCategory,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
+import {
+  formatTutorialToImageTileComponent,
+  TUTORIAL_CATEGORY_TEXTS,
+} from './Utils';
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
@@ -16,6 +19,8 @@ import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutoria
 import EducationCurriculumLesson from './EducationCurriculumLesson';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import Text from '../../../../UI/Text';
+import { TutorialContext } from '../../../../Tutorial/TutorialContext';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 
 const styles = {
   educationCurriculumTutorialContainer: {
@@ -136,7 +141,6 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 
 type Props = {|
   onBack: () => void,
-  tutorials: Array<Tutorial>,
   category: TutorialCategory,
   onOpenTemplateFromTutorial: string => Promise<void>,
   onSelectCourse: (courseId: string) => void,
@@ -144,21 +148,31 @@ type Props = {|
 
 const TutorialsCategoryPage = ({
   category,
-  tutorials,
   onBack,
   onOpenTemplateFromTutorial,
   onSelectCourse,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
+  const { tutorials } = React.useContext(TutorialContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
-  const filteredTutorials = tutorials.filter(
-    tutorial => tutorial.category === category
-  );
+  const filteredTutorials = tutorials
+    ? tutorials.filter(tutorial => tutorial.category === category)
+    : null;
 
   const [
     selectedTutorial,
     setSelectedTutorial,
   ] = React.useState<Tutorial | null>(null);
+
+  if (!filteredTutorials) {
+    return (
+      <SectionContainer flexBody>
+        <SectionRow expand>
+          <PlaceholderLoader />
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
   return (
     <I18n>

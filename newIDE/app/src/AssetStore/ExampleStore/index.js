@@ -23,10 +23,17 @@ import {
   isStartingPointExampleShortHeader,
 } from '../../ProjectCreation/EmptyAndStartingPointProjects';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import {
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
 
+const ITEMS_SPACING = 5;
 const styles = {
   grid: {
-    margin: 0,
+    textAlign: 'center',
+    width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
@@ -60,12 +67,13 @@ type Props = {|
   i18n: I18nType,
   onlyShowGames?: boolean,
   hideStartingPoints?: boolean,
-  columnsCount: number,
-  rowToInsert?: {|
-    row: number,
-    element: React.Node,
-  |},
+  getColumnsFromWindowSize: (
+    windowSize: WindowSizeType,
+    isLandscape: boolean
+  ) => number,
   hideSearch?: boolean,
+  limitRowsTo?: number,
+  hidePremiumTemplates?: boolean,
 |};
 
 const ExampleStore = ({
@@ -74,10 +82,15 @@ const ExampleStore = ({
   i18n,
   onlyShowGames,
   hideStartingPoints,
-  columnsCount,
-  rowToInsert,
+  getColumnsFromWindowSize,
   hideSearch,
+  limitRowsTo,
+  hidePremiumTemplates,
 }: Props) => {
+  const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
+  const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
+
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const {
     exampleShortHeaders: allExampleShortHeaders,
@@ -97,6 +110,7 @@ const ExampleStore = ({
     exampleStoreSearchText
   );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const columnsCount = getColumnsFromWindowSize(windowSize, isLandscape);
 
   const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
@@ -145,14 +159,15 @@ const ExampleStore = ({
     () => {
       return getExampleAndTemplateTiles({
         receivedGameTemplates,
-        privateGameTemplateListingDatas: privateGameTemplateListingDatasSearchResults
-          ? privateGameTemplateListingDatasSearchResults
-              .map(({ item }) => item)
-              .filter(
-                privateGameTemplateListingData =>
-                  !onlyShowGames || gameFilter(privateGameTemplateListingData)
-              )
-          : [],
+        privateGameTemplateListingDatas:
+          privateGameTemplateListingDatasSearchResults && !hidePremiumTemplates
+            ? privateGameTemplateListingDatasSearchResults
+                .map(({ item }) => item)
+                .filter(
+                  privateGameTemplateListingData =>
+                    !onlyShowGames || gameFilter(privateGameTemplateListingData)
+                )
+            : [],
         exampleShortHeaders: exampleShortHeadersSearchResults
           ? exampleShortHeadersSearchResults
               .map(({ item }) => item)
@@ -201,50 +216,8 @@ const ExampleStore = ({
       onlyShowGames,
       hideStartingPoints,
       allExampleShortHeaders,
+      hidePremiumTemplates,
     ]
-  );
-
-  const nodesToDisplay: React.Node[] = React.useMemo(
-    () => {
-      const numberOfTilesToDisplayUntilRowToInsert = rowToInsert
-        ? rowToInsert.row * columnsCount
-        : 0;
-      const firstTiles = resultTiles.slice(
-        0,
-        numberOfTilesToDisplayUntilRowToInsert
-      );
-      const lastTiles = resultTiles.slice(
-        numberOfTilesToDisplayUntilRowToInsert
-      );
-      return [
-        firstTiles.length > 0 ? (
-          <GridList
-            cols={columnsCount}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={2}
-            key="first-tiles"
-          >
-            {firstTiles}
-          </GridList>
-        ) : null,
-        rowToInsert ? (
-          <Line key="inserted-row">{rowToInsert.element}</Line>
-        ) : null,
-        lastTiles.length > 0 ? (
-          <GridList
-            cols={columnsCount}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={2}
-            key="last-tiles"
-          >
-            {lastTiles}
-          </GridList>
-        ) : null,
-      ].filter(Boolean);
-    },
-    [columnsCount, rowToInsert, resultTiles]
   );
 
   return (
@@ -271,11 +244,24 @@ const ExampleStore = ({
                 No results returned for your search. Try something else!
               </Trans>
             </BackgroundText>
-            {rowToInsert && <Line>{rowToInsert.element}</Line>}
           </Column>
         ) : (
           <ColumnStackLayout noMargin expand>
-            {nodesToDisplay}
+            <GridList
+              cols={columnsCount}
+              style={{
+                ...styles.grid,
+                // Avoid tiles taking too much space on large screens.
+                maxWidth: MAX_SECTION_WIDTH,
+              }}
+              cellHeight="auto"
+              spacing={ITEMS_SPACING * 2}
+            >
+              {resultTiles.slice(
+                0,
+                limitRowsTo ? limitRowsTo * columnsCount : Infinity
+              )}
+            </GridList>
           </ColumnStackLayout>
         )}
       </Column>

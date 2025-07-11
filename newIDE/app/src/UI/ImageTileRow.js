@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Column, LargeSpacer, Line } from './Grid';
+import { Column, Line, Spacer } from './Grid';
 import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
@@ -76,7 +76,7 @@ const ImageTileRow = ({
           <Text noMargin>{description}</Text>
         </Line>
       )}
-      {margin === 'dense' ? null : <LargeSpacer />}
+      {margin === 'dense' ? null : <Spacer />}
       <ImageTileGrid
         items={items}
         isLoading={isLoading}

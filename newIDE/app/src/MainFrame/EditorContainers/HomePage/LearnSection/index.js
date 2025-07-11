@@ -3,25 +3,18 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type HomeTab } from '../HomePageMenu';
 import {
-  type TutorialCategory,
-  type Tutorial,
-  canAccessTutorial,
-} from '../../../../Utils/GDevelopServices/Tutorial';
-import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
+  type CourseListingData,
+  type PrivateGameTemplateListingData,
+} from '../../../../Utils/GDevelopServices/Shop';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
-import Window from '../../../../Utils/Window';
-import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
-import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
-import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
-import { formatDuration } from '../../../../Utils/Duration';
+
 import CourseSection from './CourseSection';
 import type {
   CourseChapter,
@@ -32,135 +25,8 @@ import SectionContainer, { SectionRow } from '../SectionContainer';
 import TutorialsPage from './TutorialsPage';
 import InAppTutorialsPage from './InAppTutorialsPage';
 import CoursesPage from './CoursesPage';
-
-export const TUTORIAL_CATEGORY_TEXTS = {
-  'full-game': {
-    title: <Trans>Entire games</Trans>,
-    description: <Trans>Make complete games step by step</Trans>,
-  },
-  'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans>,
-    description: (
-      <Trans>
-        Find how to implement the most common game mechanics and more
-      </Trans>
-    ),
-  },
-  'official-beginner': {
-    title: <Trans>Beginner course</Trans>,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans>,
-  },
-  'official-intermediate': {
-    title: <Trans>Intermediate course</Trans>,
-    description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans>
-    ),
-  },
-  'official-advanced': {
-    title: <Trans>Advanced course</Trans>,
-    description: <Trans>The icing on the cake</Trans>,
-  },
-  'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans>,
-    description: (
-      <Trans>
-        For teachers and educators having the GDevelop Education subscription.
-        Ready to use resources for teaching.
-      </Trans>
-    ),
-  },
-  course: {
-    title: <Trans>Loading</Trans>,
-    description: <Trans>Loading course...</Trans>,
-  },
-  recommendations: {
-    title: <Trans>Recommendations</Trans>,
-    description: null,
-  },
-};
-
-const getChipColorFromTutorialCategory = (
-  category: TutorialCategory
-): string | null => {
-  if (category === 'official-beginner') return '#3BF7F4';
-  if (category === 'official-intermediate') return '#FFBC57';
-  if (category === 'official-advanced') return '#FF8569';
-  if (category === 'full-game') return '#FFBC57';
-  if (category === 'game-mechanic') return '#FFBC57';
-  return null;
-};
-
-const getChipTextFromTutorialCategory = (
-  category: TutorialCategory,
-  i18n: I18nType
-) => {
-  if (category === 'official-beginner') return i18n._(t`Beginner`);
-  if (category === 'official-intermediate') return i18n._(t`Intermediate`);
-  if (category === 'official-advanced') return i18n._(t`Advanced`);
-  if (category === 'full-game') return i18n._(t`Intermediate`);
-  if (category === 'game-mechanic') return i18n._(t`Intermediate`);
-
-  return null;
-};
-
-type FormatTutorialToImageTileComponentProps = {|
-  i18n: I18nType,
-  limits: ?Limits,
-  tutorial: Tutorial,
-  onSelectTutorial: (tutorial: Tutorial) => void,
-|};
-
-export const formatTutorialToImageTileComponent = ({
-  i18n,
-  tutorial,
-  limits,
-  onSelectTutorial,
-}: FormatTutorialToImageTileComponentProps): ImageTileComponent => {
-  const isLocked = !canAccessTutorial(
-    tutorial,
-    limits ? limits.capabilities : null
-  );
-  return {
-    title:
-      selectMessageByLocale(i18n, tutorial.titleByLocale) || tutorial.title,
-    description:
-      selectMessageByLocale(i18n, tutorial.descriptionByLocale) ||
-      tutorial.description,
-    isLocked,
-    onClick: () => {
-      if (tutorial.isPrivateTutorial) {
-        onSelectTutorial(tutorial);
-        return;
-      }
-
-      sendTutorialOpened(tutorial.id);
-      Window.openExternalURL(
-        selectMessageByLocale(i18n, tutorial.linkByLocale)
-      );
-    },
-    imageUrl: selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale),
-    overlayText: tutorial.duration
-      ? formatDuration(tutorial.duration)
-      : '\u{1F4D8}',
-    overlayTextPosition: 'bottomRight',
-    chipText: getChipTextFromTutorialCategory(tutorial.category, i18n),
-    chipColor: getChipColorFromTutorialCategory(tutorial.category),
-  };
-};
-
-const styles = {
-  paper: {
-    flex: 1,
-    display: 'flex',
-  },
-};
-
-export type LearnCategory =
-  | TutorialCategory
-  | null
-  | 'all-tutorials'
-  | 'all-courses'
-  | 'in-app-tutorials';
+import { type LearnCategory } from './Utils';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 
 type Props = {|
   onTabChange: (tab: HomeTab) => void,
@@ -199,6 +65,11 @@ type Props = {|
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
   onOpenAskAi: () => void,
+  onOpenNewProjectSetupDialog: () => void,
+  onSelectPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
+  onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
 const LearnSection = ({
@@ -223,12 +94,11 @@ const LearnSection = ({
   purchasingCourseListingData,
   setPurchasingCourseListingData,
   onOpenAskAi,
+  onOpenNewProjectSetupDialog,
+  onSelectPrivateGameTemplateListingData,
+  onSelectExampleShortHeader,
 }: Props) => {
-  const {
-    tutorials,
-    fetchTutorials,
-    error: tutorialLoadingError,
-  } = React.useContext(TutorialContext);
+  const { fetchTutorials } = React.useContext(TutorialContext);
 
   React.useEffect(
     () => {
@@ -271,34 +141,10 @@ const LearnSection = ({
     );
   }
 
-  if (tutorialLoadingError) {
-    return (
-      <Paper square style={styles.paper} background="dark">
-        <PlaceholderError onRetry={fetchTutorials}>
-          <Trans>
-            Can't load the tutorials. Verify your internet connection or retry
-            later.
-          </Trans>
-        </PlaceholderError>
-      </Paper>
-    );
-  }
-
-  if (!tutorials) {
-    return (
-      <SectionContainer flexBody>
-        <SectionRow expand>
-          <PlaceholderLoader />
-        </SectionRow>
-      </SectionContainer>
-    );
-  }
-
   return !selectedCategory ? (
     <MainPage
       onTabChange={onTabChange}
       onSelectCategory={onSelectCategory}
-      tutorials={tutorials}
       selectInAppTutorial={selectInAppTutorial}
       courses={courses}
       onSelectCourse={onSelectCourse}
@@ -307,9 +153,14 @@ const LearnSection = ({
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
       onOpenAskAi={onOpenAskAi}
+      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+      onSelectPrivateGameTemplateListingData={
+        onSelectPrivateGameTemplateListingData
+      }
+      onSelectExampleShortHeader={onSelectExampleShortHeader}
     />
   ) : selectedCategory === 'all-tutorials' ? (
-    <TutorialsPage onSelectCategory={onSelectCategory} tutorials={tutorials} />
+    <TutorialsPage onSelectCategory={onSelectCategory} />
   ) : selectedCategory === 'in-app-tutorials' ? (
     <InAppTutorialsPage
       onBack={() => onSelectCategory(null)}
@@ -329,7 +180,6 @@ const LearnSection = ({
     <TutorialsCategoryPage
       onBack={() => onSelectCategory('all-tutorials')}
       category={selectedCategory}
-      tutorials={tutorials}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
       onSelectCourse={onSelectCourse}
     />

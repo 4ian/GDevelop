@@ -11,7 +11,8 @@ import {
   type FileMetadata,
   type StorageProvider,
 } from '../../../ProjectsStorage';
-import LearnSection, { type LearnCategory } from './LearnSection';
+import LearnSection from './LearnSection';
+import { type LearnCategory } from './LearnSection/Utils';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
@@ -280,7 +281,7 @@ export const HomePage = React.memo<Props>(
         : isNativeMobileApp()
         ? 'play'
         : programOpeningCount > 1
-        ? 'create'
+        ? 'learn' // create
         : 'learn';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
@@ -362,16 +363,6 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
-      );
-
-      // Only fetch courses if the user decides to open the Learn section.
-      React.useEffect(
-        () => {
-          if (activeTab === 'learn' && !courses) {
-            fetchCourses();
-          }
-        },
-        [fetchCourses, activeTab, courses]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -586,6 +577,11 @@ export const HomePage = React.memo<Props>(
                         setPurchasingCourseListingData
                       }
                       onOpenAskAi={onOpenAskAi}
+                      onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+                      onSelectPrivateGameTemplateListingData={
+                        onSelectPrivateGameTemplateListingData
+                      }
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
                     />
                   )}
                   {activeTab === 'play' && (

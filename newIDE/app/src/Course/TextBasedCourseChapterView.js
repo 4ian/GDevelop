@@ -5,7 +5,7 @@ import { Trans } from '@lingui/macro';
 
 import type {
   TextBasedCourseChapter,
-  CourseChapter,
+  Course,
 } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -41,6 +41,7 @@ const styles = {
 
 type Props = {|
   chapterIndex: number,
+  course: Course,
   courseChapter: TextBasedCourseChapter,
   onOpenTemplate: (templateId?: string) => void,
   onCompleteTask: (
@@ -50,7 +51,7 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
-  onBuyWithCredits: (CourseChapter, string) => Promise<void>,
+  onClickUnlock: () => void,
 |};
 
 const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
@@ -58,17 +59,19 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     {
       chapterIndex,
       courseChapter,
+      course,
       onOpenTemplate,
       onCompleteTask,
       isTaskCompleted,
       getChapterCompletion,
-      onBuyWithCredits,
+      onClickUnlock,
     },
     ref
   ) => {
     return (
       <ColumnStackLayout expand noMargin>
         <CourseChapterTitle
+          course={course}
           chapterIndex={chapterIndex}
           courseChapter={courseChapter}
           getChapterCompletion={getChapterCompletion}
@@ -76,8 +79,9 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
         />
         {courseChapter.isLocked ? (
           <LockedCourseChapterPreview
-            onBuyWithCredits={onBuyWithCredits}
+            course={course}
             courseChapter={courseChapter}
+            onClickUnlock={onClickUnlock}
           />
         ) : courseChapter.templates.length > 0 ? (
           <div style={styles.videoAndMaterialsContainer}>
@@ -88,7 +92,7 @@ const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin>
                   {courseChapter.templates.map(template => (
-                    <Line noMargin alignItems="center">
+                    <Line noMargin alignItems="center" key={template.id}>
                       <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
                       &nbsp;
                       <Text noMargin>

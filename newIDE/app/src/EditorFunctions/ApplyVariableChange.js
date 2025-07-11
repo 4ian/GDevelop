@@ -93,8 +93,6 @@ const parseVariablePath = (
     segments.push({ type: 'property', value: currentSegment.trim() });
   }
 
-  console.log('segments', segments);
-
   return segments;
 };
 

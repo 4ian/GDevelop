@@ -67,9 +67,16 @@ export const Default = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
-          onBuyCourseChapterWithCredits={action(
-            'onBuyCourseChapterWithCredits'
+          onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+          onBuyCourse={action('onBuyCourse')}
+          purchasingCourseListingData={null}
+          setPurchasingCourseListingData={() => {}}
+          onOpenAskAi={() => action('onOpenAskAi')()}
+          onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+          onSelectPrivateGameTemplateListingData={action(
+            'onSelectPrivateGameTemplateListingData'
           )}
+          onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -108,9 +115,16 @@ export const NotAuthenticated = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
-          onBuyCourseChapterWithCredits={action(
-            'onBuyCourseChapterWithCredits'
+          onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+          onBuyCourse={action('onBuyCourse')}
+          purchasingCourseListingData={null}
+          setPurchasingCourseListingData={() => {}}
+          onOpenAskAi={() => action('onOpenAskAi')()}
+          onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+          onSelectPrivateGameTemplateListingData={action(
+            'onSelectPrivateGameTemplateListingData'
           )}
+          onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -151,9 +165,16 @@ export const EducationSubscriber = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
-          onBuyCourseChapterWithCredits={action(
-            'onBuyCourseChapterWithCredits'
+          onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+          onBuyCourse={action('onBuyCourse')}
+          purchasingCourseListingData={null}
+          setPurchasingCourseListingData={() => {}}
+          onOpenAskAi={() => action('onOpenAskAi')()}
+          onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+          onSelectPrivateGameTemplateListingData={action(
+            'onSelectPrivateGameTemplateListingData'
           )}
+          onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -194,9 +215,16 @@ export const EducationTeacher = () => (
           onOpenTemplateFromCourseChapter={action(
             'onOpenTemplateFromCourseChapter'
           )}
-          onBuyCourseChapterWithCredits={action(
-            'onBuyCourseChapterWithCredits'
+          onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+          onBuyCourse={action('onBuyCourse')}
+          purchasingCourseListingData={null}
+          setPurchasingCourseListingData={() => {}}
+          onOpenAskAi={() => action('onOpenAskAi')()}
+          onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+          onSelectPrivateGameTemplateListingData={action(
+            'onSelectPrivateGameTemplateListingData'
           )}
+          onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -231,7 +259,16 @@ export const LoadingTutorials = () => (
         onOpenTemplateFromCourseChapter={action(
           'onOpenTemplateFromCourseChapter'
         )}
-        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
+        onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+        onBuyCourse={action('onBuyCourse')}
+        purchasingCourseListingData={null}
+        setPurchasingCourseListingData={() => {}}
+        onOpenAskAi={() => action('onOpenAskAi')()}
+        onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+        onSelectPrivateGameTemplateListingData={action(
+          'onSelectPrivateGameTemplateListingData'
+        )}
+        onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>
@@ -265,7 +302,16 @@ export const LoadingCourses = () => (
         onOpenTemplateFromCourseChapter={action(
           'onOpenTemplateFromCourseChapter'
         )}
-        onBuyCourseChapterWithCredits={action('onBuyCourseChapterWithCredits')}
+        onBuyCourseWithCredits={action('onBuyCourseWithCredits')}
+        onBuyCourse={action('onBuyCourse')}
+        purchasingCourseListingData={null}
+        setPurchasingCourseListingData={() => {}}
+        onOpenAskAi={() => action('onOpenAskAi')()}
+        onOpenNewProjectSetupDialog={action('onOpenNewProjectSetupDialog')}
+        onSelectPrivateGameTemplateListingData={action(
+          'onSelectPrivateGameTemplateListingData'
+        )}
+        onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

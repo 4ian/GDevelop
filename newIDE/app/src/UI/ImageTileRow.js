@@ -1,15 +1,12 @@
 // @flow
 import * as React from 'react';
-import { Column, LargeSpacer, Line } from './Grid';
+import { Column, Line, Spacer } from './Grid';
 import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import ImageTileGrid, { type ImageTileComponent } from './ImageTileGrid';
-import {
-  useResponsiveWindowSize,
-  type WindowSizeType,
-} from './Responsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from './Responsive/ResponsiveWindowMeasurer';
 
 type ImageTileRowProps = {|
   title: React.Node,
@@ -42,8 +39,6 @@ const ImageTileRow = ({
   seeAllLabel,
   margin,
 }: ImageTileRowProps) => {
-  const { isMobile } = useResponsiveWindowSize();
-
   return (
     <>
       <LineStackLayout
@@ -59,13 +54,7 @@ const ImageTileRow = ({
           <Column noMargin>
             <FlatButton
               onClick={onShowAll}
-              label={
-                isMobile ? (
-                  <Trans>Browse</Trans> // Short label on mobile.
-                ) : (
-                  seeAllLabel || <Trans>See all</Trans>
-                )
-              }
+              label={seeAllLabel || <Trans>See all</Trans>}
               rightIcon={showAllIcon}
             />
           </Column>
@@ -76,7 +65,7 @@ const ImageTileRow = ({
           <Text noMargin>{description}</Text>
         </Line>
       )}
-      {margin === 'dense' ? null : <LargeSpacer />}
+      {margin === 'dense' ? null : <Spacer />}
       <ImageTileGrid
         items={items}
         isLoading={isLoading}

@@ -79,7 +79,7 @@ const getShopItemsColumns = (
     case 'medium':
       return 2;
     case 'large':
-      return 3;
+      return 4;
     case 'xlarge':
       return 5;
     default:
@@ -138,7 +138,7 @@ export const getAssetShortHeadersToDisplay = (
   return assetShortHeaders;
 };
 
-const cellSpacing = 8;
+const cellSpacing = 10;
 const styles = {
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
@@ -469,7 +469,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         // Don't show assets if filtering on asset packs.)
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
         const assetSize = getAssetSize(windowSize);
-        const margin = cellSpacing / 2;
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
@@ -481,7 +480,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
             size={assetSize}
             key={assetShortHeader.id}
-            margin={margin}
+            margin={cellSpacing / 2}
             hideShortDescription={!!hideDetails}
           />
         ));
@@ -749,7 +748,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                 cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
-                spacing={cellSpacing / 2}
+                spacing={cellSpacing}
               >
                 {gameTemplateTiles}
               </GridList>
@@ -765,7 +764,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                 cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
-                spacing={cellSpacing / 2}
+                spacing={cellSpacing}
               >
                 {allBundlePackTiles}
               </GridList>
@@ -781,7 +780,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                 cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
-                spacing={cellSpacing / 2}
+                spacing={cellSpacing}
               >
                 {allStandAlonePackTiles}
               </GridList>
@@ -945,12 +944,12 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           </Column>
         ) : null}
         {openedAssetPack && folderTiles.length ? (
-          <Column justifyContent="center">
+          <Column justifyContent="center" noMargin>
             <GridList
               style={styles.grid}
               cellHeight="auto"
               cols={getAssetFoldersColumns(windowSize, isLandscape)}
-              spacing={cellSpacing / 2}
+              spacing={cellSpacing}
             >
               {folderTiles}
             </GridList>

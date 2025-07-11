@@ -212,7 +212,10 @@ import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
 import { useExtensionLoadErrorDialog } from '../Utils/UseExtensionLoadErrorDialog';
-import { registerOnResourceExternallyChangedCallback } from '../MainFrame/ResourcesWatcher';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -3950,10 +3953,6 @@ const MainFrame = (props: Props) => {
           configureNewProjectActionsForProfile({
             fetchAndOpenNewProjectSetupDialogForExample,
           });
-
-          registerOnResourceExternallyChangedCallback(
-            onResourceExternallyChanged
-          );
         })
         .catch(() => {
           /* Ignore errors */
@@ -3962,6 +3961,19 @@ const MainFrame = (props: Props) => {
     // We want to run this effect only when the component did mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+
+  // Register the onResourceExternallyChanged with an up to date context.
+  React.useEffect(
+    () => {
+      const callbackId = registerOnResourceExternallyChangedCallback(
+        onResourceExternallyChanged
+      );
+      return () => {
+        unregisterOnResourceExternallyChangedCallback(callbackId);
+      };
+    },
+    [onResourceExternallyChanged]
   );
 
   useMainFrameCommands({

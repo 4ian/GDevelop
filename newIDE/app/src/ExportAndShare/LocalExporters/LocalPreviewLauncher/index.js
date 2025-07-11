@@ -269,7 +269,6 @@ export default class LocalPreviewLauncher extends React.Component<
       // Only export project data if asked and if a hot-reloading is being done.
       shouldHotReload && previewOptions.projectDataOnlyExport
     );
-    console.log('launchPreview', previewOptions, shouldHotReload);
     previewExportOptions.setShouldReloadResources(
       // Only reload resources if asked and if a hot-reloading is being done.
       shouldHotReload && previewOptions.shouldReloadResources

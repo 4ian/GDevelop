@@ -152,11 +152,13 @@ const MainPage = ({
           chipText={<Trans>Start for free</Trans>}
           title={<Trans>Official Game Dev courses</Trans>}
           titleAdornment={
-            <FlatButton
-              onClick={() => onSelectCategory('all-courses')}
-              label={<Trans>See all</Trans>}
-              rightIcon={<ArrowRight fontSize="small" />}
-            />
+            <Line noMargin justifyContent="flex-end">
+              <FlatButton
+                onClick={() => onSelectCategory('all-courses')}
+                label={<Trans>See all</Trans>}
+                rightIcon={<ArrowRight fontSize="small" />}
+              />
+            </Line>
           }
           subtitleText={
             <Trans>
@@ -266,19 +268,19 @@ const MainPage = ({
               alignItems="center"
               justifyContent="space-between"
             >
-              <Column noMargin>
+              <Column noMargin expand>
                 <Text size="section-title">
                   <Trans>Learn by dissecting ready-made games</Trans>
                 </Text>
               </Column>
-              <Column noMargin>
-                <FlatButton
-                  onClick={onOpenNewProjectSetupDialog}
-                  label={
-                    isMobile ? <Trans>Browse</Trans> : <Trans>See all</Trans>
-                  }
-                  rightIcon={<ArrowRight fontSize="small" />}
-                />
+              <Column noMargin expand>
+                <Line noMargin justifyContent="flex-end">
+                  <FlatButton
+                    onClick={onOpenNewProjectSetupDialog}
+                    label={<Trans>See all</Trans>}
+                    rightIcon={<ArrowRight fontSize="small" />}
+                  />
+                </Line>
               </Column>
             </LineStackLayout>
             <Spacer />

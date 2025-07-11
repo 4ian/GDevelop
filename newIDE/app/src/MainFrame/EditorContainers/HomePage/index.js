@@ -280,7 +280,7 @@ export const HomePage = React.memo<Props>(
         : isNativeMobileApp()
         ? 'play'
         : programOpeningCount > 1
-        ? 'learn' // create
+        ? 'create'
         : 'learn';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);

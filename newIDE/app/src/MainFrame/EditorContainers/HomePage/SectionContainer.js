@@ -158,18 +158,20 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    <ColumnStackLayout noMargin>
+                    <ColumnStackLayout noMargin expand>
                       {chipText && (
                         <Line noMargin>
                           <Chip label={chipText} style={styles.chip} />
                         </Line>
                       )}
-                      <Text size="bold-title" noMargin style={styles.title}>
+                      <Text size="title" noMargin style={styles.title}>
                         {title}
                       </Text>
                     </ColumnStackLayout>
                     {titleAdornment && (
-                      <Column noMargin>{titleAdornment}</Column>
+                      <Column expand noMargin>
+                        {titleAdornment}
+                      </Column>
                     )}
                   </LineStackLayout>
                 )}

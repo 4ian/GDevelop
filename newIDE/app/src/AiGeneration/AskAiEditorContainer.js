@@ -51,6 +51,7 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -723,11 +724,17 @@ export const AskAiEditor = React.memo<Props>(
 
               setSendingAiRequest(null, true);
 
+              const preparedAiUserContent = await prepareAiUserContent({
+                getAuthorizationHeader,
+                userId: profile.id,
+                simplifiedProjectJson,
+                projectSpecificExtensionsSummaryJson,
+              });
+
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
                 userId: profile.id,
-                gameProjectJson: simplifiedProjectJson,
-                projectSpecificExtensionsSummaryJson,
+                ...preparedAiUserContent,
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
                 fileMetadata,
@@ -872,13 +879,19 @@ export const AskAiEditor = React.memo<Props>(
                 )
               : null;
 
+            const preparedAiUserContent = await prepareAiUserContent({
+              getAuthorizationHeader,
+              userId: profile.id,
+              simplifiedProjectJson,
+              projectSpecificExtensionsSummaryJson,
+            });
+
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
-                gameProjectJson: simplifiedProjectJson,
-                projectSpecificExtensionsSummaryJson,
+                ...preparedAiUserContent,
                 payWithCredits,
                 userMessage,
               })

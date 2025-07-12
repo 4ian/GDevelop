@@ -299,7 +299,9 @@ export const createAiRequest = async (
     userId,
     userRequest,
     gameProjectJson,
+    gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey,
     payWithCredits,
     mode,
     gameId,
@@ -309,7 +311,9 @@ export const createAiRequest = async (
     userId: string,
     userRequest: string,
     gameProjectJson: string | null,
+    gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     payWithCredits: boolean,
     mode: 'chat' | 'agent',
     gameId: string | null,
@@ -328,7 +332,9 @@ export const createAiRequest = async (
     {
       userRequest,
       gameProjectJson,
+      gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey,
       payWithCredits,
       mode,
       gameId,
@@ -356,7 +362,9 @@ export const addMessageToAiRequest = async (
     userMessage,
     payWithCredits,
     gameProjectJson,
+    gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey,
   }: {|
     userId: string,
     aiRequestId: string,
@@ -364,7 +372,9 @@ export const addMessageToAiRequest = async (
     functionCallOutputs: Array<AiRequestFunctionCallOutput>,
     payWithCredits: boolean,
     gameProjectJson: string | null,
+    gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -377,7 +387,9 @@ export const addMessageToAiRequest = async (
       userMessage,
       payWithCredits,
       gameProjectJson,
+      gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey,
     },
     {
       params: {
@@ -446,8 +458,10 @@ export const createAiGeneratedEvent = async (
   getAuthorizationHeader: () => Promise<string>,
   {
     userId,
-    partialGameProjectJson,
+    gameProjectJson,
+    gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey,
     sceneName,
     eventsDescription,
     extensionNamesList,
@@ -457,8 +471,10 @@ export const createAiGeneratedEvent = async (
     relatedAiRequestId,
   }: {|
     userId: string,
-    partialGameProjectJson: string,
-    projectSpecificExtensionsSummaryJson: string,
+    gameProjectJson: string | null,
+    gameProjectJsonUserRelativeKey: string | null,
+    projectSpecificExtensionsSummaryJson: string | null,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     sceneName: string,
     eventsDescription: string,
     extensionNamesList: string,
@@ -472,8 +488,10 @@ export const createAiGeneratedEvent = async (
   const response = await axios.post(
     `${GDevelopGenerationApi.baseUrl}/ai-generated-event`,
     {
-      partialGameProjectJson,
+      gameProjectJson,
+      gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey,
       sceneName,
       eventsDescription,
       extensionNamesList,
@@ -564,6 +582,43 @@ export const createAssetSearch = async (
       objectType,
       twoDimensionalViewKind,
     },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+  return response.data;
+};
+
+export type AiUserContentPresignedUrlsResult = {
+  gameProjectJsonSignedUrl?: string,
+  gameProjectJsonUserRelativeKey?: string,
+  projectSpecificExtensionsSummaryJsonSignedUrl?: string,
+  projectSpecificExtensionsSummaryJsonUserRelativeKey?: string,
+};
+
+export const createAiUserContentPresignedUrls = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    gameProjectJsonHash,
+    projectSpecificExtensionsSummaryJsonHash,
+  }: {|
+    userId: string,
+    gameProjectJsonHash: string | null,
+    projectSpecificExtensionsSummaryJsonHash: string | null,
+  |}
+): Promise<AiUserContentPresignedUrlsResult> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopGenerationApi.baseUrl
+    }/ai-user-content/action/create-presigned-urls`,
+    { gameProjectJsonHash, projectSpecificExtensionsSummaryJsonHash },
     {
       params: {
         userId,

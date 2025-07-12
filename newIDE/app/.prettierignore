@@ -1,2 +1,3 @@
 # Prettier has troubles handling the generic typing with flow in this file.
 src/Utils/UseOptimisticState.js
+src/Utils/Sha256.js

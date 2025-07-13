@@ -27,10 +27,6 @@ import EditorsPane from './EditorsPane';
 import {
   getEditorTabsInitialState,
   openEditorTab,
-  closeEditorTab,
-  closeOtherEditorTabs,
-  closeAllEditorTabs,
-  changeCurrentTab,
   getEditors,
   getCurrentTabIndex,
   getCurrentTab,
@@ -47,7 +43,6 @@ import {
   type EditorKind,
   getEventsFunctionsExtensionEditor,
   notifyPreviewOrExportWillStart,
-  moveTabToTheRightOfHoveredTab,
   getCustomObjectEditor,
   hasEditorTabOpenedWithKey,
   getOpenedAskAiEditor,
@@ -773,25 +768,7 @@ const MainFrame = (props: Props) => {
       });
   };
 
-  const updateToolbar = React.useCallback(
-    (newEditorTabs = state.editorTabs) => {
-      const editorTab = getCurrentTab(newEditorTabs);
-      if (!editorTab || !editorTab.editorRef) {
-        setEditorToolbar(null);
-        return;
-      }
 
-      editorTab.editorRef.updateToolbar();
-    },
-    [state.editorTabs]
-  );
-
-  React.useEffect(
-    () => {
-      updateToolbar();
-    },
-    [updateToolbar]
-  );
 
   const _languageDidChange = () => {
     // A change in the language will automatically be applied
@@ -1289,12 +1266,6 @@ const MainFrame = (props: Props) => {
     },
     [openProjectManager]
   );
-
-  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
-    if (!editorsPaneRef.current || !isCurrentTab) return;
-
-    editorsPaneRef.current.setEditorToolbar(editorToolbar);
-  };
 
   const deleteLayout = (layout: gdLayout) => {
     const { currentProject } = state;
@@ -3249,61 +3220,7 @@ const MainFrame = (props: Props) => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
-  const _onChangeEditorTab = (value: number) => {
-    setState(state => ({
-      ...state,
-      editorTabs: changeCurrentTab(state.editorTabs, value),
-    })).then(state =>
-      _onEditorTabActivated(getCurrentTab(state.editorTabs), state)
-    );
-  };
 
-  const _onEditorTabActivated = (
-    editorTab: EditorTab,
-    newState: State = state
-  ) => {
-    updateToolbar(newState.editorTabs);
-    // Ensure the editors shown on the screen are updated. This is for
-    // example useful if global objects have been updated in another editor.
-    if (editorTab.editorRef) {
-      editorTab.editorRef.forceUpdateEditor();
-    }
-  };
-
-  const _onCloseEditorTab = (editorTab: EditorTab) => {
-    saveUiSettings(state.editorTabs);
-    setState(state => ({
-      ...state,
-      editorTabs: closeEditorTab(state.editorTabs, editorTab),
-    }));
-  };
-
-  const _onCloseOtherEditorTabs = (editorTab: EditorTab) => {
-    saveUiSettings(state.editorTabs);
-    setState(state => ({
-      ...state,
-      editorTabs: closeOtherEditorTabs(state.editorTabs, editorTab),
-    }));
-  };
-
-  const _onCloseAllEditorTabs = () => {
-    saveUiSettings(state.editorTabs);
-    setState(state => ({
-      ...state,
-      editorTabs: closeAllEditorTabs(state.editorTabs),
-    }));
-  };
-
-  const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
-    setState(state => ({
-      ...state,
-      editorTabs: moveTabToTheRightOfHoveredTab(
-        state.editorTabs,
-        fromIndex,
-        toHoveredIndex
-      ),
-    }));
-  };
 
   const endTutorial = React.useCallback(
     async (shouldCloseProject?: boolean) => {
@@ -3932,14 +3849,7 @@ const MainFrame = (props: Props) => {
           }
           gamesPlatformFrameTools={gamesPlatformFrameTools}
           toggleProjectManager={toggleProjectManager}
-          onChangeEditorTab={_onChangeEditorTab}
-          onCloseEditorTab={_onCloseEditorTab}
-          onCloseOtherEditorTabs={_onCloseOtherEditorTabs}
-          onCloseAllEditorTabs={_onCloseAllEditorTabs}
-          onEditorTabActivated={_onEditorTabActivated}
-          onDropEditorTab={onDropEditorTab}
-          updateToolbar={updateToolbar}
-          setEditorToolbar={setEditorToolbar}
+          setEditorTabs={setEditorTabs}
           saveProject={saveProject}
           openShareDialog={openShareDialog}
           launchDebuggerAndPreview={launchDebuggerAndPreview}

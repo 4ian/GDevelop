@@ -15,6 +15,12 @@ import {
   type EditorTabsState,
   type EditorTab,
   hasEditorTabOpenedWithKey,
+  changeCurrentTab,
+  closeEditorTab,
+  closeOtherEditorTabs,
+  closeAllEditorTabs,
+  moveTabToTheRightOfHoveredTab,
+  saveUiSettings,
 } from './EditorTabs/EditorTabsHandler';
 import type { PreviewState } from './PreviewState';
 import type { 
@@ -49,17 +55,6 @@ type Props = {|
   
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
-  onChangeEditorTab: (id: number) => void,
-  onCloseEditorTab: (editorTab: EditorTab) => void,
-  onCloseOtherEditorTabs: (editorTab: EditorTab) => void,
-  onCloseAllEditorTabs: () => void,
-  onEditorTabActivated: (editorTab: EditorTab) => void,
-  onDropEditorTab: (
-    draggedEditorTab: EditorTab,
-    targetEditorTab: EditorTab
-  ) => void,
-  updateToolbar: () => void,
-  setEditorToolbar: (toolbar: any, isCurrentTab: boolean) => void,
   saveProject: () => Promise<void>,
   openShareDialog: (tab?: string) => void,
   launchDebuggerAndPreview: () => void,
@@ -121,6 +116,7 @@ type Props = {|
   onExtensionInstalled: any,
   gamesList: GamesList,
   inAppTutorialOrchestratorRef: {| current: ?InAppTutorialOrchestrator |},
+  setEditorTabs: (editorTabs: EditorTabsState) => void,
 |};
 
 const EditorsPane = React.forwardRef<Props, ToolbarInterface>((props, ref) => {
@@ -139,14 +135,6 @@ const EditorsPane = React.forwardRef<Props, ToolbarInterface>((props, ref) => {
     canDoNetworkPreview,
     gamesPlatformFrameTools,
     toggleProjectManager,
-    onChangeEditorTab,
-    onCloseEditorTab,
-    onCloseOtherEditorTabs,
-    onCloseAllEditorTabs,
-    onEditorTabActivated,
-    onDropEditorTab,
-    updateToolbar,
-    setEditorToolbar,
     saveProject,
     openShareDialog,
     launchDebuggerAndPreview,
@@ -204,10 +192,73 @@ const EditorsPane = React.forwardRef<Props, ToolbarInterface>((props, ref) => {
     onExtensionInstalled,
     gamesList,
     inAppTutorialOrchestratorRef,
+    setEditorTabs,
   } = props;
   
+  const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const hasAskAiOpened = hasEditorTabOpenedWithKey(editorTabs, 'ask-ai');
+
+  // Internal editor toolbar management
+  const setEditorToolbar = React.useCallback((editorToolbar: any, isCurrentTab: boolean = true) => {
+    if (!toolbarRef.current || !isCurrentTab) return;
+
+    toolbarRef.current.setEditorToolbar(editorToolbar);
+  }, []);
+
+  const updateToolbar = React.useCallback(() => {
+    const editorTab = getCurrentTab(editorTabs);
+    if (!editorTab || !editorTab.editorRef) {
+      setEditorToolbar(null);
+      return;
+    }
+
+    editorTab.editorRef.updateToolbar();
+  }, [editorTabs, setEditorToolbar]);
+
+  React.useEffect(() => {
+    updateToolbar();
+  }, [updateToolbar]);
+
+  // Tab management functions
+  const _onEditorTabActivated = React.useCallback((editorTab: EditorTab) => {
+    updateToolbar();
+    // Ensure the editors shown on the screen are updated. This is for
+    // example useful if global objects have been updated in another editor.
+    if (editorTab.editorRef) {
+      editorTab.editorRef.forceUpdateEditor();
+    }
+  }, [updateToolbar]);
+
+  const _onChangeEditorTab = React.useCallback((value: number) => {
+    const newEditorTabs = changeCurrentTab(editorTabs, value);
+    setEditorTabs(newEditorTabs);
+    _onEditorTabActivated(getCurrentTab(newEditorTabs));
+  }, [editorTabs, setEditorTabs, _onEditorTabActivated]);
+
+  const _onCloseEditorTab = React.useCallback((editorTab: EditorTab) => {
+    saveUiSettings(editorTabs);
+    setEditorTabs(closeEditorTab(editorTabs, editorTab));
+  }, [editorTabs, setEditorTabs]);
+
+  const _onCloseOtherEditorTabs = React.useCallback((editorTab: EditorTab) => {
+    saveUiSettings(editorTabs);
+    setEditorTabs(closeOtherEditorTabs(editorTabs, editorTab));
+  }, [editorTabs, setEditorTabs]);
+
+  const _onCloseAllEditorTabs = React.useCallback(() => {
+    saveUiSettings(editorTabs);
+    setEditorTabs(closeAllEditorTabs(editorTabs));
+  }, [editorTabs, setEditorTabs]);
+
+  const onDropEditorTab = React.useCallback((fromIndex: number, toHoveredIndex: number) => {
+    setEditorTabs(moveTabToTheRightOfHoveredTab(editorTabs, fromIndex, toHoveredIndex));
+  }, [editorTabs, setEditorTabs]);
+
+  // Expose toolbar interface methods
+  React.useImperativeHandle(ref, () => ({
+    setEditorToolbar,
+  }), [setEditorToolbar]);
 
   return (
     <>
@@ -218,24 +269,24 @@ const EditorsPane = React.forwardRef<Props, ToolbarInterface>((props, ref) => {
           <DraggableEditorTabs
             hideLabels={false}
             editorTabs={editorTabs}
-            onClickTab={(id: number) => onChangeEditorTab(id)}
+            onClickTab={(id: number) => _onChangeEditorTab(id)}
             onCloseTab={(editorTab: EditorTab) => {
               // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
               onEditorTabClosing();
-              onCloseEditorTab(editorTab);
+              _onCloseEditorTab(editorTab);
             }}
             onCloseOtherTabs={(editorTab: EditorTab) => {
               // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
               onEditorTabClosing();
-              onCloseOtherEditorTabs(editorTab);
+              _onCloseOtherEditorTabs(editorTab);
             }}
             onCloseAll={() => {
               // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
               onEditorTabClosing();
-              onCloseAllEditorTabs();
+              _onCloseAllEditorTabs();
             }}
             onTabActivated={(editorTab: EditorTab) =>
-              onEditorTabActivated(editorTab)
+              _onEditorTabActivated(editorTab)
             }
             onDropTab={onDropEditorTab}
             onHoverTab={(
@@ -248,7 +299,7 @@ const EditorsPane = React.forwardRef<Props, ToolbarInterface>((props, ref) => {
         onOpenAskAi={openAskAi}
       />
       <Toolbar
-        ref={ref}
+        ref={toolbarRef}
         hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
           !['start page', 'debugger', 'ask-ai', null].includes(

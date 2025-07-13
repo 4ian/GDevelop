@@ -136,12 +136,26 @@ const getQuotaOrCreditsText = ({
     >
       <div>
         {isMobile ? (
-          <Trans>{quota.max - quota.current} free requests left</Trans>
+          increaseQuotaOffering === 'subscribe' ? (
+            <Trans>{quota.max - quota.current} trial requests left</Trans>
+          ) : (
+            <Trans>{quota.max - quota.current} free requests left</Trans>
+          )
+        ) : quota.period === '30days' ? (
+          increaseQuotaOffering === 'subscribe' ? (
+            <Trans>
+              {quota.max - quota.current} free trial requests left this month
+            </Trans>
+          ) : (
+            <Trans>
+              {quota.max - quota.current} of {quota.max} free requests left this
+              month
+            </Trans>
+          )
+        ) : quota.period === '1day' ? (
+          <Trans>{quota.max - quota.current} free requests left today</Trans>
         ) : (
-          <Trans>
-            {quota.max - quota.current} of {quota.max} free requests left this
-            month
-          </Trans>
+          <Trans>{quota.max - quota.current} free requests left</Trans>
         )}
       </div>
     </Tooltip>

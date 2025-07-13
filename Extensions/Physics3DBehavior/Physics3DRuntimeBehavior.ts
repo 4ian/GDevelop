@@ -1191,6 +1191,33 @@ namespace gdjs {
       this._needToRecreateBody = true;
     }
 
+    getShapeOffsetX(): float {
+      return this.shapeOffsetX;
+    }
+
+    setShapeOffsetX(shapeOffsetX: float): void {
+      this.shapeOffsetX = shapeOffsetX;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetY(): float {
+      return this.shapeOffsetY;
+    }
+
+    setShapeOffsetY(shapeOffsetY: float): void {
+      this.shapeOffsetY = shapeOffsetY;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetZ(): float {
+      return this.shapeOffsetZ;
+    }
+
+    setShapeOffsetZ(shapeOffsetZ: float): void {
+      this.shapeOffsetZ = shapeOffsetZ;
+      this._needToRecreateShape = true;
+    }
+
     getFriction(): float {
       return this.friction;
     }

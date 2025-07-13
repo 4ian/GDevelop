@@ -4,13 +4,7 @@ import * as React from 'react';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { ScreenTypeMeasurer } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { ColumnDropIndicator } from './DropIndicator';
-import {
-  type EditorTabsState,
-  type EditorTab,
-  getEditors,
-  getCurrentTabIndex,
-  getCurrentTab,
-} from './EditorTabsHandler';
+import { type EditorTab } from './EditorTabsHandler';
 import {
   ClosableTabs,
   ClosableTab,
@@ -26,7 +20,8 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
 
 type DraggableEditorTabsProps = {|
   hideLabels?: boolean,
-  editorTabs: EditorTabsState,
+  editors: Array<EditorTab>,
+  currentTab: EditorTab | null,
   onClickTab: (index: number) => void,
   onCloseTab: (editor: EditorTab) => void,
   onCloseOtherTabs: (editor: EditorTab) => void,
@@ -46,7 +41,8 @@ const homeTabApproximateWidth = 35;
 
 export function DraggableEditorTabs({
   hideLabels,
-  editorTabs,
+  editors,
+  currentTab,
   onClickTab,
   onCloseTab,
   onCloseOtherTabs,
@@ -60,8 +56,6 @@ export function DraggableEditorTabs({
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const { windowSize } = useResponsiveWindowSize();
-
-  const currentTab = getCurrentTab(editorTabs);
 
   React.useEffect(
     () => {
@@ -83,9 +77,8 @@ export function DraggableEditorTabs({
     <ClosableTabs
       hideLabels={hideLabels}
       renderTabs={({ containerWidth }) => {
-        const editors = getEditors(editorTabs);
         return editors.map((editorTab, id) => {
-          const isCurrentTab = getCurrentTabIndex(editorTabs) === id;
+          const isCurrentTab = currentTab === editorTab;
 
           // Maximum width of a tab is the width so that all tabs can fit it,
           // unless on a small screen, where we want to avoid compressing tabs too much

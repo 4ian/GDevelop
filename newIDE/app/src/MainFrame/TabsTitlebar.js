@@ -54,6 +54,8 @@ type TabsTitlebarProps = {|
   ) => React.Node,
   hasAskAiOpened: boolean,
   onOpenAskAi: () => void,
+  isLeftMost: boolean,
+  isRightMost: boolean,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -105,6 +107,8 @@ export default function TabsTitlebar({
   renderTabs,
   hasAskAiOpened,
   onOpenAskAi,
+  isLeftMost,
+  isRightMost,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -191,6 +195,7 @@ export default function TabsTitlebar({
   const shouldDisplayAskAi =
     preferences.values.showAiAskButtonInTitleBar &&
     !hasAskAiOpened &&
+    isRightMost &&
     !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
@@ -204,20 +209,22 @@ export default function TabsTitlebar({
       }}
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >
-      <TitleBarLeftSafeMargins />
-      <IconButton
-        size="small"
-        // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
-        id="main-toolbar-project-manager-button"
-        // The whole bar is draggable, so prevent the icon to be draggable,
-        // as it can affect the ability to open the menu.
-        className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-        style={styles.menuIcon}
-        color="default"
-        onClick={toggleProjectManager}
-      >
-        <MenuIcon />
-      </IconButton>
+      {isLeftMost && <TitleBarLeftSafeMargins />}
+      {isLeftMost && (
+        <IconButton
+          size="small"
+          // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.
+          id="main-toolbar-project-manager-button"
+          // The whole bar is draggable, so prevent the icon to be draggable,
+          // as it can affect the ability to open the menu.
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+          style={styles.menuIcon}
+          color="default"
+          onClick={toggleProjectManager}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
       {shouldDisplayAskAi ? (
         <div
@@ -231,7 +238,7 @@ export default function TabsTitlebar({
           />
         </div>
       ) : null}
-      <TitleBarRightSafeMargins />
+      {isRightMost && <TitleBarRightSafeMargins />}
       {tooltipData && (
         <TabsTitlebarTooltip
           anchorElement={tooltipData.element}

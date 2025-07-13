@@ -630,10 +630,7 @@ namespace gdjs {
 
     override onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
-      this.bodyUpdater.destroyBody();
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      this._destroyBody();
     }
 
     override onActivate() {
@@ -648,6 +645,24 @@ namespace gdjs {
     override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+    }
+
+    _destroyBody() {
+      this.bodyUpdater.destroyBody();
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
+    }
+
+    resetToDefaultBodyUpdater() {
+      this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
+    }
+
+    resetToDefaultCollisionChecker() {
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
     }
 
     createShape(): Jolt.Shape {

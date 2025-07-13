@@ -41,6 +41,7 @@ namespace gdjs {
     owner3D: gdjs.RuntimeObject3D;
     private _physics3DBehaviorName: string;
     private _physics3D: Physics3D | null = null;
+    private _isHookedToPhysicsStep = false;
     character: Jolt.CharacterVirtual | null = null;
     /**
      * sharedData is a reference to the shared data of the scene, that registers
@@ -169,10 +170,15 @@ namespace gdjs {
       if (this._physics3D) {
         return this._physics3D;
       }
+      if (!this.activated()) {
+        return null;
+      }
       const behavior = this.owner.getBehavior(
         this._physics3DBehaviorName
       ) as gdjs.Physics3DRuntimeBehavior;
-
+      if (!behavior.activated()) {
+        return null;
+      }
       const sharedData = behavior._sharedData;
       const jolt = sharedData.jolt;
       const extendedUpdateSettings = new Jolt.ExtendedUpdateSettings();
@@ -196,7 +202,10 @@ namespace gdjs {
         shapeFilter,
       };
       this.setStairHeightMax(this._stairHeightMax);
-      sharedData.registerHook(this);
+      if (!this._isHookedToPhysicsStep) {
+        sharedData.registerHook(this);
+        this._isHookedToPhysicsStep = true;
+      }
 
       behavior.bodyUpdater =
         new gdjs.PhysicsCharacter3DRuntimeBehavior.CharacterBodyUpdater(this);
@@ -390,36 +399,48 @@ namespace gdjs {
     }
 
     override onDeActivate() {
-      this.collisionChecker.clearContacts();
+      if (!this._physics3D) {
+        return;
+      }
+      this._destroyBody();
     }
 
-    override onActivate() {}
+    override onActivate() {
+      const behavior = this.owner.getBehavior(
+        this._physics3DBehaviorName
+      ) as gdjs.Physics3DRuntimeBehavior;
+      if (!behavior) {
+        return;
+      }
+      behavior._destroyBody();
+    }
 
     override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
-      this._destroyCharacter();
     }
 
     /**
      * Remove the character and its body from the physics engine.
      * This method is called when:
      * - The Physics3D behavior is deactivated
+     * - This behavior is deactivated
      * - The object is destroyed
-     *
-     * Only deactivating the character behavior won't destroy the character.
-     * Indeed, deactivated characters don't move as characters but still have collisions.
      */
-    _destroyCharacter() {
+    _destroyBody() {
       if (this.character) {
         if (this._canBePushed) {
           this.charactersManager.removeCharacter(this.character);
           Jolt.destroy(this.character.GetListener());
         }
+        this.collisionChecker.clearContacts();
         // The body is destroyed with the character.
         Jolt.destroy(this.character);
         this.character = null;
         if (this._physics3D) {
+          const { behavior } = this._physics3D;
+          behavior.resetToDefaultBodyUpdater();
+          behavior.resetToDefaultCollisionChecker();
           this._physics3D.behavior._body = null;
           const {
             extendedUpdateSettings,
@@ -1780,7 +1801,7 @@ namespace gdjs {
       }
 
       destroyBody() {
-        this.characterBehavior._destroyCharacter();
+        this.characterBehavior._destroyBody();
       }
     }
 

@@ -382,11 +382,9 @@ namespace gdjs {
     ): FloatPoint {
       const position = result || [0, 0];
       this._customObject.applyObjectTransformation(sceneX, sceneY, position);
-      return this._parent.convertInverseCoords(
-        position[0],
-        position[1],
-        position
-      );
+      return this._parent
+        .getLayer(this._customObject.getLayer())
+        .convertInverseCoords(position[0], position[1], 0, position);
     }
 
     /**

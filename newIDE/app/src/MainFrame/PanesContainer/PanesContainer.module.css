@@ -15,6 +15,11 @@
   flex-shrink: 0;
 }
 
+.rightPane {
+  flex-basis: 300px;
+  flex-shrink: 0;
+}
+
 .centerPane {
   flex: 1;
 }
@@ -24,6 +29,7 @@
 }
 
 .resizer {
+  z-index: 1; /* To allow the shadow to be visible. */
   width: 2px;
   cursor: ew-resize;
   background-color: #d9d9de;

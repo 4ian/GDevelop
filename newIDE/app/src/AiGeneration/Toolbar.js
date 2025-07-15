@@ -37,6 +37,9 @@ export const Toolbar = ({
           icon={<AddIcon />}
           label={<Trans>Start a new chat</Trans>}
           disabled={!canStartNewChat}
+          style={{
+            flexShrink: 0,
+          }}
         />
       </ToolbarGroup>
     </>

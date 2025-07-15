@@ -8,7 +8,10 @@ import Cross from './CustomSvgIcons/Cross';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
 import { LineStackLayout } from './Layout';
-import { TitleBarLeftSafeMargins } from './TitleBarSafeMargins';
+import {
+  TitleBarLeftSafeMargins,
+  TitleBarRightSafeMargins,
+} from './TitleBarSafeMargins';
 
 const appBarHeight = 38;
 
@@ -37,12 +40,24 @@ const styles = {
 
 type Props = {|
   icon?: React.Node,
+  drawerAnchor?: 'left' | 'right',
   title: React.Node,
   onClose: () => void,
   id: string,
 |};
 
 const DrawerTopBar = (props: Props) => {
+  const closeButton = (
+    <IconButton
+      onClick={props.onClose}
+      edge="end"
+      color="inherit"
+      size="small"
+      id={`${props.id}-close`}
+    >
+      <Cross />
+    </IconButton>
+  );
   return (
     <>
       <AppBar
@@ -53,7 +68,11 @@ const DrawerTopBar = (props: Props) => {
         elevation={0}
       >
         <Toolbar style={styles.toolbar}>
-          <TitleBarLeftSafeMargins />
+          {props.drawerAnchor !== 'right' ? (
+            <TitleBarLeftSafeMargins />
+          ) : (
+            closeButton
+          )}
           <LineStackLayout noMargin expand alignItems="center">
             {props.icon && (
               <IconButton
@@ -82,15 +101,11 @@ const DrawerTopBar = (props: Props) => {
               </Typography>
             )}
           </LineStackLayout>
-          <IconButton
-            onClick={props.onClose}
-            edge="end"
-            color="inherit"
-            size="small"
-            id={`${props.id}-close`}
-          >
-            <Cross />
-          </IconButton>
+          {props.drawerAnchor === 'right' ? (
+            <TitleBarRightSafeMargins />
+          ) : (
+            closeButton
+          )}
         </Toolbar>
       </AppBar>
     </>

@@ -77,6 +77,8 @@ export function DraggableEditorTabs({
     <ClosableTabs
       hideLabels={hideLabels}
       renderTabs={({ containerWidth }) => {
+        const hasHomeTab = editors.length > 0 && editors[0].key === 'start page';
+
         return editors.map((editorTab, id) => {
           const isCurrentTab = currentTab === editorTab;
 
@@ -87,7 +89,10 @@ export function DraggableEditorTabs({
           const maxWidth = Math.max(
             minimumMaxWidth,
             // The home tab is special because it's just an icon.
-            (containerWidth - homeTabApproximateWidth) / (editors.length - 1)
+            hasHomeTab
+              ? (containerWidth - homeTabApproximateWidth) /
+                  (editors.length - 1)
+              : containerWidth / editors.length
           );
 
           return (

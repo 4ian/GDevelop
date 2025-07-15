@@ -5,6 +5,7 @@ import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import {
+  TopLevelWindowSizeProvider,
   useResponsiveWindowSize,
   type WindowSizeType,
 } from './Responsive/ResponsiveWindowMeasurer';
@@ -480,4 +481,12 @@ const Dialog = ({
   );
 };
 
-export default Dialog;
+const DialogWithTopLevelWindowSize = (props: DialogProps) => {
+  return (
+    <TopLevelWindowSizeProvider>
+      <Dialog {...props} />
+    </TopLevelWindowSizeProvider>
+  );
+};
+
+export default DialogWithTopLevelWindowSize;

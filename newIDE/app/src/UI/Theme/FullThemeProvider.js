@@ -14,6 +14,31 @@ const jss = create({
   plugins: [...jssPreset().plugins, rtl()],
 });
 
+type MuiThemeProviderProps = {|
+  children: React.Node,
+|};
+
+export const MuiThemeOnlyProvider = ({ children }: MuiThemeProviderProps) => {
+  const { values } = React.useContext(PreferencesContext);
+  const { themeName, language } = values;
+  const { isMobile } = useResponsiveWindowSize();
+
+  const theme = React.useMemo(
+    () => {
+      const fullTheme = getFullTheme({
+        themeName,
+        language,
+        isMobile,
+      });
+
+      return fullTheme;
+    },
+    [themeName, language, isMobile]
+  );
+
+  return <ThemeProvider theme={theme.muiTheme}>{children}</ThemeProvider>;
+};
+
 type Props = {|
   children: React.Node,
   forcedThemeName?: string,

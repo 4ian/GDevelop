@@ -93,6 +93,7 @@ const styles = {
   },
   scrollableContainer: {
     display: 'flex',
+    position: 'relative',
     marginLeft: 0,
     marginRight: 0,
     flexDirection: 'column',

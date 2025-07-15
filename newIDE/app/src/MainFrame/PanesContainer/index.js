@@ -3,6 +3,8 @@
 import * as React from 'react';
 import classes from './PanesContainer.module.css';
 import classNames from 'classnames';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { useDebounce } from '../../Utils/UseDebounce';
 
 type Props = {|
   renderPane: ({
@@ -11,68 +13,127 @@ type Props = {|
     isRightMost: boolean,
   }) => React.Node,
   isLeftPaneOpened: boolean,
+  isRightPaneOpened: boolean,
 |};
 
 type DraggingState = {|
+  paneIdentifier: 'left' | 'right',
   startClientX: number,
   startWidth: number,
 |};
 
-const paneWidthMin = 100;
+const paneWidthMin = 300;
 
-export const PanesContainer = ({ renderPane, isLeftPaneOpened }: Props) => {
+export const PanesContainer = ({
+  renderPane,
+  isLeftPaneOpened,
+  isRightPaneOpened,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+  const debouncedForceUpdate = useDebounce(forceUpdate, 200);
+
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const resizerRef = React.useRef<HTMLDivElement | null>(null);
+  const leftResizerRef = React.useRef<HTMLDivElement | null>(null);
   const leftPaneRef = React.useRef<HTMLDivElement | null>(null);
+  const rightPaneRef = React.useRef<HTMLDivElement | null>(null);
+  const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
+
   const draggingStateRef = React.useRef<DraggingState | null>(null);
 
-  React.useEffect(() => {
-    const onPointerMove = (event: PointerEvent) => {
-      const leftPane = leftPaneRef.current;
-      const draggingState = draggingStateRef.current;
-      if (!draggingState || !containerRef.current || !leftPane) return;
+  React.useEffect(
+    () => {
+      const onPointerMove = (event: PointerEvent) => {
+        const leftPane = leftPaneRef.current;
+        const rightPane = rightPaneRef.current;
+        const draggingState = draggingStateRef.current;
+        if (!draggingState || !containerRef.current || !leftPane || !rightPane)
+          return;
 
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftWidth =
-        draggingState.startWidth + (event.clientX - draggingState.startClientX);
+        const containerRect = containerRef.current.getBoundingClientRect();
 
-      const min = paneWidthMin;
-      const max = containerRect.width - paneWidthMin;
-      const clampedWidth = Math.max(min, Math.min(max, newLeftWidth));
+        const newWidth =
+          draggingState.paneIdentifier === 'left'
+            ? draggingState.startWidth +
+              (event.clientX - draggingState.startClientX)
+            : draggingState.startWidth -
+              (event.clientX - draggingState.startClientX);
 
-      leftPane.style.flexBasis = `${clampedWidth}px`;
-    };
+        const min = paneWidthMin;
+        const max = containerRect.width - paneWidthMin;
+        const clampedWidth = Math.max(min, Math.min(max, newWidth));
 
-    const onPointerUp = () => {
-      draggingStateRef.current = null;
-      document.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('pointerup', onPointerUp);
-    };
+        if (draggingState.paneIdentifier === 'left') {
+          leftPane.style.flexBasis = `${clampedWidth}px`;
+        } else {
+          rightPane.style.flexBasis = `${clampedWidth}px`;
+        }
 
-    const onPointerDown = (event: PointerEvent) => {
-      event.preventDefault();
-      const leftPane = leftPaneRef.current;
-      if (!leftPane) return;
-
-      draggingStateRef.current = {
-        startClientX: event.clientX,
-        startWidth: leftPane.getBoundingClientRect().width,
+        // Only trigger a React re-render after the user has stopped dragging,
+        // to avoid re-rendering the panes too often.
+        debouncedForceUpdate();
       };
-      document.addEventListener('pointermove', onPointerMove);
-      document.addEventListener('pointerup', onPointerUp);
-    };
 
-    const resizer = resizerRef.current;
-    if (resizer) {
-      resizer.addEventListener('pointerdown', onPointerDown);
-    }
+      const onPointerUp = () => {
+        draggingStateRef.current = null;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+      };
 
-    return () => {
-      if (resizer) {
-        resizer.removeEventListener('pointerdown', onPointerDown);
+      const onLeftResizerPointerDown = (event: PointerEvent) => {
+        event.preventDefault();
+        const leftPane = leftPaneRef.current;
+        if (!leftPane) return;
+
+        draggingStateRef.current = {
+          paneIdentifier: 'left',
+          startClientX: event.clientX,
+          startWidth: leftPane.getBoundingClientRect().width,
+        };
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+      };
+
+      const onRightResizerPointerDown = (event: PointerEvent) => {
+        event.preventDefault();
+        const rightPane = rightPaneRef.current;
+        if (!rightPane) return;
+
+        draggingStateRef.current = {
+          paneIdentifier: 'right',
+          startClientX: event.clientX,
+          startWidth: rightPane.getBoundingClientRect().width,
+        };
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+      };
+
+      const leftResizer = leftResizerRef.current;
+      if (leftResizer) {
+        leftResizer.addEventListener('pointerdown', onLeftResizerPointerDown);
       }
-    };
-  }, []);
+
+      const rightResizer = rightResizerRef.current;
+      if (rightResizer) {
+        rightResizer.addEventListener('pointerdown', onRightResizerPointerDown);
+      }
+
+      return () => {
+        if (leftResizer) {
+          leftResizer.removeEventListener(
+            'pointerdown',
+            onLeftResizerPointerDown
+          );
+        }
+        if (rightResizer) {
+          rightResizer.removeEventListener(
+            'pointerdown',
+            onRightResizerPointerDown
+          );
+        }
+      };
+    },
+    [debouncedForceUpdate]
+  );
 
   return (
     <div
@@ -103,9 +164,9 @@ export const PanesContainer = ({ renderPane, isLeftPaneOpened }: Props) => {
         })}
         role="separator"
         aria-orientation="vertical"
-        aria-controls="pane-left pane-right"
+        aria-controls="pane-left pane-center"
         tabIndex={0}
-        ref={resizerRef}
+        ref={leftResizerRef}
       />
       <div
         className={classNames({
@@ -117,6 +178,32 @@ export const PanesContainer = ({ renderPane, isLeftPaneOpened }: Props) => {
         {renderPane({
           paneIdentifier: 'center',
           isLeftMost: !isLeftPaneOpened,
+          isRightMost: !isRightPaneOpened,
+        })}
+      </div>
+      <div
+        className={classNames({
+          [classes.resizer]: true,
+          [classes.hidden]: !isRightPaneOpened,
+        })}
+        role="separator"
+        aria-orientation="vertical"
+        aria-controls="pane-center pane-right"
+        tabIndex={0}
+        ref={rightResizerRef}
+      />
+      <div
+        ref={rightPaneRef}
+        className={classNames({
+          [classes.pane]: true,
+          [classes.rightPane]: true,
+          [classes.hidden]: !isRightPaneOpened,
+        })}
+        id="pane-right"
+      >
+        {renderPane({
+          paneIdentifier: 'right',
+          isLeftMost: false,
           isRightMost: true,
         })}
       </div>

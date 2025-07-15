@@ -2,12 +2,9 @@
 import * as React from 'react';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import {
-  homepageDesktopMenuBarWidth,
-  homepageMediumMenuBarWidth,
-  homepageMobileMenuHeight,
-} from '../HomePageMenuBar';
+import { homepageMobileMenuHeight } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
+import { type IframePosition } from './UseGamesPlatformFrame';
 
 export const GAMES_PLATFORM_IFRAME_ID = 'games-platform-frame';
 
@@ -33,12 +30,18 @@ type Props = {|
   loaded: boolean,
   visible: boolean,
   initialGameId: ?string,
+  iframePosition: ?IframePosition,
 |};
 
-const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
+const GamesPlatformFrame = ({
+  initialGameId,
+  loaded,
+  visible,
+  iframePosition,
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
-  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+  const { isMobile } = useResponsiveWindowSize();
 
   // Use a ref to store the initial game id, as we don't want to trigger a re-render
   // when the game id changes.
@@ -64,19 +67,14 @@ const GamesPlatformFrame = ({ initialGameId, loaded, visible }: Props) => {
     [loaded, initialGameId]
   );
 
-  const titleBarAndToolbarHeight = isMobile ? 0 : 37 + 40;
-  const containerTop = isMobile
-    ? 0 // Always top of the screen on small screens.
-    : `calc(${titleBarAndToolbarHeight}px + var(--safe-area-inset-top))`;
-  const containerBottom = isMobile ? homepageMobileMenuHeight : 0;
-  const containerLeft = isMobile
-    ? 0
-    : isMediumScreen
-    ? homepageMediumMenuBarWidth
-    : homepageDesktopMenuBarWidth;
-  const containerWidth = `calc(100% - ${containerLeft}px`;
-  const containerHeight = `calc(100% - ${titleBarAndToolbarHeight +
-    containerBottom}px - ${isMobile ? '0px' : 'var(--safe-area-inset-top)'})`;
+  const containerTop = iframePosition && !isMobile ? iframePosition.top : 0;
+  const containerLeft = iframePosition && !isMobile ? iframePosition.left : 0;
+  const containerWidth =
+    iframePosition && !isMobile ? iframePosition.width : '100%';
+  const containerHeight =
+    iframePosition && !isMobile
+      ? iframePosition.height
+      : `calc(100% - ${homepageMobileMenuHeight}px)`;
 
   // We wrap the iframe in a paper, as its content has a transparent background,
   // and we don't want what's behind the iframe to be visible.

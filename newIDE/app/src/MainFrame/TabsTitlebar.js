@@ -56,6 +56,7 @@ type TabsTitlebarProps = {|
   onOpenAskAi: () => void,
   isLeftMost: boolean,
   isRightMost: boolean,
+  displayMenuIcon: boolean,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -109,6 +110,7 @@ export default function TabsTitlebar({
   onOpenAskAi,
   isLeftMost,
   isRightMost,
+  displayMenuIcon,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -210,7 +212,7 @@ export default function TabsTitlebar({
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >
       {isLeftMost && <TitleBarLeftSafeMargins />}
-      {isLeftMost && (
+      {displayMenuIcon && (
         <IconButton
           size="small"
           // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.

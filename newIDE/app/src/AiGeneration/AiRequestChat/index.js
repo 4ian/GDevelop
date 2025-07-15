@@ -414,7 +414,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               <RobotIcon rotating size={40} />
             </Line>
             <Column noMargin alignItems="center">
-              <Text size="bold-title">
+              <Text size="bold-title" align="center">
                 {newAiRequestMode === 'agent' ? (
                   <Trans>What do you want to make?</Trans>
                 ) : (

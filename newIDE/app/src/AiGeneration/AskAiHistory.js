@@ -247,7 +247,7 @@ export const AskAiHistory = ({
   return (
     <Drawer
       open={open}
-      anchor="left"
+      anchor="right"
       onClose={onClose}
       PaperProps={{
         style: styles.drawer,
@@ -260,6 +260,7 @@ export const AskAiHistory = ({
       <ColumnStackLayout expand noMargin>
         <DrawerTopBar
           title={<Trans>AI Chat History</Trans>}
+          drawerAnchor="right"
           id="ai-chat-history-drawer-top-bar"
           onClose={onClose}
         />

@@ -140,6 +140,10 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
         editors: [],
         currentTab: 0,
       },
+      right: {
+        editors: [],
+        currentTab: 0,
+      },
     },
   };
 };
@@ -634,10 +638,14 @@ export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {
   return allEditors;
 };
 
-export const hasEditorsInLeftPane = (state: EditorTabsState): boolean => {
-  if (!state.panes.left) {
+export const hasEditorsInPane = (
+  state: EditorTabsState,
+  paneIdentifier: string
+): boolean => {
+  const pane = state.panes[paneIdentifier];
+  if (!pane) {
     return false;
   }
 
-  return state.panes.left.editors.length > 0;
+  return pane.editors.length > 0;
 };

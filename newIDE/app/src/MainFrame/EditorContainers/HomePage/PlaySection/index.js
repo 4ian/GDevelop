@@ -17,14 +17,34 @@ const PlaySection = ({ gamesPlatformFrameTools }: Props) => {
     iframeLoaded,
     iframeErrored,
     loadIframeOrRemoveTimeout,
+    updateIframePosition,
   } = gamesPlatformFrameTools;
+
+  // At each render, communicate the iframe position to the games frame.
+  const iframePositionRef = React.useRef<?HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    if (iframePositionRef.current) {
+      const rect = iframePositionRef.current.getBoundingClientRect();
+      updateIframePosition({
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+  });
 
   React.useEffect(() => {
     sendPlaySectionOpened();
   }, []);
 
   // Iframe will be displayed here if loaded.
-  return iframeLoaded ? null : (
+  return iframeLoaded ? (
+    <div
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+      ref={iframePositionRef}
+    />
+  ) : (
     <SectionContainer flexBody>
       <SectionRow expand>
         {iframeErrored ? (

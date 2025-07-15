@@ -42,7 +42,7 @@ import {
   getOpenedAskAiEditor,
   changeCurrentTab,
   getAllEditorTabs,
-  hasEditorsInLeftPane,
+  hasEditorsInPane,
 } from './EditorTabs/EditorTabsHandler';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -668,7 +668,7 @@ const MainFrame = (props: Props) => {
         extraEditorProps,
         key,
         dontFocusTab,
-        paneIdentifier: kind === 'ask-ai' ? 'left' : 'center',
+        paneIdentifier: kind === 'ask-ai' ? 'right' : 'center',
       };
     },
     [i18n, props.storageProviders]
@@ -3835,7 +3835,8 @@ const MainFrame = (props: Props) => {
     gamesList: gamesList,
   };
 
-  const isLeftPaneOpened = hasEditorsInLeftPane(state.editorTabs);
+  const isLeftPaneOpened = hasEditorsInPane(state.editorTabs, 'left');
+  const isRightPaneOpened = hasEditorsInPane(state.editorTabs, 'right');
 
   return (
     <div
@@ -3917,6 +3918,7 @@ const MainFrame = (props: Props) => {
       >
         <PanesContainer
           isLeftPaneOpened={isLeftPaneOpened}
+          isRightPaneOpened={isRightPaneOpened}
           renderPane={({ paneIdentifier, isLeftMost, isRightMost }) => (
             <EditorTabsPane
               {...editorTabsPaneProps}

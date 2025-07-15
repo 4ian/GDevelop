@@ -17,8 +17,6 @@ namespace gdjs {
   export type SimpleTileMapNetworkSyncDataType = {
     op: number;
     ai: string;
-    wid: number;
-    hei: number;
     // TODO: Support tilemap synchronization. Find an efficient way to send tiles changes.
   };
 
@@ -170,8 +168,6 @@ namespace gdjs {
         ...super.getNetworkSyncData(),
         op: this._opacity,
         ai: this._atlasImage,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
     }
 
@@ -185,18 +181,6 @@ namespace gdjs {
         networkSyncData.op !== this._opacity
       ) {
         this.setOpacity(networkSyncData.op);
-      }
-      if (
-        networkSyncData.wid !== undefined &&
-        networkSyncData.wid !== this.getWidth()
-      ) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (
-        networkSyncData.hei !== undefined &&
-        networkSyncData.hei !== this.getHeight()
-      ) {
-        this.setHeight(networkSyncData.hei);
       }
       if (networkSyncData.ai !== undefined) {
         // TODO: support changing the atlas texture

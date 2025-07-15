@@ -52,6 +52,10 @@ declare type BasicObjectNetworkSyncData = {
   y: number;
   /** The position of the instance on the Z axis. Defined only for 3D games */
   z?: number;
+  /** The width of the instance */
+  w: number;
+  /** The height of the instance */
+  h: number;
   /** Z order of the instance */
   zo: number;
   /** The angle of the instance. */

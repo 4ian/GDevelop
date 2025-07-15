@@ -18,8 +18,6 @@ namespace gdjs {
 
   export type VideoNetworkSyncDataType = {
     op: float;
-    wid: float;
-    hei: float;
     // We don't sync volume, as it's probably a user setting?
     pla: boolean;
     loop: boolean;
@@ -105,8 +103,6 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         op: this._opacity,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         pla: this.isPlayed(),
         loop: this.isLooped(),
         ct: this.getCurrentTime(),
@@ -119,12 +115,6 @@ namespace gdjs {
 
       if (this._opacity !== undefined && this._opacity && syncData.op) {
         this.setOpacity(syncData.op);
-      }
-      if (this.getWidth() !== undefined && this.getWidth() !== syncData.wid) {
-        this.setWidth(syncData.wid);
-      }
-      if (this.getHeight() !== undefined && this.getHeight() !== syncData.hei) {
-        this.setHeight(syncData.hei);
       }
       if (syncData.pla !== undefined && this.isPlayed() !== syncData.pla) {
         syncData.pla ? this.play() : this.pause();

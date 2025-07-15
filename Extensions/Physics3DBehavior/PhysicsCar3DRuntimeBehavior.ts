@@ -29,6 +29,7 @@ namespace gdjs {
     owner3D: gdjs.RuntimeObject3D;
     private _physics3DBehaviorName: string;
     private _physics3D: Physics3D | null = null;
+    private _isHookedToPhysicsStep = false;
     _vehicleController: Jolt.WheeledVehicleController | null = null;
     _stepListener: Jolt.VehicleConstraintStepListener | null = null;
     _vehicleCollisionTester: Jolt.VehicleCollisionTesterCastCylinder | null =
@@ -153,13 +154,19 @@ namespace gdjs {
       const behavior = this.owner.getBehavior(
         this._physics3DBehaviorName
       ) as gdjs.Physics3DRuntimeBehavior;
+      if (!behavior.activated()) {
+        return null;
+      }
 
       const sharedData = behavior._sharedData;
 
       this._physics3D = {
         behavior,
       };
-      sharedData.registerHook(this);
+      if (!this._isHookedToPhysicsStep) {
+        sharedData.registerHook(this);
+        this._isHookedToPhysicsStep = true;
+      }
 
       behavior.bodyUpdater =
         new gdjs.PhysicsCar3DRuntimeBehavior.VehicleBodyUpdater(
@@ -330,25 +337,33 @@ namespace gdjs {
     }
 
     override onDeActivate() {
-      if (this._stepListener) {
-        this._sharedData.physicsSystem.RemoveStepListener(this._stepListener);
+      if (!this._physics3D) {
+        return;
       }
+      this._destroyBody();
     }
 
     override onActivate() {
-      if (this._stepListener) {
-        this._sharedData.physicsSystem.AddStepListener(this._stepListener);
+      const behavior = this.owner.getBehavior(
+        this._physics3DBehaviorName
+      ) as gdjs.Physics3DRuntimeBehavior;
+      if (!behavior) {
+        return;
       }
+      behavior._destroyBody();
     }
 
     override onDestroy() {
+      this._destroyedDuringFrameLogic = true;
+      this._destroyBody();
+    }
+
+    _destroyBody() {
       if (!this._vehicleController) {
         return;
       }
-      this._destroyedDuringFrameLogic = true;
-      this.onDeActivate();
       if (this._stepListener) {
-        // stepListener is removed by onDeActivate
+        this._sharedData.physicsSystem.RemoveStepListener(this._stepListener);
         Jolt.destroy(this._stepListener);
         this._stepListener = null;
       }
@@ -360,6 +375,8 @@ namespace gdjs {
       // It is destroyed with the constraint.
       this._vehicleCollisionTester = null;
       if (this._physics3D) {
+        const { behavior } = this._physics3D;
+        behavior.resetToDefaultBodyUpdater();
         this._physics3D = null;
       }
     }
@@ -1110,7 +1127,7 @@ namespace gdjs {
       }
 
       destroyBody() {
-        this.carBehavior.onDestroy();
+        this.carBehavior._destroyBody();
         this.physicsBodyUpdater.destroyBody();
       }
     }

@@ -630,10 +630,7 @@ namespace gdjs {
 
     override onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
-      this.bodyUpdater.destroyBody();
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      this._destroyBody();
     }
 
     override onActivate() {
@@ -648,6 +645,24 @@ namespace gdjs {
     override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+    }
+
+    _destroyBody() {
+      this.bodyUpdater.destroyBody();
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
+    }
+
+    resetToDefaultBodyUpdater() {
+      this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
+    }
+
+    resetToDefaultCollisionChecker() {
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
     }
 
     createShape(): Jolt.Shape {
@@ -1174,6 +1189,33 @@ namespace gdjs {
       }
       this.massOverride = mass;
       this._needToRecreateBody = true;
+    }
+
+    getShapeOffsetX(): float {
+      return this.shapeOffsetX;
+    }
+
+    setShapeOffsetX(shapeOffsetX: float): void {
+      this.shapeOffsetX = shapeOffsetX;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetY(): float {
+      return this.shapeOffsetY;
+    }
+
+    setShapeOffsetY(shapeOffsetY: float): void {
+      this.shapeOffsetY = shapeOffsetY;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetZ(): float {
+      return this.shapeOffsetZ;
+    }
+
+    setShapeOffsetZ(shapeOffsetZ: float): void {
+      this.shapeOffsetZ = shapeOffsetZ;
+      this._needToRecreateShape = true;
     }
 
     getFriction(): float {

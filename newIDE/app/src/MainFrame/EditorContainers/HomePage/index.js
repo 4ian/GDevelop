@@ -40,8 +40,7 @@ import { type GamesList } from '../../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFrame';
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
-import { getProgramOpeningCount } from '../../../Utils/Analytics/LocalStats';
-import { isNativeMobileApp } from '../../../Utils/Platform';
+import PreferencesContext from '../../Preferences/PreferencesContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -271,15 +270,15 @@ export const HomePage = React.memo<Props>(
       );
 
       const { isMobile } = useResponsiveWindowSize();
+      const {
+        values: { showCreateSectionByDefault },
+      } = React.useContext(PreferencesContext);
       const tabRequestedAtOpening = React.useRef<HomeTab | null>(
         getRequestedTab(routeArguments)
       );
-      const programOpeningCount = getProgramOpeningCount();
       const initialTab = tabRequestedAtOpening.current
         ? tabRequestedAtOpening.current
-        : isNativeMobileApp()
-        ? 'play'
-        : programOpeningCount > 1
+        : showCreateSectionByDefault
         ? 'create'
         : 'learn';
 

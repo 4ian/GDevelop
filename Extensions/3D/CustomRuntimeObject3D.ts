@@ -77,6 +77,41 @@ namespace gdjs {
       }
     }
 
+    override getNetworkSyncData(): Object3DNetworkSyncData {
+      return {
+        ...super.getNetworkSyncData(),
+        z: this.getZ(),
+        w: this.getWidth(),
+        h: this.getHeight(),
+        d: this.getDepth(),
+        rx: this.getRotationX(),
+        ry: this.getRotationY(),
+        flipX: this.isFlippedX(),
+        flipY: this.isFlippedY(),
+        flipZ: this.isFlippedZ(),
+      };
+    }
+
+    override updateFromNetworkSyncData(
+      networkSyncData: Object3DNetworkSyncData
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData);
+      if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
+      if (networkSyncData.w !== undefined) this.setWidth(networkSyncData.w);
+      if (networkSyncData.h !== undefined) this.setHeight(networkSyncData.h);
+      if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
+      if (networkSyncData.rx !== undefined)
+        this.setRotationX(networkSyncData.rx);
+      if (networkSyncData.ry !== undefined)
+        this.setRotationY(networkSyncData.ry);
+      if (networkSyncData.flipX !== undefined)
+        this.flipX(networkSyncData.flipX);
+      if (networkSyncData.flipY !== undefined)
+        this.flipY(networkSyncData.flipY);
+      if (networkSyncData.flipZ !== undefined)
+        this.flipZ(networkSyncData.flipZ);
+    }
+
     /**
      * Set the object position on the Z axis.
      */

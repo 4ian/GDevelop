@@ -6,11 +6,21 @@ import classNames from 'classnames';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useDebounce } from '../../Utils/UseDebounce';
 
+const styles = {
+  pointerEventsNone: {
+    pointerEvents: 'none',
+  },
+  pointerEventsAll: {
+    pointerEvents: 'all',
+  },
+};
+
 type Props = {|
   renderPane: ({
     paneIdentifier: string,
     isLeftMost: boolean,
     isRightMost: boolean,
+    onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
   }) => React.Node,
   isLeftPaneOpened: boolean,
   isRightPaneOpened: boolean,
@@ -35,6 +45,7 @@ export const PanesContainer = ({
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const leftResizerRef = React.useRef<HTMLDivElement | null>(null);
   const leftPaneRef = React.useRef<HTMLDivElement | null>(null);
+  const centerPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -75,6 +86,8 @@ export const PanesContainer = ({
 
       const onPointerUp = () => {
         draggingStateRef.current = null;
+        forceUpdate();
+
         document.removeEventListener('pointermove', onPointerMove);
         document.removeEventListener('pointerup', onPointerUp);
       };
@@ -89,6 +102,8 @@ export const PanesContainer = ({
           startClientX: event.clientX,
           startWidth: leftPane.getBoundingClientRect().width,
         };
+        forceUpdate();
+
         document.addEventListener('pointermove', onPointerMove);
         document.addEventListener('pointerup', onPointerUp);
       };
@@ -103,6 +118,8 @@ export const PanesContainer = ({
           startClientX: event.clientX,
           startWidth: rightPane.getBoundingClientRect().width,
         };
+        forceUpdate();
+
         document.addEventListener('pointermove', onPointerMove);
         document.addEventListener('pointerup', onPointerUp);
       };
@@ -132,8 +149,24 @@ export const PanesContainer = ({
         }
       };
     },
-    [debouncedForceUpdate]
+    [debouncedForceUpdate, forceUpdate]
   );
+
+  const [
+    leftPanePointerEventsNone,
+    setLeftPanePointerEventsNone,
+  ] = React.useState(false);
+  const [
+    centerPanePointerEventsNone,
+    setCenterPanePointerEventsNone,
+  ] = React.useState(false);
+  const [
+    rightPanePointerEventsNone,
+    setRightPanePointerEventsNone,
+  ] = React.useState(false);
+
+  const isDragging = draggingStateRef.current !== null;
+  console.log('isDragging', isDragging);
 
   return (
     <div
@@ -141,6 +174,7 @@ export const PanesContainer = ({
       className={classes.container}
       role="group"
       aria-label="Resizable split pane"
+      style={isDragging ? styles.pointerEventsAll : undefined}
     >
       <div
         ref={leftPaneRef}
@@ -149,12 +183,18 @@ export const PanesContainer = ({
           [classes.leftPane]: true,
           [classes.hidden]: !isLeftPaneOpened,
         })}
+        style={
+          leftPanePointerEventsNone && !isDragging
+            ? styles.pointerEventsNone
+            : undefined
+        }
         id="pane-left"
       >
         {renderPane({
           paneIdentifier: 'left',
           isLeftMost: true,
           isRightMost: false,
+          onSetPointerEventsNone: setLeftPanePointerEventsNone,
         })}
       </div>
       <div
@@ -169,16 +209,23 @@ export const PanesContainer = ({
         ref={leftResizerRef}
       />
       <div
+        ref={centerPaneRef}
         className={classNames({
           [classes.pane]: true,
           [classes.centerPane]: true,
         })}
-        id="pane-right"
+        style={
+          centerPanePointerEventsNone && !isDragging
+            ? styles.pointerEventsNone
+            : undefined
+        }
+        id="pane-center"
       >
         {renderPane({
           paneIdentifier: 'center',
           isLeftMost: !isLeftPaneOpened,
           isRightMost: !isRightPaneOpened,
+          onSetPointerEventsNone: setCenterPanePointerEventsNone,
         })}
       </div>
       <div
@@ -199,12 +246,18 @@ export const PanesContainer = ({
           [classes.rightPane]: true,
           [classes.hidden]: !isRightPaneOpened,
         })}
+        style={
+          rightPanePointerEventsNone && !isDragging
+            ? styles.pointerEventsNone
+            : undefined
+        }
         id="pane-right"
       >
         {renderPane({
           paneIdentifier: 'right',
           isLeftMost: false,
           isRightMost: true,
+          onSetPointerEventsNone: setRightPanePointerEventsNone,
         })}
       </div>
     </div>

@@ -40,7 +40,7 @@ export type RenderEditorContainerProps = {|
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
-  hideTabsTitleBarAndEditorToolbar: (hidden: boolean) => void,
+  setGamesPlatformFrameShown: ({| shown: boolean, isMobile: boolean |}) => void,
 
   // Some optional extra props to pass to the rendered editor
   extraEditorProps: ?EditorContainerExtraProps,

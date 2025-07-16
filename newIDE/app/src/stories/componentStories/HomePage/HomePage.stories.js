@@ -94,7 +94,7 @@ const WrappedHomePage = ({
                 isActive={true}
                 projectItemName={null}
                 setToolbar={() => {}}
-                hideTabsTitleBarAndEditorToolbar={() => {}}
+                setGamesPlatformFrameShown={() => {}}
                 canOpen={true}
                 storageProviders={[CloudStorageProvider]}
                 onChooseProject={() => action('onChooseProject')()}
@@ -144,6 +144,7 @@ const WrappedHomePage = ({
                   iframeLoaded: false,
                   iframeVisible: false,
                   iframeErrored: false,
+                  updateIframePosition: () => {},
                   renderGamesPlatformFrame: () => null,
                 }}
                 onExtensionInstalled={action('onExtensionInstalled')}

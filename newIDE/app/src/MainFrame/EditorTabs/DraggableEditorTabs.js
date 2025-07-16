@@ -77,7 +77,8 @@ export function DraggableEditorTabs({
     <ClosableTabs
       hideLabels={hideLabels}
       renderTabs={({ containerWidth }) => {
-        const hasHomeTab = editors.length > 0 && editors[0].key === 'start page';
+        const hasHomeTab =
+          editors.length > 0 && editors[0].key === 'start page';
 
         return editors.map((editorTab, id) => {
           const isCurrentTab = currentTab === editorTab;

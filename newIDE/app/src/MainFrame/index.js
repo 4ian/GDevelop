@@ -343,10 +343,6 @@ const MainFrame = (props: Props) => {
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
-  const [
-    tabsTitleBarAndEditorToolbarHidden,
-    setTabsTitleBarAndEditorToolbarHidden,
-  ] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -3760,8 +3756,6 @@ const MainFrame = (props: Props) => {
     editorTabs: state.editorTabs,
     currentProject: currentProject,
     currentFileMetadata: currentFileMetadata,
-    tabsTitleBarAndEditorToolbarHidden: tabsTitleBarAndEditorToolbarHidden,
-    setTabsTitleBarAndEditorToolbarHidden: setTabsTitleBarAndEditorToolbarHidden,
     canSave: canSave,
     isSavingProject: isSavingProject,
     isSharingEnabled:
@@ -3919,12 +3913,18 @@ const MainFrame = (props: Props) => {
         <PanesContainer
           isLeftPaneOpened={isLeftPaneOpened}
           isRightPaneOpened={isRightPaneOpened}
-          renderPane={({ paneIdentifier, isLeftMost, isRightMost }) => (
+          renderPane={({
+            paneIdentifier,
+            isLeftMost,
+            isRightMost,
+            onSetPointerEventsNone,
+          }) => (
             <EditorTabsPane
               {...editorTabsPaneProps}
               paneIdentifier={paneIdentifier}
               isLeftMost={isLeftMost}
               isRightMost={isRightMost}
+              onSetPointerEventsNone={onSetPointerEventsNone}
             />
           )}
         />

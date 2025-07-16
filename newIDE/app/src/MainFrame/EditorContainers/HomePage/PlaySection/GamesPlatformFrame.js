@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { homepageMobileMenuHeight } from '../HomePageMenuBar';
 import Paper from '../../../../UI/Paper';
 import { type IframePosition } from './UseGamesPlatformFrame';
@@ -41,7 +40,6 @@ const GamesPlatformFrame = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
-  const { isMobile } = useResponsiveWindowSize();
 
   // Use a ref to store the initial game id, as we don't want to trigger a re-render
   // when the game id changes.
@@ -67,12 +65,15 @@ const GamesPlatformFrame = ({
     [loaded, initialGameId]
   );
 
-  const containerTop = iframePosition && !isMobile ? iframePosition.top : 0;
-  const containerLeft = iframePosition && !isMobile ? iframePosition.left : 0;
-  const containerWidth =
-    iframePosition && !isMobile ? iframePosition.width : '100%';
+  // In this component, do not use useResponsiveWindowSize. Instead, the position
+  // of the iframe must be read from iframePosition - which is set by the component
+  // responsible for making the iframe visible.
+  const containerTop =
+    iframePosition && !iframePosition.isMobile ? iframePosition.top : 0;
+  const containerLeft = iframePosition ? iframePosition.left : 0;
+  const containerWidth = iframePosition ? iframePosition.width : '100%';
   const containerHeight =
-    iframePosition && !isMobile
+    iframePosition && !iframePosition.isMobile
       ? iframePosition.height
       : `calc(100% - ${homepageMobileMenuHeight}px)`;
 

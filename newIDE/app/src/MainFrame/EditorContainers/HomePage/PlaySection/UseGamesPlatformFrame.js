@@ -164,6 +164,7 @@ const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
 };
 
 export type IframePosition = {|
+  isMobile: boolean,
   top: number,
   left: number,
   width: number,
@@ -193,7 +194,9 @@ const useGamesPlatformFrame = ({
   const [iframeVisible, setIframeVisible] = React.useState(false);
   const [iframeLoaded, setIframeLoaded] = React.useState(false);
   const [iframeErrored, setIframeErrored] = React.useState(false);
-  const [iframePosition, setIframePosition] = React.useState<?IframePosition>(null);
+  const [iframePosition, setIframePosition] = React.useState<?IframePosition>(
+    null
+  );
   const [lastGameId, setLastGameId] = React.useState<?string>(null);
   const timeoutToUnloadIframe = React.useRef<?TimeoutID>(null);
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
@@ -523,6 +526,7 @@ const useGamesPlatformFrame = ({
     (position: IframePosition) => {
       if (
         !iframePosition ||
+        iframePosition.isMobile !== position.isMobile ||
         iframePosition.top !== position.top ||
         iframePosition.left !== position.left ||
         iframePosition.width !== position.width ||

@@ -208,6 +208,7 @@ export default function TabsTitlebar({
         backgroundColor,
         // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
         visibility: hidden ? 'hidden' : 'visible',
+        pointerEvents: hidden ? undefined : 'all',
       }}
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >

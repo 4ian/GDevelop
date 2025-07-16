@@ -62,8 +62,6 @@ export type EditorTabsPaneCommonProps = {|
   editorTabs: EditorTabsState,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
-  tabsTitleBarAndEditorToolbarHidden: boolean,
-  setTabsTitleBarAndEditorToolbarHidden: (hidden: boolean) => void,
   canSave: boolean,
   isSavingProject: boolean,
   isSharingEnabled: boolean,
@@ -210,6 +208,7 @@ export type EditorTabsPaneCommonProps = {|
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
+  onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
   paneIdentifier: string,
   isLeftMost: boolean,
   isRightMost: boolean,
@@ -220,8 +219,6 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     editorTabs,
     currentProject,
     currentFileMetadata,
-    tabsTitleBarAndEditorToolbarHidden,
-    setTabsTitleBarAndEditorToolbarHidden,
     canSave,
     isSavingProject,
     isSharingEnabled,
@@ -288,6 +285,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onExtensionInstalled,
     gamesList,
     setEditorTabs,
+    onSetPointerEventsNone,
     paneIdentifier,
     isLeftMost,
     isRightMost,
@@ -297,6 +295,19 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const hasAskAiOpened = hasEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+
+  const [
+    tabsTitleBarAndEditorToolbarHidden,
+    setTabsTitleBarAndEditorToolbarHidden,
+  ] = React.useState(false);
+
+  const onSetGamesPlatformFrameShown = React.useCallback(
+    ({ shown, isMobile }: {| shown: boolean, isMobile: boolean |}) => {
+      onSetPointerEventsNone(shown);
+      setTabsTitleBarAndEditorToolbarHidden(shown && isMobile);
+    },
+    [onSetPointerEventsNone]
+  );
 
   // Internal editor toolbar management
   const setEditorToolbar = React.useCallback(
@@ -498,13 +509,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
             );
 
             return (
-              <TabContentContainer
-                key={editorTab.key}
-                active={isCurrentTab}
-                // Deactivate pointer events when the play tab is active, so the iframe
-                // can be interacted with.
-                removePointerEvents={gamesPlatformFrameTools.iframeVisible}
-              >
+              <TabContentContainer key={editorTab.key} active={isCurrentTab}>
                 <CommandsContextScopedProvider active={isCurrentTab}>
                   <ErrorBoundary
                     componentTitle={errorBoundaryProps.componentTitle}
@@ -519,7 +524,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       ref: editorRef => (editorTab.editorRef = editorRef),
                       setToolbar: editorToolbar =>
                         setEditorToolbar(editorToolbar, isCurrentTab),
-                      hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
+                      setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
                       projectItemName: editorTab.projectItemName,
                       setPreviewedLayout,
                       onOpenExternalEvents: openExternalEvents,

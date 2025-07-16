@@ -38,8 +38,7 @@
       "presentation": {
         "reveal": "silent"
       },
-      "isBackground": true,
-      "runOptions": { "instanceLimit": 1, "runOn": "folderOpen" }
+      "isBackground": true
     },
     {
       "type": "npm",

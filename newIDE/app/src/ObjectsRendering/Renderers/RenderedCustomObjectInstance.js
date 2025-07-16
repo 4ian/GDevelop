@@ -18,7 +18,7 @@ const gd: libGDevelop = global.gd;
 const getEventBasedObject = (
   project: gdProject,
   customObjectConfiguration: gdCustomObjectConfiguration
-): gdEventsBasedObject => {
+): gdEventsBasedObject | null => {
   const type = customObjectConfiguration.getType();
   return project.hasEventsBasedObject(type)
     ? project.getEventsBasedObject(type)
@@ -146,13 +146,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
     );
-
-    this.eventBasedObject = project.hasEventsBasedObject(
-      customObjectConfiguration.getType()
-    )
-      ? project.getEventsBasedObject(customObjectConfiguration.getType())
-      : null;
-
     const eventBasedObject = getEventBasedObject(
       project,
       customObjectConfiguration
@@ -466,8 +459,11 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       this._project,
       customObjectConfiguration
     );
+    if (!eventBasedObject) {
+      return;
+    }
     const variant = getVariant(eventBasedObject, customObjectConfiguration);
-    if (!eventBasedObject || !variant) {
+    if (!variant) {
       return;
     }
 

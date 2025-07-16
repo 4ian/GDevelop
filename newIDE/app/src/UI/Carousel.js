@@ -26,9 +26,9 @@ export const getCarouselColumnsFromWindowSize = (
 ) => {
   switch (windowSize) {
     case 'small':
-      return isLandscape ? 4 : 2;
+      return isLandscape ? 2 : 1;
     case 'medium':
-      return 3;
+      return 2;
     case 'large':
       return 4;
     case 'xlarge':
@@ -85,6 +85,10 @@ const styles = {
   },
 };
 
+const getAdditionalColumnToDisplayFromNumberOfColumns = (
+  numberOfColumns: number
+) => (numberOfColumns < 2 ? 0.6 : numberOfColumns < 4 ? 0.9 : 0.25);
+
 const Carousel = ({ items }: Props) => {
   const [canScrollLeft, setCanScrollLeft] = React.useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = React.useState<boolean>(false);
@@ -102,7 +106,11 @@ const Carousel = ({ items }: Props) => {
     // Show a bit more to see the next item partially.
     () =>
       initialColumnsToDisplay +
-      (items.length > initialColumnsToDisplay ? 0.25 : 0),
+      (items.length > initialColumnsToDisplay
+        ? getAdditionalColumnToDisplayFromNumberOfColumns(
+            initialColumnsToDisplay
+          )
+        : 0),
     [items.length, initialColumnsToDisplay]
   );
   const checkScrollability = React.useCallback(() => {

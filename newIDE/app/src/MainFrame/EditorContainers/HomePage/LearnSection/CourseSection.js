@@ -1,12 +1,14 @@
 // @flow
 
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import {
   type CourseChapter,
   type Course,
 } from '../../../../Utils/GDevelopServices/Asset';
+import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 import SectionContainer from '../SectionContainer';
 import VideoBasedCourseChapterView from '../../../../Course/VideoBasedCourseChapterView';
 import TextBasedCourseChapterView from '../../../../Course/TextBasedCourseChapterView';
@@ -32,8 +34,7 @@ import {
   AccordionBody,
   AccordionHeader,
 } from '../../../../UI/Accordion';
-import AnyQuestionDialog from '../AnyQuestionDialog';
-import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import CourseSectionHeader from './CourseSectionHeader';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -101,7 +102,20 @@ type Props = {|
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
   getCourseCompletion: () => CourseCompletion | null,
-  onBuyCourseChapterWithCredits: (CourseChapter, string) => Promise<void>,
+  onBuyCourseWithCredits: (
+    Course: Course,
+    password: string,
+    i18n: I18nType
+  ) => Promise<void>,
+  onBuyCourse: (
+    Course: Course,
+    password: string,
+    i18n: I18nType
+  ) => Promise<void>,
+  purchasingCourseListingData: ?CourseListingData,
+  setPurchasingCourseListingData: (CourseListingData | null) => void,
+  simulateAppStoreProduct?: boolean,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
 |};
 
 const CourseSection = ({
@@ -113,15 +127,17 @@ const CourseSection = ({
   isTaskCompleted,
   getChapterCompletion,
   getCourseCompletion,
-  onBuyCourseChapterWithCredits,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  simulateAppStoreProduct,
+  onOpenAskAi,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
-  const [isAnyQuestionDialogOpen, setIsAnyQuestionDialogOpen] = React.useState(
-    false
-  );
   const firstIncompleteChapterIdRef = React.useRef<string | null>(
     courseChapters.reduce((alreadyFoundIncompleteChapterId, chapter, index) => {
       if (alreadyFoundIncompleteChapterId)
@@ -275,6 +291,19 @@ const CourseSection = ({
     [scrollToChapter]
   );
 
+  const onClickUnlock = React.useCallback(
+    () => {
+      // Scroll to the top of the page, where the purchase button is.
+      if (scrollingContainerRef.current) {
+        scrollingContainerRef.current.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }
+    },
+    [scrollingContainerRef]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -283,11 +312,6 @@ const CourseSection = ({
             ref={scrollingContainerRef}
             applyTopSpacingAsMarginOnChildrenContainer
             backAction={onBack}
-            title={selectMessageByLocale(i18n, course.titleByLocale)}
-            subtitleText={selectMessageByLocale(
-              i18n,
-              course.shortDescriptionByLocale
-            )}
           >
             <div
               style={
@@ -295,6 +319,16 @@ const CourseSection = ({
               }
             >
               <Column noOverflowParent noMargin>
+                <CourseSectionHeader
+                  course={course}
+                  onBuyCourseWithCredits={onBuyCourseWithCredits}
+                  onBuyCourse={onBuyCourse}
+                  purchasingCourseListingData={purchasingCourseListingData}
+                  setPurchasingCourseListingData={
+                    setPurchasingCourseListingData
+                  }
+                  simulateAppStoreProduct={simulateAppStoreProduct}
+                />
                 {!values.hiddenAlertMessages[alertMessageKey] && subtitleHint && (
                   <Line>
                     <AlertMessage
@@ -310,6 +344,7 @@ const CourseSection = ({
                   chapter.videoUrl ? (
                     <VideoBasedCourseChapterView
                       chapterIndex={index}
+                      course={course}
                       courseChapter={chapter}
                       onOpenTemplate={() => {
                         onOpenTemplateFromCourseChapter(chapter);
@@ -318,7 +353,7 @@ const CourseSection = ({
                       isTaskCompleted={isTaskCompleted}
                       getChapterCompletion={getChapterCompletion}
                       key={chapter.id}
-                      onBuyWithCredits={onBuyCourseChapterWithCredits}
+                      onClickUnlock={onClickUnlock}
                       ref={_ref => {
                         if (_ref) {
                           chapterTitleRefs.current[index] = {
@@ -331,6 +366,7 @@ const CourseSection = ({
                   ) : (
                     <TextBasedCourseChapterView
                       chapterIndex={index}
+                      course={course}
                       // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
                       courseChapter={chapter}
                       onOpenTemplate={(templateId?: string) => {
@@ -340,7 +376,7 @@ const CourseSection = ({
                       isTaskCompleted={isTaskCompleted}
                       getChapterCompletion={getChapterCompletion}
                       key={chapter.id}
-                      onBuyWithCredits={onBuyCourseChapterWithCredits}
+                      onClickUnlock={onClickUnlock}
                       ref={_ref => {
                         if (_ref) {
                           chapterTitleRefs.current[index] = {
@@ -394,9 +430,9 @@ const CourseSection = ({
                           </Text>
                         </LineStackLayout>
                         <RaisedButton
-                          label={<Trans>Ask a question</Trans>}
                           primary
-                          onClick={() => setIsAnyQuestionDialogOpen(true)}
+                          label={<Trans>Ask the AI</Trans>}
+                          onClick={() => onOpenAskAi('chat')}
                         />
                       </ColumnStackLayout>
                     </Paper>
@@ -405,11 +441,6 @@ const CourseSection = ({
               )}
             </div>
           </SectionContainer>
-          {isAnyQuestionDialogOpen && (
-            <AnyQuestionDialog
-              onClose={() => setIsAnyQuestionDialogOpen(false)}
-            />
-          )}
           {isMobile && !isLandscape && (
             <div
               style={{

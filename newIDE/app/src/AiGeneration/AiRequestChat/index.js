@@ -80,6 +80,7 @@ type Props = {
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
   onStartNewChat: () => void,
+  initialMode?: 'chat' | 'agent',
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -248,6 +249,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onSendMessage,
       onSendFeedback,
       onStartNewChat,
+      initialMode,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -266,7 +268,17 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     // TODO: store the default mode in the user preferences?
     const [newAiRequestMode, setNewAiRequestMode] = React.useState<
       'chat' | 'agent'
-    >('agent');
+    >(initialMode || 'agent');
+
+    // Update the mode when initialMode changes
+    React.useEffect(
+      () => {
+        if (initialMode) {
+          setNewAiRequestMode(initialMode);
+        }
+      },
+      [initialMode]
+    );
     const aiRequestId: string = aiRequest ? aiRequest.id : '';
     const [
       userRequestTextPerAiRequestId,

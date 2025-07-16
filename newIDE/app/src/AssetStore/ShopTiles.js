@@ -12,9 +12,6 @@ import {
 } from '../Utils/GDevelopServices/Shop';
 import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import GridListTile from '@material-ui/core/GridListTile';
-import createStyles from '@material-ui/core/styles/createStyles';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -30,6 +27,7 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Skeleton from '@material-ui/lab/Skeleton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { CardWidget } from '../MainFrame/EditorContainers/HomePage/CardWidget';
 
 const styles = {
   priceTagContainer: {
@@ -81,11 +79,6 @@ const styles = {
     minWidth: 200,
     margin: 4,
   },
-  paper: {
-    margin: 4,
-    display: 'flex',
-    flexDirection: 'column',
-  },
   packTitle: {
     ...textEllipsisStyle,
     overflowWrap: 'break-word',
@@ -112,20 +105,6 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = ({ disabled }: {| disabled?: boolean |}) =>
-  makeStyles(theme =>
-    createStyles({
-      tile: !disabled
-        ? {
-            transition: 'transform 0.3s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.02)',
-            },
-          }
-        : {},
-    })
-  )();
-
 export const AssetCardTile = ({
   assetShortHeader,
   onOpenDetails,
@@ -141,30 +120,21 @@ export const AssetCardTile = ({
   hideShortDescription?: boolean,
   disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
-
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onOpenDetails();
-        }
-      }}
-      onClick={!disabled ? onOpenDetails : undefined}
-      style={{
-        margin,
-      }}
-    >
-      <AssetCard
-        id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
-        assetShortHeader={assetShortHeader}
-        size={size}
-        hideShortDescription={hideShortDescription}
-      />
+    <GridListTile style={{ margin }}>
+      <CardWidget
+        onClick={!disabled ? onOpenDetails : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <AssetCard
+          id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
+          assetShortHeader={assetShortHeader}
+          size={size}
+          hideShortDescription={hideShortDescription}
+        />
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -181,29 +151,27 @@ export const AssetFolderTile = ({
   style?: any,
   disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <Column noMargin id={`asset-folder-${tag.replace(/\s/g, '-')}`}>
-        <Line alignItems="center">
-          <FolderIcon style={styles.folderIcon} />
-          <Text noMargin style={styles.folderTitle} size="sub-title">
-            {capitalize(tag)}
-          </Text>
-        </Line>
-      </Column>
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column
+          noMargin
+          id={`asset-folder-${tag.replace(/\s/g, '-')}`}
+          noOverflowParent
+        >
+          <Line alignItems="center">
+            <FolderIcon style={styles.folderIcon} />
+            <Text noMargin style={styles.folderTitle} size="sub-title">
+              {capitalize(tag)}
+            </Text>
+          </Line>
+        </Column>
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -220,46 +188,46 @@ export const PublicAssetPackTile = ({
   style?: any,
   disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <div
-        id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
-        style={styles.paper}
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
       >
-        <CorsAwareImage
-          key={assetPack.name}
-          style={styles.previewImage}
-          src={assetPack.thumbnailUrl}
-          alt={`Preview image of asset pack ${assetPack.name}`}
-          loading="lazy"
-        />
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPack.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPack.assetsCount} Assets</Trans>
-              {assetPack.userFriendlyPrice
-                ? ' - ' + assetPack.userFriendlyPrice
-                : null}
-            </Text>
-          </Line>
+        <Column
+          noMargin
+          expand
+          id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
+          noOverflowParent
+        >
+          <CorsAwareImage
+            key={assetPack.name}
+            style={{
+              ...styles.previewImage,
+              background: gdevelopTheme.paper.backgroundColor.light,
+            }}
+            src={assetPack.thumbnailUrl}
+            alt={`Preview image of asset pack ${assetPack.name}`}
+            loading="lazy"
+          />
+          <Column>
+            <Line justifyContent="space-between" noMargin>
+              <Text style={styles.packTitle} size="body2">
+                {assetPack.name}
+              </Text>
+              <Text style={styles.packTitle} color="primary" size="body2">
+                <Trans>{assetPack.assetsCount} Assets</Trans>
+                {assetPack.userFriendlyPrice
+                  ? ' - ' + assetPack.userFriendlyPrice
+                  : null}
+              </Text>
+            </Line>
+          </Column>
         </Column>
-      </div>
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -278,61 +246,59 @@ export const PrivateAssetPackTile = ({
   owned: boolean,
   disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <div style={styles.paper}>
-        <div style={styles.thumbnailContainer}>
-          <CorsAwareImage
-            key={assetPackListingData.name}
-            style={styles.previewImage}
-            src={assetPackListingData.thumbnailUrls[0]}
-            alt={`Preview image of asset pack ${assetPackListingData.name}`}
-            loading="lazy"
-          />
-          {assetPackListingData.redeemConditions && !owned && (
-            <div style={styles.redeemableContainer}>
-              <img
-                src="res/small-diamond.svg"
-                style={styles.redeemableDiamondIcon}
-                alt="diamond"
-              />
-              <Text color="inherit" noMargin>
-                <Trans>Claim this pack</Trans>
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column noMargin expand noOverflowParent>
+          <div style={styles.thumbnailContainer}>
+            <CorsAwareImage
+              key={assetPackListingData.name}
+              style={{
+                ...styles.previewImage,
+                background: gdevelopTheme.paper.backgroundColor.light,
+              }}
+              src={assetPackListingData.thumbnailUrls[0]}
+              alt={`Preview image of asset pack ${assetPackListingData.name}`}
+              loading="lazy"
+            />
+            {assetPackListingData.redeemConditions && !owned && (
+              <div style={styles.redeemableContainer}>
+                <img
+                  src="res/small-diamond.svg"
+                  style={styles.redeemableDiamondIcon}
+                  alt="diamond"
+                />
+                <Text color="inherit" noMargin>
+                  <Trans>Claim this pack</Trans>
+                </Text>
+              </div>
+            )}
+          </div>
+          <div style={styles.priceTagContainer}>
+            <ProductPriceTag
+              productListingData={assetPackListingData}
+              withOverlay
+              owned={owned}
+            />
+          </div>
+          <Column>
+            <Line justifyContent="space-between" noMargin>
+              <Text style={styles.packTitle} size="body2">
+                {assetPackListingData.name}
               </Text>
-            </div>
-          )}
-        </div>
-        <div style={styles.priceTagContainer}>
-          <ProductPriceTag
-            productListingData={assetPackListingData}
-            withOverlay
-            owned={owned}
-          />
-        </div>
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPackListingData.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              {assetPackListingData.description}
-            </Text>
-          </Line>
+              <Text style={styles.packTitle} color="primary" size="body2">
+                {assetPackListingData.description}
+              </Text>
+            </Line>
+          </Column>
         </Column>
-      </div>
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -455,40 +421,34 @@ export const CategoryTile = ({
   style?: any,
   disabled?: boolean,
 |}) => {
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <div id={id} style={styles.paper}>
-        <CorsAwareImage
-          style={{
-            ...styles.previewImage,
-            background: gdevelopTheme.palette.primary,
-          }}
-          src={imageSource}
-          alt={imageAlt}
-          // No lazy loading because categories are the first seen tiles in the shop.
-        />
-        <Column>
-          <Line justifyContent="center" noMargin>
-            <Text style={styles.packTitle} size="sub-title">
-              {title}
-            </Text>
-          </Line>
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column noMargin alignItems="center" expand id={id} noOverflowParent>
+          <CorsAwareImage
+            style={{
+              ...styles.previewImage,
+              background: gdevelopTheme.palette.primary,
+            }}
+            src={imageSource}
+            alt={imageAlt}
+            // No lazy loading because categories are the first seen tiles in the shop.
+          />
+          <Column>
+            <Line justifyContent="center" noMargin>
+              <Text style={styles.packTitle} size="sub-title">
+                {title}
+              </Text>
+            </Line>
+          </Column>
         </Column>
-      </div>
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -508,47 +468,45 @@ export const PrivateGameTemplateTile = ({
   disabled?: boolean,
 |}) => {
   const { isMobile } = useResponsiveWindowSize();
-  const classesForGridListItem = useStylesForGridListItem({
-    disabled,
-  });
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <div style={styles.paper}>
-        <CorsAwareImage
-          key={privateGameTemplateListingData.name}
-          style={styles.previewImage}
-          src={privateGameTemplateListingData.thumbnailUrls[0]}
-          alt={`Preview image of game template ${
-            privateGameTemplateListingData.name
-          }`}
-          loading="lazy"
-        />
-        <div style={styles.priceTagContainer}>
-          <ProductPriceTag
-            productListingData={privateGameTemplateListingData}
-            withOverlay
-            owned={owned}
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column noMargin expand noOverflowParent>
+          <CorsAwareImage
+            key={privateGameTemplateListingData.name}
+            style={{
+              ...styles.previewImage,
+              background: gdevelopTheme.paper.backgroundColor.light,
+            }}
+            src={privateGameTemplateListingData.thumbnailUrls[0]}
+            alt={`Preview image of game template ${
+              privateGameTemplateListingData.name
+            }`}
+            loading="lazy"
           />
-        </div>
-        <Column>
-          {isMobile && <Spacer />}
-          <Line justifyContent="flex-start" noMargin>
-            <Text style={styles.packTitle} size="body2" noMargin={isMobile}>
-              {privateGameTemplateListingData.name}
-            </Text>
-          </Line>
+          <div style={styles.priceTagContainer}>
+            <ProductPriceTag
+              productListingData={privateGameTemplateListingData}
+              withOverlay
+              owned={owned}
+            />
+          </div>
+          <Column>
+            {isMobile && <Spacer />}
+            <Line justifyContent="flex-start" noMargin>
+              <Text style={styles.packTitle} size="body2" noMargin={isMobile}>
+                {privateGameTemplateListingData.name}
+              </Text>
+            </Line>
+          </Column>
         </Column>
-      </div>
+      </CardWidget>
     </GridListTile>
   );
 };
@@ -572,6 +530,7 @@ export const ExampleTile = ({
   disabled?: boolean,
 |}) => {
   const { isMobile } = useResponsiveWindowSize();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const thumbnailImgUrl = React.useMemo(
     () => {
       if (!exampleShortHeader) return '';
@@ -587,66 +546,68 @@ export const ExampleTile = ({
     [exampleShortHeader, useQuickCustomizationThumbnail]
   );
 
-  const classesForGridListItem = useStylesForGridListItem({ disabled });
   return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event) && !disabled) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={!disabled ? onSelect : undefined}
-    >
-      <div style={styles.paper}>
-        {exampleShortHeader ? (
-          thumbnailImgUrl ? (
-            <CorsAwareImage
-              key={exampleShortHeader.name}
-              style={styles.previewImage}
-              src={thumbnailImgUrl}
-              alt={`Preview image of example ${exampleShortHeader.name}`}
-              loading="lazy"
-            />
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column noMargin expand noOverflowParent>
+          {exampleShortHeader ? (
+            thumbnailImgUrl ? (
+              <CorsAwareImage
+                key={exampleShortHeader.name}
+                style={{
+                  ...styles.previewImage,
+                  background: gdevelopTheme.paper.backgroundColor.light,
+                }}
+                src={thumbnailImgUrl}
+                alt={`Preview image of example ${exampleShortHeader.name}`}
+                loading="lazy"
+              />
+            ) : (
+              <EmptyMessage
+                style={{
+                  ...styles.previewImage,
+                  display: 'flex',
+                }}
+              >
+                {exampleShortHeader.name}
+              </EmptyMessage>
+            )
           ) : (
-            <EmptyMessage
-              style={{
-                ...styles.previewImage,
-                display: 'flex',
-              }}
+            <Skeleton
+              variant="rect"
+              width="100%"
+              height="100%"
+              style={styles.dataLoadingSkeleton}
+            />
+          )}
+          <Column>
+            {isMobile && <Spacer />}
+            <Line
+              justifyContent={centerTitle ? 'center' : 'flex-start'}
+              noMargin
             >
-              {exampleShortHeader.name}
-            </EmptyMessage>
-          )
-        ) : (
-          <Skeleton
-            variant="rect"
-            width="100%"
-            height="100%"
-            style={styles.dataLoadingSkeleton}
-          />
-        )}
-        <Column>
-          {isMobile && <Spacer />}
-          <Line justifyContent={centerTitle ? 'center' : 'flex-start'} noMargin>
-            <Text
-              style={styles.packTitle}
-              size="body2"
-              hidden={!exampleShortHeader}
-              noMargin={isMobile}
-            >
-              {customTitle
-                ? customTitle
-                : exampleShortHeader
-                ? exampleShortHeader.name
-                : // Use some placeholder text to avoid layout shift while loading content.
-                  'Abcdef123'}
-            </Text>
-          </Line>
+              <Text
+                style={styles.packTitle}
+                size="body2"
+                hidden={!exampleShortHeader}
+                noMargin={isMobile}
+              >
+                {customTitle
+                  ? customTitle
+                  : exampleShortHeader
+                  ? exampleShortHeader.name
+                  : // Use some placeholder text to avoid layout shift while loading content.
+                    'Abcdef123'}
+              </Text>
+            </Line>
+          </Column>
         </Column>
-      </div>
+      </CardWidget>
     </GridListTile>
   );
 };

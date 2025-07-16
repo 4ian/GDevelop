@@ -4,6 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type CourseListingData,
   type Purchase,
 } from '../Utils/GDevelopServices/Shop';
 import {
@@ -283,7 +284,10 @@ export const getUserProductPurchaseUsageType = <
 };
 
 export const PurchaseProductButtons = <
-  T: PrivateAssetPackListingData | PrivateGameTemplateListingData
+  T:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData
+    | CourseListingData
 >({
   productListingData,
   selectedUsageType,
@@ -300,8 +304,8 @@ export const PurchaseProductButtons = <
   simulateAppStoreProduct?: boolean,
   i18n: I18nType,
   isAlreadyReceived: boolean,
-  onClickBuy: () => Promise<void>,
-  onClickBuyWithCredits: () => Promise<void>,
+  onClickBuy: () => void | Promise<void>,
+  onClickBuyWithCredits: () => void | Promise<void>,
 |}) => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =

@@ -40,7 +40,7 @@ import { Trans } from '@lingui/macro';
 import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
-import { CourseChapterStoreStateProvider } from '../Course/CourseChapterStoreContext';
+import { CourseStoreStateProvider } from '../Course/CourseStoreContext';
 import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
 
 type Props = {|
@@ -108,7 +108,7 @@ const Providers = ({
                                               <ExampleStoreStateProvider>
                                                 <PrivateGameTemplateStoreStateProvider>
                                                   <CreditsPackageStoreStateProvider>
-                                                    <CourseChapterStoreStateProvider>
+                                                    <CourseStoreStateProvider>
                                                       <ProductLicenseStoreStateProvider>
                                                         <MarketingPlansStoreStateProvider>
                                                           <ExtensionStoreStateProvider
@@ -134,7 +134,7 @@ const Providers = ({
                                                           </ExtensionStoreStateProvider>
                                                         </MarketingPlansStoreStateProvider>
                                                       </ProductLicenseStoreStateProvider>
-                                                    </CourseChapterStoreStateProvider>
+                                                    </CourseStoreStateProvider>
                                                   </CreditsPackageStoreStateProvider>
                                                 </PrivateGameTemplateStoreStateProvider>
                                               </ExampleStoreStateProvider>

@@ -46,10 +46,7 @@ import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformatio
 import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import ExampleStore from '../AssetStore/ExampleStore';
 import Text from '../UI/Text';
-import {
-  useResponsiveWindowSize,
-  type WindowSizeType,
-} from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper';
 import { useOnlineStatus } from '../Utils/OnlineStatus';
@@ -111,7 +108,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
-  onOpenAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -139,7 +136,6 @@ const NewProjectSetupDialog = ({
   preventBackHome,
 }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { windowSize, isLandscape } = useResponsiveWindowSize();
   const {
     authenticated,
     onOpenLoginDialog,
@@ -608,9 +604,9 @@ const NewProjectSetupDialog = ({
                     size="large"
                     color="success"
                     label={<Trans>Try the AI agent</Trans>}
-                    icon={<ArrowRight />}
+                    rightIcon={<ArrowRight />}
                     style={styles.tryAIAgentButton}
-                    onClick={onOpenAskAi}
+                    onClick={() => onOpenAskAi('agent')}
                   />
                 </ResponsiveLineStackLayout>
                 {isOnline ? (
@@ -628,7 +624,7 @@ const NewProjectSetupDialog = ({
                         );
                       }}
                       i18n={i18n}
-                      columnsCount={getItemsColumns(windowSize, isLandscape)}
+                      getColumnsFromWindowSize={getItemsColumns}
                       hideStartingPoints
                     />
                   </>

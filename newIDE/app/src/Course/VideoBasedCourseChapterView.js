@@ -5,7 +5,7 @@ import { Trans } from '@lingui/macro';
 
 import type {
   VideoBasedCourseChapter,
-  CourseChapter,
+  Course,
 } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -60,6 +60,7 @@ const styles = {
 
 type Props = {|
   chapterIndex: number,
+  course: Course,
   courseChapter: VideoBasedCourseChapter,
   onOpenTemplate: () => void,
   onCompleteTask: (
@@ -69,19 +70,20 @@ type Props = {|
   ) => void,
   isTaskCompleted: (chapterId: string, taskIndex: number) => boolean,
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
-  onBuyWithCredits: (CourseChapter, string) => Promise<void>,
+  onClickUnlock: () => void,
 |};
 
 const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,
+      course,
       courseChapter,
       onOpenTemplate,
       onCompleteTask,
       isTaskCompleted,
       getChapterCompletion,
-      onBuyWithCredits,
+      onClickUnlock,
     },
     ref
   ) => {
@@ -97,6 +99,7 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
     return (
       <ColumnStackLayout expand noMargin>
         <CourseChapterTitle
+          course={course}
           chapterIndex={chapterIndex}
           courseChapter={courseChapter}
           getChapterCompletion={getChapterCompletion}
@@ -104,8 +107,9 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
         />
         {courseChapter.isLocked ? (
           <LockedCourseChapterPreview
-            onBuyWithCredits={onBuyWithCredits}
+            course={course}
             courseChapter={courseChapter}
+            onClickUnlock={onClickUnlock}
           />
         ) : (
           <div style={styles.videoAndMaterialsContainer}>

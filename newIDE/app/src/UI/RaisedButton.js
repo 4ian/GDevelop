@@ -17,6 +17,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
   keyboardFocused?: boolean,
   fullWidth?: boolean,
   icon?: React.Node,
+  rightIcon?: React.Node,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -44,6 +45,7 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
       color,
       size,
       icon,
+      rightIcon,
       disabled,
       keyboardFocused,
       style,
@@ -88,6 +90,8 @@ const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
         {!!icon && !!label && <Spacer />}
         {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
         {label ? <span>{label}</span> : null}
+        {!!rightIcon && !!label && <Spacer />}
+        {rightIcon}
       </Button>
     );
   }

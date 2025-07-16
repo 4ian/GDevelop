@@ -132,7 +132,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: () => void,

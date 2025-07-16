@@ -46,7 +46,7 @@ export type MainMenuCallbacks = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 

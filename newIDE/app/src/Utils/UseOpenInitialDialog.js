@@ -8,7 +8,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
   openProfileDialog: () => void,
-  openAskAi: (mode?: 'agent' | 'chat') => void,
+  openAskAi: (mode: 'agent' | 'chat') => void,
 |};
 
 /**

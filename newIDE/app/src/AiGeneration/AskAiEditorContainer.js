@@ -499,7 +499,7 @@ export type AskAiEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-  startNewChat: (mode?: 'chat' | 'agent') => void,
+  startNewChat: (mode: 'chat' | 'agent') => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -573,7 +573,7 @@ export const AskAiEditor = React.memo<Props>(
 
       const canStartNewChat = !!selectedAiRequestId;
       const onStartNewChat = React.useCallback(
-        (mode?: 'chat' | 'agent') => {
+        (mode: 'chat' | 'agent') => {
           setSelectedAiRequestId(null);
           if (mode) {
             setNewChatMode(mode);

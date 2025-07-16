@@ -53,7 +53,7 @@ type TabsTitlebarProps = {|
     onEditorTabClosing: () => void
   ) => React.Node,
   hasAskAiOpened: boolean,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {

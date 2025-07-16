@@ -62,7 +62,7 @@ type Props = {|
   ) => Promise<void>,
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData

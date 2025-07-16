@@ -1233,7 +1233,7 @@ const MainFrame = (props: Props) => {
   });
 
   const openAskAi = React.useCallback(
-    (mode?: 'chat' | 'agent') => {
+    (mode: 'chat' | 'agent') => {
       setState(state => {
         const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
         if (askAiEditor) {

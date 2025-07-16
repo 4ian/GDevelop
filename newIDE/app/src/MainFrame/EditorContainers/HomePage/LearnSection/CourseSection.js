@@ -115,7 +115,7 @@ type Props = {|
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
   simulateAppStoreProduct?: boolean,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
 |};
 
 const CourseSection = ({

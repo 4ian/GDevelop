@@ -35,9 +35,7 @@ module.exports = {
       .addStrExpression(
         'CurrentLobbyID',
         _('Current lobby ID'),
-        _(
-          "Returns current lobby ID."
-        ),
+        _('Returns current lobby ID.'),
         _('Lobbies'),
         'JsPlatform/Extensions/multiplayer.svg'
       )

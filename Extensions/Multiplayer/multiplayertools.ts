@@ -1798,12 +1798,7 @@ namespace gdjs {
       }
     };
 
-    export const authenticateAndQuickJoinWithLobbyID = async (
-      runtimeScene: gdjs.RuntimeScene,
-      lobbyID: string,
-      displayLoader: boolean,
-      openLobbiesPageIfFailure: boolean
-    ) => {
+    const isQuickJoiningTooFast = () => {
       const requestDoneAt = Date.now();
       if (_lastQuickJoinRequestDoneAt) {
         if (requestDoneAt - _lastQuickJoinRequestDoneAt < 500) {
@@ -1811,12 +1806,18 @@ namespace gdjs {
           logger.warn(
             'Last request to quick join a lobby was sent too little time ago. Ignoring this one.'
           );
-          return;
+          return true;
         }
       } else {
         _lastQuickJoinRequestDoneAt = requestDoneAt;
       }
 
+      return false;
+    };
+
+    const isNotCorrectlyAuthenticatedForQuickJoin = async (
+      runtimeScene: RuntimeScene
+    ) => {
       const playerId = gdjs.playerAuthentication.getUserId();
       const playerToken = gdjs.playerAuthentication.getUserToken();
       if (!playerId || !playerToken) {
@@ -1826,15 +1827,24 @@ namespace gdjs {
             .promise;
         _isWaitingForLogin = false;
 
-        if (status === 'logged') {
-          await quickJoinWithLobbyID(
-            runtimeScene,
-            lobbyID,
-            displayLoader,
-            openLobbiesPageIfFailure
-          );
+        if (status !== 'logged') {
+          return true;
         }
+      }
 
+      return false;
+    };
+
+    export const authenticateAndQuickJoinWithLobbyID = async (
+      runtimeScene: gdjs.RuntimeScene,
+      lobbyID: string,
+      displayLoader: boolean,
+      openLobbiesPageIfFailure: boolean
+    ) => {
+      if (isQuickJoiningTooFast()) {
+        return;
+      }
+      if (await isNotCorrectlyAuthenticatedForQuickJoin(runtimeScene)) {
         return;
       }
       await quickJoinWithLobbyID(
@@ -1850,36 +1860,10 @@ namespace gdjs {
       displayLoader: boolean,
       openLobbiesPageIfFailure: boolean
     ) => {
-      const requestDoneAt = Date.now();
-      if (_lastQuickJoinRequestDoneAt) {
-        if (requestDoneAt - _lastQuickJoinRequestDoneAt < 500) {
-          _lastQuickJoinRequestDoneAt = requestDoneAt;
-          logger.warn(
-            'Last request to quick join a lobby was sent too little time ago. Ignoring this one.'
-          );
-          return;
-        }
-      } else {
-        _lastQuickJoinRequestDoneAt = requestDoneAt;
+      if (isQuickJoiningTooFast()) {
+        return;
       }
-
-      const playerId = gdjs.playerAuthentication.getUserId();
-      const playerToken = gdjs.playerAuthentication.getUserToken();
-      if (!playerId || !playerToken) {
-        _isWaitingForLogin = true;
-        const { status } =
-          await gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene)
-            .promise;
-        _isWaitingForLogin = false;
-
-        if (status === 'logged') {
-          await quickJoinLobby(
-            runtimeScene,
-            displayLoader,
-            openLobbiesPageIfFailure
-          );
-        }
-
+      if (await isNotCorrectlyAuthenticatedForQuickJoin(runtimeScene)) {
         return;
       }
       await quickJoinLobby(

@@ -635,11 +635,6 @@ namespace gdjs {
 
     override onActivate() {
       this._sharedData.addToBehaviorsList(this);
-
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
-      this.updateBodyFromObject();
     }
 
     override onDestroy() {

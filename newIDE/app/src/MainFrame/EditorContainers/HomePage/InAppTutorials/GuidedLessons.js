@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import {
   useResponsiveWindowSize,
@@ -44,6 +43,8 @@ import TopDownRPGMovement from './Icons/TopDownRPGMovement';
 import FireABullet from './Icons/FireAbullet';
 import CoopPlatformer from './Icons/CoopPlatformer';
 import TilemapPlatformer from './Icons/TilemapPlatformer';
+import Carousel from '../../../../UI/Carousel';
+import { GridList } from '@material-ui/core';
 
 const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
@@ -63,6 +64,7 @@ const getColumnsFromWindowSize = (
   }
 };
 
+const NUMBER_OF_SCROLLS = 2; // Number of times the carousel can be scrolled to see all items.
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
@@ -171,20 +173,17 @@ export const allInAppTutorialsCards = [
   },
 ];
 
-const NUMBER_OF_ROWS_TO_SHOW_ON_MOBILE_LIMITED_VIEW = 2;
-const NUMBER_OF_ROWS_TO_SHOW_ON_DESKTOP_LIMITED_VIEW = 1;
-
 type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   /** To use to restrict the lessons that are displayed. */
   lessonsIds?: ?Array<string>,
-  showLimitedItems?: boolean,
+  displayAsCarousel?: boolean,
 |};
 
 const GuidedLessons = ({
   selectInAppTutorial,
   lessonsIds,
-  showLimitedItems,
+  displayAsCarousel,
 }: Props) => {
   const isOnline = useOnlineStatus();
   const {
@@ -195,7 +194,7 @@ const GuidedLessons = ({
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { isMobile, windowSize, isLandscape } = useResponsiveWindowSize();
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
 
   const getTutorialPartProgress = ({
     tutorialId,
@@ -233,25 +232,18 @@ const GuidedLessons = ({
       if (lessonsIds) {
         displayedGuidedLessonsIds = lessonsIds;
       }
-      if (showLimitedItems) {
-        if (isMobile && !isLandscape) {
-          displayedGuidedLessonsIds = displayedGuidedLessonsIds.slice(
-            0,
-            NUMBER_OF_ROWS_TO_SHOW_ON_MOBILE_LIMITED_VIEW * numberOfColumns
-          );
-        } else {
-          displayedGuidedLessonsIds = displayedGuidedLessonsIds.slice(
-            0,
-            NUMBER_OF_ROWS_TO_SHOW_ON_DESKTOP_LIMITED_VIEW * numberOfColumns
-          );
-        }
+      if (displayAsCarousel) {
+        displayedGuidedLessonsIds = displayedGuidedLessonsIds.slice(
+          0,
+          numberOfColumns * (NUMBER_OF_SCROLLS + 1)
+        );
       }
 
       return allInAppTutorialsCards.filter(item =>
         displayedGuidedLessonsIds.includes(item.id)
       );
     },
-    [lessonsIds, showLimitedItems, numberOfColumns, isMobile, isLandscape]
+    [lessonsIds, displayAsCarousel, numberOfColumns]
   );
 
   return (
@@ -278,30 +270,58 @@ const GuidedLessons = ({
                 <ColoredLinearProgress value={lessonsProgress} />
               </LineStackLayout>
             </Column>
-            <GridList
-              cols={getColumnsFromWindowSize(windowSize, isLandscape)}
-              style={styles.grid}
-              cellHeight="auto"
-              spacing={ITEMS_SPACING * 2}
-            >
-              {guidedLessonCards.map(item => (
-                <GridListTile key={item.id}>
-                  <InAppTutorialPhaseCard
-                    title={item.title}
-                    description={item.description}
-                    shortDescription={item.shortDescription}
-                    durationInMinutes={item.durationInMinutes}
-                    renderImage={item.renderImage}
-                    progress={getTutorialPartProgress({ tutorialId: item.id })}
-                    onClick={() => selectInAppTutorial(item.id)}
-                    // Phase is disabled if there's a running tutorial or if offline,
-                    // because we cannot fetch the tutorial.
-                    disabled={!!currentlyRunningInAppTutorial || !isOnline}
-                    loading={!inAppTutorialShortHeaders}
-                  />
-                </GridListTile>
-              ))}
-            </GridList>
+            {displayAsCarousel ? (
+              <Carousel
+                items={guidedLessonCards.map(item => ({
+                  renderItem: () => (
+                    <GridListTile key={item.id}>
+                      <InAppTutorialPhaseCard
+                        title={item.title}
+                        description={item.description}
+                        shortDescription={item.shortDescription}
+                        durationInMinutes={item.durationInMinutes}
+                        renderImage={item.renderImage}
+                        progress={getTutorialPartProgress({
+                          tutorialId: item.id,
+                        })}
+                        onClick={() => selectInAppTutorial(item.id)}
+                        // Phase is disabled if there's a running tutorial or if offline,
+                        // because we cannot fetch the tutorial.
+                        disabled={!!currentlyRunningInAppTutorial || !isOnline}
+                        loading={!inAppTutorialShortHeaders}
+                      />
+                    </GridListTile>
+                  ),
+                }))}
+              />
+            ) : (
+              <GridList
+                cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={ITEMS_SPACING * 2}
+              >
+                {guidedLessonCards.map(item => (
+                  <GridListTile key={item.id}>
+                    <InAppTutorialPhaseCard
+                      title={item.title}
+                      description={item.description}
+                      shortDescription={item.shortDescription}
+                      durationInMinutes={item.durationInMinutes}
+                      renderImage={item.renderImage}
+                      progress={getTutorialPartProgress({
+                        tutorialId: item.id,
+                      })}
+                      onClick={() => selectInAppTutorial(item.id)}
+                      // Phase is disabled if there's a running tutorial or if offline,
+                      // because we cannot fetch the tutorial.
+                      disabled={!!currentlyRunningInAppTutorial || !isOnline}
+                      loading={!inAppTutorialShortHeaders}
+                    />
+                  </GridListTile>
+                ))}
+              </GridList>
+            )}
           </ColumnStackLayout>
         )}
       </div>

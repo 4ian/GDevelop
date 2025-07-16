@@ -203,7 +203,7 @@ const ExampleStore = ({
         gdevelopTheme,
         privateGameTemplatesPeriodicity: 1,
         showOwnedGameTemplatesFirst: true,
-      }).allGridItems;
+      });
     },
     [
       receivedGameTemplates,

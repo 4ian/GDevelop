@@ -37,7 +37,9 @@ import { getColumnsFromWindowSize, type LearnCategory } from './Utils';
 import ExampleStore from '../../../../AssetStore/ExampleStore';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import Carousel from '../../../../UI/Carousel';
 
+const NUMBER_OF_SCROLLS = 2; // Number of times the carousel can be scrolled to see all items.
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
@@ -108,8 +110,10 @@ const MainPage = ({
   const displayedCourses = React.useMemo(
     () => {
       if (!courses) return null;
-      const numberOfColumns = getColumnsFromWindowSize(windowSize, isLandscape);
-      return courses.slice(0, numberOfColumns);
+      const numberOfColumnsToScroll =
+        getColumnsFromWindowSize(windowSize, isLandscape) *
+        (NUMBER_OF_SCROLLS + 1);
+      return courses.slice(0, numberOfColumnsToScroll);
     },
     [courses, windowSize, isLandscape]
   );
@@ -191,41 +195,42 @@ const MainPage = ({
         >
           <SectionRow>
             <Line>
-              <GridList
-                cols={numberOfColumns}
-                style={styles.grid}
-                cellHeight="auto"
-                spacing={ITEMS_SPACING * 2}
-              >
-                {displayedCourses && listedCourses
-                  ? displayedCourses.map(course => {
-                      const completion = getCourseCompletion(course.id);
-                      const courseListingData = listedCourses.find(
-                        listedCourse => listedCourse.id === course.id
-                      );
-                      return (
-                        <GridListTile key={course.id}>
-                          <CourseCard
-                            course={course}
-                            courseListingData={courseListingData}
-                            completion={completion}
-                            onClick={() => {
-                              onSelectCourse(course.id);
-                            }}
-                          />
-                        </GridListTile>
-                      );
-                    })
-                  : new Array(numberOfColumns).fill(0).map((_, index) => (
-                      <GridListTile key={`skeleton-course-${index}`}>
-                        <CourseCard
-                          course={null}
-                          courseListingData={null}
-                          completion={null}
-                        />
-                      </GridListTile>
-                    ))}
-              </GridList>
+              <Carousel
+                items={
+                  displayedCourses && listedCourses
+                    ? displayedCourses.map(course => {
+                        const completion = getCourseCompletion(course.id);
+                        const courseListingData = listedCourses.find(
+                          listedCourse => listedCourse.id === course.id
+                        );
+                        return {
+                          renderItem: () => (
+                            <GridListTile key={course.id}>
+                              <CourseCard
+                                course={course}
+                                courseListingData={courseListingData}
+                                completion={completion}
+                                onClick={() => {
+                                  onSelectCourse(course.id);
+                                }}
+                              />
+                            </GridListTile>
+                          ),
+                        };
+                      })
+                    : new Array(6).fill(0).map((_, index) => ({
+                        renderItem: () => (
+                          <GridListTile key={`skeleton-course-${index}`}>
+                            <CourseCard
+                              course={null}
+                              courseListingData={null}
+                              completion={null}
+                            />
+                          </GridListTile>
+                        ),
+                      }))
+                }
+              />
             </Line>
           </SectionRow>
           <SectionRow>
@@ -250,7 +255,7 @@ const MainPage = ({
             </LineStackLayout>
             <GuidedLessons
               selectInAppTutorial={selectInAppTutorial}
-              showLimitedItems
+              displayAsCarousel
             />
           </SectionRow>
           <SectionRow>

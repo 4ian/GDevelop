@@ -220,7 +220,9 @@ const InAppTutorialPhaseCard = ({
                       <Chip
                         size="small"
                         label={
-                          durationInMinutes === 1 ? (
+                          isMobile ? (
+                            <Trans>{durationInMinutes} min.</Trans>
+                          ) : durationInMinutes === 1 ? (
                             <Trans>1 minute</Trans>
                           ) : (
                             <Trans>{durationInMinutes} minutes</Trans>

@@ -24,8 +24,19 @@ import type { GDevelopTheme } from '../UI/Theme';
 
 const styles = {
   icon: {
-    width: 12,
-    height: 12,
+    width: 13,
+    height: 13,
+    position: 'relative',
+    top: -1,
+  },
+  creditPriceContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 3,
+  },
+  columnOrSeparator: {
+    marginTop: -3,
+    marginBottom: -1,
   },
 };
 
@@ -109,26 +120,32 @@ export const renderProductPrice = ({
   ) : showBothPrices && creditPrice ? (
     showBothPrices === 'column' ? (
       <Column alignItems="flex-end">
-        <LineStackLayout noMargin alignItems="center">
+        <div style={styles.creditPriceContainer}>
           <Coin style={styles.icon} />
           <Text noMargin size="sub-title" color="inherit">
             {creditPrice.amount}
           </Text>
-        </LineStackLayout>
-        <Trans>or</Trans>
+        </div>
+        <span style={styles.columnOrSeparator}>
+          <Text noMargin color="inherit">
+            <Trans>or</Trans>
+          </Text>
+        </span>
         <Text noMargin size="sub-title" color="primary">
           {formattedPrice}
         </Text>
       </Column>
     ) : (
       <LineStackLayout noMargin>
-        <LineStackLayout noMargin alignItems="center">
+        <div style={styles.creditPriceContainer}>
           <Coin style={styles.icon} />
           <Text noMargin size="sub-title" color="inherit">
             {creditPrice.amount}
           </Text>
-        </LineStackLayout>
-        <Trans>or</Trans>
+        </div>
+        <Text noMargin color="inherit">
+          <Trans>or</Trans>
+        </Text>
         <Text noMargin size="sub-title" color="primary">
           {formattedPrice}
         </Text>

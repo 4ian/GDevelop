@@ -1,4 +1,12 @@
 namespace gdjs {
+  type CustomObject3DNetworkSyncDataType = CustomObjectNetworkSyncDataType & {
+    z: float;
+    d: float;
+    rx: float;
+    ry: float;
+    ifz: boolean;
+  };
+
   /**
    * Base class for 3D custom objects.
    */
@@ -75,6 +83,30 @@ namespace gdjs {
       if (initialInstanceData.flippedZ) {
         this.flipZ(initialInstanceData.flippedZ);
       }
+    }
+
+    getNetworkSyncData(): CustomObject3DNetworkSyncDataType {
+      return {
+        ...super.getNetworkSyncData(),
+        z: this.getZ(),
+        d: this.getDepth(),
+        rx: this.getRotationX(),
+        ry: this.getRotationY(),
+        ifz: this.isFlippedZ(),
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: CustomObject3DNetworkSyncDataType
+    ): void {
+      super.updateFromNetworkSyncData(networkSyncData);
+      if (networkSyncData.z !== undefined) this.setZ(networkSyncData.z);
+      if (networkSyncData.d !== undefined) this.setDepth(networkSyncData.d);
+      if (networkSyncData.rx !== undefined)
+        this.setRotationX(networkSyncData.rx);
+      if (networkSyncData.ry !== undefined)
+        this.setRotationY(networkSyncData.ry);
+      if (networkSyncData.ifz !== undefined) this.flipZ(networkSyncData.ifz);
     }
 
     /**

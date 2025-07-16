@@ -95,6 +95,7 @@ const ScenePropertiesDialog = ({
 
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
+    layout.setStopSoundsOnStartup(shouldStopSoundsOnStartup);
     layout.setResourcesPreloading(resourcesPreloading);
     layout.setResourcesUnloading(resourcesUnloading);
     layout.setBackgroundColor(

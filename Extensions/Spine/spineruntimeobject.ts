@@ -14,8 +14,6 @@ namespace gdjs {
 
   export type SpineNetworkSyncDataType = {
     opa: float;
-    wid: float;
-    hei: float;
     scaX: float;
     scaY: float;
     flipX: boolean;
@@ -117,8 +115,6 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         opa: this._opacity,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         scaX: this.getScaleX(),
         scaY: this.getScaleY(),
         flipX: this.isFlippedX(),
@@ -136,12 +132,6 @@ namespace gdjs {
 
       if (syncData.opa !== undefined && syncData.opa !== this._opacity) {
         this.setOpacity(syncData.opa);
-      }
-      if (syncData.wid !== undefined && syncData.wid !== this.getWidth()) {
-        this.setWidth(syncData.wid);
-      }
-      if (syncData.hei !== undefined && syncData.hei !== this.getHeight()) {
-        this.setHeight(syncData.hei);
       }
       if (syncData.scaX !== undefined && syncData.scaX !== this.getScaleX()) {
         this.setScaleX(syncData.scaX);

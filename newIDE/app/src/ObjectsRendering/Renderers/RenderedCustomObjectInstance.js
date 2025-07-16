@@ -15,6 +15,16 @@ import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
+const getEventBasedObject = (
+  project: gdProject,
+  customObjectConfiguration: gdCustomObjectConfiguration
+): gdEventsBasedObject | null => {
+  const type = customObjectConfiguration.getType();
+  return project.hasEventsBasedObject(type)
+    ? project.getEventsBasedObject(type)
+    : null;
+};
+
 const getVariant = (
   eventBasedObject: gdEventsBasedObject,
   customObjectConfiguration: gdCustomObjectConfiguration
@@ -93,7 +103,6 @@ const getPropertyMappingRules = (
  */
 export default class RenderedCustomObjectInstance extends Rendered3DInstance
   implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
-  eventBasedObject: gdEventsBasedObject | null;
   _isRenderedIn3D = false;
 
   /** Functor used to render an instance */
@@ -137,14 +146,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
     );
-
-    this.eventBasedObject = project.hasEventsBasedObject(
-      customObjectConfiguration.getType()
-    )
-      ? project.getEventsBasedObject(customObjectConfiguration.getType())
-      : null;
-
-    const { eventBasedObject } = this;
+    const eventBasedObject = getEventBasedObject(
+      project,
+      customObjectConfiguration
+    );
     if (!eventBasedObject) {
       return;
     }
@@ -218,13 +223,16 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   _getChildObjectConfiguration = (
     childObjectName: string
   ): gdObjectConfiguration | null => {
-    const eventBasedObject = this.eventBasedObject;
-    if (!eventBasedObject) {
-      return null;
-    }
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       this._associatedObjectConfiguration
     );
+    const eventBasedObject = getEventBasedObject(
+      this._project,
+      customObjectConfiguration
+    );
+    if (!eventBasedObject) {
+      return null;
+    }
     const variant = getVariant(eventBasedObject, customObjectConfiguration);
     if (!variant) {
       return null;
@@ -363,12 +371,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
-
-    const eventBasedObject = project.hasEventsBasedObject(
-      customObjectConfiguration.getType()
-    )
-      ? project.getEventsBasedObject(customObjectConfiguration.getType())
-      : null;
+    const eventBasedObject = getEventBasedObject(
+      project,
+      customObjectConfiguration
+    );
     if (!eventBasedObject) {
       return 'res/unknown32.png';
     }
@@ -432,20 +438,32 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   getVariant(): gdEventsBasedObjectVariant | null {
-    const { eventBasedObject } = this;
-    if (!eventBasedObject) {
-      return null;
-    }
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       this._associatedObjectConfiguration
     );
+    const eventBasedObject = getEventBasedObject(
+      this._project,
+      customObjectConfiguration
+    );
+    if (!eventBasedObject) {
+      return null;
+    }
     return getVariant(eventBasedObject, customObjectConfiguration);
   }
 
   update() {
-    const { eventBasedObject } = this;
-    const variant = this.getVariant();
-    if (!eventBasedObject || !variant) {
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      this._associatedObjectConfiguration
+    );
+    const eventBasedObject = getEventBasedObject(
+      this._project,
+      customObjectConfiguration
+    );
+    if (!eventBasedObject) {
+      return;
+    }
+    const variant = getVariant(eventBasedObject, customObjectConfiguration);
+    if (!variant) {
       return;
     }
 

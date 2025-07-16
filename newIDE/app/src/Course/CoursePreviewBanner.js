@@ -34,6 +34,12 @@ import EmptyBadge from '../UI/CustomSvgIcons/EmptyBadge';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
+export const freeChipStyle = {
+  height: 20,
+  backgroundColor: '#8BE7C4',
+  color: '#1D1D26',
+};
+
 const styles = {
   container: { padding: 16, display: 'flex', borderRadius: 8 },
   mobileContainer: { padding: 8, display: 'flex', borderRadius: 8 },
@@ -48,16 +54,6 @@ const styles = {
   },
   progress: { borderRadius: 4, height: 5 },
   chip: { height: 24 },
-  freeChip: {
-    height: 20,
-    borderRadius: 32,
-    paddingTop: 2,
-    paddingBottom: 2,
-    paddingLeft: 8,
-    paddingRight: 8,
-    backgroundColor: '#8BE7C4',
-    color: '#1D1D26',
-  },
   gdevelopAvatar: { width: 20, height: 20 },
   thumbnail: { borderRadius: 4, aspectRatio: '16 / 9', maxWidth: '100%' },
   statusContainer: {
@@ -79,12 +75,14 @@ const styles = {
 };
 
 const ChapterTile = ({
+  course,
   chapter,
   chapterIndex,
   isComplete,
   gdevelopTheme,
 }: {|
-  chapter: ?CourseChapter,
+  course: Course,
+  chapter: CourseChapter,
   isComplete: boolean,
   chapterIndex: number,
   gdevelopTheme: GDevelopTheme,
@@ -92,14 +90,14 @@ const ChapterTile = ({
   return (
     <Column expand>
       <Spacer />
-      {chapter && chapter.isLocked ? (
+      {chapter.isLocked ? (
         <Paper background="light" style={{ padding: 4 }}>
           <LineStackLayout noMargin alignItems="center" justifyContent="center">
             <div style={styles.statusContainer}>
               <Lock fontSize="inherit" color="secondary" />
             </div>
             <Text color="secondary" noMargin>
-              <Trans>Unlock with {chapter.priceInCredits} credits</Trans>
+              <Trans>Unlock with the full course</Trans>
             </Text>
           </LineStackLayout>
         </Paper>
@@ -112,13 +110,9 @@ const ChapterTile = ({
         >
           <CheckCircle fontSize="inherit" />
         </div>
-      ) : chapter && chapter.isFree ? (
+      ) : course.isLocked && chapter.isFree ? (
         <Line noMargin>
-          <div style={styles.freeChip}>
-            <Text noMargin color="inherit" size="body-small">
-              <Trans>Free</Trans>
-            </Text>
-          </div>
+          <Chip style={freeChipStyle} label={<Trans>Free!</Trans>} />
         </Line>
       ) : (
         <div style={styles.statusIconOnly}>
@@ -136,21 +130,13 @@ const ChapterTile = ({
           <Trans>Chapter</Trans>
         </Text>
       </Line>
-      {chapter ? (
-        <Text
-          size="sub-title"
-          noMargin
-          color={chapter.isLocked ? 'secondary' : 'primary'}
-        >
-          {chapter.title}
-        </Text>
-      ) : (
-        <Text>
-          <i>
-            <Trans>Coming soon</Trans>
-          </i>
-        </Text>
-      )}
+      <Text
+        size="sub-title"
+        noMargin
+        color={chapter.isLocked ? 'secondary' : 'primary'}
+      >
+        {chapter.title}
+      </Text>
       <LargeSpacer />
     </Column>
   );
@@ -258,6 +244,7 @@ const CoursePreviewBanner = ({
               ))}
             {index > 0 && <Spacer />}
             <ChapterTile
+              course={course}
               chapter={chapter}
               chapterIndex={chapterIndex}
               gdevelopTheme={gdevelopTheme}

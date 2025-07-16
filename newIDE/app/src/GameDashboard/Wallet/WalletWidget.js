@@ -7,7 +7,7 @@ import DashboardWidget, {
 import { ColumnStackLayout } from '../../UI/Layout';
 import Coin from '../../Credits/Icons/Coin';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { EarnCredits } from '../../MainFrame/EditorContainers/HomePage/GetStartedSection/EarnCredits';
+import { EarnCredits } from './EarnCredits';
 import TextButton from '../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 

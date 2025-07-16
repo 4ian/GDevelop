@@ -15,8 +15,6 @@ namespace gdjs {
   export type TiledSpriteObjectData = ObjectData & TiledSpriteObjectDataType;
 
   export type TiledSpriteNetworkSyncDataType = {
-    wid: number;
-    hei: number;
     xo: number;
     yo: number;
     op: number;
@@ -83,8 +81,6 @@ namespace gdjs {
     getNetworkSyncData(): TiledSpriteNetworkSyncData {
       return {
         ...super.getNetworkSyncData(),
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         xo: this.getXOffset(),
         yo: this.getYOffset(),
         op: this.getOpacity(),
@@ -99,12 +95,6 @@ namespace gdjs {
 
       // Texture is not synchronized, see if this is asked or not.
 
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
-      }
       if (networkSyncData.xo !== undefined) {
         this.setXOffset(networkSyncData.xo);
       }

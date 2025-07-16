@@ -87,7 +87,7 @@ export type EditorTabsPaneCommonProps = {|
   |}) => void,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
-  openAskAi: () => void,
+  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: (layoutName: ?string) => void,
   openExternalEvents: (name: string) => void,
@@ -238,7 +238,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     setPreviewOverride,
     openVersionHistoryPanel,
     onQuitVersionHistory,
-    openAskAi,
+    onOpenAskAi,
     getStorageProvider,
     setPreviewedLayout,
     openExternalEvents,
@@ -463,7 +463,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
           />
         )}
         hasAskAiOpened={hasAskAiOpened}
-        onOpenAskAi={openAskAi}
+        onOpenAskAi={onOpenAskAi}
       />
       <Toolbar
         ref={toolbarRef}
@@ -527,6 +527,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       setGamesPlatformFrameShown: onSetGamesPlatformFrameShown,
                       projectItemName: editorTab.projectItemName,
                       setPreviewedLayout,
+                      onOpenAskAi,
                       onOpenExternalEvents: openExternalEvents,
                       onOpenEvents: (sceneName: string) => {
                         openLayout(sceneName, {

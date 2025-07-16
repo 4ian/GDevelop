@@ -630,10 +630,7 @@ namespace gdjs {
 
     override onDeActivate() {
       this._sharedData.removeFromBehaviorsList(this);
-      this.bodyUpdater.destroyBody();
-      this._contactsEndedThisFrame.length = 0;
-      this._contactsStartedThisFrame.length = 0;
-      this._currentContacts.length = 0;
+      this._destroyBody();
     }
 
     override onActivate() {
@@ -648,6 +645,24 @@ namespace gdjs {
     override onDestroy() {
       this._destroyedDuringFrameLogic = true;
       this.onDeActivate();
+    }
+
+    _destroyBody() {
+      this.bodyUpdater.destroyBody();
+      this._contactsEndedThisFrame.length = 0;
+      this._contactsStartedThisFrame.length = 0;
+      this._currentContacts.length = 0;
+    }
+
+    resetToDefaultBodyUpdater() {
+      this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
+        this
+      );
+    }
+
+    resetToDefaultCollisionChecker() {
+      this.collisionChecker =
+        new gdjs.Physics3DRuntimeBehavior.DefaultCollisionChecker(this);
     }
 
     createShape(): Jolt.Shape {
@@ -1176,6 +1191,33 @@ namespace gdjs {
       this._needToRecreateBody = true;
     }
 
+    getShapeOffsetX(): float {
+      return this.shapeOffsetX;
+    }
+
+    setShapeOffsetX(shapeOffsetX: float): void {
+      this.shapeOffsetX = shapeOffsetX;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetY(): float {
+      return this.shapeOffsetY;
+    }
+
+    setShapeOffsetY(shapeOffsetY: float): void {
+      this.shapeOffsetY = shapeOffsetY;
+      this._needToRecreateShape = true;
+    }
+
+    getShapeOffsetZ(): float {
+      return this.shapeOffsetZ;
+    }
+
+    setShapeOffsetZ(shapeOffsetZ: float): void {
+      this.shapeOffsetZ = shapeOffsetZ;
+      this._needToRecreateShape = true;
+    }
+
     getFriction(): float {
       return this.friction;
     }
@@ -1540,9 +1582,9 @@ namespace gdjs {
       }
       const body = this._body!;
 
-      const deltaX = towardX - body.GetPosition().GetX();
-      const deltaY = towardY - body.GetPosition().GetY();
-      const deltaZ = towardZ - body.GetPosition().GetZ();
+      const deltaX = towardX - this.owner3D.getX();
+      const deltaY = towardY - this.owner3D.getY();
+      const deltaZ = towardZ - this.owner3D.getZ();
       const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
       if (distanceSq === 0) {
         return;
@@ -1600,19 +1642,16 @@ namespace gdjs {
       length: float,
       towardX: float,
       towardY: float,
-      towardZ: float,
-      originX: float,
-      originY: float,
-      originZ: float
+      towardZ: float
     ): void {
       if (this._body === null) {
         if (!this._createBody()) return;
       }
       const body = this._body!;
 
-      const deltaX = towardX - originX;
-      const deltaY = towardY - originY;
-      const deltaZ = towardZ - originZ;
+      const deltaX = towardX - this.owner3D.getX();
+      const deltaY = towardY - this.owner3D.getY();
+      const deltaZ = towardZ - this.owner3D.getZ();
       const distanceSq = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
       if (distanceSq === 0) {
         return;
@@ -1621,12 +1660,7 @@ namespace gdjs {
 
       this._sharedData.bodyInterface.AddImpulse(
         body.GetID(),
-        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio),
-        this.getRVec3(
-          originX * this._sharedData.worldInvScale,
-          originY * this._sharedData.worldInvScale,
-          originZ * this._sharedData.worldInvScale
-        )
+        this.getVec3(deltaX * ratio, deltaY * ratio, deltaZ * ratio)
       );
     }
 

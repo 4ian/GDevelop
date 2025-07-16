@@ -64,8 +64,6 @@ namespace gdjs {
 
   export type TextInputNetworkSyncDataType = {
     opa: float;
-    wid: float;
-    hei: float;
     txt: string;
     frn: string;
     fs: number;
@@ -260,8 +258,6 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(),
         opa: this.getOpacity(),
-        wid: this.getWidth(),
-        hei: this.getHeight(),
         txt: this.getText(),
         frn: this.getFontResourceName(),
         fs: this.getFontSize(),
@@ -282,8 +278,6 @@ namespace gdjs {
       super.updateFromNetworkSyncData(syncData);
 
       if (syncData.opa !== undefined) this.setOpacity(syncData.opa);
-      if (syncData.wid !== undefined) this.setWidth(syncData.wid);
-      if (syncData.hei !== undefined) this.setHeight(syncData.hei);
       if (syncData.txt !== undefined) this.setText(syncData.txt);
       if (syncData.frn !== undefined) this.setFontResourceName(syncData.frn);
       if (syncData.fs !== undefined) this.setFontSize(syncData.fs);

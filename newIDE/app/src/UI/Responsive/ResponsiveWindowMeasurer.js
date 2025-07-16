@@ -28,7 +28,7 @@ const sizeThresholds = {
   smallHeight: 500,
   smallWidth: 600,
   mediumWidth: 1150,
-  largeWidth: 1500,
+  largeWidth: 1800,
 };
 
 /**

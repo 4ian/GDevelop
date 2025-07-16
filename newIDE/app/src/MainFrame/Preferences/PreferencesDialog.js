@@ -83,6 +83,7 @@ const PreferencesDialog = ({
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setShowCreateSectionByDefault,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -393,6 +394,27 @@ const PreferencesDialog = ({
             </Text>
             <ColumnStackLayout>
               <Text size="sub-title">
+                <Trans>At launch</Trans>
+              </Text>
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowCreateSectionByDefault}
+                checked={values.showCreateSectionByDefault}
+                label={i18n._(
+                  t`Show the "Create" section by default when opening GDevelop`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setAutoOpenMostRecentProject}
+                checked={values.autoOpenMostRecentProject}
+                label={i18n._(
+                  t`Automatically re-open the project edited during last session`
+                )}
+              />
+              <Text size="sub-title">
                 <Trans>Previews</Trans>
               </Text>
               <ColumnStackLayout>
@@ -529,15 +551,6 @@ const PreferencesDialog = ({
                   checked={values.displaySaveReminder.activated}
                   label={i18n._(
                     t`Display save reminder after significant changes in project`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setAutoOpenMostRecentProject}
-                  checked={values.autoOpenMostRecentProject}
-                  label={i18n._(
-                    t`Automatically re-open the project edited during last session`
                   )}
                 />
                 <CompactToggleField

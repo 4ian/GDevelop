@@ -148,6 +148,7 @@ const WrappedHomePage = ({
                   renderGamesPlatformFrame: () => null,
                 }}
                 onExtensionInstalled={action('onExtensionInstalled')}
+                onOpenAskAi={() => action('onOpenAskAi')()}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

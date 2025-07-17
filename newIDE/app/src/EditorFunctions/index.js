@@ -373,9 +373,9 @@ const createObject: EditorFunction = {
         scene: layout,
         objectName: object_name,
         objectType: object_type,
-        searchTerms: search_terms,
-        description,
-        twoDimensionalViewKind: two_dimensional_view_kind,
+        searchTerms: search_terms || '',
+        description: description || '',
+        twoDimensionalViewKind: two_dimensional_view_kind || '',
       });
 
       if (status === 'error') {
@@ -1340,8 +1340,8 @@ const put2dInstances: EditorFunction = {
       args,
       'brush_position'
     );
-    const brush_size = SafeExtractor.extractStringProperty(args, 'brush_size');
-    const brush_end_position = SafeExtractor.extractNumberProperty(
+    const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
+    const brush_end_position = SafeExtractor.extractStringProperty(
       args,
       'brush_end_position'
     );
@@ -1392,7 +1392,7 @@ const put2dInstances: EditorFunction = {
       const brushPosition: Array<number> | null = brush_position
         ? brush_position.split(',').map(Number)
         : null;
-      const brushSize = brush_size ? Number(brush_size) : 0;
+      const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
       const instancesToDelete = new Set();
@@ -1447,7 +1447,7 @@ const put2dInstances: EditorFunction = {
             project.getGameResolutionWidth() / 2,
             project.getGameResolutionHeight() / 2,
           ];
-      const brushSize = brush_size ? Number(brush_size) : 0;
+      const brushSize = brush_size || 0;
       const brushEndPosition = brush_end_position
         ? brush_end_position.split(',').map(Number)
         : null;
@@ -1520,8 +1520,8 @@ const put2dInstances: EditorFunction = {
             (brushEndPosition[1] - brushPosition[1]) / gridColumnCount;
 
           modifiedAndCreatedInstances.forEach((instance, i) => {
-            const row = Math.floor(i / columnCount);
-            const column = i % columnCount;
+            const row = Math.floor(i / gridColumnCount);
+            const column = i % gridColumnCount;
 
             instance.setX(brushPosition[0] + column * gridColumnSize);
             instance.setY(brushPosition[1] + row * gridRowSize);
@@ -2472,6 +2472,12 @@ const addOrEditVariable: EditorFunction = {
       }
       variablesContainer = project.getLayout(scene_name).getVariables();
     } else if (variable_scope === 'object') {
+      if (!object_name) {
+        return makeGenericFailure(
+          `Missing "object_name" argument, required to edit an object variable.`
+        );
+      }
+
       let objectsContainer;
       if (scene_name) {
         if (!project.hasLayoutNamed(scene_name)) {

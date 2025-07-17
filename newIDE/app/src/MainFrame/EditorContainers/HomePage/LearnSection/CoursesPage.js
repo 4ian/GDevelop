@@ -12,7 +12,6 @@ import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import { Line } from '../../../../UI/Grid';
 import { GridList, GridListTile } from '@material-ui/core';
 import CourseStoreContext from '../../../../Course/CourseStoreContext';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import CourseCard from './CourseCard';
@@ -55,16 +54,6 @@ const CoursesPage = ({
 }: Props) => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
-
-  if (!courses || !listedCourses) {
-    return (
-      <SectionContainer flexBody>
-        <SectionRow expand>
-          <PlaceholderLoader />
-        </SectionRow>
-      </SectionContainer>
-    );
-  }
 
   return (
     <I18n>
@@ -112,7 +101,7 @@ const CoursesPage = ({
                         </GridListTile>
                       );
                     })
-                  : new Array(5).fill(0).map((_, index) => (
+                  : new Array(6).fill(0).map((_, index) => (
                       <GridListTile key={`skeleton-course-${index}`}>
                         <CourseCard
                           course={null}

@@ -108,7 +108,7 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
-  onOpenAskAi: (mode?: 'chat' | 'agent') => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,

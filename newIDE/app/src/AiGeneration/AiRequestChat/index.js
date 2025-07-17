@@ -79,7 +79,7 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
-  onStartNewChat: () => void,
+  onStartNewChat: (mode: 'chat' | 'agent') => void,
   initialMode?: 'chat' | 'agent',
 
   onProcessFunctionCalls: (
@@ -645,7 +645,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       <Text size="body-small" color="secondary" align="center" noMargin>
         <Trans>
           This request is for another project.{' '}
-          <Link href="#" onClick={onStartNewChat}>
+          <Link
+            href="#"
+            onClick={() => onStartNewChat(aiRequest.mode || 'chat')}
+          >
             Start a new chat
           </Link>{' '}
           to build on a new project.

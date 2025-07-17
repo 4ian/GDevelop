@@ -1,3 +1,4 @@
+// @flow
 /**
  * Access to properties and type objects safely (ensuring no crash and no exception
  * in case the expected type is not the one found or totally different than assumed).

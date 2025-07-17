@@ -59,7 +59,7 @@ const getShopItemsColumns = (
     case 'small':
       return isLandscape ? 3 : 2;
     case 'medium':
-      return 2;
+      return 3;
     case 'large':
       return 4;
     case 'xlarge':
@@ -400,7 +400,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         )}
-        {displayPromotions ? (
+        {displayPromotions && !openedShopCategory ? (
           <ColumnStackLayout noMargin>
             <Text size="block-title">
               <Trans>Promotions + Earn credits</Trans>

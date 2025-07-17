@@ -106,6 +106,7 @@ namespace gdjs {
       this.updateBorderWidth();
       this.updateDisabled();
       this.updateReadOnly();
+      this.updateSpellCheck();
       this.updateTextAlign();
       this.updateMaxLength();
       this.updatePadding();
@@ -340,6 +341,12 @@ namespace gdjs {
       if (!this._input) return;
 
       this._input.readOnly = this._object.isReadOnly();
+    }
+
+    updateSpellCheck() {
+      if (!this._input) return;
+
+      this._input.spellcheck = this._object.isSpellCheckEnabled();
     }
 
     updateMaxLength() {

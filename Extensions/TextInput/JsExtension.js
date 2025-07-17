@@ -78,6 +78,9 @@ module.exports = {
       } else if (propertyName === 'disabled') {
         objectContent.disabled = newValue === '1';
         return true;
+      } else if (propertyName === 'spellCheck') {
+        objectContent.spellCheck = newValue === '1';
+        return true;
       } else if (propertyName === 'maxLength') {
         objectContent.maxLength = newValue;
         return true;
@@ -158,6 +161,13 @@ module.exports = {
         .setValue(objectContent.disabled ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Disabled'))
+        .setGroup(_('Field'));
+
+      objectProperties
+        .getOrCreate('spellCheck')
+        .setValue(objectContent.spellCheck ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Enable spell check'))
         .setGroup(_('Field'));
 
       objectProperties
@@ -272,6 +282,7 @@ module.exports = {
       borderWidth: 1,
       readOnly: false,
       disabled: false,
+      spellCheck: false,
       paddingX: 2,
       paddingY: 1,
       textAlign: 'left',
@@ -591,6 +602,21 @@ module.exports = {
       .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDisabled')
       .setGetter('isDisabled');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'SpellCheck',
+        _('Spell check enabled'),
+        _('spell check is enabled'),
+        _('spell check enabled'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setSpellCheck')
+      .setGetter('isSpellCheckEnabled');
 
     // Other expressions/conditions/actions:
 

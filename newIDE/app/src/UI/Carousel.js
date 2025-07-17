@@ -52,8 +52,8 @@ const styles = {
     flexWrap: 'nowrap',
     scrollbarWidth: 'none' /* For modern browsers */,
     msOverflowStyle: 'none' /* For Internet Explorer and Edge */,
-    '&::-webkit-scrollbar': {
-      height: 0 /* For old hrome, Safari, and Opera */,
+    '&::WebkitScrollbar': {
+      height: 0 /* For old Chrome, Safari, and Opera */,
     },
   },
   container: { display: 'flex', position: 'relative', width: '100%' },
@@ -182,7 +182,7 @@ const Carousel = ({ items }: Props) => {
       <div
         style={{
           ...styles.arrowsContainer,
-          display: isMobile ? 'hidden' : 'flex',
+          display: isMobile ? 'none' : 'flex',
           opacity: isHoveringContainer ? 1 : 0,
         }}
       >

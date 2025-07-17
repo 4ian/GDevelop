@@ -867,7 +867,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       [objectName],
       this.state.selectedLayer
     );
+    this._onInstancesAddedAndSendToEditor3D(instances);
+  };
+
+  _onInstancesAddedAndSendToEditor3D = (
+    instances: Array<gdInitialInstance>
+  ) => {
     this._onInstancesAdded(instances);
+    this._sendAddedInstances(instances);
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
@@ -912,6 +919,21 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   onInstanceAddedOnInvisibleLayer = (layer: ?string) => {
     this.setState({ invisibleLayerOnWhichInstancesHaveJustBeenAdded: layer });
+  };
+
+  _sendAddedInstances = (instances: Array<gdInitialInstance>) => {
+    const { previewDebuggerServer } = this.props;
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'addInstances',
+          payload: {
+            instances: instances.map(instance => serializeToJSObject(instance)),
+            moveUnderCursor: false,
+          },
+        });
+      });
+    }
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
@@ -975,6 +997,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.editObjectByName(instance.getObjectName());
   };
 
+  _onInstancesMovedAndSendToEditor3D = (
+    instances: Array<gdInitialInstance>
+  ) => {
+    this._onInstancesMoved(instances);
+    this._sendUpdatedInstances(instances);
+  };
+
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
@@ -986,6 +1015,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
@@ -999,6 +1029,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
@@ -1012,6 +1043,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.forceUpdatePropertiesEditor()
     );
+    this._sendUpdatedInstances(instances);
   };
 
   _exportDataOnly = debounce(() => {
@@ -1023,6 +1055,16 @@ export default class SceneEditor extends React.Component<Props, State> {
    * (position, rotation, size, something else?)
    */
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
+    this._sendUpdatedInstances(instances);
+    // TODO: Create a new export mode that will generate only the bare minimum
+    // so that the runtime game has up-to-date data without unnecessary reloading scripts.
+    // Once the mode exists, call it here.
+    // this._exportDataOnly();
+    this.forceUpdate();
+    //TODO: Save for redo with debounce (and cancel on unmount)
+  };
+
+  _sendUpdatedInstances = (instances: Array<gdInitialInstance>) => {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return;
 
@@ -1034,12 +1076,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
       });
     });
-    // TODO: Create a new export mode that will generate only the bare minimum
-    // so that the runtime game has up-to-date data without unnecessary reloading scripts.
-    // Once the mode exists, call it here.
-    // this._exportDataOnly();
-    this.forceUpdate();
-    //TODO: Save for redo with debounce (and cancel on unmount)
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
@@ -2105,28 +2141,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         // Instance duplication can only be done in the same scene, so no need to check
         () => true,
     });
-    this._onInstancesAdded(newInstances);
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({
       instances: newInstances,
       multiSelect: true,
       layersLocks: null,
     });
-
-    const { previewDebuggerServer } = this.props;
-    if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'addInstances',
-          payload: {
-            instances: newInstances.map(instance =>
-              serializeToJSObject(instance)
-            ),
-            moveUnderCursor: false,
-          },
-        });
-      });
-    }
 
     this.forceUpdatePropertiesEditor();
   };
@@ -2158,7 +2179,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           .hasObjectNamed(objectName),
     });
 
-    this._onInstancesAdded(newInstances);
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({
       instances: newInstances,
@@ -2185,21 +2206,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
         editorDisplay.instancesHandlers.snapSelection(newInstances);
       }
-    }
-
-    const { previewDebuggerServer } = this.props;
-    if (previewDebuggerServer) {
-      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-        previewDebuggerServer.sendMessage(debuggerId, {
-          command: 'addInstances',
-          payload: {
-            instances: newInstances.map(instance =>
-              serializeToJSObject(instance)
-            ),
-            moveUnderCursor: true,
-          },
-        });
-      });
     }
 
     this.forceUpdatePropertiesEditor();
@@ -2539,10 +2545,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onShift2: this.zoomToInitialPosition,
                   onShift3: this.zoomToFitContent,
                 }}
-                onInstancesAdded={this._onInstancesAdded}
+                onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
                 onInstancesSelected={this._onInstancesSelected}
                 onInstanceDoubleClicked={this._onInstanceDoubleClicked}
-                onInstancesMoved={this._onInstancesMoved}
+                onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
                 onInstancesResized={this._onInstancesResized}
                 onInstancesRotated={this._onInstancesRotated}
                 isInstanceOf3DObject={this.isInstanceOf3DObject}

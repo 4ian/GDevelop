@@ -50,11 +50,6 @@ const styles = {
     overflowX: 'scroll',
     overflowY: 'hidden',
     flexWrap: 'nowrap',
-    scrollbarWidth: 'none' /* For modern browsers */,
-    msOverflowStyle: 'none' /* For Internet Explorer and Edge */,
-    '&::WebkitScrollbar': {
-      height: 0 /* For old Chrome, Safari, and Opera */,
-    },
   },
   container: { display: 'flex', position: 'relative', width: '100%' },
   arrowsContainer: {
@@ -212,6 +207,7 @@ const Carousel = ({ items }: Props) => {
         </div>
       </div>
       <GridList
+        className="almost-invisible-scrollbar"
         cols={actualColumnsToDisplay}
         style={styles.gridList}
         cellHeight="auto"

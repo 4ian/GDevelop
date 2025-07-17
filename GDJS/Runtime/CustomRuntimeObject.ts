@@ -17,6 +17,11 @@ namespace gdjs {
     isInnerAreaFollowingParentSize: boolean;
   };
 
+  export type CustomObjectNetworkSyncDataType = ObjectNetworkSyncData & {
+    ifx: boolean;
+    ify: boolean;
+  };
+
   /**
    * An object that contains other object.
    *
@@ -196,6 +201,26 @@ namespace gdjs {
         }
       }
       return true;
+    }
+
+    getNetworkSyncData(): CustomObjectNetworkSyncDataType {
+      return {
+        ...super.getNetworkSyncData(),
+        ifx: this.isFlippedX(),
+        ify: this.isFlippedY(),
+      };
+    }
+
+    updateFromNetworkSyncData(
+      networkSyncData: CustomObjectNetworkSyncDataType
+    ) {
+      super.updateFromNetworkSyncData(networkSyncData);
+      if (networkSyncData.ifx !== undefined) {
+        this.flipX(networkSyncData.ifx);
+      }
+      if (networkSyncData.ify !== undefined) {
+        this.flipY(networkSyncData.ify);
+      }
     }
 
     override extraInitializationFromInitialInstance(

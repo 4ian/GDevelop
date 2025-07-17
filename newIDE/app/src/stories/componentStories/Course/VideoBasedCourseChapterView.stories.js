@@ -7,6 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import {
   videoBasedCourseChapter,
   lockedCourseChapter,
+  premiumCourse,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -18,13 +19,14 @@ export default {
 export const Default = () => {
   return (
     <VideoBasedCourseChapterView
+      course={premiumCourse}
       courseChapter={videoBasedCourseChapter}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
-      onBuyWithCredits={action('onBuyWithCredits')}
+      onClickUnlock={() => action('onClickUnlock')()}
     />
   );
 };
@@ -32,13 +34,14 @@ export const Default = () => {
 export const Locked = () => {
   return (
     <VideoBasedCourseChapterView
+      course={premiumCourse}
       courseChapter={lockedCourseChapter}
       onOpenTemplate={action('open template')}
       onCompleteTask={action('onCompleteTask')}
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={0}
-      onBuyWithCredits={action('onBuyWithCredits')}
+      onClickUnlock={() => action('onClickUnlock')()}
     />
   );
 };

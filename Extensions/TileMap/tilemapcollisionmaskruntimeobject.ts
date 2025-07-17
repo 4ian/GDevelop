@@ -26,8 +26,6 @@ namespace gdjs {
     os: float;
     fo: float;
     oo: float;
-    wid: float;
-    hei: float;
   };
 
   export type TilemapCollisionMaskNetworkSyncData = ObjectNetworkSyncData &
@@ -202,8 +200,6 @@ namespace gdjs {
         os: this.getOutlineSize(),
         fo: this.getFillOpacity(),
         oo: this.getOutlineOpacity(),
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
     }
 
@@ -235,12 +231,6 @@ namespace gdjs {
       }
       if (networkSyncData.oo !== undefined) {
         this.setOutlineOpacity(networkSyncData.oo);
-      }
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
       }
     }
 

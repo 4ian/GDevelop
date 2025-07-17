@@ -51,6 +51,7 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import { prepareAiUserContent } from './PrepareAiUserContent';
 import { setEditorHotReloadNeeded } from '../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
@@ -483,6 +484,7 @@ type Props = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  mode?: 'chat' | 'agent' | null,
   gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
@@ -499,7 +501,7 @@ export type AskAiEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-  startNewChat: () => void,
+  startNewChat: (mode: 'chat' | 'agent') => void,
   forceInGameEditorHotReload: ({|
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
@@ -529,6 +531,7 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
+        mode,
         gameEditorMode,
       }: Props,
       ref
@@ -561,11 +564,27 @@ export const AskAiEditor = React.memo<Props>(
       ] = React.useState<NewAiRequestOptions | null>(null);
 
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
+      const [newChatMode, setNewChatMode] = React.useState<'chat' | 'agent'>(
+        mode || 'agent'
+      );
+
+      // Update newChatMode when mode prop changes
+      React.useEffect(
+        () => {
+          if (mode) {
+            setNewChatMode(mode);
+          }
+        },
+        [mode]
+      );
 
       const canStartNewChat = !!selectedAiRequestId;
       const onStartNewChat = React.useCallback(
-        () => {
+        (mode: 'chat' | 'agent') => {
           setSelectedAiRequestId(null);
+          if (mode) {
+            setNewChatMode(mode);
+          }
         },
         [setSelectedAiRequestId]
       );
@@ -743,11 +762,17 @@ export const AskAiEditor = React.memo<Props>(
 
               setSendingAiRequest(null, true);
 
+              const preparedAiUserContent = await prepareAiUserContent({
+                getAuthorizationHeader,
+                userId: profile.id,
+                simplifiedProjectJson,
+                projectSpecificExtensionsSummaryJson,
+              });
+
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
                 userId: profile.id,
-                gameProjectJson: simplifiedProjectJson,
-                projectSpecificExtensionsSummaryJson,
+                ...preparedAiUserContent,
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
                 fileMetadata,
@@ -892,13 +917,19 @@ export const AskAiEditor = React.memo<Props>(
                 )
               : null;
 
+            const preparedAiUserContent = await prepareAiUserContent({
+              getAuthorizationHeader,
+              userId: profile.id,
+              simplifiedProjectJson,
+              projectSpecificExtensionsSummaryJson,
+            });
+
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
                 userId: profile.id,
                 aiRequestId: selectedAiRequestId,
                 functionCallOutputs,
-                gameProjectJson: simplifiedProjectJson,
-                projectSpecificExtensionsSummaryJson,
+                ...preparedAiUserContent,
                 payWithCredits,
                 userMessage,
               })
@@ -1046,6 +1077,7 @@ export const AskAiEditor = React.memo<Props>(
                     ? isAutoProcessingFunctionCalls(selectedAiRequest.id)
                     : false
                 }
+                initialMode={newChatMode}
                 setAutoProcessFunctionCalls={shouldAutoProcess => {
                   if (!selectedAiRequest) return;
                   setAutoProcessFunctionCalls(
@@ -1104,6 +1136,7 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
+        mode={props.extraEditorProps && props.extraEditorProps.mode}
         gameEditorMode={props.gameEditorMode}
       />
     )}

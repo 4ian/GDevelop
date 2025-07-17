@@ -930,6 +930,54 @@ module.exports = {
       aut
         .addExpressionAndConditionAndAction(
           'number',
+          'ShapeOffsetX',
+          _('Shape offset X'),
+          _('the object shape offset on X.'),
+          _('the shape offset on X'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetX')
+        .setGetter('getShapeOffsetX');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShapeOffsetY',
+          _('Shape offset Y'),
+          _('the object shape offset on Y.'),
+          _('the shape offset on Y'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetY')
+        .setGetter('getShapeOffsetY');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShapeOffsetZ',
+          _('Shape offset Z'),
+          _('the object shape offset on Z.'),
+          _('the shape offset on Z'),
+          _('Body settings'),
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setShapeOffsetZ')
+        .setGetter('getShapeOffsetZ');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
           'Friction',
           _('Friction'),
           _(

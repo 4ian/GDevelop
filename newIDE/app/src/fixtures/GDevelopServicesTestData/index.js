@@ -859,6 +859,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   receivedAssetShortHeaders: [],
   gameTemplatePurchases: [],
   assetPackPurchases: [],
+  coursePurchases: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
   onCancelLoginOrSignUp: () => {},
@@ -887,6 +888,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshAssetPackPurchases: async () => {
     console.info('This should refresh the asset pack purchases');
+  },
+  onRefreshCoursePurchases: async () => {
+    console.info('This should refresh the courses purchases');
   },
   onRefreshEarningsBalance: async () => {
     console.info('This should refresh the user earnings balance');
@@ -3103,6 +3107,7 @@ export const premiumCourse: Course = {
     'uk-UA': 'Початковий рівень',
     'zh-CN': '初级水平',
   },
+  includedInSubscriptions: ['gdevelop_silver', 'gdevelop_gold'],
   chaptersTargetCount: 15,
   durationInWeeks: 2,
   specializationId: 'game-development',

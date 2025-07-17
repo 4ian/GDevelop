@@ -10,6 +10,7 @@ import {
 
 import { type EventsGenerationResult } from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
+import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,21 +41,24 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       if (!profile) throw new Error('User should be authenticated.');
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
+      const simplifiedProjectJson = JSON.stringify(
+        simplifiedProjectBuilder.getSimplifiedProject(project, {})
+      );
       const projectSpecificExtensionsSummaryJson = JSON.stringify(
         simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
       );
 
+      const preparedAiUserContent = await prepareAiUserContent({
+        getAuthorizationHeader,
+        userId: profile.id,
+        simplifiedProjectJson,
+        projectSpecificExtensionsSummaryJson,
+      });
+
       const createResult = await retryIfFailed({ times: 2 }, () =>
         createAiGeneratedEvent(getAuthorizationHeader, {
           userId: profile.id,
-          partialGameProjectJson: JSON.stringify(
-            simplifiedProjectBuilder.getSimplifiedProject(project, {
-              scopeToScene: sceneName,
-            }),
-            null,
-            2
-          ),
-          projectSpecificExtensionsSummaryJson,
+          ...preparedAiUserContent,
           sceneName,
           eventsDescription,
           extensionNamesList,

@@ -299,6 +299,9 @@ export type Course = {|
   titleByLocale: MessageByLocale,
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
+
+  isLocked?: boolean,
+  includedInSubscriptions: string[],
 |};
 
 export type UserCourseProgress = {|
@@ -639,7 +642,27 @@ export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   return decodedFilenameWithExtension;
 };
 
-export const listCourses = async (): Promise<Array<Course>> => {
+export const listCourses = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: ?string,
+  |}
+): Promise<Array<Course>> => {
+  if (userId) {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await client.get(`/course`, {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    });
+    return response.data;
+  }
   const response = await client.get(`/course`);
   return response.data;
 };

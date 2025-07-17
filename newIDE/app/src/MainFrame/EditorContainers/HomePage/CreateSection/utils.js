@@ -9,12 +9,10 @@ import {
   type StorageProvider,
 } from '../../../../ProjectsStorage';
 import { marginsSize } from '../../../../UI/Grid';
-import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
-import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
-import { type CarouselThumbnail } from '../../../../UI/Carousel';
+import { type GDevelopTheme } from '../../../../UI/Theme';
 import {
   ExampleTile,
   PrivateGameTemplateTile,
@@ -155,87 +153,6 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
     .filter(Boolean);
 };
 
-const formatGameTemplateListingDataForCarousel = ({
-  gameTemplateListingData,
-  onSelectGameTemplate,
-  i18n,
-  receivedGameTemplates,
-}: {|
-  gameTemplateListingData: PrivateGameTemplateListingData,
-  onSelectGameTemplate: PrivateGameTemplateListingData => void,
-  i18n: I18nType,
-  receivedGameTemplates: ?Array<PrivateGameTemplate>,
-|}): CarouselThumbnail => {
-  const isTemplateOwned =
-    !!receivedGameTemplates &&
-    !!receivedGameTemplates.find(
-      receivedGameTemplate =>
-        receivedGameTemplate.id === gameTemplateListingData.id
-    );
-  return {
-    id: gameTemplateListingData.id,
-    title: gameTemplateListingData.name,
-    thumbnailUrl: gameTemplateListingData.thumbnailUrls[0],
-    onClick: () => {
-      sendGameTemplateInformationOpened({
-        gameTemplateName: gameTemplateListingData.name,
-        gameTemplateId: gameTemplateListingData.id,
-        source: 'homepage',
-      });
-      onSelectGameTemplate(gameTemplateListingData);
-    },
-    overlayText: getProductPriceOrOwnedLabel({
-      i18n,
-      productListingData: gameTemplateListingData,
-      owned: isTemplateOwned,
-    }),
-    overlayTextPosition: 'topLeft',
-  };
-};
-
-const formatExampleShortHeaderForCarousel = ({
-  exampleShortHeader,
-  onSelectExample,
-}: {|
-  exampleShortHeader: ExampleShortHeader,
-  onSelectExample: ExampleShortHeader => void,
-|}) => {
-  return {
-    id: exampleShortHeader.id,
-    title: exampleShortHeader.name,
-    onClick: () => onSelectExample(exampleShortHeader),
-    thumbnailUrl: exampleShortHeader.previewImageUrls[0],
-  };
-};
-
-const formatItemForCarousel = ({
-  item,
-  onSelectGameTemplate,
-  onSelectExample,
-  i18n,
-  receivedGameTemplates,
-}: {
-  item: PrivateGameTemplateListingData | ExampleShortHeader,
-  onSelectGameTemplate: PrivateGameTemplateListingData => void,
-  onSelectExample: ExampleShortHeader => void,
-  i18n: I18nType,
-  receivedGameTemplates: ?Array<PrivateGameTemplate>,
-}): CarouselThumbnail => {
-  if (item.previewImageUrls) {
-    return formatExampleShortHeaderForCarousel({
-      exampleShortHeader: item,
-      onSelectExample: onSelectExample,
-    });
-  } else {
-    return formatGameTemplateListingDataForCarousel({
-      i18n,
-      onSelectGameTemplate: onSelectGameTemplate,
-      gameTemplateListingData: item,
-      receivedGameTemplates: receivedGameTemplates,
-    });
-  }
-};
-
 const formatItemForGrid = ({
   item,
   onSelectGameTemplate,
@@ -288,6 +205,7 @@ export const getExampleAndTemplateTiles = ({
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   i18n,
+  gdevelopTheme,
   numberOfItemsExclusivelyInCarousel = 0,
   numberOfItemsInCarousel = 0,
   privateGameTemplatesPeriodicity,
@@ -301,21 +219,14 @@ export const getExampleAndTemplateTiles = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
+  gdevelopTheme: GDevelopTheme,
   numberOfItemsExclusivelyInCarousel?: number,
   numberOfItemsInCarousel?: number,
   privateGameTemplatesPeriodicity: number,
   showOwnedGameTemplatesFirst?: boolean,
-|}): {|
-  carouselThumbnailItems: Array<CarouselThumbnail>,
-  gridItemsCompletingCarousel: Array<React.Node>,
-  allGridItems: Array<React.Node>,
-|} => {
+|}): Array<React.Node> => {
   if (!exampleShortHeaders || !privateGameTemplateListingDatas) {
-    return {
-      carouselThumbnailItems: [],
-      gridItemsCompletingCarousel: [],
-      allGridItems: [],
-    };
+    return [];
   }
   const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
     exampleShortHeader =>
@@ -328,12 +239,6 @@ export const getExampleAndTemplateTiles = ({
       !exampleShortHeader.previewImageUrls[0]
   );
 
-  const carouselItems: Array<
-    PrivateGameTemplateListingData | ExampleShortHeader
-  > = [];
-  const itemsCompletingCarousel: Array<
-    PrivateGameTemplateListingData | ExampleShortHeader
-  > = [];
   const allItems: Array<
     PrivateGameTemplateListingData | ExampleShortHeader
   > = [];
@@ -363,29 +268,13 @@ export const getExampleAndTemplateTiles = ({
 
     // First handle example.
     if (exampleShortHeader) {
-      // Handle carousel.
-      if (carouselItems.length < numberOfItemsInCarousel) {
-        carouselItems.push(exampleShortHeader);
-      }
-      // Handle grid.
       allItems.push(exampleShortHeader);
-      if (carouselItems.length > numberOfItemsExclusivelyInCarousel) {
-        itemsCompletingCarousel.push(exampleShortHeader);
-      }
     }
 
     // Then handle private game template if in the right periodicity.
     if (shouldAddPrivateGameTemplate && privateGameTemplateListingData) {
-      // Handle carousel.
-      if (carouselItems.length < numberOfItemsInCarousel) {
-        carouselItems.push(privateGameTemplateListingData);
-      }
-      // Handle grid.
       if (privateGameTemplateListingData) {
         allItems.push(privateGameTemplateListingData);
-        if (carouselItems.length > numberOfItemsExclusivelyInCarousel) {
-          itemsCompletingCarousel.push(privateGameTemplateListingData);
-        }
       }
     }
 
@@ -400,26 +289,6 @@ export const getExampleAndTemplateTiles = ({
   exampleShortHeadersWithoutThumbnails.forEach(exampleShortHeader => {
     allItems.push(exampleShortHeader);
   });
-
-  const carouselThumbnailItems = carouselItems.map(item =>
-    formatItemForCarousel({
-      item,
-      onSelectGameTemplate: onSelectPrivateGameTemplateListingData,
-      onSelectExample: onSelectExampleShortHeader,
-      i18n,
-      receivedGameTemplates,
-    })
-  );
-
-  const gridItemsCompletingCarousel = itemsCompletingCarousel.map(item =>
-    formatItemForGrid({
-      item,
-      onSelectGameTemplate: onSelectPrivateGameTemplateListingData,
-      onSelectExample: onSelectExampleShortHeader,
-      i18n,
-      receivedGameTemplates,
-    })
-  );
 
   const allGridItems = allItems
     .sort((item1, item2) => {
@@ -452,5 +321,5 @@ export const getExampleAndTemplateTiles = ({
       })
     );
 
-  return { carouselThumbnailItems, gridItemsCompletingCarousel, allGridItems };
+  return allGridItems;
 };

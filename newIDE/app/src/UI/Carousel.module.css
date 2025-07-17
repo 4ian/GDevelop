@@ -1,0 +1,8 @@
+.arrowContainer:hover {
+    filter: brightness(130%);
+    transition: 'filter 100ms ease';
+}
+
+.arrowContainer path {
+    cursor: pointer;
+}

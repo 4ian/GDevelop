@@ -46,10 +46,14 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
 
   const ambientLight = layer
     .getEffects()
-    .insertNewEffect('3D Ammbient Light', 0);
-  ambientLight.setEffectType('Scene3D::AmbientLight');
-  ambientLight.setStringParameter('color', '255;255;255');
-  ambientLight.setDoubleParameter('intensity', 0.25);
+    .insertNewEffect('3D Ambient Hemisphere Light', 0);
+  ambientLight.setEffectType('Scene3D::HemisphereLight');
+  ambientLight.setStringParameter('skyColor', '255;255;255');
+  ambientLight.setStringParameter('groundColor', '127;127;127');
+  ambientLight.setDoubleParameter('intensity', 0.33);
+  ambientLight.setStringParameter('top', 'Z+');
+  ambientLight.setDoubleParameter('elevation', 40);
+  ambientLight.setDoubleParameter('rotation', 300);
 };
 
 export const addDefaultLightToAllLayers = (layout: gdLayout): void => {

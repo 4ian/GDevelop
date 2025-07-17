@@ -484,6 +484,8 @@ namespace gdjs {
       return {
         x: this.x,
         y: this.y,
+        w: this.getWidth(),
+        h: this.getHeight(),
         zo: this.zOrder,
         a: this.angle,
         hid: this.hidden,
@@ -511,6 +513,12 @@ namespace gdjs {
       }
       if (networkSyncData.y !== undefined) {
         this.setY(networkSyncData.y);
+      }
+      if (networkSyncData.w !== undefined) {
+        this.setWidth(networkSyncData.w);
+      }
+      if (networkSyncData.h !== undefined) {
+        this.setHeight(networkSyncData.h);
       }
       if (networkSyncData.zo !== undefined) {
         this.setZOrder(networkSyncData.zo);
@@ -2737,11 +2745,12 @@ namespace gdjs {
      *
      * @return true if the cursor, or any touch, is on the object.
      */
-    cursorOnObject(instanceContainer: gdjs.RuntimeInstanceContainer): boolean {
+    cursorOnObject(): boolean {
       const workingPoint: FloatPoint = gdjs.staticArray(
         RuntimeObject.prototype.cursorOnObject
       ) as FloatPoint;
       workingPoint.length = 2;
+      const instanceContainer = this.getInstanceContainer();
       const inputManager = instanceContainer.getGame().getInputManager();
       const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(

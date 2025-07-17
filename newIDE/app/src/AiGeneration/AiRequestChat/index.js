@@ -79,7 +79,8 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
-  onStartNewChat: () => void,
+  onStartNewChat: (mode: 'chat' | 'agent') => void,
+  initialMode?: 'chat' | 'agent',
 
   onProcessFunctionCalls: (
     functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
@@ -136,12 +137,26 @@ const getQuotaOrCreditsText = ({
     >
       <div>
         {isMobile ? (
-          <Trans>{quota.max - quota.current} free requests left</Trans>
+          increaseQuotaOffering === 'subscribe' ? (
+            <Trans>{quota.max - quota.current} trial requests left</Trans>
+          ) : (
+            <Trans>{quota.max - quota.current} free requests left</Trans>
+          )
+        ) : quota.period === '30days' ? (
+          increaseQuotaOffering === 'subscribe' ? (
+            <Trans>
+              {quota.max - quota.current} free trial requests left this month
+            </Trans>
+          ) : (
+            <Trans>
+              {quota.max - quota.current} of {quota.max} free requests left this
+              month
+            </Trans>
+          )
+        ) : quota.period === '1day' ? (
+          <Trans>{quota.max - quota.current} free requests left today</Trans>
         ) : (
-          <Trans>
-            {quota.max - quota.current} of {quota.max} free requests left this
-            month
-          </Trans>
+          <Trans>{quota.max - quota.current} free requests left</Trans>
         )}
       </div>
     </Tooltip>
@@ -234,6 +249,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onSendMessage,
       onSendFeedback,
       onStartNewChat,
+      initialMode,
       quota,
       increaseQuotaOffering,
       lastSendError,
@@ -252,7 +268,17 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     // TODO: store the default mode in the user preferences?
     const [newAiRequestMode, setNewAiRequestMode] = React.useState<
       'chat' | 'agent'
-    >('agent');
+    >(initialMode || 'agent');
+
+    // Update the mode when initialMode changes
+    React.useEffect(
+      () => {
+        if (initialMode) {
+          setNewAiRequestMode(initialMode);
+        }
+      },
+      [initialMode]
+    );
     const aiRequestId: string = aiRequest ? aiRequest.id : '';
     const [
       userRequestTextPerAiRequestId,
@@ -619,7 +645,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       <Text size="body-small" color="secondary" align="center" noMargin>
         <Trans>
           This request is for another project.{' '}
-          <Link href="#" onClick={onStartNewChat}>
+          <Link
+            href="#"
+            onClick={() => onStartNewChat(aiRequest.mode || 'chat')}
+          >
             Start a new chat
           </Link>{' '}
           to build on a new project.

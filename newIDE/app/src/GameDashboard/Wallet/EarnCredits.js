@@ -1,24 +1,24 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import Text from '../../../../UI/Text';
+import Text from '../../UI/Text';
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../../../UI/Layout';
+} from '../../UI/Layout';
 import {
   type Badge,
   type Achievement,
-} from '../../../../Utils/GDevelopServices/Badge';
-import { Column } from '../../../../UI/Grid';
-import Window from '../../../../Utils/Window';
-import Coin from '../../../../Credits/Icons/Coin';
-import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+} from '../../Utils/GDevelopServices/Badge';
+import { Column } from '../../UI/Grid';
+import Window from '../../Utils/Window';
+import Coin from '../../Credits/Icons/Coin';
+import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import { I18n } from '@lingui/react';
-import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
-import TextButton from '../../../../UI/TextButton';
-import RouterContext from '../../../RouterContext';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import TextButton from '../../UI/TextButton';
+import RouterContext from '../../MainFrame/RouterContext';
 
 type CreditItemType = 'badge' | 'feedback';
 type BadgeInfo = {|

@@ -380,11 +380,8 @@ namespace gdjs {
           .isMouseInsideCanvas();
       };
 
-      const _cursorIsOnObject = function (
-        obj: gdjs.RuntimeObject,
-        instanceContainer: gdjs.RuntimeInstanceContainer
-      ) {
-        return obj.cursorOnObject(instanceContainer);
+      const _cursorIsOnObject = function (obj: gdjs.RuntimeObject) {
+        return obj.cursorOnObject();
       };
 
       export const cursorOnObject = function (
@@ -397,7 +394,7 @@ namespace gdjs {
           _cursorIsOnObject,
           objectsLists,
           inverted,
-          instanceContainer
+          null
         );
       };
 

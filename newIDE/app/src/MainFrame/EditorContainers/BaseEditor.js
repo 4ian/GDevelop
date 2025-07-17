@@ -26,6 +26,9 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
+
+  // Ask AI
+  mode?: 'chat' | 'agent',
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -88,6 +91,7 @@ export type RenderEditorContainerProps = {|
     variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onOpenAskAi: (mode: 'chat' | 'agent') => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,

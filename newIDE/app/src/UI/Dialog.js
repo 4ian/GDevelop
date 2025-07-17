@@ -45,8 +45,8 @@ const getDefaultMaxWidthFromSize = (windowSize: WindowSizeType) => {
     case 'small':
       return false; // Full width
     case 'medium':
-    case 'large':
       return 'md';
+    case 'large':
     case 'xlarge':
       return 'lg';
     default:

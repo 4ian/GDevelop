@@ -21,6 +21,7 @@ const commonProps = {
     limitReached: false,
     current: 0,
     max: 2,
+    period: '1day',
   },
   onStartNewAiRequest: () => {},
   onSendMessage: async () => {},
@@ -70,6 +71,7 @@ export const NewAiRequestAlreadyUsedOneInThePast = () => (
             limitReached: false,
             current: 1,
             max: 2,
+            period: '1day',
           }}
           increaseQuotaOffering="upgrade"
         />
@@ -405,6 +407,7 @@ export const ReadyAiRequestAndAlreadyUsedOneInThePast = () => (
             limitReached: false,
             current: 1,
             max: 30,
+            period: '1day',
           }}
         />
       )}

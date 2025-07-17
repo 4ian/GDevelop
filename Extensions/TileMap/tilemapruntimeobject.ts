@@ -25,8 +25,6 @@ namespace gdjs {
     lai: number;
     lei: number;
     asps: number;
-    wid: number;
-    hei: number;
   };
 
   export type TilemapNetworkSyncData = ObjectNetworkSyncData &
@@ -158,8 +156,6 @@ namespace gdjs {
         lai: this._layerIndex,
         lei: this._levelIndex,
         asps: this._animationSpeedScale,
-        wid: this.getWidth(),
-        hei: this.getHeight(),
       };
     }
 
@@ -189,12 +185,6 @@ namespace gdjs {
       }
       if (networkSyncData.asps !== undefined) {
         this.setAnimationSpeedScale(networkSyncData.asps);
-      }
-      if (networkSyncData.wid !== undefined) {
-        this.setWidth(networkSyncData.wid);
-      }
-      if (networkSyncData.hei !== undefined) {
-        this.setHeight(networkSyncData.hei);
       }
     }
 

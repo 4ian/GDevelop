@@ -438,7 +438,6 @@ export const useGetConceptMetadata = () => {
   }).current;
   const getActionMetadata = useRefWithInit(() => {
     return memoize((type: string) => {
-      console.log(type);
       const {
         extensionShortHeader,
         eventsBasedBehavior,
@@ -447,7 +446,6 @@ export const useGetConceptMetadata = () => {
       } = findEventsFunctionInExtensions(extensionShortHeadersByName, type);
 
       if (extensionShortHeader && eventsFunction) {
-        console.log(eventsFunction);
         return {
           kind: 'Action',
           name: eventsFunction.fullName,

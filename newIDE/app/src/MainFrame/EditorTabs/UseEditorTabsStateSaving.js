@@ -22,6 +22,7 @@ type Props = {|
     name: string,
     dontFocusTab?: boolean,
     project?: ?gdProject,
+    mode?: 'chat' | 'agent',
   |}) => EditorOpeningOptions,
 |};
 

@@ -616,11 +616,13 @@ const MainFrame = (props: Props) => {
       name,
       dontFocusTab,
       project,
+      mode,
     }: {
       kind: EditorKind,
       name: string,
       dontFocusTab?: boolean,
       project?: ?gdProject,
+      mode?: 'chat' | 'agent',
     }) => {
       const label =
         kind === 'resources'
@@ -693,6 +695,8 @@ const MainFrame = (props: Props) => {
       const extraEditorProps =
         kind === 'start page'
           ? { storageProviders: props.storageProviders }
+          : kind === 'ask-ai'
+          ? { mode }
           : undefined;
       return {
         icon,
@@ -1263,11 +1267,11 @@ const MainFrame = (props: Props) => {
   });
 
   const openAskAi = React.useCallback(
-    () => {
+    (mode: 'chat' | 'agent') => {
       setState(state => {
         const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
         if (askAiEditor) {
-          askAiEditor.startNewChat();
+          askAiEditor.startNewChat(mode);
         }
 
         // Open or focus the AI editor.
@@ -1275,7 +1279,7 @@ const MainFrame = (props: Props) => {
           ...state,
           editorTabs: openEditorTab(
             state.editorTabs,
-            getEditorOpeningOptions({ kind: 'ask-ai', name: '' })
+            getEditorOpeningOptions({ kind: 'ask-ai', name: '', mode })
           ),
         };
       });
@@ -4291,6 +4295,7 @@ const MainFrame = (props: Props) => {
                     hideTabsTitleBarAndEditorToolbar: setTabsTitleBarAndEditorToolbarHidden,
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
+                    onOpenAskAi: openAskAi,
                     onOpenExternalEvents: openExternalEvents,
                     onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {

@@ -8,7 +8,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
   openProfileDialog: () => void,
-  openAskAi: () => void,
+  openAskAi: (mode: 'agent' | 'chat') => void,
 |};
 
 /**
@@ -76,7 +76,7 @@ const useOpenInitialDialog = ({
           // in the manage tab. So the homepage handles the route arguments itself.
           break;
         case 'ask-ai':
-          openAskAi();
+          openAskAi('agent');
           break;
         default:
           break;

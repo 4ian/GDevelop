@@ -308,6 +308,15 @@ export const sendGameTemplateInformationOpened = (options: {|
   recordEvent('game_template_information_opened', options);
 };
 
+export const sendCourseBuyClicked = (options: {|
+  courseId: string,
+  courseName: string,
+  currency?: string,
+  usageType: string,
+|}) => {
+  recordEvent('course_buy_clicked', options);
+};
+
 export const sendUserSurveyStarted = () => {
   recordEvent('user_survey_started');
 };

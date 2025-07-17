@@ -75,6 +75,7 @@ namespace gdjs {
       this._input.style.padding = `${this._object
         .getPaddingY()
         .toFixed(2)}px ${this._object.getPaddingX().toFixed(2)}px`;
+      this._input.spellcheck = this._object.isSpellcheckEnabled();
 
       this._form.appendChild(this._input);
 
@@ -109,6 +110,7 @@ namespace gdjs {
       this.updateTextAlign();
       this.updateMaxLength();
       this.updatePadding();
+      this.updateSpellcheck();
 
       this._runtimeGame
         .getRenderer()
@@ -365,6 +367,12 @@ namespace gdjs {
 
       const newTextAlign = this._object.getTextAlign();
       this._input.style.textAlign = newTextAlign;
+    }
+
+    updateSpellcheck() {
+      if (!this._input) return;
+
+      this._input.spellcheck = this._object.isSpellcheckEnabled();
     }
 
     isFocused() {

@@ -90,6 +90,9 @@ module.exports = {
       } else if (propertyName === 'textAlign') {
         objectContent.textAlign = newValue;
         return true;
+      } else if (propertyName === 'spellcheck') {
+        objectContent.spellcheck = newValue === '1';
+        return true;
       }
 
       return false;
@@ -256,6 +259,14 @@ module.exports = {
         .setLabel(_('Text alignment'))
         .setGroup(_('Field appearance'));
 
+      objectProperties
+        .getOrCreate('spellcheck')
+        .setValue(objectContent.spellcheck ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Enable spellcheck'))
+        .setDescription(_('Enable spell checking for the text input'))
+        .setGroup(_('Field'));
+
       return objectProperties;
     };
     textInputObject.content = {
@@ -276,6 +287,7 @@ module.exports = {
       paddingY: 1,
       textAlign: 'left',
       maxLength: 0,
+      spellcheck: false,
     };
 
     textInputObject.updateInitialInstanceProperty = function (
@@ -591,6 +603,24 @@ module.exports = {
       .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDisabled')
       .setGetter('isDisabled');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'Spellcheck',
+        _('Spellcheck'),
+        _('spellcheck is enabled'),
+        _('spellcheck'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Enable spellcheck?'))
+      )
+      .setFunctionName('setSpellcheck')
+      .setGetter('isSpellcheckEnabled');
 
     // Other expressions/conditions/actions:
 

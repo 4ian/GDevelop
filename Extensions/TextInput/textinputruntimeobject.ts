@@ -59,6 +59,7 @@ namespace gdjs {
       textAlign?: SupportedTextAlign;
       maxLength?: integer;
       // ----
+      spellcheck?: boolean;
     };
   }
 
@@ -77,6 +78,7 @@ namespace gdjs {
     bw: float;
     dis: boolean;
     ro: boolean;
+    spck: boolean;
   };
 
   export type TextInputNetworkSyncData = ObjectNetworkSyncData &
@@ -117,6 +119,7 @@ namespace gdjs {
     private _disabled: boolean;
     private _readOnly: boolean;
     private _isSubmitted: boolean;
+    private _spellcheck: boolean;
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
@@ -151,6 +154,7 @@ namespace gdjs {
           ? objectData.content.paddingY
           : 1;
       this._isSubmitted = false;
+      this._spellcheck = objectData.content.spellcheck || false;
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -250,6 +254,13 @@ namespace gdjs {
       ) {
         this.setPaddingY(newObjectData.content.paddingY);
       }
+      if (
+        newObjectData.content.spellcheck !== undefined &&
+        oldObjectData.content.spellcheck !== newObjectData.content.spellcheck
+      ) {
+        this._spellcheck = newObjectData.content.spellcheck;
+        this._renderer.updateSpellcheck();
+      }
 
       return true;
     }
@@ -271,6 +282,7 @@ namespace gdjs {
         bw: this.getBorderWidth(),
         dis: this.isDisabled(),
         ro: this.isReadOnly(),
+        spck: this.isSpellcheckEnabled(),
       };
     }
 
@@ -291,6 +303,7 @@ namespace gdjs {
       if (syncData.bw !== undefined) this.setBorderWidth(syncData.bw);
       if (syncData.dis !== undefined) this.setDisabled(syncData.dis);
       if (syncData.ro !== undefined) this.setReadOnly(syncData.ro);
+      if (syncData.spck !== undefined) this.setSpellcheck(syncData.spck);
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
@@ -631,6 +644,17 @@ namespace gdjs {
           .clearAllPressedKeys();
       }
       this._renderer.focus();
+    }
+
+    isSpellcheckEnabled(): boolean {
+      return this._spellcheck;
+    }
+
+    setSpellcheck(value: boolean) {
+      if (this._spellcheck === value) return;
+
+      this._spellcheck = value;
+      this._renderer.updateSpellcheck();
     }
   }
   gdjs.registerObject(

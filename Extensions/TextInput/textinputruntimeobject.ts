@@ -54,6 +54,7 @@ namespace gdjs {
       disabled: boolean;
       readOnly: boolean;
       // ---- Values can be undefined because of support for these feature was added in v5.5.222.
+      spellCheck?: boolean;
       paddingX?: float;
       paddingY?: float;
       textAlign?: SupportedTextAlign;
@@ -77,6 +78,7 @@ namespace gdjs {
     bw: float;
     dis: boolean;
     ro: boolean;
+    sc: boolean;
   };
 
   export type TextInputNetworkSyncData = ObjectNetworkSyncData &
@@ -116,6 +118,7 @@ namespace gdjs {
     private _borderWidth: float;
     private _disabled: boolean;
     private _readOnly: boolean;
+    private _spellCheck: boolean;
     private _isSubmitted: boolean;
     _renderer: TextInputRuntimeObjectRenderer;
 
@@ -140,6 +143,10 @@ namespace gdjs {
       this._borderWidth = objectData.content.borderWidth;
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
+      this._spellCheck =
+        objectData.content.spellCheck !== undefined
+          ? objectData.content.spellCheck
+          : false;
       this._textAlign = parseTextAlign(objectData.content.textAlign);
       this._maxLength = objectData.content.maxLength || 0;
       this._paddingX =
@@ -227,6 +234,12 @@ namespace gdjs {
         this.setReadOnly(newObjectData.content.readOnly);
       }
       if (
+        newObjectData.content.spellCheck !== undefined &&
+        oldObjectData.content.spellCheck !== newObjectData.content.spellCheck
+      ) {
+        this.setSpellCheck(newObjectData.content.spellCheck);
+      }
+      if (
         newObjectData.content.maxLength !== undefined &&
         oldObjectData.content.maxLength !== newObjectData.content.maxLength
       ) {
@@ -271,6 +284,7 @@ namespace gdjs {
         bw: this.getBorderWidth(),
         dis: this.isDisabled(),
         ro: this.isReadOnly(),
+        sc: this.isSpellCheckEnabled(),
       };
     }
 
@@ -291,6 +305,7 @@ namespace gdjs {
       if (syncData.bw !== undefined) this.setBorderWidth(syncData.bw);
       if (syncData.dis !== undefined) this.setDisabled(syncData.dis);
       if (syncData.ro !== undefined) this.setReadOnly(syncData.ro);
+      if (syncData.sc !== undefined) this.setSpellCheck(syncData.sc);
     }
 
     updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
@@ -561,6 +576,15 @@ namespace gdjs {
 
     isReadOnly(): boolean {
       return this._readOnly;
+    }
+
+    setSpellCheck(value: boolean) {
+      this._spellCheck = value;
+      this._renderer.updateSpellCheck();
+    }
+
+    isSpellCheckEnabled(): boolean {
+      return this._spellCheck;
     }
 
     isFocused(): boolean {

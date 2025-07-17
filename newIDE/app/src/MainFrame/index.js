@@ -1955,6 +1955,7 @@ const MainFrame = (props: Props) => {
         if (!currentlyRunningInAppTutorial) {
           const wholeProjectDiagnosticReport = currentProject.getWholeProjectDiagnosticReport();
           if (
+            !isForInGameEdition &&
             (forceDiagnosticReport ||
               preferences.values.openDiagnosticReportAutomatically) &&
             wholeProjectDiagnosticReport.hasAnyIssue()

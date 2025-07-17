@@ -440,8 +440,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
       ignoreSeal: true,
     });
-    this.setState({ lastSelectionType: 'instance' });
-    this.updateToolbar();
+    this._selectObjectOfInstances(newlySelectedInstances);
   }
 
   onResourceExternallyChanged = async (resourceInfo: {|
@@ -916,6 +915,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
+    this._sendSelectedInstances();
+    this._selectObjectOfInstances(instances);
+  };
+
+  _selectObjectOfInstances = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) {
       this.setState(
         {
@@ -1106,10 +1110,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
       ignoreSeal: true,
     });
-
-    this._sendSelectedInstances();
-    this.setState({ lastSelectionType: 'instance' });
-    this.updateToolbar();
+    this._onInstancesSelected(instances);
   };
 
   _sendSelectedInstances = () => {

@@ -74,6 +74,24 @@ export const preventGameFramePointerEvents = (enabled: boolean) => {
   onPreventGameFramePointerEvents(enabled);
 };
 
+const logSwitchingInfo = ({
+  editorId,
+  sceneName,
+  externalLayoutName,
+  eventsBasedObjectType,
+  eventsBasedObjectVariantName,
+}: EditorContentIdentifiers) => {
+  console.info(
+    eventsBasedObjectType
+      ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
+          ''}" of "${eventsBasedObjectType || ''}".`
+      : externalLayoutName
+      ? `Switching in-game edition previews to external layout "${externalLayoutName ||
+          ''}" (scene: "${sceneName || ''}").`
+      : `Switching in-game edition previews to scene "${sceneName || ''}".`
+  );
+};
+
 type Props = {|
   previewDebuggerServer: PreviewDebuggerServer | null,
   enabled: boolean,
@@ -184,16 +202,13 @@ export const EmbeddedGameFrame = ({
           });
           neededHotReload.current = 'None';
         } else {
-          console.info(
-            eventsBasedObjectType
-              ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
-                  ''}" of "${eventsBasedObjectType || ''}".`
-              : externalLayoutName
-              ? `Switching in-game edition previews to external layout "${externalLayoutName ||
-                  ''}" (scene: "${sceneName || ''}").`
-              : `Switching in-game edition previews to scene "${sceneName ||
-                  ''}".`
-          );
+          logSwitchingInfo({
+            editorId,
+            sceneName,
+            externalLayoutName,
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName,
+          });
           previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
             previewDebuggerServer.sendMessage(debuggerId, {
               command: 'switchForInGameEdition',
@@ -218,16 +233,13 @@ export const EmbeddedGameFrame = ({
         if (neededHotReload.current !== 'None') {
           return;
         }
-        console.info(
-          eventsBasedObjectType
-            ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
-                ''}" of "${eventsBasedObjectType || ''}".`
-            : externalLayoutName
-            ? `Switching in-game edition previews to external layout "${externalLayoutName ||
-                ''}" (scene: "${sceneName || ''}").`
-            : `Switching in-game edition previews to scene "${sceneName ||
-                ''}".`
-        );
+        logSwitchingInfo({
+          editorId,
+          sceneName,
+          externalLayoutName,
+          eventsBasedObjectType,
+          eventsBasedObjectVariantName,
+        });
         previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
           previewDebuggerServer.sendMessage(debuggerId, {
             command: 'switchForInGameEdition',

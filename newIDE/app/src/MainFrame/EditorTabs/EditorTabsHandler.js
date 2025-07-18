@@ -259,13 +259,17 @@ export const closeTabsExceptIf = (
 
     const currentEditorTab = pane.editors[pane.currentTab] || null;
     const paneRemainingEditors = pane.editors.filter(keepPredicate);
+    const currentEditorTabNewIndex = paneRemainingEditors.indexOf(
+      currentEditorTab
+    );
     newState.panes[paneIdentifier] = {
       ...pane,
-      editors: pane.editors.filter(keepPredicate),
+      editors: paneRemainingEditors,
 
       // Keep the focus on the current editor tab, or if it was closed
       // go back to the first tab.
-      currentTab: paneRemainingEditors.indexOf(currentEditorTab) || 0,
+      currentTab:
+        currentEditorTabNewIndex === -1 ? 0 : currentEditorTabNewIndex,
     };
   }
 

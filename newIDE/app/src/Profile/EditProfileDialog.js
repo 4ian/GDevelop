@@ -387,7 +387,7 @@ const EditProfileDialog = ({
   const canDelete = !actionInProgress;
 
   const onDeleteAccount = React.useCallback(
-    async (i18n: I18nType) => {
+    async () => {
       if (!canDelete || isStudentAccount) {
         return;
       }

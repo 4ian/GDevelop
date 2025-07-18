@@ -71,7 +71,11 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  onOpenAskAi: (mode: 'chat' | 'agent') => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   onOpenNewProjectSetupDialog: () => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -391,7 +395,13 @@ const MainPage = ({
                               color="success"
                               label={<Trans>Ask the AI</Trans>}
                               rightIcon={<ArrowRight />}
-                              onClick={() => onOpenAskAi('chat')}
+                              onClick={() =>
+                                onOpenAskAi({
+                                  mode: 'chat',
+                                  aiRequestId: null,
+                                  paneIdentifier: 'center',
+                                })
+                              }
                             />
                           </ColumnStackLayout>
                         </Line>

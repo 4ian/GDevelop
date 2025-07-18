@@ -8,13 +8,16 @@ import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 
 type Props = {|
-  onStartNewChat: (mode: 'chat' | 'agent') => void,
+  onStartOrOpenChat: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+  |}) => void,
   canStartNewChat: boolean,
   onOpenHistory: () => void,
 |};
 
 export const Toolbar = ({
-  onStartNewChat,
+  onStartOrOpenChat,
   canStartNewChat,
   onOpenHistory,
 }: Props) => {
@@ -33,7 +36,12 @@ export const Toolbar = ({
       <ToolbarGroup lastChild>
         <RaisedButton
           primary
-          onClick={() => onStartNewChat('agent')}
+          onClick={() =>
+            onStartOrOpenChat({
+              mode: 'agent',
+              aiRequestId: null,
+            })
+          }
           icon={<AddIcon />}
           label={<Trans>Start a new chat</Trans>}
           disabled={!canStartNewChat}

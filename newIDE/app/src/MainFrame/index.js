@@ -567,13 +567,17 @@ const MainFrame = (props: Props) => {
       name,
       dontFocusTab,
       project,
+      paneIdentifier,
       mode,
+      aiRequestId,
     }: {
       kind: EditorKind,
       name: string,
       dontFocusTab?: boolean,
       project?: ?gdProject,
+      paneIdentifier?: 'left' | 'center' | 'right' | null,
       mode?: 'chat' | 'agent',
+      aiRequestId?: string | null,
     }) => {
       const label =
         kind === 'resources'
@@ -647,7 +651,7 @@ const MainFrame = (props: Props) => {
         kind === 'start page'
           ? { storageProviders: props.storageProviders }
           : kind === 'ask-ai'
-          ? { mode }
+          ? { mode, aiRequestId }
           : undefined;
       return {
         icon,
@@ -668,7 +672,7 @@ const MainFrame = (props: Props) => {
         extraEditorProps,
         key,
         dontFocusTab,
-        paneIdentifier: kind === 'ask-ai' ? 'right' : 'center',
+        paneIdentifier: paneIdentifier || 'center',
       };
     },
     [i18n, props.storageProviders]
@@ -1198,11 +1202,24 @@ const MainFrame = (props: Props) => {
   });
 
   const openAskAi = React.useCallback(
-    (mode: 'chat' | 'agent') => {
+    ({
+      mode,
+      aiRequestId,
+      paneIdentifier,
+    }: {|
+      mode: 'chat' | 'agent',
+      aiRequestId: string | null,
+      paneIdentifier: 'left' | 'center' | 'right' | null,
+    |}) => {
       setState(state => {
+        // TODO: add support for opening on the right
+        // If already open, send to where it's asked.
+        // TODO: add support for opening a specific AI request.
+
         const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
         if (askAiEditor) {
-          askAiEditor.startNewChat(mode);
+          askAiEditor.startOrOpenChat({ mode, aiRequestId });
+          // TODO: move pane.
         }
 
         // Open or focus the AI editor.
@@ -1210,7 +1227,13 @@ const MainFrame = (props: Props) => {
           ...state,
           editorTabs: openEditorTab(
             state.editorTabs,
-            getEditorOpeningOptions({ kind: 'ask-ai', name: '', mode })
+            getEditorOpeningOptions({
+              kind: 'ask-ai',
+              name: '',
+              mode,
+              aiRequestId,
+              paneIdentifier,
+            })
           ),
         };
       });
@@ -3727,6 +3750,16 @@ const MainFrame = (props: Props) => {
     isApplicationTopLevelMenu: false,
     hideAskAi,
   };
+  const onOpenAskAiFromMainMenu = React.useCallback(
+    () => {
+      openAskAi({
+        mode: 'agent',
+        aiRequestId: null,
+        paneIdentifier: currentProject ? 'right' : 'center',
+      });
+    },
+    [openAskAi, currentProject]
+  );
   const mainMenuCallbacks = {
     onChooseProject: () => openOpenFromStorageProviderDialog(),
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
@@ -3745,7 +3778,7 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: onOpenProfileDialog,
-    onOpenAskAi: openAskAi,
+    onOpenAskAi: onOpenAskAiFromMainMenu,
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

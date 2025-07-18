@@ -166,7 +166,6 @@ export const PanesContainer = ({
   ] = React.useState(false);
 
   const isDragging = draggingStateRef.current !== null;
-  console.log('isDragging', isDragging);
 
   return (
     <div

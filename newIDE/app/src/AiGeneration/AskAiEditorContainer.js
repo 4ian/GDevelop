@@ -499,7 +499,10 @@ export type AskAiEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-  startNewChat: (mode: 'chat' | 'agent') => void,
+  startOrOpenChat: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+  |}) => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -572,9 +575,15 @@ export const AskAiEditor = React.memo<Props>(
       );
 
       const canStartNewChat = !!selectedAiRequestId;
-      const onStartNewChat = React.useCallback(
-        (mode: 'chat' | 'agent') => {
-          setSelectedAiRequestId(null);
+      const onStartOrOpenChat = React.useCallback(
+        ({
+          mode,
+          aiRequestId,
+        }: {|
+          mode: 'chat' | 'agent',
+          aiRequestId: string | null,
+        |}) => {
+          if (aiRequestId) setSelectedAiRequestId(aiRequestId);
           if (mode) {
             setNewChatMode(mode);
           }
@@ -606,14 +615,14 @@ export const AskAiEditor = React.memo<Props>(
           if (setToolbar) {
             setToolbar(
               <Toolbar
-                onStartNewChat={onStartNewChat}
+                onStartOrOpenChat={onStartOrOpenChat}
                 canStartNewChat={canStartNewChat}
                 onOpenHistory={onOpenHistory}
               />
             );
           }
         },
-        [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
+        [setToolbar, onStartOrOpenChat, canStartNewChat, onOpenHistory]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -626,7 +635,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
-        startNewChat: onStartNewChat,
+        startOrOpenChat: onStartOrOpenChat,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
@@ -1067,7 +1076,7 @@ export const AskAiEditor = React.memo<Props>(
                 }}
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
-                onStartNewChat={onStartNewChat}
+                onStartOrOpenChat={onStartOrOpenChat}
               />
             </div>
           </Paper>

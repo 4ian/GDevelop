@@ -87,7 +87,11 @@ export type EditorTabsPaneCommonProps = {|
   |}) => void,
   openVersionHistoryPanel: () => void,
   onQuitVersionHistory: () => Promise<void>,
-  onOpenAskAi: (mode: 'chat' | 'agent') => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: (layoutName: ?string) => void,
   openExternalEvents: (name: string) => void,
@@ -428,6 +432,14 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   });
   useOnResize(useForceUpdate()); // Ensure the pane is re-rendered when the window is resized.
 
+  const onOpenAskAiFromTitlebar = React.useCallback(() => {
+    onOpenAskAi({
+      mode: 'agent',
+      aiRequestId: null,
+      paneIdentifier: currentProject ? 'right' : 'center',
+    });
+  }, [onOpenAskAi, currentProject]);
+
   return (
     <div style={styles.container} ref={containerRef}>
       <TabsTitlebar
@@ -463,7 +475,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
           />
         )}
         hasAskAiOpened={hasAskAiOpened}
-        onOpenAskAi={onOpenAskAi}
+        onOpenAskAi={onOpenAskAiFromTitlebar}
       />
       <Toolbar
         ref={toolbarRef}

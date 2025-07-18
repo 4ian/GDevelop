@@ -50,7 +50,7 @@ const commonProps = {
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
-  onStartNewChat: () => {},
+  onStartOrOpenChat: () => {},
 };
 
 const fakeOutputWithUserRequestOnly = [

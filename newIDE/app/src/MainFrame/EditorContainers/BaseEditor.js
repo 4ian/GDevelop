@@ -29,6 +29,7 @@ export type EditorContainerExtraProps = {|
 
   // Ask AI
   mode?: 'chat' | 'agent',
+  aiRequestId?: string | null,
 |};
 
 export type SceneEventsOutsideEditorChanges = {|
@@ -86,7 +87,11 @@ export type RenderEditorContainerProps = {|
     variantName: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
-  onOpenAskAi: (mode: 'chat' | 'agent') => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,

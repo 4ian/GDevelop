@@ -723,6 +723,7 @@ namespace gdjs {
       selectedInstances: Array<InstancePersistentUuidData>;
       removedInstances: Array<InstancePersistentUuidData>;
     }): void {
+      console.trace();
       const inGameEditor = this._runtimegame._inGameEditor;
       if (!inGameEditor) {
         return;

@@ -341,6 +341,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   onReceiveInstanceChanges(changes: InstanceChanges) {
+    console.log(changes);
     // TODO: ensure this works for external layouts too.
 
     // TODO: adapt all of this to get all instances in one shot.
@@ -388,7 +389,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       modifiedInstances.push(instance);
     });
-    this._onInstancesMoved(modifiedInstances);
+    if (modifiedInstances.length > 0) {
+      this._onInstancesMoved(modifiedInstances);
+    }
 
     const newlySelectedInstances = changes.selectedInstances
       .map(selectedInstanceData => {
@@ -775,6 +778,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   );
 
   undo = () => {
+    console.log(this.state.history);
     // TODO: Do not clear selection so that the user can actually see
     // the changes it is undoing (variable change, instance moved, etc.)
     // or find a way to display a sumup of the change such as "Variable XXX

@@ -733,7 +733,7 @@ namespace gdjs {
           object.setZ(object.getZ() + deltaZ);
         }
       }
-      this._sendSelectionUpdate();
+      this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
     }
 
     private _handleSelectedObjectDragging(): void {
@@ -822,7 +822,7 @@ namespace gdjs {
       if (inputManager.isMouseButtonReleased(0)) {
         this._draggedSelectedObject = null;
         this._objectMover.endMove();
-        this._sendSelectionUpdate();
+        this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
       }
     }
 
@@ -871,7 +871,7 @@ namespace gdjs {
         !this._selectionControlsMovementTotalDelta
       ) {
         this._objectMover.endMove();
-        this._sendSelectionUpdate();
+        this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
       }
 
       // Start moving the selection.
@@ -1290,6 +1290,7 @@ namespace gdjs {
     }
 
     private _sendSelectionUpdate(options?: {
+      hasSelectedObjectBeenModified?: boolean;
       addedObjects?: Array<gdjs.RuntimeObject>;
       removedObjects?: Array<gdjs.RuntimeObject>;
     }) {
@@ -1307,10 +1308,13 @@ namespace gdjs {
           })
           .filter(isDefined);
 
-      const updatedInstances = this._selection
-        .getSelectedObjects()
-        .map((object) => this.getInstanceDataFromRuntimeObject(object))
-        .filter(isDefined);
+      const updatedInstances =
+        options && options.hasSelectedObjectBeenModified
+          ? this._selection
+              .getSelectedObjects()
+              .map((object) => this.getInstanceDataFromRuntimeObject(object))
+              .filter(isDefined)
+          : [];
 
       const addedInstances =
         options && options.addedObjects

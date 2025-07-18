@@ -168,11 +168,10 @@ namespace gdjs {
           gdjs.behaviorsTypes.items[behaviorTypeName];
       }
 
-      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
-
       // Reload projectData and runtimeGameOptions stored by convention in data.js:
       await this._reloadScript('data.js');
 
+      const newRuntimeGameOptions: RuntimeGameOptions = gdjs.runtimeGameOptions;
       const newProjectData: ProjectData = gdjs.projectData;
 
       if (gdjs.inAppTutorialMessage) {
@@ -199,17 +198,46 @@ namespace gdjs {
           newScriptFiles,
           projectDataOnlyExport
         );
+        const newRuntimeGameStatus =
+          newRuntimeGameOptions.initialRuntimeGameStatus;
 
-        const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
-          oldBehaviorConstructors,
-          gdjs.behaviorsTypes.items
-        );
-        await this._hotReloadRuntimeGame(
-          oldProjectData,
-          newProjectData,
-          changedRuntimeBehaviors,
-          this._runtimeGame
-        );
+        if (
+          newRuntimeGameStatus &&
+          newRuntimeGameStatus.editorId &&
+          newRuntimeGameStatus.isInGameEdition &&
+          newRuntimeGameStatus.editorId !==
+            this._runtimeGame._inGameEditor?.getEditorId()
+        ) {
+          // The editor don't need to hot-reload the current scene because the
+          // editor switched to another one.
+          this._runtimeGame.setProjectData(newProjectData);
+          await this._runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+            newProjectData.firstLayout,
+            () => {}
+          );
+          this._runtimeGame._switchToSceneOrVariant(
+            newRuntimeGameStatus.editorId || null,
+            newRuntimeGameStatus.sceneName,
+            newRuntimeGameStatus.injectedExternalLayoutName,
+            newRuntimeGameStatus.eventsBasedObjectType,
+            newRuntimeGameStatus.eventsBasedObjectVariantName
+          );
+          const inGameEditor = this._runtimeGame._inGameEditor;
+          if (inGameEditor) {
+            inGameEditor.setEditorId(newRuntimeGameStatus.editorId);
+          }
+        } else {
+          const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
+            oldBehaviorConstructors,
+            gdjs.behaviorsTypes.items
+          );
+          await this._hotReloadRuntimeGame(
+            oldProjectData,
+            newProjectData,
+            changedRuntimeBehaviors,
+            this._runtimeGame
+          );
+        }
       } catch (error) {
         const errorTarget = error.target;
         if (errorTarget instanceof HTMLScriptElement) {

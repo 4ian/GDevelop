@@ -13,7 +13,11 @@ import {
 import SceneEditor from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const gd: libGDevelop = global.gd;
 
@@ -84,18 +88,12 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     }
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
+  hotReloadInGameEditorIfNeeded(hotReloadProps: {|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) {
-    this._switchToSceneEdition({
-      hotReload: true,
-      projectDataOnlyExport,
-      shouldReloadResources,
-    });
+    this._switchToSceneEdition(hotReloadProps);
   }
 
   _switchToSceneEdition({
@@ -114,7 +112,6 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       eventsBasedObjectType: projectItemName || null,
       eventsBasedObjectVariantName: this.getVariantName(),
     });
-
     if (this.props.gameEditorMode === 'embedded-game' && projectItemName) {
       switchToSceneEdition({
         editorId,
@@ -129,7 +126,26 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       if (this.editor) {
         this.editor.onEditorReloaded();
       }
+    } else if (hotReload) {
+      setEditorHotReloadNeeded({
+        projectDataOnlyExport,
+        shouldReloadResources,
+      });
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    if (!projectItemName) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: null,
+      externalLayoutName: null,
+      eventsBasedObjectType: this.getEventsBasedObjectType() || null,
+      eventsBasedObjectVariantName: this.getVariantName(),
+    });
   }
 
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {

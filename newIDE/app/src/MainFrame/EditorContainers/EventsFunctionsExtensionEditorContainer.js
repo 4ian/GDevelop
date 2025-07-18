@@ -56,14 +56,24 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  forceInGameEditorHotReload(hotReloadProps: {|
+  hotReloadInGameEditorIfNeeded({
+    hotReload,
+    projectDataOnlyExport,
+    shouldReloadResources,
+  }: {|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) {
-    if (this.props.gameEditorMode === 'embedded-game') {
-      setEditorHotReloadNeeded(hotReloadProps);
+    if (hotReload) {
+      setEditorHotReloadNeeded({
+        projectDataOnlyExport,
+        shouldReloadResources,
+      });
     }
   }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {}
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.

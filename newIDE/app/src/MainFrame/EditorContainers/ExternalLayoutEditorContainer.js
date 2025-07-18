@@ -28,7 +28,11 @@ import {
 } from '../ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 const styles = {
   container: {
@@ -107,18 +111,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
+  hotReloadInGameEditorIfNeeded(hotReloadProps: {|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) {
-    this._switchToSceneEdition({
-      hotReload: true,
-      projectDataOnlyExport,
-      shouldReloadResources,
-    });
+    this._switchToSceneEdition(hotReloadProps);
   }
 
   _switchToSceneEdition({
@@ -138,7 +136,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
       eventsBasedObjectType: null,
       eventsBasedObjectVariantName: null,
     });
-
     if (
       this.props.gameEditorMode === 'embedded-game' &&
       layout &&
@@ -157,7 +154,27 @@ export class ExternalLayoutEditorContainer extends React.Component<
       if (this.editor) {
         this.editor.onEditorReloaded();
       }
+    } else if (hotReload) {
+      setEditorHotReloadNeeded({
+        projectDataOnlyExport,
+        shouldReloadResources,
+      });
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    const layout = this.getLayout();
+    if (!projectItemName || !layout) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: layout.getName(),
+      externalLayoutName: projectItemName,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {

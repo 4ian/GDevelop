@@ -1500,6 +1500,7 @@ const MainFrame = (props: Props) => {
     }
     if (hasEventsBasedObject) {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: false,
         shouldReloadResources: false,
       });
@@ -1507,26 +1508,70 @@ const MainFrame = (props: Props) => {
   };
 
   const hotReloadInGameEditorIfNeeded = React.useCallback(
-    (hotReloadProps: {|
+    ({
+      hotReload,
+      projectDataOnlyExport,
+      shouldReloadResources,
+    }: {|
+      hotReload: boolean,
       projectDataOnlyExport: boolean,
       shouldReloadResources: boolean,
     |}) => {
       const currentTab = getCurrentTab(state.editorTabs);
       const editorRef = currentTab ? currentTab.editorRef : null;
       if (!editorRef) {
-        if (gameEditorMode === 'embedded-game') {
-          setEditorHotReloadNeeded(hotReloadProps);
-        }
+        setEditorHotReloadNeeded({
+          projectDataOnlyExport,
+          shouldReloadResources,
+        });
         return;
       }
-      editorRef.forceInGameEditorHotReload(hotReloadProps);
+      editorRef.hotReloadInGameEditorIfNeeded({
+        hotReload,
+        projectDataOnlyExport,
+        shouldReloadResources,
+      });
     },
-    [state.editorTabs, gameEditorMode]
+    [state.editorTabs]
+  );
+
+  React.useEffect(
+    () => {
+      if (gameEditorMode === 'embedded-game') {
+        // The in-game editor is never hot-reloaded:
+        // - in 2D mode
+        // - from a tab without 3D editor
+        //
+        // It triggers required hot-reload level when users:
+        // - switch to 3D mode
+        // - switch to a 3D editor tab
+        //
+        // Hot-reloads are triggered right away from a 3D editor.
+        // Which means this call has no effect when switching between 2
+        // 3D editors.
+        hotReloadInGameEditorIfNeeded({
+          hotReload: false,
+          projectDataOnlyExport: true,
+          shouldReloadResources: false,
+        });
+      } else {
+        // Switch the 3D editor to the same scene as the 2D one.
+        // It allows to keep the 3D editor up to date for a fast switch
+        // between 2D and 3D.
+        const currentTab = getCurrentTab(state.editorTabs);
+        const editorRef = currentTab ? currentTab.editorRef : null;
+        if (editorRef) {
+          editorRef.switchInGameEditorIfNoHotReloadIsNeeded();
+        }
+      }
+    },
+    [gameEditorMode, state.editorTabs, hotReloadInGameEditorIfNeeded]
   );
 
   const onSceneAdded = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
@@ -1537,6 +1582,7 @@ const MainFrame = (props: Props) => {
   const onExternalLayoutAdded = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
@@ -1548,6 +1594,7 @@ const MainFrame = (props: Props) => {
     () => {
       // Ensure the effect implementation is exported.
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: false,
         shouldReloadResources: false,
       });
@@ -1589,6 +1636,7 @@ const MainFrame = (props: Props) => {
         currentProject.setFirstLayout(uniqueNewName);
       }
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
@@ -1623,6 +1671,7 @@ const MainFrame = (props: Props) => {
         uniqueNewName
       );
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: false,
       });
@@ -1847,6 +1896,18 @@ const MainFrame = (props: Props) => {
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
+
+      console.log('_launchPreview', {
+        networkPreview,
+        numberOfWindows,
+        hotReload,
+        projectDataOnlyExport,
+        shouldReloadResources,
+        fullLoadingScreen,
+        forceDiagnosticReport,
+        launchCaptureOptions,
+        isForInGameEdition,
+      });
 
       const previewLauncher = _previewLauncher.current;
       if (!previewLauncher) return;
@@ -2488,6 +2549,7 @@ const MainFrame = (props: Props) => {
 
   const onExtractAsExternalLayout = (name: string) => {
     hotReloadInGameEditorIfNeeded({
+      hotReload: true,
       projectDataOnlyExport: true,
       shouldReloadResources: false,
     });
@@ -2530,6 +2592,7 @@ const MainFrame = (props: Props) => {
   const onEventBasedObjectTypeChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: false,
         shouldReloadResources: false,
       });
@@ -2635,6 +2698,7 @@ const MainFrame = (props: Props) => {
   const onResourceExternallyChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: true,
       });
@@ -2645,6 +2709,7 @@ const MainFrame = (props: Props) => {
   const onResourceUsageChanged = React.useCallback(
     () => {
       hotReloadInGameEditorIfNeeded({
+        hotReload: true,
         projectDataOnlyExport: true,
         shouldReloadResources: false,
       });

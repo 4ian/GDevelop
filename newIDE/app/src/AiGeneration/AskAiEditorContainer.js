@@ -502,10 +502,12 @@ export type AskAiEditorInterface = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   startNewChat: (mode: 'chat' | 'agent') => void,
-  forceInGameEditorHotReload: ({|
+  hotReloadInGameEditorIfNeeded: ({|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -623,16 +625,24 @@ export const AskAiEditor = React.memo<Props>(
         [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
       );
 
-      const forceInGameEditorHotReload = React.useCallback(
-        (hotReloadProps: {|
+      const hotReloadInGameEditorIfNeeded = React.useCallback(
+        ({
+          hotReload,
+          projectDataOnlyExport,
+          shouldReloadResources,
+        }: {|
+          hotReload: boolean,
           projectDataOnlyExport: boolean,
           shouldReloadResources: boolean,
         |}) => {
-          if (gameEditorMode === 'embedded-game') {
-            setEditorHotReloadNeeded(hotReloadProps);
+          if (hotReload) {
+            setEditorHotReloadNeeded({
+              projectDataOnlyExport,
+              shouldReloadResources,
+            });
           }
         },
-        [gameEditorMode]
+        []
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -646,7 +656,8 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
         startNewChat: onStartNewChat,
-        forceInGameEditorHotReload,
+        hotReloadInGameEditorIfNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(

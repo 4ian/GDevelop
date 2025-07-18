@@ -10,12 +10,16 @@ type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
 |};
 
-type SwitchToSceneEditionOptions = {|
+type EditorContentIdentifiers = {|
   editorId: string,
   sceneName: string | null,
   externalLayoutName: string | null,
   eventsBasedObjectType: string | null,
   eventsBasedObjectVariantName: string | null,
+|};
+
+type SwitchToSceneEditionOptions = {|
+  ...EditorContentIdentifiers,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
   shouldReloadResources: boolean,
@@ -29,6 +33,9 @@ let onSetEditorHotReloadNeeded:
       projectDataOnlyExport: boolean,
       shouldReloadResources: boolean,
     |}) => void) = null;
+let onSwitchInGameEditorIfNoHotReloadIsNeeded:
+  | null
+  | (EditorContentIdentifiers => void) = null;
 let onPreventGameFramePointerEvents: null | ((enabled: boolean) => void) = null;
 
 export const attachToPreview = ({
@@ -51,6 +58,14 @@ export const setEditorHotReloadNeeded = (hotReloadProps: {|
   if (!onSetEditorHotReloadNeeded)
     throw new Error('No EmbeddedGameFrame registered.');
   onSetEditorHotReloadNeeded(hotReloadProps);
+};
+
+export const switchInGameEditorIfNoHotReloadIsNeeded = (
+  editorContentIdentifiers: EditorContentIdentifiers
+) => {
+  if (!onSwitchInGameEditorIfNoHotReloadIsNeeded)
+    throw new Error('No EmbeddedGameFrame registered.');
+  onSwitchInGameEditorIfNoHotReloadIsNeeded(editorContentIdentifiers);
 };
 
 export const preventGameFramePointerEvents = (enabled: boolean) => {
@@ -190,6 +205,39 @@ export const EmbeddedGameFrame = ({
             });
           });
         }
+      };
+      onSwitchInGameEditorIfNoHotReloadIsNeeded = ({
+        editorId,
+        sceneName,
+        externalLayoutName,
+        eventsBasedObjectType,
+        eventsBasedObjectVariantName,
+      }: EditorContentIdentifiers) => {
+        if (!previewDebuggerServer) return;
+        if (!enabled) return;
+        if (neededHotReload.current !== 'None') {
+          return;
+        }
+        console.info(
+          eventsBasedObjectType
+            ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
+                ''}" of "${eventsBasedObjectType || ''}".`
+            : externalLayoutName
+            ? `Switching in-game edition previews to external layout "${externalLayoutName ||
+                ''}" (scene: "${sceneName || ''}").`
+            : `Switching in-game edition previews to scene "${sceneName ||
+                ''}".`
+        );
+        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'switchForInGameEdition',
+            editorId,
+            sceneName,
+            externalLayoutName,
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName,
+          });
+        });
       };
     },
     [

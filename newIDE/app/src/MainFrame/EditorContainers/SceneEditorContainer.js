@@ -13,7 +13,11 @@ import {
 } from './BaseEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
-import { switchToSceneEdition } from '../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  switchToSceneEdition,
+  setEditorHotReloadNeeded,
+  switchInGameEditorIfNoHotReloadIsNeeded,
+} from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
@@ -61,18 +65,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   }
 
-  forceInGameEditorHotReload({
-    projectDataOnlyExport,
-    shouldReloadResources,
-  }: {|
+  hotReloadInGameEditorIfNeeded(hotReloadProps: {|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) {
-    this._switchToSceneEdition({
-      hotReload: true,
-      projectDataOnlyExport,
-      shouldReloadResources,
-    });
+    this._switchToSceneEdition(hotReloadProps);
   }
 
   _switchToSceneEdition({
@@ -105,7 +103,26 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
       if (this.editor) {
         this.editor.onEditorReloaded();
       }
+    } else if (hotReload) {
+      setEditorHotReloadNeeded({
+        projectDataOnlyExport,
+        shouldReloadResources,
+      });
     }
+  }
+
+  switchInGameEditorIfNoHotReloadIsNeeded() {
+    const { projectItemName, editorId } = this.props;
+    if (!projectItemName) {
+      return;
+    }
+    switchInGameEditorIfNoHotReloadIsNeeded({
+      editorId,
+      sceneName: projectItemName,
+      externalLayoutName: null,
+      eventsBasedObjectType: null,
+      eventsBasedObjectVariantName: null,
+    });
   }
 
   updateToolbar() {

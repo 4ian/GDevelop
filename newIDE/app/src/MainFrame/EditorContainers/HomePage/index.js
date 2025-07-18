@@ -176,10 +176,12 @@ export type HomePageEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     scene: SceneEventsOutsideEditorChanges
   ) => void,
-  forceInGameEditorHotReload: ({|
+  hotReloadInGameEditorIfNeeded: ({|
+    hotReload: boolean,
     projectDataOnlyExport: boolean,
     shouldReloadResources: boolean,
   |}) => void,
+  switchInGameEditorIfNoHotReloadIsNeeded: () => void,
 |};
 
 export const HomePage = React.memo<Props>(
@@ -445,16 +447,24 @@ export const HomePage = React.memo<Props>(
         [updateToolbar, activeTab, hideTabsTitleBarAndEditorToolbar, isMobile]
       );
 
-      const forceInGameEditorHotReload = React.useCallback(
-        (hotReloadProps: {|
+      const hotReloadInGameEditorIfNeeded = React.useCallback(
+        ({
+          hotReload,
+          projectDataOnlyExport,
+          shouldReloadResources,
+        }: {|
+          hotReload: boolean,
           projectDataOnlyExport: boolean,
           shouldReloadResources: boolean,
         |}) => {
-          if (gameEditorMode === 'embedded-game') {
-            setEditorHotReloadNeeded(hotReloadProps);
+          if (hotReload) {
+            setEditorHotReloadNeeded({
+              projectDataOnlyExport,
+              shouldReloadResources,
+            });
           }
         },
-        [gameEditorMode]
+        []
       );
 
       React.useImperativeHandle(ref, () => ({
@@ -465,7 +475,8 @@ export const HomePage = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
-        forceInGameEditorHotReload,
+        hotReloadInGameEditorIfNeeded,
+        switchInGameEditorIfNoHotReloadIsNeeded: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform

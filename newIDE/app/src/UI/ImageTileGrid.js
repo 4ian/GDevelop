@@ -46,7 +46,7 @@ const styles = {
   },
   thumbnailImageWithDescription: {
     display: 'block', // Display as a block to prevent cumulative layout shift.
-    objectFit: 'cover',
+    objectFit: 'contain',
     verticalAlign: 'middle',
     width: '100%',
     borderRadius: 8,

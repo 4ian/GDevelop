@@ -39,7 +39,7 @@ const styles = {
   previewImage: {
     width: '100%',
     display: 'block',
-    objectFit: 'cover',
+    objectFit: 'contain',
     borderRadius: 8,
     border: '1px solid lightgrey',
     boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.

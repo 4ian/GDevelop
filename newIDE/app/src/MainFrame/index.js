@@ -26,6 +26,7 @@ import EditorTabsPane, {
 import {
   getEditorTabsInitialState,
   openEditorTab,
+  closeEditorTab,
   closeProjectTabs,
   closeLayoutTabs,
   closeExternalLayoutTabs,
@@ -1212,29 +1213,38 @@ const MainFrame = (props: Props) => {
       paneIdentifier: 'left' | 'center' | 'right' | null,
     |}) => {
       setState(state => {
-        // TODO: add support for opening on the right
-        // If already open, send to where it's asked.
-        // TODO: add support for opening a specific AI request.
+        const openedEditor = getOpenedAskAiEditor(state.editorTabs);
+        let newEditorTabs = state.editorTabs;
+        if (openedEditor) {
+          if (
+            !paneIdentifier ||
+            openedEditor.paneIdentifier === paneIdentifier
+          ) {
+            // The editor is opened, and at the right position.
+            openedEditor.askAiEditor.startOrOpenChat({ mode, aiRequestId });
+            return state;
+          }
 
-        const askAiEditor = getOpenedAskAiEditor(state.editorTabs);
-        if (askAiEditor) {
-          askAiEditor.startOrOpenChat({ mode, aiRequestId });
-          // TODO: move pane.
+          // The editor is opened, but not in the right pane.
+          // Close it and it will re-open in the right pane.
+          newEditorTabs = closeEditorTab(newEditorTabs, openedEditor.editorTab);
         }
 
-        // Open or focus the AI editor.
+        // Open, or focus if already opened, the editor.
+        newEditorTabs = openEditorTab(
+          newEditorTabs,
+          getEditorOpeningOptions({
+            kind: 'ask-ai',
+            name: '',
+            mode,
+            aiRequestId,
+            paneIdentifier,
+          })
+        );
+
         return {
           ...state,
-          editorTabs: openEditorTab(
-            state.editorTabs,
-            getEditorOpeningOptions({
-              kind: 'ask-ai',
-              name: '',
-              mode,
-              aiRequestId,
-              paneIdentifier,
-            })
-          ),
+          editorTabs: newEditorTabs,
         };
       });
     },

@@ -432,13 +432,16 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   });
   useOnResize(useForceUpdate()); // Ensure the pane is re-rendered when the window is resized.
 
-  const onOpenAskAiFromTitlebar = React.useCallback(() => {
-    onOpenAskAi({
-      mode: 'agent',
-      aiRequestId: null,
-      paneIdentifier: currentProject ? 'right' : 'center',
-    });
-  }, [onOpenAskAi, currentProject]);
+  const onOpenAskAiFromTitlebar = React.useCallback(
+    () => {
+      onOpenAskAi({
+        mode: 'agent',
+        aiRequestId: null,
+        paneIdentifier: currentProject ? 'right' : 'center',
+      });
+    },
+    [onOpenAskAi, currentProject]
+  );
 
   return (
     <div style={styles.container} ref={containerRef}>

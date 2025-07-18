@@ -36,7 +36,7 @@ import { type EditorCallbacks } from '../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
-} from './AiRequestChat/AiRequestUtils';
+} from './AiRequestUtils';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -52,65 +52,9 @@ import {
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { prepareAiUserContent } from './PrepareAiUserContent';
+import { AiRequestContext } from './AiRequestContext';
 
 const gd: libGDevelop = global.gd;
-
-const useEditorFunctionCallResultsPerRequest = () => {
-  const [
-    editorFunctionCallResultsPerRequest,
-    setEditorFunctionCallResultsPerRequest,
-  ] = React.useState<{
-    [aiRequestId: string]: Array<EditorFunctionCallResult>,
-  }>({});
-
-  return {
-    getEditorFunctionCallResults: React.useCallback(
-      (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
-        editorFunctionCallResultsPerRequest[aiRequestId] || null,
-      [editorFunctionCallResultsPerRequest]
-    ),
-    addEditorFunctionCallResults: React.useCallback(
-      (
-        aiRequestId: string,
-        editorFunctionCallResults: EditorFunctionCallResult[]
-      ) => {
-        setEditorFunctionCallResultsPerRequest(
-          editorFunctionCallResultsPerRequest => {
-            const existingEditorFunctionCallResults = (
-              editorFunctionCallResultsPerRequest[aiRequestId] || []
-            ).filter(existingEditorFunctionCallResult => {
-              return !editorFunctionCallResults.some(
-                editorFunctionCallResult => {
-                  return (
-                    editorFunctionCallResult.call_id ===
-                    existingEditorFunctionCallResult.call_id
-                  );
-                }
-              );
-            });
-
-            return {
-              ...editorFunctionCallResultsPerRequest,
-              [aiRequestId]: [
-                ...existingEditorFunctionCallResults,
-                ...editorFunctionCallResults,
-              ],
-            };
-          }
-        );
-      },
-      []
-    ),
-    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
-      setEditorFunctionCallResultsPerRequest(
-        editorFunctionCallResultsPerRequest => ({
-          ...editorFunctionCallResultsPerRequest,
-          [aiRequestId]: null,
-        })
-      );
-    }, []),
-  };
-};
 
 const useProcessFunctionCalls = ({
   i18n,
@@ -280,52 +224,20 @@ const useProcessFunctionCalls = ({
   };
 };
 
-type AiRequestSendState = {|
-  isSending: boolean,
-  lastSendError: ?Error,
-|};
-
-export const useAiRequests = () => {
+export const useSelectedAiRequest = ({
+  initialAiRequestId,
+}: {|
+  initialAiRequestId: string | null,
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const { aiRequests, updateAiRequest } = aiRequestStorage;
 
-  const [aiRequests, setAiRequests] = React.useState<{ [string]: AiRequest }>(
-    {}
-  );
   const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
     string | null
-  >(null);
-
-  const updateAiRequest = React.useCallback(
-    (aiRequestId: string, aiRequest: AiRequest) => {
-      setAiRequests(aiRequests => ({
-        ...aiRequests,
-        [aiRequestId]: aiRequest,
-      }));
-    },
-    []
-  );
-
-  const refreshAiRequest = React.useCallback(
-    async (aiRequestId: string) => {
-      if (!profile) return;
-
-      try {
-        const updatedAiRequest = await getAiRequest(getAuthorizationHeader, {
-          userId: profile.id,
-          aiRequestId: aiRequestId,
-        });
-        updateAiRequest(updatedAiRequest.id, updatedAiRequest);
-      } catch (error) {
-        console.error(
-          'Error while background refreshing AI request - ignoring:',
-          error
-        );
-      }
-    },
-    [getAuthorizationHeader, profile, updateAiRequest]
-  );
+  >(initialAiRequestId);
 
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
@@ -375,59 +287,10 @@ export const useAiRequests = () => {
     ]
   );
 
-  const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
-    [string]: AiRequestSendState,
-  }>({});
-  const isSendingAiRequest = React.useCallback(
-    (aiRequestId: string | null) =>
-      !!aiRequestSendStates[aiRequestId || ''] &&
-      aiRequestSendStates[aiRequestId || ''].isSending,
-    [aiRequestSendStates]
-  );
-  const getLastSendError = React.useCallback(
-    (aiRequestId: string | null) =>
-      (aiRequestSendStates[aiRequestId || ''] &&
-        aiRequestSendStates[aiRequestId || ''].lastSendError) ||
-      null,
-    [aiRequestSendStates]
-  );
-  const setSendingAiRequest = React.useCallback(
-    (aiRequestId: string | null, isSending: boolean) => {
-      const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
-        [aiRequestIdToSet]: {
-          isSending,
-          lastSendError: null,
-        },
-      }));
-    },
-    [setAiRequestSendStates]
-  );
-  const setLastSendError = React.useCallback(
-    (aiRequestId: string | null, lastSendError: ?Error) => {
-      const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
-        [aiRequestIdToSet]: {
-          isSending: false,
-          lastSendError,
-        },
-      }));
-    },
-    [setAiRequestSendStates]
-  );
-
   return {
     selectedAiRequest,
     selectedAiRequestId,
     setSelectedAiRequestId,
-    updateAiRequest,
-    refreshAiRequest,
-    isSendingAiRequest,
-    setSendingAiRequest,
-    setLastSendError,
-    getLastSendError,
   };
 };
 
@@ -483,7 +346,13 @@ type Props = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  mode?: 'chat' | 'agent' | null,
+  initialMode: 'chat' | 'agent' | null,
+  initialAiRequestId: string | null,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -528,7 +397,9 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
-        mode,
+        initialMode,
+        initialAiRequestId,
+        onOpenAskAi,
       }: Props,
       ref
     ) => {
@@ -543,13 +414,9 @@ export const AskAiEditor = React.memo<Props>(
         selectedAiRequest,
         selectedAiRequestId,
         setSelectedAiRequestId,
-        updateAiRequest,
-        refreshAiRequest,
-        setSendingAiRequest,
-        isSendingAiRequest,
-        getLastSendError,
-        setLastSendError,
-      } = useAiRequests();
+      } = useSelectedAiRequest({
+        initialAiRequestId,
+      });
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
         selectedAiRequestId
       );
@@ -561,17 +428,17 @@ export const AskAiEditor = React.memo<Props>(
 
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
       const [newChatMode, setNewChatMode] = React.useState<'chat' | 'agent'>(
-        mode || 'agent'
+        initialMode || 'agent'
       );
 
       // Update newChatMode when mode prop changes
       React.useEffect(
         () => {
-          if (mode) {
-            setNewChatMode(mode);
+          if (initialMode) {
+            setNewChatMode(initialMode);
           }
         },
-        [mode]
+        [initialMode]
       );
 
       const canStartNewChat = !!selectedAiRequestId;
@@ -600,10 +467,22 @@ export const AskAiEditor = React.memo<Props>(
       }, []);
 
       const {
+        aiRequestStorage,
+        editorFunctionCallResultsStorage,
+      } = React.useContext(AiRequestContext);
+      const {
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         clearEditorFunctionCallResults,
-      } = useEditorFunctionCallResultsPerRequest();
+      } = editorFunctionCallResultsStorage;
+      const {
+        updateAiRequest,
+        refreshAiRequest,
+        isSendingAiRequest,
+        getLastSendError,
+        setSendingAiRequest,
+        setLastSendError,
+      } = aiRequestStorage;
 
       const {
         createAiProject,
@@ -829,6 +708,7 @@ export const AskAiEditor = React.memo<Props>(
           updateAiRequest,
           createAiProject,
           newAiRequestOptions,
+          onOpenAskAi,
         ]
       );
 
@@ -1125,7 +1005,13 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
-        mode={props.extraEditorProps && props.extraEditorProps.mode}
+        initialMode={
+          (props.extraEditorProps && props.extraEditorProps.mode) || null
+        }
+        initialAiRequestId={
+          (props.extraEditorProps && props.extraEditorProps.aiRequestId) || null
+        }
+        onOpenAskAi={props.onOpenAskAi}
       />
     )}
   </I18n>

@@ -604,33 +604,50 @@ export const moveTabToPosition = (
   };
 };
 
-export const hasEditorTabOpenedWithKey = (
+const getEditorTabOpenedWithKey = (
   editorTabsState: EditorTabsState,
   key: string
-) => {
+): {|
+  paneIdentifier: string,
+  editorTab: EditorTab,
+|} | null => {
   for (const paneIdentifier in editorTabsState.panes) {
     const pane = editorTabsState.panes[paneIdentifier];
-    if (pane && pane.editors.find(editor => editor.key === key)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-export const getOpenedAskAiEditor = (
-  state: EditorTabsState
-): AskAiEditorInterface | null => {
-  for (const paneIdentifier in state.panes) {
-    const pane = state.panes[paneIdentifier];
-    const editor = pane && pane.editors.find(editor => editor.key === 'ask-ai');
-    if (editor) {
-      // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
-      return editor.editorRef || null;
+    const editorTab = pane && pane.editors.find(editor => editor.key === key);
+    if (editorTab) {
+      return { editorTab, paneIdentifier };
     }
   }
 
   return null;
+};
+
+export const hasEditorTabOpenedWithKey = (
+  editorTabsState: EditorTabsState,
+  key: string
+): boolean => {
+  return getEditorTabOpenedWithKey(editorTabsState, key) !== null;
+};
+
+export const getOpenedAskAiEditor = (
+  state: EditorTabsState
+): null | {|
+  askAiEditor: AskAiEditorInterface,
+  editorTab: EditorTab,
+  paneIdentifier: string,
+|} => {
+  const currentEditorTabAndPaneIdentifier = getEditorTabOpenedWithKey(
+    state,
+    'ask-ai'
+  );
+  if (!currentEditorTabAndPaneIdentifier) return null;
+
+  return {
+    // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+    askAiEditor: currentEditorTabAndPaneIdentifier.editorTab.editorRef,
+    editorTab: currentEditorTabAndPaneIdentifier.editorTab,
+    paneIdentifier: currentEditorTabAndPaneIdentifier.paneIdentifier,
+  };
 };
 
 export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {

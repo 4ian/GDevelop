@@ -1451,6 +1451,28 @@ namespace gdjs {
       }
     }
 
+    hotReloadRuntimeInstances(
+      oldInstances: InstanceData[],
+      newInstances: InstanceData[],
+      runtimeInstanceContainer: RuntimeInstanceContainer
+    ): void {
+      const projectData: ProjectData = gdjs.projectData;
+      const objects: Array<ObjectData> = [];
+      runtimeInstanceContainer._objects.values(objects);
+      projectData.layouts;
+      this._hotReloadRuntimeSceneInstances(
+        projectData,
+        projectData,
+        [],
+        objects,
+        objects,
+        oldInstances,
+        newInstances,
+        runtimeInstanceContainer
+      );
+      gdjs.copyArray(oldInstances, newInstances);
+    }
+
     _hotReloadRuntimeSceneInstances(
       oldProjectData: ProjectData,
       newProjectData: ProjectData,

@@ -298,6 +298,18 @@ namespace gdjs {
             );
           }
         }
+      } else if (data.command === 'hotReloadAllInstances') {
+        if (runtimeGame._inGameEditor) {
+          const editedInstanceContainer =
+            runtimeGame._inGameEditor._getEditedInstanceContainer();
+          if (editedInstanceContainer) {
+            that._hotReloader.hotReloadRuntimeInstances(
+              runtimeGame._inGameEditor.getEditedInstanceDataList(),
+              data.payload.instances,
+              editedInstanceContainer
+            );
+          }
+        }
       } else if (data.command === 'switchForInGameEdition') {
         if (!this._runtimegame.isInGameEdition()) return;
 
@@ -734,6 +746,34 @@ namespace gdjs {
           command: 'openContextMenu',
           editorId: inGameEditor.getEditorId(),
           payload: { cursorX, cursorY },
+        })
+      );
+    }
+
+    sendUndo(): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'undo',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
+        })
+      );
+    }
+
+    sendRedo(): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'redo',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
         })
       );
     }

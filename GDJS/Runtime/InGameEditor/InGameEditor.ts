@@ -30,6 +30,8 @@ namespace gdjs {
   const Q_KEY = 81;
   const E_KEY = 69;
   const F_KEY = 70;
+  const Y_KEY = 90;
+  const Z_KEY = 90;
 
   let hasWindowFocus = true;
   if (typeof window !== 'undefined') {
@@ -108,6 +110,22 @@ namespace gdjs {
     return (
       inputManager.isKeyPressed(LEFT_SHIFT_KEY) ||
       inputManager.isKeyPressed(RIGHT_SHIFT_KEY)
+    );
+  };
+
+  const isControlPressedOnly = (inputManager: gdjs.InputManager) => {
+    return (
+      isControlOrCmdPressed(inputManager) &&
+      !isShiftPressed(inputManager) &&
+      !isAltPressed(inputManager)
+    );
+  };
+
+  const isControlPlusShiftPressedOnly = (inputManager: gdjs.InputManager) => {
+    return (
+      isControlOrCmdPressed(inputManager) &&
+      isShiftPressed(inputManager) &&
+      !isAltPressed(inputManager)
     );
   };
 
@@ -434,6 +452,10 @@ namespace gdjs {
 
     setEditorId(editorId: string): void {
       this._editorId = editorId;
+    }
+
+    getEditedInstanceDataList(): InstanceData[] {
+      return this._editedInstanceDataList;
     }
 
     setEditedInstanceDataList(editedInstanceDataList: InstanceData[]) {
@@ -1502,6 +1524,34 @@ namespace gdjs {
       debuggerClient.sendOpenContextMenu(cursorX, cursorY);
     }
 
+    private _handleShortcuts() {
+      const inputManager = this._runtimeGame.getInputManager();
+      if (isControlPressedOnly(inputManager)) {
+        if (inputManager.wasKeyReleased(Z_KEY)) {
+          this._sendUndo();
+        } else if (inputManager.wasKeyReleased(Y_KEY)) {
+          this._sendRedo();
+        }
+      }
+      if (isControlPlusShiftPressedOnly(inputManager)) {
+        if (inputManager.wasKeyReleased(Z_KEY)) {
+          this._sendRedo();
+        }
+      }
+    }
+
+    private _sendUndo() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendUndo();
+    }
+
+    private _sendRedo() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendRedo();
+    }
+
     cancelDragNewInstance() {
       const editedInstanceContainer = this._getEditedInstanceContainer();
       if (!editedInstanceContainer) return;
@@ -1932,6 +1982,7 @@ namespace gdjs {
       this._updateSelectionControls();
       this._updateInnerAreaOutline();
       this._handleContextMenu();
+      this._handleShortcuts();
       this._wasMovingSelectionLastFrame =
         !!this._selectionControlsMovementTotalDelta;
       if (!this._selectionControlsMovementTotalDelta) {

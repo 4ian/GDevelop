@@ -307,6 +307,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                 parsedMessage.payload.cursorX,
                 parsedMessage.payload.cursorY
               );
+            } else if (parsedMessage.command === 'undo') {
+              if (canUndo(this.state.history)) {
+                this.undo();
+              }
+            } else if (parsedMessage.command === 'redo') {
+              if (canRedo(this.state.history)) {
+                this.redo();
+              }
             }
           },
         }
@@ -782,6 +790,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (this.editorDisplay)
           this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
         this.updateToolbar();
+        this._sendHotReloadAllInstances();
       }
     );
   };
@@ -798,8 +807,23 @@ export default class SceneEditor extends React.Component<Props, State> {
         if (this.editorDisplay)
           this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
         this.updateToolbar();
+        this._sendHotReloadAllInstances();
       }
     );
+  };
+
+  _sendHotReloadAllInstances = () => {
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return;
+
+    previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+      previewDebuggerServer.sendMessage(debuggerId, {
+        command: 'hotReloadAllInstances',
+        payload: {
+          instances: serializeToJSObject(this.props.initialInstances),
+        },
+      });
+    });
   };
 
   _onObjectFolderOrObjectWithContextSelected = (

@@ -115,7 +115,8 @@
       },
       "window": {
         "background-color": {
-          "value": "#21252B"
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
         }
       },
       "canvas": {

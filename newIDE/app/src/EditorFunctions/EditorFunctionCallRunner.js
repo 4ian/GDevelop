@@ -56,10 +56,12 @@ export const processEditorFunctionCalls = async ({
   ignore,
   ensureExtensionInstalled,
   searchAndInstallAsset,
-}: ProcessEditorFunctionCallsOptions): Promise<
-  Array<EditorFunctionCallResult>
-> => {
+}: ProcessEditorFunctionCallsOptions): Promise<{|
+  results: Array<EditorFunctionCallResult>,
+  createdSceneNames: Array<string>,
+|}> => {
   const results: Array<EditorFunctionCallResult> = [];
+  const createdSceneNames: Array<string> = [];
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -147,12 +149,8 @@ export const processEditorFunctionCalls = async ({
       });
 
       if (success && args) {
-        if (typeof args.scene_name === 'string') {
-          editorCallbacks.onOpenLayout(args.scene_name, {
-            openEventsEditor: true,
-            openSceneEditor: true,
-            focusWhenOpened: 'none',
-          });
+        if (name === 'create_scene' && typeof args.scene_name === 'string') {
+          createdSceneNames.push(args.scene_name);
         }
       }
     } catch (error) {
@@ -165,5 +163,5 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return results;
+  return { results, createdSceneNames };
 };

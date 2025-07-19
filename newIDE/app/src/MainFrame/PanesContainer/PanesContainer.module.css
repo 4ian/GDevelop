@@ -23,6 +23,19 @@
   flex-shrink: 0;
 }
 
+@keyframes slide-in-right {
+  from {
+    transform: translateX(40px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.rightPane:not(.hidden) {
+  animation: slide-in-right 0.15s ease-out;
+}
+
 .centerPane {
   flex: 1;
 }

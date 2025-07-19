@@ -73,7 +73,9 @@ const useProcessFunctionCalls = ({
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
-  onSendEditorFunctionCallResults: () => Promise<void>,
+  onSendEditorFunctionCallResults: (
+    options: null | {| createdSceneNames: Array<string> |}
+  ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
   addEditorFunctionCallResults: (
     string,
@@ -140,7 +142,7 @@ const useProcessFunctionCalls = ({
         }))
       );
 
-      const editorFunctionCallResults = await processEditorFunctionCalls({
+      const { results, createdSceneNames } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
         functionCalls: functionCalls.map(functionCall => ({
@@ -160,14 +162,13 @@ const useProcessFunctionCalls = ({
         searchAndInstallAsset,
       });
 
-      addEditorFunctionCallResults(
-        selectedAiRequest.id,
-        editorFunctionCallResults
-      );
+      addEditorFunctionCallResults(selectedAiRequest.id, results);
 
       // We may have processed everything, so try to send the results
       // to the backend.
-      triggerSendEditorFunctionCallResults();
+      triggerSendEditorFunctionCallResults({
+        createdSceneNames,
+      });
     },
     [
       project,
@@ -727,7 +728,13 @@ export const AskAiEditor = React.memo<Props>(
 
       // Send the results of the function call outputs, if any, and the user message (if any).
       const onSendMessage = React.useCallback(
-        async ({ userMessage }: {| userMessage: string |}) => {
+        async ({
+          userMessage,
+          createdSceneNames,
+        }: {|
+          userMessage: string,
+          createdSceneNames?: Array<string>,
+        |}) => {
           if (
             !profile ||
             !selectedAiRequestId ||
@@ -839,9 +846,25 @@ export const AskAiEditor = React.memo<Props>(
               // Ignore limits refresh error.
             }
           }
+
+          if (selectedAiRequest && createdSceneNames) {
+            onOpenAskAi({
+              mode: selectedAiRequest.mode || 'agent',
+              aiRequestId: selectedAiRequestId,
+              paneIdentifier: 'right',
+            });
+            createdSceneNames.forEach(sceneName => {
+              onOpenLayout(sceneName, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              });
+            });
+          }
         },
         [
           profile,
+          selectedAiRequest,
           selectedAiRequestId,
           isSendingAiRequest,
           getEditorFunctionCallResults,
@@ -857,12 +880,15 @@ export const AskAiEditor = React.memo<Props>(
           onRefreshLimits,
           project,
           hasFunctionsCallsToProcess,
+          onOpenAskAi,
+          onOpenLayout,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
-        () =>
+        (options: null | {| createdSceneNames: Array<string> |}) =>
           onSendMessage({
             userMessage: '',
+            createdSceneNames: options ? options.createdSceneNames : [],
           }),
         [onSendMessage]
       );

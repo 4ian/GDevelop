@@ -68,6 +68,7 @@ type Props = {
   |}) => void,
   onSendMessage: (options: {|
     userMessage: string,
+    createdScenes?: Array<string>,
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,

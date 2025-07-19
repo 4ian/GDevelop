@@ -56,10 +56,12 @@ export const processEditorFunctionCalls = async ({
   ignore,
   ensureExtensionInstalled,
   searchAndInstallAsset,
-}: ProcessEditorFunctionCallsOptions): Promise<
-  Array<EditorFunctionCallResult>
-> => {
+}: ProcessEditorFunctionCallsOptions): Promise<{|
+  results: Array<EditorFunctionCallResult>,
+  createdScenes: Array<string>,
+|}> => {
   const results: Array<EditorFunctionCallResult> = [];
+  const createdScenes: Array<string> = [];
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
@@ -153,6 +155,7 @@ export const processEditorFunctionCalls = async ({
             openSceneEditor: true,
             focusWhenOpened: 'none',
           });
+          createdScenes.push(args.scene_name);
         }
       }
     } catch (error) {
@@ -165,5 +168,5 @@ export const processEditorFunctionCalls = async ({
     }
   }
 
-  return results;
+  return { results, createdScenes };
 };

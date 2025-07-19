@@ -150,8 +150,8 @@
       },
       "window": {
         "background-color": {
-          "value": "#1D1D26",
-          "comment": "Palette/Grey/100"
+          "value": "#32323B",
+          "comment": "Palette/Grey/80"
         }
       },
       "canvas": {

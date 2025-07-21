@@ -1125,7 +1125,7 @@ module.exports = {
       topFaceResourceName: '',
       bottomFaceResourceName: '',
       frontFaceVisible: true,
-      backFaceVisible: false,
+      backFaceVisible: true,
       leftFaceVisible: true,
       rightFaceVisible: true,
       topFaceVisible: true,

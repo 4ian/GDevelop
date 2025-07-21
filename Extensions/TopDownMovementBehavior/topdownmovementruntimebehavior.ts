@@ -507,10 +507,6 @@ namespace gdjs {
           cos = 0;
         }
 
-        const getAcceleratedSpeed = this._useLegacyTurnBack
-          ? TopDownMovementRuntimeBehavior.getLegacyAcceleratedSpeed
-          : TopDownMovementRuntimeBehavior.getAcceleratedSpeed;
-
         let currentSpeed = Math.hypot(this._xVelocity, this._yVelocity);
         const dotProduct = this._xVelocity * cos + this._yVelocity * sin;
         if (dotProduct < 0) {
@@ -518,13 +514,14 @@ namespace gdjs {
           // Keep the negative velocity projected on the new direction.
           currentSpeed = dotProduct;
         }
-        const speed = getAcceleratedSpeed(
+        const speed = TopDownMovementRuntimeBehavior.getAcceleratedSpeed(
           currentSpeed,
           targetedSpeed,
           this._maxSpeed,
           this._acceleration,
           this._deceleration,
-          timeDelta
+          timeDelta,
+          this._useLegacyTurnBack
         );
         this._xVelocity = speed * cos;
         this._yVelocity = speed * sin;
@@ -599,10 +596,13 @@ namespace gdjs {
       speedMax: float,
       acceleration: float,
       deceleration: float,
-      timeDelta: float
+      timeDelta: float,
+      useLegacyTurnBack: boolean = false
     ): float {
       let newSpeed = currentSpeed;
-      const turningBackAcceleration = Math.max(acceleration, deceleration);
+      const turningBackAcceleration = useLegacyTurnBack
+        ? acceleration
+        : Math.max(acceleration, deceleration);
       if (targetedSpeed < 0) {
         if (currentSpeed <= targetedSpeed) {
           // Reduce the speed to match the stick force.
@@ -638,62 +638,6 @@ namespace gdjs {
           newSpeed = Math.min(
             targetedSpeed,
             currentSpeed + turningBackAcceleration * timeDelta
-          );
-        }
-      } else {
-        // Decelerate and stop.
-        if (currentSpeed < 0) {
-          newSpeed = Math.min(currentSpeed + deceleration * timeDelta, 0);
-        }
-        if (currentSpeed > 0) {
-          newSpeed = Math.max(currentSpeed - deceleration * timeDelta, 0);
-        }
-      }
-      return newSpeed;
-    }
-
-    private static getLegacyAcceleratedSpeed(
-      currentSpeed: float,
-      targetedSpeed: float,
-      speedMax: float,
-      acceleration: float,
-      deceleration: float,
-      timeDelta: float
-    ): float {
-      let newSpeed = currentSpeed;
-      if (targetedSpeed < 0) {
-        if (currentSpeed <= targetedSpeed) {
-          // Reduce the speed to match the stick force.
-          newSpeed = Math.min(
-            targetedSpeed,
-            currentSpeed + deceleration * timeDelta
-          );
-        } else if (currentSpeed <= 0) {
-          // Accelerate
-          newSpeed -= Math.max(-speedMax, acceleration * timeDelta);
-        } else {
-          newSpeed = Math.max(
-            targetedSpeed,
-            currentSpeed - deceleration * timeDelta
-          );
-        }
-      } else if (targetedSpeed > 0) {
-        if (currentSpeed >= targetedSpeed) {
-          // Reduce the speed to match the stick force.
-          newSpeed = Math.max(
-            targetedSpeed,
-            currentSpeed - deceleration * timeDelta
-          );
-        } else if (currentSpeed >= 0) {
-          // Accelerate
-          newSpeed = Math.min(
-            speedMax,
-            currentSpeed + acceleration * timeDelta
-          );
-        } else {
-          newSpeed = Math.min(
-            targetedSpeed,
-            currentSpeed + deceleration * timeDelta
           );
         }
       } else {

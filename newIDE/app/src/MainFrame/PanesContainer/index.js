@@ -5,6 +5,7 @@ import classes from './PanesContainer.module.css';
 import classNames from 'classnames';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useDebounce } from '../../Utils/UseDebounce';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   pointerEventsNone: {
@@ -15,15 +16,23 @@ const styles = {
   },
 };
 
+export type FloatingPaneState = 'open' | 'closed';
+
 type Props = {|
   renderPane: ({
     paneIdentifier: string,
     isLeftMost: boolean,
     isRightMost: boolean,
+    isDrawer: boolean,
     onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
+    panesDrawerState: { [string]: FloatingPaneState },
+    onSetPaneDrawerState: (
+      paneIdentifier: string,
+      newState: FloatingPaneState
+    ) => void,
   }) => React.Node,
-  isLeftPaneOpened: boolean,
-  isRightPaneOpened: boolean,
+  hasEditorsInLeftPane: boolean,
+  hasEditorsInRightPane: boolean,
 |};
 
 type DraggingState = {|
@@ -36,9 +45,10 @@ const paneWidthMin = 300;
 
 export const PanesContainer = ({
   renderPane,
-  isLeftPaneOpened,
-  isRightPaneOpened,
+  hasEditorsInLeftPane,
+  hasEditorsInRightPane,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const debouncedForceUpdate = useDebounce(forceUpdate, 200);
 
@@ -48,6 +58,74 @@ export const PanesContainer = ({
   const centerPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const [panesDrawerState, setPanesDrawerState] = React.useState<{
+    [string]: FloatingPaneState,
+  }>({
+    left: 'open',
+    right: 'open',
+  });
+
+  const setPaneDrawerState = React.useCallback(
+    (paneIdentifier: string, newState: FloatingPaneState) => {
+      setPanesDrawerState(panesDrawerState => ({
+        ...panesDrawerState,
+        [paneIdentifier]: newState,
+      }));
+    },
+    []
+  );
+
+  React.useEffect(
+    () => {
+      if (isMobile) {
+        // Just switched to mobile view: any drawer is closed.
+        setPanesDrawerState({
+          left: 'closed',
+          right: 'closed',
+        });
+      } else {
+        // Just switched to non-mobile view: always consider the pane drawers as open.
+        setPanesDrawerState({
+          left: 'open',
+          right: 'open',
+        });
+      }
+    },
+    [isMobile]
+  );
+
+  React.useEffect(
+    () => {
+      if (hasEditorsInRightPane) {
+        // Just opened the first editor in the right pane: ensure the drawer
+        // pane is shown.
+        // Note that is the screen is big enough so that drawers are not shown,
+        // the state is "open" anyway, this is fine.
+        setPanesDrawerState(panesDrawerState => ({
+          ...panesDrawerState,
+          right: 'open',
+        }));
+      }
+    },
+    [hasEditorsInRightPane]
+  );
+
+  React.useEffect(
+    () => {
+      if (hasEditorsInLeftPane) {
+        // Just opened the first editor in the left pane: ensure the drawer
+        // pane is shown.
+        // Note that is the screen is big enough so that drawers are not shown,
+        // the state is "open" anyway, this is fine.
+        setPanesDrawerState(panesDrawerState => ({
+          ...panesDrawerState,
+          left: 'open',
+        }));
+      }
+    },
+    [hasEditorsInLeftPane]
+  );
 
   const draggingStateRef = React.useRef<DraggingState | null>(null);
 
@@ -180,7 +258,10 @@ export const PanesContainer = ({
         className={classNames({
           [classes.pane]: true,
           [classes.leftPane]: true,
-          [classes.hidden]: !isLeftPaneOpened,
+          [classes.drawer]: isMobile,
+          [classes.closedDrawer]:
+            isMobile && panesDrawerState['left'] === 'closed',
+          [classes.hidden]: !hasEditorsInLeftPane,
         })}
         style={
           leftPanePointerEventsNone && !isDragging
@@ -193,13 +274,16 @@ export const PanesContainer = ({
           paneIdentifier: 'left',
           isLeftMost: true,
           isRightMost: false,
+          isDrawer: isMobile,
+          panesDrawerState,
+          onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setLeftPanePointerEventsNone,
         })}
       </div>
       <div
         className={classNames({
           [classes.resizer]: true,
-          [classes.hidden]: !isLeftPaneOpened,
+          [classes.hidden]: !hasEditorsInLeftPane || isMobile,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -222,15 +306,18 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'center',
-          isLeftMost: !isLeftPaneOpened,
-          isRightMost: !isRightPaneOpened,
+          isLeftMost: isMobile || !hasEditorsInLeftPane,
+          isRightMost: isMobile || !hasEditorsInRightPane,
+          isDrawer: false,
+          panesDrawerState,
+          onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setCenterPanePointerEventsNone,
         })}
       </div>
       <div
         className={classNames({
           [classes.resizer]: true,
-          [classes.hidden]: !isRightPaneOpened,
+          [classes.hidden]: !hasEditorsInRightPane || isMobile,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -243,7 +330,10 @@ export const PanesContainer = ({
         className={classNames({
           [classes.pane]: true,
           [classes.rightPane]: true,
-          [classes.hidden]: !isRightPaneOpened,
+          [classes.drawer]: isMobile,
+          [classes.closedDrawer]:
+            isMobile && panesDrawerState['right'] === 'closed',
+          [classes.hidden]: !hasEditorsInRightPane,
         })}
         style={
           rightPanePointerEventsNone && !isDragging
@@ -256,6 +346,9 @@ export const PanesContainer = ({
           paneIdentifier: 'right',
           isLeftMost: false,
           isRightMost: true,
+          isDrawer: isMobile,
+          panesDrawerState,
+          onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setRightPanePointerEventsNone,
         })}
       </div>

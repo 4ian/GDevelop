@@ -3876,8 +3876,8 @@ const MainFrame = (props: Props) => {
     gamesList: gamesList,
   };
 
-  const isLeftPaneOpened = hasEditorsInPane(state.editorTabs, 'left');
-  const isRightPaneOpened = hasEditorsInPane(state.editorTabs, 'right');
+  const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
+  const hasEditorsInRightPane = hasEditorsInPane(state.editorTabs, 'right');
 
   return (
     <div
@@ -3958,20 +3958,26 @@ const MainFrame = (props: Props) => {
         }
       >
         <PanesContainer
-          isLeftPaneOpened={isLeftPaneOpened}
-          isRightPaneOpened={isRightPaneOpened}
+          hasEditorsInLeftPane={hasEditorsInLeftPane}
+          hasEditorsInRightPane={hasEditorsInRightPane}
           renderPane={({
             paneIdentifier,
             isLeftMost,
             isRightMost,
+            isDrawer,
             onSetPointerEventsNone,
+            panesDrawerState,
+            onSetPaneDrawerState,
           }) => (
             <EditorTabsPane
               {...editorTabsPaneProps}
               paneIdentifier={paneIdentifier}
               isLeftMost={isLeftMost}
               isRightMost={isRightMost}
+              isDrawer={isDrawer}
               onSetPointerEventsNone={onSetPointerEventsNone}
+              panesDrawerState={panesDrawerState}
+              onSetPaneDrawerState={onSetPaneDrawerState}
             />
           )}
         />

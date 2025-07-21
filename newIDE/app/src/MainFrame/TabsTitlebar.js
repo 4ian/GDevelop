@@ -52,11 +52,12 @@ type TabsTitlebarProps = {|
     onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
     onEditorTabClosing: () => void
   ) => React.Node,
-  hasAskAiOpened: boolean,
-  onOpenAskAi: () => void,
   isLeftMost: boolean,
   isRightMost: boolean,
   displayMenuIcon: boolean,
+
+  displayAskAi: boolean,
+  onAskAiClicked: () => void,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -106,11 +107,11 @@ export default function TabsTitlebar({
   toggleProjectManager,
   hidden,
   renderTabs,
-  hasAskAiOpened,
-  onOpenAskAi,
   isLeftMost,
   isRightMost,
   displayMenuIcon,
+  displayAskAi,
+  onAskAiClicked,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -195,10 +196,7 @@ export default function TabsTitlebar({
     limits.capabilities.classrooms.hideAskAi;
 
   const shouldDisplayAskAi =
-    preferences.values.showAiAskButtonInTitleBar &&
-    !hasAskAiOpened &&
-    isRightMost &&
-    !hideAskAi;
+    preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   return (
@@ -237,7 +235,7 @@ export default function TabsTitlebar({
           <TextButton
             icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
             label={'Ask AI'}
-            onClick={onOpenAskAi}
+            onClick={onAskAiClicked}
           />
         </div>
       ) : null}

@@ -604,7 +604,7 @@ export const moveTabToPosition = (
   };
 };
 
-const getEditorTabOpenedWithKey = (
+export const getEditorTabOpenedWithKey = (
   editorTabsState: EditorTabsState,
   key: string
 ): {|
@@ -622,7 +622,7 @@ const getEditorTabOpenedWithKey = (
   return null;
 };
 
-export const hasEditorTabOpenedWithKey = (
+const hasEditorTabOpenedWithKey = (
   editorTabsState: EditorTabsState,
   key: string
 ): boolean => {

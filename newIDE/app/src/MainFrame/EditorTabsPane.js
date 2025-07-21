@@ -15,7 +15,7 @@ import {
   getCurrentTabForPane,
   type EditorTabsState,
   type EditorTab,
-  hasEditorTabOpenedWithKey,
+  getEditorTabOpenedWithKey,
   changeCurrentTab,
   closeEditorTab,
   closeOtherEditorTabs,
@@ -47,6 +47,8 @@ import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/Responsiv
 import { MuiThemeOnlyProvider } from '../UI/Theme/FullThemeProvider';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useOnResize from '../Utils/UseOnResize';
+import DrawerTopBar from '../UI/DrawerTopBar';
+import { type FloatingPaneState } from './PanesContainer';
 
 const styles = {
   container: {
@@ -216,6 +218,12 @@ type Props = {|
   paneIdentifier: string,
   isLeftMost: boolean,
   isRightMost: boolean,
+  isDrawer: boolean,
+  panesDrawerState: { [string]: FloatingPaneState },
+  onSetPaneDrawerState: (
+    paneIdentifier: string,
+    newState: FloatingPaneState
+  ) => void,
 |};
 
 const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
@@ -293,11 +301,14 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     paneIdentifier,
     isLeftMost,
     isRightMost,
+    isDrawer,
+    onSetPaneDrawerState,
+    panesDrawerState,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const hasAskAiOpened = hasEditorTabOpenedWithKey(editorTabs, 'ask-ai');
+  const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   const [
@@ -434,52 +445,77 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
 
   const onOpenAskAiFromTitlebar = React.useCallback(
     () => {
+      if (
+        askAiPaneIdentifier &&
+        askAiPaneIdentifier.paneIdentifier === 'right'
+      ) {
+        onSetPaneDrawerState('right', 'open');
+        return;
+      }
+
       onOpenAskAi({
         mode: 'agent',
         aiRequestId: null,
         paneIdentifier: currentProject ? 'right' : 'center',
       });
     },
-    [onOpenAskAi, currentProject]
+    [askAiPaneIdentifier, onOpenAskAi, currentProject, onSetPaneDrawerState]
   );
 
   return (
     <div style={styles.container} ref={containerRef}>
-      <TabsTitlebar
-        isLeftMost={isLeftMost}
-        isRightMost={isRightMost}
-        displayMenuIcon={paneIdentifier === 'center'}
-        hidden={tabsTitleBarAndEditorToolbarHidden}
-        toggleProjectManager={toggleProjectManager}
-        renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
-          <DraggableEditorTabs
-            hideLabels={false}
-            editors={paneEditorTabs}
-            currentTab={currentTab}
-            onClickTab={onChangeEditorTab}
-            onCloseTab={(editorTab: EditorTab) => {
-              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosing();
-              onCloseEditorTab(editorTab);
-            }}
-            onCloseOtherTabs={(editorTab: EditorTab) => {
-              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosing();
-              onCloseOtherEditorTabs(editorTab);
-            }}
-            onCloseAll={() => {
-              // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-              onEditorTabClosing();
-              onCloseAllEditorTabs();
-            }}
-            onTabActivated={onEditorTabActivated}
-            onDropTab={onDropEditorTab}
-            onHoverTab={onEditorTabHovered}
-          />
-        )}
-        hasAskAiOpened={hasAskAiOpened}
-        onOpenAskAi={onOpenAskAiFromTitlebar}
-      />
+      {isDrawer ? (
+        <DrawerTopBar
+          drawerAnchor={isRightMost ? 'right' : 'left'}
+          title={'Ask AI'}
+          id={paneIdentifier + '-top-bar'}
+          onClose={() => onSetPaneDrawerState(paneIdentifier, 'closed')}
+        />
+      ) : (
+        <TabsTitlebar
+          isLeftMost={isLeftMost}
+          isRightMost={isRightMost}
+          displayMenuIcon={paneIdentifier === 'center'}
+          hidden={tabsTitleBarAndEditorToolbarHidden}
+          toggleProjectManager={toggleProjectManager}
+          renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
+            <DraggableEditorTabs
+              hideLabels={false}
+              editors={paneEditorTabs}
+              currentTab={currentTab}
+              onClickTab={onChangeEditorTab}
+              onCloseTab={(editorTab: EditorTab) => {
+                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+                onEditorTabClosing();
+                onCloseEditorTab(editorTab);
+              }}
+              onCloseOtherTabs={(editorTab: EditorTab) => {
+                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+                onEditorTabClosing();
+                onCloseOtherEditorTabs(editorTab);
+              }}
+              onCloseAll={() => {
+                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
+                onEditorTabClosing();
+                onCloseAllEditorTabs();
+              }}
+              onTabActivated={onEditorTabActivated}
+              onDropTab={onDropEditorTab}
+              onHoverTab={onEditorTabHovered}
+            />
+          )}
+          displayAskAi={
+            !askAiPaneIdentifier
+              ? // If Ask AI is closed, display the button on the right most part of the window.
+                isRightMost
+              : // If it's open, hide the button unless Ask AI is in a floating pane that is closed.
+                paneIdentifier === 'center' &&
+                panesDrawerState[askAiPaneIdentifier.paneIdentifier] ===
+                  'closed'
+          }
+          onAskAiClicked={onOpenAskAiFromTitlebar}
+        />
+      )}
       <Toolbar
         ref={toolbarRef}
         hidden={tabsTitleBarAndEditorToolbarHidden}

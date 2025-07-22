@@ -91,14 +91,25 @@ const useCourses = () => {
   const [chaptersByCourseId, setChaptersByCourseId] = React.useState<{|
     [courseId: string]: CourseChapter[],
   |}>({});
-  const userId = profile ? profile.id : null;
+
+  // Memo those values to avoid unnecessary effect calls.
+  const userId = React.useMemo(() => (profile ? profile.id : null), [profile]);
+  const userSubscriptionPlanId = React.useMemo(
+    () => (subscription ? subscription.planId : null),
+    [subscription]
+  );
+  const userCoursePurchasesCount = React.useMemo(
+    () => (coursePurchases ? coursePurchases.length : 0),
+    [coursePurchases]
+  );
 
   const fetchCourses = React.useCallback(
-    async () => {
+    async (): Promise<Array<Course>> => {
       const fetchedCourses = await listCourses(getAuthorizationHeader, {
         userId,
       });
       setCourses(fetchedCourses);
+      return fetchedCourses;
     },
     [userId, getAuthorizationHeader]
   );
@@ -427,31 +438,27 @@ const useCourses = () => {
   React.useEffect(
     () => {
       (async () => {
-        if (courses && loginState !== 'loggingIn') {
+        if (userSubscriptionPlanId || userCoursePurchasesCount) {
+          // Just to trigger a re-fetch of the courses when the user subscription changes,
+          // or when the user purchases a course.
+        }
+        // Check the loginState, to avoid fetching courses just before the user logs in.
+        if (loginState === 'done') {
+          const fetchedCourses = await fetchCourses();
           await Promise.all(
-            courses.map(course => fetchCourseChapters(course.id))
+            fetchedCourses.map(course => fetchCourseChapters(course.id))
           );
           setAreChaptersReady(true);
         }
       })();
     },
-    // (Re)fetch course chapters when courses are refetched.
-    [courses, fetchCourseChapters, loginState]
-  );
-
-  React.useEffect(
-    () => {
-      (async () => {
-        if (subscription || coursePurchases) {
-          // Just to trigger a re-fetch of the courses when the user subscription changes,
-          // or when the user purchases a course.
-        }
-        if (loginState !== 'loggingIn') {
-          await fetchCourses();
-        }
-      })();
-    },
-    [fetchCourses, subscription, coursePurchases, loginState]
+    [
+      fetchCourses,
+      fetchCourseChapters,
+      userSubscriptionPlanId,
+      userCoursePurchasesCount,
+      loginState,
+    ]
   );
 
   const selectedCourse = React.useMemo(

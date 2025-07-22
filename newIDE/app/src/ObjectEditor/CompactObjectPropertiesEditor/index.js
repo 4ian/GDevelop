@@ -53,6 +53,7 @@ import Window from '../../Utils/Window';
 import CompactTextField from '../../UI/CompactTextField';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
+import { getVariantName } from '../Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -375,11 +376,15 @@ export const CompactObjectPropertiesEditor = ({
   const customObjectConfiguration = eventsBasedObject
     ? gd.asCustomObjectConfiguration(objectConfiguration)
     : null;
+  const variantName = customObjectConfiguration
+    ? getVariantName(eventsBasedObject, customObjectConfiguration)
+    : '';
 
   const shouldDisplayEventsBasedObjectChildren =
     customObjectConfiguration &&
     (customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
-      customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration());
+      (!variantName &&
+        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration()));
 
   const helpLink = getHelpLink(objectMetadata.getHelpPath());
 
@@ -519,7 +524,6 @@ export const CompactObjectPropertiesEditor = ({
                               project={project}
                               resourceManagementProps={resourceManagementProps}
                               unsavedChanges={unsavedChanges}
-                              eventsBasedObject={eventsBasedObject}
                               customObjectConfiguration={
                                 customObjectConfiguration
                               }

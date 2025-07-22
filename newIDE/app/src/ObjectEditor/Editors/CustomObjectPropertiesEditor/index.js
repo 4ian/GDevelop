@@ -68,7 +68,7 @@ const styles = {
   icon: { width: 16, height: 16 },
 };
 
-const getVariantName = (
+export const getVariantName = (
   eventBasedObject: gdEventsBasedObject | null,
   customObjectConfiguration: gdCustomObjectConfiguration
 ): string =>
@@ -136,7 +136,15 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
 
-  const eventBasedObject = project.hasEventsBasedObject(
+  const customObjectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+    customObjectConfiguration.getType()
+  );
+  const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
+    customObjectExtensionName
+  )
+    ? project.getEventsFunctionsExtension(customObjectExtensionName)
+    : null;
+  const customObjectEventsBasedObject = project.hasEventsBasedObject(
     customObjectConfiguration.getType()
   )
     ? project.getEventsBasedObject(customObjectConfiguration.getType())
@@ -225,22 +233,22 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const duplicateVariant = React.useCallback(
     (i18n: I18nType, newName: string) => {
-      if (!eventBasedObject) {
+      if (!customObjectEventsBasedObject) {
         return;
       }
-      const variants = eventBasedObject.getVariants();
+      const variants = customObjectEventsBasedObject.getVariants();
       // TODO Forbid name with `::`
       const uniqueNewName = newNameGenerator(
         newName || i18n._(t`New variant`),
         tentativeNewName => variants.hasVariantNamed(tentativeNewName)
       );
       const oldVariantName = getVariantName(
-        eventBasedObject,
+        customObjectEventsBasedObject,
         customObjectConfiguration
       );
       const oldVariant = oldVariantName
         ? variants.getVariant(oldVariantName)
-        : eventBasedObject.getDefaultVariant();
+        : customObjectEventsBasedObject.getDefaultVariant();
       const newVariant = variants.insertNewVariant(uniqueNewName, 0);
       unserializeFromJSObject(
         newVariant,
@@ -255,15 +263,20 @@ const CustomObjectPropertiesEditor = (props: Props) => {
       setNewVariantDialogOpen(false);
       forceUpdate();
     },
-    [customObjectConfiguration, eventBasedObject, forceUpdate, project]
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      forceUpdate,
+      project,
+    ]
   );
 
   const deleteVariant = React.useCallback(
     () => {
-      if (!eventBasedObject || !onDeleteEventsBasedObjectVariant) {
+      if (!customObjectEventsBasedObject || !onDeleteEventsBasedObjectVariant) {
         return;
       }
-      const variants = eventBasedObject.getVariants();
+      const variants = customObjectEventsBasedObject.getVariants();
       const selectedVariantName = customObjectConfiguration.getVariantName();
       if (variants.hasVariantNamed(selectedVariantName)) {
         customObjectConfiguration.setVariantName('');
@@ -278,7 +291,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
         );
         onDeleteEventsBasedObjectVariant(
           eventBasedExtension,
-          eventBasedObject,
+          customObjectEventsBasedObject,
           variants.getVariant(selectedVariantName)
         );
         forceUpdate();
@@ -286,11 +299,16 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     },
     [
       customObjectConfiguration,
-      eventBasedObject,
+      customObjectEventsBasedObject,
       forceUpdate,
       onDeleteEventsBasedObjectVariant,
       project,
     ]
+  );
+
+  const variantName = getVariantName(
+    customObjectEventsBasedObject,
+    customObjectConfiguration
   );
 
   return (
@@ -307,9 +325,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 />
               ))}
               {propertiesSchema.length ||
-              (eventBasedObject &&
-                (eventBasedObject.getObjects().getObjectsCount() ||
-                  eventBasedObject.isAnimatable())) ? (
+              (customObjectEventsBasedObject &&
+                (customObjectEventsBasedObject.getObjects().getObjectsCount() ||
+                  customObjectEventsBasedObject.isAnimatable())) ? (
                 <React.Fragment>
                   {extraInformation ? (
                     <Line>
@@ -342,12 +360,22 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             label={<Trans>Edit</Trans>}
                             leftIcon={<Edit />}
                             onClick={editVariant}
+                            // Avoid to loss user changes by forcing them
+                            // to duplicate these variants.
                             disabled={
-                              !eventBasedObject ||
+                              !customObjectEventsBasedObject ||
+                              // Variants from the asset store are reset when
+                              // creating a new object with the same asset.
                               getVariant(
-                                eventBasedObject,
+                                customObjectEventsBasedObject,
                                 customObjectConfiguration
-                              ).getAssetStoreAssetId() !== ''
+                              ).getAssetStoreAssetId() !== '' ||
+                              // The default variant is reset when updating
+                              // the extension.
+                              (!variantName &&
+                                !!customObjectExtension &&
+                                customObjectExtension.getOriginName() ===
+                                  'gdevelop-extension-store')
                             }
                           />
                           <FlatButton
@@ -363,10 +391,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         </LineStackLayout>
                         <SelectField
                           floatingLabelText={<Trans>Variant</Trans>}
-                          value={getVariantName(
-                            eventBasedObject,
-                            customObjectConfiguration
-                          )}
+                          value={variantName}
                           onChange={(e, i, value: string) => {
                             customObjectConfiguration.setVariantName(value);
                             forceUpdate();
@@ -377,15 +402,17 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             value=""
                             label={t`Default`}
                           />
-                          {eventBasedObject &&
+                          {customObjectEventsBasedObject &&
                             mapFor(
                               0,
-                              eventBasedObject.getVariants().getVariantsCount(),
+                              customObjectEventsBasedObject
+                                .getVariants()
+                                .getVariantsCount(),
                               i => {
-                                if (!eventBasedObject) {
+                                if (!customObjectEventsBasedObject) {
                                   return null;
                                 }
-                                const variant = eventBasedObject
+                                const variant = customObjectEventsBasedObject
                                   .getVariants()
                                   .getVariantAt(i);
                                 return (
@@ -401,12 +428,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       </ColumnStackLayout>
                     </>
                   )}
-                  {(!getVariantName(
-                    eventBasedObject,
-                    customObjectConfiguration
-                  ) ||
+                  {(!variantName ||
                     customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
-                    (eventBasedObject &&
+                    (customObjectEventsBasedObject &&
                       (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
                       !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
                         <Line alignItems="center">
@@ -462,9 +486,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           </Line>
                           {mapFor(
                             0,
-                            eventBasedObject.getObjects().getObjectsCount(),
+                            customObjectEventsBasedObject
+                              .getObjects()
+                              .getObjectsCount(),
                             i => {
-                              const childObject = eventBasedObject
+                              const childObject = customObjectEventsBasedObject
                                 .getObjects()
                                 .getObjectAt(i);
                               const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
@@ -563,31 +589,32 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           )}
                         </>
                       )))}
-                  {eventBasedObject && eventBasedObject.isAnimatable() && (
-                    <Column expand>
-                      <Text size="block-title">
-                        <Trans>Animations</Trans>
-                      </Text>
-                      <AnimationList
-                        ref={animationList}
-                        animations={animations}
-                        project={project}
-                        layout={layout}
-                        eventsFunctionsExtension={eventsFunctionsExtension}
-                        eventsBasedObject={eventsBasedObject}
-                        object={object}
-                        objectName={objectName}
-                        resourceManagementProps={resourceManagementProps}
-                        onSizeUpdated={onSizeUpdated}
-                        onObjectUpdated={onObjectUpdated}
-                        isAnimationListLocked={false}
-                        scrollView={scrollView}
-                        onCreateMatchingSpriteCollisionMask={
-                          onCreateMatchingSpriteCollisionMask
-                        }
-                      />
-                    </Column>
-                  )}
+                  {customObjectEventsBasedObject &&
+                    customObjectEventsBasedObject.isAnimatable() && (
+                      <Column expand>
+                        <Text size="block-title">
+                          <Trans>Animations</Trans>
+                        </Text>
+                        <AnimationList
+                          ref={animationList}
+                          animations={animations}
+                          project={project}
+                          layout={layout}
+                          eventsFunctionsExtension={eventsFunctionsExtension}
+                          eventsBasedObject={eventsBasedObject}
+                          object={object}
+                          objectName={objectName}
+                          resourceManagementProps={resourceManagementProps}
+                          onSizeUpdated={onSizeUpdated}
+                          onObjectUpdated={onObjectUpdated}
+                          isAnimationListLocked={false}
+                          scrollView={scrollView}
+                          onCreateMatchingSpriteCollisionMask={
+                            onCreateMatchingSpriteCollisionMask
+                          }
+                        />
+                      </Column>
+                    )}
                 </React.Fragment>
               ) : (
                 <EmptyMessage>
@@ -599,8 +626,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               )}
             </ColumnStackLayout>
           </ScrollView>
-          {eventBasedObject &&
-            eventBasedObject.isAnimatable() &&
+          {customObjectEventsBasedObject &&
+            customObjectEventsBasedObject.isAnimatable() &&
             !isChildObject && (
               <Column noMargin>
                 <ResponsiveLineStackLayout
@@ -736,12 +763,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               />
             </Dialog>
           )}
-          {newVariantDialogOpen && eventBasedObject && (
+          {newVariantDialogOpen && customObjectEventsBasedObject && (
             <NewVariantDialog
-              initialName={
-                getVariantName(eventBasedObject, customObjectConfiguration) ||
-                i18n._(t`New variant`)
-              }
+              initialName={variantName || i18n._(t`New variant`)}
               onApply={name => duplicateVariant(i18n, name)}
               onCancel={() => {
                 setNewVariantDialogOpen(false);

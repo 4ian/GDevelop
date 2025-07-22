@@ -360,7 +360,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             label={<Trans>Edit</Trans>}
                             leftIcon={<Edit />}
                             onClick={editVariant}
-                            // Avoid to loss user changes by forcing them
+                            // Avoid to lose user changes by forcing them
                             // to duplicate these variants.
                             disabled={
                               !customObjectEventsBasedObject ||

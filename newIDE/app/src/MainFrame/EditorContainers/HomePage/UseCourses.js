@@ -92,16 +92,10 @@ const useCourses = () => {
     [courseId: string]: CourseChapter[],
   |}>({});
 
-  // Memo those values to avoid unnecessary effect calls.
-  const userId = React.useMemo(() => (profile ? profile.id : null), [profile]);
-  const userSubscriptionPlanId = React.useMemo(
-    () => (subscription ? subscription.planId : null),
-    [subscription]
-  );
-  const userCoursePurchasesCount = React.useMemo(
-    () => (coursePurchases ? coursePurchases.length : 0),
-    [coursePurchases]
-  );
+  // Extract those values to avoid unnecessary effect calls.
+  const userId = profile ? profile.id : null;
+  const userSubscriptionPlanId = subscription ? subscription.planId : null;
+  const userCoursePurchasesCount = coursePurchases ? coursePurchases.length : 0;
 
   const fetchCourses = React.useCallback(
     async (): Promise<Array<Course>> => {

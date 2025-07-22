@@ -178,7 +178,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) {
-        if (renderedInstance instanceof Rendered3DInstance) {
+        if (renderedInstance.isRenderedIn3D()) {
           pixiObject.zOrder = instance.getZ() + renderedInstance.getDepth();
         } else {
           pixiObject.zOrder = instance.getZOrder();

@@ -18,6 +18,11 @@ type MuiThemeProviderProps = {|
   children: React.Node,
 |};
 
+/**
+ * Allow to override the Material-UI theme for a specific subtree.
+ * Useful for panes which are having a different "responsive window size"
+ * than the rest of the application.
+ */
 export const MuiThemeOnlyProvider = ({ children }: MuiThemeProviderProps) => {
   const { values } = React.useContext(PreferencesContext);
   const { themeName, language } = values;

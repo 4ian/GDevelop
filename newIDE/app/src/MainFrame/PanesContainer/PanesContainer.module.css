@@ -113,12 +113,11 @@
   z-index: 1; /* To allow the shadow to be visible. */
   width: 2px;
   cursor: ew-resize;
-  background-color: #d9d9de;
+  background-color: var(--theme-surface-titlebar-background-color);
   flex-shrink: 0;
   pointer-events: all;
 }
 .resizer:hover,
 .resizer:focus {
-  background-color: #999;
   outline: none;
 }

@@ -93,6 +93,101 @@ export const getVariant = (
     : eventBasedObject.getDefaultVariant();
 };
 
+/** Avoid to lose user changes by forcing them to duplicate these variants. */
+export const isVariantEditable = (
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null
+): boolean => {
+  if (
+    !customObjectConfiguration ||
+    !eventsBasedObject ||
+    !eventsFunctionsExtension
+  ) {
+    return false;
+  }
+  // Variants from the asset store are reset when creating a new object with
+  // the same asset.
+  return (
+    getVariant(
+      eventsBasedObject,
+      customObjectConfiguration
+    ).getAssetStoreAssetId() === '' &&
+    // The default variant is reset when updating the extension.
+    (!!getVariantName(eventsBasedObject, customObjectConfiguration) ||
+      eventsFunctionsExtension.getOriginName() !== 'gdevelop-extension-store')
+  );
+};
+
+export const duplicateVariant = (
+  newName: string,
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  project: gdProject,
+  i18n: I18nType
+): void => {
+  if (!eventsBasedObject || !customObjectConfiguration) {
+    return;
+  }
+  const variants = eventsBasedObject.getVariants();
+  // TODO Forbid name with `::`
+  const uniqueNewName = newNameGenerator(
+    newName || i18n._(t`New variant`),
+    tentativeNewName => variants.hasVariantNamed(tentativeNewName)
+  );
+  const oldVariantName = getVariantName(
+    eventsBasedObject,
+    customObjectConfiguration
+  );
+  const oldVariant = oldVariantName
+    ? variants.getVariant(oldVariantName)
+    : eventsBasedObject.getDefaultVariant();
+  const newVariant = variants.insertNewVariant(uniqueNewName, 0);
+  unserializeFromJSObject(
+    newVariant,
+    serializeToJSObject(oldVariant),
+    'unserializeFrom',
+    project
+  );
+  newVariant.setName(uniqueNewName);
+  newVariant.setAssetStoreAssetId('');
+  newVariant.setAssetStoreOriginalName('');
+  customObjectConfiguration.setVariantName(uniqueNewName);
+};
+
+export const deleteVariant = (
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  project: gdProject,
+  onDeleteEventsBasedObjectVariant: ?(
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void
+): void => {
+  if (
+    !customObjectConfiguration ||
+    !eventsBasedObject ||
+    !eventsFunctionsExtension ||
+    !onDeleteEventsBasedObjectVariant
+  ) {
+    return;
+  }
+  const variants = eventsBasedObject.getVariants();
+  const selectedVariantName = customObjectConfiguration.getVariantName();
+  if (!variants.hasVariantNamed(selectedVariantName)) {
+    return;
+  }
+  customObjectConfiguration.setVariantName('');
+  onDeleteEventsBasedObjectVariant(
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    variants.getVariant(selectedVariantName)
+  );
+};
+
 type Props = EditorProps;
 
 const CustomObjectPropertiesEditor = (props: Props) => {
@@ -217,85 +312,55 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const editVariant = React.useCallback(
     () => {
-      onOpenEventBasedObjectVariantEditor &&
+      customObjectExtension &&
+        customObjectEventsBasedObject &&
+        onOpenEventBasedObjectVariantEditor &&
         onOpenEventBasedObjectVariantEditor(
-          gd.PlatformExtension.getExtensionFromFullObjectType(
-            customObjectConfiguration.getType()
-          ),
-          gd.PlatformExtension.getObjectNameFromFullObjectType(
-            customObjectConfiguration.getType()
-          ),
+          customObjectExtension.getName(),
+          customObjectEventsBasedObject.getName(),
           customObjectConfiguration.getVariantName()
         );
     },
-    [customObjectConfiguration, onOpenEventBasedObjectVariantEditor]
+    [
+      customObjectConfiguration,
+      onOpenEventBasedObjectVariantEditor,
+      customObjectExtension,
+      customObjectEventsBasedObject,
+    ]
   );
 
-  const duplicateVariant = React.useCallback(
+  const doDuplicateVariant = React.useCallback(
     (i18n: I18nType, newName: string) => {
-      if (!customObjectEventsBasedObject) {
-        return;
-      }
-      const variants = customObjectEventsBasedObject.getVariants();
-      // TODO Forbid name with `::`
-      const uniqueNewName = newNameGenerator(
-        newName || i18n._(t`New variant`),
-        tentativeNewName => variants.hasVariantNamed(tentativeNewName)
-      );
-      const oldVariantName = getVariantName(
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
         customObjectEventsBasedObject,
-        customObjectConfiguration
+        customObjectExtension,
+        project,
+        i18n
       );
-      const oldVariant = oldVariantName
-        ? variants.getVariant(oldVariantName)
-        : customObjectEventsBasedObject.getDefaultVariant();
-      const newVariant = variants.insertNewVariant(uniqueNewName, 0);
-      unserializeFromJSObject(
-        newVariant,
-        serializeToJSObject(oldVariant),
-        'unserializeFrom',
-        project
-      );
-      newVariant.setName(uniqueNewName);
-      newVariant.setAssetStoreAssetId('');
-      newVariant.setAssetStoreOriginalName('');
-      customObjectConfiguration.setVariantName(uniqueNewName);
       setNewVariantDialogOpen(false);
       forceUpdate();
     },
     [
       customObjectConfiguration,
       customObjectEventsBasedObject,
+      customObjectExtension,
       forceUpdate,
       project,
     ]
   );
 
-  const deleteVariant = React.useCallback(
+  const doDeleteVariant = React.useCallback(
     () => {
-      if (!customObjectEventsBasedObject || !onDeleteEventsBasedObjectVariant) {
-        return;
-      }
-      const variants = customObjectEventsBasedObject.getVariants();
-      const selectedVariantName = customObjectConfiguration.getVariantName();
-      if (variants.hasVariantNamed(selectedVariantName)) {
-        customObjectConfiguration.setVariantName('');
-        const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
-          customObjectConfiguration.getType()
-        );
-        if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
-          return;
-        }
-        const eventBasedExtension = project.getEventsFunctionsExtension(
-          extensionName
-        );
-        onDeleteEventsBasedObjectVariant(
-          eventBasedExtension,
-          customObjectEventsBasedObject,
-          variants.getVariant(selectedVariantName)
-        );
-        forceUpdate();
-      }
+      deleteVariant(
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        onDeleteEventsBasedObjectVariant
+      );
+      forceUpdate();
     },
     [
       customObjectConfiguration,
@@ -303,6 +368,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
       forceUpdate,
       onDeleteEventsBasedObjectVariant,
       project,
+      customObjectExtension,
     ]
   );
 
@@ -357,39 +423,34 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       <ColumnStackLayout expand noMargin>
                         <LineStackLayout>
                           <FlatButton
+                            key={'edit-variant'}
                             label={<Trans>Edit</Trans>}
                             leftIcon={<Edit />}
                             onClick={editVariant}
-                            // Avoid to lose user changes by forcing them
-                            // to duplicate these variants.
                             disabled={
-                              !customObjectEventsBasedObject ||
-                              // Variants from the asset store are reset when
-                              // creating a new object with the same asset.
-                              getVariant(
+                              !isVariantEditable(
+                                customObjectConfiguration,
                                 customObjectEventsBasedObject,
-                                customObjectConfiguration
-                              ).getAssetStoreAssetId() !== '' ||
-                              // The default variant is reset when updating
-                              // the extension.
-                              (!variantName &&
-                                !!customObjectExtension &&
-                                customObjectExtension.getOriginName() ===
-                                  'gdevelop-extension-store')
+                                customObjectExtension
+                              )
                             }
                           />
                           <FlatButton
+                            key={'duplicate-variant'}
                             label={<Trans>Duplicate</Trans>}
                             leftIcon={<Add />}
                             onClick={() => setNewVariantDialogOpen(true)}
                           />
                           <FlatButton
+                            key={'delete-variant'}
                             label={<Trans>Delete</Trans>}
                             leftIcon={<Trash />}
-                            onClick={deleteVariant}
+                            onClick={doDeleteVariant}
+                            disabled={!variantName}
                           />
                         </LineStackLayout>
                         <SelectField
+                          id={'variant-name'}
                           floatingLabelText={<Trans>Variant</Trans>}
                           value={variantName}
                           onChange={(e, i, value: string) => {
@@ -766,7 +827,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
           {newVariantDialogOpen && customObjectEventsBasedObject && (
             <NewVariantDialog
               initialName={variantName || i18n._(t`New variant`)}
-              onApply={name => duplicateVariant(i18n, name)}
+              onApply={name => doDuplicateVariant(i18n, name)}
               onCancel={() => {
                 setNewVariantDialogOpen(false);
               }}

@@ -101,11 +101,6 @@
       }
     },
     "surface": {
-      "titlebar": {
-        "background-color": {
-          "value": "#191724"
-        }
-      },
       "toolbar": {
         "background-color": {
           "value": "#1f1d2e"
@@ -113,7 +108,7 @@
       },
       "window": {
         "background-color": {
-          "value": "#1F1D2A"
+          "value": "#191724"
         }
       },
       "canvas": {

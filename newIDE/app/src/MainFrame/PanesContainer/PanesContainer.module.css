@@ -115,7 +115,7 @@
   z-index: 1; /* To allow the shadow to be visible. */
   width: 2px;
   cursor: ew-resize;
-  background-color: var(--theme-surface-titlebar-background-color);
+  background-color: transparent;
   flex-shrink: 0;
   pointer-events: all;
 }

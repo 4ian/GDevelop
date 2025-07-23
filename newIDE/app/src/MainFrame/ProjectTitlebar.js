@@ -53,13 +53,15 @@ const ProjectTitlebar = React.memo<Props>(
           .join(' - ');
 
         Window.setTitle(title);
-        Window.setTitleBarColor(gdevelopTheme.titlebar.backgroundColor);
+        Window.setWindowBackgroundColor(
+          gdevelopTheme.surface.window.backgroundColor
+        );
       },
       [
         projectIdentifier,
         suffix,
         hasUnsavedChanges,
-        gdevelopTheme.titlebar.backgroundColor,
+        gdevelopTheme.surface.window.backgroundColor,
         storageProviderName,
       ]
     );

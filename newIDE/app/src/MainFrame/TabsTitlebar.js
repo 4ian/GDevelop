@@ -114,8 +114,6 @@ export default function TabsTitlebar({
   onAskAiClicked,
 }: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
@@ -123,13 +121,6 @@ export default function TabsTitlebar({
     editorTab: EditorTab,
   |}>(null);
   const tooltipTimeoutId = React.useRef<?TimeoutID>(null);
-
-  React.useEffect(
-    () => {
-      Window.setTitleBarColor(backgroundColor);
-    },
-    [backgroundColor]
-  );
 
   const onEditorTabHovered = React.useCallback(
     (
@@ -203,7 +194,7 @@ export default function TabsTitlebar({
     <div
       style={{
         ...styles.container,
-        backgroundColor,
+        backgroundColor: 'transparent',
         // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
         visibility: hidden ? 'hidden' : 'visible',
         pointerEvents: hidden ? undefined : 'all',

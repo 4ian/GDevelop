@@ -8,7 +8,7 @@
 .pane {
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
   position: relative;
   pointer-events: all;
 }
@@ -16,11 +16,13 @@
 .leftPane {
   flex-basis: 300px;
   flex-shrink: 0;
+  z-index: 1; /* Create a new stacking context. */
 }
 
 .rightPane {
   flex-basis: 300px;
   flex-shrink: 0;
+  z-index: 1; /* Create a new stacking context. */
 }
 
 @keyframes slide-in-right {

@@ -3,8 +3,8 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import AddIcon from '../UI/CustomSvgIcons/Add';
-import HistoryIcon from '../UI/CustomSvgIcons/History';
-import RaisedButton from '../UI/RaisedButton';
+import ChatBubblesIcon from '../UI/CustomSvgIcons/ChatBubbles';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import IconButton from '../UI/IconButton';
 
 type Props = {|
@@ -30,11 +30,11 @@ export const Toolbar = ({
           tooltip={t`View history`}
           onClick={onOpenHistory}
         >
-          <HistoryIcon />
+          <ChatBubblesIcon />
         </IconButton>
       </ToolbarGroup>
       <ToolbarGroup lastChild>
-        <RaisedButton
+        <ResponsiveRaisedButton
           primary
           onClick={() =>
             onStartOrOpenChat({

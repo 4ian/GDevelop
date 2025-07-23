@@ -550,6 +550,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               </>
             ) : null}
           </ColumnStackLayout>
+          <Spacer />
           <Column justifyContent="center">
             {newAiRequestMode === 'agent' ? (
               <Text size="body-small" color="secondary" align="center" noMargin>

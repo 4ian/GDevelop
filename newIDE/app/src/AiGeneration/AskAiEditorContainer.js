@@ -302,6 +302,8 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     minWidth: 0,
+    overflowY: 'scroll',
+    overflowX: 'hidden',
   },
   chatContainer: {
     flex: 1,
@@ -451,10 +453,8 @@ export const AskAiEditor = React.memo<Props>(
           mode: 'chat' | 'agent',
           aiRequestId: string | null,
         |}) => {
-          if (aiRequestId) setSelectedAiRequestId(aiRequestId);
-          if (mode) {
-            setNewChatMode(mode);
-          }
+          setSelectedAiRequestId(aiRequestId);
+          setNewChatMode(mode);
         },
         [setSelectedAiRequestId]
       );

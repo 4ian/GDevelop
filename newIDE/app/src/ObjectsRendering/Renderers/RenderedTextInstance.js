@@ -39,7 +39,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
-    getPropertyOverridings: () => Map<string, string> | null
+    getPropertyOverridings: (() => Map<string, string>) | null
   ) {
     super(
       project,

@@ -363,8 +363,8 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#A6A6AB",
-          "comment": "Palette/Grey/40"
+          "value": "#D9D9DE",
+          "comment": "Background/tertiary"
         },
         "color": {
           "value": "#1D1D26",

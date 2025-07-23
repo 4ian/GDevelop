@@ -37,6 +37,7 @@ const styles = {
     height: 34,
   },
   askAiContainer: {
+    zIndex: 0, // Create a stacking context to avoid the AI icon z-indexed element to display above other panes or UI elements.
     marginBottom: 4,
     marginRight: 1,
     marginLeft: 2,

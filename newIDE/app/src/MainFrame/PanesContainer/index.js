@@ -24,8 +24,8 @@ type Props = {|
     isLeftMostPane: boolean,
     isRightMostPane: boolean,
     isDrawer: boolean,
+    areSidePanesDrawers: boolean,
     onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
-    panesDrawerState: { [string]: FloatingPaneState },
     onSetPaneDrawerState: (
       paneIdentifier: string,
       newState: FloatingPaneState
@@ -43,6 +43,104 @@ type DraggingState = {|
 
 const paneWidthMin = 300;
 
+/** Allow a pane to be moved and closed with a swipe on touchscreens. */
+const useSwipeableDrawer = ({
+  enabled,
+  paneRef,
+  direction,
+  onClose,
+}: {|
+  enabled: boolean,
+  paneRef: {| current: HTMLDivElement | null |},
+  direction: 'left' | 'right',
+  onClose: () => void,
+|}) => {
+  React.useEffect(
+    () => {
+      const drawer = paneRef.current;
+      if (!drawer) return;
+      if (!enabled) return;
+
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+
+      const minSwipeDistance = 80;
+
+      const onTouchStart = (e: TouchEvent) => {
+        startX = e.touches[0].clientX;
+        currentX = e.touches[0].clientX;
+        isDragging = true;
+        drawer.style.transition = 'none';
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (!isDragging) return;
+
+        currentX = e.touches[0].clientX;
+        const deltaX = currentX - startX;
+
+        const hasMovedEnough = Math.abs(deltaX) > 10;
+
+        const translate = !hasMovedEnough
+          ? 0
+          : direction === 'left'
+          ? Math.max(0, deltaX)
+          : Math.min(0, deltaX); // Prevent dragging in wrong direction
+
+        drawer.style.transform = `translateX(${translate}px)`;
+      };
+
+      const onTouchEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        const deltaX = currentX - startX;
+        const shouldClose =
+          direction === 'left'
+            ? deltaX > minSwipeDistance
+            : deltaX < -minSwipeDistance;
+
+        // Animate the drawer either to close or fully open position,
+        const animationTimeInMs = 200;
+        drawer.style.transition = `transform 0.${animationTimeInMs}s ease-out`;
+
+        if (shouldClose) {
+          // Animate to close position.
+          const closeTransform = direction === 'left' ? '100vw' : '-100vw';
+          drawer.style.transform = `translateX(${closeTransform})`;
+
+          // Delay to match animation time.
+          setTimeout(() => {
+            onClose(); // This is responsible for ensuring the drawer will stay closed.
+            drawer.style.transform = ''; // Reset for future swipes
+          }, 250);
+        } else {
+          // Snap back to open.
+          drawer.style.transform = 'translateX(0)';
+
+          // Delay to match animation time.
+          setTimeout(() => {
+            drawer.style.transform = ''; // Reset for future swipes
+          }, 250);
+        }
+      };
+
+      drawer.addEventListener('touchstart', onTouchStart);
+      drawer.addEventListener('touchmove', onTouchMove);
+      drawer.addEventListener('touchend', onTouchEnd);
+
+      return () => {
+        drawer.removeEventListener('touchstart', onTouchStart);
+        drawer.removeEventListener('touchmove', onTouchMove);
+        drawer.removeEventListener('touchend', onTouchEnd);
+        drawer.style.transform = '';
+      };
+    },
+    [enabled, paneRef, direction, onClose]
+  );
+};
+
 export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
@@ -58,6 +156,8 @@ export const PanesContainer = ({
   const centerPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightPaneRef = React.useRef<HTMLDivElement | null>(null);
   const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const areSidePanesDrawers = isMobile;
 
   const [panesDrawerState, setPanesDrawerState] = React.useState<{
     [string]: FloatingPaneState,
@@ -78,7 +178,7 @@ export const PanesContainer = ({
 
   React.useEffect(
     () => {
-      if (isMobile) {
+      if (areSidePanesDrawers) {
         // Just switched to mobile view: any drawer is closed.
         setPanesDrawerState({
           left: 'closed',
@@ -92,7 +192,7 @@ export const PanesContainer = ({
         });
       }
     },
-    [isMobile]
+    [areSidePanesDrawers]
   );
 
   React.useEffect(
@@ -102,13 +202,10 @@ export const PanesContainer = ({
         // pane is shown.
         // Note that is the screen is big enough so that drawers are not shown,
         // the state is "open" anyway, this is fine.
-        setPanesDrawerState(panesDrawerState => ({
-          ...panesDrawerState,
-          right: 'open',
-        }));
+        setPaneDrawerState('right', 'open');
       }
     },
-    [hasEditorsInRightPane]
+    [setPaneDrawerState, hasEditorsInRightPane]
   );
 
   React.useEffect(
@@ -118,14 +215,33 @@ export const PanesContainer = ({
         // pane is shown.
         // Note that is the screen is big enough so that drawers are not shown,
         // the state is "open" anyway, this is fine.
-        setPanesDrawerState(panesDrawerState => ({
-          ...panesDrawerState,
-          left: 'open',
-        }));
+        setPaneDrawerState('left', 'open');
       }
     },
-    [hasEditorsInLeftPane]
+    [setPaneDrawerState, hasEditorsInLeftPane]
   );
+
+  const onCloseLeftPane = React.useCallback(
+    () => setPaneDrawerState('left', 'closed'),
+    [setPaneDrawerState]
+  );
+  useSwipeableDrawer({
+    enabled: areSidePanesDrawers,
+    paneRef: leftPaneRef,
+    direction: 'left',
+    onClose: onCloseLeftPane,
+  });
+
+  const onCloseRightPane = React.useCallback(
+    () => setPaneDrawerState('right', 'closed'),
+    [setPaneDrawerState]
+  );
+  useSwipeableDrawer({
+    enabled: areSidePanesDrawers,
+    paneRef: rightPaneRef,
+    direction: 'left',
+    onClose: onCloseRightPane,
+  });
 
   const draggingStateRef = React.useRef<DraggingState | null>(null);
 
@@ -258,9 +374,9 @@ export const PanesContainer = ({
         className={classNames({
           [classes.pane]: true,
           [classes.leftPane]: true,
-          [classes.drawer]: isMobile,
+          [classes.drawer]: areSidePanesDrawers,
           [classes.closedDrawer]:
-            isMobile && panesDrawerState['left'] === 'closed',
+            areSidePanesDrawers && panesDrawerState['left'] === 'closed',
           [classes.hidden]: !hasEditorsInLeftPane,
         })}
         style={
@@ -274,8 +390,8 @@ export const PanesContainer = ({
           paneIdentifier: 'left',
           isLeftMostPane: true,
           isRightMostPane: false,
-          isDrawer: isMobile,
-          panesDrawerState,
+          isDrawer: areSidePanesDrawers,
+          areSidePanesDrawers,
           onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setLeftPanePointerEventsNone,
         })}
@@ -283,7 +399,7 @@ export const PanesContainer = ({
       <div
         className={classNames({
           [classes.resizer]: true,
-          [classes.hidden]: !hasEditorsInLeftPane || isMobile,
+          [classes.hidden]: !hasEditorsInLeftPane || areSidePanesDrawers,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -306,10 +422,10 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'center',
-          isLeftMostPane: isMobile || !hasEditorsInLeftPane,
-          isRightMostPane: isMobile || !hasEditorsInRightPane,
+          isLeftMostPane: areSidePanesDrawers || !hasEditorsInLeftPane,
+          isRightMostPane: areSidePanesDrawers || !hasEditorsInRightPane,
           isDrawer: false,
-          panesDrawerState,
+          areSidePanesDrawers,
           onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setCenterPanePointerEventsNone,
         })}
@@ -317,7 +433,7 @@ export const PanesContainer = ({
       <div
         className={classNames({
           [classes.resizer]: true,
-          [classes.hidden]: !hasEditorsInRightPane || isMobile,
+          [classes.hidden]: !hasEditorsInRightPane || areSidePanesDrawers,
         })}
         role="separator"
         aria-orientation="vertical"
@@ -330,9 +446,9 @@ export const PanesContainer = ({
         className={classNames({
           [classes.pane]: true,
           [classes.rightPane]: true,
-          [classes.drawer]: isMobile,
+          [classes.drawer]: areSidePanesDrawers,
           [classes.closedDrawer]:
-            isMobile && panesDrawerState['right'] === 'closed',
+            areSidePanesDrawers && panesDrawerState['right'] === 'closed',
           [classes.hidden]: !hasEditorsInRightPane,
         })}
         style={
@@ -346,8 +462,8 @@ export const PanesContainer = ({
           paneIdentifier: 'right',
           isLeftMostPane: false,
           isRightMostPane: true,
-          isDrawer: isMobile,
-          panesDrawerState,
+          isDrawer: areSidePanesDrawers,
+          areSidePanesDrawers,
           onSetPaneDrawerState: setPaneDrawerState,
           onSetPointerEventsNone: setRightPanePointerEventsNone,
         })}

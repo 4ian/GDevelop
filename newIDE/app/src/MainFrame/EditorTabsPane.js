@@ -219,7 +219,7 @@ type Props = {|
   isLeftMostPane: boolean,
   isRightMostPane: boolean,
   isDrawer: boolean,
-  panesDrawerState: { [string]: FloatingPaneState },
+  areSidePanesDrawers: boolean,
   onSetPaneDrawerState: (
     paneIdentifier: string,
     newState: FloatingPaneState
@@ -303,7 +303,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     isRightMostPane,
     isDrawer,
     onSetPaneDrawerState,
-    panesDrawerState,
+    areSidePanesDrawers,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -508,10 +508,9 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
             !askAiPaneIdentifier
               ? // If Ask AI is closed, display the button on the right most part of the window.
                 isRightMostPane
-              : // If it's open, hide the button unless Ask AI is in a floating pane that is closed.
-                paneIdentifier === 'center' &&
-                panesDrawerState[askAiPaneIdentifier.paneIdentifier] ===
-                  'closed'
+              : // If it's open, only show it if it's in a drawer pane.
+                areSidePanesDrawers &&
+                askAiPaneIdentifier.paneIdentifier !== 'center'
           }
           onAskAiClicked={onOpenAskAiFromTitlebar}
         />

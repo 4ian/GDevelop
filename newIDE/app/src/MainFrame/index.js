@@ -3965,8 +3965,8 @@ const MainFrame = (props: Props) => {
             isLeftMostPane,
             isRightMostPane,
             isDrawer,
+            areSidePanesDrawers,
             onSetPointerEventsNone,
-            panesDrawerState,
             onSetPaneDrawerState,
           }) => (
             <EditorTabsPane
@@ -3975,8 +3975,8 @@ const MainFrame = (props: Props) => {
               isLeftMostPane={isLeftMostPane}
               isRightMostPane={isRightMostPane}
               isDrawer={isDrawer}
+              areSidePanesDrawers={areSidePanesDrawers}
               onSetPointerEventsNone={onSetPointerEventsNone}
-              panesDrawerState={panesDrawerState}
               onSetPaneDrawerState={onSetPaneDrawerState}
             />
           )}

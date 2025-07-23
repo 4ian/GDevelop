@@ -2045,6 +2045,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onOpenEventBasedObjectVariantEditor={
                   this.props.onOpenEventBasedObjectVariantEditor
                 }
+                onDeleteEventsBasedObjectVariant={
+                  this.props.onDeleteEventsBasedObjectVariant
+                }
                 onRenameObjectFolderOrObjectWithContextFinish={
                   this._onRenameObjectFolderOrObjectWithContextFinish
                 }

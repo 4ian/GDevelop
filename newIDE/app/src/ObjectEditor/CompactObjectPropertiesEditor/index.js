@@ -270,6 +270,10 @@ export const CompactObjectPropertiesEditor = ({
   const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const [isEffectsFolded, setIsEffectsFolded] = React.useState(false);
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+  const [
+    duplicateAndEditVariantDialogOpen,
+    setDuplicateAndEditVariantDialogOpen,
+  ] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
@@ -430,6 +434,16 @@ export const CompactObjectPropertiesEditor = ({
 
   const editVariant = React.useCallback(
     () => {
+      if (
+        !isVariantEditable(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension
+        )
+      ) {
+        setDuplicateAndEditVariantDialogOpen(true);
+        return;
+      }
       customObjectExtension &&
         customObjectEventsBasedObject &&
         customObjectConfiguration &&
@@ -467,6 +481,30 @@ export const CompactObjectPropertiesEditor = ({
       customObjectExtension,
       forceUpdate,
       project,
+    ]
+  );
+
+  const duplicateAndEditVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setDuplicateAndEditVariantDialogOpen(false);
+      forceUpdate();
+      editVariant();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+      editVariant,
     ]
   );
 
@@ -625,13 +663,6 @@ export const CompactObjectPropertiesEditor = ({
                           key={'edit-variant'}
                           size="small"
                           onClick={editVariant}
-                          disabled={
-                            !isVariantEditable(
-                              customObjectConfiguration,
-                              customObjectEventsBasedObject,
-                              customObjectExtension
-                            )
-                          }
                         >
                           <Edit style={styles.icon} />
                         </IconButton>
@@ -960,6 +991,16 @@ export const CompactObjectPropertiesEditor = ({
           onApply={name => doDuplicateVariant(i18n, name)}
           onCancel={() => {
             setNewVariantDialogOpen(false);
+          }}
+        />
+      )}
+      {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+        <NewVariantDialog
+          isDuplicationBeforeEdition
+          initialName={variantName || i18n._(t`New variant`)}
+          onApply={name => duplicateAndEditVariant(i18n, name)}
+          onCancel={() => {
+            setDuplicateAndEditVariantDialogOpen(false);
           }}
         />
       )}

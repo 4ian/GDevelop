@@ -309,9 +309,23 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+  const [
+    duplicateAndEditVariantDialogOpen,
+    setDuplicateAndEditVariantDialogOpen,
+  ] = React.useState(false);
 
   const editVariant = React.useCallback(
     () => {
+      if (
+        !isVariantEditable(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension
+        )
+      ) {
+        setDuplicateAndEditVariantDialogOpen(true);
+        return;
+      }
       customObjectExtension &&
         customObjectEventsBasedObject &&
         onOpenEventBasedObjectVariantEditor &&
@@ -348,6 +362,30 @@ const CustomObjectPropertiesEditor = (props: Props) => {
       customObjectExtension,
       forceUpdate,
       project,
+    ]
+  );
+
+  const duplicateAndEditVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setDuplicateAndEditVariantDialogOpen(false);
+      forceUpdate();
+      editVariant();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+      editVariant,
     ]
   );
 
@@ -427,13 +465,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             label={<Trans>Edit</Trans>}
                             leftIcon={<Edit />}
                             onClick={editVariant}
-                            disabled={
-                              !isVariantEditable(
-                                customObjectConfiguration,
-                                customObjectEventsBasedObject,
-                                customObjectExtension
-                              )
-                            }
                           />
                           <FlatButton
                             key={'duplicate-variant'}
@@ -830,6 +861,16 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               onApply={name => doDuplicateVariant(i18n, name)}
               onCancel={() => {
                 setNewVariantDialogOpen(false);
+              }}
+            />
+          )}
+          {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+            <NewVariantDialog
+              isDuplicationBeforeEdition
+              initialName={variantName || i18n._(t`New variant`)}
+              onApply={name => duplicateAndEditVariant(i18n, name)}
+              onCancel={() => {
+                setDuplicateAndEditVariantDialogOpen(false);
               }}
             />
           )}

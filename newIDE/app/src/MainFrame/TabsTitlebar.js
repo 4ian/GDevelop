@@ -3,8 +3,6 @@ import * as React from 'react';
 
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
-import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import Window from '../Utils/Window';
 import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,

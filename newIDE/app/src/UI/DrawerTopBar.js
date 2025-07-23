@@ -68,11 +68,7 @@ const DrawerTopBar = (props: Props) => {
         elevation={0}
       >
         <Toolbar style={styles.toolbar}>
-          {props.drawerAnchor !== 'right' ? (
-            <TitleBarLeftSafeMargins />
-          ) : (
-            closeButton
-          )}
+          {props.drawerAnchor !== 'right' && <TitleBarLeftSafeMargins />}
           <LineStackLayout noMargin expand alignItems="center">
             {props.icon && (
               <IconButton
@@ -101,11 +97,8 @@ const DrawerTopBar = (props: Props) => {
               </Typography>
             )}
           </LineStackLayout>
-          {props.drawerAnchor === 'right' ? (
-            <TitleBarRightSafeMargins />
-          ) : (
-            closeButton
-          )}
+          {closeButton}
+          {props.drawerAnchor === 'right' && <TitleBarRightSafeMargins />}
         </Toolbar>
       </AppBar>
     </>

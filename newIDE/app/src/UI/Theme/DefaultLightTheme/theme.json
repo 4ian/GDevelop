@@ -144,8 +144,7 @@
       },
       "window": {
         "background-color": {
-          "value": "#D9D9DE",
-          "comment": "Palette/Grey/20"
+          "value": "#F5F5F7"
         }
       },
       "canvas": {

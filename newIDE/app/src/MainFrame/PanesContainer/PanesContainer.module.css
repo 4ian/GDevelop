@@ -63,7 +63,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  left: 75px;
+  left: 82px;
 }
 
 .leftPane.drawer {
@@ -71,7 +71,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  right: 75px;
+  right: 82px;
 }
 
 /* Pane, as drawer, hiding.  */

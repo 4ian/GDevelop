@@ -463,18 +463,19 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   />
                   {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                     <>
-                      <Line>
-                        <Column expand noMargin>
-                          <Text size="block-title">Variant</Text>
-                        </Column>
-                      </Line>
-                      <ColumnStackLayout expand noMargin>
+                      <LineStackLayout
+                        noMargin
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Text size="block-title">Variant</Text>
                         <LineStackLayout>
                           <FlatButton
-                            key={'edit-variant'}
-                            label={<Trans>Edit</Trans>}
-                            leftIcon={<Edit />}
-                            onClick={editVariant}
+                            key={'delete-variant'}
+                            label={<Trans>Delete</Trans>}
+                            leftIcon={<Trash />}
+                            onClick={doDeleteVariant}
+                            disabled={!variantName}
                           />
                           <FlatButton
                             key={'duplicate-variant'}
@@ -483,13 +484,14 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             onClick={() => setNewVariantDialogOpen(true)}
                           />
                           <FlatButton
-                            key={'delete-variant'}
-                            label={<Trans>Delete</Trans>}
-                            leftIcon={<Trash />}
-                            onClick={doDeleteVariant}
-                            disabled={!variantName}
+                            key={'edit-variant'}
+                            label={<Trans>Edit</Trans>}
+                            leftIcon={<Edit />}
+                            onClick={editVariant}
                           />
                         </LineStackLayout>
+                      </LineStackLayout>
+                      <ColumnStackLayout expand noMargin>
                         <SelectField
                           id={'variant-name'}
                           floatingLabelText={<Trans>Variant</Trans>}

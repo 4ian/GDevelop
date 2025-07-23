@@ -127,12 +127,17 @@ const getQuotaOrCreditsText = ({
         <>
           {increaseQuotaOffering === 'subscribe' ? (
             <Trans>
-              Get GDevelop premium to get more free requests every month.
+              Get GDevelop premium to get more free requests every day.
+            </Trans>
+          ) : quota.period === '30days' ? (
+            <Trans>
+              These are parts of your GDevelop premium membership ({quota.max}{' '}
+              free requests per month).
             </Trans>
           ) : (
             <Trans>
               These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per month).
+              free requests per day).
             </Trans>
           )}{' '}
           <Trans>Free requests do not consume credits on your account.</Trans>

@@ -27,7 +27,7 @@ class RenderedInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
-    propertyOverridings: Map<string, string> = new Map<string, string>()
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   );
 
   /**
@@ -80,6 +80,8 @@ class RenderedInstance {
   getDefaultHeight(): number;
 
   getDefaultDepth(): number;
+
+  getPropertyOverridings(): Map<string, string> | null;
 }
 
 /**
@@ -107,7 +109,8 @@ class Rendered3DInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: Class<PixiResourcesLoader>,
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   );
 
   /**
@@ -174,6 +177,8 @@ class Rendered3DInstance {
    * Return the depth of the instance when the instance doesn't have a custom size.
    */
   getDefaultDepth(): number;
+
+  getPropertyOverridings(): Map<string, string> | null;
 }
 
 declare type ObjectsRenderingService = {

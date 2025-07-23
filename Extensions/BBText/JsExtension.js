@@ -508,7 +508,7 @@ module.exports = {
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader,
-        propertyOverridings
+        getPropertyOverridings
       ) {
         super(
           project,
@@ -516,7 +516,7 @@ module.exports = {
           associatedObjectConfiguration,
           pixiContainer,
           pixiResourcesLoader,
-          propertyOverridings
+          getPropertyOverridings
         );
 
         const bbTextStyles = {
@@ -555,9 +555,11 @@ module.exports = {
           gd.ObjectJsImplementation
         );
 
-        const rawText = this._propertyOverridings.has('Text')
-          ? this._propertyOverridings.get('Text')
-          : object.content.text;
+        const propertyOverridings = this.getPropertyOverridings();
+        const rawText =
+          propertyOverridings && propertyOverridings.has('Text')
+            ? propertyOverridings.get('Text')
+            : object.content.text;
         if (rawText !== this._pixiObject.text) {
           this._pixiObject.text = rawText;
         }

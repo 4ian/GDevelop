@@ -469,27 +469,29 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                         alignItems="center"
                       >
                         <Text size="block-title">Variant</Text>
-                        <LineStackLayout>
-                          <FlatButton
-                            key={'delete-variant'}
-                            label={<Trans>Delete</Trans>}
-                            leftIcon={<Trash />}
-                            onClick={doDeleteVariant}
-                            disabled={!variantName}
-                          />
-                          <FlatButton
-                            key={'duplicate-variant'}
-                            label={<Trans>Duplicate</Trans>}
-                            leftIcon={<Add />}
-                            onClick={() => setNewVariantDialogOpen(true)}
-                          />
-                          <FlatButton
-                            key={'edit-variant'}
-                            label={<Trans>Edit</Trans>}
-                            leftIcon={<Edit />}
-                            onClick={editVariant}
-                          />
-                        </LineStackLayout>
+                        <Column>
+                          <LineStackLayout>
+                            <FlatButton
+                              key={'delete-variant'}
+                              label={<Trans>Delete</Trans>}
+                              leftIcon={<Trash />}
+                              onClick={doDeleteVariant}
+                              disabled={!variantName}
+                            />
+                            <FlatButton
+                              key={'duplicate-variant'}
+                              label={<Trans>Duplicate</Trans>}
+                              leftIcon={<Add />}
+                              onClick={() => setNewVariantDialogOpen(true)}
+                            />
+                            <FlatButton
+                              key={'edit-variant'}
+                              label={<Trans>Edit</Trans>}
+                              leftIcon={<Edit />}
+                              onClick={editVariant}
+                            />
+                          </LineStackLayout>
+                        </Column>
                       </LineStackLayout>
                       <ColumnStackLayout expand noMargin>
                         <SelectField

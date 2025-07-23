@@ -62,6 +62,7 @@ import {
   deleteVariant,
 } from '../Editors/CustomObjectPropertiesEditor';
 import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -275,6 +276,7 @@ export const CompactObjectPropertiesEditor = ({
     setDuplicateAndEditVariantDialogOpen,
   ] = React.useState(false);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
   const objectConfiguration = object.getConfiguration();
@@ -509,7 +511,14 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   const doDeleteVariant = React.useCallback(
-    () => {
+    async () => {
+      const hasConfirmedDeletion = await showDeleteConfirmation({
+        title: t`Remove variant`,
+        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+      });
+      if (!hasConfirmedDeletion) {
+        return;
+      }
       deleteVariant(
         customObjectConfiguration,
         customObjectEventsBasedObject,
@@ -526,6 +535,7 @@ export const CompactObjectPropertiesEditor = ({
       onDeleteEventsBasedObjectVariant,
       project,
       customObjectExtension,
+      showDeleteConfirmation,
     ]
   );
 

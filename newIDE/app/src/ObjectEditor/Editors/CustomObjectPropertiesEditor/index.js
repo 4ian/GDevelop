@@ -61,6 +61,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../../Utils/Serializer';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -228,6 +229,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     customObjectConfiguration.getType()
   ];
 
+  const { showDeleteConfirmation } = useAlertDialog();
   const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
 
@@ -390,7 +392,14 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   );
 
   const doDeleteVariant = React.useCallback(
-    () => {
+    async () => {
+      const hasConfirmedDeletion = await showDeleteConfirmation({
+        title: t`Remove variant`,
+        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+      });
+      if (!hasConfirmedDeletion) {
+        return;
+      }
       deleteVariant(
         customObjectConfiguration,
         customObjectEventsBasedObject,
@@ -407,6 +416,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
       onDeleteEventsBasedObjectVariant,
       project,
       customObjectExtension,
+      showDeleteConfirmation,
     ]
   );
 

@@ -52,8 +52,8 @@ type TabsTitlebarProps = {|
     onEditorTabHovered: (?EditorTab, {| isLabelTruncated: boolean |}) => void,
     onEditorTabClosing: () => void
   ) => React.Node,
-  isLeftMost: boolean,
-  isRightMost: boolean,
+  isLeftMostPane: boolean,
+  isRightMostPane: boolean,
   displayMenuIcon: boolean,
 
   displayAskAi: boolean,
@@ -107,8 +107,8 @@ export default function TabsTitlebar({
   toggleProjectManager,
   hidden,
   renderTabs,
-  isLeftMost,
-  isRightMost,
+  isLeftMostPane,
+  isRightMostPane,
   displayMenuIcon,
   displayAskAi,
   onAskAiClicked,
@@ -201,7 +201,7 @@ export default function TabsTitlebar({
       }}
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
     >
-      {isLeftMost && <TitleBarLeftSafeMargins />}
+      {isLeftMostPane && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
         <IconButton
           size="small"
@@ -230,7 +230,7 @@ export default function TabsTitlebar({
           />
         </div>
       ) : null}
-      {isRightMost && <TitleBarRightSafeMargins />}
+      {isRightMostPane && <TitleBarRightSafeMargins />}
       {tooltipData && (
         <TabsTitlebarTooltip
           anchorElement={tooltipData.element}

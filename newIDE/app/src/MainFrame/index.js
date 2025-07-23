@@ -3962,8 +3962,8 @@ const MainFrame = (props: Props) => {
           hasEditorsInRightPane={hasEditorsInRightPane}
           renderPane={({
             paneIdentifier,
-            isLeftMost,
-            isRightMost,
+            isLeftMostPane,
+            isRightMostPane,
             isDrawer,
             onSetPointerEventsNone,
             panesDrawerState,
@@ -3972,8 +3972,8 @@ const MainFrame = (props: Props) => {
             <EditorTabsPane
               {...editorTabsPaneProps}
               paneIdentifier={paneIdentifier}
-              isLeftMost={isLeftMost}
-              isRightMost={isRightMost}
+              isLeftMostPane={isLeftMostPane}
+              isRightMostPane={isRightMostPane}
               isDrawer={isDrawer}
               onSetPointerEventsNone={onSetPointerEventsNone}
               panesDrawerState={panesDrawerState}

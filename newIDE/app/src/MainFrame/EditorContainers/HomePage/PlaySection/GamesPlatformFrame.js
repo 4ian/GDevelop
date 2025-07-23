@@ -65,9 +65,11 @@ const GamesPlatformFrame = ({
     [loaded, initialGameId]
   );
 
-  // In this component, do not use useResponsiveWindowSize. Instead, the position
-  // of the iframe must be read from iframePosition - which is set by the component
-  // responsible for making the iframe visible.
+  // In this component, do not use useResponsiveWindowSize. The position
+  // of the iframe is read from iframePosition - which is set by the component
+  // responsible for positioning the iframe (typically, the "Play section" component).
+  // The iframe position can change according to the size of the pane containing it -
+  // which is not always the same as the size of the top level window.
   const containerTop =
     iframePosition && !iframePosition.isMobile ? iframePosition.top : 0;
   const containerLeft = iframePosition ? iframePosition.left : 0;

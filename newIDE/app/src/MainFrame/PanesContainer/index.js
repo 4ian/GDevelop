@@ -21,8 +21,8 @@ export type FloatingPaneState = 'open' | 'closed';
 type Props = {|
   renderPane: ({
     paneIdentifier: string,
-    isLeftMost: boolean,
-    isRightMost: boolean,
+    isLeftMostPane: boolean,
+    isRightMostPane: boolean,
     isDrawer: boolean,
     onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
     panesDrawerState: { [string]: FloatingPaneState },
@@ -272,8 +272,8 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'left',
-          isLeftMost: true,
-          isRightMost: false,
+          isLeftMostPane: true,
+          isRightMostPane: false,
           isDrawer: isMobile,
           panesDrawerState,
           onSetPaneDrawerState: setPaneDrawerState,
@@ -306,8 +306,8 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'center',
-          isLeftMost: isMobile || !hasEditorsInLeftPane,
-          isRightMost: isMobile || !hasEditorsInRightPane,
+          isLeftMostPane: isMobile || !hasEditorsInLeftPane,
+          isRightMostPane: isMobile || !hasEditorsInRightPane,
           isDrawer: false,
           panesDrawerState,
           onSetPaneDrawerState: setPaneDrawerState,
@@ -344,8 +344,8 @@ export const PanesContainer = ({
       >
         {renderPane({
           paneIdentifier: 'right',
-          isLeftMost: false,
-          isRightMost: true,
+          isLeftMostPane: false,
+          isRightMostPane: true,
           isDrawer: isMobile,
           panesDrawerState,
           onSetPaneDrawerState: setPaneDrawerState,

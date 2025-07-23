@@ -216,8 +216,8 @@ type Props = {|
   ...EditorTabsPaneCommonProps,
   onSetPointerEventsNone: (enablePointerEventsNone: boolean) => void,
   paneIdentifier: string,
-  isLeftMost: boolean,
-  isRightMost: boolean,
+  isLeftMostPane: boolean,
+  isRightMostPane: boolean,
   isDrawer: boolean,
   panesDrawerState: { [string]: FloatingPaneState },
   onSetPaneDrawerState: (
@@ -299,8 +299,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     setEditorTabs,
     onSetPointerEventsNone,
     paneIdentifier,
-    isLeftMost,
-    isRightMost,
+    isLeftMostPane,
+    isRightMostPane,
     isDrawer,
     onSetPaneDrawerState,
     panesDrawerState,
@@ -466,15 +466,15 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     <div style={styles.container} ref={containerRef}>
       {isDrawer ? (
         <DrawerTopBar
-          drawerAnchor={isRightMost ? 'right' : 'left'}
+          drawerAnchor={isRightMostPane ? 'right' : 'left'}
           title={'Ask AI'}
           id={paneIdentifier + '-top-bar'}
           onClose={() => onSetPaneDrawerState(paneIdentifier, 'closed')}
         />
       ) : (
         <TabsTitlebar
-          isLeftMost={isLeftMost}
-          isRightMost={isRightMost}
+          isLeftMostPane={isLeftMostPane}
+          isRightMostPane={isRightMostPane}
           displayMenuIcon={paneIdentifier === 'center'}
           hidden={tabsTitleBarAndEditorToolbarHidden}
           toggleProjectManager={toggleProjectManager}
@@ -507,7 +507,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
           displayAskAi={
             !askAiPaneIdentifier
               ? // If Ask AI is closed, display the button on the right most part of the window.
-                isRightMost
+                isRightMostPane
               : // If it's open, hide the button unless Ask AI is in a floating pane that is closed.
                 paneIdentifier === 'center' &&
                 panesDrawerState[askAiPaneIdentifier.paneIdentifier] ===

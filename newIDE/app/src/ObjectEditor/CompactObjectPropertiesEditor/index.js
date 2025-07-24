@@ -60,6 +60,7 @@ import {
   isVariantEditable,
   duplicateVariant,
   deleteVariant,
+  ChildrenOverridingDepreciationAlert,
 } from '../Editors/CustomObjectPropertiesEditor';
 import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -717,6 +718,10 @@ export const CompactObjectPropertiesEditor = ({
                     </CompactSelectField>
                   </ColumnStackLayout>
                 )}
+                {shouldDisplayEventsBasedObjectChildren &&
+                  !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                    <ChildrenOverridingDepreciationAlert />
+                  )}
                 {customObjectEventsBasedObject &&
                   customObjectConfiguration &&
                   shouldDisplayEventsBasedObjectChildren &&

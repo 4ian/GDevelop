@@ -62,11 +62,23 @@ import {
   unserializeFromJSObject,
 } from '../../../Utils/Serializer';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { MarkdownText } from '../../../UI/MarkdownText';
 
 const gd: libGDevelop = global.gd;
 
 const styles = {
   icon: { width: 16, height: 16 },
+};
+
+export const ChildrenOverridingDepreciationAlert = () => {
+  return (
+    <AlertMessage kind="warning">
+      <MarkdownText
+        translatableSource={t`Children configurations are deprecated. This [migration documentation](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/migrate-to-variants/) can help you use variants instead.`}
+        isStandaloneText
+      />
+    </AlertMessage>
+  );
 };
 
 export const getVariantName = (
@@ -538,30 +550,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
                     (customObjectEventsBasedObject &&
                       (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
-                      !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
-                        <Line alignItems="center">
-                          <Column expand noMargin>
-                            <Text size="block-title">Children objects</Text>
-                          </Column>
-                          <Column alignItems="right">
-                            <FlatButton
-                              label={
-                                <Trans>Override children configuration</Trans>
-                              }
-                              onClick={() => {
-                                customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
-                                  true
-                                );
-                                customObjectConfiguration.clearChildrenConfiguration();
-                                if (onObjectUpdated) {
-                                  onObjectUpdated();
-                                }
-                                forceUpdate();
-                              }}
-                            />
-                          </Column>
-                        </Line>
-                      ) : (
+                      !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? null : (
                         <>
                           <Line alignItems="center">
                             <Column expand noMargin>
@@ -590,6 +579,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               </Column>
                             )}
                           </Line>
+                          {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                            <ChildrenOverridingDepreciationAlert />
+                          )}
                           {mapFor(
                             0,
                             customObjectEventsBasedObject

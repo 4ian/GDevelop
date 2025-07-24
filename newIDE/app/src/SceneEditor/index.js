@@ -1555,14 +1555,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           )
         : null;
 
-      const objectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
-        object.getType()
-      );
-      const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
-        objectExtensionName
-      )
-        ? project.getEventsFunctionsExtension(objectExtensionName)
+      const objectExtensionName = object
+        ? gd.PlatformExtension.getExtensionFromFullObjectType(object.getType())
         : null;
+      const customObjectExtension =
+        objectExtensionName &&
+        project.hasEventsFunctionsExtensionNamed(objectExtensionName)
+          ? project.getEventsFunctionsExtension(objectExtensionName)
+          : null;
 
       return [
         ...this.getContextMenuInstancesWiseItems(i18n),

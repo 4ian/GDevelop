@@ -275,6 +275,12 @@ namespace gdjs {
         pixiRenderer.render(this._pixiContainer, {
           clear: this._runtimeScene.getClearCanvas(),
         });
+        const debugContainer = this._runtimeScene
+          .getDebuggerRenderer()
+          .getRendererObject();
+        if (debugContainer) {
+          pixiRenderer.render(debugContainer, { clear: false });
+        }
         this._layerRenderingMetrics.rendered2DLayersCount++;
       }
 

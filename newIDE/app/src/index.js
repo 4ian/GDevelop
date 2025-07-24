@@ -41,7 +41,7 @@ try {
       language: 'en', // language is not important here as we only look for a color.
       isMobile: true, // window size is not important as we only look for a color.
     });
-    color = theme.muiTheme.palette.background.default;
+    color = theme.gdevelopTheme.surface.window.backgroundColor;
   }
 } catch {}
 
@@ -69,7 +69,7 @@ type State = {|
 
 class Bootstrapper extends Component<{}, State> {
   state = {
-    loadingMessage: 'Loading the editor...',
+    loadingMessage: '',
     App: null,
   };
   authentication = new Authentication();

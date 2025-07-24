@@ -30,7 +30,7 @@ const styles = {
   container: { maxWidth: 850 },
   thumbnail: {
     display: 'block', // Display as a block to prevent cumulative layout shift.
-    objectFit: 'cover',
+    objectFit: 'contain',
     verticalAlign: 'middle',
     borderRadius: 8,
     width: '100%',

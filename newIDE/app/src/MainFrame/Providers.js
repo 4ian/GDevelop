@@ -42,6 +42,7 @@ import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/P
 import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
 import { CourseStoreStateProvider } from '../Course/CourseStoreContext';
 import { Resource3DPreviewProvider } from '../ResourcesList/ResourcePreview/Resource3DPreviewContext';
+import { AiRequestProvider } from '../AiGeneration/AiRequestContext';
 
 type Props = {|
   authentication: Authentication,
@@ -121,11 +122,13 @@ const Providers = ({
                                                                 <AnnouncementsFeedStateProvider>
                                                                   <PrivateAssetsAuthorizationProvider>
                                                                     <Resource3DPreviewProvider>
-                                                                      {children(
-                                                                        {
-                                                                          i18n,
-                                                                        }
-                                                                      )}
+                                                                      <AiRequestProvider>
+                                                                        {children(
+                                                                          {
+                                                                            i18n,
+                                                                          }
+                                                                        )}
+                                                                      </AiRequestProvider>
                                                                     </Resource3DPreviewProvider>
                                                                   </PrivateAssetsAuthorizationProvider>
                                                                 </AnnouncementsFeedStateProvider>

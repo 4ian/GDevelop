@@ -29,7 +29,7 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
 import { type EditorCallbacks } from '../../EditorFunctions';
-import { getFunctionCallsToProcess } from './AiRequestUtils';
+import { getFunctionCallsToProcess } from '../AiRequestUtils';
 import CircularProgress from '../../UI/CircularProgress';
 import TwoStatesButton from '../../UI/TwoStatesButton';
 import Help from '../../UI/CustomSvgIcons/Help';
@@ -68,6 +68,7 @@ type Props = {
   |}) => void,
   onSendMessage: (options: {|
     userMessage: string,
+    createdSceneNames?: Array<string>,
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
@@ -79,7 +80,10 @@ type Props = {
   hasOpenedProject: boolean,
   isAutoProcessingFunctionCalls: boolean,
   setAutoProcessFunctionCalls: boolean => void,
-  onStartNewChat: (mode: 'chat' | 'agent') => void,
+  onStartOrOpenChat: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+  |}) => void,
   initialMode?: 'chat' | 'agent',
 
   onProcessFunctionCalls: (
@@ -123,12 +127,17 @@ const getQuotaOrCreditsText = ({
         <>
           {increaseQuotaOffering === 'subscribe' ? (
             <Trans>
-              Get GDevelop premium to get more free requests every month.
+              Get GDevelop premium to get more free requests every day.
+            </Trans>
+          ) : quota.period === '30days' ? (
+            <Trans>
+              These are parts of your GDevelop premium membership ({quota.max}{' '}
+              free requests per month).
             </Trans>
           ) : (
             <Trans>
               These are parts of your GDevelop premium membership ({quota.max}{' '}
-              free requests per month).
+              free requests per day).
             </Trans>
           )}{' '}
           <Trans>Free requests do not consume credits on your account.</Trans>
@@ -248,7 +257,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       onStartNewAiRequest,
       onSendMessage,
       onSendFeedback,
-      onStartNewChat,
+      onStartOrOpenChat,
       initialMode,
       quota,
       increaseQuotaOffering,
@@ -426,7 +435,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               <RobotIcon rotating size={40} />
             </Line>
             <Column noMargin alignItems="center">
-              <Text size="bold-title">
+              <Text size="bold-title" align="center">
                 {newAiRequestMode === 'agent' ? (
                   <Trans>What do you want to make?</Trans>
                 ) : (
@@ -439,7 +448,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
                 value={newAiRequestMode}
                 leftButton={{
                   icon: <Hammer fontSize="small" />,
-                  label: <Trans>Build for me (beta)</Trans>,
+                  label: <Trans>Build for me</Trans>,
                   value: 'agent',
                 }}
                 rightButton={{
@@ -546,6 +555,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
               </>
             ) : null}
           </ColumnStackLayout>
+          <Spacer />
           <Column justifyContent="center">
             {newAiRequestMode === 'agent' ? (
               <Text size="body-small" color="secondary" align="center" noMargin>
@@ -647,7 +657,12 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
           This request is for another project.{' '}
           <Link
             href="#"
-            onClick={() => onStartNewChat(aiRequest.mode || 'chat')}
+            onClick={() =>
+              onStartOrOpenChat({
+                mode: aiRequest.mode || 'chat',
+                aiRequestId: null,
+              })
+            }
           >
             Start a new chat
           </Link>{' '}

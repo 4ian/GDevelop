@@ -39,7 +39,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
-    propertyOverridings: Map<string, string>
+    getPropertyOverridings: (() => Map<string, string>) | null
   ) {
     super(
       project,
@@ -47,7 +47,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader,
-      propertyOverridings
+      getPropertyOverridings
     );
 
     const style = new PIXI.TextStyle({
@@ -86,9 +86,11 @@ export default class RenderedTextInstance extends RenderedInstance {
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       this._associatedObjectConfiguration
     );
-    this._pixiObject.text = this._propertyOverridings.has('Text')
-      ? this._propertyOverridings.get('Text')
-      : textObjectConfiguration.getText();
+    const propertyOverridings = this.getPropertyOverridings();
+    this._pixiObject.text =
+      propertyOverridings && propertyOverridings.has('Text')
+        ? propertyOverridings.get('Text')
+        : textObjectConfiguration.getText();
 
     //Update style, only if needed to avoid destroying text rendering performances
     if (

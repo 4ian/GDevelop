@@ -1,0 +1,105 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  pointer-events: all;
+}
+
+.leftPane {
+  flex-basis: 300px;
+  flex-shrink: 0;
+  z-index: 1; /* Create a new stacking context. */
+}
+
+.rightPane {
+  flex-basis: 300px;
+  flex-shrink: 0;
+  z-index: 1; /* Create a new stacking context. */
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(40px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-40px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Pane opening (drawer or not) */
+.rightPane:not(.hidden) {
+  animation: slide-in-right 0.15s ease-out;
+}
+
+.leftPane:not(.hidden) {
+  animation: slide-in-left 0.15s ease-out;
+}
+
+/* Pane as drawer */
+.pane.drawer {
+  width: min(calc(100vw - 82px), 320px);
+  will-change: transform;
+  box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.2),
+    0px 16px 24px 2px rgba(0, 0, 0, 0.14), 0px 6px 30px 5px rgba(0, 0, 0, 0.12);
+}
+
+.rightPane.drawer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.leftPane.drawer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* Pane, as drawer, closed.  */
+.rightPane:not(.hidden).closedDrawer {
+  transform: translateX(100vw);
+}
+
+.leftPane:not(.hidden).closedDrawer {
+  transform: translateX(-100vw);
+}
+
+.centerPane {
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.resizer {
+  z-index: 1; /* To allow the shadow to be visible. */
+  width: 2px;
+  cursor: ew-resize;
+  background-color: transparent;
+  flex-shrink: 0;
+  pointer-events: all;
+}
+.resizer:hover,
+.resizer:focus {
+  outline: none;
+}

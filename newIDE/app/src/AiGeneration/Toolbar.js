@@ -3,18 +3,21 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import AddIcon from '../UI/CustomSvgIcons/Add';
-import HistoryIcon from '../UI/CustomSvgIcons/History';
-import RaisedButton from '../UI/RaisedButton';
+import ChatBubblesIcon from '../UI/CustomSvgIcons/ChatBubbles';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import IconButton from '../UI/IconButton';
 
 type Props = {|
-  onStartNewChat: (mode: 'chat' | 'agent') => void,
+  onStartOrOpenChat: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+  |}) => void,
   canStartNewChat: boolean,
   onOpenHistory: () => void,
 |};
 
 export const Toolbar = ({
-  onStartNewChat,
+  onStartOrOpenChat,
   canStartNewChat,
   onOpenHistory,
 }: Props) => {
@@ -27,16 +30,24 @@ export const Toolbar = ({
           tooltip={t`View history`}
           onClick={onOpenHistory}
         >
-          <HistoryIcon />
+          <ChatBubblesIcon />
         </IconButton>
       </ToolbarGroup>
       <ToolbarGroup lastChild>
-        <RaisedButton
+        <ResponsiveRaisedButton
           primary
-          onClick={() => onStartNewChat('agent')}
+          onClick={() =>
+            onStartOrOpenChat({
+              mode: 'agent',
+              aiRequestId: null,
+            })
+          }
           icon={<AddIcon />}
           label={<Trans>Start a new chat</Trans>}
           disabled={!canStartNewChat}
+          style={{
+            flexShrink: 0,
+          }}
         />
       </ToolbarGroup>
     </>

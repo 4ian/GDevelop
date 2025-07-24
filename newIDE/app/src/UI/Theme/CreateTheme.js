@@ -477,8 +477,10 @@ export function createGdevelopTheme({
           color: styles['ThemeMessageHotColor'],
         },
       },
-      titlebar: {
-        backgroundColor: styles['ThemeSurfaceTitlebarBackgroundColor'],
+      surface: {
+        window: {
+          backgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
+        },
       },
       toolbar: {
         backgroundColor: styles['ThemeSurfaceToolbarBackgroundColor'],

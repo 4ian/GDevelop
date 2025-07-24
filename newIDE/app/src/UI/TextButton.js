@@ -6,7 +6,7 @@ import { type ButtonInterface } from './Button';
 
 type Props = {|
   label: React.Node,
-  onClick: ?(ev: any) => void | Promise<void>,
+  onClick: ?() => void | Promise<void>,
   primary?: boolean,
   secondary?: boolean,
   allowBrowserAutoTranslate?: boolean,

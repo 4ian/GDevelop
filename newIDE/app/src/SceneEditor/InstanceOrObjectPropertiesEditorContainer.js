@@ -44,6 +44,16 @@ type Props = {|
   onObjectsModified: (objects: Array<gdObject>) => void,
   onUpdateBehaviorsSharedData: () => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onOpenEventBasedObjectVariantEditor: (
+    extensionName: string,
+    eventsBasedObjectName: string,
+    variantName: string
+  ) => void,
+  onDeleteEventsBasedObjectVariant: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void,
   isBehaviorListLocked: boolean,
 
   // For instances:
@@ -87,6 +97,8 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
     eventsFunctionsExtension,
     onUpdateBehaviorsSharedData,
     onExtensionInstalled,
+    onOpenEventBasedObjectVariantEditor,
+    onDeleteEventsBasedObjectVariant,
     isBehaviorListLocked,
 
     // For instances:
@@ -123,6 +135,10 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
           onExtensionInstalled={onExtensionInstalled}
           isBehaviorListLocked={isBehaviorListLocked}
+          onOpenEventBasedObjectVariantEditor={
+            onOpenEventBasedObjectVariantEditor
+          }
+          onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
           {...commonProps}
         />
       ) : (

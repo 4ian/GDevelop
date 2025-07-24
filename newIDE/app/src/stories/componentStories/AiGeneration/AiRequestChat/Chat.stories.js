@@ -46,7 +46,7 @@ const commonProps = {
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
   isAutoProcessingFunctionCalls: false,
-  onStartNewChat: () => {},
+  onStartOrOpenChat: () => {},
 };
 
 export const NewAiRequest = () => (

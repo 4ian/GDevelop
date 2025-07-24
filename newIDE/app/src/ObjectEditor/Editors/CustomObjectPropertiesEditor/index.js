@@ -61,6 +61,8 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../../Utils/Serializer';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { MarkdownText } from '../../../UI/MarkdownText';
 
 const gd: libGDevelop = global.gd;
 
@@ -68,7 +70,18 @@ const styles = {
   icon: { width: 16, height: 16 },
 };
 
-const getVariantName = (
+export const ChildrenOverridingDepreciationAlert = () => {
+  return (
+    <AlertMessage kind="warning">
+      <MarkdownText
+        translatableSource={t`Children configurations are deprecated. This [migration documentation](https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/migrate-to-variants/) can help you use variants instead.`}
+        isStandaloneText
+      />
+    </AlertMessage>
+  );
+};
+
+export const getVariantName = (
   eventBasedObject: gdEventsBasedObject | null,
   customObjectConfiguration: gdCustomObjectConfiguration
 ): string =>
@@ -91,6 +104,101 @@ export const getVariant = (
   return variantName
     ? variants.getVariant(variantName)
     : eventBasedObject.getDefaultVariant();
+};
+
+/** Avoid to lose user changes by forcing them to duplicate these variants. */
+export const isVariantEditable = (
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null
+): boolean => {
+  if (
+    !customObjectConfiguration ||
+    !eventsBasedObject ||
+    !eventsFunctionsExtension
+  ) {
+    return false;
+  }
+  // Variants from the asset store are reset when creating a new object with
+  // the same asset.
+  return (
+    getVariant(
+      eventsBasedObject,
+      customObjectConfiguration
+    ).getAssetStoreAssetId() === '' &&
+    // The default variant is reset when updating the extension.
+    (!!getVariantName(eventsBasedObject, customObjectConfiguration) ||
+      eventsFunctionsExtension.getOriginName() !== 'gdevelop-extension-store')
+  );
+};
+
+export const duplicateVariant = (
+  newName: string,
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  project: gdProject,
+  i18n: I18nType
+): void => {
+  if (!eventsBasedObject || !customObjectConfiguration) {
+    return;
+  }
+  const variants = eventsBasedObject.getVariants();
+  // TODO Forbid name with `::`
+  const uniqueNewName = newNameGenerator(
+    newName || i18n._(t`New variant`),
+    tentativeNewName => variants.hasVariantNamed(tentativeNewName)
+  );
+  const oldVariantName = getVariantName(
+    eventsBasedObject,
+    customObjectConfiguration
+  );
+  const oldVariant = oldVariantName
+    ? variants.getVariant(oldVariantName)
+    : eventsBasedObject.getDefaultVariant();
+  const newVariant = variants.insertNewVariant(uniqueNewName, 0);
+  unserializeFromJSObject(
+    newVariant,
+    serializeToJSObject(oldVariant),
+    'unserializeFrom',
+    project
+  );
+  newVariant.setName(uniqueNewName);
+  newVariant.setAssetStoreAssetId('');
+  newVariant.setAssetStoreOriginalName('');
+  customObjectConfiguration.setVariantName(uniqueNewName);
+};
+
+export const deleteVariant = (
+  customObjectConfiguration: gdCustomObjectConfiguration | null,
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  project: gdProject,
+  onDeleteEventsBasedObjectVariant: ?(
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventBasedObject: gdEventsBasedObject,
+    variant: gdEventsBasedObjectVariant
+  ) => void
+): void => {
+  if (
+    !customObjectConfiguration ||
+    !eventsBasedObject ||
+    !eventsFunctionsExtension ||
+    !onDeleteEventsBasedObjectVariant
+  ) {
+    return;
+  }
+  const variants = eventsBasedObject.getVariants();
+  const selectedVariantName = customObjectConfiguration.getVariantName();
+  if (!variants.hasVariantNamed(selectedVariantName)) {
+    return;
+  }
+  customObjectConfiguration.setVariantName('');
+  onDeleteEventsBasedObjectVariant(
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    variants.getVariant(selectedVariantName)
+  );
 };
 
 type Props = EditorProps;
@@ -133,10 +241,19 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     customObjectConfiguration.getType()
   ];
 
+  const { showDeleteConfirmation } = useAlertDialog();
   const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
 
-  const eventBasedObject = project.hasEventsBasedObject(
+  const customObjectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+    customObjectConfiguration.getType()
+  );
+  const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
+    customObjectExtensionName
+  )
+    ? project.getEventsFunctionsExtension(customObjectExtensionName)
+    : null;
+  const customObjectEventsBasedObject = project.hasEventsBasedObject(
     customObjectConfiguration.getType()
   )
     ? project.getEventsBasedObject(customObjectConfiguration.getType())
@@ -206,91 +323,118 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+  const [
+    duplicateAndEditVariantDialogOpen,
+    setDuplicateAndEditVariantDialogOpen,
+  ] = React.useState(false);
 
   const editVariant = React.useCallback(
     () => {
-      onOpenEventBasedObjectVariantEditor &&
+      if (
+        !isVariantEditable(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension
+        )
+      ) {
+        setDuplicateAndEditVariantDialogOpen(true);
+        return;
+      }
+      customObjectExtension &&
+        customObjectEventsBasedObject &&
+        onOpenEventBasedObjectVariantEditor &&
         onOpenEventBasedObjectVariantEditor(
-          gd.PlatformExtension.getExtensionFromFullObjectType(
-            customObjectConfiguration.getType()
-          ),
-          gd.PlatformExtension.getObjectNameFromFullObjectType(
-            customObjectConfiguration.getType()
-          ),
+          customObjectExtension.getName(),
+          customObjectEventsBasedObject.getName(),
           customObjectConfiguration.getVariantName()
         );
     },
-    [customObjectConfiguration, onOpenEventBasedObjectVariantEditor]
+    [
+      customObjectConfiguration,
+      onOpenEventBasedObjectVariantEditor,
+      customObjectExtension,
+      customObjectEventsBasedObject,
+    ]
   );
 
-  const duplicateVariant = React.useCallback(
+  const doDuplicateVariant = React.useCallback(
     (i18n: I18nType, newName: string) => {
-      if (!eventBasedObject) {
-        return;
-      }
-      const variants = eventBasedObject.getVariants();
-      // TODO Forbid name with `::`
-      const uniqueNewName = newNameGenerator(
-        newName || i18n._(t`New variant`),
-        tentativeNewName => variants.hasVariantNamed(tentativeNewName)
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
       );
-      const oldVariantName = getVariantName(
-        eventBasedObject,
-        customObjectConfiguration
-      );
-      const oldVariant = oldVariantName
-        ? variants.getVariant(oldVariantName)
-        : eventBasedObject.getDefaultVariant();
-      const newVariant = variants.insertNewVariant(uniqueNewName, 0);
-      unserializeFromJSObject(
-        newVariant,
-        serializeToJSObject(oldVariant),
-        'unserializeFrom',
-        project
-      );
-      newVariant.setName(uniqueNewName);
-      newVariant.setAssetStoreAssetId('');
-      newVariant.setAssetStoreOriginalName('');
-      customObjectConfiguration.setVariantName(uniqueNewName);
       setNewVariantDialogOpen(false);
       forceUpdate();
     },
-    [customObjectConfiguration, eventBasedObject, forceUpdate, project]
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+    ]
   );
 
-  const deleteVariant = React.useCallback(
-    () => {
-      if (!eventBasedObject || !onDeleteEventsBasedObjectVariant) {
-        return;
-      }
-      const variants = eventBasedObject.getVariants();
-      const selectedVariantName = customObjectConfiguration.getVariantName();
-      if (variants.hasVariantNamed(selectedVariantName)) {
-        customObjectConfiguration.setVariantName('');
-        const extensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
-          customObjectConfiguration.getType()
-        );
-        if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
-          return;
-        }
-        const eventBasedExtension = project.getEventsFunctionsExtension(
-          extensionName
-        );
-        onDeleteEventsBasedObjectVariant(
-          eventBasedExtension,
-          eventBasedObject,
-          variants.getVariant(selectedVariantName)
-        );
-        forceUpdate();
-      }
+  const duplicateAndEditVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setDuplicateAndEditVariantDialogOpen(false);
+      forceUpdate();
+      editVariant();
     },
     [
       customObjectConfiguration,
-      eventBasedObject,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+      editVariant,
+    ]
+  );
+
+  const doDeleteVariant = React.useCallback(
+    async () => {
+      const hasConfirmedDeletion = await showDeleteConfirmation({
+        title: t`Remove variant`,
+        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+      });
+      if (!hasConfirmedDeletion) {
+        return;
+      }
+      deleteVariant(
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        onDeleteEventsBasedObjectVariant
+      );
+      forceUpdate();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
       forceUpdate,
       onDeleteEventsBasedObjectVariant,
       project,
+      customObjectExtension,
+      showDeleteConfirmation,
     ]
+  );
+
+  const variantName = getVariantName(
+    customObjectEventsBasedObject,
+    customObjectConfiguration
   );
 
   return (
@@ -307,9 +451,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 />
               ))}
               {propertiesSchema.length ||
-              (eventBasedObject &&
-                (eventBasedObject.getObjects().getObjectsCount() ||
-                  eventBasedObject.isAnimatable())) ? (
+              (customObjectEventsBasedObject &&
+                (customObjectEventsBasedObject.getObjects().getObjectsCount() ||
+                  customObjectEventsBasedObject.isAnimatable())) ? (
                 <React.Fragment>
                   {extraInformation ? (
                     <Line>
@@ -331,42 +475,41 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   />
                   {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                     <>
-                      <Line>
-                        <Column expand noMargin>
-                          <Text size="block-title">Variant</Text>
+                      <LineStackLayout
+                        noMargin
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Text size="block-title">Variant</Text>
+                        <Column>
+                          <LineStackLayout>
+                            <FlatButton
+                              key={'delete-variant'}
+                              label={<Trans>Delete</Trans>}
+                              leftIcon={<Trash />}
+                              onClick={doDeleteVariant}
+                              disabled={!variantName}
+                            />
+                            <FlatButton
+                              key={'duplicate-variant'}
+                              label={<Trans>Duplicate</Trans>}
+                              leftIcon={<Add />}
+                              onClick={() => setNewVariantDialogOpen(true)}
+                            />
+                            <FlatButton
+                              key={'edit-variant'}
+                              label={<Trans>Edit</Trans>}
+                              leftIcon={<Edit />}
+                              onClick={editVariant}
+                            />
+                          </LineStackLayout>
                         </Column>
-                      </Line>
+                      </LineStackLayout>
                       <ColumnStackLayout expand noMargin>
-                        <LineStackLayout>
-                          <FlatButton
-                            label={<Trans>Edit</Trans>}
-                            leftIcon={<Edit />}
-                            onClick={editVariant}
-                            disabled={
-                              !eventBasedObject ||
-                              getVariant(
-                                eventBasedObject,
-                                customObjectConfiguration
-                              ).getAssetStoreAssetId() !== ''
-                            }
-                          />
-                          <FlatButton
-                            label={<Trans>Duplicate</Trans>}
-                            leftIcon={<Add />}
-                            onClick={() => setNewVariantDialogOpen(true)}
-                          />
-                          <FlatButton
-                            label={<Trans>Delete</Trans>}
-                            leftIcon={<Trash />}
-                            onClick={deleteVariant}
-                          />
-                        </LineStackLayout>
                         <SelectField
+                          id={'variant-name'}
                           floatingLabelText={<Trans>Variant</Trans>}
-                          value={getVariantName(
-                            eventBasedObject,
-                            customObjectConfiguration
-                          )}
+                          value={variantName}
                           onChange={(e, i, value: string) => {
                             customObjectConfiguration.setVariantName(value);
                             forceUpdate();
@@ -377,15 +520,17 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             value=""
                             label={t`Default`}
                           />
-                          {eventBasedObject &&
+                          {customObjectEventsBasedObject &&
                             mapFor(
                               0,
-                              eventBasedObject.getVariants().getVariantsCount(),
+                              customObjectEventsBasedObject
+                                .getVariants()
+                                .getVariantsCount(),
                               i => {
-                                if (!eventBasedObject) {
+                                if (!customObjectEventsBasedObject) {
                                   return null;
                                 }
-                                const variant = eventBasedObject
+                                const variant = customObjectEventsBasedObject
                                   .getVariants()
                                   .getVariantAt(i);
                                 return (
@@ -401,37 +546,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       </ColumnStackLayout>
                     </>
                   )}
-                  {(!getVariantName(
-                    eventBasedObject,
-                    customObjectConfiguration
-                  ) ||
+                  {(!variantName ||
                     customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
-                    (eventBasedObject &&
+                    (customObjectEventsBasedObject &&
                       (!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() &&
-                      !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? (
-                        <Line alignItems="center">
-                          <Column expand noMargin>
-                            <Text size="block-title">Children objects</Text>
-                          </Column>
-                          <Column alignItems="right">
-                            <FlatButton
-                              label={
-                                <Trans>Override children configuration</Trans>
-                              }
-                              onClick={() => {
-                                customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
-                                  true
-                                );
-                                customObjectConfiguration.clearChildrenConfiguration();
-                                if (onObjectUpdated) {
-                                  onObjectUpdated();
-                                }
-                                forceUpdate();
-                              }}
-                            />
-                          </Column>
-                        </Line>
-                      ) : (
+                      !customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration() ? null : (
                         <>
                           <Line alignItems="center">
                             <Column expand noMargin>
@@ -460,11 +579,16 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               </Column>
                             )}
                           </Line>
+                          {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
+                            <ChildrenOverridingDepreciationAlert />
+                          )}
                           {mapFor(
                             0,
-                            eventBasedObject.getObjects().getObjectsCount(),
+                            customObjectEventsBasedObject
+                              .getObjects()
+                              .getObjectsCount(),
                             i => {
-                              const childObject = eventBasedObject
+                              const childObject = customObjectEventsBasedObject
                                 .getObjects()
                                 .getObjectAt(i);
                               const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
@@ -563,31 +687,32 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           )}
                         </>
                       )))}
-                  {eventBasedObject && eventBasedObject.isAnimatable() && (
-                    <Column expand>
-                      <Text size="block-title">
-                        <Trans>Animations</Trans>
-                      </Text>
-                      <AnimationList
-                        ref={animationList}
-                        animations={animations}
-                        project={project}
-                        layout={layout}
-                        eventsFunctionsExtension={eventsFunctionsExtension}
-                        eventsBasedObject={eventsBasedObject}
-                        object={object}
-                        objectName={objectName}
-                        resourceManagementProps={resourceManagementProps}
-                        onSizeUpdated={onSizeUpdated}
-                        onObjectUpdated={onObjectUpdated}
-                        isAnimationListLocked={false}
-                        scrollView={scrollView}
-                        onCreateMatchingSpriteCollisionMask={
-                          onCreateMatchingSpriteCollisionMask
-                        }
-                      />
-                    </Column>
-                  )}
+                  {customObjectEventsBasedObject &&
+                    customObjectEventsBasedObject.isAnimatable() && (
+                      <Column expand>
+                        <Text size="block-title">
+                          <Trans>Animations</Trans>
+                        </Text>
+                        <AnimationList
+                          ref={animationList}
+                          animations={animations}
+                          project={project}
+                          layout={layout}
+                          eventsFunctionsExtension={eventsFunctionsExtension}
+                          eventsBasedObject={eventsBasedObject}
+                          object={object}
+                          objectName={objectName}
+                          resourceManagementProps={resourceManagementProps}
+                          onSizeUpdated={onSizeUpdated}
+                          onObjectUpdated={onObjectUpdated}
+                          isAnimationListLocked={false}
+                          scrollView={scrollView}
+                          onCreateMatchingSpriteCollisionMask={
+                            onCreateMatchingSpriteCollisionMask
+                          }
+                        />
+                      </Column>
+                    )}
                 </React.Fragment>
               ) : (
                 <EmptyMessage>
@@ -599,8 +724,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               )}
             </ColumnStackLayout>
           </ScrollView>
-          {eventBasedObject &&
-            eventBasedObject.isAnimatable() &&
+          {customObjectEventsBasedObject &&
+            customObjectEventsBasedObject.isAnimatable() &&
             !isChildObject && (
               <Column noMargin>
                 <ResponsiveLineStackLayout
@@ -736,15 +861,22 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               />
             </Dialog>
           )}
-          {newVariantDialogOpen && eventBasedObject && (
+          {newVariantDialogOpen && customObjectEventsBasedObject && (
             <NewVariantDialog
-              initialName={
-                getVariantName(eventBasedObject, customObjectConfiguration) ||
-                i18n._(t`New variant`)
-              }
-              onApply={name => duplicateVariant(i18n, name)}
+              initialName={variantName || i18n._(t`New variant`)}
+              onApply={name => doDuplicateVariant(i18n, name)}
               onCancel={() => {
                 setNewVariantDialogOpen(false);
+              }}
+            />
+          )}
+          {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+            <NewVariantDialog
+              isDuplicationBeforeEdition
+              initialName={variantName || i18n._(t`New variant`)}
+              onApply={name => duplicateAndEditVariant(i18n, name)}
+              onCancel={() => {
+                setDuplicateAndEditVariantDialogOpen(false);
               }}
             />
           )}

@@ -30,7 +30,11 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
-  openAskAi: (mode: 'chat' | 'agent') => void,
+  openAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -179,7 +183,11 @@ const useNewProjectDialog = ({
   const onOpenAskAi = React.useCallback(
     () => {
       closeNewProjectDialog();
-      openAskAi('agent');
+      openAskAi({
+        mode: 'agent',
+        aiRequestId: null,
+        paneIdentifier: 'center',
+      });
     },
     [closeNewProjectDialog, openAskAi]
   );

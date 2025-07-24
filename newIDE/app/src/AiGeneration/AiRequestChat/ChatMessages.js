@@ -4,7 +4,7 @@ import { ChatBubble } from './ChatBubble';
 import { Line } from '../../UI/Grid';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { getFunctionCallToFunctionCallOutputMap } from './AiRequestUtils';
+import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
 import { FunctionCallRow } from './FunctionCallRow';
 import IconButton from '../../UI/IconButton';
 import Like from '../../UI/CustomSvgIcons/Like';

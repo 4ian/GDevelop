@@ -63,7 +63,6 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
       }
 
       // Copy missing behaviors
-      auto &behaviors = object.GetAllBehaviorContents();
       for (const auto &pair : defaultBehaviors) {
         const auto &behaviorName = pair.first;
         const auto &defaultBehavior = pair.second;
@@ -82,11 +81,9 @@ void EventsBasedObjectVariantHelper::ComplyVariantsToEventsBasedObject(
         }
       }
       // Delete extra behaviors
-      for (auto it = behaviors.begin(); it != behaviors.end(); ++it) {
-        const auto &behaviorName = it->first;
+      for (auto &behaviorName : object.GetAllBehaviorNames()) {
         if (!defaultObject->HasBehaviorNamed(behaviorName)) {
           object.RemoveBehavior(behaviorName);
-          --it;
         }
       }
 

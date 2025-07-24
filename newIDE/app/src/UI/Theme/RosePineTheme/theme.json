@@ -101,11 +101,6 @@
       }
     },
     "surface": {
-      "titlebar": {
-        "background-color": {
-          "value": "#191724"
-        }
-      },
       "toolbar": {
         "background-color": {
           "value": "#1f1d2e"

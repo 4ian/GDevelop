@@ -115,7 +115,11 @@ type Props = {|
   purchasingCourseListingData: ?CourseListingData,
   setPurchasingCourseListingData: (CourseListingData | null) => void,
   simulateAppStoreProduct?: boolean,
-  onOpenAskAi: (mode: 'chat' | 'agent') => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 |};
 
 const CourseSection = ({
@@ -432,7 +436,13 @@ const CourseSection = ({
                         <RaisedButton
                           primary
                           label={<Trans>Ask the AI</Trans>}
-                          onClick={() => onOpenAskAi('chat')}
+                          onClick={() =>
+                            onOpenAskAi({
+                              mode: 'chat',
+                              aiRequestId: null,
+                              paneIdentifier: 'right',
+                            })
+                          }
                         />
                       </ColumnStackLayout>
                     </Paper>

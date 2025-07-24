@@ -254,6 +254,8 @@ app.on('ready', function() {
       // setTitleBarOverlay seems not defined on macOS.
       if (mainWindow.setTitleBarOverlay)
         mainWindow.setTitleBarOverlay(overlayOptions);
+      if (mainWindow.setBackgroundColor)
+        mainWindow.setBackgroundColor(overlayOptions.color);
     }
   );
 

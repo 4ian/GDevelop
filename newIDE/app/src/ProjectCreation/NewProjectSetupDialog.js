@@ -108,7 +108,11 @@ type Props = {|
     newProjectSetup: NewProjectSetup,
     i18n: I18nType
   ) => Promise<void>,
-  onOpenAskAi: (mode: 'chat' | 'agent') => void,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
   selectedExampleShortHeader: ?ExampleShortHeader,
   onSelectExampleShortHeader: (exampleShortHeader: ?ExampleShortHeader) => void,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
@@ -606,7 +610,13 @@ const NewProjectSetupDialog = ({
                     label={<Trans>Try the AI agent</Trans>}
                     rightIcon={<ArrowRight />}
                     style={styles.tryAIAgentButton}
-                    onClick={() => onOpenAskAi('agent')}
+                    onClick={() =>
+                      onOpenAskAi({
+                        mode: 'agent',
+                        aiRequestId: null,
+                        paneIdentifier: 'center',
+                      })
+                    }
                   />
                 </ResponsiveLineStackLayout>
                 {isOnline ? (

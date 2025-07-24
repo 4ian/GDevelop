@@ -65,7 +65,8 @@ const useSwipeableDrawer = ({
       let currentX = 0;
       let isDragging = false;
 
-      const minSwipeDistance = 80;
+      const minDistanceForAction = 80;
+      const minDistanceForMovement = 30;
 
       const onTouchStart = (e: TouchEvent) => {
         startX = e.touches[0].clientX;
@@ -80,7 +81,7 @@ const useSwipeableDrawer = ({
         currentX = e.touches[0].clientX;
         const deltaX = currentX - startX;
 
-        const hasMovedEnough = Math.abs(deltaX) > 10;
+        const hasMovedEnough = Math.abs(deltaX) > minDistanceForMovement;
 
         const translate = !hasMovedEnough
           ? 0
@@ -98,8 +99,8 @@ const useSwipeableDrawer = ({
         const deltaX = currentX - startX;
         const shouldClose =
           direction === 'left'
-            ? deltaX > minSwipeDistance
-            : deltaX < -minSwipeDistance;
+            ? deltaX > minDistanceForAction
+            : deltaX < -minDistanceForAction;
 
         // Animate the drawer either to close or fully open position,
         const animationTimeInMs = 200;

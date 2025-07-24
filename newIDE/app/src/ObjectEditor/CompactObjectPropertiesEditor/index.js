@@ -719,6 +719,7 @@ export const CompactObjectPropertiesEditor = ({
                   </ColumnStackLayout>
                 )}
                 {shouldDisplayEventsBasedObjectChildren &&
+                  customObjectConfiguration &&
                   !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
                     <ChildrenOverridingDepreciationAlert />
                   )}

@@ -48,6 +48,7 @@ export const Toolbar = React.memo<ToolbarProps>(
           // Use content-visibility as we know the exact height of the toolbar, so the
           // content can be entirely skipped when hidden:
           contentVisibility: hidden ? 'hidden' : 'visible',
+          pointerEvents: hidden ? undefined : 'all',
         }}
       >
         {children}

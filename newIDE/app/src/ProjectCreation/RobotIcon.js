@@ -16,9 +16,7 @@ const useClasses = (rotating, size) =>
       '&::before': {
         content: "''",
         display: 'block',
-        background: `conic-gradient(${
-          theme.palette.type === 'light' ? '#f0f0f0' : '#262231'
-        }, #b07bf7)`,
+        background: `conic-gradient(from -18deg at 59.52% 50%, #FFBC57 0deg, #F6945B 157.5deg, #DFA9E4 257.88461208343506deg, rgba(201, 182, 252, 0.00) 360deg)`,
         width: 'calc(100% * 1.41421356237)',
         paddingBottom: 'calc(100% * 1.41421356237)',
         position: 'absolute',

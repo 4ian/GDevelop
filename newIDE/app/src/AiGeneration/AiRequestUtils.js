@@ -3,8 +3,8 @@ import {
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
-} from '../../Utils/GDevelopServices/Generation';
-import { type EditorFunctionCallResult } from '../../EditorFunctions/EditorFunctionCallRunner';
+} from '../Utils/GDevelopServices/Generation';
+import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 
 export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,

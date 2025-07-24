@@ -136,12 +136,6 @@
       }
     },
     "surface": {
-      "titlebar": {
-        "background-color": {
-          "value": "#D9D9DE",
-          "comment": "Palette/Grey/20"
-        }
-      },
       "toolbar": {
         "background-color": {
           "value": "#FAFAFA",
@@ -150,7 +144,7 @@
       },
       "window": {
         "background-color": {
-          "value": "#F7F7F7"
+          "value": "#F5F5F7"
         }
       },
       "canvas": {
@@ -369,8 +363,8 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#A6A6AB",
-          "comment": "Palette/Grey/40"
+          "value": "#D9D9DE",
+          "comment": "Background/tertiary"
         },
         "color": {
           "value": "#1D1D26",

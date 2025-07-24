@@ -3,8 +3,10 @@
 import * as React from 'react';
 import InAppTutorialOrchestrator from './InAppTutorialOrchestrator';
 import { type EditorIdentifier } from '../Utils/GDevelopServices/InAppTutorial';
-import { type EditorTabsState } from '../MainFrame/EditorTabs/EditorTabsHandler';
-import { getCurrentTab } from '../MainFrame/EditorTabs/EditorTabsHandler';
+import {
+  getCurrentTabForPane,
+  type EditorTabsState,
+} from '../MainFrame/EditorTabs/EditorTabsHandler';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -21,7 +23,7 @@ const useInAppTutorialOrchestrator = ({ editorTabs }: Props) => {
 
   React.useEffect(
     () => {
-      const currentTab = getCurrentTab(editorTabs);
+      const currentTab = getCurrentTabForPane(editorTabs, 'center');
       if (!currentTab) {
         setCurrentEditor(null);
         return;

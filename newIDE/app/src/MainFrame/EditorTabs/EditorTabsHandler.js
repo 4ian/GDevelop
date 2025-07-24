@@ -53,8 +53,12 @@ export type EditorTab = {|
 |};
 
 export type EditorTabsState = {|
-  editors: Array<EditorTab>,
-  currentTab: number,
+  panes: {
+    [paneIdentifier: string]: {|
+      editors: Array<EditorTab>,
+      currentTab: number,
+    |},
+  },
 |};
 
 export type EditorKind =
@@ -82,6 +86,7 @@ export type EditorTabsPersistedState = {|
 |};
 
 export type EditorOpeningOptions = {|
+  paneIdentifier: string,
   label?: string,
   icon?: React.Node,
   renderCustomIcon?: ?(brightness: number) => React.Node,
@@ -126,8 +131,20 @@ export const getEditorTabMetadata = (
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
-    editors: [],
-    currentTab: 0,
+    panes: {
+      left: {
+        editors: [],
+        currentTab: 0,
+      },
+      center: {
+        editors: [],
+        currentTab: 0,
+      },
+      right: {
+        editors: [],
+        currentTab: 0,
+      },
+    },
   };
 };
 
@@ -144,17 +161,28 @@ export const openEditorTab = (
     extraEditorProps,
     dontFocusTab,
     closable,
+    paneIdentifier,
   }: EditorOpeningOptions
 ): EditorTabsState => {
-  const existingEditorId = findIndex(
-    state.editors,
-    editor => editor.key === key
-  );
-  if (existingEditorId !== -1) {
-    return {
-      ...state,
-      currentTab: dontFocusTab ? state.currentTab : existingEditorId,
-    };
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+
+    const existingEditorId = findIndex(
+      pane.editors,
+      editor => editor.key === key
+    );
+    if (existingEditorId !== -1) {
+      return {
+        ...state,
+        panes: {
+          ...state.panes,
+          [paneIdentifier]: {
+            ...pane,
+            currentTab: dontFocusTab ? pane.currentTab : existingEditorId,
+          },
+        },
+      };
+    }
   }
 
   const editorTab: EditorTab = {
@@ -170,46 +198,82 @@ export const openEditorTab = (
     closable: typeof closable === 'undefined' ? true : !!closable,
   };
 
+  const pane = state.panes[paneIdentifier];
+  if (!pane) {
+    throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
+  }
+
   return {
     ...state,
-    editors:
-      // Make sure the home page is always the first tab.
-      key === 'start page'
-        ? [editorTab, ...state.editors]
-        : [...state.editors, editorTab],
-    currentTab: dontFocusTab ? state.currentTab : state.editors.length,
+    panes: {
+      ...state.panes,
+      [paneIdentifier]: {
+        ...pane,
+        editors:
+          // Make sure the home page is always the first tab.
+          key === 'start page'
+            ? [editorTab, ...pane.editors]
+            : [...pane.editors, editorTab],
+        currentTab: dontFocusTab ? pane.currentTab : pane.editors.length,
+      },
+    },
   };
 };
 
 export const changeCurrentTab = (
   state: EditorTabsState,
+  paneIdentifier: string,
   newTabId: number
 ): EditorTabsState => {
+  const pane = state.panes[paneIdentifier];
+  if (!pane) {
+    throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
+  }
+
   return {
     ...state,
-    currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
+    panes: {
+      ...state.panes,
+      [paneIdentifier]: {
+        ...pane,
+        currentTab: Math.max(0, Math.min(newTabId, pane.editors.length - 1)),
+      },
+    },
   };
 };
 
 export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
-  return state.editors.some(editor => editor.key === 'start page');
+  return hasEditorTabOpenedWithKey(state, 'start page');
 };
 
 export const closeTabsExceptIf = (
   state: EditorTabsState,
   keepPredicate: (editorTab: EditorTab) => boolean
 ) => {
-  const currentEditorTab = getCurrentTab(state);
-  const remainingEditors = state.editors.filter(keepPredicate);
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: remainingEditors,
-    },
-    // Keep the focus on the current editor tab, or if it was closed
-    // go back to the first tab.
-    remainingEditors.indexOf(currentEditorTab) || 0
-  );
+  let newState = { ...state };
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    if (!pane) {
+      throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
+    }
+
+    const currentEditorTab = pane.editors[pane.currentTab] || null;
+    const paneRemainingEditors = pane.editors.filter(keepPredicate);
+    const currentEditorTabNewIndex = paneRemainingEditors.indexOf(
+      currentEditorTab
+    );
+    newState.panes[paneIdentifier] = {
+      ...pane,
+      editors: paneRemainingEditors,
+
+      // Keep the focus on the current editor tab, or if it was closed
+      // go back to the first tab.
+      currentTab:
+        currentEditorTabNewIndex === -1 ? 0 : currentEditorTabNewIndex,
+    };
+  }
+
+  return newState;
 };
 
 export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
@@ -233,16 +297,27 @@ export const closeOtherEditorTabs = (
   );
 };
 
-export const getEditors = (state: EditorTabsState): Array<EditorTab> => {
-  return state.editors;
+export const getEditorsForPane = (
+  state: EditorTabsState,
+  paneIdentifier: string
+): Array<EditorTab> => {
+  return state.panes[paneIdentifier].editors || [];
 };
 
-export const getCurrentTabIndex = (state: EditorTabsState): number => {
-  return state.currentTab;
+export const getCurrentTabIndexForPane = (
+  state: EditorTabsState,
+  paneIdentifier: string
+): number => {
+  const pane = state.panes[paneIdentifier];
+  return pane.currentTab || 0;
 };
 
-export const getCurrentTab = (state: EditorTabsState): EditorTab => {
-  return state.editors[state.currentTab];
+export const getCurrentTabForPane = (
+  state: EditorTabsState,
+  paneIdentifier: string
+): EditorTab | null => {
+  const pane = state.panes[paneIdentifier];
+  return pane.editors[pane.currentTab] || null;
 };
 
 export const closeProjectTabs = (
@@ -261,15 +336,22 @@ export const closeProjectTabs = (
  * to the project.
  */
 export const saveUiSettings = (state: EditorTabsState) => {
-  state.editors.forEach(editorTab => {
-    if (
-      editorTab.editorRef &&
-      (editorTab.editorRef instanceof SceneEditorContainer ||
-        editorTab.editorRef instanceof ExternalLayoutEditorContainer)
-    ) {
-      editorTab.editorRef.saveUiSettings();
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    if (!pane) {
+      continue;
     }
-  });
+
+    pane.editors.forEach(editorTab => {
+      if (
+        editorTab.editorRef &&
+        (editorTab.editorRef instanceof SceneEditorContainer ||
+          editorTab.editorRef instanceof ExternalLayoutEditorContainer)
+      ) {
+        editorTab.editorRef.saveUiSettings();
+      }
+    });
+  }
 };
 
 /**
@@ -277,13 +359,20 @@ export const saveUiSettings = (state: EditorTabsState) => {
  * to editors with changes to commit them (like modified extensions).
  */
 export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
-  state.editors.forEach(editorTab => {
-    const editor = editorTab.editorRef;
-
-    if (editor instanceof EventsFunctionsExtensionEditorContainer) {
-      editor.previewOrExportWillStart();
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    if (!pane) {
+      continue;
     }
-  });
+
+    pane.editors.forEach(editorTab => {
+      const editor = editorTab.editorRef;
+
+      if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+        editor.previewOrExportWillStart();
+      }
+    });
+  }
 };
 
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
@@ -405,14 +494,21 @@ export const closeEventsBasedObjectVariantTab = (
 export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
-): ?{| editor: EventsFunctionsExtensionEditorContainer, tabIndex: number |} => {
-  for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
-    const editor = state.editors[tabIndex].editorRef;
-    if (
-      editor instanceof EventsFunctionsExtensionEditorContainer &&
-      editor.getEventsFunctionsExtension() === eventsFunctionsExtension
-    ) {
-      return { editor, tabIndex };
+): ?{|
+  editor: EventsFunctionsExtensionEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof EventsFunctionsExtensionEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
     }
   }
 
@@ -424,16 +520,23 @@ export const getCustomObjectEditor = (
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   variantName: string
-): ?{| editor: CustomObjectEditorContainer, tabIndex: number |} => {
-  for (let tabIndex = 0; tabIndex < state.editors.length; ++tabIndex) {
-    const editor = state.editors[tabIndex].editorRef;
-    if (
-      editor instanceof CustomObjectEditorContainer &&
-      editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
-      editor.getEventsBasedObject() === eventsBasedObject &&
-      editor.getVariantName() === variantName
-    ) {
-      return { editor, tabIndex };
+): ?{|
+  editor: CustomObjectEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof CustomObjectEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+        editor.getEventsBasedObject() === eventsBasedObject &&
+        editor.getVariantName() === variantName
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
     }
   }
 
@@ -442,6 +545,7 @@ export const getCustomObjectEditor = (
 
 export const moveTabToTheRightOfHoveredTab = (
   editorTabsState: EditorTabsState,
+  paneIdentifier: string,
   movingTabIndex: number,
   hoveredTabIndex: number
 ): EditorTabsState => {
@@ -450,21 +554,32 @@ export const moveTabToTheRightOfHoveredTab = (
   const destinationIndex =
     movingTabIndex > hoveredTabIndex ? hoveredTabIndex + 1 : hoveredTabIndex;
 
-  return moveTabToPosition(editorTabsState, movingTabIndex, destinationIndex);
+  return moveTabToPosition(
+    editorTabsState,
+    paneIdentifier,
+    movingTabIndex,
+    destinationIndex
+  );
 };
 
 export const moveTabToPosition = (
   editorTabsState: EditorTabsState,
+  paneIdentifier: string,
   fromIndex: number,
   toIndex: number
 ): EditorTabsState => {
-  const currentEditorTabs = [...getEditors(editorTabsState)];
-  const movingTab = currentEditorTabs[fromIndex];
-  currentEditorTabs.splice(fromIndex, 1);
-  currentEditorTabs.splice(toIndex, 0, movingTab);
+  const paneNewEditorTabs = [
+    ...getEditorsForPane(editorTabsState, paneIdentifier),
+  ];
+  const movingTab = paneNewEditorTabs[fromIndex];
+  paneNewEditorTabs.splice(fromIndex, 1);
+  paneNewEditorTabs.splice(toIndex, 0, movingTab);
 
-  let currentTabIndex = getCurrentTabIndex(editorTabsState);
-  let currentTabNewIndex = currentTabIndex;
+  let currentTabIndex = getCurrentTabIndexForPane(
+    editorTabsState,
+    paneIdentifier
+  );
+  let paneNewCurrentTab = currentTabIndex;
 
   const movingTabIsCurrentTab = fromIndex === currentTabIndex;
   const tabIsMovedFromLeftToRightOfCurrentTab =
@@ -472,25 +587,86 @@ export const moveTabToPosition = (
   const tabIsMovedFromRightToLeftOfCurrentTab =
     fromIndex > currentTabIndex && toIndex <= currentTabIndex;
 
-  if (movingTabIsCurrentTab) currentTabNewIndex = toIndex;
-  else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabNewIndex -= 1;
-  else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabNewIndex += 1;
+  if (movingTabIsCurrentTab) paneNewCurrentTab = toIndex;
+  else if (tabIsMovedFromLeftToRightOfCurrentTab) paneNewCurrentTab -= 1;
+  else if (tabIsMovedFromRightToLeftOfCurrentTab) paneNewCurrentTab += 1;
 
-  return { editors: currentEditorTabs, currentTab: currentTabNewIndex };
+  return {
+    ...editorTabsState,
+    panes: {
+      ...editorTabsState.panes,
+      [paneIdentifier]: {
+        ...editorTabsState.panes[paneIdentifier],
+        editors: paneNewEditorTabs,
+        currentTab: paneNewCurrentTab,
+      },
+    },
+  };
 };
 
-export const hasEditorTabOpenedWithKey = (
+export const getEditorTabOpenedWithKey = (
   editorTabsState: EditorTabsState,
   key: string
-) => {
-  return !!editorTabsState.editors.find(editor => editor.key === key);
+): {|
+  paneIdentifier: string,
+  editorTab: EditorTab,
+|} | null => {
+  for (const paneIdentifier in editorTabsState.panes) {
+    const pane = editorTabsState.panes[paneIdentifier];
+    const editorTab = pane && pane.editors.find(editor => editor.key === key);
+    if (editorTab) {
+      return { editorTab, paneIdentifier };
+    }
+  }
+
+  return null;
+};
+
+const hasEditorTabOpenedWithKey = (
+  editorTabsState: EditorTabsState,
+  key: string
+): boolean => {
+  return getEditorTabOpenedWithKey(editorTabsState, key) !== null;
 };
 
 export const getOpenedAskAiEditor = (
   state: EditorTabsState
-): AskAiEditorInterface | null => {
-  const editor = state.editors.find(editor => editor.key === 'ask-ai');
+): null | {|
+  askAiEditor: AskAiEditorInterface,
+  editorTab: EditorTab,
+  paneIdentifier: string,
+|} => {
+  const currentEditorTabAndPaneIdentifier = getEditorTabOpenedWithKey(
+    state,
+    'ask-ai'
+  );
+  if (!currentEditorTabAndPaneIdentifier) return null;
 
-  // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
-  return (editor && editor.editorRef) || null;
+  return {
+    // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+    askAiEditor: currentEditorTabAndPaneIdentifier.editorTab.editorRef,
+    editorTab: currentEditorTabAndPaneIdentifier.editorTab,
+    paneIdentifier: currentEditorTabAndPaneIdentifier.paneIdentifier,
+  };
+};
+
+export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {
+  const allEditors = [];
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    allEditors.push(...pane.editors);
+  }
+  return allEditors;
+};
+
+export const hasEditorsInPane = (
+  state: EditorTabsState,
+  paneIdentifier: string
+): boolean => {
+  const pane = state.panes[paneIdentifier];
+  if (!pane) {
+    return false;
+  }
+
+  return pane.editors.length > 0;
 };

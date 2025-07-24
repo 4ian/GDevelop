@@ -36,7 +36,7 @@ import { type EditorCallbacks } from '../EditorFunctions';
 import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
-} from './AiRequestChat/AiRequestUtils';
+} from './AiRequestUtils';
 import { useStableUpToDateRef } from '../Utils/UseStableUpToDateCallback';
 import { useTriggerAtNextRender } from '../Utils/useTriggerAtNextRender';
 import { type NewProjectSetup } from '../ProjectCreation/NewProjectSetupDialog';
@@ -52,65 +52,9 @@ import {
 import { useCreateAiProjectDialog } from './UseCreateAiProjectDialog';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { prepareAiUserContent } from './PrepareAiUserContent';
+import { AiRequestContext } from './AiRequestContext';
 
 const gd: libGDevelop = global.gd;
-
-const useEditorFunctionCallResultsPerRequest = () => {
-  const [
-    editorFunctionCallResultsPerRequest,
-    setEditorFunctionCallResultsPerRequest,
-  ] = React.useState<{
-    [aiRequestId: string]: Array<EditorFunctionCallResult>,
-  }>({});
-
-  return {
-    getEditorFunctionCallResults: React.useCallback(
-      (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
-        editorFunctionCallResultsPerRequest[aiRequestId] || null,
-      [editorFunctionCallResultsPerRequest]
-    ),
-    addEditorFunctionCallResults: React.useCallback(
-      (
-        aiRequestId: string,
-        editorFunctionCallResults: EditorFunctionCallResult[]
-      ) => {
-        setEditorFunctionCallResultsPerRequest(
-          editorFunctionCallResultsPerRequest => {
-            const existingEditorFunctionCallResults = (
-              editorFunctionCallResultsPerRequest[aiRequestId] || []
-            ).filter(existingEditorFunctionCallResult => {
-              return !editorFunctionCallResults.some(
-                editorFunctionCallResult => {
-                  return (
-                    editorFunctionCallResult.call_id ===
-                    existingEditorFunctionCallResult.call_id
-                  );
-                }
-              );
-            });
-
-            return {
-              ...editorFunctionCallResultsPerRequest,
-              [aiRequestId]: [
-                ...existingEditorFunctionCallResults,
-                ...editorFunctionCallResults,
-              ],
-            };
-          }
-        );
-      },
-      []
-    ),
-    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
-      setEditorFunctionCallResultsPerRequest(
-        editorFunctionCallResultsPerRequest => ({
-          ...editorFunctionCallResultsPerRequest,
-          [aiRequestId]: null,
-        })
-      );
-    }, []),
-  };
-};
 
 const useProcessFunctionCalls = ({
   i18n,
@@ -129,7 +73,9 @@ const useProcessFunctionCalls = ({
   resourceManagementProps: ResourceManagementProps,
   editorCallbacks: EditorCallbacks,
   selectedAiRequest: ?AiRequest,
-  onSendEditorFunctionCallResults: () => Promise<void>,
+  onSendEditorFunctionCallResults: (
+    options: null | {| createdSceneNames: Array<string> |}
+  ) => Promise<void>,
   getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
   addEditorFunctionCallResults: (
     string,
@@ -196,7 +142,7 @@ const useProcessFunctionCalls = ({
         }))
       );
 
-      const editorFunctionCallResults = await processEditorFunctionCalls({
+      const { results, createdSceneNames } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
         functionCalls: functionCalls.map(functionCall => ({
@@ -216,14 +162,13 @@ const useProcessFunctionCalls = ({
         searchAndInstallAsset,
       });
 
-      addEditorFunctionCallResults(
-        selectedAiRequest.id,
-        editorFunctionCallResults
-      );
+      addEditorFunctionCallResults(selectedAiRequest.id, results);
 
       // We may have processed everything, so try to send the results
       // to the backend.
-      triggerSendEditorFunctionCallResults();
+      triggerSendEditorFunctionCallResults({
+        createdSceneNames,
+      });
     },
     [
       project,
@@ -280,52 +225,20 @@ const useProcessFunctionCalls = ({
   };
 };
 
-type AiRequestSendState = {|
-  isSending: boolean,
-  lastSendError: ?Error,
-|};
-
-export const useAiRequests = () => {
+export const useSelectedAiRequest = ({
+  initialAiRequestId,
+}: {|
+  initialAiRequestId: string | null,
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const { aiRequests, updateAiRequest } = aiRequestStorage;
 
-  const [aiRequests, setAiRequests] = React.useState<{ [string]: AiRequest }>(
-    {}
-  );
   const [selectedAiRequestId, setSelectedAiRequestId] = React.useState<
     string | null
-  >(null);
-
-  const updateAiRequest = React.useCallback(
-    (aiRequestId: string, aiRequest: AiRequest) => {
-      setAiRequests(aiRequests => ({
-        ...aiRequests,
-        [aiRequestId]: aiRequest,
-      }));
-    },
-    []
-  );
-
-  const refreshAiRequest = React.useCallback(
-    async (aiRequestId: string) => {
-      if (!profile) return;
-
-      try {
-        const updatedAiRequest = await getAiRequest(getAuthorizationHeader, {
-          userId: profile.id,
-          aiRequestId: aiRequestId,
-        });
-        updateAiRequest(updatedAiRequest.id, updatedAiRequest);
-      } catch (error) {
-        console.error(
-          'Error while background refreshing AI request - ignoring:',
-          error
-        );
-      }
-    },
-    [getAuthorizationHeader, profile, updateAiRequest]
-  );
+  >(initialAiRequestId);
 
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
@@ -375,59 +288,10 @@ export const useAiRequests = () => {
     ]
   );
 
-  const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
-    [string]: AiRequestSendState,
-  }>({});
-  const isSendingAiRequest = React.useCallback(
-    (aiRequestId: string | null) =>
-      !!aiRequestSendStates[aiRequestId || ''] &&
-      aiRequestSendStates[aiRequestId || ''].isSending,
-    [aiRequestSendStates]
-  );
-  const getLastSendError = React.useCallback(
-    (aiRequestId: string | null) =>
-      (aiRequestSendStates[aiRequestId || ''] &&
-        aiRequestSendStates[aiRequestId || ''].lastSendError) ||
-      null,
-    [aiRequestSendStates]
-  );
-  const setSendingAiRequest = React.useCallback(
-    (aiRequestId: string | null, isSending: boolean) => {
-      const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
-        [aiRequestIdToSet]: {
-          isSending,
-          lastSendError: null,
-        },
-      }));
-    },
-    [setAiRequestSendStates]
-  );
-  const setLastSendError = React.useCallback(
-    (aiRequestId: string | null, lastSendError: ?Error) => {
-      const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
-        [aiRequestIdToSet]: {
-          isSending: false,
-          lastSendError,
-        },
-      }));
-    },
-    [setAiRequestSendStates]
-  );
-
   return {
     selectedAiRequest,
     selectedAiRequestId,
     setSelectedAiRequestId,
-    updateAiRequest,
-    refreshAiRequest,
-    isSendingAiRequest,
-    setSendingAiRequest,
-    setLastSendError,
-    getLastSendError,
   };
 };
 
@@ -438,6 +302,8 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     minWidth: 0,
+    overflowY: 'scroll',
+    overflowX: 'hidden',
   },
   chatContainer: {
     flex: 1,
@@ -483,7 +349,13 @@ type Props = {|
     changes: SceneEventsOutsideEditorChanges
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  mode?: 'chat' | 'agent' | null,
+  initialMode: 'chat' | 'agent' | null,
+  initialAiRequestId: string | null,
+  onOpenAskAi: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+    paneIdentifier: 'left' | 'center' | 'right' | null,
+  |}) => void,
 |};
 
 export type AskAiEditorInterface = {|
@@ -499,7 +371,10 @@ export type AskAiEditorInterface = {|
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
-  startNewChat: (mode: 'chat' | 'agent') => void,
+  startOrOpenChat: ({|
+    mode: 'chat' | 'agent',
+    aiRequestId: string | null,
+  |}) => void,
 |};
 
 export type NewAiRequestOptions = {|
@@ -525,7 +400,9 @@ export const AskAiEditor = React.memo<Props>(
         onOpenLayout,
         onSceneEventsModifiedOutsideEditor,
         onExtensionInstalled,
-        mode,
+        initialMode,
+        initialAiRequestId,
+        onOpenAskAi,
       }: Props,
       ref
     ) => {
@@ -540,13 +417,9 @@ export const AskAiEditor = React.memo<Props>(
         selectedAiRequest,
         selectedAiRequestId,
         setSelectedAiRequestId,
-        updateAiRequest,
-        refreshAiRequest,
-        setSendingAiRequest,
-        isSendingAiRequest,
-        getLastSendError,
-        setLastSendError,
-      } = useAiRequests();
+      } = useSelectedAiRequest({
+        initialAiRequestId,
+      });
       const upToDateSelectedAiRequestId = useStableUpToDateRef(
         selectedAiRequestId
       );
@@ -558,26 +431,30 @@ export const AskAiEditor = React.memo<Props>(
 
       const [isHistoryOpen, setIsHistoryOpen] = React.useState<boolean>(false);
       const [newChatMode, setNewChatMode] = React.useState<'chat' | 'agent'>(
-        mode || 'agent'
+        initialMode || 'agent'
       );
 
       // Update newChatMode when mode prop changes
       React.useEffect(
         () => {
-          if (mode) {
-            setNewChatMode(mode);
+          if (initialMode) {
+            setNewChatMode(initialMode);
           }
         },
-        [mode]
+        [initialMode]
       );
 
       const canStartNewChat = !!selectedAiRequestId;
-      const onStartNewChat = React.useCallback(
-        (mode: 'chat' | 'agent') => {
-          setSelectedAiRequestId(null);
-          if (mode) {
-            setNewChatMode(mode);
-          }
+      const onStartOrOpenChat = React.useCallback(
+        ({
+          mode,
+          aiRequestId,
+        }: {|
+          mode: 'chat' | 'agent',
+          aiRequestId: string | null,
+        |}) => {
+          setSelectedAiRequestId(aiRequestId);
+          setNewChatMode(mode);
         },
         [setSelectedAiRequestId]
       );
@@ -591,10 +468,22 @@ export const AskAiEditor = React.memo<Props>(
       }, []);
 
       const {
+        aiRequestStorage,
+        editorFunctionCallResultsStorage,
+      } = React.useContext(AiRequestContext);
+      const {
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         clearEditorFunctionCallResults,
-      } = useEditorFunctionCallResultsPerRequest();
+      } = editorFunctionCallResultsStorage;
+      const {
+        updateAiRequest,
+        refreshAiRequest,
+        isSendingAiRequest,
+        getLastSendError,
+        setSendingAiRequest,
+        setLastSendError,
+      } = aiRequestStorage;
 
       const {
         createAiProject,
@@ -606,14 +495,14 @@ export const AskAiEditor = React.memo<Props>(
           if (setToolbar) {
             setToolbar(
               <Toolbar
-                onStartNewChat={onStartNewChat}
+                onStartOrOpenChat={onStartOrOpenChat}
                 canStartNewChat={canStartNewChat}
                 onOpenHistory={onOpenHistory}
               />
             );
           }
         },
-        [setToolbar, onStartNewChat, canStartNewChat, onOpenHistory]
+        [setToolbar, onStartOrOpenChat, canStartNewChat, onOpenHistory]
       );
 
       React.useEffect(updateToolbar, [updateToolbar]);
@@ -626,7 +515,7 @@ export const AskAiEditor = React.memo<Props>(
         onSceneObjectEdited: noop,
         onSceneObjectsDeleted: noop,
         onSceneEventsModifiedOutsideEditor: noop,
-        startNewChat: onStartNewChat,
+        startOrOpenChat: onStartOrOpenChat,
       }));
 
       const aiRequestChatRef = React.useRef<AiRequestChatInterface | null>(
@@ -820,6 +709,7 @@ export const AskAiEditor = React.memo<Props>(
           updateAiRequest,
           createAiProject,
           newAiRequestOptions,
+          onOpenAskAi,
         ]
       );
 
@@ -838,7 +728,13 @@ export const AskAiEditor = React.memo<Props>(
 
       // Send the results of the function call outputs, if any, and the user message (if any).
       const onSendMessage = React.useCallback(
-        async ({ userMessage }: {| userMessage: string |}) => {
+        async ({
+          userMessage,
+          createdSceneNames,
+        }: {|
+          userMessage: string,
+          createdSceneNames?: Array<string>,
+        |}) => {
           if (
             !profile ||
             !selectedAiRequestId ||
@@ -950,9 +846,25 @@ export const AskAiEditor = React.memo<Props>(
               // Ignore limits refresh error.
             }
           }
+
+          if (selectedAiRequest && createdSceneNames) {
+            onOpenAskAi({
+              mode: selectedAiRequest.mode || 'agent',
+              aiRequestId: selectedAiRequestId,
+              paneIdentifier: 'right',
+            });
+            createdSceneNames.forEach(sceneName => {
+              onOpenLayout(sceneName, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'scene',
+              });
+            });
+          }
         },
         [
           profile,
+          selectedAiRequest,
           selectedAiRequestId,
           isSendingAiRequest,
           getEditorFunctionCallResults,
@@ -968,12 +880,15 @@ export const AskAiEditor = React.memo<Props>(
           onRefreshLimits,
           project,
           hasFunctionsCallsToProcess,
+          onOpenAskAi,
+          onOpenLayout,
         ]
       );
       const onSendEditorFunctionCallResults = React.useCallback(
-        () =>
+        (options: null | {| createdSceneNames: Array<string> |}) =>
           onSendMessage({
             userMessage: '',
+            createdSceneNames: options ? options.createdSceneNames : [],
           }),
         [onSendMessage]
       );
@@ -1067,7 +982,7 @@ export const AskAiEditor = React.memo<Props>(
                 }}
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
-                onStartNewChat={onStartNewChat}
+                onStartOrOpenChat={onStartOrOpenChat}
               />
             </div>
           </Paper>
@@ -1116,7 +1031,13 @@ export const renderAskAiEditorContainer = (
           props.onSceneEventsModifiedOutsideEditor
         }
         onExtensionInstalled={props.onExtensionInstalled}
-        mode={props.extraEditorProps && props.extraEditorProps.mode}
+        initialMode={
+          (props.extraEditorProps && props.extraEditorProps.mode) || null
+        }
+        initialAiRequestId={
+          (props.extraEditorProps && props.extraEditorProps.aiRequestId) || null
+        }
+        onOpenAskAi={props.onOpenAskAi}
       />
     )}
   </I18n>

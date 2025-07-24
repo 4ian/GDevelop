@@ -20,7 +20,7 @@ import {
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
-import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -313,6 +313,14 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       project.getCurrentPlatform(),
       object.getType()
     );
+    const objectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+      object.getType()
+    );
+    const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
+      objectExtensionName
+    )
+      ? project.getEventsFunctionsExtension(objectExtensionName)
+      : null;
     return [
       {
         label: i18n._(t`Copy`),
@@ -372,11 +380,11 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       project.hasEventsBasedObject(object.getType())
         ? {
             label: i18n._(t`Edit children`),
-            enabled:
-              getVariant(
-                project.getEventsBasedObject(object.getType()),
-                gd.asCustomObjectConfiguration(object.getConfiguration())
-              ).getAssetStoreAssetId() === '',
+            enabled: isVariantEditable(
+              gd.asCustomObjectConfiguration(object.getConfiguration()),
+              project.getEventsBasedObject(object.getType()),
+              customObjectExtension
+            ),
             click: () => {
               const customObjectConfiguration = gd.asCustomObjectConfiguration(
                 object.getConfiguration()

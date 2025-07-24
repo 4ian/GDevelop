@@ -81,7 +81,7 @@ import { unserializeFromJSObject } from '../Utils/Serializer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
-import { getVariant } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
+import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -1555,6 +1555,15 @@ export default class SceneEditor extends React.Component<Props, State> {
           )
         : null;
 
+      const objectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+        object.getType()
+      );
+      const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
+        objectExtensionName
+      )
+        ? project.getEventsFunctionsExtension(objectExtensionName)
+        : null;
+
       return [
         ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
@@ -1582,11 +1591,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         object && project.hasEventsBasedObject(object.getType())
           ? {
               label: i18n._(t`Edit children`),
-              enabled:
-                getVariant(
-                  project.getEventsBasedObject(object.getType()),
-                  gd.asCustomObjectConfiguration(object.getConfiguration())
-                ).getAssetStoreAssetId() === '',
+              enabled: isVariantEditable(
+                gd.asCustomObjectConfiguration(object.getConfiguration()),
+                project.getEventsBasedObject(object.getType()),
+                customObjectExtension
+              ),
               click: () => {
                 const customObjectConfiguration = gd.asCustomObjectConfiguration(
                   object.getConfiguration()

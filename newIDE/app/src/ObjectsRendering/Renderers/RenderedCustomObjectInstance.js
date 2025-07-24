@@ -119,7 +119,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
-    propertyOverridings: Map<string, string>
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   ) {
     super(
       project,
@@ -128,7 +128,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       pixiContainer,
       threeGroup,
       pixiResourcesLoader,
-      propertyOverridings
+      getPropertyOverridings
     );
 
     // Setup the PIXI object:
@@ -256,26 +256,31 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         this._associatedObjectConfiguration
       );
       // Apply property mapping rules on the child instance.
-      const childPropertyOverridings = new Map<string, string>();
-      const customObjectProperties = customObjectConfiguration.getProperties();
-      for (const propertyMappingRule of this._propertyMappingRules) {
-        if (propertyMappingRule.targetChild !== instance.getObjectName()) {
-          continue;
+      const getChildPropertyOverridings = () => {
+        const childPropertyOverridings = new Map<string, string>();
+
+        const propertyOverridings = this.getPropertyOverridings();
+        const customObjectProperties = customObjectConfiguration.getProperties();
+        for (const propertyMappingRule of this._propertyMappingRules) {
+          if (propertyMappingRule.targetChild !== instance.getObjectName()) {
+            continue;
+          }
+          const sourceValue =
+            propertyOverridings &&
+            propertyOverridings.has(propertyMappingRule.sourceProperty)
+              ? propertyOverridings.get(propertyMappingRule.sourceProperty)
+              : customObjectProperties
+                  .get(propertyMappingRule.sourceProperty)
+                  .getValue();
+          if (sourceValue !== undefined) {
+            childPropertyOverridings.set(
+              propertyMappingRule.targetProperty,
+              sourceValue
+            );
+          }
         }
-        const sourceValue = this._propertyOverridings.has(
-          propertyMappingRule.sourceProperty
-        )
-          ? this._propertyOverridings.get(propertyMappingRule.sourceProperty)
-          : customObjectProperties
-              .get(propertyMappingRule.sourceProperty)
-              .getValue();
-        if (sourceValue !== undefined) {
-          childPropertyOverridings.set(
-            propertyMappingRule.targetProperty,
-            sourceValue
-          );
-        }
-      }
+        return childPropertyOverridings;
+      };
       //...so let's create a renderer.
       const childObjectConfiguration = this._getChildObjectConfiguration(
         instance.getObjectName()
@@ -287,7 +292,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
             childObjectConfiguration,
             this._pixiObject,
             this._threeObject,
-            childPropertyOverridings
+            getChildPropertyOverridings
           )
         : new RenderedUnknownInstance(
             this._project,

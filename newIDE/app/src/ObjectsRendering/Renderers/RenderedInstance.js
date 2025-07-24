@@ -15,7 +15,7 @@ export default class RenderedInstance {
   _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
   _wasDestroyed: boolean;
-  _propertyOverridings: Map<string, string>;
+  _getPropertyOverridings: (() => Map<string, string>) | null;
 
   constructor(
     project: gdProject,
@@ -23,7 +23,7 @@ export default class RenderedInstance {
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
-    propertyOverridings: Map<string, string> = new Map<string, string>()
+    getPropertyOverridings: (() => Map<string, string>) | null = null
   ) {
     this._pixiObject = null;
     this._instance = instance;
@@ -31,7 +31,7 @@ export default class RenderedInstance {
     this._pixiContainer = pixiContainer;
     this._project = project;
     this._pixiResourcesLoader = pixiResourcesLoader;
-    this._propertyOverridings = propertyOverridings;
+    this._getPropertyOverridings = getPropertyOverridings;
     this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
     this._wasDestroyed = false;
   }
@@ -133,5 +133,9 @@ export default class RenderedInstance {
 
   getDefaultDepth(): number {
     return 0;
+  }
+
+  getPropertyOverridings(): Map<string, string> | null {
+    return this._getPropertyOverridings && this._getPropertyOverridings();
   }
 }

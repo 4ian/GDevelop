@@ -261,7 +261,15 @@ export const EmbeddedGameFrame = ({
   );
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+    <div
+      style={{
+        position: 'absolute',
+        top: 31 + 40, // Height of the tabs + toolbar.
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}
+    >
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <iframe
           ref={iframeRef}

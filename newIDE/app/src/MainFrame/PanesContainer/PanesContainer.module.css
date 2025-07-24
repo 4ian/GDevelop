@@ -85,6 +85,7 @@
 
 .centerPane {
   flex: 1;
+  pointer-events: none; /* Let the pointer events go through, and the pane itself is responsible for setting them back when necessary. */
 }
 
 .hidden {

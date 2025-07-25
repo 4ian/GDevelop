@@ -1500,10 +1500,12 @@ const MainFrame = (props: Props) => {
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
         if (!editorRef) {
-          setEditorHotReloadNeeded({
-            projectDataOnlyExport,
-            shouldReloadResources,
-          });
+          if (hotReload) {
+            setEditorHotReloadNeeded({
+              projectDataOnlyExport,
+              shouldReloadResources,
+            });
+          }
           return;
         }
         editorRef.hotReloadInGameEditorIfNeeded({

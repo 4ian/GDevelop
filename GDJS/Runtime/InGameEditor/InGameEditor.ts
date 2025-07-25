@@ -1661,9 +1661,7 @@ namespace gdjs {
       }
 
       if (is3D(this._draggedNewObject)) {
-        const cursor = this._getCursorIn3D(
-          this._selection.getSelectedObjects()
-        );
+        const cursor = this._getCursorIn3D([this._draggedNewObject]);
         if (cursor) {
           const [cursorX, cursorY, cursorZ] = cursor;
           this._draggedNewObject.setX(cursorX);

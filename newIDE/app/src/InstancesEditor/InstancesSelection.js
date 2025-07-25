@@ -15,10 +15,6 @@ export default class InstancesSelection {
     return this.selection;
   }
 
-  getLastSelectedInstances(): gdInitialInstance {
-    return this.selection[this.selection.length - 1];
-  }
-
   isInstanceSelected(instance: gdInitialInstance) {
     for (var i = 0; i < this.selection.length; i++) {
       if (gd.compare(this.selection[i], instance)) return true;

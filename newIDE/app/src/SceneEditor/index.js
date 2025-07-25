@@ -2144,10 +2144,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const lastSelectedInstance = this.instancesSelection.getLastSelectedInstances();
-    let x = lastSelectedInstance.getX();
-    let y = lastSelectedInstance.getY();
-    const z = lastSelectedInstance.getZ();
+    let x = 0;
+    let y = 0;
     if (this.editorDisplay) {
       const selectionAABB = this.editorDisplay.instancesHandlers.getSelectionAABB();
       x = selectionAABB.centerX();
@@ -2158,7 +2156,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
         x,
         y,
-        z,
         pasteInTheForeground: !!pasteInTheForeground,
         instances: serializedSelection,
       });

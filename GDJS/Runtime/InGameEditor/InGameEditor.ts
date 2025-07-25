@@ -25,11 +25,14 @@ namespace gdjs {
   const RIGHT_META_KEY = gdjs.InputManager.getLocationAwareKeyCode(93, 2);
   const W_KEY = 87;
   const A_KEY = 65;
+  const C_KEY = 67;
   const S_KEY = 83;
   const D_KEY = 68;
   const Q_KEY = 81;
   const E_KEY = 69;
   const F_KEY = 70;
+  const V_KEY = 86;
+  const X_KEY = 89;
   const Y_KEY = 90;
   const Z_KEY = 90;
 
@@ -693,21 +696,11 @@ namespace gdjs {
       const currentScene = this._runtimeGame.getSceneStack().getCurrentScene();
       if (!currentScene) return;
 
-      const closestIntersect = this._getClosestIntersectionUnderCursor(
-        this._selection.getSelectedObjects()
-      );
-      let cursorX = 0;
-      let cursorY = 0;
-      let cursorZ = 0;
-      if (closestIntersect) {
-        cursorX = closestIntersect.point.x;
-        cursorY = -closestIntersect.point.y;
-        cursorZ = closestIntersect.point.z;
-      } else {
-        cursorX = gdjs.evtTools.input.getCursorX(currentScene, '', 0);
-        cursorY = gdjs.evtTools.input.getCursorY(currentScene, '', 0);
-        cursorZ = 0;
+      const cursor = this._getCursorIn3D(this._selection.getSelectedObjects());
+      if (!cursor) {
+        return;
       }
+      const [cursorX, cursorY, cursorZ] = cursor;
 
       let minX = Number.MAX_VALUE;
       let minY = Number.MAX_VALUE;
@@ -777,22 +770,15 @@ namespace gdjs {
       let intersectionY: float = 0;
       let intersectionZ: float = 0;
       if (is3D(this._draggedSelectedObject)) {
-        const closestIntersect = this._getClosestIntersectionUnderCursor(
+        const cursor = this._getCursorIn3D(
           this._selection.getSelectedObjects()
         );
-        if (closestIntersect) {
+        if (cursor) {
+          const [cursorX, cursorY, cursorZ] = cursor;
           isIntersectionFound = true;
-          intersectionX = closestIntersect.point.x;
-          intersectionY = -closestIntersect.point.y;
-          intersectionZ = closestIntersect.point.z;
-        } else {
-          const projectedCursor = this._getProjectedCursor();
-          if (projectedCursor) {
-            isIntersectionFound = true;
-            intersectionX = projectedCursor[0];
-            intersectionY = projectedCursor[1];
-            intersectionZ = 0;
-          }
+          intersectionX = cursorX;
+          intersectionY = cursorY;
+          intersectionZ = cursorZ;
         }
       } else {
         const projectedCursor = this._getProjectedCursor();
@@ -1535,6 +1521,12 @@ namespace gdjs {
           this._sendUndo();
         } else if (inputManager.wasKeyReleased(Y_KEY)) {
           this._sendRedo();
+        } else if (inputManager.wasKeyReleased(C_KEY)) {
+          this._sendCopy();
+        } else if (inputManager.wasKeyReleased(V_KEY)) {
+          this._sendPaste();
+        } else if (inputManager.wasKeyReleased(X_KEY)) {
+          this._sendCut();
         }
       }
       if (isControlPlusShiftPressedOnly(inputManager)) {
@@ -1554,6 +1546,24 @@ namespace gdjs {
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
       debuggerClient.sendRedo();
+    }
+
+    private _sendCopy() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendCopy();
+    }
+
+    private _sendPaste() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendPaste();
+    }
+
+    private _sendCut() {
+      const debuggerClient = this._runtimeGame._debuggerClient;
+      if (!debuggerClient) return;
+      debuggerClient.sendCut();
     }
 
     cancelDragNewInstance() {
@@ -1651,20 +1661,14 @@ namespace gdjs {
       }
 
       if (is3D(this._draggedNewObject)) {
-        const closestIntersect = this._getClosestIntersectionUnderCursor([
-          this._draggedNewObject,
-        ]);
-        if (closestIntersect) {
-          this._draggedNewObject.setX(closestIntersect.point.x);
-          this._draggedNewObject.setY(-closestIntersect.point.y);
-          this._draggedNewObject.setZ(closestIntersect.point.z);
-        } else {
-          const projectedCursor = this._getProjectedCursor();
-          if (projectedCursor) {
-            this._draggedNewObject.setX(projectedCursor[0]);
-            this._draggedNewObject.setY(projectedCursor[1]);
-            this._draggedNewObject.setZ(0);
-          }
+        const cursor = this._getCursorIn3D(
+          this._selection.getSelectedObjects()
+        );
+        if (cursor) {
+          const [cursorX, cursorY, cursorZ] = cursor;
+          this._draggedNewObject.setX(cursorX);
+          this._draggedNewObject.setY(cursorY);
+          this._draggedNewObject.setZ(cursorZ);
         }
       } else {
         const projectedCursor = this._getProjectedCursor();
@@ -1903,6 +1907,25 @@ namespace gdjs {
       }
 
       return closestIntersect;
+    }
+
+    private _getCursorIn3D(
+      excludedObjects?: Array<gdjs.RuntimeObject>
+    ): [float, float, float] | null {
+      const closestIntersect =
+        this._getClosestIntersectionUnderCursor(excludedObjects);
+      if (closestIntersect) {
+        return [
+          closestIntersect.point.x,
+          -closestIntersect.point.y,
+          closestIntersect.point.z,
+        ];
+      }
+      const projectedCursor = this._getProjectedCursor();
+      if (!projectedCursor) {
+        return null;
+      }
+      return [projectedCursor[0], projectedCursor[1], 0];
     }
 
     private _getNormalizedScreenX(x: float): float {

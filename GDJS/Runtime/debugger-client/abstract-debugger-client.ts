@@ -778,6 +778,48 @@ namespace gdjs {
       );
     }
 
+    sendCopy(): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'copy',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
+        })
+      );
+    }
+
+    sendPaste(): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'paste',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
+        })
+      );
+    }
+
+    sendCut(): void {
+      const inGameEditor = this._runtimegame._inGameEditor;
+      if (!inGameEditor) {
+        return;
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'cut',
+          editorId: inGameEditor.getEditorId(),
+          payload: {},
+        })
+      );
+    }
+
     /**
      * Send profiling results.
      * @param framesAverageMeasures The measures made for each frames.

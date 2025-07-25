@@ -11,8 +11,12 @@ export default class InstancesSelection {
     return !!this.getSelectedInstances().length;
   }
 
-  getSelectedInstances() {
+  getSelectedInstances(): Array<gdInitialInstance> {
     return this.selection;
+  }
+
+  getLastSelectedInstances(): gdInitialInstance {
+    return this.selection[this.selection.length - 1];
   }
 
   isInstanceSelected(instance: gdInitialInstance) {

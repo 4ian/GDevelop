@@ -315,6 +315,12 @@ export default class SceneEditor extends React.Component<Props, State> {
               if (canRedo(this.state.history)) {
                 this.redo();
               }
+            } else if (parsedMessage.command === 'copy') {
+              this.copySelection();
+            } else if (parsedMessage.command === 'paste') {
+              this.paste();
+            } else if (parsedMessage.command === 'cut') {
+              this.cutSelection();
             }
           },
         }
@@ -2138,8 +2144,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    let x = 0;
-    let y = 0;
+    const lastSelectedInstance = this.instancesSelection.getLastSelectedInstances();
+    let x = lastSelectedInstance.getX();
+    let y = lastSelectedInstance.getY();
+    const z = lastSelectedInstance.getZ();
     if (this.editorDisplay) {
       const selectionAABB = this.editorDisplay.instancesHandlers.getSelectionAABB();
       x = selectionAABB.centerX();
@@ -2150,6 +2158,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
         x,
         y,
+        z,
         pasteInTheForeground: !!pasteInTheForeground,
         instances: serializedSelection,
       });
@@ -2240,9 +2249,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           instance.setY(instance.getY() + position[1]);
         }
         editorDisplay.instancesHandlers.snapSelection(newInstances);
+        this._sendUpdatedInstances(newInstances);
       }
     }
-
     this.forceUpdatePropertiesEditor();
   };
 

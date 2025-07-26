@@ -35,7 +35,7 @@ type Props = {|
   courses: ?Array<Course>,
   onSelectCourse: (courseId: string) => void,
   previewedCourse: ?Course,
-  previewedCourseChapters: ?Array<CourseChapter>,
+  getCourseChapters: (courseId: string) => ?Array<CourseChapter>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
     courseId: string,
@@ -48,7 +48,7 @@ const CoursesPage = ({
   courses,
   onSelectCourse,
   previewedCourse,
-  previewedCourseChapters,
+  getCourseChapters,
   getCourseChapterCompletion,
   getCourseCompletion,
 }: Props) => {
@@ -65,7 +65,7 @@ const CoursesPage = ({
           <SectionRow>
             <CoursePreviewBanner
               course={previewedCourse}
-              courseChapters={previewedCourseChapters}
+              getCourseChapters={getCourseChapters}
               getCourseCompletion={getCourseCompletion}
               getCourseChapterCompletion={getCourseChapterCompletion}
               onDisplayCourse={() => {

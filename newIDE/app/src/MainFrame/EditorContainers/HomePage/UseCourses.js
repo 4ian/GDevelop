@@ -43,7 +43,7 @@ type ReadyUser = {|
 |};
 
 /**
- * Help to reduce the number of re-fetches of the course chapters by
+ * Help to reduce the number of re-fetches of the courses by
  * debouncing the user changes.
  */
 const useReadyUser = () => {
@@ -79,6 +79,10 @@ const useReadyUser = () => {
 
   return readyUser;
 };
+
+const noCourseChapters: {
+  [courseId: string]: CourseChapter[],
+} = {};
 
 const useCourses = () => {
   const {
@@ -131,13 +135,18 @@ const useCourses = () => {
     updateUserCourseProgress
   );
 
-  const [areChaptersReady, setAreChaptersReady] = React.useState<boolean>(
+  const [areCoursesFetched, setAreCoursesFetched] = React.useState<boolean>(
     false
   );
 
-  const [chaptersByCourseId, setChaptersByCourseId] = React.useState<{|
-    [courseId: string]: CourseChapter[],
-  |}>({});
+  const [
+    chaptersByCourseIdByUserId,
+    setChaptersByCourseIdByUserId,
+  ] = React.useState<{
+    [userId: string]: { [courseId: string]: CourseChapter[] },
+  }>({
+    '': noCourseChapters,
+  });
 
   const fetchCourses = React.useCallback(
     async (): Promise<Array<Course>> => {
@@ -166,6 +175,10 @@ const useCourses = () => {
   const fetchCourseChapters = React.useCallback(
     async (courseId: string) => {
       try {
+        console.info(
+          `Fetching chapters for course ${courseId} for userId=${userId ||
+            'null'}.`
+        );
         const [fetchedChapters, userProgress] = await Promise.all([
           listCourseChapters(getAuthorizationHeader, {
             courseId,
@@ -189,9 +202,13 @@ const useCourses = () => {
           ...currentProgressByCourseId,
           [courseId]: userProgress,
         }));
-        setChaptersByCourseId(currentChaptersByCourseId => ({
-          ...currentChaptersByCourseId,
-          [courseId]: fetchedChapters,
+        const userIdOrEmpty: string = userId || '';
+        setChaptersByCourseIdByUserId(currentChaptersByCourseIdByUserId => ({
+          ...currentChaptersByCourseIdByUserId,
+          [userIdOrEmpty]: {
+            ...currentChaptersByCourseIdByUserId[userIdOrEmpty],
+            [courseId]: fetchedChapters,
+          },
         }));
       } catch (error) {
         console.error(
@@ -270,9 +287,12 @@ const useCourses = () => {
     [userCourseProgress]
   );
 
+  const chaptersByCourseId =
+    chaptersByCourseIdByUserId[userId || ''] || noCourseChapters;
+
   const getChapterCompletion = React.useCallback(
     (courseId: string, chapterId: string): CourseChapterCompletion | null => {
-      const chapters = chaptersByCourseId[courseId];
+      const chapters = chaptersByCourseId ? chaptersByCourseId[courseId] : null;
       if (!chapters) return null;
 
       const chapter = chapters.find(chapter => chapter.id === chapterId);
@@ -304,7 +324,7 @@ const useCourses = () => {
       const course = courses.find(course => course.id === courseId);
       if (!course) return null;
 
-      const chapters = chaptersByCourseId[courseId];
+      const chapters = chaptersByCourseId ? chaptersByCourseId[courseId] : null;
       if (!chapters) return null;
 
       const chaptersCount = course.chaptersTargetCount;
@@ -478,30 +498,29 @@ const useCourses = () => {
           return;
         }
 
-        // In the future, we should only fetch course chapters when the user opens one
-        // (by using getters to lazily load them).
-        console.info('Fetching all course chapters. User status:', {
-          userStatus,
-          userSubscriptionPlanId,
-          userCoursePurchasesCount,
-          userId,
-        });
+        console.info(`Fetching all courses for userId=${userId || 'null'}.`);
 
-        if (userSubscriptionPlanId || userCoursePurchasesCount || userId) {
-          // Just to trigger a re-fetch of the courses when the user subscription changes,
+        if (userSubscriptionPlanId || userCoursePurchasesCount) {
+          // Trigger a re-fetch of the courses when the user subscription changes,
           // or when the user purchases a course or when the user logs in/out.
         }
 
-        const fetchedCourses = await fetchCourses();
-        await Promise.all(
-          fetchedCourses.map(course => fetchCourseChapters(course.id))
-        );
-        setAreChaptersReady(true);
+        if (userId) {
+          const userIdOrEmpty: string = userId || '';
+          // we empty the chapters fetched for the user to ensure they are re-fetched
+          // and up-to-date (notably in case subscription changed or purchase count changed).
+          setChaptersByCourseIdByUserId(currentChaptersByCourseIdByUserId => ({
+            ...currentChaptersByCourseIdByUserId,
+            [userIdOrEmpty]: noCourseChapters,
+          }));
+        }
+
+        await fetchCourses();
+        setAreCoursesFetched(true);
       })();
     },
     [
       fetchCourses,
-      fetchCourseChapters,
       userSubscriptionPlanId,
       userCoursePurchasesCount,
       userId,
@@ -509,12 +528,28 @@ const useCourses = () => {
     ]
   );
 
+  // This callback will change (triggering re-renders)
+  // anytime the chapters are fetched for a course for a user.
+  const getCourseChapters = React.useCallback(
+    (courseId: string) => {
+      if (chaptersByCourseId[courseId] !== undefined) {
+        return chaptersByCourseId[courseId];
+      }
+
+      // Chapter is not loaded yet, fetch it. Note that we could store
+      // the promise to avoid fetching it multiple times.
+      fetchCourseChapters(courseId);
+      return null;
+    },
+    [chaptersByCourseId, fetchCourseChapters]
+  );
+
   const selectedCourse = React.useMemo(
     () => {
-      if (!selectedCourseId || !courses || !areChaptersReady) return null;
+      if (!selectedCourseId || !courses) return null;
       return courses.find(course => course.id === selectedCourseId) || null;
     },
-    [selectedCourseId, courses, areChaptersReady]
+    [selectedCourseId, courses]
   );
 
   return {
@@ -522,8 +557,8 @@ const useCourses = () => {
     fetchCourses,
     onSelectCourse,
     selectedCourse,
-    courseChaptersByCourseId: chaptersByCourseId,
-    areChaptersReady,
+    getCourseChapters,
+    areCoursesFetched,
     onCompleteTask,
     isTaskCompleted,
     getChapterCompletion,

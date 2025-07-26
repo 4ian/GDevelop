@@ -64,7 +64,6 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
   previewedCourse: ?Course,
   courses: ?(Course[]),
-  previewedCourseChapters: ?(CourseChapter[]),
   onSelectCourse: (courseId: string) => void,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
@@ -89,7 +88,6 @@ const MainPage = ({
   selectInAppTutorial,
   previewedCourse,
   courses,
-  previewedCourseChapters,
   onSelectCourse,
   getCourseCompletion,
   getCourseChapterCompletion,

@@ -34,11 +34,10 @@ type Props = {|
   onOpenTemplateFromTutorial: string => Promise<void>,
   onOpenTemplateFromCourseChapter: CourseChapter => Promise<void>,
   previewedCourse: ?Course,
-  previewedCourseChapters: ?(CourseChapter[]),
   onSelectCourse: (courseId: string | null) => void,
   course: ?Course,
   courses: ?(Course[]),
-  courseChapters: ?(CourseChapter[]),
+  getCourseChapters: (courseId: string) => ?Array<CourseChapter>,
   onCompleteCourseTask: (
     chapterId: string,
     taskIndex: number,
@@ -82,10 +81,9 @@ const LearnSection = ({
   onOpenTemplateFromTutorial,
   onOpenTemplateFromCourseChapter,
   previewedCourse,
-  previewedCourseChapters,
   onSelectCourse,
   course,
-  courseChapters,
+  getCourseChapters,
   courses,
   onCompleteCourseTask,
   isCourseTaskCompleted,
@@ -110,6 +108,8 @@ const LearnSection = ({
   );
 
   if (course) {
+    const courseChapters = getCourseChapters(course.id);
+
     if (!courseChapters) {
       return (
         <SectionContainer flexBody>
@@ -151,7 +151,6 @@ const LearnSection = ({
       courses={courses}
       onSelectCourse={onSelectCourse}
       previewedCourse={previewedCourse}
-      previewedCourseChapters={previewedCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
       onOpenAskAi={onOpenAskAi}
@@ -174,7 +173,7 @@ const LearnSection = ({
       courses={courses}
       onSelectCourse={onSelectCourse}
       previewedCourse={previewedCourse}
-      previewedCourseChapters={previewedCourseChapters}
+      getCourseChapters={getCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
     />

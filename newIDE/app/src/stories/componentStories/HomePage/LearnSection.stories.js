@@ -46,14 +46,13 @@ export const Default = () => (
         }}
       >
         <LearnSection
-          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
-          course={premiumCourse}
-          courses={[premiumCourse]}
-          onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[
+          getCourseChapters={() => [
             videoBasedCourseChapter,
             lockedCourseChapter,
           ]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -94,14 +93,13 @@ export const NotAuthenticated = () => (
         }}
       >
         <LearnSection
-          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
-          course={premiumCourse}
-          courses={[premiumCourse]}
-          onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[
+          getCourseChapters={() => [
             videoBasedCourseChapter,
             lockedCourseChapter,
           ]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -144,14 +142,13 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
-          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
-          course={premiumCourse}
-          courses={[premiumCourse]}
-          onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[
+          getCourseChapters={() => [
             videoBasedCourseChapter,
             lockedCourseChapter,
           ]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -194,14 +191,13 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
-          courseChapters={[videoBasedCourseChapter, lockedCourseChapter]}
-          course={premiumCourse}
-          courses={[premiumCourse]}
-          onSelectCourse={action('onSelectCourse')}
-          previewedCourseChapters={[
+          getCourseChapters={() => [
             videoBasedCourseChapter,
             lockedCourseChapter,
           ]}
+          course={premiumCourse}
+          courses={[premiumCourse]}
+          onSelectCourse={action('onSelectCourse')}
           previewedCourse={premiumCourse}
           isCourseTaskCompleted={() => false}
           onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -241,11 +237,10 @@ export const LoadingTutorials = () => (
       }}
     >
       <LearnSection
-        courseChapters={null}
+        getCourseChapters={() => null}
         course={null}
         courses={[premiumCourse]} //TODO
         onSelectCourse={action('onSelectCourse')}
-        previewedCourseChapters={null}
         previewedCourse={null}
         isCourseTaskCompleted={() => false}
         onCompleteCourseTask={action('onCompleteCourseTask')}
@@ -284,11 +279,10 @@ export const LoadingCourses = () => (
       }}
     >
       <LearnSection
-        courseChapters={null}
+        getCourseChapters={() => null}
         course={null}
         courses={null}
         onSelectCourse={action('onSelectCourse')}
-        previewedCourseChapters={null}
         previewedCourse={null}
         isCourseTaskCompleted={() => false}
         onCompleteCourseTask={action('onCompleteCourseTask')}

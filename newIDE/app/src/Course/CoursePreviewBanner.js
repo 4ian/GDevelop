@@ -144,7 +144,7 @@ const ChapterTile = ({
 
 type Props = {|
   course: ?Course,
-  courseChapters: ?(CourseChapter[]),
+  getCourseChapters: (courseId: string) => ?Array<CourseChapter>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
     courseId: string,
@@ -155,7 +155,7 @@ type Props = {|
 
 const CoursePreviewBanner = ({
   course,
-  courseChapters,
+  getCourseChapters,
   getCourseCompletion,
   getCourseChapterCompletion,
   onDisplayCourse,
@@ -168,6 +168,7 @@ const CoursePreviewBanner = ({
 
   const chapterTiles = React.useMemo(
     () => {
+      const courseChapters = course ? getCourseChapters(course.id) : null;
       if (!course || !courseChapters) {
         return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
           return (
@@ -256,7 +257,7 @@ const CoursePreviewBanner = ({
     },
     [
       course,
-      courseChapters,
+      getCourseChapters,
       getCourseChapterCompletion,
       numberOfTilesToDisplay,
       gdevelopTheme,
@@ -457,7 +458,7 @@ const CoursePreviewBanner = ({
                       </LineStackLayout>
                       <RaisedButton
                         primary
-                        disabled={!course || !courseChapters}
+                        disabled={!course}
                         label={
                           !courseCompletion ||
                           courseCompletion.percentage === 0 ? (

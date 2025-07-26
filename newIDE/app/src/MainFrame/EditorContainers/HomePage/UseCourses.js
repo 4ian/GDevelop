@@ -35,15 +35,62 @@ export type CourseCompletion = {|
   chapters: number,
 |};
 
-const useCourses = () => {
+type ReadyUser = {|
+  userStatus: 'ready' | 'not-ready',
+  userId: string | null,
+  userSubscriptionPlanId: string | null,
+  userCoursePurchasesCount: number | null,
+|};
+
+/**
+ * Help to reduce the number of re-fetches of the course chapters by
+ * debouncing the user changes.
+ */
+const useReadyUser = () => {
   const {
     profile,
-    limits,
     subscription,
     coursePurchases,
+    loginState,
+  } = React.useContext(AuthenticatedUserContext);
+
+  const [readyUser, setReadyUser] = React.useState<ReadyUser>({
+    userStatus: 'not-ready',
+    userId: null,
+    userSubscriptionPlanId: null,
+    userCoursePurchasesCount: null,
+  });
+
+  React.useEffect(
+    () => {
+      if (loginState !== 'done') {
+        return;
+      }
+
+      setReadyUser({
+        userStatus: 'ready',
+        userId: profile ? profile.id : null,
+        userSubscriptionPlanId: subscription ? subscription.planId : null,
+        userCoursePurchasesCount: coursePurchases ? coursePurchases.length : 0,
+      });
+    },
+    [profile, loginState, subscription, coursePurchases]
+  );
+
+  return readyUser;
+};
+
+const useCourses = () => {
+  const {
+    userStatus,
+    userId,
+    userSubscriptionPlanId,
+    userCoursePurchasesCount,
+  } = useReadyUser();
+  const {
+    limits,
     getAuthorizationHeader,
     onOpenLoginDialog,
-    loginState,
   } = React.useContext(AuthenticatedUserContext);
   const {
     values: { language },
@@ -91,11 +138,6 @@ const useCourses = () => {
   const [chaptersByCourseId, setChaptersByCourseId] = React.useState<{|
     [courseId: string]: CourseChapter[],
   |}>({});
-
-  // Extract those values to avoid unnecessary effect calls.
-  const userId = profile ? profile.id : null;
-  const userSubscriptionPlanId = subscription ? subscription.planId : null;
-  const userCoursePurchasesCount = coursePurchases ? coursePurchases.length : 0;
 
   const fetchCourses = React.useCallback(
     async (): Promise<Array<Course>> => {
@@ -432,18 +474,29 @@ const useCourses = () => {
   React.useEffect(
     () => {
       (async () => {
-        if (userSubscriptionPlanId || userCoursePurchasesCount) {
+        if (userStatus !== 'ready') {
+          return;
+        }
+
+        // In the future, we should only fetch course chapters when the user opens one
+        // (by using getters to lazily load them).
+        console.info('Fetching all course chapters. User status:', {
+          userStatus,
+          userSubscriptionPlanId,
+          userCoursePurchasesCount,
+          userId,
+        });
+
+        if (userSubscriptionPlanId || userCoursePurchasesCount || userId) {
           // Just to trigger a re-fetch of the courses when the user subscription changes,
-          // or when the user purchases a course.
+          // or when the user purchases a course or when the user logs in/out.
         }
-        // Check the loginState, to avoid fetching courses just before the user logs in.
-        if (loginState === 'done') {
-          const fetchedCourses = await fetchCourses();
-          await Promise.all(
-            fetchedCourses.map(course => fetchCourseChapters(course.id))
-          );
-          setAreChaptersReady(true);
-        }
+
+        const fetchedCourses = await fetchCourses();
+        await Promise.all(
+          fetchedCourses.map(course => fetchCourseChapters(course.id))
+        );
+        setAreChaptersReady(true);
       })();
     },
     [
@@ -451,7 +504,8 @@ const useCourses = () => {
       fetchCourseChapters,
       userSubscriptionPlanId,
       userCoursePurchasesCount,
-      loginState,
+      userId,
+      userStatus,
     ]
   );
 

@@ -1,6 +1,6 @@
 describe('gdjs.VariablesContainer', function() {
   it('benchmark get', function() {
-    this.timeout(20000);
+    vi.setTimeout(20000);
     var container = new gdjs.VariablesContainer();
 
     const benchmarkSuite = makeBenchmarkSuite();

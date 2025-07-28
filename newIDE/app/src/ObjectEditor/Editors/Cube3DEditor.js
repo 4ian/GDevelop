@@ -22,6 +22,7 @@ import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesM
 import AlertMessage from '../../UI/AlertMessage';
 import { hasLight } from './Model3DEditor';
 import { PropertyCheckbox } from './PropertyFields';
+import { mapVector } from '../../Utils/MapFor';
 
 const facesProperties = [
   {
@@ -95,14 +96,10 @@ const Cube3DEditor = ({
 
   const facesOrientationChoices = properties
     .get('facesOrientation')
-    .getExtraInfo()
-    .toJSArray()
-    .map(value => ({ value, label: value }));
+    .getChoices();
   const backFaceUpThroughWhichAxisRotationChoices = properties
     .get('backFaceUpThroughWhichAxisRotation')
-    .getExtraInfo()
-    .toJSArray()
-    .map(value => ({ value, label: value }));
+    .getChoices();
 
   return (
     <ColumnStackLayout noMargin>
@@ -181,11 +178,11 @@ const Cube3DEditor = ({
             onChangeProperty('facesOrientation', newValue);
           }}
         >
-          {facesOrientationChoices.map(choice => (
+          {mapVector(facesOrientationChoices, choice => (
             <SelectOption
-              label={choice.label}
-              value={choice.value}
-              key={choice.value}
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
             />
           ))}
         </SelectField>
@@ -203,11 +200,11 @@ const Cube3DEditor = ({
             onChangeProperty('backFaceUpThroughWhichAxisRotation', newValue);
           }}
         >
-          {backFaceUpThroughWhichAxisRotationChoices.map(choice => (
+          {mapVector(backFaceUpThroughWhichAxisRotationChoices, choice => (
             <SelectOption
-              label={choice.label}
-              value={choice.value}
-              key={choice.value}
+              label={choice.getLabel()}
+              value={choice.getValue()}
+              key={choice.getValue()}
             />
           ))}
         </SelectField>

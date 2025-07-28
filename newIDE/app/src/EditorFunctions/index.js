@@ -59,6 +59,7 @@ export type EditorFunctionGenericOutput = {|
   sharedProperties?: any,
   instances?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  animationNames?: string,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
 |};
@@ -515,6 +516,7 @@ const inspectObjectProperties: EditorFunction = {
       })
       .filter(Boolean);
 
+    // Also include information about behaviors:
     const behaviors = object
       .getAllBehaviorNames()
       .toJSArray()
@@ -526,12 +528,29 @@ const inspectObjectProperties: EditorFunction = {
         };
       });
 
-    return {
+    // Also include information about animations:
+    const animationNames = mapFor(
+      0,
+      objectConfiguration.getAnimationsCount(),
+      i => {
+        return (
+          objectConfiguration.getAnimationName(i) ||
+          `(animation without name, animation index is: ${i})`
+        );
+      }
+    );
+
+    const output: EditorFunctionGenericOutput = {
       success: true,
       objectName: object_name,
       properties,
       behaviors,
     };
+    if (animationNames.length > 0) {
+      output.animationNames = animationNames.join(', ');
+    }
+
+    return output;
   },
 };
 

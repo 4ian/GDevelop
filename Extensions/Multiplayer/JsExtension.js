@@ -32,6 +32,12 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/multiplayer.svg');
 
     extension
+      .addDependency()
+      .setName('Safari View Controller Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('@gdevelop/cordova-plugin-safariviewcontroller');
+
+    extension
       .addStrExpression(
         'CurrentLobbyID',
         _('Current lobby ID'),

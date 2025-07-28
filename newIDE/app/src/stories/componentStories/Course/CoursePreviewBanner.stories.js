@@ -36,7 +36,7 @@ export const CompletedCourse = () => {
     >
       <CoursePreviewBanner
         course={premiumCourse}
-        courseChapters={[videoBasedCourseChapter]}
+        getCourseChapters={() => [videoBasedCourseChapter]}
         getCourseCompletion={() => ({
           percentage: 1,
           completedChapters: 1,

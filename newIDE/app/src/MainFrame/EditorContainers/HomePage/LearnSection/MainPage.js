@@ -10,10 +10,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
-import type {
-  Course,
-  CourseChapter,
-} from '../../../../Utils/GDevelopServices/Asset';
+import type { Course } from '../../../../Utils/GDevelopServices/Asset';
 import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import FlatButton from '../../../../UI/FlatButton';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';

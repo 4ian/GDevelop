@@ -834,34 +834,51 @@ namespace gdjs {
             authWindowOptions,
           });
 
+          if (typeof SafariViewController === 'undefined') {
+            logger.error(
+              'Cordova plugin SafariViewController is not installed.'
+            );
+            resolve('errored');
+            return;
+          }
+
           SafariViewController.isAvailable(function (available: boolean) {
-            if (available) {
-              SafariViewController.show(
-                {
-                  url: targetUrl,
-                  hidden: false,
-                  animated: true,
-                  transition: 'slide',
-                  enterReaderModeIfAvailable: false,
-                  barColor: '#000000',
-                  tintColor: '#ffffff',
-                  controlTintColor: '#ffffff',
-                },
-                function (result: any) {
-                  // Other events are `opened` and `loaded`.
-                  if (result.event === 'closed') {
-                    resolve('dismissed');
-                  }
-                },
-                function (error: any) {
-                  logger.log('Error opening webview: ' + JSON.stringify(error));
-                  resolve('errored');
-                }
+            if (!available) {
+              logger.error(
+                'Cordova plugin SafariViewController is installed but not available'
               );
-            } else {
-              logger.error('Plugin SafariViewController is not available');
               resolve('errored');
+              return;
             }
+
+            logger.info(
+              'Opening authentication window for Cordova with SafariViewController.'
+            );
+            SafariViewController.show(
+              {
+                url: targetUrl,
+                hidden: false,
+                animated: true,
+                transition: 'slide',
+                enterReaderModeIfAvailable: false,
+                barColor: '#000000',
+                tintColor: '#ffffff',
+                controlTintColor: '#ffffff',
+              },
+              function (result: any) {
+                // Other events are `opened` and `loaded`.
+                if (result.event === 'closed') {
+                  resolve('dismissed');
+                }
+              },
+              function (error: any) {
+                logger.log(
+                  'Error opening authentication window: ' +
+                    JSON.stringify(error)
+                );
+                resolve('errored');
+              }
+            );
           });
         }
       );

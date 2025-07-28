@@ -31,6 +31,12 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension
+      .addDependency()
+      .setName('Safari View Controller Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('@gdevelop/cordova-plugin-safariviewcontroller');
+
+    extension
       .addAction(
         'SavePlayerScore',
         _('Save player score'),

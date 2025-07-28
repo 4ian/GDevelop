@@ -35,7 +35,7 @@ module.exports = {
       .addDependency()
       .setName('Safari View Controller Cordova plugin')
       .setDependencyType('cordova')
-      .setExportName('cordova-plugin-safariviewcontroller');
+      .setExportName('@gdevelop/cordova-plugin-safariviewcontroller');
 
     extension
       .addAction(

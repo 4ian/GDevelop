@@ -631,6 +631,22 @@ namespace gdjs {
     }
 
     /**
+     * Get the data associated to a scene.
+     *
+     * @param name The name of the scene.
+     * @return The data associated to the scene or null if not found.
+     */
+    getSceneData(sceneName: string): LayoutData | null {
+      for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
+        const sceneData = this._data.layouts[i];
+        if (sceneData.name == sceneName) {
+          return sceneData;
+        }
+      }
+      return null;
+    }
+
+    /**
      * Get the data associated to an external layout.
      *
      * @param name The name of the external layout.

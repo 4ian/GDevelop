@@ -41,6 +41,7 @@ export const Default = () => {
         layout={testProject.testLayout}
         layersContainer={testProject.testLayout.getLayers()}
         hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        onBackgroundColorChanged={action('onBackgroundColorChanged')}
       />
     </DragAndDropContextProvider>
   );
@@ -72,6 +73,7 @@ export const SmallWidthAndHeight = () => {
           layout={testProject.testLayout}
           layersContainer={testProject.testLayout.getLayers()}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onBackgroundColorChanged={action('onBackgroundColorChanged')}
         />
       </div>
     </DragAndDropContextProvider>

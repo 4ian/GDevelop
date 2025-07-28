@@ -39,6 +39,7 @@ type LayersListBodyProps = {|
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
   onLayersModified: () => void,
+  onBackgroundColorChanged: () => void,
   width: number,
 |};
 
@@ -66,6 +67,7 @@ const LayersListBody = ({
   selectedLayer,
   onSelectLayer,
   onLayersModified,
+  onBackgroundColorChanged,
 }: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -81,6 +83,15 @@ const LayersListBody = ({
       forceUpdate();
     },
     [forceUpdate, onLayersModified, unsavedChanges]
+  );
+
+  const triggerOnBackgroundColorChanged = React.useCallback(
+    () => {
+      onBackgroundColorChanged();
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    },
+    [forceUpdate, onBackgroundColorChanged, unsavedChanges]
   );
 
   const onDropLayer = React.useCallback(
@@ -202,7 +213,7 @@ const LayersListBody = ({
               {layout && (
                 <BackgroundColorRow
                   layout={layout}
-                  onBackgroundColorChanged={triggerOnLayersModified}
+                  onBackgroundColorChanged={triggerOnBackgroundColorChanged}
                 />
               )}
             </div>
@@ -228,6 +239,7 @@ type Props = {|
   onLayerRenamed: () => void,
   onCreateLayer: () => void,
   onLayersVisibilityInEditorChanged: () => void,
+  onBackgroundColorChanged: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
   // Preview:
@@ -316,6 +328,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 onLayersModified={props.onLayersModified}
                 onRemoveLayer={props.onRemoveLayer}
                 onLayerRenamed={props.onLayerRenamed}
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />

@@ -67,6 +67,7 @@ export type SceneEditorsDisplayProps = {|
   onLayerRenamed: () => void,
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
+  onBackgroundColorChanged: () => void,
   onObjectCreated: gdObject => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
   onObjectEdited: (

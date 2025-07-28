@@ -1333,43 +1333,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
-    const {
-      previewDebuggerServer,
-      layersContainer,
-      onEffectAdded,
-    } = this.props;
-    if (hasAnyEffectBeenAdded) {
-      // This triggers a full hot-reload. We don't need to reload layers specifically.
-      onEffectAdded();
-    } else {
-      if (this.props.project.areEffectsHiddenInEditor()) {
-        return;
-      }
-      if (previewDebuggerServer) {
-        previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
-          previewDebuggerServer.sendMessage(debuggerId, {
-            command: 'hotReloadLayers',
-            payload: {
-              layers: mapFor(0, layersContainer.getLayersCount(), i => {
-                const layer = layersContainer.getLayerAt(i);
-                return serializeToJSObject(layer);
-              }),
-            },
-          });
-        });
-      }
-    }
-  };
-
-  _onLayersVisibilityInEditorChanged = () => {
+  _sendHotReloadLayers = () => {
     const { previewDebuggerServer, layersContainer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadLayers',
           payload: {
-            areEffectsHidden: this.props.project.areEffectsHiddenInEditor(),
             layers: mapFor(0, layersContainer.getLayersCount(), i => {
               const layer = layersContainer.getLayerAt(i);
               return serializeToJSObject(layer);
@@ -1378,6 +1348,44 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       });
     }
+  };
+
+  _sendSetBackgroundColor = () => {
+    const { previewDebuggerServer, layout } = this.props;
+    if (!layout) {
+      return;
+    }
+    if (previewDebuggerServer) {
+      previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'setBackgroundColor',
+          payload: {
+            backgroundColor: [
+              layout.getBackgroundColorRed(),
+              layout.getBackgroundColorGreen(),
+              layout.getBackgroundColorBlue(),
+            ],
+          },
+        });
+      });
+    }
+  };
+
+  _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
+    const { onEffectAdded } = this.props;
+    if (hasAnyEffectBeenAdded) {
+      // This triggers a full hot-reload. We don't need to reload layers specifically.
+      onEffectAdded();
+    } else {
+      if (this.props.project.areEffectsHiddenInEditor()) {
+        return;
+      }
+      this._sendHotReloadLayers();
+    }
+  };
+
+  _onLayersVisibilityInEditorChanged = () => {
+    this._sendHotReloadLayers();
   };
 
   _onSelectLayer = (layerName: string) => {
@@ -2522,6 +2530,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onLayerRenamed={this._onLayerRenamed}
                 onLayersModified={() => this._onLayersModified(false)}
+                onBackgroundColorChanged={this._sendSetBackgroundColor}
                 onLayersVisibilityInEditorChanged={
                   this._onLayersVisibilityInEditorChanged
                 }
@@ -2831,6 +2840,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onEditVariables={() => this.editLayoutVariables(true)}
                   onOpenMoreSettings={this.props.onOpenMoreSettings}
                   resourceManagementProps={this.props.resourceManagementProps}
+                  onBackgroundColorChanged={this._sendSetBackgroundColor}
                 />
               )}
               {this.state.scenePropertiesDialogOpen &&

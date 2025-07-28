@@ -158,7 +158,7 @@ export const EmbeddedGameFrame = ({
             neededHotReload.current = 'DataAndResources';
           }
         }
-        console.log("onSetEditorHotReloadNeeded", projectDataOnlyExport);
+        console.log('onSetEditorHotReloadNeeded', projectDataOnlyExport);
       };
       onSwitchToSceneEdition = (options: SwitchToSceneEditionOptions) => {
         if (!previewDebuggerServer) return;

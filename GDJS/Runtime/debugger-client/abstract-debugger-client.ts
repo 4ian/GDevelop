@@ -298,6 +298,32 @@ namespace gdjs {
             );
           }
         }
+      } else if (data.command === 'setBackgroundColor') {
+        if (runtimeGame._inGameEditor) {
+          const editedInstanceContainer =
+            runtimeGame._inGameEditor._getEditedInstanceContainer();
+          if (editedInstanceContainer) {
+            const backgroundColor = data.payload.backgroundColor;
+            if (
+              backgroundColor &&
+              editedInstanceContainer instanceof gdjs.RuntimeScene
+            ) {
+              const sceneData = runtimeGame.getSceneData(
+                editedInstanceContainer.getScene().getName()
+              );
+              if (sceneData) {
+                editedInstanceContainer._backgroundColor = gdjs.rgbToHexNumber(
+                  backgroundColor[0],
+                  backgroundColor[1],
+                  backgroundColor[2]
+                );
+                sceneData.r = backgroundColor[0];
+                sceneData.v = backgroundColor[1];
+                sceneData.b = backgroundColor[2];
+              }
+            }
+          }
+        }
       } else if (data.command === 'hotReloadAllInstances') {
         if (runtimeGame._inGameEditor) {
           const editedInstanceContainer =

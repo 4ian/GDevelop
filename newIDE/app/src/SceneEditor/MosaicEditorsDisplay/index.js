@@ -360,6 +360,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           unsavedChanges={props.unsavedChanges}
           ref={layersListRef}
           hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+          onBackgroundColorChanged={props.onBackgroundColorChanged}
         />
       ),
     },

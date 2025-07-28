@@ -1453,6 +1453,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         onOpenLayoutProperties(null);
                       }}
                       resourceManagementProps={resourceManagementProps}
+                      onBackgroundColorChanged={() => {
+                        // TODO This can probably wait the rework of scene properties.
+                      }}
                     />
                   )}
                   {project && !!editedVariablesLayout && (

@@ -43,6 +43,10 @@ StringInstructionsExtension::StringInstructionsExtension() {
       "gdjs.evtTools.string.strFindLastFrom");
   GetAllExpressions()["StrFindLastFrom"].SetFunctionName(
       "gdjs.evtTools.string.strFindLastFrom");
+  GetAllStrExpressions()["StrReplaceOne"].SetFunctionName(
+      "gdjs.evtTools.string.strReplaceOne");
+  GetAllStrExpressions()["StrReplaceAll"].SetFunctionName(
+      "gdjs.evtTools.string.strReplaceAll");
 
   StripUnimplementedInstructionsAndExpressions();
 }

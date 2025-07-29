@@ -668,6 +668,11 @@ namespace gdjs {
      */
     onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {}
 
+    /**
+     * Called when the game zoom factor is changed to adapt to a new resolution.
+     */
+    onGameZoomFactorChanged(): void {}
+
     //Rendering:
     /**
      * @return The internal object for a 2D rendering (PIXI.DisplayObject...)

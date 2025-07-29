@@ -747,11 +747,15 @@ const ProjectPropertiesDialog = (props: Props) => {
                 >
                   <SelectOption
                     value="linear"
-                    label={t`Linear (antialiased rendering, good for most games)`}
+                    label={t`Linear (smooth, good for most games)`}
+                  />
+                  <SelectOption
+                    value="magnified"
+                    label={t`Magnified (sharp, good for modern pixel-art games)`}
                   />
                   <SelectOption
                     value="nearest"
-                    label={t`Nearest (no antialiasing, good for pixel perfect games)`}
+                    label={t`Nearest (aliased, good for pixel perfect games)`}
                   />
                 </SelectField>
                 <Checkbox
@@ -767,7 +771,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                 />
-                {scaleMode === 'nearest' && (
+                {(scaleMode === 'nearest' || scaleMode === 'magnified') && (
                   <DismissableAlertMessage
                     identifier="use-non-smoothed-textures"
                     kind="info"

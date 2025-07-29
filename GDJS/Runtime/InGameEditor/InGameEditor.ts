@@ -639,6 +639,8 @@ namespace gdjs {
           this._selection.add(object);
         }
       }
+      // Send back default instances sizes.
+      this._sendSelectionUpdate();
     }
 
     centerViewOnLastSelectedInstance(visibleScreenArea: {
@@ -1294,6 +1296,25 @@ namespace gdjs {
           })
           .filter(isDefined);
 
+      const getSelectedInstances = (
+        objects: Array<gdjs.RuntimeObject>
+      ): Array<InstancePersistentUuidData> =>
+        objects
+          .map((object) => {
+            if (!object.persistentUuid) {
+              return null;
+            }
+            return {
+              persistentUuid: object.persistentUuid,
+              defaultWidth: object.getOriginalWidth(),
+              defaultHeight: object.getOriginalHeight(),
+              defaultDepth: is3D(object)
+                ? object.getOriginalDepth()
+                : undefined,
+            };
+          })
+          .filter(isDefined);
+
       const updatedInstances =
         options && options.hasSelectedObjectBeenModified
           ? this._selection
@@ -1319,7 +1340,7 @@ namespace gdjs {
       debuggerClient.sendInstanceChanges({
         updatedInstances,
         addedInstances,
-        selectedInstances: getPersistentUuidsFromObjects(
+        selectedInstances: getSelectedInstances(
           this._selection.getSelectedObjects()
         ),
         removedInstances: getPersistentUuidsFromObjects(removedInstances),
@@ -1351,13 +1372,10 @@ namespace gdjs {
           angle: runtimeObject.getAngle(),
           rotationY: runtimeObject.getRotationY(),
           rotationX: runtimeObject.getRotationX(),
-          customSize:
-            width !== defaultWidth ||
-            height !== defaultHeight ||
-            depth !== defaultDepth,
+          customSize: width !== defaultWidth || height !== defaultHeight,
           width,
           height,
-          depth,
+          depth: depth === defaultDepth ? undefined : depth,
           locked: oldData ? oldData.locked : false,
           sealed: oldData ? oldData.sealed : false,
           // TODO: how to transmit/should we transmit other properties?

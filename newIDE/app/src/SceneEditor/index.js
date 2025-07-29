@@ -97,10 +97,17 @@ type InstancePersistentUuidData = {|
   persistentUuid: string,
 |};
 
+type SelectedInstanceData = {|
+  persistentUuid: string,
+  defaultWidth: number,
+  defaultHeight: number,
+  defaultDepth: number,
+|};
+
 type InstanceChanges = {|
   updatedInstances: Array<any>, // TODO: type this.
   addedInstances: Array<any>, // TODO: type this.
-  selectedInstances: Array<InstancePersistentUuidData>,
+  selectedInstances: Array<SelectedInstanceData>,
   removedInstances: Array<InstancePersistentUuidData>,
 |};
 
@@ -382,10 +389,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       instance.setRotationY(rotationY);
       instance.setRotationX(rotationX);
       instance.setHasCustomSize(customSize);
-      instance.setHasCustomDepth(customSize);
       if (customSize) {
         instance.setCustomWidth(width);
         instance.setCustomHeight(height);
+        instance.setCustomDepth(depth);
+      }
+      const hasCustomDepth = Number.isFinite(depth);
+      instance.setHasCustomDepth(hasCustomDepth);
+      if (hasCustomDepth) {
         instance.setCustomDepth(depth);
       }
       instance.setDefaultWidth(defaultWidth);
@@ -400,11 +411,21 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const newlySelectedInstances = changes.selectedInstances
       .map(selectedInstanceData => {
-        const { persistentUuid } = selectedInstanceData;
+        const {
+          persistentUuid,
+          defaultWidth,
+          defaultHeight,
+          defaultDepth,
+        } = selectedInstanceData;
         const instance = getInstanceInLayoutWithPersistentUuid(
           this.props.initialInstances,
           persistentUuid
         );
+        if (instance) {
+          instance.setDefaultWidth(defaultWidth);
+          instance.setDefaultHeight(defaultHeight);
+          instance.setDefaultDepth(defaultDepth);
+        }
         return instance || null;
       })
       .filter(Boolean);
@@ -446,7 +467,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       return instance;
     });
     if (justAddedInstances.length) {
-      console.log('ADDED', justAddedInstances);
       this._onInstancesAdded(justAddedInstances);
     }
 

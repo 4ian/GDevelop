@@ -304,7 +304,10 @@ export default class SceneEditor extends React.Component<Props, State> {
           onConnectionErrored: () => {},
           onServerStateChanged: () => {},
           onHandleParsedMessage: ({ id, parsedMessage }) => {
-            if (parsedMessage.editorId !== this.props.editorId) {
+            if (
+              this.props.gameEditorMode !== 'embedded-game' ||
+              parsedMessage.editorId !== this.props.editorId
+            ) {
               return;
             }
             if (parsedMessage.command === 'updateInstances') {

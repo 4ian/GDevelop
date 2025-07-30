@@ -698,3 +698,22 @@ export const listCourseChapters = async (
   });
   return response.data;
 };
+
+export const getCourseChapterRatingUrl = ({
+  courseId,
+  chapterId,
+  userId,
+}: {|
+  courseId: string,
+  chapterId: string,
+  userId: string,
+|}): string => {
+  const url = new URL(
+    `${
+      GDevelopAssetApi.baseUrl
+    }/course/${courseId}/chapter/${chapterId}/action/redirect-to-rating`
+  );
+
+  url.searchParams.set('userId', userId);
+  return url.toString();
+};

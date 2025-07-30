@@ -36,10 +36,9 @@ import {
   AccordionHeader,
 } from '../../../../UI/Accordion';
 import CourseSectionHeader from './CourseSectionHeader';
-import FlatButton from '../../../../UI/FlatButton';
 import Window from '../../../../Utils/Window';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import AddComment from '../../../../UI/CustomSvgIcons/AddComment';
+import { RatingBanner } from './RatingBanner';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -145,6 +144,9 @@ const CourseSection = ({
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
+  const {
+    values: { language },
+  } = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
@@ -399,10 +401,8 @@ const CourseSection = ({
                         }}
                       />
                     )}
-                    <Line expand noMargin justifyContent="flex-end">
-                      <FlatButton
-                        label={<Trans>Finished? Rate this chapter</Trans>}
-                        leftIcon={<AddComment />}
+                    {!chapter.isLocked && (
+                      <RatingBanner
                         disabled={!userId}
                         onClick={() => {
                           if (!userId) return;
@@ -411,11 +411,12 @@ const CourseSection = ({
                             userId,
                             courseId: course.id,
                             chapterId: chapter.id,
+                            language,
                           });
                           Window.openExternalURL(url);
                         }}
                       />
-                    </Line>
+                    )}
                     <LargeSpacer />
                   </ColumnStackLayout>
                 ))}

@@ -672,11 +672,11 @@ export const listCourseChapters = async (
   {
     userId,
     courseId,
-    lang,
+    language,
   }: {|
     userId: ?string,
     courseId: string,
-    lang: string,
+    language: string,
   |}
 ): Promise<Array<CourseChapter>> => {
   if (userId) {
@@ -685,7 +685,7 @@ export const listCourseChapters = async (
     const response = await client.get(`/course/${courseId}/chapter`, {
       params: {
         userId,
-        lang,
+        language,
       },
       headers: {
         Authorization: authorizationHeader,
@@ -694,7 +694,7 @@ export const listCourseChapters = async (
     return response.data;
   }
   const response = await client.get(`/course/${courseId}/chapter`, {
-    params: { lang },
+    params: { language },
   });
   return response.data;
 };
@@ -703,10 +703,12 @@ export const getCourseChapterRatingUrl = ({
   courseId,
   chapterId,
   userId,
+  language,
 }: {|
   courseId: string,
   chapterId: string,
   userId: string,
+  language: string,
 |}): string => {
   const url = new URL(
     `${
@@ -715,5 +717,6 @@ export const getCourseChapterRatingUrl = ({
   );
 
   url.searchParams.set('userId', userId);
+  url.searchParams.set('language', language);
   return url.toString();
 };

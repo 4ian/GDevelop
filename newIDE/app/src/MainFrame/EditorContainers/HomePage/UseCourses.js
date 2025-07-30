@@ -99,7 +99,6 @@ const useCourses = () => {
   const {
     values: { language },
   } = React.useContext(PreferencesContext);
-  const userLanguage2LetterCode = language.split('_')[0].toLowerCase();
 
   const [courses, setCourses] = React.useState<?(Course[])>(null);
   const { listedCourses } = React.useContext(CourseStoreContext);
@@ -183,7 +182,7 @@ const useCourses = () => {
           listCourseChapters(getAuthorizationHeader, {
             courseId,
             userId,
-            lang: userLanguage2LetterCode,
+            language,
           }),
           (async () => {
             if (userId) {
@@ -217,7 +216,7 @@ const useCourses = () => {
         );
       }
     },
-    [getAuthorizationHeader, userId, userLanguage2LetterCode]
+    [getAuthorizationHeader, userId, language]
   );
 
   const onCompleteTask = React.useCallback(

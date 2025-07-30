@@ -314,6 +314,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               showBasicProfilingCounters={values.showBasicProfilingCounters}
               tileMapTileSelection={props.tileMapTileSelection}
               onSelectTileMapTile={props.onSelectTileMapTile}
+              editorViewPosition2D={props.editorViewPosition2D}
             />
           </ErrorBoundary>
           <div style={styles.bottomContainer} id={swipeableDrawerContainerId}>

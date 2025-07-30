@@ -19,6 +19,7 @@ import ViewPosition from '../InstancesEditor/ViewPosition';
 import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
+import { type EditorViewPosition2D } from '../InstancesEditor';
 
 export type SceneEditorsDisplayProps = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -129,6 +130,7 @@ export type SceneEditorsDisplayProps = {|
 
   instancesEditorSettings: InstancesEditorSettings,
   onInstancesEditorSettingsMutated: InstancesEditorSettings => void,
+  editorViewPosition2D: EditorViewPosition2D,
 
   historyHandler: HistoryHandler,
   unsavedChanges?: ?UnsavedChanges,

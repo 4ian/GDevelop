@@ -87,6 +87,7 @@ import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer'
 import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtractor';
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
+import { type EditorViewPosition2D } from '../InstancesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -239,6 +240,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
+  editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
 
   constructor(props: Props) {
     super(props);
@@ -2667,6 +2669,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onOpenedEditorsChanged={this.updateToolbar}
                 lastSelectionType={this.state.lastSelectionType}
                 onExtensionInstalled={this.props.onExtensionInstalled}
+                editorViewPosition2D={this.editorViewPosition2D}
               />
               <I18n>
                 {({ i18n }) => (

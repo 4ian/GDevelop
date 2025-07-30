@@ -959,21 +959,25 @@ namespace gdjs {
     }
 
     hotReloadRuntimeSceneObjects(
-      objects: ObjectData[],
+      addedOrUpdatedObjects: Array<ObjectData>,
+      removedObjectNames: Array<string>,
       runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      const oldObjects: Array<ObjectData | null> = objects.map(
+      const oldObjects: Array<ObjectData | null> = addedOrUpdatedObjects.map(
         (objectData) =>
           runtimeInstanceContainer._objects.get(objectData.name) || null
       );
+      for (const removedObjectName of removedObjectNames) {
+        oldObjects.push(
+          runtimeInstanceContainer._objects.get(removedObjectName) || null
+        );
+      }
 
       const projectData: ProjectData = gdjs.projectData;
       const newObjectDataList = HotReloader.resolveCustomObjectConfigurations(
         projectData,
-        objects
+        addedOrUpdatedObjects
       );
-
-      console.log("hotReloadRuntimeSceneObjects", oldObjects, newObjectDataList);
 
       this._hotReloadRuntimeSceneObjects(
         oldObjects,
@@ -981,12 +985,15 @@ namespace gdjs {
         runtimeInstanceContainer
       );
       // Update the GameData
-      for (let index = 0; index < objects.length; index++) {
+      for (let index = 0; index < addedOrUpdatedObjects.length; index++) {
         const oldObjectData = oldObjects[index];
         // When the object is new, the hot-reload call `registerObject`
         // so `_objects` is already updated.
         if (oldObjectData) {
-          HotReloader.assignOrDelete(oldObjectData, objects[index]);
+          HotReloader.assignOrDelete(
+            oldObjectData,
+            addedOrUpdatedObjects[index]
+          );
         }
       }
     }

@@ -1134,18 +1134,30 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectsModified = (objects: Array<gdObject>) => {
-    this._hotReloadObjects(objects);
+    this._hotReloadObjects({ addedOrUpdatedObjects: objects });
   };
 
-  _hotReloadObjects = (objects: Array<gdObject>) => {
+  _hotReloadObjects = ({
+    addedOrUpdatedObjects,
+    removedObjectNames,
+  }: {|
+    addedOrUpdatedObjects?: Array<gdObject>,
+    removedObjectNames?: Array<string>,
+  |}) => {
     const { previewDebuggerServer } = this.props;
-
     if (previewDebuggerServer) {
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hotReloadObjects',
           payload: {
-            objects: objects.map(object => serializeToJSObject(object)),
+            addedOrUpdatedObjects:
+              addedOrUpdatedObjects === undefined
+                ? []
+                : addedOrUpdatedObjects.map(object =>
+                    serializeToJSObject(object)
+                  ),
+            removedObjectNames:
+              removedObjectNames === undefined ? [] : removedObjectNames,
           },
         });
       });
@@ -1183,7 +1195,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       // Send it now that the dialog changes are accepted.
       resourceManagementProps.onResourceUsageChanged();
     } else {
-      this._hotReloadObjects([objectWithContext.object]);
+      this._hotReloadObjects({
+        addedOrUpdatedObjects: [objectWithContext.object],
+      });
     }
   };
 
@@ -1282,7 +1296,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this._addInstanceForNewObject(object.getName());
 
-    this._hotReloadObjects([object]);
+    this._hotReloadObjects({ addedOrUpdatedObjects: [object] });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -1464,6 +1478,12 @@ export default class SceneEditor extends React.Component<Props, State> {
           object.getName()
         );
       }
+    });
+
+    this._hotReloadObjects({
+      removedObjectNames: objectsWithContext.map(context =>
+        context.object.getName()
+      ),
     });
 
     // Note: done() actually does the deletion of the objects,

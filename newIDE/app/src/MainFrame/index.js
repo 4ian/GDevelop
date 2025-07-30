@@ -1499,20 +1499,20 @@ const MainFrame = (props: Props) => {
           paneIdentifier
         );
         const editorRef = currentTab ? currentTab.editorRef : null;
-        if (!editorRef) {
+        if (editorRef) {
+          editorRef.hotReloadInGameEditorIfNeeded({
+            hotReload,
+            projectDataOnlyExport,
+            shouldReloadResources,
+          });
+        } else {
           if (hotReload) {
             setEditorHotReloadNeeded({
               projectDataOnlyExport,
               shouldReloadResources,
             });
           }
-          return;
         }
-        editorRef.hotReloadInGameEditorIfNeeded({
-          hotReload,
-          projectDataOnlyExport,
-          shouldReloadResources,
-        });
       }
     },
     [state.editorTabs]

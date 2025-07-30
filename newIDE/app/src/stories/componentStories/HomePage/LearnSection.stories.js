@@ -60,7 +60,6 @@ export const Default = () => (
           getCourseCompletion={() => null}
           selectedCategory={null}
           onSelectCategory={action('onSelectCategory')}
-          onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
           onOpenTemplateFromCourseChapter={action(
@@ -76,6 +75,8 @@ export const Default = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+          getSubscriptionPlansWithPricingSystems={() => null}
+          receivedCourses={[]}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -107,7 +108,6 @@ export const NotAuthenticated = () => (
           getCourseCompletion={() => null}
           selectedCategory={null}
           onSelectCategory={action('onSelectCategory')}
-          onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
           onOpenTemplateFromCourseChapter={action(
@@ -123,6 +123,8 @@ export const NotAuthenticated = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+          getSubscriptionPlansWithPricingSystems={() => null}
+          receivedCourses={[]}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -156,7 +158,6 @@ export const EducationSubscriber = () => (
           getCourseCompletion={() => null}
           selectedCategory={null}
           onSelectCategory={action('onSelectCategory')}
-          onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
           onOpenTemplateFromCourseChapter={action(
@@ -172,6 +173,8 @@ export const EducationSubscriber = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+          getSubscriptionPlansWithPricingSystems={() => null}
+          receivedCourses={[]}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -205,7 +208,6 @@ export const EducationTeacher = () => (
           getCourseCompletion={() => null}
           selectedCategory={null}
           onSelectCategory={action('onSelectCategory')}
-          onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
           onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
           onOpenTemplateFromCourseChapter={action(
@@ -221,6 +223,8 @@ export const EducationTeacher = () => (
             'onSelectPrivateGameTemplateListingData'
           )}
           onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+          getSubscriptionPlansWithPricingSystems={() => null}
+          receivedCourses={[]}
         />
       </TutorialContext.Provider>
     </PreferencesContext.Provider>
@@ -248,7 +252,6 @@ export const LoadingTutorials = () => (
         getCourseCompletion={() => null}
         selectedCategory={null}
         onSelectCategory={action('onSelectCategory')}
-        onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         onOpenTemplateFromCourseChapter={action(
@@ -264,6 +267,8 @@ export const LoadingTutorials = () => (
           'onSelectPrivateGameTemplateListingData'
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+        getSubscriptionPlansWithPricingSystems={() => null}
+        receivedCourses={[]}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>
@@ -290,7 +295,6 @@ export const LoadingCourses = () => (
         getCourseCompletion={() => null}
         selectedCategory={null}
         onSelectCategory={action('onSelectCategory')}
-        onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
         onOpenTemplateFromTutorial={action('onOpenTemplateFromTutorial')}
         onOpenTemplateFromCourseChapter={action(
@@ -306,6 +310,8 @@ export const LoadingCourses = () => (
           'onSelectPrivateGameTemplateListingData'
         )}
         onSelectExampleShortHeader={action('onSelectExampleShortHeader')}
+        getSubscriptionPlansWithPricingSystems={() => null}
+        receivedCourses={[]}
       />
     </TutorialContext.Provider>
   </PreferencesContext.Provider>

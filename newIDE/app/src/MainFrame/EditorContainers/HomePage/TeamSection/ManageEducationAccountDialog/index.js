@@ -614,7 +614,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                     >
                       <LineStackLayout noMargin alignItems="center">
                         {getPlanIcon({
-                          subscriptionPlan: userSubscriptionPlanWithPricingSystems,
+                          planId: userSubscriptionPlanWithPricingSystems.id,
                           logoSize: 20,
                         })}
                         <Text noMargin>

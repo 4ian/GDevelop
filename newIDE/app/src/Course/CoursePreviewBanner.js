@@ -150,7 +150,7 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  onDisplayCourse: boolean => void,
+  onDisplayCourse: () => void,
 |};
 
 const CoursePreviewBanner = ({
@@ -316,7 +316,7 @@ const CoursePreviewBanner = ({
       {({ i18n }) => (
         <Paper background="medium" variant="outlined">
           <ButtonBase
-            onClick={() => onDisplayCourse(true)}
+            onClick={onDisplayCourse}
             component="div"
             style={
               isMobile && !isLandscape
@@ -469,7 +469,7 @@ const CoursePreviewBanner = ({
                             <Trans>Keep learning</Trans>
                           )
                         }
-                        onClick={() => onDisplayCourse(true)}
+                        onClick={onDisplayCourse}
                       />
                     </ResponsiveLineStackLayout>
                   </Paper>

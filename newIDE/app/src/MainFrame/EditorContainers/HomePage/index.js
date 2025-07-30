@@ -41,6 +41,7 @@ import { type GamesPlatformFrameTools } from './PlaySection/UseGamesPlatformFram
 import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -273,6 +274,10 @@ export const HomePage = React.memo<Props>(
       const [learnCategory, setLearnCategory] = React.useState<LearnCategory>(
         null
       );
+      const { getSubscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+        authenticatedUser,
+        includeLegacy: false,
+      });
 
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -547,7 +552,6 @@ export const HomePage = React.memo<Props>(
                   )}
                   {activeTab === 'learn' && (
                     <LearnSection
-                      onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
                       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
                       onOpenTemplateFromCourseChapter={
@@ -576,6 +580,14 @@ export const HomePage = React.memo<Props>(
                         onSelectPrivateGameTemplateListingData
                       }
                       onSelectExampleShortHeader={onSelectExampleShortHeader}
+                      getSubscriptionPlansWithPricingSystems={
+                        getSubscriptionPlansWithPricingSystems
+                      }
+                      receivedCourses={
+                        courses
+                          ? courses.filter(course => !course.isLocked)
+                          : undefined
+                      }
                     />
                   )}
                   {activeTab === 'play' && (
@@ -592,6 +604,15 @@ export const HomePage = React.memo<Props>(
                       }
                       onOpenProfile={onOpenProfile}
                       onExtensionInstalled={onExtensionInstalled}
+                      onCourseOpen={(courseId: string) => {
+                        onSelectCourse(courseId);
+                        setActiveTab('learn');
+                      }}
+                      receivedCourses={
+                        courses
+                          ? courses.filter(course => !course.isLocked)
+                          : undefined
+                      }
                     />
                   )}
                   {activeTab === 'team-view' &&

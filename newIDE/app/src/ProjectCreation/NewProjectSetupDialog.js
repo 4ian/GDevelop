@@ -57,6 +57,7 @@ import RaisedButton from '../UI/RaisedButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import Chip from '../UI/Chip';
 import { LineStackLayout } from '../UI/Layout';
+import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -145,7 +146,9 @@ const NewProjectSetupDialog = ({
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
     receivedGameTemplates,
+    receivedBundles,
     gameTemplatePurchases,
+    bundlePurchases,
   } = authenticatedUser;
   const [
     emptyProjectSelected,
@@ -159,6 +162,7 @@ const NewProjectSetupDialog = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
+  const { bundleListingDatas } = React.useContext(BundleStoreContext);
   const isOnline = useOnlineStatus();
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
@@ -344,15 +348,27 @@ const NewProjectSetupDialog = ({
         productId: selectedPrivateGameTemplateListingData
           ? selectedPrivateGameTemplateListingData.id
           : null,
-        receivedProducts: receivedGameTemplates,
-        productPurchases: gameTemplatePurchases,
-        allProductListingDatas: privateGameTemplateListingDatas,
+        receivedProducts: [
+          ...(receivedGameTemplates || []),
+          ...(receivedBundles || []),
+        ],
+        productPurchases: [
+          ...(gameTemplatePurchases || []),
+          ...(bundlePurchases || []),
+        ],
+        allProductListingDatas: [
+          ...(privateGameTemplateListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
       }),
     [
       gameTemplatePurchases,
+      bundlePurchases,
       selectedPrivateGameTemplateListingData,
       privateGameTemplateListingDatas,
+      bundleListingDatas,
       receivedGameTemplates,
+      receivedBundles,
     ]
   );
   const noGameTemplateSelectedOrSelectedAndOwned =

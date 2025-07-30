@@ -9,6 +9,8 @@ import {
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
+  type CourseListingData,
 } from '../Utils/GDevelopServices/Shop';
 import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import GridListTile from '@material-ui/core/GridListTile';
@@ -17,7 +19,10 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import ProductPriceTag, { renderProductPrice } from './ProductPriceTag';
+import ProductPriceTag, {
+  OwnedLabel,
+  renderProductPrice,
+} from './ProductPriceTag';
 import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
@@ -28,6 +33,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { CardWidget } from '../MainFrame/EditorContainers/HomePage/CardWidget';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
 const styles = {
   priceTagContainer: {
@@ -304,13 +310,20 @@ export const PrivateAssetPackTile = ({
 };
 
 export const PromoBundleCard = ({
-  productListingData,
+  bundleProductListingData,
+  includedProductListingData,
   onSelect,
   owned,
 }: {|
-  productListingData:
+  bundleProductListingData:
     | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData,
+    | PrivateGameTemplateListingData
+    | BundleListingData,
+  includedProductListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData
+    | CourseListingData
+    | BundleListingData,
   onSelect: () => void,
   owned: boolean,
 |}) => {
@@ -328,52 +341,44 @@ export const PromoBundleCard = ({
             <ResponsiveLineStackLayout expand noMargin noResponsiveLandscape>
               <div style={styles.promoImageContainer}>
                 <CorsAwareImage
-                  key={productListingData.name}
+                  key={bundleProductListingData.name}
                   style={{
                     ...styles.previewImage,
                     ...styles.promoImage,
                   }}
-                  src={productListingData.thumbnailUrls[0]}
-                  alt={`Preview image of bundle ${productListingData.name}`}
+                  src={bundleProductListingData.thumbnailUrls[0]}
+                  alt={`Preview image of bundle ${
+                    bundleProductListingData.name
+                  }`}
                   loading="lazy"
                 />
               </div>
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
                   {!owned ? (
-                    <Trans>Get {productListingData.description}!</Trans>
-                  ) : productListingData.productType === 'ASSET_PACK' ? (
-                    <Trans>You already own this pack!</Trans>
+                    <Trans>Get {bundleProductListingData.name}!</Trans>
                   ) : (
-                    <Trans>You already own this template!</Trans>
+                    <Trans>
+                      You already own {bundleProductListingData.name}!
+                    </Trans>
                   )}
                 </Text>
                 <Text color="primary" size="body2">
                   {!owned ? (
-                    productListingData.productType === 'ASSET_PACK' ? (
-                      <Trans>
-                        This pack is included in this bundle for{' '}
-                        {renderProductPrice({
-                          i18n,
-                          productListingData,
-                          plainText: true,
-                        })}
-                        !
-                      </Trans>
-                    ) : (
-                      <Trans>
-                        This template is included in this bundle for{' '}
-                        {renderProductPrice({
-                          i18n,
-                          productListingData,
-                          plainText: true,
-                        })}
-                        !
-                      </Trans>
-                    )
+                    <Trans>
+                      {includedProductListingData.name} is included in this
+                      bundle for{' '}
+                      {renderProductPrice({
+                        i18n,
+                        productListingData: bundleProductListingData,
+                        plainText: true,
+                      })}
+                      !
+                    </Trans>
                   ) : (
                     <Trans>
-                      It is included in the bundle {productListingData.name}.
+                      {includedProductListingData.name} is included in the
+                      bundle {bundleProductListingData.name}.
                     </Trans>
                   )}
                 </Text>
@@ -508,6 +513,136 @@ export const PrivateGameTemplateTile = ({
         </Column>
       </CardWidget>
     </GridListTile>
+  );
+};
+
+export const CourseTile = ({
+  courseListingData,
+  onSelect,
+  style,
+  owned,
+  disabled,
+}: {|
+  courseListingData: CourseListingData,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+  owned: boolean,
+  disabled?: boolean,
+|}) => {
+  const { isMobile } = useResponsiveWindowSize();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <GridListTile style={style}>
+      <CardWidget
+        onClick={!disabled ? onSelect : undefined}
+        size="large"
+        disabled={disabled}
+        noBorder
+      >
+        <Column noMargin expand noOverflowParent>
+          <CorsAwareImage
+            key={courseListingData.name}
+            style={{
+              ...styles.previewImage,
+              background: gdevelopTheme.paper.backgroundColor.light,
+            }}
+            src={courseListingData.thumbnailUrls[0]}
+            alt={`Preview image of course ${courseListingData.name}`}
+            loading="lazy"
+          />
+          <div style={styles.priceTagContainer}>
+            <ProductPriceTag
+              productListingData={courseListingData}
+              withOverlay
+              owned={owned}
+            />
+          </div>
+          <Column>
+            {isMobile && <Spacer />}
+            <Line justifyContent="flex-start" noMargin>
+              <Text style={styles.packTitle} size="body2" noMargin={isMobile}>
+                {courseListingData.name}
+              </Text>
+            </Line>
+          </Column>
+        </Column>
+      </CardWidget>
+    </GridListTile>
+  );
+};
+
+export const BundleTile = ({
+  bundleListingData,
+  onSelect,
+  style,
+  owned,
+  disabled,
+}: {|
+  bundleListingData: BundleListingData,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+  owned: boolean,
+  disabled?: boolean,
+|}) => {
+  const { isMobile } = useResponsiveWindowSize();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <GridListTile style={style}>
+          <CardWidget
+            onClick={!disabled ? onSelect : undefined}
+            size="large"
+            disabled={disabled}
+            noBorder
+          >
+            <Column noMargin expand noOverflowParent>
+              <CorsAwareImage
+                key={bundleListingData.name}
+                style={{
+                  ...styles.previewImage,
+                  background: gdevelopTheme.paper.backgroundColor.light,
+                }}
+                src={bundleListingData.thumbnailUrls[0]}
+                alt={`Preview image of bundle ${bundleListingData.name}`}
+                loading="lazy"
+              />
+              <div style={styles.priceTagContainer}>
+                {bundleListingData ? (
+                  <ProductPriceTag
+                    productListingData={bundleListingData}
+                    withOverlay
+                    owned={owned}
+                  />
+                ) : (
+                  <OwnedLabel />
+                )}
+              </div>
+              <Column>
+                {isMobile && <Spacer />}
+                <Line justifyContent="flex-start" noMargin>
+                  <Text
+                    style={styles.packTitle}
+                    size="body2"
+                    noMargin={isMobile}
+                  >
+                    {bundleListingData.nameByLocale
+                      ? selectMessageByLocale(
+                          i18n,
+                          bundleListingData.nameByLocale
+                        )
+                      : bundleListingData.name}
+                  </Text>
+                </Line>
+              </Column>
+            </Column>
+          </CardWidget>
+        </GridListTile>
+      )}
+    </I18n>
   );
 };
 

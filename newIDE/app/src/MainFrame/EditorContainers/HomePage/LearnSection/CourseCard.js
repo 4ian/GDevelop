@@ -234,7 +234,6 @@ const CourseCard = ({
                       />
                       {getProductPriceOrOwnedLabel({
                         i18n,
-                        gdevelopTheme,
                         productListingData: courseListingData,
                         usageType: 'default',
                         showBothPrices: 'column',

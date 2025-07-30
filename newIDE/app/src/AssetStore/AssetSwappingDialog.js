@@ -191,7 +191,7 @@ function AssetSwappingDialog({
           >
             <AssetStore
               ref={assetStore}
-              hideGameTemplates
+              onlyShowAssets
               assetSwappedObject={object}
               minimalUI={minimalUI}
             />

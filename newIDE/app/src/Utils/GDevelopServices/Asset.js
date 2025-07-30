@@ -123,6 +123,7 @@ export type PrivateAssetPack = {|
   tag: string,
   longDescription: string,
   content: PrivateAssetPackContent,
+  includedPackIds?: Array<string>,
 |};
 
 export type PrivateGameTemplate = {|
@@ -134,6 +135,35 @@ export type PrivateGameTemplate = {|
   tag: string,
   longDescription: string,
   gamePreviewLink: string,
+  includedTemplateIds?: Array<string>,
+|};
+
+export type IncludedProduct = {|
+  productId: string,
+  usageType: string,
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE' | 'COURSE' | 'CREDITS_PACKAGE',
+|};
+
+export type IncludedRedemptionCode = {|
+  givenSubscriptionPlanId: string,
+  durationInDays: number,
+|};
+
+export type Bundle = {|
+  id: string,
+  name: string,
+  nameByLocale: MessageByLocale,
+  createdAt: string,
+  updatedAt: string,
+  // If the bundle is archived, it will not be available for purchase anymore.
+  // But it will still be available for users who already purchased it.
+  archivedAt?: string,
+  longDescription: string,
+  longDescriptionByLocale: MessageByLocale,
+  previewImageUrls: Array<string>,
+  tag: string,
+  includedProducts: Array<IncludedProduct>,
+  includedRedemptionCodes: Array<IncludedRedemptionCode>,
 |};
 
 export type PrivatePdfTutorial = {|
@@ -516,6 +546,11 @@ export const getPrivateGameTemplate = async (
   return response.data;
 };
 
+export const getBundle = async (bundleId: string): Promise<Bundle> => {
+  const response = await client.get(`/bundle/${bundleId}`);
+  return response.data;
+};
+
 export const getPrivatePdfTutorial = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -609,6 +644,22 @@ export const listReceivedGameTemplates = async (
 ): Promise<Array<PrivateGameTemplate>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get('/game-template', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const listReceivedBundles = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<Bundle>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/bundle', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });

@@ -6,6 +6,7 @@ import {
   redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
   getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -65,6 +66,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import { BundleStoreContext } from '../Bundles/BundleStoreContext';
 
 const cellSpacing = 10;
 
@@ -164,11 +166,9 @@ type Props = {|
     |}
   ) => void,
   onGameTemplateOpen: (
-    privateGameTemplateListingData: PrivateGameTemplateListingData,
-    options?: {|
-      forceProductPage?: boolean,
-    |}
+    privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
+  onBundleOpen: (bundleListingData: BundleListingData) => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -177,17 +177,21 @@ const PrivateAssetPackInformationPage = ({
   privateAssetPackListingDatasFromSameCreator,
   onAssetPackOpen,
   onGameTemplateOpen,
+  onBundleOpen,
   simulateAppStoreProduct,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { bundleListingDatas } = React.useContext(BundleStoreContext);
   const { showAlert } = useAlertDialog();
   const {
     receivedAssetPacks,
+    receivedBundles,
     profile,
     limits,
     assetPackPurchases,
+    bundlePurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
     subscription,
@@ -234,15 +238,27 @@ const PrivateAssetPackInformationPage = ({
         productId: privateAssetPackListingData
           ? privateAssetPackListingData.id
           : null,
-        receivedProducts: receivedAssetPacks,
-        productPurchases: assetPackPurchases,
-        allProductListingDatas: privateAssetPackListingDatas,
+        receivedProducts: [
+          ...(receivedAssetPacks || []),
+          ...(receivedBundles || []),
+        ],
+        productPurchases: [
+          ...(assetPackPurchases || []),
+          ...(bundlePurchases || []),
+        ],
+        allProductListingDatas: [
+          ...(privateAssetPackListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
       }),
     [
       assetPackPurchases,
+      bundlePurchases,
       privateAssetPackListingData,
       privateAssetPackListingDatas,
+      bundleListingDatas,
       receivedAssetPacks,
+      receivedBundles,
     ]
   );
   const isAlreadyReceived = !!userAssetPackPurchaseUsageType;
@@ -251,17 +267,21 @@ const PrivateAssetPackInformationPage = ({
     () =>
       getProductsIncludedInBundleTiles({
         product: assetPack,
-        productListingDatas: privateAssetPackListingDatas,
+        productListingDatas: [...(privateAssetPackListingDatas || [])],
         productListingData: privateAssetPackListingData,
-        receivedProducts: receivedAssetPacks,
-        onProductOpen: product =>
+        receivedProducts: [...(receivedAssetPacks || [])],
+        onPrivateAssetPackOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       assetPack,
       privateAssetPackListingDatas,
       receivedAssetPacks,
       onAssetPackOpen,
+      onGameTemplateOpen,
+      onBundleOpen,
       privateAssetPackListingData,
     ]
   );
@@ -270,16 +290,30 @@ const PrivateAssetPackInformationPage = ({
     () =>
       getBundlesContainingProductTiles({
         product: assetPack,
-        productListingDatas: privateAssetPackListingDatas,
-        receivedProducts: receivedAssetPacks,
-        onProductOpen: product =>
+        productListingData: privateAssetPackListingData,
+        productListingDatas: [
+          ...(privateAssetPackListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
+        receivedProducts: [
+          ...(receivedAssetPacks || []),
+          ...(receivedBundles || []),
+        ],
+        onPrivateAssetPackOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       assetPack,
+      privateAssetPackListingData,
       privateAssetPackListingDatas,
+      bundleListingDatas,
       receivedAssetPacks,
+      receivedBundles,
       onAssetPackOpen,
+      onGameTemplateOpen,
+      onBundleOpen,
     ]
   );
 

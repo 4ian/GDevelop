@@ -133,7 +133,7 @@ const PromotionSubscriptionPlan = ({
   const [period, setPeriod] = React.useState<'year' | 'month'>('year');
 
   const planIcon = getPlanIcon({
-    subscriptionPlan: subscriptionPlanWithPricingSystems,
+    planId: subscriptionPlanWithPricingSystems.id,
     logoSize: 12,
   });
 

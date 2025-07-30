@@ -5,6 +5,7 @@ import {
   buyProductWithCredits,
   type PrivateGameTemplateListingData,
   type PrivateAssetPackListingData,
+  type BundleListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateGameTemplate,
@@ -60,6 +61,7 @@ import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDial
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { LARGE_WIDGET_SIZE } from '../../MainFrame/EditorContainers/HomePage/CardWidget';
+import { BundleStoreContext } from '../Bundles/BundleStoreContext';
 
 const cellSpacing = 10;
 
@@ -123,8 +125,16 @@ const styles = {
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
-  onGameTemplateOpen: PrivateGameTemplateListingData => void,
-  onAssetPackOpen?: PrivateAssetPackListingData => void,
+  onAssetPackOpen?: (
+    privateAssetPackListingData: PrivateAssetPackListingData,
+    options?: {|
+      forceProductPage?: boolean,
+    |}
+  ) => void,
+  onGameTemplateOpen: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
+  onBundleOpen?: (bundleListingData: BundleListingData) => void,
   onCreateWithGameTemplate?: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
 |};
@@ -134,6 +144,7 @@ const PrivateGameTemplateInformationPage = ({
   privateGameTemplateListingDatasFromSameCreator,
   onGameTemplateOpen,
   onAssetPackOpen,
+  onBundleOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
 }: Props) => {
@@ -141,11 +152,14 @@ const PrivateGameTemplateInformationPage = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
+  const { bundleListingDatas } = React.useContext(BundleStoreContext);
   const {
     receivedGameTemplates,
+    receivedBundles,
     profile,
     limits,
     gameTemplatePurchases,
+    bundlePurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
   } = React.useContext(AuthenticatedUserContext);
@@ -191,15 +205,27 @@ const PrivateGameTemplateInformationPage = ({
         productId: privateGameTemplateListingData
           ? privateGameTemplateListingData.id
           : null,
-        receivedProducts: receivedGameTemplates,
-        productPurchases: gameTemplatePurchases,
-        allProductListingDatas: privateGameTemplateListingDatas,
+        receivedProducts: [
+          ...(receivedGameTemplates || []),
+          ...(receivedBundles || []),
+        ],
+        productPurchases: [
+          ...(gameTemplatePurchases || []),
+          ...(bundlePurchases || []),
+        ],
+        allProductListingDatas: [
+          ...(privateGameTemplateListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
       }),
     [
       gameTemplatePurchases,
+      bundlePurchases,
       privateGameTemplateListingData,
       privateGameTemplateListingDatas,
+      bundleListingDatas,
       receivedGameTemplates,
+      receivedBundles,
     ]
   );
   const isAlreadyReceived = !!userGameTemplatePurchaseUsageType;
@@ -208,33 +234,55 @@ const PrivateGameTemplateInformationPage = ({
     () =>
       getProductsIncludedInBundleTiles({
         product: gameTemplate,
-        productListingDatas: privateGameTemplateListingDatas,
+        productListingDatas: [...(privateGameTemplateListingDatas || [])],
         productListingData: privateGameTemplateListingData,
-        receivedProducts: receivedGameTemplates,
-        onProductOpen: onGameTemplateOpen,
+        receivedProducts: [...(receivedGameTemplates || [])],
+        onPrivateAssetPackOpen: onAssetPackOpen
+          ? product => onAssetPackOpen(product, { forceProductPage: true })
+          : undefined,
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       gameTemplate,
       privateGameTemplateListingDatas,
       receivedGameTemplates,
+      onAssetPackOpen,
       onGameTemplateOpen,
+      onBundleOpen,
       privateGameTemplateListingData,
     ]
   );
 
-  const bundlesContainingPackTiles = React.useMemo(
+  const bundlesContainingTemplateTiles = React.useMemo(
     () =>
       getBundlesContainingProductTiles({
         product: gameTemplate,
-        productListingDatas: privateGameTemplateListingDatas,
-        receivedProducts: receivedGameTemplates,
-        onProductOpen: onGameTemplateOpen,
+        productListingData: privateGameTemplateListingData,
+        productListingDatas: [
+          ...(privateGameTemplateListingDatas || []),
+          ...(bundleListingDatas || []),
+        ],
+        receivedProducts: [
+          ...(receivedGameTemplates || []),
+          ...(receivedBundles || []),
+        ],
+        onPrivateAssetPackOpen: onAssetPackOpen
+          ? product => onAssetPackOpen(product, { forceProductPage: true })
+          : undefined,
+        onPrivateGameTemplateOpen: onGameTemplateOpen,
+        onBundleOpen,
       }),
     [
       gameTemplate,
+      privateGameTemplateListingData,
       privateGameTemplateListingDatas,
+      bundleListingDatas,
       receivedGameTemplates,
+      receivedBundles,
+      onAssetPackOpen,
       onGameTemplateOpen,
+      onBundleOpen,
     ]
   );
 
@@ -589,12 +637,12 @@ const PrivateGameTemplateInformationPage = ({
                     />
                   </Text>
                 </Column>
-                {bundlesContainingPackTiles &&
-                bundlesContainingPackTiles.length ? (
+                {bundlesContainingTemplateTiles &&
+                bundlesContainingTemplateTiles.length ? (
                   <>
                     <ColumnStackLayout noMargin>
                       <LargeSpacer />
-                      {bundlesContainingPackTiles}
+                      {bundlesContainingTemplateTiles}
                       <LargeSpacer />
                     </ColumnStackLayout>
                   </>

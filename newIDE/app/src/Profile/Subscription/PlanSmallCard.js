@@ -38,7 +38,7 @@ const PlanSmallCard = (props: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const planIcon = getPlanIcon({
-    subscriptionPlan: props.subscriptionPlanWithPricingSystems,
+    planId: props.subscriptionPlanWithPricingSystems.id,
     logoSize: 40,
   });
 

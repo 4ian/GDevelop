@@ -135,7 +135,7 @@ const SubscriptionOptions = ({
                     <Column expand noMargin>
                       <LineStackLayout noMargin alignItems="center">
                         {getPlanIcon({
-                          subscriptionPlan: subscriptionPlanWithPricingSystems,
+                          planId: subscriptionPlanWithPricingSystems.id,
                           logoSize: 12,
                         })}
                         <Text

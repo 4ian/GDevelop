@@ -8,10 +8,23 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Subscription } from './Usage';
 import { Trans } from '@lingui/macro';
+import {
+  type Bundle,
+  type PrivateAssetPack,
+  type PrivateGameTemplate,
+} from '../../Utils/GDevelopServices/Asset';
 
 export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
+
+export type ProductType =
+  | 'ASSET_PACK'
+  | 'GAME_TEMPLATE'
+  | 'CREDITS_PACKAGE'
+  | 'COURSE'
+  | 'COURSE_CHAPTER'
+  | 'BUNDLE';
 
 type StripeAndPaypalPrice = {|
   value: number,
@@ -26,29 +39,34 @@ type CreditPrice = {|
   usageType: string,
 |};
 
-type ProductListingData = {|
+export type IncludedListableProduct = {|
+  productId: string,
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE' | 'COURSE' | 'CREDITS_PACKAGE',
+  usageType: string,
+|};
+
+export type IncludedRedemptionCode = {|
+  givenSubscriptionPlanId: string,
+  durationInDays: number,
+|};
+
+export type ProductListingData = {|
   id: string,
   sellerId: string,
   isSellerGDevelop: boolean,
-  productType:
-    | 'ASSET_PACK'
-    | 'GAME_TEMPLATE'
-    | 'CREDITS_PACKAGE'
-    | 'COURSE_CHAPTER'
-    | 'COURSE',
-  listing:
-    | 'ASSET_PACK'
-    | 'GAME_TEMPLATE'
-    | 'CREDITS_PACKAGE'
-    | 'COURSE_CHAPTER'
-    | 'COURSE',
+  productType: ProductType,
+  listing: ProductType,
   name: string,
+  nameByLocale?: MessageByLocale,
   description: string,
+  descriptionByLocale?: MessageByLocale,
   categories: Array<string>,
   updatedAt: string,
   createdAt: string,
   thumbnailUrls: string[],
   includedListableProductIds?: string[],
+  includedListableProducts?: Array<IncludedListableProduct>,
+  includedRedemptionCodes?: Array<IncludedRedemptionCode>,
 |};
 
 type RedeemCondition = {
@@ -119,6 +137,14 @@ export type CourseListingData = {|
   listing: 'COURSE',
 |};
 
+export type BundleListingData = {|
+  ...ProductListingData,
+  ...AppStoreProductAttributes,
+  ...StripeAndPaypalSellableAttributes,
+  productType: 'BUNDLE',
+  listing: 'BUNDLE',
+|};
+
 export type Purchase = {|
   id: string,
   usageType: string,
@@ -134,12 +160,7 @@ export type Purchase = {|
   paypalOrderId?: string,
   manualGiftReason?: string,
   creditsAmount?: number,
-  productType:
-    | 'ASSET_PACK'
-    | 'GAME_TEMPLATE'
-    | 'CREDITS_PACKAGE'
-    | 'COURSE'
-    | 'COURSE_CHAPTER',
+  productType: ProductType,
 |};
 
 type ProductLicenseType = 'personal' | 'commercial' | 'unlimited' | 'default';
@@ -148,6 +169,76 @@ export type ProductLicense = {|
   nameByLocale: MessageByLocale,
   descriptionByLocale: MessageByLocale,
 |};
+
+// Helper to create a listing data for an item that is not
+// sold anymore, but still available for users who purchased it.
+const getArchivedProductListingData = ({
+  asset,
+}: {
+  asset: Bundle | PrivateAssetPack | PrivateGameTemplate,
+}): ProductListingData => ({
+  id: asset.id,
+  sellerId: 'R0F5QGNCzgOY5w2cxGeKJOq2UaD2',
+  isSellerGDevelop: true,
+  name: asset.name,
+  description: asset.longDescription,
+  categories: [],
+  updatedAt: asset.updatedAt,
+  createdAt: asset.createdAt,
+  thumbnailUrls: asset.previewImageUrls,
+  listing: 'BUNDLE', // Will be replaced by the actual listing type.
+  productType: 'BUNDLE', // Will be replaced by the actual product type.
+});
+
+export const getArchivedBundleListingData = ({
+  bundle,
+}: {|
+  bundle: Bundle,
+|}): BundleListingData => ({
+  ...getArchivedProductListingData({ asset: bundle }),
+  productType: 'BUNDLE',
+  listing: 'BUNDLE',
+  includedListableProducts: bundle.includedProducts,
+  includedRedemptionCodes: bundle.includedRedemptionCodes,
+  descriptionByLocale: bundle.longDescriptionByLocale,
+  nameByLocale: bundle.nameByLocale,
+  appStoreProductId: '',
+  prices: [],
+  sellerStripeAccountId: '',
+  stripeProductId: '',
+});
+
+export const getArchivedPrivateAssetPackListingData = ({
+  assetPack,
+}: {|
+  assetPack: PrivateAssetPack,
+|}): PrivateAssetPackListingData => ({
+  ...getArchivedProductListingData({ asset: assetPack }),
+  productType: 'ASSET_PACK',
+  listing: 'ASSET_PACK',
+  includedListableProductIds: assetPack.includedPackIds,
+  appStoreProductId: '',
+  prices: [],
+  creditPrices: [],
+  sellerStripeAccountId: '',
+  stripeProductId: '',
+});
+
+export const getArchivedPrivateGameTemplateListingData = ({
+  gameTemplate,
+}: {|
+  gameTemplate: PrivateGameTemplate,
+|}): PrivateGameTemplateListingData => ({
+  ...getArchivedProductListingData({ asset: gameTemplate }),
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
+  includedListableProductIds: gameTemplate.includedTemplateIds,
+  appStoreProductId: '',
+  prices: [],
+  creditPrices: [],
+  sellerStripeAccountId: '',
+  stripeProductId: '',
+});
 
 export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
@@ -209,6 +300,18 @@ export const listListedCourses = async (): Promise<
   return courses;
 };
 
+export const listListedBundles = async (): Promise<
+  Array<BundleListingData>
+> => {
+  const response = await client.get('/bundle');
+  const bundles = response.data;
+  if (!Array.isArray(bundles)) {
+    throw new Error('Invalid response from the bundles API');
+  }
+
+  return bundles;
+};
+
 export const listSellerAssetPacks = async ({
   sellerId,
 }: {|
@@ -243,7 +346,13 @@ export const listUserPurchases = async (
     role,
   }: {|
     userId: string,
-    productType: 'asset-pack' | 'game-template' | 'credits-package' | 'course',
+    productType:
+      | 'asset-pack'
+      | 'game-template'
+      | 'credits-package'
+      | 'course'
+      | 'course-chapter'
+      | 'bundle',
     role: 'receiver' | 'buyer',
   |}
 ): Promise<Array<Purchase>> => {

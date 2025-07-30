@@ -51,6 +51,7 @@ import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
   listReceivedGameTemplates,
+  listReceivedBundles,
 } from '../Utils/GDevelopServices/Asset';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -220,6 +221,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
         onRefreshCoursePurchases: this._fetchUserCoursePurchases,
+        onRefreshBundlePurchases: this._fetchUserBundlePurchases,
         onRefreshEarningsBalance: this._fetchEarningsBalance,
         onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
@@ -529,6 +531,20 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading received game templates:', error);
       }
     );
+    listReceivedBundles(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedBundles =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedBundles,
+          },
+        })),
+      error => {
+        console.error('Error while loading received bundles:', error);
+      }
+    );
     listUserPurchases(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
       productType: 'game-template',
@@ -575,6 +591,22 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading course purchases:', error);
+      }
+    );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'bundle',
+      role: 'receiver',
+    }).then(
+      bundlePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            bundlePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading bundle purchases:', error);
       }
     );
     this._fetchUserBadges();
@@ -814,6 +846,30 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _fetchUserBundles = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedBundles = await listReceivedBundles(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedBundles,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received bundles:', error);
+    }
+  };
+
   _fetchUserGameTemplatePurchases = async () => {
     const { authentication } = this.props;
     const firebaseUser = this.state.authenticatedUser.firebaseUser;
@@ -892,11 +948,38 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  _fetchUserBundlePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const bundlePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'bundle',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          bundlePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading bundle purchases:', error);
+    }
+  };
+
   _fetchUserProducts = async () => {
     await Promise.all([
       this._fetchUserAssetPacks(),
       this._fetchUserAssetShortHeaders(),
       this._fetchUserGameTemplates(),
+      this._fetchUserBundles(),
     ]);
   };
 

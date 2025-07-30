@@ -7,6 +7,7 @@ import {
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
 } from '../Utils/GDevelopServices/Shop';
 
 /**
@@ -116,6 +117,22 @@ export const getPrivateGameTemplateListingDataFromUserFriendlySlug = ({
     privateGameTemplate => privateGameTemplateId === privateGameTemplate.id
   );
   if (privateGameTemplateListingData) return privateGameTemplateListingData;
+
+  return null;
+};
+
+export const getBundleListingDataFromUserFriendlySlug = ({
+  bundleListingDatas,
+  userFriendlySlug,
+}: {|
+  bundleListingDatas: Array<BundleListingData>,
+  userFriendlySlug: string,
+|}): ?BundleListingData => {
+  const bundleId = getIdFromPrivateProductUserFriendlySlug(userFriendlySlug);
+  const bundleListingData = bundleListingDatas.find(
+    bundle => bundleId === bundle.id
+  );
+  if (bundleListingData) return bundleListingData;
 
   return null;
 };

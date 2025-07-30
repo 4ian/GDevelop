@@ -7,6 +7,8 @@ import {
   type Course,
   type CourseChapter,
 } from '../../../../Utils/GDevelopServices/Asset';
+import type { BundleListingData } from '../../../../Utils/GDevelopServices/Shop';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import { Line } from '../../../../UI/Grid';
@@ -16,6 +18,8 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import CourseCard from './CourseCard';
 import { getColumnsFromWindowSize } from './Utils';
+import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
@@ -34,6 +38,7 @@ type Props = {|
   onBack: () => void,
   courses: ?Array<Course>,
   onSelectCourse: (courseId: string) => void,
+  onSelectBundle: (bundleListingData: BundleListingData) => void,
   previewedCourse: ?Course,
   getCourseChapters: (courseId: string) => ?Array<CourseChapter>,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
@@ -41,19 +46,31 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
+  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
 const CoursesPage = ({
   onBack,
   courses,
   onSelectCourse,
+  onSelectBundle,
   previewedCourse,
   getCourseChapters,
   getCourseChapterCompletion,
   getCourseCompletion,
+  getSubscriptionPlansWithPricingSystems,
 }: Props) => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
+  const numberOfItemsOnOneRow = getColumnsFromWindowSize(
+    windowSize,
+    isLandscape
+  );
+  const { limits } = React.useContext(AuthenticatedUserContext);
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
 
   return (
     <I18n>
@@ -77,13 +94,13 @@ const CoursesPage = ({
           <SectionRow>
             <Line>
               <GridList
-                cols={getColumnsFromWindowSize(windowSize, isLandscape)}
+                cols={numberOfItemsOnOneRow}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={ITEMS_SPACING * 2}
               >
                 {courses && listedCourses
-                  ? courses.map(course => {
+                  ? courses.slice(0, numberOfItemsOnOneRow).map(course => {
                       const completion = getCourseCompletion(course.id);
                       const courseListingData = listedCourses.find(
                         listedCourse => listedCourse.id === course.id
@@ -113,6 +130,47 @@ const CoursesPage = ({
               </GridList>
             </Line>
           </SectionRow>
+          {!hidePremiumProducts && (
+            <SectionRow>
+              <BundlePreviewBanner
+                onDisplayBundle={onSelectBundle}
+                getSubscriptionPlansWithPricingSystems={
+                  getSubscriptionPlansWithPricingSystems
+                }
+              />
+            </SectionRow>
+          )}
+          {courses && listedCourses && courses.length > numberOfItemsOnOneRow && (
+            <SectionRow>
+              <Line>
+                <GridList
+                  cols={numberOfItemsOnOneRow}
+                  style={styles.grid}
+                  cellHeight="auto"
+                  spacing={ITEMS_SPACING * 2}
+                >
+                  {courses.slice(numberOfItemsOnOneRow).map(course => {
+                    const completion = getCourseCompletion(course.id);
+                    const courseListingData = listedCourses.find(
+                      listedCourse => listedCourse.id === course.id
+                    );
+                    return (
+                      <GridListTile key={course.id}>
+                        <CourseCard
+                          course={course}
+                          courseListingData={courseListingData}
+                          completion={completion}
+                          onClick={() => {
+                            onSelectCourse(course.id);
+                          }}
+                        />
+                      </GridListTile>
+                    );
+                  })}
+                </GridList>
+              </Line>
+            </SectionRow>
+          )}
         </SectionContainer>
       )}
     </I18n>

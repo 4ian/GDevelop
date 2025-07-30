@@ -72,6 +72,7 @@ export type ObjectTreeViewItemProps = {|
   initialInstances?: gdInitialInstancesContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
+  onObjectCreated: gdObject => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
   ) => void,
@@ -568,6 +569,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       objectsContainer,
       onObjectPasted,
       onObjectModified,
+      onObjectCreated,
     } = this.props;
 
     const newObjectWithContext = addSerializedObjectToObjectsContainer({
@@ -586,6 +588,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+    onObjectCreated(newObjectWithContext.object);
   }
 
   duplicate(): void {
@@ -596,6 +599,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       forceUpdateList,
       editName,
       selectObjectFolderOrObjectWithContext,
+      onObjectCreated,
     } = this.props;
 
     const object = this.object.getObject();
@@ -620,6 +624,8 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         .getObjectChild(newObjectWithContext.object.getName()),
       global: this._isGlobal,
     };
+
+    onObjectCreated(newObjectWithContext.object);
 
     forceUpdateList();
     editName(getObjectTreeViewItemId(newObjectWithContext.object));

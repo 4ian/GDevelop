@@ -1281,6 +1281,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.props.unsavedChanges.triggerUnsavedChanges();
 
     this._addInstanceForNewObject(object.getName());
+
+    this._hotReloadObjects([object]);
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {

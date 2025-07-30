@@ -973,6 +973,8 @@ namespace gdjs {
         objects
       );
 
+      console.log("hotReloadRuntimeSceneObjects", oldObjects, newObjectDataList);
+
       this._hotReloadRuntimeSceneObjects(
         oldObjects,
         newObjectDataList,

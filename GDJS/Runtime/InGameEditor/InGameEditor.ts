@@ -1291,7 +1291,6 @@ namespace gdjs {
       addedObjects?: Array<gdjs.RuntimeObject>;
       removedObjects?: Array<gdjs.RuntimeObject>;
     }) {
-      console.log('_sendSelectionUpdate', options);
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
 

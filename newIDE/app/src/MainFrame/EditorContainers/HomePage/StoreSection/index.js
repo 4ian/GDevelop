@@ -10,6 +10,7 @@ import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import { type Course } from '../../../../Utils/GDevelopServices/Asset';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 import { AssetStoreNavigatorContext } from '../../../../AssetStore/AssetStoreNavigator';
@@ -22,6 +23,8 @@ type Props = {|
   ) => void,
   onOpenProfile: () => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCourseOpen: (courseId: string) => void,
+  receivedCourses?: ?Array<Course>,
 |};
 
 const StoreSection = ({
@@ -30,6 +33,8 @@ const StoreSection = ({
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
   onExtensionInstalled,
+  onCourseOpen,
+  receivedCourses,
 }: Props) => {
   const [
     isAssetPackDialogInstallOpen,
@@ -84,6 +89,8 @@ const StoreSection = ({
         }
         displayPromotions
         onOpenProfile={onOpenProfile}
+        receivedCourses={receivedCourses}
+        onCourseOpen={onCourseOpen}
       />
       {(openedAssetPack || openedAssetShortHeader) && (
         <Line justifyContent="flex-end">

@@ -226,6 +226,19 @@ export type SummarizedPlanFeature = {|
   displayInSummary?: true,
 |};
 
+export type RedemptionCode = {|
+  code: string,
+  givenSubscriptionPlanId: string | null,
+  durationInDays: number,
+  maxUsageCount: number,
+  remainingUsageCount: number,
+  madeBy: string,
+  madeFor: string | null,
+  ownerId?: string,
+  createdAt: number,
+  updatedAt: number,
+|};
+
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
 export const apiClient = axios.create({
@@ -675,3 +688,21 @@ export function getSummarizedSubscriptionPlanFeatures(
 
   return summarizedFeatures;
 }
+
+export const getRedemptionCodes = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<RedemptionCode>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/redemption-code', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return response.data;
+};

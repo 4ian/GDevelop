@@ -11,6 +11,8 @@ import {
   sendAssetOpened,
   sendAssetPackInformationOpened,
   sendAssetPackOpened,
+  sendBundleInformationOpened,
+  sendCourseInformationOpened,
   sendGameTemplateInformationOpened,
 } from '../Utils/Analytics/EventSender';
 import {
@@ -18,12 +20,15 @@ import {
   type PublicAssetPack,
   type PublicAssetPacks,
   type PrivateAssetPack,
+  type Course,
   doesAssetPackContainAudio,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
+  type CourseListingData,
 } from '../Utils/GDevelopServices/Shop';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
@@ -61,14 +66,18 @@ import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGa
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { AssetSwappingAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import { delay } from '../Utils/Delay';
+import { BundleStoreContext } from './Bundles/BundleStoreContext';
+import BundleInformationPage from './Bundles/BundleInformationPage';
 
 type Props = {|
-  hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
+  onlyShowAssets?: boolean, // TODO: if we add more options, use an array instead.
   displayPromotions?: boolean,
   onOpenPrivateGameTemplateListingData?: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenProfile?: () => void,
+  receivedCourses?: ?Array<Course>,
+  onCourseOpen?: (courseId: string) => void,
   assetSwappedObject?: ?gdObject,
   minimalUI?: boolean,
 |};
@@ -105,10 +114,12 @@ const identifyAssetPackKind = ({
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
   (
     {
-      hideGameTemplates,
+      onlyShowAssets,
       displayPromotions,
       onOpenPrivateGameTemplateListingData,
       onOpenProfile,
+      receivedCourses,
+      onCourseOpen,
       assetSwappedObject,
       minimalUI,
     }: Props,
@@ -175,6 +186,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       fetchGameTemplates,
       shop: { privateGameTemplateListingDatasSearchResults },
     } = React.useContext(PrivateGameTemplateStoreContext);
+    const {
+      bundleListingDatas,
+      error: bundleStoreError,
+      fetchBundles,
+      shop: { bundleListingDatasSearchResults },
+    } = React.useContext(BundleStoreContext);
+
     const currentPage = shopNavigationState.getCurrentPage();
     const {
       openedAssetPack,
@@ -182,6 +200,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       openedShopCategory,
       openedPrivateAssetPackListingData,
       openedPrivateGameTemplateListingData,
+      openedBundleListingData,
       filtersState,
     } = currentPage;
     const isOnHomePage = isHomePage(currentPage);
@@ -235,11 +254,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       () => {
         fetchAssetsAndFilters();
         fetchGameTemplates();
+        fetchBundles();
       },
-      [fetchAssetsAndFilters, fetchGameTemplates]
+      [fetchAssetsAndFilters, fetchGameTemplates, fetchBundles]
     );
 
-    const storeError = assetStoreError || privateGameTemplateStoreError;
+    const storeError =
+      assetStoreError || privateGameTemplateStoreError || bundleStoreError;
 
     const reApplySearchTextIfNeeded = React.useCallback(
       (page: AssetStorePageState): boolean => {
@@ -257,6 +278,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       !openedAssetShortHeader && // Don't show filters on asset page.
       !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
       !openedPrivateGameTemplateListingData && // Don't show filters on private game template information page.
+      !openedBundleListingData && // Don't show filters on bundle information page.
       !(
         openedAssetPack &&
         openedAssetPack.content &&
@@ -473,6 +495,35 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [saveScrollPosition, shopNavigationState]
     );
 
+    const selectBundle = React.useCallback(
+      (bundleListingData: BundleListingData) => {
+        sendBundleInformationOpened({
+          bundleName: bundleListingData.name,
+          bundleId: bundleListingData.id,
+          source: 'store',
+        });
+        saveScrollPosition();
+        shopNavigationState.openBundleInformationPage({
+          bundleListingData,
+          storeSearchText: true,
+          clearSearchText: true,
+        });
+      },
+      [saveScrollPosition, shopNavigationState]
+    );
+
+    const selectCourse = React.useCallback(
+      (courseListingData: CourseListingData) => {
+        sendCourseInformationOpened({
+          courseName: courseListingData.name,
+          courseId: courseListingData.id,
+          source: 'store',
+        });
+        if (onCourseOpen) onCourseOpen(courseListingData.id);
+      },
+      [onCourseOpen]
+    );
+
     const selectShopCategory = React.useCallback(
       (category: string) => {
         saveScrollPosition();
@@ -535,9 +586,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     React.useEffect(
       () => {
         if (
-          hideGameTemplates &&
+          onlyShowAssets &&
           (openedShopCategory === gameTemplatesCategoryId ||
-            openedPrivateGameTemplateListingData)
+            openedPrivateGameTemplateListingData ||
+            openedBundleListingData)
         ) {
           shopNavigationState.openHome();
         }
@@ -545,7 +597,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [
         openedShopCategory,
         openedPrivateGameTemplateListingData,
-        hideGameTemplates,
+        openedBundleListingData,
+        onlyShowAssets,
         shopNavigationState,
       ]
     );
@@ -633,7 +686,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             <Column expand useFullHeight noMargin>
               <SearchBar
                 placeholder={
-                  hideGameTemplates ? t`Search assets` : t`Search the shop`
+                  onlyShowAssets ? t`Search assets` : t`Search the shop`
                 }
                 value={searchText}
                 onChange={(newValue: string) => {
@@ -762,7 +815,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               </PlaceholderError>
             ) : publicAssetPacks &&
               privateAssetPackListingDatas &&
-              privateGameTemplateListingDatas ? (
+              privateGameTemplateListingDatas &&
+              bundleListingDatas ? (
               <AssetsHome
                 ref={assetsHome}
                 publicAssetPacks={publicAssetPacks}
@@ -770,12 +824,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 privateGameTemplateListingDatas={
                   privateGameTemplateListingDatas
                 }
+                bundleListingDatas={bundleListingDatas}
                 onPublicAssetPackSelection={selectPublicAssetPack}
                 onPrivateAssetPackSelection={selectPrivateAssetPack}
                 onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+                onBundleSelection={selectBundle}
                 onCategorySelection={selectShopCategory}
                 openedShopCategory={openedShopCategory}
-                hideGameTemplates={hideGameTemplates}
+                onlyShowAssets={onlyShowAssets}
                 displayPromotions={displayPromotions}
                 onOpenProfile={onOpenProfile}
               />
@@ -797,6 +853,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   ? []
                   : privateGameTemplateListingDatasSearchResults
               }
+              bundleListingDatas={
+                assetSwappedObject ? [] : bundleListingDatasSearchResults
+              }
               assetShortHeaders={assetShortHeadersSearchResults}
               ref={assetsList}
               error={storeError}
@@ -804,10 +863,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onPrivateAssetPackSelection={selectPrivateAssetPack}
               onPublicAssetPackSelection={selectPublicAssetPack}
               onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+              onBundleSelection={selectBundle}
               onFolderSelection={selectFolder}
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}
-              hideGameTemplates={hideGameTemplates}
+              onlyShowAssets={onlyShowAssets}
               hideDetails={!!assetSwappedObject && !!minimalUI}
             />
           ) : // Do not show the asset details if we're swapping an asset.
@@ -826,6 +886,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               privateAssetPackListingData={openedPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
               onGameTemplateOpen={selectPrivateGameTemplate}
+              onBundleOpen={selectBundle}
               privateAssetPackListingDatasFromSameCreator={
                 privateAssetPackListingDatasFromSameCreator
               }
@@ -843,9 +904,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               }}
               onAssetPackOpen={selectPrivateAssetPack}
               onGameTemplateOpen={selectPrivateGameTemplate}
+              onBundleOpen={selectBundle}
               privateGameTemplateListingDatasFromSameCreator={
                 privateGameTemplateListingDatasFromSameCreator
               }
+            />
+          ) : !!openedBundleListingData ? (
+            <BundleInformationPage
+              bundleListingData={openedBundleListingData}
+              receivedCourses={receivedCourses}
+              onBundleOpen={selectBundle}
+              onGameTemplateOpen={selectPrivateGameTemplate}
+              onAssetPackOpen={selectPrivateAssetPack}
+              onCourseOpen={selectCourse}
             />
           ) : null}
           {canShowFiltersPanel && (

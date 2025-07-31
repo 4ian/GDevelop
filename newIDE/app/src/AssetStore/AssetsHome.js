@@ -10,6 +10,10 @@ import type {
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
+  getArchivedBundleListingData,
+  getArchivedPrivateGameTemplateListingData,
+  getArchivedPrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
@@ -24,6 +28,7 @@ import {
   PrivateAssetPackTile,
   PublicAssetPackTile,
   PrivateGameTemplateTile,
+  BundleTile,
 } from './ShopTiles';
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
@@ -161,12 +166,14 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
+  bundleListingDatas: Array<BundleListingData>,
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
+  onBundleSelection: BundleListingData => void,
   onCategorySelection: string => void,
   openedShopCategory: string | null,
-  hideGameTemplates?: boolean,
+  onlyShowAssets?: boolean,
   displayPromotions?: boolean,
   onOpenProfile?: () => void,
 |};
@@ -177,12 +184,14 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
       privateGameTemplateListingDatas,
+      bundleListingDatas,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
       onPrivateGameTemplateSelection,
+      onBundleSelection,
       onCategorySelection,
       openedShopCategory,
-      hideGameTemplates,
+      onlyShowAssets,
       displayPromotions,
       onOpenProfile,
     }: Props,
@@ -192,6 +201,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     const {
       receivedAssetPacks,
       receivedGameTemplates,
+      receivedBundles,
       badges,
       achievements,
     } = React.useContext(AuthenticatedUserContext);
@@ -220,7 +230,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         Object.entries(shopCategories).map(
           // $FlowExpectedError - Object.entries does not infer well the type of the value.
           ([id, { title, imageSource, imageAlt }]) =>
-            hideGameTemplates && id === 'game-template' ? null : (
+            onlyShowAssets && id === 'game-template' ? null : (
               <CategoryTile
                 // This id would be more appropriate if it was shop-category-...
                 // but it is kept as is to avoid breaking some guided lessons using this
@@ -236,7 +246,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               />
             )
         ),
-      [onCategorySelection, hideGameTemplates]
+      [onCategorySelection, onlyShowAssets]
     );
 
     const openedShopCategoryTitle = openedShopCategory
@@ -257,7 +267,10 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const { allStandAloneTiles, allBundleTiles } = React.useMemo(
+    const {
+      allAssetPackStandAloneTiles,
+      allAssetPackBundleTiles,
+    } = React.useMemo(
       () => {
         const privateAssetPackStandAloneTiles: Array<React.Node> = [];
         const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
@@ -304,13 +317,55 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             }
           });
 
-        const allBundleTiles = [
+        const archivedOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+        const archivedOwnedAssetPackBundleTiles: Array<React.Node> = [];
+        // Some asset pack products can be archived, meaning the listing data
+        // is not available anymore, but the user still owns the asset pack.
+        // We look at the remaining receivedAssetPacks to display them.
+        (receivedAssetPacks || [])
+          .filter(
+            assetPack =>
+              !privateAssetPackListingDatas.find(
+                privateAssetPackListingData =>
+                  privateAssetPackListingData.id === assetPack.id
+              )
+          )
+          .forEach(assetPack => {
+            const archivedAssetPackListingData = getArchivedPrivateAssetPackListingData(
+              {
+                assetPack,
+              }
+            );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={archivedAssetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(archivedAssetPackListingData);
+                }}
+                owned={true}
+                key={assetPack.id}
+              />
+            );
+
+            if (
+              archivedAssetPackListingData.includedListableProductIds &&
+              !!archivedAssetPackListingData.includedListableProductIds.length
+            ) {
+              archivedOwnedAssetPackBundleTiles.push(tile);
+            } else {
+              archivedOwnedAssetPackStandAloneTiles.push(tile);
+            }
+          });
+
+        const allAssetPackBundleTiles = [
           ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+          ...archivedOwnedAssetPackBundleTiles,
           ...privateAssetPackBundleTiles,
         ];
 
-        const allStandAloneTiles = [
+        const allAssetPackStandAloneTiles = [
           ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+          ...archivedOwnedAssetPackStandAloneTiles,
           ...mergeArraysPerGroup(
             privateAssetPackStandAloneTiles,
             starterPacksTiles,
@@ -319,7 +374,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           ),
         ];
 
-        return { allStandAloneTiles, allBundleTiles };
+        return { allAssetPackStandAloneTiles, allAssetPackBundleTiles };
       },
       [
         privateAssetPackListingDatas,
@@ -330,29 +385,153 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ]
     );
 
+    const allBundleTiles = React.useMemo(
+      () => {
+        const bundleTiles: Array<React.Node> = [];
+        const ownedBundleTiles: Array<React.Node> = [];
+
+        bundleListingDatas
+          .filter(
+            bundleListingData =>
+              !openedShopCategory ||
+              bundleListingData.categories.includes(openedShopCategory)
+          )
+          .forEach(bundleListingData => {
+            const isBundleOwned =
+              !!receivedBundles &&
+              !!receivedBundles.find(
+                bundle => bundle.id === bundleListingData.id
+              );
+            const tile = (
+              <BundleTile
+                bundleListingData={bundleListingData}
+                onSelect={() => {
+                  onBundleSelection(bundleListingData);
+                }}
+                owned={isBundleOwned}
+                key={bundleListingData.id}
+              />
+            );
+            if (isBundleOwned) {
+              ownedBundleTiles.push(tile);
+            } else {
+              bundleTiles.push(tile);
+            }
+          });
+
+        // Some bundle products can be archived, meaning the listing data
+        // is not available anymore, but the user still owns the bundle.
+        // We look at the remaining receivedBundles to display them.
+        const archivedOwnedBundleTiles = (receivedBundles || [])
+          .filter(
+            bundle =>
+              !bundleListingDatas.find(
+                bundleListingData => bundleListingData.id === bundle.id
+              )
+          )
+          .map(bundle => {
+            const archivedBundleListingData = getArchivedBundleListingData({
+              bundle,
+            });
+            return (
+              <BundleTile
+                bundleListingData={archivedBundleListingData}
+                onSelect={() => {
+                  onBundleSelection(archivedBundleListingData);
+                }}
+                owned={true}
+                key={bundle.id}
+              />
+            );
+          });
+
+        return [
+          ...ownedBundleTiles, // Display owned bundles first.
+          ...archivedOwnedBundleTiles,
+          ...bundleTiles,
+        ];
+      },
+      [
+        bundleListingDatas,
+        openedShopCategory,
+        onBundleSelection,
+        receivedBundles,
+      ]
+    );
+
     const gameTemplateTiles = React.useMemo(
       () => {
+        const gameTemplateTiles: Array<React.Node> = [];
+        const ownedGameTemplateTiles: Array<React.Node> = [];
+
         // Only show game templates if the category is not set or is set to "game-template".
-        return privateGameTemplateListingDatas
+        privateGameTemplateListingDatas
           .filter(
             privateGameTemplateListingData =>
               !openedShopCategory || openedShopCategory === 'game-template'
           )
-          .map((privateGameTemplateListingData, index) => (
-            <PrivateGameTemplateTile
-              privateGameTemplateListingData={privateGameTemplateListingData}
-              onSelect={() => {
-                onPrivateGameTemplateSelection(privateGameTemplateListingData);
-              }}
-              owned={
-                !!receivedGameTemplates &&
-                !!receivedGameTemplates.find(
-                  pack => pack.id === privateGameTemplateListingData.id
-                )
+          .forEach(privateGameTemplateListingData => {
+            const isGameTemplateOwned =
+              !!receivedGameTemplates &&
+              !!receivedGameTemplates.find(
+                pack => pack.id === privateGameTemplateListingData.id
+              );
+            const tile = (
+              <PrivateGameTemplateTile
+                privateGameTemplateListingData={privateGameTemplateListingData}
+                onSelect={() => {
+                  onPrivateGameTemplateSelection(
+                    privateGameTemplateListingData
+                  );
+                }}
+                owned={isGameTemplateOwned}
+                key={privateGameTemplateListingData.id}
+              />
+            );
+
+            if (isGameTemplateOwned) {
+              ownedGameTemplateTiles.push(tile);
+            } else {
+              gameTemplateTiles.push(tile);
+            }
+          });
+
+        // Some game template products can be archived, meaning the listing data
+        // is not available anymore, but the user still owns the game template.
+        // We look at the remaining receivedGameTemplates to display them.
+        const archivedOwnedGameTemplateTiles = (receivedGameTemplates || [])
+          .filter(
+            gameTemplate =>
+              !privateGameTemplateListingDatas.find(
+                privateGameTemplateListingData =>
+                  privateGameTemplateListingData.id === gameTemplate.id
+              )
+          )
+          .map(gameTemplate => {
+            const archivedGameTemplateListingData = getArchivedPrivateGameTemplateListingData(
+              {
+                gameTemplate,
               }
-              key={privateGameTemplateListingData.id}
-            />
-          ));
+            );
+            return (
+              <PrivateGameTemplateTile
+                privateGameTemplateListingData={archivedGameTemplateListingData}
+                onSelect={() => {
+                  onPrivateGameTemplateSelection(
+                    archivedGameTemplateListingData
+                  );
+                }}
+                owned={true}
+                key={gameTemplate.id}
+              />
+            );
+          });
+
+        return [
+          ...ownedGameTemplateTiles, // Display owned game templates first.
+          ...archivedOwnedGameTemplateTiles,
+          ...gameTemplateTiles,
+        ];
       },
       [
         privateGameTemplateListingDatas,
@@ -363,10 +542,10 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     );
 
     const {
-      displayedList: displayedStandAloneTiles,
+      displayedList: displayedAssetPackStandAloneTiles,
       onShowMore: onShowMoreStandAloneTiles,
     } = useProgressiveReveal({
-      list: allStandAloneTiles,
+      list: allAssetPackStandAloneTiles,
       numberPerPage: 25,
     });
 
@@ -416,12 +595,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             )}
           </ColumnStackLayout>
         ) : null}
-        {allBundleTiles.length ? (
+        {allBundleTiles.length && !onlyShowAssets ? (
           <>
             <Column noMargin>
               <Line>
                 <Text size="block-title">
-                  <Trans>Bundles</Trans>
+                  <Trans>GDevelop Bundles</Trans>
                 </Text>
               </Line>
             </Column>
@@ -435,6 +614,25 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         ) : null}
+        {allAssetPackBundleTiles.length ? (
+          <>
+            <Column noMargin>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Asset pack bundles</Trans>
+                </Text>
+              </Line>
+            </Column>
+            <GridList
+              cols={getShopItemsColumns(windowSize, isLandscape)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {allAssetPackBundleTiles}
+            </GridList>
+          </>
+        ) : null}
         {openedShopCategoryTitle && (
           <Column noMargin>
             <Line>
@@ -442,7 +640,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </Line>
           </Column>
         )}
-        {!hideGameTemplates && (
+        {!onlyShowAssets && (
           <>
             {!openedShopCategoryTitle && (
               <Column noMargin>
@@ -478,7 +676,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {displayedStandAloneTiles}
+          {displayedAssetPackStandAloneTiles}
         </GridList>
       </ScrollView>
     );

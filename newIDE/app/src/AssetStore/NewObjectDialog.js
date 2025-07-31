@@ -641,7 +641,7 @@ function NewObjectDialog({
             }
           >
             {currentTab === 'asset-store' && (
-              <AssetStore ref={assetStore} hideGameTemplates />
+              <AssetStore ref={assetStore} onlyShowAssets />
             )}
             {currentTab === 'new-object' &&
               (selectedCustomObjectEnumeratedMetadata &&

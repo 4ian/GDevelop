@@ -1,0 +1,10 @@
+.container {
+  border-radius: 5px;
+  background: linear-gradient(
+    0deg,
+    var(--theme-primary-light) -80%,
+    transparent
+  );
+  display: flex;
+  padding: 8px 20px;
+}

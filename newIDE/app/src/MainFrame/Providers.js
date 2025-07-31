@@ -24,6 +24,7 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { PrivateGameTemplateStoreStateProvider } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { BundleStoreStateProvider } from '../AssetStore/Bundles/BundleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
@@ -108,37 +109,39 @@ const Providers = ({
                                             <ResourceStoreStateProvider>
                                               <ExampleStoreStateProvider>
                                                 <PrivateGameTemplateStoreStateProvider>
-                                                  <CreditsPackageStoreStateProvider>
-                                                    <CourseStoreStateProvider>
-                                                      <ProductLicenseStoreStateProvider>
-                                                        <MarketingPlansStoreStateProvider>
-                                                          <ExtensionStoreStateProvider
-                                                            i18n={i18n}
-                                                          >
-                                                            <BehaviorStoreStateProvider
+                                                  <BundleStoreStateProvider>
+                                                    <CreditsPackageStoreStateProvider>
+                                                      <CourseStoreStateProvider>
+                                                        <ProductLicenseStoreStateProvider>
+                                                          <MarketingPlansStoreStateProvider>
+                                                            <ExtensionStoreStateProvider
                                                               i18n={i18n}
                                                             >
-                                                              <TutorialStateProvider>
-                                                                <AnnouncementsFeedStateProvider>
-                                                                  <PrivateAssetsAuthorizationProvider>
-                                                                    <Resource3DPreviewProvider>
-                                                                      <AiRequestProvider>
-                                                                        {children(
-                                                                          {
-                                                                            i18n,
-                                                                          }
-                                                                        )}
-                                                                      </AiRequestProvider>
-                                                                    </Resource3DPreviewProvider>
-                                                                  </PrivateAssetsAuthorizationProvider>
-                                                                </AnnouncementsFeedStateProvider>
-                                                              </TutorialStateProvider>
-                                                            </BehaviorStoreStateProvider>
-                                                          </ExtensionStoreStateProvider>
-                                                        </MarketingPlansStoreStateProvider>
-                                                      </ProductLicenseStoreStateProvider>
-                                                    </CourseStoreStateProvider>
-                                                  </CreditsPackageStoreStateProvider>
+                                                              <BehaviorStoreStateProvider
+                                                                i18n={i18n}
+                                                              >
+                                                                <TutorialStateProvider>
+                                                                  <AnnouncementsFeedStateProvider>
+                                                                    <PrivateAssetsAuthorizationProvider>
+                                                                      <Resource3DPreviewProvider>
+                                                                        <AiRequestProvider>
+                                                                          {children(
+                                                                            {
+                                                                              i18n,
+                                                                            }
+                                                                          )}
+                                                                        </AiRequestProvider>
+                                                                      </Resource3DPreviewProvider>
+                                                                    </PrivateAssetsAuthorizationProvider>
+                                                                  </AnnouncementsFeedStateProvider>
+                                                                </TutorialStateProvider>
+                                                              </BehaviorStoreStateProvider>
+                                                            </ExtensionStoreStateProvider>
+                                                          </MarketingPlansStoreStateProvider>
+                                                        </ProductLicenseStoreStateProvider>
+                                                      </CourseStoreStateProvider>
+                                                    </CreditsPackageStoreStateProvider>
+                                                  </BundleStoreStateProvider>
                                                 </PrivateGameTemplateStoreStateProvider>
                                               </ExampleStoreStateProvider>
                                             </ResourceStoreStateProvider>

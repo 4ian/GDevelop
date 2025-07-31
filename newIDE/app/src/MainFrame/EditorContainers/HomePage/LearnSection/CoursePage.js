@@ -7,6 +7,7 @@ import { I18n } from '@lingui/react';
 import {
   type CourseChapter,
   type Course,
+  getCourseChapterRatingUrl,
 } from '../../../../Utils/GDevelopServices/Asset';
 import { type CourseListingData } from '../../../../Utils/GDevelopServices/Shop';
 import SectionContainer from '../SectionContainer';
@@ -15,7 +16,7 @@ import TextBasedCourseChapterView from '../../../../Course/TextBasedCourseChapte
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
-import { Column, Line, Spacer } from '../../../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../../../UI/Grid';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Help from '../../../../UI/CustomSvgIcons/Help';
@@ -34,7 +35,10 @@ import {
   AccordionBody,
   AccordionHeader,
 } from '../../../../UI/Accordion';
-import CourseSectionHeader from './CourseSectionHeader';
+import CoursePageHeader from './CoursePageHeader';
+import Window from '../../../../Utils/Window';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { RatingBanner } from './RatingBanner';
 
 const styles = {
   desktopContainer: { display: 'flex', gap: 16 },
@@ -122,7 +126,7 @@ type Props = {|
   |}) => void,
 |};
 
-const CourseSection = ({
+const CoursePage = ({
   course,
   courseChapters,
   onOpenTemplateFromCourseChapter,
@@ -138,6 +142,11 @@ const CourseSection = ({
   simulateAppStoreProduct,
   onOpenAskAi,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+  const userId = (profile && profile.id) || null;
+  const {
+    values: { language },
+  } = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlertMessage, values } = React.useContext(PreferencesContext);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
@@ -323,7 +332,7 @@ const CourseSection = ({
               }
             >
               <Column noOverflowParent noMargin>
-                <CourseSectionHeader
+                <CoursePageHeader
                   course={course}
                   onBuyCourseWithCredits={onBuyCourseWithCredits}
                   onBuyCourse={onBuyCourse}
@@ -344,54 +353,73 @@ const CourseSection = ({
                     </AlertMessage>
                   </Line>
                 )}
-                {courseChapters.map((chapter: CourseChapter, index) =>
-                  chapter.videoUrl ? (
-                    <VideoBasedCourseChapterView
-                      chapterIndex={index}
-                      course={course}
-                      courseChapter={chapter}
-                      onOpenTemplate={() => {
-                        onOpenTemplateFromCourseChapter(chapter);
-                      }}
-                      onCompleteTask={onCompleteTask}
-                      isTaskCompleted={isTaskCompleted}
-                      getChapterCompletion={getChapterCompletion}
-                      key={chapter.id}
-                      onClickUnlock={onClickUnlock}
-                      ref={_ref => {
-                        if (_ref) {
-                          chapterTitleRefs.current[index] = {
+                {courseChapters.map((chapter: CourseChapter, index) => (
+                  <ColumnStackLayout expand noOverflowParent noMargin>
+                    {chapter.videoUrl ? (
+                      <VideoBasedCourseChapterView
+                        chapterIndex={index}
+                        course={course}
+                        courseChapter={chapter}
+                        onOpenTemplate={() => {
+                          onOpenTemplateFromCourseChapter(chapter);
+                        }}
+                        onCompleteTask={onCompleteTask}
+                        isTaskCompleted={isTaskCompleted}
+                        getChapterCompletion={getChapterCompletion}
+                        key={chapter.id}
+                        onClickUnlock={onClickUnlock}
+                        ref={_ref => {
+                          if (_ref) {
+                            chapterTitleRefs.current[index] = {
+                              chapterId: chapter.id,
+                              ref: _ref,
+                            };
+                          }
+                        }}
+                      />
+                    ) : (
+                      <TextBasedCourseChapterView
+                        chapterIndex={index}
+                        course={course}
+                        // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
+                        courseChapter={chapter}
+                        onOpenTemplate={(templateId?: string) => {
+                          onOpenTemplateFromCourseChapter(chapter, templateId);
+                        }}
+                        onCompleteTask={onCompleteTask}
+                        isTaskCompleted={isTaskCompleted}
+                        getChapterCompletion={getChapterCompletion}
+                        key={chapter.id}
+                        onClickUnlock={onClickUnlock}
+                        ref={_ref => {
+                          if (_ref) {
+                            chapterTitleRefs.current[index] = {
+                              chapterId: chapter.id,
+                              ref: _ref,
+                            };
+                          }
+                        }}
+                      />
+                    )}
+                    {!chapter.isLocked && (
+                      <RatingBanner
+                        disabled={!userId}
+                        onClick={() => {
+                          if (!userId) return;
+
+                          const url = getCourseChapterRatingUrl({
+                            userId,
+                            courseId: course.id,
                             chapterId: chapter.id,
-                            ref: _ref,
-                          };
-                        }
-                      }}
-                    />
-                  ) : (
-                    <TextBasedCourseChapterView
-                      chapterIndex={index}
-                      course={course}
-                      // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
-                      courseChapter={chapter}
-                      onOpenTemplate={(templateId?: string) => {
-                        onOpenTemplateFromCourseChapter(chapter, templateId);
-                      }}
-                      onCompleteTask={onCompleteTask}
-                      isTaskCompleted={isTaskCompleted}
-                      getChapterCompletion={getChapterCompletion}
-                      key={chapter.id}
-                      onClickUnlock={onClickUnlock}
-                      ref={_ref => {
-                        if (_ref) {
-                          chapterTitleRefs.current[index] = {
-                            chapterId: chapter.id,
-                            ref: _ref,
-                          };
-                        }
-                      }}
-                    />
-                  )
-                )}
+                            language,
+                          });
+                          Window.openExternalURL(url);
+                        }}
+                      />
+                    )}
+                    <LargeSpacer />
+                  </ColumnStackLayout>
+                ))}
                 <div style={styles.footer} />
               </Column>
               {isMobile && !isLandscape ? null : (
@@ -493,4 +521,4 @@ const CourseSection = ({
   );
 };
 
-export default CourseSection;
+export default CoursePage;

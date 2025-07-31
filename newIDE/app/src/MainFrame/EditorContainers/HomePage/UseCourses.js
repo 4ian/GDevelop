@@ -40,6 +40,7 @@ type ReadyUser = {|
   userId: string | null,
   userSubscriptionPlanId: string | null,
   userCoursePurchasesCount: number | null,
+  userBundlePurchaseCount: number | null,
 |};
 
 /**
@@ -51,6 +52,7 @@ const useReadyUser = () => {
     profile,
     subscription,
     coursePurchases,
+    bundlePurchases,
     loginState,
   } = React.useContext(AuthenticatedUserContext);
 
@@ -59,6 +61,7 @@ const useReadyUser = () => {
     userId: null,
     userSubscriptionPlanId: null,
     userCoursePurchasesCount: null,
+    userBundlePurchaseCount: null,
   });
 
   React.useEffect(
@@ -72,9 +75,10 @@ const useReadyUser = () => {
         userId: profile ? profile.id : null,
         userSubscriptionPlanId: subscription ? subscription.planId : null,
         userCoursePurchasesCount: coursePurchases ? coursePurchases.length : 0,
+        userBundlePurchaseCount: bundlePurchases ? bundlePurchases.length : 0,
       });
     },
-    [profile, loginState, subscription, coursePurchases]
+    [profile, loginState, subscription, coursePurchases, bundlePurchases]
   );
 
   return readyUser;
@@ -90,6 +94,7 @@ const useCourses = () => {
     userId,
     userSubscriptionPlanId,
     userCoursePurchasesCount,
+    userBundlePurchaseCount,
   } = useReadyUser();
   const {
     limits,
@@ -99,7 +104,6 @@ const useCourses = () => {
   const {
     values: { language },
   } = React.useContext(PreferencesContext);
-  const userLanguage2LetterCode = language.split('_')[0].toLowerCase();
 
   const [courses, setCourses] = React.useState<?(Course[])>(null);
   const { listedCourses } = React.useContext(CourseStoreContext);
@@ -148,15 +152,23 @@ const useCourses = () => {
     '': noCourseChapters,
   });
 
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
+
   const fetchCourses = React.useCallback(
     async (): Promise<Array<Course>> => {
       const fetchedCourses = await listCourses(getAuthorizationHeader, {
         userId,
       });
-      setCourses(fetchedCourses);
-      return fetchedCourses;
+      const displayedCourses = fetchedCourses.filter(
+        course => !hidePremiumProducts || !course.isLocked
+      );
+      setCourses(displayedCourses);
+      return displayedCourses;
     },
-    [userId, getAuthorizationHeader]
+    [userId, getAuthorizationHeader, hidePremiumProducts]
   );
 
   const onSelectCourse = React.useCallback(
@@ -183,7 +195,7 @@ const useCourses = () => {
           listCourseChapters(getAuthorizationHeader, {
             courseId,
             userId,
-            lang: userLanguage2LetterCode,
+            language,
           }),
           (async () => {
             if (userId) {
@@ -217,7 +229,7 @@ const useCourses = () => {
         );
       }
     },
-    [getAuthorizationHeader, userId, userLanguage2LetterCode]
+    [getAuthorizationHeader, userId, language]
   );
 
   const onCompleteTask = React.useCallback(
@@ -324,13 +336,13 @@ const useCourses = () => {
       const course = courses.find(course => course.id === courseId);
       if (!course) return null;
 
-      const chapters = chaptersByCourseId ? chaptersByCourseId[courseId] : null;
-      if (!chapters) return null;
-
       const chaptersCount = course.chaptersTargetCount;
       const courseProgress = userProgressByCourseId[courseId];
       if (!courseProgress)
         return { percentage: 0, completedChapters: 0, chapters: chaptersCount };
+
+      const chapters = chaptersByCourseId ? chaptersByCourseId[courseId] : null;
+      if (!chapters) return null;
 
       let completion = 0;
       let completedChapters = 0;
@@ -500,7 +512,11 @@ const useCourses = () => {
 
         console.info(`Fetching all courses for userId=${userId || 'null'}.`);
 
-        if (userSubscriptionPlanId || userCoursePurchasesCount) {
+        if (
+          userSubscriptionPlanId ||
+          userCoursePurchasesCount ||
+          userBundlePurchaseCount
+        ) {
           // Trigger a re-fetch of the courses when the user subscription changes,
           // or when the user purchases a course or when the user logs in/out.
         }
@@ -523,6 +539,7 @@ const useCourses = () => {
       fetchCourses,
       userSubscriptionPlanId,
       userCoursePurchasesCount,
+      userBundlePurchaseCount,
       userId,
       userStatus,
     ]

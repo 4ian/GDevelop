@@ -7,7 +7,6 @@ import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
-import { type HomeTab } from '../HomePageMenu';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import type { Course } from '../../../../Utils/GDevelopServices/Asset';
@@ -32,9 +31,14 @@ import CourseStoreContext from '../../../../Course/CourseStoreContext';
 import TutorialsRow from './TutorialsRow';
 import { getColumnsFromWindowSize, type LearnCategory } from './Utils';
 import ExampleStore from '../../../../AssetStore/ExampleStore';
-import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import {
+  type PrivateGameTemplateListingData,
+  type BundleListingData,
+} from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import Carousel from '../../../../UI/Carousel';
+import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
 
 const NUMBER_OF_SCROLLS = 2; // Number of times the carousel can be scrolled to see all items.
 const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
@@ -56,12 +60,11 @@ const styles = {
 };
 
 type Props = {|
-  onTabChange: (tab: HomeTab) => void,
   onSelectCategory: (category: LearnCategory) => void,
   selectInAppTutorial: (tutorialId: string) => void,
-  previewedCourse: ?Course,
   courses: ?(Course[]),
   onSelectCourse: (courseId: string) => void,
+  onSelectBundle: (bundleListingData: BundleListingData) => void,
   getCourseCompletion: (courseId: string) => CourseCompletion | null,
   getCourseChapterCompletion: (
     courseId: string,
@@ -77,21 +80,22 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
 const MainPage = ({
-  onTabChange,
   onSelectCategory,
   selectInAppTutorial,
-  previewedCourse,
   courses,
   onSelectCourse,
+  onSelectBundle,
   getCourseCompletion,
   getCourseChapterCompletion,
   onOpenAskAi,
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
+  getSubscriptionPlansWithPricingSystems,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
@@ -105,6 +109,11 @@ const MainPage = ({
     isLandscape,
     isMediumScreen,
   } = useResponsiveWindowSize();
+
+  const hidePremiumProducts =
+    !!limits &&
+    !!limits.capabilities.classrooms &&
+    limits.capabilities.classrooms.hidePremiumProducts;
 
   const displayedCourses = React.useMemo(
     () => {
@@ -232,6 +241,16 @@ const MainPage = ({
               />
             </Line>
           </SectionRow>
+          {!hidePremiumProducts && (
+            <SectionRow>
+              <BundlePreviewBanner
+                onDisplayBundle={onSelectBundle}
+                getSubscriptionPlansWithPricingSystems={
+                  getSubscriptionPlansWithPricingSystems
+                }
+              />
+            </SectionRow>
+          )}
           <SectionRow>
             <LineStackLayout
               justifyContent="space-between"

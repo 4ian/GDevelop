@@ -308,6 +308,31 @@ export const sendGameTemplateInformationOpened = (options: {|
   recordEvent('game_template_information_opened', options);
 };
 
+export const sendBundleBuyClicked = (options: {|
+  bundleId: string,
+  bundleName: string,
+  bundleTag: string,
+  currency?: string,
+  usageType: string,
+|}) => {
+  recordEvent('bundle_buy_clicked', options);
+};
+export const sendBundleInformationOpened = (options: {|
+  bundleId: string,
+  bundleName: string,
+  source: 'store' | 'learn' | 'web-link',
+|}) => {
+  recordEvent('bundle_information_opened', options);
+};
+
+export const sendCourseInformationOpened = (options: {|
+  courseId: string,
+  courseName: string,
+  source: 'store' | 'learn',
+|}) => {
+  recordEvent('course_information_opened', options);
+};
+
 export const sendCourseBuyClicked = (options: {|
   courseId: string,
   courseName: string,

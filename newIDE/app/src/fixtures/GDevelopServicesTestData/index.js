@@ -857,9 +857,11 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   userEarningsBalance,
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
+  receivedBundles: [],
   gameTemplatePurchases: [],
   assetPackPurchases: [],
   coursePurchases: [],
+  bundlePurchases: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
   onCancelLoginOrSignUp: () => {},
@@ -891,6 +893,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshCoursePurchases: async () => {
     console.info('This should refresh the courses purchases');
+  },
+  onRefreshBundlePurchases: async () => {
+    console.info('This should refresh the bundle purchases');
   },
   onRefreshEarningsBalance: async () => {
     console.info('This should refresh the user earnings balance');

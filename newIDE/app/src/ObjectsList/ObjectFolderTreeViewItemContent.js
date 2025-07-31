@@ -21,6 +21,8 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 
+const gd: libGDevelop = global.gd;
+
 export const expandAllSubfolders = (
   objectFolder: gdObjectFolderOrObject,
   isGlobal: boolean,
@@ -59,6 +61,10 @@ export type ObjectFolderTreeViewItemProps = {|
   objectsContainer: gdObjectsContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
+  onObjectCreated: (
+    object: gdObject,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
   expandFolders: (
     objectFolderOrObjectWithContexts: Array<ObjectFolderOrObjectWithContext>
   ) => void,
@@ -421,7 +427,13 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       onObjectPasted,
       expandFolders,
       onObjectModified,
+      onObjectCreated,
     } = this.props;
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
 
     const newObjectWithContext = addSerializedObjectToObjectsContainer({
       project,
@@ -436,6 +448,8 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       serializedObject,
       addInsideFolder: true,
     });
+
+    onObjectCreated(newObjectWithContext.object, isTheFirstOfItsTypeInProject);
 
     onObjectModified(false);
     if (onObjectPasted) onObjectPasted(newObjectWithContext.object);

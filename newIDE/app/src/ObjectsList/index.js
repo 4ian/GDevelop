@@ -471,7 +471,10 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
-  onObjectCreated: gdObject => void,
+  onObjectCreated: (
+    object: gdObject,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => void,
   onObjectEdited: (
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
@@ -601,6 +604,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               globalObjectsContainer.hasObjectNamed(name))
         );
 
+        const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+          project,
+          objectType
+        );
+
         let object;
         let objectFolderOrObjectWithContext;
         if (
@@ -662,11 +670,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
-          onObjectCreated(object);
           onObjectFolderOrObjectWithContextSelected(
             objectFolderOrObjectWithContext
           );
         }
+        onObjectCreated(object, isTheFirstOfItsTypeInProject);
       },
       [
         project,
@@ -685,7 +693,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (objects.length === 0) return;
 
         objects.forEach(object => {
-          onObjectCreated(object);
+          onObjectCreated(
+            object,
+            // Editor hot-reload is already triggered by onResourceUsageChanged at the
+            // end of asset installation. There is no need to trigger it here too especially in a loop.
+            false
+          );
         });
 
         // Here, the last object in the array might not be the last object
@@ -1053,6 +1066,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,
@@ -1072,6 +1086,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         onObjectPasted,
         onObjectModified,
+        onObjectCreated,
         editName,
         expandFolders,
         addFolder,

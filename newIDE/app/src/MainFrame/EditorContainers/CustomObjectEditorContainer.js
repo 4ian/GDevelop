@@ -360,6 +360,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             this.props.onDeleteEventsBasedObjectVariant
           }
           onEffectAdded={this.props.onEffectAdded}
+          onNewObjectTypeUsed={this.props.onNewObjectTypeUsed}
         />
       </div>
     );

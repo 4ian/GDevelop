@@ -183,6 +183,7 @@ type Props = {|
     variant: gdEventsBasedObjectVariant
   ) => void,
   onEffectAdded: () => void,
+  onNewObjectTypeUsed: () => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1280,7 +1281,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
-  _onObjectCreated = (object: gdObject) => {
+  _onObjectCreated = (
+    object: gdObject,
+    isTheFirstOfItsTypeInProject: boolean
+  ) => {
     const infoBarDetails = onObjectAdded({
       object,
       layersContainer: this.props.layersContainer,
@@ -1298,7 +1302,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this._addInstanceForNewObject(object.getName());
 
-    this._hotReloadObjects({ addedOrUpdatedObjects: [object] });
+    if (isTheFirstOfItsTypeInProject) {
+      this.props.onNewObjectTypeUsed();
+    } else {
+      this._hotReloadObjects({ addedOrUpdatedObjects: [object] });
+    }
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {

@@ -2879,6 +2879,10 @@ interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
 };
 
+interface UsedObjectTypeFinder {
+  boolean STATIC_ScanProject([Ref] Project project, [Const] DOMString objectType);
+};
+
 interface ExampleExtensionUsagesFinder {
   [Value] SetString STATIC_GetUsedExtensions([Ref] Project project);
 };

@@ -1583,6 +1583,20 @@ const MainFrame = (props: Props) => {
       // Ensure the effect implementation is exported.
       hotReloadInGameEditorIfNeeded({
         hotReload: true,
+        projectDataOnlyExport: true,
+        shouldReloadResources: false,
+      });
+    },
+    [hotReloadInGameEditorIfNeeded]
+  );
+
+  const onNewObjectTypeUsed = React.useCallback(
+    () => {
+      // Ensure the object implementation is exported.
+      hotReloadInGameEditorIfNeeded({
+        hotReload: true,
+        // TODO Only export data when the object type is not the first 3D one used.
+        // This is only necessary the first time Three.js is exported.
         projectDataOnlyExport: false,
         shouldReloadResources: false,
       });
@@ -4183,6 +4197,7 @@ const MainFrame = (props: Props) => {
     onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
+    onNewObjectTypeUsed: onNewObjectTypeUsed,
     gamesList: gamesList,
   };
 

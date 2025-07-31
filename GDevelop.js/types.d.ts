@@ -2057,6 +2057,10 @@ export class UsedExtensionsFinder extends EmscriptenObject {
   static scanProject(project: Project): UsedExtensionsResult;
 }
 
+export class UsedObjectTypeFinder extends EmscriptenObject {
+  static scanProject(project: Project, objectType: string): boolean;
+}
+
 export class ExampleExtensionUsagesFinder extends EmscriptenObject {
   static getUsedExtensions(project: Project): SetString;
 }

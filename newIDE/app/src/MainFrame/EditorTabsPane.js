@@ -237,6 +237,7 @@ export type EditorTabsPaneCommonProps = {|
   ) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onEffectAdded: () => void,
+  onNewObjectTypeUsed: () => void,
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
@@ -328,6 +329,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     onSceneEventsModifiedOutsideEditor,
     onExtensionInstalled,
     onEffectAdded,
+    onNewObjectTypeUsed,
     gamesList,
     setEditorTabs,
     onSetPointerEventsNone,
@@ -731,6 +733,7 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       onSceneEventsModifiedOutsideEditor: onSceneEventsModifiedOutsideEditor,
                       onExtensionInstalled: onExtensionInstalled,
                       onEffectAdded: onEffectAdded,
+                      onNewObjectTypeUsed: onNewObjectTypeUsed,
                       gamesList,
                       gamesPlatformFrameTools,
                     })}

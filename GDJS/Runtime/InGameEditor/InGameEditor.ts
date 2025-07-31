@@ -345,6 +345,7 @@ namespace gdjs {
     private _editedInstanceContainer: gdjs.RuntimeInstanceContainer | null =
       null;
     private _editedInstanceDataList: InstanceData[] = [];
+    private _editedObjectDataList: ObjectData[] = [];
     private _selectedLayerName: string = '';
     private _innerArea: AABB3D | null = null;
     private _threeInnerArea: THREE.Object3D | null = null;
@@ -463,6 +464,14 @@ namespace gdjs {
 
     setEditedInstanceDataList(editedInstanceDataList: InstanceData[]) {
       this._editedInstanceDataList = editedInstanceDataList;
+    }
+
+    getEditedObjectDataList(): ObjectData[] {
+      return this._editedObjectDataList;
+    }
+
+    setEditedObjectDataList(editedObjectDataList: ObjectData[]) {
+      this._editedObjectDataList = editedObjectDataList;
     }
 
     setEditedInstanceContainer(
@@ -1282,6 +1291,7 @@ namespace gdjs {
       addedObjects?: Array<gdjs.RuntimeObject>;
       removedObjects?: Array<gdjs.RuntimeObject>;
     }) {
+      console.log('_sendSelectionUpdate', options);
       const debuggerClient = this._runtimeGame._debuggerClient;
       if (!debuggerClient) return;
 

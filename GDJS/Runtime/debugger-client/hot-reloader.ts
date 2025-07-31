@@ -961,7 +961,9 @@ namespace gdjs {
     hotReloadRuntimeSceneObjects(
       addedOrUpdatedObjects: Array<ObjectData>,
       removedObjectNames: Array<string>,
-      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+      // runtimeInstanceContainer gives an access as a map.
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer,
+      editedObjectDataList: Array<ObjectData>
     ): void {
       const oldObjects: Array<ObjectData | null> = addedOrUpdatedObjects.map(
         (objectData) =>
@@ -994,6 +996,16 @@ namespace gdjs {
             oldObjectData,
             addedOrUpdatedObjects[index]
           );
+        } else {
+          editedObjectDataList.push(addedOrUpdatedObjects[index]);
+        }
+      }
+      for (const removedObjectName of removedObjectNames) {
+        for (let index = 0; index < editedObjectDataList.length; index++) {
+          if (editedObjectDataList[index].name === removedObjectName) {
+            editedObjectDataList.splice(index, 1);
+            break;
+          }
         }
       }
     }

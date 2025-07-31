@@ -277,7 +277,8 @@ namespace gdjs {
             that._hotReloader.hotReloadRuntimeSceneObjects(
               data.payload.addedOrUpdatedObjects,
               data.payload.removedObjectNames,
-              editedInstanceContainer
+              editedInstanceContainer,
+              runtimeGame._inGameEditor.getEditedObjectDataList()
             );
           }
         }

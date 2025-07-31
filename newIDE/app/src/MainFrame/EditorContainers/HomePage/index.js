@@ -42,6 +42,7 @@ import { type CourseChapter } from '../../../Utils/GDevelopServices/Asset';
 import useCourses from './UseCourses';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import useSubscriptionPlans from '../../../Utils/UseSubscriptionPlans';
+import { BundleStoreContext } from '../../../AssetStore/Bundles/BundleStoreContext';
 
 const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
   if (
@@ -297,6 +298,10 @@ export const HomePage = React.memo<Props>(
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
       );
+      const {
+        fetchBundles,
+        shop: { setInitialBundleUserFriendlySlug },
+      } = React.useContext(BundleStoreContext);
       const openedGame = React.useMemo(
         () =>
           !openedGameId || !games
@@ -324,8 +329,11 @@ export const HomePage = React.memo<Props>(
                 routeArguments['game-template']
               );
             }
+            if (routeArguments['bundle']) {
+              setInitialBundleUserFriendlySlug(routeArguments['bundle']);
+            }
             // Remove the arguments so that the asset store is not opened again.
-            removeRouteArguments(['asset-pack', 'game-template']);
+            removeRouteArguments(['asset-pack', 'game-template', 'bundle']);
           } else if (requestedTab === 'manage') {
             const gameId = routeArguments['game-id'];
             if (gameId) {
@@ -358,6 +366,7 @@ export const HomePage = React.memo<Props>(
           removeRouteArguments,
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
+          setInitialBundleUserFriendlySlug,
           games,
           areCoursesFetched,
         ]
@@ -369,8 +378,14 @@ export const HomePage = React.memo<Props>(
           fetchExamplesAndFilters();
           fetchGameTemplates();
           fetchTutorials();
+          fetchBundles();
         },
-        [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
+        [
+          fetchExamplesAndFilters,
+          fetchTutorials,
+          fetchGameTemplates,
+          fetchBundles,
+        ]
       );
 
       // Fetch user cloud projects when home page becomes active

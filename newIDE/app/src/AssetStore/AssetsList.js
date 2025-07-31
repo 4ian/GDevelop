@@ -627,7 +627,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         )
           return [];
 
-        const gameTemplateTiles: Array<React.Node> = [];
+        const notOwnedGameTemplateTiles: Array<React.Node> = [];
         const ownedGameTemplateTiles: Array<React.Node> = [];
 
         privateGameTemplateListingDatas.forEach(
@@ -653,14 +653,14 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             if (isGameTemplateOwned) {
               ownedGameTemplateTiles.push(tile);
             } else {
-              gameTemplateTiles.push(tile);
+              notOwnedGameTemplateTiles.push(tile);
             }
           }
         );
 
         return [
           ...ownedGameTemplateTiles, // Display owned game templates first.
-          ...gameTemplateTiles,
+          ...notOwnedGameTemplateTiles,
         ];
       },
       [
@@ -683,7 +683,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         )
           return [];
 
-        const bundleTiles: Array<React.Node> = [];
+        const notOwnedBundleTiles: Array<React.Node> = [];
         const ownedBundleTiles: Array<React.Node> = [];
 
         bundleListingDatas.forEach(bundleListingData => {
@@ -704,13 +704,13 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           if (isBundleOwned) {
             ownedBundleTiles.push(tile);
           } else {
-            bundleTiles.push(tile);
+            notOwnedBundleTiles.push(tile);
           }
         });
 
         return [
           ...ownedBundleTiles, // Display owned bundles first.
-          ...bundleTiles,
+          ...notOwnedBundleTiles,
         ];
       },
       [

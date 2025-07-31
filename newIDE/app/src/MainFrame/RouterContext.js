@@ -20,6 +20,7 @@ type RouteKey =
   | 'games-dashboard-tab'
   | 'asset-pack'
   | 'game-template'
+  | 'bundle'
   | 'tutorial-id'
   | 'course-id'
   | 'create-from-example'

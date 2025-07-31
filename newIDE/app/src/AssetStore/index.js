@@ -863,6 +863,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onPrivateAssetPackSelection={selectPrivateAssetPack}
               onPublicAssetPackSelection={selectPublicAssetPack}
               onPrivateGameTemplateSelection={selectPrivateGameTemplate}
+              onBundleSelection={selectBundle}
               onFolderSelection={selectFolder}
               onGoBackToFolderIndex={goBackToFolderIndex}
               currentPage={shopNavigationState.getCurrentPage()}

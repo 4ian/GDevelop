@@ -41,17 +41,18 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
 
   React.useEffect(
     () => {
-      if (profile) {
-        // Fetch redemption codes from the profile.
-        const fetchRedemptionCodes = async () => {
-          const codes = await getRedemptionCodes(
-            getAuthorizationHeader,
-            profile.id
-          );
-          setRedemptionCodes(codes);
-        };
-        fetchRedemptionCodes();
+      if (!profile) {
+        return;
       }
+
+      const fetchRedemptionCodes = async () => {
+        const codes = await getRedemptionCodes(
+          getAuthorizationHeader,
+          profile.id
+        );
+        setRedemptionCodes(codes);
+      };
+      fetchRedemptionCodes();
     },
     [profile, getAuthorizationHeader]
   );

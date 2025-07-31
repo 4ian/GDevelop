@@ -195,7 +195,7 @@ const BundlePurchaseDialog = ({
     [receivedBundles]
   );
 
-  // If the user has received this particular template, either:
+  // If the user has received this particular bundle, either:
   // - they just logged in, and already have it, so we close the dialog.
   // - they just bought it, we display the success message.
   React.useEffect(

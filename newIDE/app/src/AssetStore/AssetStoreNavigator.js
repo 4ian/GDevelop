@@ -9,6 +9,7 @@ import {
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
 } from '../Utils/GDevelopServices/Shop';
 
 export type AssetStorePageState = {|
@@ -17,6 +18,7 @@ export type AssetStorePageState = {|
   openedAssetShortHeader: ?AssetShortHeader,
   openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   openedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+  openedBundleListingData: ?BundleListingData,
   selectedFolders: Array<string>,
   filtersState: FiltersState,
   pageBreakIndex?: ?number,
@@ -53,6 +55,11 @@ export type NavigationState = {|
     storeSearchText: boolean,
     clearSearchText: boolean,
   |}) => void,
+  openBundleInformationPage: ({|
+    bundleListingData: BundleListingData,
+    storeSearchText: boolean,
+    clearSearchText: boolean,
+  |}) => void,
   openAssetDetailPage: ({|
     assetShortHeader: AssetShortHeader,
     storeSearchText: boolean,
@@ -76,6 +83,7 @@ export const assetStoreHomePageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   openedPrivateGameTemplateListingData: null,
+  openedBundleListingData: null,
   selectedFolders: [],
   filtersState: noFilter,
   displayAssets: false,
@@ -87,6 +95,7 @@ const searchPageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   openedPrivateGameTemplateListingData: null,
+  openedBundleListingData: null,
   selectedFolders: [],
   filtersState: noFilter,
   displayAssets: true,
@@ -99,6 +108,7 @@ export const isHomePage = (pageState: AssetStorePageState) => {
       !pageState.openedPrivateAssetPackListingData &&
       !pageState.openedPrivateGameTemplateListingData &&
       !pageState.openedAssetPack &&
+      !pageState.openedBundleListingData &&
       pageState.filtersState === noFilter &&
       !pageState.displayAssets)
   );
@@ -109,7 +119,8 @@ export const isSearchResultPage = (pageState: AssetStorePageState) => {
     !isHomePage(pageState) &&
     !pageState.openedAssetShortHeader &&
     !pageState.openedPrivateAssetPackListingData &&
-    !pageState.openedPrivateGameTemplateListingData
+    !pageState.openedPrivateGameTemplateListingData &&
+    !pageState.openedBundleListingData
   );
 };
 
@@ -133,6 +144,7 @@ export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
   openPackPage: () => {},
   openPrivateAssetPackInformationPage: () => {},
   openPrivateGameTemplateInformationPage: () => {},
+  openBundleInformationPage: () => {},
   openAssetDetailPage: () => {},
   navigateInsideFolder: string => {},
   goBackToFolderIndex: number => {},
@@ -169,7 +181,12 @@ export const AssetStoreNavigatorStateProvider = (
           });
           return newCurrentPage;
         }
-        return previousPages[0];
+        if (previousPages.length === 1) {
+          // If we are already on the root page, do nothing.
+          return previousPages[0];
+        }
+        // If there are no previous pages, return the home page state.
+        return assetStoreHomePageState;
       },
       openHome: () => {
         setHistory({ previousPages: [assetStoreHomePageState] });
@@ -244,6 +261,7 @@ export const AssetStoreNavigatorStateProvider = (
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
               openedPrivateGameTemplateListingData: null,
+              openedBundleListingData: null,
               displayAssets: true,
               filtersState: {
                 chosenCategory: {
@@ -271,6 +289,7 @@ export const AssetStoreNavigatorStateProvider = (
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
               openedPrivateGameTemplateListingData: null,
+              openedBundleListingData: null,
               filtersState: noFilter,
               displayAssets: false,
               selectedFolders: [],
@@ -315,6 +334,7 @@ export const AssetStoreNavigatorStateProvider = (
                 openedAssetPack: assetPack,
                 openedPrivateAssetPackListingData: null,
                 openedPrivateGameTemplateListingData: null,
+                openedBundleListingData: null,
                 displayAssets: true,
                 filtersState: {
                   chosenCategory: {
@@ -373,6 +393,7 @@ export const AssetStoreNavigatorStateProvider = (
                 openedAssetPack: null,
                 openedPrivateAssetPackListingData: privateAssetPackListingData,
                 openedPrivateGameTemplateListingData: null,
+                openedBundleListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
                 selectedFolders: [],
@@ -418,6 +439,7 @@ export const AssetStoreNavigatorStateProvider = (
                 openedAssetPack: null,
                 openedPrivateAssetPackListingData: null,
                 openedPrivateGameTemplateListingData: null,
+                openedBundleListingData: null,
                 filtersState: noFilter,
                 displayAssets: false,
                 selectedFolders: [],
@@ -463,6 +485,53 @@ export const AssetStoreNavigatorStateProvider = (
                 openedAssetPack: null,
                 openedPrivateAssetPackListingData: null,
                 openedPrivateGameTemplateListingData: privateGameTemplateListingData,
+                openedBundleListingData: null,
+                filtersState: noFilter,
+                displayAssets: false,
+                selectedFolders: [],
+              },
+            ],
+          };
+        });
+        if (clearSearchText) setSearchText('');
+      },
+      openBundleInformationPage: ({
+        bundleListingData,
+        storeSearchText,
+        clearSearchText,
+      }: {|
+        bundleListingData: BundleListingData,
+        storeSearchText: boolean,
+        clearSearchText: boolean,
+      |}) => {
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          const currentPageWithSearchText = {
+            ...currentPage,
+            searchText: storeSearchText ? searchText : '',
+          };
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
+          const previousPages = [
+            ...previousPagesWithoutCurrentPage,
+            currentPageWithSearchText,
+          ];
+          return {
+            ...previousHistory,
+            previousPages: [
+              ...previousPages,
+              {
+                openedAssetShortHeader: null,
+                openedShopCategory: null,
+                openedAssetPack: null,
+                openedPrivateAssetPackListingData: null,
+                openedPrivateGameTemplateListingData: null,
+                openedBundleListingData: bundleListingData,
                 filtersState: noFilter,
                 displayAssets: false,
                 selectedFolders: [],

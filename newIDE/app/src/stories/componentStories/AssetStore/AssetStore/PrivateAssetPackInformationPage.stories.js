@@ -299,6 +299,7 @@ const PrivateAssetPackInformationPageStory = ({
               privateAssetPackListingData={privateAssetPackListingData}
               onAssetPackOpen={() => action('open asset pack')()}
               onGameTemplateOpen={() => action('open game template')()}
+              onBundleOpen={() => action('open bundle')()}
               privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
                 assetPackListingData =>
                   assetPackListingData.id !== privateAssetPackListingData.id

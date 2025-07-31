@@ -31,9 +31,10 @@ import Window from '../../../../Utils/Window';
 import { PurchaseProductButtons } from '../../../../AssetStore/ProductPageHelper';
 import { shouldUseAppStoreProduct } from '../../../../Utils/AppStorePurchases';
 import { Divider } from '@material-ui/core';
-import classes from './CourseSectionHeader.module.css';
+import classes from './CoursePageHeader.module.css';
 import Gold from '../../../../Profile/Subscription/Icons/Gold';
 import Chip from '../../../../UI/Chip';
+import SecureCheckout from '../../../../AssetStore/SecureCheckout/SecureCheckout';
 
 const styles = {
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
@@ -95,7 +96,7 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CourseSectionHeader = ({
+const CoursePageHeader = ({
   course,
   onBuyCourseWithCredits,
   onBuyCourse,
@@ -271,20 +272,30 @@ const CourseSectionHeader = ({
                             </div>
                           </Column>
                         )}
-                        <PurchaseProductButtons
-                          i18n={i18n}
-                          productListingData={courseListingData}
-                          selectedUsageType="default"
-                          onUsageTypeChange={() => {}}
-                          simulateAppStoreProduct={
-                            shouldUseOrSimulateAppStoreProduct
-                          }
-                          isAlreadyReceived={!course.isLocked}
-                          onClickBuy={() => onBuyCourse(course, password, i18n)}
-                          onClickBuyWithCredits={() =>
-                            onWillBuyWithCredits(i18n)
-                          }
-                        />
+                        <ResponsiveLineStackLayout
+                          noMargin
+                          forceMobileLayout={isMediumScreen}
+                        >
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                          <PurchaseProductButtons
+                            i18n={i18n}
+                            productListingData={courseListingData}
+                            selectedUsageType="default"
+                            onUsageTypeChange={() => {}}
+                            simulateAppStoreProduct={
+                              shouldUseOrSimulateAppStoreProduct
+                            }
+                            isAlreadyReceived={!course.isLocked}
+                            onClickBuy={() =>
+                              onBuyCourse(course, password, i18n)
+                            }
+                            onClickBuyWithCredits={() =>
+                              onWillBuyWithCredits(i18n)
+                            }
+                          />
+                        </ResponsiveLineStackLayout>
                       </ResponsiveLineStackLayout>
                     )}
                   </Paper>
@@ -313,4 +324,4 @@ const CourseSectionHeader = ({
   );
 };
 
-export default CourseSectionHeader;
+export default CoursePageHeader;

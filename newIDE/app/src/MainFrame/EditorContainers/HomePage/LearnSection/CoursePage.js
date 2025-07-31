@@ -35,7 +35,7 @@ import {
   AccordionBody,
   AccordionHeader,
 } from '../../../../UI/Accordion';
-import CourseSectionHeader from './CourseSectionHeader';
+import CoursePageHeader from './CoursePageHeader';
 import Window from '../../../../Utils/Window';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { RatingBanner } from './RatingBanner';
@@ -126,7 +126,7 @@ type Props = {|
   |}) => void,
 |};
 
-const CourseSection = ({
+const CoursePage = ({
   course,
   courseChapters,
   onOpenTemplateFromCourseChapter,
@@ -332,7 +332,7 @@ const CourseSection = ({
               }
             >
               <Column noOverflowParent noMargin>
-                <CourseSectionHeader
+                <CoursePageHeader
                   course={course}
                   onBuyCourseWithCredits={onBuyCourseWithCredits}
                   onBuyCourse={onBuyCourse}
@@ -521,4 +521,4 @@ const CourseSection = ({
   );
 };
 
-export default CourseSection;
+export default CoursePage;

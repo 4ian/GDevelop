@@ -9,6 +9,7 @@ import {
   type PrivateGameTemplateListingData,
   type CreditsPackageListingData,
   type CourseListingData,
+  type BundleListingData,
 } from '../Utils/GDevelopServices/Shop';
 import {
   shouldUseAppStoreProduct,
@@ -20,7 +21,6 @@ import Text from '../UI/Text';
 import { Column } from '../UI/Grid';
 import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
-import type { GDevelopTheme } from '../UI/Theme';
 
 const styles = {
   icon: {
@@ -45,7 +45,8 @@ type FormatProps = {|
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | CreditsPackageListingData
-    | CourseListingData,
+    | CourseListingData
+    | BundleListingData,
   i18n: I18nType,
   usageType?: string,
   plainText?: boolean,
@@ -59,10 +60,11 @@ export const renderProductPrice = ({
   plainText,
   showBothPrices,
 }: FormatProps): React.Node => {
-  // Only use the app store product if it's a credits package.
+  // For Credits packages & Bundles, on mobile, only show the app store product price.
   if (
     shouldUseAppStoreProduct() &&
-    productListingData.productType === 'CREDITS_PACKAGE'
+    (productListingData.productType === 'CREDITS_PACKAGE' ||
+      productListingData.productType === 'BUNDLE')
   ) {
     const appStoreProduct = getAppStoreProduct(
       productListingData.appStoreProductId
@@ -70,21 +72,15 @@ export const renderProductPrice = ({
     return appStoreProduct ? appStoreProduct.price : '';
   }
 
-  const creditPrices =
-    productListingData.productType !== 'CREDITS_PACKAGE'
-      ? productListingData.creditPrices || []
-      : [];
+  const creditPrices = productListingData.creditPrices || [];
   const creditPrice = usageType
     ? creditPrices.find(price => price.usageType === usageType)
     : creditPrices.length > 0
     ? creditPrices[0]
     : null;
 
-  // If we're on mobile, only show credits prices for non-credits packages.
-  if (
-    shouldUseAppStoreProduct() &&
-    productListingData.productType !== 'CREDITS_PACKAGE'
-  ) {
+  // If we're on mobile, only show credits prices for other packages.
+  if (shouldUseAppStoreProduct()) {
     if (!creditPrice) return '';
     return plainText ? (
       i18n._(t`${creditPrice.amount} credits`)
@@ -163,23 +159,17 @@ type ProductPriceOrOwnedProps = {|
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | CreditsPackageListingData
-    | CourseListingData,
+    | CourseListingData
+    | BundleListingData,
   i18n: I18nType,
-  gdevelopTheme: GDevelopTheme,
   usageType?: string,
   owned?: boolean,
   showBothPrices?: 'column' | 'line',
 |};
 
-export const getProductPriceOrOwnedLabel = ({
-  i18n,
-  gdevelopTheme,
-  productListingData,
-  usageType,
-  owned,
-  showBothPrices,
-}: ProductPriceOrOwnedProps): React.Node => {
-  return owned ? (
+export const OwnedLabel = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
     <LineStackLayout noMargin alignItems="center">
       <CheckCircle
         style={{
@@ -190,6 +180,18 @@ export const getProductPriceOrOwnedLabel = ({
         <Trans>Owned</Trans>
       </Text>
     </LineStackLayout>
+  );
+};
+
+export const getProductPriceOrOwnedLabel = ({
+  i18n,
+  productListingData,
+  usageType,
+  owned,
+  showBothPrices,
+}: ProductPriceOrOwnedProps): React.Node => {
+  return owned ? (
+    <OwnedLabel />
   ) : (
     renderProductPrice({ i18n, productListingData, usageType, showBothPrices })
   );
@@ -200,7 +202,8 @@ type ProductPriceTagProps = {|
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | CreditsPackageListingData
-    | CourseListingData,
+    | CourseListingData
+    | BundleListingData,
   usageType?: string,
   /**
    * To be used when the component is over an element for which
@@ -216,13 +219,11 @@ const ProductPriceTag = ({
   withOverlay,
   owned,
 }: ProductPriceTagProps) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
       {({ i18n }) => {
         const label = getProductPriceOrOwnedLabel({
           i18n,
-          gdevelopTheme,
           productListingData,
           usageType,
           owned,

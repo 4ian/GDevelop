@@ -470,7 +470,7 @@ export default function SubscriptionDialog({
                   >
                     <Line alignItems="center" noMargin>
                       {getPlanIcon({
-                        subscriptionPlan: userSubscriptionPlanWithPricingSystems,
+                        planId: userSubscriptionPlanWithPricingSystems.id,
                         logoSize: 20,
                       })}
                       <Text size="block-title">

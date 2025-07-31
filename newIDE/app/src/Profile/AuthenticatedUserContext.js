@@ -25,6 +25,7 @@ import {
   type AssetShortHeader,
   type PrivateAssetPack,
   type PrivateGameTemplate,
+  type Bundle,
 } from '../Utils/GDevelopServices/Asset';
 import { type Purchase } from '../Utils/GDevelopServices/Shop';
 
@@ -40,9 +41,11 @@ export type AuthenticatedUser = {|
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  receivedBundles: ?Array<Bundle>,
   gameTemplatePurchases: ?Array<Purchase>,
   assetPackPurchases: ?Array<Purchase>,
   coursePurchases: ?Array<Purchase>,
+  bundlePurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
   notifications: ?Array<Notification>,
   userEarningsBalance: ?UserEarningsBalance,
@@ -76,6 +79,7 @@ export type AuthenticatedUser = {|
   onRefreshGameTemplatePurchases: () => Promise<void>,
   onRefreshAssetPackPurchases: () => Promise<void>,
   onRefreshCoursePurchases: () => Promise<void>,
+  onRefreshBundlePurchases: () => Promise<void>,
   onRefreshEarningsBalance: () => Promise<void>,
   onRefreshNotifications: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
@@ -94,6 +98,7 @@ export const authenticatedUserPropertiesLoadingState = {
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
   receivedGameTemplates: null,
+  receivedBundles: null,
   badges: null,
   notifications: null,
 };
@@ -108,6 +113,7 @@ export const initialAuthenticatedUser = {
   gameTemplatePurchases: null,
   assetPackPurchases: null,
   coursePurchases: null,
+  bundlePurchases: null,
   recommendations: null,
   subscription: null,
   usages: null,
@@ -135,6 +141,7 @@ export const initialAuthenticatedUser = {
   onRefreshGameTemplatePurchases: async () => {},
   onRefreshAssetPackPurchases: async () => {},
   onRefreshCoursePurchases: async () => {},
+  onRefreshBundlePurchases: async () => {},
   onRefreshEarningsBalance: async () => {},
   onRefreshNotifications: async () => {},
   onPurchaseSuccessful: async () => {},
@@ -158,6 +165,7 @@ export const authenticatedUserLoggedOutAttributes = {
   receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
   receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
   receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
+  receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   userEarningsBalance: null,
   usages: null,

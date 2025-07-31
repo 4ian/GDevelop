@@ -1,10 +1,10 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { type HomeTab } from '../HomePageMenu';
 import {
   type CourseListingData,
   type PrivateGameTemplateListingData,
+  type BundleListingData,
 } from '../../../../Utils/GDevelopServices/Shop';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
@@ -13,7 +13,7 @@ import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
-import CourseSection from './CourseSection';
+import CoursePage from './CoursePage';
 import type {
   CourseChapter,
   Course,
@@ -25,9 +25,16 @@ import InAppTutorialsPage from './InAppTutorialsPage';
 import CoursesPage from './CoursesPage';
 import { type LearnCategory } from './Utils';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
+import BundlePage from './BundlePage';
+import RouterContext from '../../../RouterContext';
+import {
+  sendBundleInformationOpened,
+  sendCourseInformationOpened,
+} from '../../../../Utils/Analytics/EventSender';
+import { BundleStoreContext } from '../../../../AssetStore/Bundles/BundleStoreContext';
 
 type Props = {|
-  onTabChange: (tab: HomeTab) => void,
   selectInAppTutorial: (tutorialId: string) => void,
   selectedCategory: LearnCategory,
   onSelectCategory: LearnCategory => void,
@@ -71,10 +78,11 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
+  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
+  receivedCourses: ?Array<Course>,
 |};
 
 const LearnSection = ({
-  onTabChange,
   selectInAppTutorial,
   selectedCategory,
   onSelectCategory,
@@ -97,14 +105,56 @@ const LearnSection = ({
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
+  getSubscriptionPlansWithPricingSystems,
+  receivedCourses,
 }: Props) => {
   const { fetchTutorials } = React.useContext(TutorialContext);
+  const { fetchBundles } = React.useContext(BundleStoreContext);
+  const { navigateToRoute } = React.useContext(RouterContext);
+
+  const [
+    selectedBundleListingData,
+    setSelectedBundleListingData,
+  ] = React.useState<?BundleListingData>(null);
+
+  const onOpenBundle = React.useCallback(
+    (bundleListingData: BundleListingData) => {
+      sendBundleInformationOpened({
+        bundleName: bundleListingData.name,
+        bundleId: bundleListingData.id,
+        source: 'learn',
+      });
+      setSelectedBundleListingData(bundleListingData);
+    },
+    [setSelectedBundleListingData]
+  );
+
+  const onOpenCourse = React.useCallback(
+    (courseId: string | null) => {
+      if (courseId && courses) {
+        const course = courses.find(c => c.id === courseId);
+        if (course && course.isLocked) {
+          // Only send the event if the course is not owned.
+          sendCourseInformationOpened({
+            courseName: course.titleByLocale['en'],
+            courseId: courseId,
+            source: 'learn',
+          });
+        }
+      }
+      onSelectCourse(courseId);
+    },
+    [onSelectCourse, courses]
+  );
 
   React.useEffect(
     () => {
       fetchTutorials();
+      fetchBundles();
     },
-    [fetchTutorials]
+    // Fetch tutorials and bundles only once when the component mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   if (course) {
@@ -121,7 +171,7 @@ const LearnSection = ({
     }
 
     return (
-      <CourseSection
+      <CoursePage
         course={course}
         courseChapters={courseChapters}
         onBack={() => {
@@ -143,14 +193,40 @@ const LearnSection = ({
     );
   }
 
+  if (selectedBundleListingData) {
+    return (
+      <BundlePage
+        bundleListingData={selectedBundleListingData}
+        onBack={() => setSelectedBundleListingData(null)}
+        getSubscriptionPlansWithPricingSystems={
+          getSubscriptionPlansWithPricingSystems
+        }
+        onAssetPackOpen={privateAssetPackListingData => {
+          // Ideally we would open it in the Learn Section,
+          // but asset packs are not supported in the Learn Section yet.
+          navigateToRoute('store', {
+            'asset-pack': `product-${privateAssetPackListingData.id}`,
+          });
+        }}
+        onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
+        onBundleOpen={onOpenBundle}
+        onCourseOpen={courseListingData => {
+          onOpenCourse(courseListingData.id);
+        }}
+        courses={courses}
+        receivedCourses={receivedCourses}
+        getCourseCompletion={getCourseCompletion}
+      />
+    );
+  }
+
   return !selectedCategory ? (
     <MainPage
-      onTabChange={onTabChange}
       onSelectCategory={onSelectCategory}
       selectInAppTutorial={selectInAppTutorial}
       courses={courses}
-      onSelectCourse={onSelectCourse}
-      previewedCourse={previewedCourse}
+      onSelectCourse={onOpenCourse}
+      onSelectBundle={onOpenBundle}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
       onOpenAskAi={onOpenAskAi}
@@ -159,6 +235,9 @@ const LearnSection = ({
         onSelectPrivateGameTemplateListingData
       }
       onSelectExampleShortHeader={onSelectExampleShortHeader}
+      getSubscriptionPlansWithPricingSystems={
+        getSubscriptionPlansWithPricingSystems
+      }
     />
   ) : selectedCategory === 'all-tutorials' ? (
     <TutorialsPage onSelectCategory={onSelectCategory} />
@@ -171,18 +250,22 @@ const LearnSection = ({
     <CoursesPage
       onBack={() => onSelectCategory(null)}
       courses={courses}
-      onSelectCourse={onSelectCourse}
+      onSelectCourse={onOpenCourse}
+      onSelectBundle={onOpenBundle}
       previewedCourse={previewedCourse}
       getCourseChapters={getCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
+      getSubscriptionPlansWithPricingSystems={
+        getSubscriptionPlansWithPricingSystems
+      }
     />
   ) : (
     <TutorialsCategoryPage
       onBack={() => onSelectCategory('all-tutorials')}
       category={selectedCategory}
       onOpenTemplateFromTutorial={onOpenTemplateFromTutorial}
-      onSelectCourse={onSelectCourse}
+      onSelectCourse={onOpenCourse}
     />
   );
 };

@@ -67,6 +67,7 @@ import {
 } from '../../Profile/Subscription/PlanCard';
 import RedemptionCodesDialog from '../../RedemptionCode/RedemptionCodesDialog';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
+import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
 
 const cellSpacing = 10;
 
@@ -551,10 +552,10 @@ const BundleInformationPage = ({
                                 })}
                                 <Text>
                                   <Trans>
-                                    {Math.round(
-                                      includedRedemptionCode.durationInDays / 30
+                                    {formatDurationOfRedemptionCode(
+                                      includedRedemptionCode.durationInDays
                                     )}{' '}
-                                    months of
+                                    of
                                     {getPlanInferredNameFromId(
                                       includedRedemptionCode.givenSubscriptionPlanId
                                     )}

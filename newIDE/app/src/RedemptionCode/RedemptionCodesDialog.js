@@ -25,6 +25,7 @@ import {
   getPlanInferredNameFromId,
 } from '../Profile/Subscription/PlanCard';
 import AlertMessage from '../UI/AlertMessage';
+import { formatDurationOfRedemptionCode } from './Utils';
 
 type Props = {|
   onClose: () => void,
@@ -133,9 +134,7 @@ const RedemptionCodesDialog = ({ onClose }: Props) => {
                   </TableRowColumn>
                   <TableRowColumn>
                     <Text>
-                      <Trans>
-                        {Math.round(code.durationInDays / 30)} months
-                      </Trans>
+                      {formatDurationOfRedemptionCode(code.durationInDays)}
                     </Text>
                   </TableRowColumn>
                   <TableRowColumn>

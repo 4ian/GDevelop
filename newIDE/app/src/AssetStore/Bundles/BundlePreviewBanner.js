@@ -50,6 +50,7 @@ import School from '../../UI/CustomSvgIcons/School';
 import Coin from '../../Credits/Icons/Coin';
 import Sparkle from '../../UI/CustomSvgIcons/Sparkle';
 import { renderEstimatedTotalPriceFormatted } from './Utils';
+import { formatDurationOfRedemptionCode } from '../../RedemptionCode/Utils';
 
 const highlightColor = '#6CF9F7';
 
@@ -228,7 +229,10 @@ const BundlePreviewTile = ({
               })}
               <Text>
                 <Trans>
-                  {Math.round(redemptionCode.durationInDays / 30)} months of
+                  {formatDurationOfRedemptionCode(
+                    redemptionCode.durationInDays
+                  )}{' '}
+                  of
                   {getPlanInferredNameFromId(
                     redemptionCode.givenSubscriptionPlanId
                   )}

@@ -46,6 +46,7 @@ import {
 import FlatButton from '../../../../UI/FlatButton';
 import Coin from '../../../../Credits/Icons/Coin';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
+import { formatDurationOfRedemptionCode } from '../../../../RedemptionCode/Utils';
 
 const styles = {
   title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
@@ -266,10 +267,10 @@ const BundlePageHeader = ({
                               })}
                               <Text>
                                 <Trans>
-                                  {Math.round(
-                                    includedRedemptionCode.durationInDays / 30
+                                  {formatDurationOfRedemptionCode(
+                                    includedRedemptionCode.durationInDays
                                   )}{' '}
-                                  months of
+                                  of
                                   {getPlanInferredNameFromId(
                                     includedRedemptionCode.givenSubscriptionPlanId
                                   )}

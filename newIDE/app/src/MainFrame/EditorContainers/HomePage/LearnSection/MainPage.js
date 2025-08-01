@@ -80,7 +80,6 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
 const MainPage = ({
@@ -95,7 +94,6 @@ const MainPage = ({
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
-  getSubscriptionPlansWithPricingSystems,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
@@ -243,12 +241,7 @@ const MainPage = ({
           </SectionRow>
           {!hidePremiumProducts && (
             <SectionRow>
-              <BundlePreviewBanner
-                onDisplayBundle={onSelectBundle}
-                getSubscriptionPlansWithPricingSystems={
-                  getSubscriptionPlansWithPricingSystems
-                }
-              />
+              <BundlePreviewBanner onDisplayBundle={onSelectBundle} />
             </SectionRow>
           )}
           <SectionRow>

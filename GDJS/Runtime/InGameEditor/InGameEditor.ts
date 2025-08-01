@@ -63,7 +63,7 @@ namespace gdjs {
     Flippable;
 
   const is3D = (object: gdjs.RuntimeObject): object is RuntimeObjectWith3D => {
-    return typeof THREE !== 'undefined' && gdjs.Base3DHandler.is3D(object);
+    return gdjs.Base3DHandler.is3D(object);
   };
 
   type AABB3D = {
@@ -350,11 +350,9 @@ namespace gdjs {
     private _innerArea: AABB3D | null = null;
     private _threeInnerArea: THREE.Object3D | null = null;
     //@ts-ignore
-    private _tempVector2d: THREE.Vector2 =
-      typeof THREE === 'undefined' ? null : new THREE.Vector2();
+    private _tempVector2d: THREE.Vector2 = new THREE.Vector2();
     //@ts-ignore
-    private _raycaster: THREE.Raycaster =
-      typeof THREE === 'undefined' ? null : new THREE.Raycaster();
+    private _raycaster: THREE.Raycaster = new THREE.Raycaster();
 
     private _editorCameras = new Map<string, EditorCamera>();
 
@@ -2292,8 +2290,7 @@ namespace gdjs {
 
   class OrbitCameraControl implements CameraControl {
     //@ts-ignore
-    target: THREE.Vector3 =
-      typeof THREE === 'undefined' ? null : new THREE.Vector3();
+    target: THREE.Vector3 = new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 90;
     distance: float = 800;
@@ -2402,17 +2399,14 @@ namespace gdjs {
 
   class FreeCameraControl implements CameraControl {
     //@ts-ignore
-    position: THREE.Vector3 =
-      typeof THREE === 'undefined' ? null : new THREE.Vector3();
+    position: THREE.Vector3 = new THREE.Vector3();
     rotationAngle: float = 0;
     elevationAngle: float = 30;
     private _isEnabled: boolean = true;
     //@ts-ignore
-    private _euler: THREE.Euler =
-      typeof THREE === 'undefined' ? null : new THREE.Euler(0, 0, 0, 'ZYX');
+    private _euler: THREE.Euler = new THREE.Euler(0, 0, 0, 'ZYX');
     //@ts-ignore
-    private _rotationMatrix: THREE.Matrix4 =
-      typeof THREE === 'undefined' ? null : new THREE.Matrix4();
+    private _rotationMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
     private _runtimeGame: gdjs.RuntimeGame;
     private _lastCursorX: float = 0;

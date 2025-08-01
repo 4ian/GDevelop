@@ -155,7 +155,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 usedExtensionsResult.Has3DObjects(),
+                 /*pixiInThreeRenderers=*/
+                 usedExtensionsResult.Has3DObjects() || options.isInGameEdition,
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/

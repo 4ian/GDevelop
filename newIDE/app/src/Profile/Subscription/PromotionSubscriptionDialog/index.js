@@ -227,11 +227,11 @@ export default function PromotionSubscriptionDialog({
 
                 if (hasJustRedeemedCode) {
                   try {
+                    onOpenPendingDialog(true);
                     setIsRefreshing(true);
                     await authenticatedUser.onRefreshSubscription();
                   } finally {
                     setIsRefreshing(false);
-                    onOpenPendingDialog(true);
                   }
                 }
               }}

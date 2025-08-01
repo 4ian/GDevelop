@@ -184,7 +184,7 @@ export const openEditorTab = (
           key === 'start page'
             ? [editorTab, ...pane.editors]
             : [...pane.editors, editorTab],
-        currentTab: pane.editors.length,
+        currentTab: pane.currentTab,
       },
     },
   };
@@ -192,7 +192,7 @@ export const openEditorTab = (
     newState = changeCurrentTab(
       newState,
       paneIdentifier,
-      newState.panes[paneIdentifier].editors.length
+      pane.editors.length
     );
   }
   return newState;

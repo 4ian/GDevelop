@@ -36,7 +36,6 @@ import {
   type BundleListingData,
 } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import Carousel from '../../../../UI/Carousel';
 import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
 

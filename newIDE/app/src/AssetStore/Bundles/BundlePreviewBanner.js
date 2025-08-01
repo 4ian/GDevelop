@@ -26,7 +26,6 @@ import {
   type BundleListingData,
   type CourseListingData,
 } from '../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
 import {
   getProductsIncludedInBundle,
   getUserProductPurchaseUsageType,

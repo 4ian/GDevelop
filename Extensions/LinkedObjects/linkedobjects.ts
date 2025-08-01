@@ -239,7 +239,7 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
         obj: gdjs.RuntimeObject | null,
-        eventsFunctionContext: EventsFunctionContext | null | undefined 
+        eventsFunctionContext: EventsFunctionContext | null | undefined
       ) {
         if (obj === null) {
           return false;

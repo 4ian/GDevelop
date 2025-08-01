@@ -821,8 +821,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         }
         if (!codeGenerator.HasProjectAndLayout()) {
           functionParameters += ", eventsFunctionContext";
-          callArguments += ", typeof eventsFunctionContext !== \'undefined\' ? "
-                           "eventsFunctionContext : undefined";
+          callArguments += ", eventsFunctionContext";
         }
 
         // Generate the function code

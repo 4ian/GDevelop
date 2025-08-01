@@ -21,6 +21,9 @@ AdvancedExtension::AdvancedExtension() {
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -28,15 +31,16 @@ AdvancedExtension::AdvancedExtension() {
                 "number",
                 instruction.GetParameter(0).GetPlainString());
 
-        return "if (typeof eventsFunctionContext !== 'undefined') { "
-               "eventsFunctionContext.returnValue = " +
-               expressionCode + "; }";
+        return "eventsFunctionContext.returnValue = " + expressionCode + ";";
       });
 
   GetAllActions()["SetReturnString"]
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -44,29 +48,31 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        return "if (typeof eventsFunctionContext !== 'undefined') { "
-               "eventsFunctionContext.returnValue = " +
-               expressionCode + "; }";
+        return "eventsFunctionContext.returnValue = " + expressionCode + ";";
       });
 
   GetAllActions()["SetReturnBoolean"]
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String booleanCode =
             (parameter == "True" || parameter == "Vrai") ? "true" : "false";
 
-        return "if (typeof eventsFunctionContext !== 'undefined') { "
-               "eventsFunctionContext.returnValue = " +
-               booleanCode + "; }";
+        return "eventsFunctionContext.returnValue = " + booleanCode + ";";
       });
 
   GetAllActions()["CopyArgumentToVariable"]
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String variable =
@@ -74,17 +80,17 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "scenevar", instruction.GetParameter(1),
                 "");
 
-        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
-               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
-               parameter + "), " + variable +
-               ", false);\n"
-               "}\n";
+        return "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable + ", false);\n";
       });
 
   GetAllActions()["CopyArgumentToVariable2"]
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String variable =
@@ -92,17 +98,17 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "variable", instruction.GetParameter(1),
                 "");
 
-        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
-               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
-               parameter + "), " + variable +
-               ", false);\n"
-               "}\n";
+        return "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable + ", false);\n";
       });
 
   GetAllActions()["CopyVariableToArgument"]
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String variable =
@@ -110,17 +116,18 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "scenevar", instruction.GetParameter(1),
                 "");
 
-        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
-               "gdjs.Variable.copy(" +
-               variable + ", eventsFunctionContext.getArgument(" + parameter +
-               "), false);\n"
-               "}\n";
+        return "gdjs.Variable.copy(" + variable +
+               ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n";
       });
 
   GetAllActions()["CopyVariableToArgument2"]
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("");
+        }
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String variable =
@@ -128,17 +135,18 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "variable", instruction.GetParameter(1),
                 "");
 
-        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
-               "gdjs.Variable.copy(" +
-               variable + ", eventsFunctionContext.getArgument(" + parameter +
-               "), false);\n"
-               "}\n";
+        return "gdjs.Variable.copy(" + variable +
+               ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n";
       });
 
   GetAllConditions()["GetArgumentAsBoolean"]
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("false");
+        }
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -146,10 +154,8 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 instruction.GetParameter(0).GetPlainString());
         gd::String valueCode =
-            gd::String(instruction.IsInverted() ? "!" : "") +
-            "(typeof eventsFunctionContext !== 'undefined' ? "
-            "!!eventsFunctionContext.getArgument(" +
-            parameterNameCode + ") : false)";
+            gd::String(instruction.IsInverted() ? "!" : "!!") +
+            "eventsFunctionContext.getArgument(" + parameterNameCode + ")";
         gd::String outputCode =
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context) +
             " = " + valueCode + ";\n";
@@ -161,6 +167,9 @@ AdvancedExtension::AdvancedExtension() {
       .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("0");
+        }
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -168,9 +177,8 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
-        return "(typeof eventsFunctionContext !== 'undefined' ? "
-               "Number(eventsFunctionContext.getArgument(" +
-               parameterNameCode + ")) || 0 : 0)";
+        return "(Number(eventsFunctionContext.getArgument(" + parameterNameCode +
+               ")) || 0)";
       });
 
   GetAllStrExpressions()["GetArgumentAsString"]
@@ -178,6 +186,9 @@ AdvancedExtension::AdvancedExtension() {
       .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
+        if (codeGenerator.HasProjectAndLayout()) {
+            return gd::String("\"\"");
+        }
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -185,9 +196,8 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
-        return "(typeof eventsFunctionContext !== 'undefined' ? \"\" + "
-               "eventsFunctionContext.getArgument(" +
-               parameterNameCode + ") : \"\")";
+        return "\"\" + eventsFunctionContext.getArgument(" + parameterNameCode +
+               ")";
       });
 
   GetAllConditions()["CompareArgumentAsNumber"]
@@ -210,12 +220,13 @@ AdvancedExtension::AdvancedExtension() {
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
                codeGenerator.GenerateRelationalOperation(
                    operatorString,
-                   "((typeof eventsFunctionContext !== 'undefined' ? "
-                   "Number(eventsFunctionContext.getArgument(" +
-                       parameterNameCode + ")) || 0 : 0)",
+                   codeGenerator.HasProjectAndLayout()
+                       ? "0"
+                       : "(Number(eventsFunctionContext.getArgument(" +
+                             parameterNameCode + ")) || 0)",
                    operandCode) +
                ");\n";
       });
@@ -240,12 +251,13 @@ AdvancedExtension::AdvancedExtension() {
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
                codeGenerator.GenerateRelationalOperation(
                    operatorString,
-                   "((typeof eventsFunctionContext !== 'undefined' ? "
-                   "\"\" + eventsFunctionContext.getArgument(" +
-                       parameterNameCode + ") : \"\")",
+                   codeGenerator.HasProjectAndLayout()
+                       ? "\"\""
+                       : "(\"\" + eventsFunctionContext.getArgument(" +
+                             parameterNameCode + "))",
                    operandCode) +
                ");\n";
       });

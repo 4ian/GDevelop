@@ -2368,14 +2368,7 @@ namespace gdjs {
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
-      const layerRenderer = layer.getRenderer();
       const layerName = layer.getName();
-      const threeCamera = layerRenderer.getThreeCamera();
-
-      if (!threeCamera) {
-        return;
-      }
-
       layer.setCameraX(this.getCameraX());
       layer.setCameraY(this.getCameraY());
       setCameraZ(currentScene, this.getCameraZ(), layerName, 0);
@@ -2537,14 +2530,7 @@ namespace gdjs {
     }
 
     updateCamera(currentScene: RuntimeScene, layer: RuntimeLayer): void {
-      const layerRenderer = layer.getRenderer();
       const layerName = layer.getName();
-      const threeCamera = layerRenderer.getThreeCamera();
-
-      if (!threeCamera) {
-        return;
-      }
-
       layer.setCameraX(this.position.x);
       layer.setCameraY(this.position.y);
       setCameraZ(currentScene, this.position.z, layerName, 0);

@@ -105,12 +105,11 @@ export default function RedeemCodeDialog({
               disabled={isLoading}
               onClick={() => onClose(false)}
             />,
-            <LeftLoader isLoading={isLoading}>
+            <LeftLoader isLoading={isLoading} key="redeem">
               <DialogPrimaryButton
                 label={<Trans>Redeem</Trans>}
                 disabled={!canRedeem}
                 primary
-                key="redeem"
                 onClick={onRedeemCode}
               />
             </LeftLoader>,

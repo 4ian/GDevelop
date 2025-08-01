@@ -25,15 +25,7 @@ import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { mergeArraysPerGroup } from '../Utils/Array';
-import {
-  AssetCardTile,
-  AssetFolderTile,
-  PrivateAssetPackTile,
-  PrivateGameTemplateTile,
-  PublicAssetPackTile,
-  BundleTile,
-} from './ShopTiles';
+import { AssetCardTile, AssetFolderTile } from './ShopTiles';
 import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { Column, LargeSpacer, Line } from '../UI/Grid';
@@ -55,6 +47,13 @@ import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
 import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { BundleStoreContext } from './Bundles/BundleStoreContext';
+import {
+  getBundleTiles,
+  getGameTemplateTiles,
+  getAssetPackTiles,
+  getPublicAssetPackTiles,
+} from './AssetStoreUtils';
+import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWidget';
 
 const ASSETS_DISPLAY_LIMIT = 60;
 
@@ -142,9 +141,13 @@ export const getAssetShortHeadersToDisplay = (
 };
 
 const cellSpacing = 10;
+const MAX_COLUMNS = getShopItemsColumns('xlarge', true);
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const styles = {
   grid: {
-    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: MAX_SECTION_WIDTH,
+    width: `calc(100% + ${cellSpacing}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
@@ -296,10 +299,13 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     const {
       error: gameTemplateStoreError,
       fetchGameTemplates,
+      privateGameTemplateListingDatas: allPrivateGameTemplateListingDatas,
     } = React.useContext(PrivateGameTemplateStoreContext);
-    const { error: bundleStoreError, fetchBundles } = React.useContext(
-      BundleStoreContext
-    );
+    const {
+      error: bundleStoreError,
+      fetchBundles,
+      bundleListingDatas: allBundleListingDatas,
+    } = React.useContext(BundleStoreContext);
     const {
       receivedAssetPacks,
       receivedGameTemplates,
@@ -511,23 +517,13 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       ]
     );
 
-    const publicPacksTiles: Array<React.Node> = React.useMemo(
-      () => {
-        if (
-          !publicAssetPacks ||
-          !onPublicAssetPackSelection ||
-          // Don't show public packs if filtering on assets.
-          hasAssetFiltersApplied
-        )
-          return [];
-        return publicAssetPacks.map((assetPack, index) => (
-          <PublicAssetPackTile
-            assetPack={assetPack}
-            onSelect={() => onPublicAssetPackSelection(assetPack)}
-            key={`${assetPack.tag}-${index}`}
-          />
-        ));
-      },
+    const publicPackTiles: Array<React.Node> = React.useMemo(
+      () =>
+        getPublicAssetPackTiles({
+          publicAssetPacks,
+          onPublicAssetPackSelection,
+          hasAssetFiltersApplied,
+        }),
       [publicAssetPacks, onPublicAssetPackSelection, hasAssetFiltersApplied]
     );
 
@@ -535,135 +531,38 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       allAssetPackStandAloneTiles,
       allAssetPackBundleTiles,
     } = React.useMemo(
-      () => {
-        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateAssetPackBundleTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
-
-        if (
-          !privateAssetPackListingDatas ||
-          !receivedAssetPacks ||
-          // Don't show private packs if filtering on assets.
-          hasAssetFiltersApplied
-        ) {
-          return {
-            allAssetPackStandAloneTiles: [],
-            allAssetPackBundleTiles: [],
-          };
-        }
-
-        !!onPrivateAssetPackSelection &&
-          privateAssetPackListingDatas.forEach(assetPackListingData => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(assetPackListingData);
-                }}
-                owned={isPackOwned}
-                key={assetPackListingData.id}
-              />
-            );
-            if (
-              assetPackListingData.includedListableProductIds &&
-              !!assetPackListingData.includedListableProductIds.length
-            ) {
-              if (isPackOwned) {
-                privateOwnedAssetPackBundleTiles.push(tile);
-              } else {
-                privateAssetPackBundleTiles.push(tile);
-              }
-            } else {
-              if (isPackOwned) {
-                privateOwnedAssetPackStandAloneTiles.push(tile);
-              } else {
-                privateAssetPackStandAloneTiles.push(tile);
-              }
-            }
-          });
-
-        const allAssetPackBundleTiles = [
-          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-          ...privateAssetPackBundleTiles,
-        ];
-
-        const allAssetPackStandAloneTiles = [
-          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-          ...mergeArraysPerGroup(
-            privateAssetPackStandAloneTiles,
-            publicPacksTiles,
-            2,
-            1
-          ),
-        ];
-
-        return { allAssetPackStandAloneTiles, allAssetPackBundleTiles };
-      },
+      () =>
+        getAssetPackTiles({
+          allPrivateAssetPackListingDatas,
+          displayedPrivateAssetPackListingDatas: privateAssetPackListingDatas,
+          onPrivateAssetPackSelection,
+          publicAssetPackTiles: publicPackTiles,
+          receivedAssetPacks,
+          hasAssetFiltersApplied,
+        }),
       [
+        allPrivateAssetPackListingDatas,
         privateAssetPackListingDatas,
         onPrivateAssetPackSelection,
-        publicPacksTiles,
+        publicPackTiles,
         receivedAssetPacks,
         hasAssetFiltersApplied,
       ]
     );
 
     const gameTemplateTiles = React.useMemo(
-      () => {
-        if (
-          !privateGameTemplateListingDatas ||
-          !onPrivateGameTemplateSelection ||
-          // Don't show private game templates if filtering on assets.
-          hasAssetFiltersApplied ||
-          // Don't show private game templates if filtering on asset packs.
-          hasAssetPackFiltersApplied ||
-          onlyShowAssets
-        )
-          return [];
-
-        const notOwnedGameTemplateTiles: Array<React.Node> = [];
-        const ownedGameTemplateTiles: Array<React.Node> = [];
-
-        privateGameTemplateListingDatas.forEach(
-          privateGameTemplateListingData => {
-            const isGameTemplateOwned =
-              !!receivedGameTemplates &&
-              !!receivedGameTemplates.find(
-                pack => pack.id === privateGameTemplateListingData.id
-              );
-            const tile = (
-              <PrivateGameTemplateTile
-                privateGameTemplateListingData={privateGameTemplateListingData}
-                onSelect={() => {
-                  onPrivateGameTemplateSelection(
-                    privateGameTemplateListingData
-                  );
-                }}
-                owned={isGameTemplateOwned}
-                key={privateGameTemplateListingData.id}
-              />
-            );
-
-            if (isGameTemplateOwned) {
-              ownedGameTemplateTiles.push(tile);
-            } else {
-              notOwnedGameTemplateTiles.push(tile);
-            }
-          }
-        );
-
-        return [
-          ...ownedGameTemplateTiles, // Display owned game templates first.
-          ...notOwnedGameTemplateTiles,
-        ];
-      },
+      () =>
+        getGameTemplateTiles({
+          allPrivateGameTemplateListingDatas,
+          displayedPrivateGameTemplateListingDatas: privateGameTemplateListingDatas,
+          onPrivateGameTemplateSelection,
+          receivedGameTemplates,
+          hasAssetFiltersApplied,
+          hasAssetPackFiltersApplied,
+          onlyShowAssets,
+        }),
       [
+        allPrivateGameTemplateListingDatas,
         privateGameTemplateListingDatas,
         onPrivateGameTemplateSelection,
         receivedGameTemplates,
@@ -674,46 +573,16 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     );
 
     const bundleTiles = React.useMemo(
-      () => {
-        if (
-          !bundleListingDatas ||
-          !onBundleSelection ||
-          // Don't show bundles if filtering on assets.
-          hasAssetFiltersApplied
-        )
-          return [];
-
-        const notOwnedBundleTiles: Array<React.Node> = [];
-        const ownedBundleTiles: Array<React.Node> = [];
-
-        bundleListingDatas.forEach(bundleListingData => {
-          const isBundleOwned =
-            !!receivedBundles &&
-            !!receivedBundles.find(pack => pack.id === bundleListingData.id);
-          const tile = (
-            <BundleTile
-              bundleListingData={bundleListingData}
-              onSelect={() => {
-                onBundleSelection(bundleListingData);
-              }}
-              owned={isBundleOwned}
-              key={bundleListingData.id}
-            />
-          );
-
-          if (isBundleOwned) {
-            ownedBundleTiles.push(tile);
-          } else {
-            notOwnedBundleTiles.push(tile);
-          }
-        });
-
-        return [
-          ...ownedBundleTiles, // Display owned bundles first.
-          ...notOwnedBundleTiles,
-        ];
-      },
+      () =>
+        getBundleTiles({
+          allBundleListingDatas: allBundleListingDatas,
+          displayedBundleListingDatas: bundleListingDatas,
+          onBundleSelection,
+          receivedBundles,
+          hasAssetFiltersApplied,
+        }),
       [
+        allBundleListingDatas,
         bundleListingDatas,
         onBundleSelection,
         receivedBundles,

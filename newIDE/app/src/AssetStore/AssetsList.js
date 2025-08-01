@@ -14,6 +14,9 @@ import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
   type BundleListingData,
+  getArchivedBundleListingData,
+  getArchivedPrivateGameTemplateListingData,
+  getArchivedPrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import GridList from '@material-ui/core/GridList';
@@ -588,13 +591,56 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             }
           });
 
+        const archivedOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+        const archivedOwnedAssetPackBundleTiles: Array<React.Node> = [];
+        // Some asset pack products can be archived, meaning the listing data
+        // is not available anymore, but the user still owns the asset pack.
+        // We look at the remaining receivedAssetPacks to display them.
+        !!onPrivateAssetPackSelection &&
+          (receivedAssetPacks || [])
+            .filter(
+              assetPack =>
+                !privateAssetPackListingDatas.find(
+                  privateAssetPackListingData =>
+                    privateAssetPackListingData.id === assetPack.id
+                )
+            )
+            .forEach(assetPack => {
+              const archivedAssetPackListingData = getArchivedPrivateAssetPackListingData(
+                {
+                  assetPack,
+                }
+              );
+              const tile = (
+                <PrivateAssetPackTile
+                  assetPackListingData={archivedAssetPackListingData}
+                  onSelect={() => {
+                    onPrivateAssetPackSelection(archivedAssetPackListingData);
+                  }}
+                  owned={true}
+                  key={assetPack.id}
+                />
+              );
+
+              if (
+                archivedAssetPackListingData.includedListableProductIds &&
+                !!archivedAssetPackListingData.includedListableProductIds.length
+              ) {
+                archivedOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                archivedOwnedAssetPackStandAloneTiles.push(tile);
+              }
+            });
+
         const allAssetPackBundleTiles = [
           ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+          ...archivedOwnedAssetPackBundleTiles,
           ...privateAssetPackBundleTiles,
         ];
 
         const allAssetPackStandAloneTiles = [
           ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+          ...archivedOwnedAssetPackStandAloneTiles,
           ...mergeArraysPerGroup(
             privateAssetPackStandAloneTiles,
             publicPacksTiles,
@@ -658,8 +704,40 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           }
         );
 
+        // Some game template products can be archived, meaning the listing data
+        // is not available anymore, but the user still owns the game template.
+        // We look at the remaining receivedGameTemplates to display them.
+        const archivedOwnedGameTemplateTiles = (receivedGameTemplates || [])
+          .filter(
+            gameTemplate =>
+              !privateGameTemplateListingDatas.find(
+                privateGameTemplateListingData =>
+                  privateGameTemplateListingData.id === gameTemplate.id
+              )
+          )
+          .map(gameTemplate => {
+            const archivedGameTemplateListingData = getArchivedPrivateGameTemplateListingData(
+              {
+                gameTemplate,
+              }
+            );
+            return (
+              <PrivateGameTemplateTile
+                privateGameTemplateListingData={archivedGameTemplateListingData}
+                onSelect={() => {
+                  onPrivateGameTemplateSelection(
+                    archivedGameTemplateListingData
+                  );
+                }}
+                owned={true}
+                key={gameTemplate.id}
+              />
+            );
+          });
+
         return [
           ...ownedGameTemplateTiles, // Display owned game templates first.
+          ...archivedOwnedGameTemplateTiles,
           ...notOwnedGameTemplateTiles,
         ];
       },
@@ -708,8 +786,32 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           }
         });
 
+        const archivedOwnedBundleTiles = (receivedBundles || [])
+          .filter(
+            bundle =>
+              !bundleListingDatas.find(
+                bundleListingData => bundleListingData.id === bundle.id
+              )
+          )
+          .map(bundle => {
+            const archivedBundleListingData = getArchivedBundleListingData({
+              bundle,
+            });
+            return (
+              <BundleTile
+                bundleListingData={archivedBundleListingData}
+                onSelect={() => {
+                  onBundleSelection(archivedBundleListingData);
+                }}
+                owned={true}
+                key={bundle.id}
+              />
+            );
+          });
+
         return [
           ...ownedBundleTiles, // Display owned bundles first.
+          ...archivedOwnedBundleTiles,
           ...notOwnedBundleTiles,
         ];
       },

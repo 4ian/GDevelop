@@ -211,6 +211,18 @@ const BundleInformationPage = ({
     [bundlePurchases, bundleListingData, bundleListingDatas, receivedBundles]
   );
   const isAlreadyReceived = !!userBundlePurchaseUsageType;
+  const isOwningAnotherVariant = React.useMemo(
+    () => {
+      if (!bundle || isAlreadyReceived || !receivedBundles) return false;
+
+      // Another bundle older version of that bundle can be owned.
+      // We look at the tag to determine if the bundle is the same.
+      return !!receivedBundles.find(
+        receivedBundle => receivedBundle.tag === bundle.tag
+      );
+    },
+    [bundle, isAlreadyReceived, receivedBundles]
+  );
 
   const additionalProductThumbnailsIncludedInBundle: string[] = React.useMemo(
     () => {
@@ -357,7 +369,7 @@ const BundleInformationPage = ({
 
   const onClickBuy = React.useCallback(
     async () => {
-      if (!bundle) return;
+      if (!bundle || isOwningAnotherVariant) return;
       if (isAlreadyReceived) {
         onBundleOpen(bundleListingData);
         return;
@@ -381,7 +393,13 @@ const BundleInformationPage = ({
         console.warn('Unable to send event', e);
       }
     },
-    [bundle, bundleListingData, isAlreadyReceived, onBundleOpen]
+    [
+      bundle,
+      bundleListingData,
+      isAlreadyReceived,
+      isOwningAnotherVariant,
+      onBundleOpen,
+    ]
   );
 
   const mediaItems = React.useMemo(
@@ -506,7 +524,14 @@ const BundleInformationPage = ({
                         </Text>
                       </LineStackLayout>
                       <Spacer />
-                      {!isAlreadyReceived ? (
+                      {isOwningAnotherVariant ? (
+                        <AlertMessage kind="warning">
+                          <Trans>
+                            You own an older version of this bundle. Browse the
+                            store to access it!
+                          </Trans>
+                        </AlertMessage>
+                      ) : !isAlreadyReceived ? (
                         <>
                           {!shouldUseOrSimulateAppStoreProduct && (
                             <SecureCheckout />

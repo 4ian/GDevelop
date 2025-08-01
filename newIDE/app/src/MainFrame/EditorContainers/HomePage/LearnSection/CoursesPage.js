@@ -8,7 +8,6 @@ import {
   type CourseChapter,
 } from '../../../../Utils/GDevelopServices/Asset';
 import type { BundleListingData } from '../../../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import CoursePreviewBanner from '../../../../Course/CoursePreviewBanner';
 import type { CourseCompletion, CourseChapterCompletion } from '../UseCourses';
 import { Line } from '../../../../UI/Grid';
@@ -46,7 +45,6 @@ type Props = {|
     courseId: string,
     chapterId: string
   ) => CourseChapterCompletion | null,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
 const CoursesPage = ({
@@ -58,7 +56,6 @@ const CoursesPage = ({
   getCourseChapters,
   getCourseChapterCompletion,
   getCourseCompletion,
-  getSubscriptionPlansWithPricingSystems,
 }: Props) => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
@@ -132,12 +129,7 @@ const CoursesPage = ({
           </SectionRow>
           {!hidePremiumProducts && (
             <SectionRow>
-              <BundlePreviewBanner
-                onDisplayBundle={onSelectBundle}
-                getSubscriptionPlansWithPricingSystems={
-                  getSubscriptionPlansWithPricingSystems
-                }
-              />
+              <BundlePreviewBanner onDisplayBundle={onSelectBundle} />
             </SectionRow>
           )}
           {courses && listedCourses && courses.length > numberOfItemsOnOneRow && (

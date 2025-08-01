@@ -149,7 +149,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    updateFromObjectData(
+    override updateFromObjectData(
       oldObjectData: TextObjectData,
       newObjectData: TextObjectData
     ): boolean {
@@ -214,7 +214,7 @@ namespace gdjs {
       return true;
     }
 
-    getNetworkSyncData(): TextObjectNetworkSyncData {
+    override getNetworkSyncData(): TextObjectNetworkSyncData {
       return {
         ...super.getNetworkSyncData(),
         str: this._str,
@@ -242,7 +242,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: TextObjectNetworkSyncData
     ): void {
       super.updateFromNetworkSyncData(networkSyncData);
@@ -317,23 +317,22 @@ namespace gdjs {
       }
     }
 
-    getRendererObject() {
+    override getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    override updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 
-    onDestroyed(): void {
+    override onDestroyed(): void {
       super.onDestroyed();
       this._renderer.destroy();
     }
 
-    /**
-     * Initialize the extra parameters that could be set for an instance.
-     */
-    extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
         this.setWrapping(true);
@@ -353,27 +352,17 @@ namespace gdjs {
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set object position on X axis.
-     */
-    setX(x: float): void {
+    override setX(x: float): void {
       super.setX(x);
       this._updateTextPosition();
     }
 
-    /**
-     * Set object position on Y axis.
-     */
-    setY(y: float): void {
+    override setY(y: float): void {
       super.setY(y);
       this._updateTextPosition();
     }
 
-    /**
-     * Set the angle of the object.
-     * @param angle The new angle of the object
-     */
-    setAngle(angle: float): void {
+    override setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
     }
@@ -499,14 +488,14 @@ namespace gdjs {
     /**
      * Get width of the text.
      */
-    getWidth(): float {
+    override getWidth(): float {
       return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     /**
      * Get height of the text.
      */
-    getHeight(): float {
+    override getHeight(): float {
       return this._renderer.getHeight();
     }
 
@@ -685,11 +674,11 @@ namespace gdjs {
       }
     }
 
-    setWidth(width: float): void {
+    override setWidth(width: float): void {
       this.setWrappingWidth(width);
     }
 
-    getDrawableY(): float {
+    override getDrawableY(): float {
       return (
         this.getY() -
         (this._verticalTextAlignment === 'center'

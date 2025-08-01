@@ -36,7 +36,6 @@ import {
   type BundleListingData,
 } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import Carousel from '../../../../UI/Carousel';
 import BundlePreviewBanner from '../../../../AssetStore/Bundles/BundlePreviewBanner';
 
@@ -80,7 +79,6 @@ type Props = {|
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
 const MainPage = ({
@@ -95,7 +93,6 @@ const MainPage = ({
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
-  getSubscriptionPlansWithPricingSystems,
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
@@ -243,12 +240,7 @@ const MainPage = ({
           </SectionRow>
           {!hidePremiumProducts && (
             <SectionRow>
-              <BundlePreviewBanner
-                onDisplayBundle={onSelectBundle}
-                getSubscriptionPlansWithPricingSystems={
-                  getSubscriptionPlansWithPricingSystems
-                }
-              />
+              <BundlePreviewBanner onDisplayBundle={onSelectBundle} />
             </SectionRow>
           )}
           <SectionRow>

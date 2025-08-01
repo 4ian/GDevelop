@@ -26,7 +26,6 @@ import {
   type BundleListingData,
   type CourseListingData,
 } from '../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
 import {
   getProductsIncludedInBundle,
   getUserProductPurchaseUsageType,
@@ -255,13 +254,9 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 
 type Props = {|
   onDisplayBundle: (bundleListingData: BundleListingData) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
-const BundlePreviewBanner = ({
-  onDisplayBundle,
-  getSubscriptionPlansWithPricingSystems,
-}: Props) => {
+const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -339,8 +334,6 @@ const BundlePreviewBanner = ({
     ]
   );
 
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
-
   const redemptionCodesIncludedInBundle = React.useMemo(
     () =>
       bundleListingData
@@ -387,7 +380,7 @@ const BundlePreviewBanner = ({
           // $FlowFixMe
           coursesIncludedInBundle[index];
         if (!courseListingData) {
-          return <div style={{ flex: 1 }} />;
+          return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;
         }
 
         return (
@@ -496,7 +489,6 @@ const BundlePreviewBanner = ({
                             bundleListingData,
                             productListingDatasIncludedInBundle,
                             redemptionCodesIncludedInBundle,
-                            subscriptionPlansWithPricingSystems,
                           })}
                         </span>
                       </Text>

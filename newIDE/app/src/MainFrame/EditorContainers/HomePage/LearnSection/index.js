@@ -235,9 +235,6 @@ const LearnSection = ({
         onSelectPrivateGameTemplateListingData
       }
       onSelectExampleShortHeader={onSelectExampleShortHeader}
-      getSubscriptionPlansWithPricingSystems={
-        getSubscriptionPlansWithPricingSystems
-      }
     />
   ) : selectedCategory === 'all-tutorials' ? (
     <TutorialsPage onSelectCategory={onSelectCategory} />
@@ -256,9 +253,6 @@ const LearnSection = ({
       getCourseChapters={getCourseChapters}
       getCourseCompletion={getCourseCompletion}
       getCourseChapterCompletion={getCourseChapterCompletion}
-      getSubscriptionPlansWithPricingSystems={
-        getSubscriptionPlansWithPricingSystems
-      }
     />
   ) : (
     <TutorialsCategoryPage

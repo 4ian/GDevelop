@@ -1228,14 +1228,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   else if (metadata.GetType() == "objectsContext") {
     argOutput =
-        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
-        ": runtimeScene)";
+        HasProjectAndLayout() ? "runtimeScene" : "eventsFunctionContext";
   }
   // Code only parameter type
   else if (metadata.GetType() == "eventsFunctionContext") {
-    argOutput =
-        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
-        ": undefined)";
+    argOutput = HasProjectAndLayout() ? "null" : "eventsFunctionContext";
   } else
     return gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,

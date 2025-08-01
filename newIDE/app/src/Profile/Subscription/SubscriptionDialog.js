@@ -878,11 +878,11 @@ export default function SubscriptionDialog({
 
                 if (hasJustRedeemedCode) {
                   try {
+                    onOpenPendingDialog(true);
                     setIsChangingSubscription(true);
                     await authenticatedUser.onRefreshSubscription();
                   } finally {
                     setIsChangingSubscription(false);
-                    onOpenPendingDialog(true);
                   }
                 }
               }}

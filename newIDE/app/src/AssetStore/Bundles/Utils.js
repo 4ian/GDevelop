@@ -8,14 +8,12 @@ import {
   type CreditsPackageListingData,
   type IncludedRedemptionCode,
 } from '../../Utils/GDevelopServices/Shop';
-import { type SubscriptionPlanWithPricingSystems } from '../../Utils/GDevelopServices/Usage';
 
 export const renderEstimatedTotalPriceFormatted = ({
   i18n,
   bundleListingData,
   productListingDatasIncludedInBundle,
   redemptionCodesIncludedInBundle,
-  subscriptionPlansWithPricingSystems,
 }: {
   i18n: I18nType,
   bundleListingData: ?BundleListingData,
@@ -27,14 +25,12 @@ export const renderEstimatedTotalPriceFormatted = ({
     | CreditsPackageListingData
   >,
   redemptionCodesIncludedInBundle: ?Array<IncludedRedemptionCode>,
-  subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>,
 }): ?string => {
   let totalPrice = 0;
   if (
     !bundleListingData ||
     !productListingDatasIncludedInBundle ||
-    !redemptionCodesIncludedInBundle ||
-    !subscriptionPlansWithPricingSystems
+    !redemptionCodesIncludedInBundle
   )
     return null;
 
@@ -106,19 +102,33 @@ export const renderEstimatedTotalPriceFormatted = ({
     for (const redemptionCode of redemptionCodesIncludedInBundle) {
       const planId = redemptionCode.givenSubscriptionPlanId;
       if (planId) {
-        const subscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
-          plan => plan.id === planId
-        );
-        if (subscriptionPlanWithPricingSystems) {
-          const monthlyPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
-            pricingSystem => pricingSystem.period === 'month'
+        let estimatedAmountInCents = null;
+        if (redemptionCode.estimatedPrices) {
+          const estimatedPrice = redemptionCode.estimatedPrices.find(
+            price => price.currency === currencyCode
           );
-          if (monthlyPricingSystem) {
-            totalPrice +=
-              monthlyPricingSystem.amountInCents *
-              Math.round(redemptionCode.durationInDays / 30);
+          if (estimatedPrice) {
+            estimatedAmountInCents = estimatedPrice.value;
           }
         }
+
+        // If no estimated price is provided, guess a mostly correct value
+        // for backward compatibility.
+        if (estimatedAmountInCents === null) {
+          const monthlyEstimatedAmountInCents =
+            planId === 'gdevelop_silver'
+              ? 599
+              : planId === 'gdevelop_gold'
+              ? 1099
+              : planId === 'gdevelop_startup'
+              ? 3499
+              : 0;
+          estimatedAmountInCents =
+            monthlyEstimatedAmountInCents *
+            Math.max(1, Math.round(redemptionCode.durationInDays / 30));
+        }
+
+        totalPrice += estimatedAmountInCents || 0;
       }
     }
   }

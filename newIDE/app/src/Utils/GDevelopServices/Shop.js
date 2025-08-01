@@ -48,6 +48,10 @@ export type IncludedListableProduct = {|
 export type IncludedRedemptionCode = {|
   givenSubscriptionPlanId: string,
   durationInDays: number,
+  estimatedPrices?: Array<{
+    value: number,
+    currency: 'USD' | 'EUR',
+  }>,
 |};
 
 export type ProductListingData = {|

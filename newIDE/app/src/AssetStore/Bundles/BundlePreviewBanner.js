@@ -255,13 +255,9 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
 
 type Props = {|
   onDisplayBundle: (bundleListingData: BundleListingData) => void,
-  getSubscriptionPlansWithPricingSystems: () => Array<SubscriptionPlanWithPricingSystems> | null,
 |};
 
-const BundlePreviewBanner = ({
-  onDisplayBundle,
-  getSubscriptionPlansWithPricingSystems,
-}: Props) => {
+const BundlePreviewBanner = ({ onDisplayBundle }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -338,8 +334,6 @@ const BundlePreviewBanner = ({
       creditsPackageListingDatas,
     ]
   );
-
-  const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
 
   const redemptionCodesIncludedInBundle = React.useMemo(
     () =>
@@ -496,7 +490,6 @@ const BundlePreviewBanner = ({
                             bundleListingData,
                             productListingDatasIncludedInBundle,
                             redemptionCodesIncludedInBundle,
-                            subscriptionPlansWithPricingSystems,
                           })}
                         </span>
                       </Text>

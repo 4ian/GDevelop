@@ -52,6 +52,20 @@ namespace gdjs {
         return runtimeScene.getScene().getTimeManager().setTimeScale(timeScale);
       };
 
+      export const setMaximumFPS = function(
+        runtimeScene: gdjs.RuntimeScene,
+        fps: float
+      ) {
+        runtimeScene.getGame()._maxFPS = fps;
+      };
+
+      export const setMinimumFPS = function(
+        runtimeScene: gdjs.RuntimeScene,
+        fps: float
+      ) {
+        runtimeScene.getGame()._minFPS = fps;
+      };
+
       export const getTimeScale = function (runtimeScene: gdjs.RuntimeScene) {
         return runtimeScene.getScene().getTimeManager().getTimeScale();
       };

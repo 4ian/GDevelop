@@ -152,6 +152,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
+      .AddAction("SetMaximumFPS",
+                _("Maximum FPS"),
+                _("Change the maximum frames per second at runtime."),
+                _("Set maximum FPS to _PARAM1_"),
+                _("Rendering"),
+                "res/actions/fps_max24.png",
+                "res/actions/fps_max.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Maximum FPS"));
+
+  extension
+      .AddAction("SetMinimumFPS",
+                _("Minimum FPS"),
+                _("Change the minimum frames per second at runtime."),
+                _("Set minimum FPS to _PARAM1_"),
+                _("Rendering"),
+                "res/actions/fps_min24.png",
+                "res/actions/fps_min.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Minimum FPS"));
+
+  extension
       .AddAction("Wait",
                  _("Wait X seconds"),
                  _("Waits a number of seconds before running "

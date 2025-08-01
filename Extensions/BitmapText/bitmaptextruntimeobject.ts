@@ -426,6 +426,10 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
+    override setWidth(width: float): void {
+      this.setWrappingWidth(width);
+    }
+
     override getDrawableY(): float {
       return (
         this.getY() -

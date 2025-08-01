@@ -550,13 +550,13 @@ describe('libGD.js - GDJS related tests', function () {
       // GetArgumentAsString("MyString") should be generated code to query and cast as a string
       // the argument
       expect(code).toMatch(
-        '"" + eventsFunctionContext.getArgument("MyString")'
+        '("" + eventsFunctionContext.getArgument("MyString"))'
       );
 
       // GetArgumentAsNumber("MyNumber") should be generated code to query and cast as a string
       // the argument
       expect(code).toMatch(
-        'Number(eventsFunctionContext.getArgument("MyNumber")) || 0'
+        '(Number(eventsFunctionContext.getArgument("MyNumber")) || 0)'
       );
 
       // The loop is using a counter somewhere

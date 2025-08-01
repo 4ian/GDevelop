@@ -177,8 +177,8 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
-        return "Number(eventsFunctionContext.getArgument(" + parameterNameCode +
-               ")) || 0";
+        return "(Number(eventsFunctionContext.getArgument(" + parameterNameCode +
+               ")) || 0)";
       });
 
   GetAllStrExpressions()["GetArgumentAsString"]
@@ -219,13 +219,13 @@ AdvancedExtension::AdvancedExtension() {
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
                codeGenerator.GenerateRelationalOperation(
                    operatorString,
                    codeGenerator.HasProjectAndLayout()
                        ? "0"
-                       : "Number(eventsFunctionContext.getArgument(" +
-                             parameterNameCode + ")) || 0",
+                       : "(Number(eventsFunctionContext.getArgument(" +
+                             parameterNameCode + ")) || 0)",
                    operandCode) +
                ");\n";
       });
@@ -250,13 +250,13 @@ AdvancedExtension::AdvancedExtension() {
             codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
                codeGenerator.GenerateRelationalOperation(
                    operatorString,
                    codeGenerator.HasProjectAndLayout()
                        ? "\"\""
-                       : "\"\" + eventsFunctionContext.getArgument(" +
-                             parameterNameCode + ")",
+                       : "(\"\" + eventsFunctionContext.getArgument(" +
+                             parameterNameCode + "))",
                    operandCode) +
                ");\n";
       });

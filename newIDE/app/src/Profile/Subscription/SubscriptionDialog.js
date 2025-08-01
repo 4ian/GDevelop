@@ -29,9 +29,7 @@ import { type SubscriptionType } from './SubscriptionSuggestionContext';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import RedeemCodeDialog from '../RedeemCodeDialog';
 import PlanCard, { getPlanIcon } from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -225,7 +223,6 @@ export default function SubscriptionDialog({
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
-  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const subscriptionPlansWithPricingSystems = getAvailableSubscriptionPlansWithPrices();
   const userLegacySubscriptionPlanWithPricingSystem = getUserLegacySubscriptionPlanWithPricingSystem();
@@ -439,16 +436,6 @@ export default function SubscriptionDialog({
                 key="close"
                 primary={false}
                 onClick={onClose}
-              />,
-            ]}
-            secondaryActions={[
-              <FlatButton
-                leftIcon={<RedemptionCodeIcon />}
-                label={<Trans>Redeem a code</Trans>}
-                key="redeem-code"
-                disabled={!authenticatedUser.authenticated || isLoading}
-                primary={false}
-                onClick={() => setRedeemCodeDialogOpen(true)}
               />,
             ]}
             open
@@ -870,24 +857,6 @@ export default function SubscriptionDialog({
                 </Text>
               </Dialog>
             )}
-          {redeemCodeDialogOpen && (
-            <RedeemCodeDialog
-              authenticatedUser={authenticatedUser}
-              onClose={async hasJustRedeemedCode => {
-                setRedeemCodeDialogOpen(false);
-
-                if (hasJustRedeemedCode) {
-                  try {
-                    onOpenPendingDialog(true);
-                    setIsChangingSubscription(true);
-                    await authenticatedUser.onRefreshSubscription();
-                  } finally {
-                    setIsChangingSubscription(false);
-                  }
-                }
-              }}
-            />
-          )}
           {cancelReasonDialogOpen && (
             <CancelReasonDialog
               onClose={() => {

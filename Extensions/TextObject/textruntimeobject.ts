@@ -330,7 +330,9 @@ namespace gdjs {
       this._renderer.destroy();
     }
 
-    override extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+    override extraInitializationFromInitialInstance(
+      initialInstanceData: InstanceData
+    ) {
       if (initialInstanceData.customSize) {
         this.setWrappingWidth(initialInstanceData.width);
         this.setWrapping(true);

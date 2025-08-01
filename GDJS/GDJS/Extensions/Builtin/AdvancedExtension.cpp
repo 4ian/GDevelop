@@ -196,7 +196,8 @@ AdvancedExtension::AdvancedExtension() {
                 "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
-        return "eventsFunctionContext.getArgument(" + parameterNameCode + ")";
+        return "\"\" + eventsFunctionContext.getArgument(" + parameterNameCode +
+               ")";
       });
 
   GetAllConditions()["CompareArgumentAsNumber"]

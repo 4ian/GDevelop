@@ -39,11 +39,13 @@ type SubscriptionSuggestionState = {|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
     filter?: SubscriptionType,
   |}) => void,
+  openSubscriptionPendingDialog: () => void,
 |};
 
 export const SubscriptionSuggestionContext = React.createContext<SubscriptionSuggestionState>(
   {
     openSubscriptionDialog: () => {},
+    openSubscriptionPendingDialog: () => {},
   }
 );
 
@@ -74,6 +76,11 @@ export const SubscriptionSuggestionProvider = ({
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
 
+  const openSubscriptionPendingDialog = React.useCallback(
+    () => setSubscriptionPendingDialogOpen(true),
+    []
+  );
+
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
   const openSubscriptionDialog = React.useCallback(
@@ -100,9 +107,10 @@ export const SubscriptionSuggestionProvider = ({
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
   );
 
-  const value = React.useMemo(() => ({ openSubscriptionDialog }), [
-    openSubscriptionDialog,
-  ]);
+  const value = React.useMemo(
+    () => ({ openSubscriptionDialog, openSubscriptionPendingDialog }),
+    [openSubscriptionDialog, openSubscriptionPendingDialog]
+  );
 
   const getAvailableSubscriptionPlansWithPrices = useLazyMemo(
     React.useCallback(

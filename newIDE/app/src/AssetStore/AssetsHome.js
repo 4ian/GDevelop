@@ -11,9 +11,6 @@ import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
   type BundleListingData,
-  getArchivedBundleListingData,
-  getArchivedPrivateGameTemplateListingData,
-  getArchivedPrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
@@ -22,19 +19,18 @@ import {
   type WindowSizeType,
 } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { mergeArraysPerGroup } from '../Utils/Array';
-import {
-  CategoryTile,
-  PrivateAssetPackTile,
-  PublicAssetPackTile,
-  PrivateGameTemplateTile,
-  BundleTile,
-} from './ShopTiles';
+import { CategoryTile } from './ShopTiles';
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
 import { EarnCredits } from '../GameDashboard/Wallet/EarnCredits';
 import { LARGE_WIDGET_SIZE } from '../MainFrame/EditorContainers/HomePage/CardWidget';
+import {
+  getBundleTiles,
+  getGameTemplateTiles,
+  getAssetPackTiles,
+  getPublicAssetPackTiles,
+} from './AssetStoreUtils';
 
 const cellSpacing = 10;
 
@@ -253,204 +249,47 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ? shopCategories[openedShopCategory].title
       : null;
 
-    const starterPacksTiles: Array<React.Node> = starterPacks
-      .filter(
-        assetPack =>
-          !openedShopCategory ||
-          assetPack.categories.includes(openedShopCategory)
-      )
-      .map((assetPack, index) => (
-        <PublicAssetPackTile
-          assetPack={assetPack}
-          onSelect={() => onPublicAssetPackSelection(assetPack)}
-          key={`${assetPack.tag}-${index}`}
-        />
-      ));
+    const publicPackTiles: Array<React.Node> = React.useMemo(
+      () =>
+        getPublicAssetPackTiles({
+          publicAssetPacks: starterPacks,
+          onPublicAssetPackSelection,
+          openedShopCategory,
+        }),
+      [starterPacks, onPublicAssetPackSelection, openedShopCategory]
+    );
 
     const {
       allAssetPackStandAloneTiles,
       allAssetPackBundleTiles,
     } = React.useMemo(
-      () => {
-        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateAssetPackBundleTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
-
-        privateAssetPackListingDatas
-          .filter(
-            assetPackListingData =>
-              !openedShopCategory ||
-              assetPackListingData.categories.includes(openedShopCategory)
-          )
-          .forEach(assetPackListingData => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(assetPackListingData);
-                }}
-                owned={isPackOwned}
-                key={assetPackListingData.id}
-              />
-            );
-            if (
-              assetPackListingData.includedListableProductIds &&
-              !!assetPackListingData.includedListableProductIds.length
-            ) {
-              if (isPackOwned) {
-                privateOwnedAssetPackBundleTiles.push(tile);
-              } else {
-                privateAssetPackBundleTiles.push(tile);
-              }
-            } else {
-              if (isPackOwned) {
-                privateOwnedAssetPackStandAloneTiles.push(tile);
-              } else {
-                privateAssetPackStandAloneTiles.push(tile);
-              }
-            }
-          });
-
-        const archivedOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-        const archivedOwnedAssetPackBundleTiles: Array<React.Node> = [];
-        // Some asset pack products can be archived, meaning the listing data
-        // is not available anymore, but the user still owns the asset pack.
-        // We look at the remaining receivedAssetPacks to display them.
-        (receivedAssetPacks || [])
-          .filter(
-            assetPack =>
-              !privateAssetPackListingDatas.find(
-                privateAssetPackListingData =>
-                  privateAssetPackListingData.id === assetPack.id
-              )
-          )
-          .forEach(assetPack => {
-            const archivedAssetPackListingData = getArchivedPrivateAssetPackListingData(
-              {
-                assetPack,
-              }
-            );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={archivedAssetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(archivedAssetPackListingData);
-                }}
-                owned={true}
-                key={assetPack.id}
-              />
-            );
-
-            if (
-              archivedAssetPackListingData.includedListableProductIds &&
-              !!archivedAssetPackListingData.includedListableProductIds.length
-            ) {
-              archivedOwnedAssetPackBundleTiles.push(tile);
-            } else {
-              archivedOwnedAssetPackStandAloneTiles.push(tile);
-            }
-          });
-
-        const allAssetPackBundleTiles = [
-          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-          ...archivedOwnedAssetPackBundleTiles,
-          ...privateAssetPackBundleTiles,
-        ];
-
-        const allAssetPackStandAloneTiles = [
-          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-          ...archivedOwnedAssetPackStandAloneTiles,
-          ...mergeArraysPerGroup(
-            privateAssetPackStandAloneTiles,
-            starterPacksTiles,
-            2,
-            1
-          ),
-        ];
-
-        return { allAssetPackStandAloneTiles, allAssetPackBundleTiles };
-      },
+      () =>
+        getAssetPackTiles({
+          allPrivateAssetPackListingDatas: privateAssetPackListingDatas,
+          displayedPrivateAssetPackListingDatas: privateAssetPackListingDatas,
+          onPrivateAssetPackSelection,
+          publicAssetPackTiles: publicPackTiles,
+          receivedAssetPacks,
+          openedShopCategory,
+        }),
       [
         privateAssetPackListingDatas,
         openedShopCategory,
         onPrivateAssetPackSelection,
-        starterPacksTiles,
+        publicPackTiles,
         receivedAssetPacks,
       ]
     );
 
     const allBundleTiles = React.useMemo(
-      () => {
-        const bundleTiles: Array<React.Node> = [];
-        const ownedBundleTiles: Array<React.Node> = [];
-
-        bundleListingDatas
-          .filter(
-            bundleListingData =>
-              !openedShopCategory ||
-              bundleListingData.categories.includes(openedShopCategory)
-          )
-          .forEach(bundleListingData => {
-            const isBundleOwned =
-              !!receivedBundles &&
-              !!receivedBundles.find(
-                bundle => bundle.id === bundleListingData.id
-              );
-            const tile = (
-              <BundleTile
-                bundleListingData={bundleListingData}
-                onSelect={() => {
-                  onBundleSelection(bundleListingData);
-                }}
-                owned={isBundleOwned}
-                key={bundleListingData.id}
-              />
-            );
-            if (isBundleOwned) {
-              ownedBundleTiles.push(tile);
-            } else {
-              bundleTiles.push(tile);
-            }
-          });
-
-        // Some bundle products can be archived, meaning the listing data
-        // is not available anymore, but the user still owns the bundle.
-        // We look at the remaining receivedBundles to display them.
-        const archivedOwnedBundleTiles = (receivedBundles || [])
-          .filter(
-            bundle =>
-              !bundleListingDatas.find(
-                bundleListingData => bundleListingData.id === bundle.id
-              )
-          )
-          .map(bundle => {
-            const archivedBundleListingData = getArchivedBundleListingData({
-              bundle,
-            });
-            return (
-              <BundleTile
-                bundleListingData={archivedBundleListingData}
-                onSelect={() => {
-                  onBundleSelection(archivedBundleListingData);
-                }}
-                owned={true}
-                key={bundle.id}
-              />
-            );
-          });
-
-        return [
-          ...ownedBundleTiles, // Display owned bundles first.
-          ...archivedOwnedBundleTiles,
-          ...bundleTiles,
-        ];
-      },
+      () =>
+        getBundleTiles({
+          allBundleListingDatas: bundleListingDatas,
+          displayedBundleListingDatas: bundleListingDatas,
+          onBundleSelection,
+          receivedBundles,
+          openedShopCategory,
+        }),
       [
         bundleListingDatas,
         openedShopCategory,
@@ -460,79 +299,14 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     );
 
     const gameTemplateTiles = React.useMemo(
-      () => {
-        const gameTemplateTiles: Array<React.Node> = [];
-        const ownedGameTemplateTiles: Array<React.Node> = [];
-
-        // Only show game templates if the category is not set or is set to "game-template".
-        privateGameTemplateListingDatas
-          .filter(
-            privateGameTemplateListingData =>
-              !openedShopCategory || openedShopCategory === 'game-template'
-          )
-          .forEach(privateGameTemplateListingData => {
-            const isGameTemplateOwned =
-              !!receivedGameTemplates &&
-              !!receivedGameTemplates.find(
-                pack => pack.id === privateGameTemplateListingData.id
-              );
-            const tile = (
-              <PrivateGameTemplateTile
-                privateGameTemplateListingData={privateGameTemplateListingData}
-                onSelect={() => {
-                  onPrivateGameTemplateSelection(
-                    privateGameTemplateListingData
-                  );
-                }}
-                owned={isGameTemplateOwned}
-                key={privateGameTemplateListingData.id}
-              />
-            );
-
-            if (isGameTemplateOwned) {
-              ownedGameTemplateTiles.push(tile);
-            } else {
-              gameTemplateTiles.push(tile);
-            }
-          });
-
-        // Some game template products can be archived, meaning the listing data
-        // is not available anymore, but the user still owns the game template.
-        // We look at the remaining receivedGameTemplates to display them.
-        const archivedOwnedGameTemplateTiles = (receivedGameTemplates || [])
-          .filter(
-            gameTemplate =>
-              !privateGameTemplateListingDatas.find(
-                privateGameTemplateListingData =>
-                  privateGameTemplateListingData.id === gameTemplate.id
-              )
-          )
-          .map(gameTemplate => {
-            const archivedGameTemplateListingData = getArchivedPrivateGameTemplateListingData(
-              {
-                gameTemplate,
-              }
-            );
-            return (
-              <PrivateGameTemplateTile
-                privateGameTemplateListingData={archivedGameTemplateListingData}
-                onSelect={() => {
-                  onPrivateGameTemplateSelection(
-                    archivedGameTemplateListingData
-                  );
-                }}
-                owned={true}
-                key={gameTemplate.id}
-              />
-            );
-          });
-
-        return [
-          ...ownedGameTemplateTiles, // Display owned game templates first.
-          ...archivedOwnedGameTemplateTiles,
-          ...gameTemplateTiles,
-        ];
-      },
+      () =>
+        getGameTemplateTiles({
+          allPrivateGameTemplateListingDatas: privateGameTemplateListingDatas,
+          displayedPrivateGameTemplateListingDatas: privateGameTemplateListingDatas,
+          onPrivateGameTemplateSelection,
+          receivedGameTemplates,
+          openedShopCategory,
+        }),
       [
         privateGameTemplateListingDatas,
         openedShopCategory,

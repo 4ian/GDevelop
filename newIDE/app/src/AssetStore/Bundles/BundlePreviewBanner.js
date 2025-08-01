@@ -387,7 +387,7 @@ const BundlePreviewBanner = ({
           // $FlowFixMe
           coursesIncludedInBundle[index];
         if (!courseListingData) {
-          return <div style={{ flex: 1 }} />;
+          return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;
         }
 
         return (

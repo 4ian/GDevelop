@@ -502,18 +502,21 @@ namespace gdjs {
    * @returns {Array}
    */
   export const objectsListsToArray = function (
-    objectsLists: Hashtable<RuntimeObject>
+    objectsLists: Hashtable<RuntimeObject>,
+    result: Array<RuntimeObject> = []
   ): Array<RuntimeObject> {
-    var lists = gdjs.staticArray(gdjs.objectsListsToArray);
+    const lists = gdjs.staticArray(gdjs.objectsListsToArray);
     objectsLists.values(lists);
 
-    var result: Array<RuntimeObject> = [];
-    for (var i = 0; i < lists.length; ++i) {
-      var arr = lists[i];
-      for (var k = 0; k < arr.length; ++k) {
-        result.push(arr[k]);
+    let resultIndex = 0;
+    for (let i = 0; i < lists.length; ++i) {
+      const arr = lists[i];
+      for (let k = 0; k < arr.length; ++k) {
+        result[resultIndex] = arr[k];
+        resultIndex++;
       }
     }
+    result.length = resultIndex;
     return result;
   };
 

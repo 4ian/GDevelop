@@ -420,6 +420,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::ParameterMetadataContainer &parameters, int firstParameterIndex,
       bool addsSceneParameter);
 
+  gd::String GenerateEventsFunctionParametersToAttribuesNull(
+      const gd::ParameterMetadataContainer &parameters, int firstParameterIndex,
+      bool addsSceneParameter);
+
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a free
    * function to provides access objects, object creation and access to
@@ -486,6 +490,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
        gd::String &objectsGettersMap,
        gd::String &objectArraysMap,
        gd::String &behaviorNamesMap,
+       const gd::String &constructorAdditionalCode = "",
+       const gd::String &reinitializeAdditionalCode = "",
        const gd::String &thisObjectName = "",
        const gd::String &thisBehaviorName = "");
 };

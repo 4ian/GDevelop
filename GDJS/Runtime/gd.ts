@@ -527,8 +527,8 @@ namespace gdjs {
    * @param dst The destination array
    */
   export const copyArray = function <T>(src: Array<T>, dst: Array<T>): void {
-    var len = src.length;
-    for (var i = 0; i < len; ++i) {
+    const len = src.length;
+    for (let i = 0; i < len; ++i) {
       dst[i] = src[i];
     }
     dst.length = len;

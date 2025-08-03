@@ -228,6 +228,11 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
+  auto contextParameterList = codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          eventsFunction.GetParametersForEvents(
+              eventsBasedBehavior.GetEventsFunctions()),
+          2, true) + ", that";
+
   // Generate the code setting up the context of the function.
   gd::String fullPreludeCode =
       preludeCode + "\n" + "const that = this;\n" +
@@ -237,13 +242,21 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // generation adapted for this (rely less on `gdjs.RuntimeScene`, and more
       // on `RuntimeInstanceContainer`).
       "const runtimeScene = this._runtimeScene;\n" +
-      "const eventsFunctionContext = new " +
-      codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
-      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(
-              eventsBasedBehavior.GetEventsFunctions()),
-          2, true) +
-      ", that);\n";
+      "if (!" + codeGenerator.GetCodeNamespaceAccessor() + "context) " +
+          codeGenerator.GetCodeNamespaceAccessor() + "context = new " +
+          codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
+          contextParameterList + ");\n"
+          "const eventsFunctionContext = " +
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted ? new " +
+          codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
+          contextParameterList + ") : " + codeGenerator.GetCodeNamespaceAccessor() +
+          "context;\n" + //
+          "if (!" + codeGenerator.GetCodeNamespaceAccessor() +
+          "isExecuted) {\n" + codeGenerator.GetCodeNamespaceAccessor() +
+          "context.reinitialize(" + contextParameterList + ");\n" + //
+          codeGenerator.GetCodeNamespaceAccessor() +
+          "isExecuted = true;\n"
+          "}\n";
 
   auto parameterList =
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -258,8 +271,14 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
-          "Object", "Behavior"),
-      fullPreludeCode, eventsFunction.GetEvents(), "",
+          "Object", "Behavior") +
+          codeGenerator.GetCodeNamespaceAccessor() + "context = null;\n" + //
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n",
+      fullPreludeCode,
+      eventsFunction.GetEvents(),
+      "if (eventsFunctionContext === " +
+          codeGenerator.GetCodeNamespaceAccessor() + "context) " +
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   // TODO: the editor should pass the diagnostic report and display it to the
@@ -307,6 +326,11 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
+  auto contextParameterList = codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          eventsFunction.GetParametersForEvents(
+              eventsBasedObject.GetEventsFunctions()),
+          1, true) + ", that";
+
   // Generate the code setting up the context of the function.
   gd::String fullPreludeCode =
       preludeCode + "\n" + "const that = this;\n" +
@@ -314,7 +338,22 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       // it from the object.
       // TODO: this should be renamed to "instanceContainer" and have the code generation
       // adapted for this (rely less on `gdjs.RuntimeScene`, and more on `RuntimeInstanceContainer`).
-      "const runtimeScene = this._instanceContainer;\n";
+      "const runtimeScene = this._instanceContainer;\n"
+      "if (!" + codeGenerator.GetCodeNamespaceAccessor() + "context) " +
+          codeGenerator.GetCodeNamespaceAccessor() + "context = new " +
+          codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
+          contextParameterList + ");\n"
+          "const eventsFunctionContext = " +
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted ? new " +
+          codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
+          contextParameterList + ") : " + codeGenerator.GetCodeNamespaceAccessor() +
+          "context;\n" + //
+          "if (!" + codeGenerator.GetCodeNamespaceAccessor() +
+          "isExecuted) {\n" + codeGenerator.GetCodeNamespaceAccessor() +
+          "context.reinitialize(" + contextParameterList + ");\n" + //
+          codeGenerator.GetCodeNamespaceAccessor() +
+          "isExecuted = true;\n"
+          "}\n";
 
   auto parameterList =
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -323,15 +362,6 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
               eventsBasedObject.GetEventsFunctions()),
           1, false);
 
-  fullPreludeCode +=
-      "const eventsFunctionContext = new " +
-      codeGenerator.GetCodeNamespaceAccessor() + "Context(" +
-      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(
-              eventsBasedObject.GetEventsFunctions()),
-          1, true) +
-      ", that);\n";
-
   gd::String output = GenerateEventsListCompleteFunctionCode(
       codeGenerator, fullyQualifiedFunctionName, parameterList,
       codeGenerator.GenerateObjectEventsFunctionContext(
@@ -339,8 +369,14 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
-          "Object"),
-      fullPreludeCode, eventsFunction.GetEvents(), endingCode,
+          "Object") +
+      codeGenerator.GetCodeNamespaceAccessor() + "context = null;\n" + //
+      codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n",
+      fullPreludeCode, eventsFunction.GetEvents(), 
+      "if (eventsFunctionContext === " +
+          codeGenerator.GetCodeNamespaceAccessor() + "context) " +
+          codeGenerator.GetCodeNamespaceAccessor() + "isExecuted = false;\n" +
+      endingCode,
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   // TODO: the editor should pass the diagnostic report and display it to the
@@ -610,8 +646,11 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
     // child-object are never picked because they are not parameters.
     const auto& childName = ManObjListName(childObject->GetName());
     reinitializeAdditionalCode +=
-        "  gdjs.copyArray(this" + childName + "List, runtimeScene.getObjects(" +
-        ConvertToStringExplicit(childObject->GetName()) + "));\n";
+        "  gdjs.copyArray(runtimeScene.getObjects(" +
+        ConvertToStringExplicit(childObject->GetName()) +
+        "), "
+        "this._objectArraysMap[" +
+        ConvertToStringExplicit(childObject->GetName()) + "]);\n";
   }
 
   return GenerateEventsFunctionContext(eventsFunctionsExtension,

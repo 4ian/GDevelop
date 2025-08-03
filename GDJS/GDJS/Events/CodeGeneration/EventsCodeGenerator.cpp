@@ -754,8 +754,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
         "reinitialize(" + parameterList + ") {\n" +
         GenerateEventsFunctionParametersToAttribues(
           eventsFunction.GetParametersForEvents(
-              eventsFunctionsExtension.GetEventsFunctions()),
-          0, true) +
+              eventsFunctionsContainer),
+          firstParameterIndex, true) +
         // The async task, if there is one
         async +
          // The object name to parameter map:

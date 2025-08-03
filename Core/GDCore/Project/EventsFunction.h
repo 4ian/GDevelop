@@ -235,6 +235,9 @@ class GD_CORE_API EventsFunction {
 
   /**
    * \brief Return the parameters of the function that are used in the events.
+   * 
+   * \warning `ActionWithOperator` function are muted by this function. Make sure
+   * to use the right functions container to avoid strange side effects.
    *
    * \note During code/extension generation, new parameters are added
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".

@@ -634,7 +634,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     gd::String& objectsGettersMap,
     gd::String& objectArraysMap,
     gd::String& behaviorNamesMap,
-    const gd::String &constructorAdditionalCode,
+    const gd::String& constructorAdditionalCode,
     const gd::String& reinitializeAdditionalCode,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
@@ -720,7 +720,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
           firstParameterIndex, true) +
       (thisObjectName.empty() && thisBehaviorName.empty() ? "" : ", that");
 
-  return gd::String(GetCodeNamespaceAccessor() + "Context = class {\n") +
+  return GetCodeNamespaceAccessor() + "Context = class {\n"
         "constructor(" + parameterList + ") {\n" +
         GenerateEventsFunctionParametersToAttribues(
           eventsFunction.GetParametersForEvents(

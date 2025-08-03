@@ -80,7 +80,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       eventsFunctionsExtension,
       eventsBasedBehavior,
       gdjs,
-      {logCode: false}
+      { logCode: false }
     );
     project.delete();
 
